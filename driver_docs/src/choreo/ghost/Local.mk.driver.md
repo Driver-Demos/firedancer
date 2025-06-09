@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation in a software build process. It checks for the presence of the `FD_HAS_INT128` flag to include headers and objects related to `fd_ghost` and `fd_choreo`. If the `FD_HAS_HOSTED` flag is also defined, it adds a unit test target `test_ghost` that depends on several components, including `fd_choreo`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.

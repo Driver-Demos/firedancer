@@ -1,0 +1,2 @@
+# Purpose
+This file is a Protocol Buffers (proto3) schema definition for a package named "packet." It defines the structure of messages used in the package, specifically a `PacketBatch` containing multiple `Packet` messages. Each `Packet` includes binary data and metadata (`Meta`), which details attributes such as size, address, port, flags, and sender stake. The `PacketFlags` message enumerates various boolean flags that describe the state or handling of a packet.

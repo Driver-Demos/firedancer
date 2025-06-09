@@ -1,0 +1,8 @@
+
+## Files
+- **[all.txns](txn/all.txns.driver.md)**: The `all.txns` file in the `firedancer` codebase contains Base64-encoded data blocks with metadata headers, used for storing or transmitting binary data in a text-friendly format, requiring decoding and understanding of its structure and context for effective and secure handling within software systems.
+- **[test-transactions-parallel.sh](txn/test-transactions-parallel.sh.driver.md)**: The `test-transactions-parallel.sh` file is a Bash script used to execute a specified number of transactions in parallel using the `parallel` command, while reporting the number of successful transmissions.
+- **[test-transactions.sh](txn/test-transactions.sh.driver.md)**: The `test-transactions.sh` file is a Bash script used to test transaction transmissions by reading a specified number of transactions from a file and logging the results.
+- **[test-txns.sh](txn/test-txns.sh.driver.md)**: The `test-txns.sh` file is a Bash script used to execute QUIC transaction tests within a specific network namespace in the `firedancer` codebase.
+- **[test.sh](txn/test.sh.driver.md)**: The `test.sh` file in the `firedancer` codebase facilitates the execution of tests by using Make to select the appropriate build directory based on the current environment variables.
+- **[tx](txn/tx.driver.md)**: The `tx` file in the `firedancer` codebase contains a large block of base64-encoded data intended for storage or transmission in text-only environments, serving as a data payload that requires decoding to reveal its original binary form for use by a specific application or system.

@@ -1,0 +1,8 @@
+
+## Files
+- **[fd_replay_loop.c](test/fd_replay_loop.c.driver.md)**: The `fd_replay_loop.c` file in the `firedancer` codebase implements functions for replaying packets from a pcap file stream, managing flow control, and handling diagnostics and housekeeping tasks within a replay loop.
+- **[fd_replay_loop.h](test/fd_replay_loop.h.driver.md)**: The `fd_replay_loop.h` file in the `firedancer` codebase provides functionality for replaying data from a pcap file into a tango fragment stream, including managing flow control and diagnostics for reliable and unreliable consumers.
+- **[Local.mk](test/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase defines build rules and dependencies for the `fd_wiredancer_test` library and its associated unit test `test_wiredancer_demo` when `FD_HAS_WIREDANCER` is enabled.
+- **[test_wiredancer_demo.c](test/test_wiredancer_demo.c.driver.md)**: The `test_wiredancer_demo.c` file is a unit test designed to run in AWS-F1 to verify the performance and correctness of the Wiredancer system against x86, involving packet replay, transaction parsing, and signature verification, with options for random transaction corruption and FPGA slot configuration.
+- **[wd_f1_mon.c](test/wd_f1_mon.c.driver.md)**: The `wd_f1_mon.c` file in the `firedancer` codebase implements a monitoring tool for AWS-F1 FPGA systems, providing functionality to read and display various performance counters and metrics in an ASCII chart format.
+- **[wd_f1_mon.h](test/wd_f1_mon.h.driver.md)**: The `wd_f1_mon.h` file in the `firedancer` codebase defines a structure for monitoring state and includes a function for thread monitoring and a method for calibrating time-stamp counter ticks per nanosecond.

@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile segment used for conditional compilation in a software project. It checks for the presence of specific features or environments, such as `FD_HAS_HOSTED`, `FD_HAS_LINUX`, and `FD_HAS_INT128`, to conditionally include headers and object files related to key management functionalities like `fd_keyguard`, `fd_keyguard_client`, `fd_keyswitch`, and `fd_keyload`. It also defines a unit test target for `test_keyload`, ensuring that the necessary components are compiled and linked when the specified conditions are met.

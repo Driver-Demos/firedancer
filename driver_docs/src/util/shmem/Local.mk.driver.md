@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile, which is used to automate the build process of a software project. It defines rules and dependencies for compiling and linking various components, such as headers, object files, scripts, binaries, and unit tests related to shared memory functionality. The conditional block at the end specifies different object files to include based on whether the `FD_HAS_HOSTED` variable is defined, allowing for platform-specific configurations.

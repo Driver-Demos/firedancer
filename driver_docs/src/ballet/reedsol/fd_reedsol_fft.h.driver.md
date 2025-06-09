@@ -1,0 +1,1526 @@
+# Purpose
+The provided code is a C header file implementing specialized Fast Fourier Transform (FFT) and Inverse Fast Fourier Transform (IFFT) operations tailored for Reed-Solomon error correction codes, utilizing a novel polynomial basis as described in an IEEE paper. It is designed to transform polynomials between the "evaluation basis" and the "coefficient basis" within the Galois Field GF(2^8), which is essential for error correction in data storage and transmission systems. The code comprises macros and function declarations, such as `FD_REEDSOL_GENERATE_FFT` and `FD_REEDSOL_GENERATE_IFFT`, which facilitate FFT and IFFT operations on data sets of varying sizes, optimized through vectorization and "butterfly" operations. These components are intended for internal use within a larger library, providing foundational functionality for error correction without defining a public API, and are likely auto-generated to allow dynamic code creation based on specific configurations. This structure supports high-performance computing applications by offering reusable, low-level building blocks for robust error correction capabilities.
+# Imports and Dependencies
+
+---
+- `fd_reedsol_private.h`
+
+
+# Function Declarations (Public API)
+
+---
+### fd\_reedsol\_ifft\_256\_0<!-- {{#callable_declaration:fd_reedsol_ifft_256_0}} -->
+Performs an inverse fast Fourier transform on 256 Galois field elements.
+- **Description**: This function is used to perform an inverse fast Fourier transform (IFFT) on 256 elements of a Galois field, which are provided as input pointers. It is typically used in error correction algorithms, such as Reed-Solomon codes, where transforming data between time and frequency domains is necessary. The function expects exactly 256 input pointers, each pointing to a valid `gf_t` element. The input values are modified in place, meaning the results of the IFFT are written back to the same memory locations. Ensure that all input pointers are valid and non-null before calling this function to avoid undefined behavior.
+- **Inputs**:
+    - `_in00`: Pointer to the first Galois field element. Must not be null.
+    - `_in01`: Pointer to the second Galois field element. Must not be null.
+    - `_in02`: Pointer to the third Galois field element. Must not be null.
+    - `_in03`: Pointer to the fourth Galois field element. Must not be null.
+    - `_in04`: Pointer to the fifth Galois field element. Must not be null.
+    - `_in05`: Pointer to the sixth Galois field element. Must not be null.
+    - `_in06`: Pointer to the seventh Galois field element. Must not be null.
+    - `_in07`: Pointer to the eighth Galois field element. Must not be null.
+    - `_in08`: Pointer to the ninth Galois field element. Must not be null.
+    - `_in09`: Pointer to the tenth Galois field element. Must not be null.
+    - `_in10`: Pointer to the eleventh Galois field element. Must not be null.
+    - `_in11`: Pointer to the twelfth Galois field element. Must not be null.
+    - `_in12`: Pointer to the thirteenth Galois field element. Must not be null.
+    - `_in13`: Pointer to the fourteenth Galois field element. Must not be null.
+    - `_in14`: Pointer to the fifteenth Galois field element. Must not be null.
+    - `_in15`: Pointer to the sixteenth Galois field element. Must not be null.
+    - `_in16`: Pointer to the seventeenth Galois field element. Must not be null.
+    - `_in17`: Pointer to the eighteenth Galois field element. Must not be null.
+    - `_in18`: Pointer to the nineteenth Galois field element. Must not be null.
+    - `_in19`: Pointer to the twentieth Galois field element. Must not be null.
+    - `_in20`: Pointer to the twenty-first Galois field element. Must not be null.
+    - `_in21`: Pointer to the twenty-second Galois field element. Must not be null.
+    - `_in22`: Pointer to the twenty-third Galois field element. Must not be null.
+    - `_in23`: Pointer to the twenty-fourth Galois field element. Must not be null.
+    - `_in24`: Pointer to the twenty-fifth Galois field element. Must not be null.
+    - `_in25`: Pointer to the twenty-sixth Galois field element. Must not be null.
+    - `_in26`: Pointer to the twenty-seventh Galois field element. Must not be null.
+    - `_in27`: Pointer to the twenty-eighth Galois field element. Must not be null.
+    - `_in28`: Pointer to the twenty-ninth Galois field element. Must not be null.
+    - `_in29`: Pointer to the thirtieth Galois field element. Must not be null.
+    - `_in30`: Pointer to the thirty-first Galois field element. Must not be null.
+    - `_in31`: Pointer to the thirty-second Galois field element. Must not be null.
+    - `_in32`: Pointer to the thirty-third Galois field element. Must not be null.
+    - `_in33`: Pointer to the thirty-fourth Galois field element. Must not be null.
+    - `_in34`: Pointer to the thirty-fifth Galois field element. Must not be null.
+    - `_in35`: Pointer to the thirty-sixth Galois field element. Must not be null.
+    - `_in36`: Pointer to the thirty-seventh Galois field element. Must not be null.
+    - `_in37`: Pointer to the thirty-eighth Galois field element. Must not be null.
+    - `_in38`: Pointer to the thirty-ninth Galois field element. Must not be null.
+    - `_in39`: Pointer to the fortieth Galois field element. Must not be null.
+    - `_in40`: Pointer to the forty-first Galois field element. Must not be null.
+    - `_in41`: Pointer to the forty-second Galois field element. Must not be null.
+    - `_in42`: Pointer to the forty-third Galois field element. Must not be null.
+    - `_in43`: Pointer to the forty-fourth Galois field element. Must not be null.
+    - `_in44`: Pointer to the forty-fifth Galois field element. Must not be null.
+    - `_in45`: Pointer to the forty-sixth Galois field element. Must not be null.
+    - `_in46`: Pointer to the forty-seventh Galois field element. Must not be null.
+    - `_in47`: Pointer to the forty-eighth Galois field element. Must not be null.
+    - `_in48`: Pointer to the forty-ninth Galois field element. Must not be null.
+    - `_in49`: Pointer to the fiftieth Galois field element. Must not be null.
+    - `_in50`: Pointer to the fifty-first Galois field element. Must not be null.
+    - `_in51`: Pointer to the fifty-second Galois field element. Must not be null.
+    - `_in52`: Pointer to the fifty-third Galois field element. Must not be null.
+    - `_in53`: Pointer to the fifty-fourth Galois field element. Must not be null.
+    - `_in54`: Pointer to the fifty-fifth Galois field element. Must not be null.
+    - `_in55`: Pointer to the fifty-sixth Galois field element. Must not be null.
+    - `_in56`: Pointer to the fifty-seventh Galois field element. Must not be null.
+    - `_in57`: Pointer to the fifty-eighth Galois field element. Must not be null.
+    - `_in58`: Pointer to the fifty-ninth Galois field element. Must not be null.
+    - `_in59`: Pointer to the sixtieth Galois field element. Must not be null.
+    - `_in60`: Pointer to the sixty-first Galois field element. Must not be null.
+    - `_in61`: Pointer to the sixty-second Galois field element. Must not be null.
+    - `_in62`: Pointer to the sixty-third Galois field element. Must not be null.
+    - `_in63`: Pointer to the sixty-fourth Galois field element. Must not be null.
+    - `_in64`: Pointer to the sixty-fifth Galois field element. Must not be null.
+    - `_in65`: Pointer to the sixty-sixth Galois field element. Must not be null.
+    - `_in66`: Pointer to the sixty-seventh Galois field element. Must not be null.
+    - `_in67`: Pointer to the sixty-eighth Galois field element. Must not be null.
+    - `_in68`: Pointer to the sixty-ninth Galois field element. Must not be null.
+    - `_in69`: Pointer to the seventieth Galois field element. Must not be null.
+    - `_in70`: Pointer to the seventy-first Galois field element. Must not be null.
+    - `_in71`: Pointer to the seventy-second Galois field element. Must not be null.
+    - `_in72`: Pointer to the seventy-third Galois field element. Must not be null.
+    - `_in73`: Pointer to the seventy-fourth Galois field element. Must not be null.
+    - `_in74`: Pointer to the seventy-fifth Galois field element. Must not be null.
+    - `_in75`: Pointer to the seventy-sixth Galois field element. Must not be null.
+    - `_in76`: Pointer to the seventy-seventh Galois field element. Must not be null.
+    - `_in77`: Pointer to the seventy-eighth Galois field element. Must not be null.
+    - `_in78`: Pointer to the seventy-ninth Galois field element. Must not be null.
+    - `_in79`: Pointer to the eightieth Galois field element. Must not be null.
+    - `_in80`: Pointer to the eighty-first Galois field element. Must not be null.
+    - `_in81`: Pointer to the eighty-second Galois field element. Must not be null.
+    - `_in82`: Pointer to the eighty-third Galois field element. Must not be null.
+    - `_in83`: Pointer to the eighty-fourth Galois field element. Must not be null.
+    - `_in84`: Pointer to the eighty-fifth Galois field element. Must not be null.
+    - `_in85`: Pointer to the eighty-sixth Galois field element. Must not be null.
+    - `_in86`: Pointer to the eighty-seventh Galois field element. Must not be null.
+    - `_in87`: Pointer to the eighty-eighth Galois field element. Must not be null.
+    - `_in88`: Pointer to the eighty-ninth Galois field element. Must not be null.
+    - `_in89`: Pointer to the ninetieth Galois field element. Must not be null.
+    - `_in90`: Pointer to the ninety-first Galois field element. Must not be null.
+    - `_in91`: Pointer to the ninety-second Galois field element. Must not be null.
+    - `_in92`: Pointer to the ninety-third Galois field element. Must not be null.
+    - `_in93`: Pointer to the ninety-fourth Galois field element. Must not be null.
+    - `_in94`: Pointer to the ninety-fifth Galois field element. Must not be null.
+    - `_in95`: Pointer to the ninety-sixth Galois field element. Must not be null.
+    - `_in96`: Pointer to the ninety-seventh Galois field element. Must not be null.
+    - `_in97`: Pointer to the ninety-eighth Galois field element. Must not be null.
+    - `_in98`: Pointer to the ninety-ninth Galois field element. Must not be null.
+    - `_in99`: Pointer to the one hundredth Galois field element. Must not be null.
+    - `_in100`: Pointer to the one hundred and first Galois field element. Must not be null.
+    - `_in101`: Pointer to the one hundred and second Galois field element. Must not be null.
+    - `_in102`: Pointer to the one hundred and third Galois field element. Must not be null.
+    - `_in103`: Pointer to the one hundred and fourth Galois field element. Must not be null.
+    - `_in104`: Pointer to the one hundred and fifth Galois field element. Must not be null.
+    - `_in105`: Pointer to the one hundred and sixth Galois field element. Must not be null.
+    - `_in106`: Pointer to the one hundred and seventh Galois field element. Must not be null.
+    - `_in107`: Pointer to the one hundred and eighth Galois field element. Must not be null.
+    - `_in108`: Pointer to the one hundred and ninth Galois field element. Must not be null.
+    - `_in109`: Pointer to the one hundred and tenth Galois field element. Must not be null.
+    - `_in110`: Pointer to the one hundred and eleventh Galois field element. Must not be null.
+    - `_in111`: Pointer to the one hundred and twelfth Galois field element. Must not be null.
+    - `_in112`: Pointer to the one hundred and thirteenth Galois field element. Must not be null.
+    - `_in113`: Pointer to the one hundred and fourteenth Galois field element. Must not be null.
+    - `_in114`: Pointer to the one hundred and fifteenth Galois field element. Must not be null.
+    - `_in115`: Pointer to the one hundred and sixteenth Galois field element. Must not be null.
+    - `_in116`: Pointer to the one hundred and seventeenth Galois field element. Must not be null.
+    - `_in117`: Pointer to the one hundred and eighteenth Galois field element. Must not be null.
+    - `_in118`: Pointer to the one hundred and nineteenth Galois field element. Must not be null.
+    - `_in119`: Pointer to the one hundred and twentieth Galois field element. Must not be null.
+    - `_in120`: Pointer to the one hundred and twenty-first Galois field element. Must not be null.
+    - `_in121`: Pointer to the one hundred and twenty-second Galois field element. Must not be null.
+    - `_in122`: Pointer to the one hundred and twenty-third Galois field element. Must not be null.
+    - `_in123`: Pointer to the one hundred and twenty-fourth Galois field element. Must not be null.
+    - `_in124`: Pointer to the one hundred and twenty-fifth Galois field element. Must not be null.
+    - `_in125`: Pointer to the one hundred and twenty-sixth Galois field element. Must not be null.
+    - `_in126`: Pointer to the one hundred and twenty-seventh Galois field element. Must not be null.
+    - `_in127`: Pointer to the one hundred and twenty-eighth Galois field element. Must not be null.
+    - `_in128`: Pointer to the one hundred and twenty-ninth Galois field element. Must not be null.
+    - `_in129`: Pointer to the one hundred and thirtieth Galois field element. Must not be null.
+    - `_in130`: Pointer to the one hundred and thirty-first Galois field element. Must not be null.
+    - `_in131`: Pointer to the one hundred and thirty-second Galois field element. Must not be null.
+    - `_in132`: Pointer to the one hundred and thirty-third Galois field element. Must not be null.
+    - `_in133`: Pointer to the one hundred and thirty-fourth Galois field element. Must not be null.
+    - `_in134`: Pointer to the one hundred and thirty-fifth Galois field element. Must not be null.
+    - `_in135`: Pointer to the one hundred and thirty-sixth Galois field element. Must not be null.
+    - `_in136`: Pointer to the one hundred and thirty-seventh Galois field element. Must not be null.
+    - `_in137`: Pointer to the one hundred and thirty-eighth Galois field element. Must not be null.
+    - `_in138`: Pointer to the one hundred and thirty-ninth Galois field element. Must not be null.
+    - `_in139`: Pointer to the one hundred and fortieth Galois field element. Must not be null.
+    - `_in140`: Pointer to the one hundred and forty-first Galois field element. Must not be null.
+    - `_in141`: Pointer to the one hundred and forty-second Galois field element. Must not be null.
+    - `_in142`: Pointer to the one hundred and forty-third Galois field element. Must not be null.
+    - `_in143`: Pointer to the one hundred and forty-fourth Galois field element. Must not be null.
+    - `_in144`: Pointer to the one hundred and forty-fifth Galois field element. Must not be null.
+    - `_in145`: Pointer to the one hundred and forty-sixth Galois field element. Must not be null.
+    - `_in146`: Pointer to the one hundred and forty-seventh Galois field element. Must not be null.
+    - `_in147`: Pointer to the one hundred and forty-eighth Galois field element. Must not be null.
+    - `_in148`: Pointer to the one hundred and forty-ninth Galois field element. Must not be null.
+    - `_in149`: Pointer to the one hundred and fiftieth Galois field element. Must not be null.
+    - `_in150`: Pointer to the one hundred and fifty-first Galois field element. Must not be null.
+    - `_in151`: Pointer to the one hundred and fifty-second Galois field element. Must not be null.
+    - `_in152`: Pointer to the one hundred and fifty-third Galois field element. Must not be null.
+    - `_in153`: Pointer to the one hundred and fifty-fourth Galois field element. Must not be null.
+    - `_in154`: Pointer to the one hundred and fifty-fifth Galois field element. Must not be null.
+    - `_in155`: Pointer to the one hundred and fifty-sixth Galois field element. Must not be null.
+    - `_in156`: Pointer to the one hundred and fifty-seventh Galois field element. Must not be null.
+    - `_in157`: Pointer to the one hundred and fifty-eighth Galois field element. Must not be null.
+    - `_in158`: Pointer to the one hundred and fifty-ninth Galois field element. Must not be null.
+    - `_in159`: Pointer to the one hundred and sixtieth Galois field element. Must not be null.
+    - `_in160`: Pointer to the one hundred and sixty-first Galois field element. Must not be null.
+    - `_in161`: Pointer to the one hundred and sixty-second Galois field element. Must not be null.
+    - `_in162`: Pointer to the one hundred and sixty-third Galois field element. Must not be null.
+    - `_in163`: Pointer to the one hundred and sixty-fourth Galois field element. Must not be null.
+    - `_in164`: Pointer to the one hundred and sixty-fifth Galois field element. Must not be null.
+    - `_in165`: Pointer to the one hundred and sixty-sixth Galois field element. Must not be null.
+    - `_in166`: Pointer to the one hundred and sixty-seventh Galois field element. Must not be null.
+    - `_in167`: Pointer to the one hundred and sixty-eighth Galois field element. Must not be null.
+    - `_in168`: Pointer to the one hundred and sixty-ninth Galois field element. Must not be null.
+    - `_in169`: Pointer to the one hundred and seventieth Galois field element. Must not be null.
+    - `_in170`: Pointer to the one hundred and seventy-first Galois field element. Must not be null.
+    - `_in171`: Pointer to the one hundred and seventy-second Galois field element. Must not be null.
+    - `_in172`: Pointer to the one hundred and seventy-third Galois field element. Must not be null.
+    - `_in173`: Pointer to the one hundred and seventy-fourth Galois field element. Must not be null.
+    - `_in174`: Pointer to the one hundred and seventy-fifth Galois field element. Must not be null.
+    - `_in175`: Pointer to the one hundred and seventy-sixth Galois field element. Must not be null.
+    - `_in176`: Pointer to the one hundred and seventy-seventh Galois field element. Must not be null.
+    - `_in177`: Pointer to the one hundred and seventy-eighth Galois field element. Must not be null.
+    - `_in178`: Pointer to the one hundred and seventy-ninth Galois field element. Must not be null.
+    - `_in179`: Pointer to the one hundred and eightieth Galois field element. Must not be null.
+    - `_in180`: Pointer to the one hundred and eighty-first Galois field element. Must not be null.
+    - `_in181`: Pointer to the one hundred and eighty-second Galois field element. Must not be null.
+    - `_in182`: Pointer to the one hundred and eighty-third Galois field element. Must not be null.
+    - `_in183`: Pointer to the one hundred and eighty-fourth Galois field element. Must not be null.
+    - `_in184`: Pointer to the one hundred and eighty-fifth Galois field element. Must not be null.
+    - `_in185`: Pointer to the one hundred and eighty-sixth Galois field element. Must not be null.
+    - `_in186`: Pointer to the one hundred and eighty-seventh Galois field element. Must not be null.
+    - `_in187`: Pointer to the one hundred and eighty-eighth Galois field element. Must not be null.
+    - `_in188`: Pointer to the one hundred and eighty-ninth Galois field element. Must not be null.
+    - `_in189`: Pointer to the one hundred and ninetieth Galois field element. Must not be null.
+    - `_in190`: Pointer to the one hundred and ninety-first Galois field element. Must not be null.
+    - `_in191`: Pointer to the one hundred and ninety-second Galois field element. Must not be null.
+    - `_in192`: Pointer to the one hundred and ninety-third Galois field element. Must not be null.
+    - `_in193`: Pointer to the one hundred and ninety-fourth Galois field element. Must not be null.
+    - `_in194`: Pointer to the one hundred and ninety-fifth Galois field element. Must not be null.
+    - `_in195`: Pointer to the one hundred and ninety-sixth Galois field element. Must not be null.
+    - `_in196`: Pointer to the one hundred and ninety-seventh Galois field element. Must not be null.
+    - `_in197`: Pointer to the one hundred and ninety-eighth Galois field element. Must not be null.
+    - `_in198`: Pointer to the one hundred and ninety-ninth Galois field element. Must not be null.
+    - `_in199`: Pointer to the two hundredth Galois field element. Must not be null.
+    - `_in200`: Pointer to the two hundred and first Galois field element. Must not be null.
+    - `_in201`: Pointer to the two hundred and second Galois field element. Must not be null.
+    - `_in202`: Pointer to the two hundred and third Galois field element. Must not be null.
+    - `_in203`: Pointer to the two hundred and fourth Galois field element. Must not be null.
+    - `_in204`: Pointer to the two hundred and fifth Galois field element. Must not be null.
+    - `_in205`: Pointer to the two hundred and sixth Galois field element. Must not be null.
+    - `_in206`: Pointer to the two hundred and seventh Galois field element. Must not be null.
+    - `_in207`: Pointer to the two hundred and eighth Galois field element. Must not be null.
+    - `_in208`: Pointer to the two hundred and ninth Galois field element. Must not be null.
+    - `_in209`: Pointer to the two hundred and tenth Galois field element. Must not be null.
+    - `_in210`: Pointer to the two hundred and eleventh Galois field element. Must not be null.
+    - `_in211`: Pointer to the two hundred and twelfth Galois field element. Must not be null.
+    - `_in212`: Pointer to the two hundred and thirteenth Galois field element. Must not be null.
+    - `_in213`: Pointer to the two hundred and fourteenth Galois field element. Must not be null.
+    - `_in214`: Pointer to the two hundred and fifteenth Galois field element. Must not be null.
+    - `_in215`: Pointer to the two hundred and sixteenth Galois field element. Must not be null.
+    - `_in216`: Pointer to the two hundred and seventeenth Galois field element. Must not be null.
+    - `_in217`: Pointer to the two hundred and eighteenth Galois field element. Must not be null.
+    - `_in218`: Pointer to the two hundred and nineteenth Galois field element. Must not be null.
+    - `_in219`: Pointer to the two hundred and twentieth Galois field element. Must not be null.
+    - `_in220`: Pointer to the two hundred and twenty-first Galois field element. Must not be null.
+    - `_in221`: Pointer to the two hundred and twenty-second Galois field element. Must not be null.
+    - `_in222`: Pointer to the two hundred and twenty-third Galois field element. Must not be null.
+    - `_in223`: Pointer to the two hundred and twenty-fourth Galois field element. Must not be null.
+    - `_in224`: Pointer to the two hundred and twenty-fifth Galois field element. Must not be null.
+    - `_in225`: Pointer to the two hundred and twenty-sixth Galois field element. Must not be null.
+    - `_in226`: Pointer to the two hundred and twenty-seventh Galois field element. Must not be null.
+    - `_in227`: Pointer to the two hundred and twenty-eighth Galois field element. Must not be null.
+    - `_in228`: Pointer to the two hundred and twenty-ninth Galois field element. Must not be null.
+    - `_in229`: Pointer to the two hundred and thirtieth Galois field element. Must not be null.
+    - `_in230`: Pointer to the two hundred and thirty-first Galois field element. Must not be null.
+    - `_in231`: Pointer to the two hundred and thirty-second Galois field element. Must not be null.
+    - `_in232`: Pointer to the two hundred and thirty-third Galois field element. Must not be null.
+    - `_in233`: Pointer to the two hundred and thirty-fourth Galois field element. Must not be null.
+    - `_in234`: Pointer to the two hundred and thirty-fifth Galois field element. Must not be null.
+    - `_in235`: Pointer to the two hundred and thirty-sixth Galois field element. Must not be null.
+    - `_in236`: Pointer to the two hundred and thirty-seventh Galois field element. Must not be null.
+    - `_in237`: Pointer to the two hundred and thirty-eighth Galois field element. Must not be null.
+    - `_in238`: Pointer to the two hundred and thirty-ninth Galois field element. Must not be null.
+    - `_in239`: Pointer to the two hundred and fortieth Galois field element. Must not be null.
+    - `_in240`: Pointer to the two hundred and forty-first Galois field element. Must not be null.
+    - `_in241`: Pointer to the two hundred and forty-second Galois field element. Must not be null.
+    - `_in242`: Pointer to the two hundred and forty-third Galois field element. Must not be null.
+    - `_in243`: Pointer to the two hundred and forty-fourth Galois field element. Must not be null.
+    - `_in244`: Pointer to the two hundred and forty-fifth Galois field element. Must not be null.
+    - `_in245`: Pointer to the two hundred and forty-sixth Galois field element. Must not be null.
+    - `_in246`: Pointer to the two hundred and forty-seventh Galois field element. Must not be null.
+    - `_in247`: Pointer to the two hundred and forty-eighth Galois field element. Must not be null.
+    - `_in248`: Pointer to the two hundred and forty-ninth Galois field element. Must not be null.
+    - `_in249`: Pointer to the two hundred and fiftieth Galois field element. Must not be null.
+    - `_in250`: Pointer to the two hundred and fifty-first Galois field element. Must not be null.
+    - `_in251`: Pointer to the two hundred and fifty-second Galois field element. Must not be null.
+    - `_in252`: Pointer to the two hundred and fifty-third Galois field element. Must not be null.
+    - `_in253`: Pointer to the two hundred and fifty-fourth Galois field element. Must not be null.
+    - `_in254`: Pointer to the two hundred and fifty-fifth Galois field element. Must not be null.
+    - `_in255`: Pointer to the two hundred and fifty-sixth Galois field element. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_ifft_256_0`](wrapped_impl/fd_reedsol_fft_impl_256_0.c.driver.md#fd_reedsol_ifft_256_0)  (Implementation)
+
+
+---
+### fd\_reedsol\_fft\_256\_0<!-- {{#callable_declaration:fd_reedsol_fft_256_0}} -->
+Performs a 256-point Reed-Solomon FFT transformation on input data.
+- **Description**: This function applies a 256-point Fast Fourier Transform (FFT) specific to Reed-Solomon error correction codes on the provided input data. It is designed to be used in contexts where Reed-Solomon encoding or decoding is required, particularly in error correction scenarios. The function expects 256 input elements, each represented by a pointer to a `gf_t` type, which is typically a Galois Field element. The function modifies the input data in place, so the input pointers must point to valid, writable memory locations. It is crucial to ensure that all input pointers are non-null and correctly initialized before calling this function to avoid undefined behavior.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in01`: Pointer to the second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in02`: Pointer to the third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in64`: Pointer to the sixty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in65`: Pointer to the sixty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in66`: Pointer to the sixty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in67`: Pointer to the sixty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in68`: Pointer to the sixty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in69`: Pointer to the seventieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in70`: Pointer to the seventy-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in71`: Pointer to the seventy-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in72`: Pointer to the seventy-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in73`: Pointer to the seventy-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in74`: Pointer to the seventy-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in75`: Pointer to the seventy-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in76`: Pointer to the seventy-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in77`: Pointer to the seventy-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in78`: Pointer to the seventy-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in79`: Pointer to the eightieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in80`: Pointer to the eighty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in81`: Pointer to the eighty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in82`: Pointer to the eighty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in83`: Pointer to the eighty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in84`: Pointer to the eighty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in85`: Pointer to the eighty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in86`: Pointer to the eighty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in87`: Pointer to the eighty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in88`: Pointer to the eighty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in89`: Pointer to the ninetieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in90`: Pointer to the ninety-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in91`: Pointer to the ninety-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in92`: Pointer to the ninety-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in93`: Pointer to the ninety-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in94`: Pointer to the ninety-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in95`: Pointer to the ninety-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in96`: Pointer to the ninety-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in97`: Pointer to the ninety-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in98`: Pointer to the ninety-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in99`: Pointer to the one hundredth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in100`: Pointer to the one hundred and first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in101`: Pointer to the one hundred and second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in102`: Pointer to the one hundred and third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in103`: Pointer to the one hundred and fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in104`: Pointer to the one hundred and fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in105`: Pointer to the one hundred and sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in106`: Pointer to the one hundred and seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in107`: Pointer to the one hundred and eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in108`: Pointer to the one hundred and ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in109`: Pointer to the one hundred and tenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in110`: Pointer to the one hundred and eleventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in111`: Pointer to the one hundred and twelfth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in112`: Pointer to the one hundred and thirteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in113`: Pointer to the one hundred and fourteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in114`: Pointer to the one hundred and fifteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in115`: Pointer to the one hundred and sixteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in116`: Pointer to the one hundred and seventeenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in117`: Pointer to the one hundred and eighteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in118`: Pointer to the one hundred and nineteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in119`: Pointer to the one hundred and twentieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in120`: Pointer to the one hundred and twenty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in121`: Pointer to the one hundred and twenty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in122`: Pointer to the one hundred and twenty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in123`: Pointer to the one hundred and twenty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in124`: Pointer to the one hundred and twenty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in125`: Pointer to the one hundred and twenty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in126`: Pointer to the one hundred and twenty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in127`: Pointer to the one hundred and twenty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in128`: Pointer to the one hundred and twenty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in129`: Pointer to the one hundred and thirtieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in130`: Pointer to the one hundred and thirty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in131`: Pointer to the one hundred and thirty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in132`: Pointer to the one hundred and thirty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in133`: Pointer to the one hundred and thirty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in134`: Pointer to the one hundred and thirty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in135`: Pointer to the one hundred and thirty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in136`: Pointer to the one hundred and thirty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in137`: Pointer to the one hundred and thirty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in138`: Pointer to the one hundred and thirty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in139`: Pointer to the one hundred and fortieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in140`: Pointer to the one hundred and forty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in141`: Pointer to the one hundred and forty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in142`: Pointer to the one hundred and forty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in143`: Pointer to the one hundred and forty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in144`: Pointer to the one hundred and forty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in145`: Pointer to the one hundred and forty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in146`: Pointer to the one hundred and forty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in147`: Pointer to the one hundred and forty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in148`: Pointer to the one hundred and forty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in149`: Pointer to the one hundred and fiftieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in150`: Pointer to the one hundred and fifty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in151`: Pointer to the one hundred and fifty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in152`: Pointer to the one hundred and fifty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in153`: Pointer to the one hundred and fifty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in154`: Pointer to the one hundred and fifty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in155`: Pointer to the one hundred and fifty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in156`: Pointer to the one hundred and fifty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in157`: Pointer to the one hundred and fifty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in158`: Pointer to the one hundred and fifty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in159`: Pointer to the one hundred and sixtieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in160`: Pointer to the one hundred and sixty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in161`: Pointer to the one hundred and sixty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in162`: Pointer to the one hundred and sixty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in163`: Pointer to the one hundred and sixty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in164`: Pointer to the one hundred and sixty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in165`: Pointer to the one hundred and sixty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in166`: Pointer to the one hundred and sixty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in167`: Pointer to the one hundred and sixty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in168`: Pointer to the one hundred and sixty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in169`: Pointer to the one hundred and seventieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in170`: Pointer to the one hundred and seventy-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in171`: Pointer to the one hundred and seventy-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in172`: Pointer to the one hundred and seventy-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in173`: Pointer to the one hundred and seventy-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in174`: Pointer to the one hundred and seventy-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in175`: Pointer to the one hundred and seventy-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in176`: Pointer to the one hundred and seventy-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in177`: Pointer to the one hundred and seventy-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in178`: Pointer to the one hundred and seventy-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in179`: Pointer to the one hundred and eightieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in180`: Pointer to the one hundred and eighty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in181`: Pointer to the one hundred and eighty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in182`: Pointer to the one hundred and eighty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in183`: Pointer to the one hundred and eighty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in184`: Pointer to the one hundred and eighty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in185`: Pointer to the one hundred and eighty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in186`: Pointer to the one hundred and eighty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in187`: Pointer to the one hundred and eighty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in188`: Pointer to the one hundred and eighty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in189`: Pointer to the one hundred and ninetieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in190`: Pointer to the one hundred and ninety-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in191`: Pointer to the one hundred and ninety-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in192`: Pointer to the one hundred and ninety-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in193`: Pointer to the one hundred and ninety-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in194`: Pointer to the one hundred and ninety-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in195`: Pointer to the one hundred and ninety-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in196`: Pointer to the one hundred and ninety-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in197`: Pointer to the one hundred and ninety-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in198`: Pointer to the one hundred and ninety-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in199`: Pointer to the two hundredth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in200`: Pointer to the two hundred and first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in201`: Pointer to the two hundred and second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in202`: Pointer to the two hundred and third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in203`: Pointer to the two hundred and fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in204`: Pointer to the two hundred and fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in205`: Pointer to the two hundred and sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in206`: Pointer to the two hundred and seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in207`: Pointer to the two hundred and eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in208`: Pointer to the two hundred and ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in209`: Pointer to the two hundred and tenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in210`: Pointer to the two hundred and eleventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in211`: Pointer to the two hundred and twelfth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in212`: Pointer to the two hundred and thirteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in213`: Pointer to the two hundred and fourteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in214`: Pointer to the two hundred and fifteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in215`: Pointer to the two hundred and sixteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in216`: Pointer to the two hundred and seventeenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in217`: Pointer to the two hundred and eighteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in218`: Pointer to the two hundred and nineteenth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in219`: Pointer to the two hundred and twentieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in220`: Pointer to the two hundred and twenty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in221`: Pointer to the two hundred and twenty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in222`: Pointer to the two hundred and twenty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in223`: Pointer to the two hundred and twenty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in224`: Pointer to the two hundred and twenty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in225`: Pointer to the two hundred and twenty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in226`: Pointer to the two hundred and twenty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in227`: Pointer to the two hundred and twenty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in228`: Pointer to the two hundred and twenty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in229`: Pointer to the two hundred and thirtieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in230`: Pointer to the two hundred and thirty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in231`: Pointer to the two hundred and thirty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in232`: Pointer to the two hundred and thirty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in233`: Pointer to the two hundred and thirty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in234`: Pointer to the two hundred and thirty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in235`: Pointer to the two hundred and thirty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in236`: Pointer to the two hundred and thirty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in237`: Pointer to the two hundred and thirty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in238`: Pointer to the two hundred and thirty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in239`: Pointer to the two hundred and fortieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in240`: Pointer to the two hundred and forty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in241`: Pointer to the two hundred and forty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in242`: Pointer to the two hundred and forty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in243`: Pointer to the two hundred and forty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in244`: Pointer to the two hundred and forty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in245`: Pointer to the two hundred and forty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in246`: Pointer to the two hundred and forty-seventh input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in247`: Pointer to the two hundred and forty-eighth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in248`: Pointer to the two hundred and forty-ninth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in249`: Pointer to the two hundred and fiftieth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in250`: Pointer to the two hundred and fifty-first input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in251`: Pointer to the two hundred and fifty-second input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in252`: Pointer to the two hundred and fifty-third input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in253`: Pointer to the two hundred and fifty-fourth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in254`: Pointer to the two hundred and fifty-fifth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+    - `_in255`: Pointer to the two hundred and fifty-sixth input element of type `gf_t`. Must not be null and must point to valid, writable memory.
+- **Output**: The function modifies the input data in place, updating each input pointer with the transformed value.
+- **See also**: [`fd_reedsol_fft_256_0`](wrapped_impl/fd_reedsol_fft_impl_256_0.c.driver.md#fd_reedsol_fft_256_0)  (Implementation)
+
+
+---
+### fd\_reedsol\_ifft\_128\_0<!-- {{#callable_declaration:fd_reedsol_ifft_128_0}} -->
+Performs an inverse fast Fourier transform on 128 Galois field elements.
+- **Description**: This function is used to perform an inverse fast Fourier transform (IFFT) on 128 input elements represented in a Galois field. It is typically used in error correction algorithms such as Reed-Solomon codes. The function takes pointers to 128 `gf_t` elements as input, modifies them in place, and does not return any value. It is essential that all input pointers are valid and point to initialized `gf_t` elements, as the function will dereference these pointers to read and write data. The caller must ensure that the input pointers are not null and that they point to memory locations that can be safely modified.
+- **Inputs**:
+    - `_in00`: Pointer to the first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in01`: Pointer to the second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in02`: Pointer to the third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in03`: Pointer to the fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in04`: Pointer to the fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in05`: Pointer to the sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in06`: Pointer to the seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in07`: Pointer to the eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in08`: Pointer to the ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in09`: Pointer to the tenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in10`: Pointer to the eleventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in11`: Pointer to the twelfth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in12`: Pointer to the thirteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in13`: Pointer to the fourteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in14`: Pointer to the fifteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in15`: Pointer to the sixteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in16`: Pointer to the seventeenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in17`: Pointer to the eighteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in18`: Pointer to the nineteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in19`: Pointer to the twentieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in20`: Pointer to the twenty-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in21`: Pointer to the twenty-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in22`: Pointer to the twenty-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in23`: Pointer to the twenty-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in24`: Pointer to the twenty-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in25`: Pointer to the twenty-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in26`: Pointer to the twenty-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in27`: Pointer to the twenty-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in28`: Pointer to the twenty-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in29`: Pointer to the thirtieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in30`: Pointer to the thirty-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in31`: Pointer to the thirty-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in32`: Pointer to the thirty-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in33`: Pointer to the thirty-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in34`: Pointer to the thirty-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in35`: Pointer to the thirty-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in36`: Pointer to the thirty-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in37`: Pointer to the thirty-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in38`: Pointer to the thirty-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in39`: Pointer to the fortieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in40`: Pointer to the forty-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in41`: Pointer to the forty-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in42`: Pointer to the forty-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in43`: Pointer to the forty-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in44`: Pointer to the forty-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in45`: Pointer to the forty-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in46`: Pointer to the forty-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in47`: Pointer to the forty-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in48`: Pointer to the forty-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in49`: Pointer to the fiftieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in50`: Pointer to the fifty-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in51`: Pointer to the fifty-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in52`: Pointer to the fifty-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in53`: Pointer to the fifty-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in54`: Pointer to the fifty-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in55`: Pointer to the fifty-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in56`: Pointer to the fifty-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in57`: Pointer to the fifty-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in58`: Pointer to the fifty-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in59`: Pointer to the sixtieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in60`: Pointer to the sixty-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in61`: Pointer to the sixty-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in62`: Pointer to the sixty-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in63`: Pointer to the sixty-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in64`: Pointer to the sixty-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in65`: Pointer to the sixty-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in66`: Pointer to the sixty-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in67`: Pointer to the sixty-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in68`: Pointer to the sixty-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in69`: Pointer to the seventieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in70`: Pointer to the seventy-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in71`: Pointer to the seventy-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in72`: Pointer to the seventy-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in73`: Pointer to the seventy-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in74`: Pointer to the seventy-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in75`: Pointer to the seventy-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in76`: Pointer to the seventy-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in77`: Pointer to the seventy-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in78`: Pointer to the seventy-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in79`: Pointer to the eightieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in80`: Pointer to the eighty-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in81`: Pointer to the eighty-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in82`: Pointer to the eighty-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in83`: Pointer to the eighty-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in84`: Pointer to the eighty-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in85`: Pointer to the eighty-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in86`: Pointer to the eighty-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in87`: Pointer to the eighty-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in88`: Pointer to the eighty-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in89`: Pointer to the ninetieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in90`: Pointer to the ninety-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in91`: Pointer to the ninety-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in92`: Pointer to the ninety-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in93`: Pointer to the ninety-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in94`: Pointer to the ninety-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in95`: Pointer to the ninety-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in96`: Pointer to the ninety-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in97`: Pointer to the ninety-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in98`: Pointer to the ninety-ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in99`: Pointer to the one hundredth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in100`: Pointer to the one hundred and first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in101`: Pointer to the one hundred and second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in102`: Pointer to the one hundred and third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in103`: Pointer to the one hundred and fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in104`: Pointer to the one hundred and fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in105`: Pointer to the one hundred and sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in106`: Pointer to the one hundred and seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in107`: Pointer to the one hundred and eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in108`: Pointer to the one hundred and ninth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in109`: Pointer to the one hundred and tenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in110`: Pointer to the one hundred and eleventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in111`: Pointer to the one hundred and twelfth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in112`: Pointer to the one hundred and thirteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in113`: Pointer to the one hundred and fourteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in114`: Pointer to the one hundred and fifteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in115`: Pointer to the one hundred and sixteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in116`: Pointer to the one hundred and seventeenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in117`: Pointer to the one hundred and eighteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in118`: Pointer to the one hundred and nineteenth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in119`: Pointer to the one hundred and twentieth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in120`: Pointer to the one hundred and twenty-first `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in121`: Pointer to the one hundred and twenty-second `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in122`: Pointer to the one hundred and twenty-third `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in123`: Pointer to the one hundred and twenty-fourth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in124`: Pointer to the one hundred and twenty-fifth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in125`: Pointer to the one hundred and twenty-sixth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in126`: Pointer to the one hundred and twenty-seventh `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+    - `_in127`: Pointer to the one hundred and twenty-eighth `gf_t` element. Must not be null and should point to a valid, initialized `gf_t` element.
+- **Output**: None
+- **See also**: [`fd_reedsol_ifft_128_0`](wrapped_impl/fd_reedsol_fft_impl_128_0.c.driver.md#fd_reedsol_ifft_128_0)  (Implementation)
+
+
+---
+### fd\_reedsol\_ifft\_128\_128<!-- {{#callable_declaration:fd_reedsol_ifft_128_128}} -->
+Performs an inverse fast Fourier transform on 128 input elements.
+- **Description**: This function applies an inverse fast Fourier transform (IFFT) to 128 input elements, each represented by a pointer to a `gf_t` type. It is typically used in signal processing or error correction contexts where such transformations are necessary. The function expects all input pointers to be valid and non-null, as it reads from and writes back to these locations. The caller must ensure that the input data is correctly initialized before calling this function. After execution, the transformed data is written back to the original input locations.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in64`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in65`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in66`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in67`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in68`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in69`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in70`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in71`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in72`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in73`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in74`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in75`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in76`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in77`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in78`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in79`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in80`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in81`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in82`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in83`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in84`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in85`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in86`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in87`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in88`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in89`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in90`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in91`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in92`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in93`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in94`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in95`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in96`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in97`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in98`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in99`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in100`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in101`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in102`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in103`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in104`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in105`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in106`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in107`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in108`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in109`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in110`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in111`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in112`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in113`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in114`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in115`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in116`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in117`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in118`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in119`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in120`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in121`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in122`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in123`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in124`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in125`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in126`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in127`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ifft_128_128`](wrapped_impl/fd_reedsol_fft_impl_128_128.c.driver.md#fd_reedsol_ifft_128_128)  (Implementation)
+
+
+---
+### fd\_reedsol\_fft\_128\_0<!-- {{#callable_declaration:fd_reedsol_fft_128_0}} -->
+Performs a 128-point Reed-Solomon FFT transformation on input data.
+- **Description**: This function applies a 128-point Fast Fourier Transform (FFT) specific to Reed-Solomon error correction on the provided input data. It is designed to be used in contexts where Reed-Solomon encoding or decoding is required, particularly in error correction scenarios. The function expects exactly 128 input elements, each represented by a pointer to a `gf_t` type, which is typically a Galois Field element. The function modifies the input data in place, meaning the transformed data will overwrite the original input values. It is crucial that all input pointers are valid and point to properly initialized `gf_t` elements, as the function does not perform any input validation or error checking.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element representing the first input data. Must not be null.
+    - `_in01`: Pointer to a `gf_t` element representing the second input data. Must not be null.
+    - `_in02`: Pointer to a `gf_t` element representing the third input data. Must not be null.
+    - `_in03`: Pointer to a `gf_t` element representing the fourth input data. Must not be null.
+    - `_in04`: Pointer to a `gf_t` element representing the fifth input data. Must not be null.
+    - `_in05`: Pointer to a `gf_t` element representing the sixth input data. Must not be null.
+    - `_in06`: Pointer to a `gf_t` element representing the seventh input data. Must not be null.
+    - `_in07`: Pointer to a `gf_t` element representing the eighth input data. Must not be null.
+    - `_in08`: Pointer to a `gf_t` element representing the ninth input data. Must not be null.
+    - `_in09`: Pointer to a `gf_t` element representing the tenth input data. Must not be null.
+    - `_in10`: Pointer to a `gf_t` element representing the eleventh input data. Must not be null.
+    - `_in11`: Pointer to a `gf_t` element representing the twelfth input data. Must not be null.
+    - `_in12`: Pointer to a `gf_t` element representing the thirteenth input data. Must not be null.
+    - `_in13`: Pointer to a `gf_t` element representing the fourteenth input data. Must not be null.
+    - `_in14`: Pointer to a `gf_t` element representing the fifteenth input data. Must not be null.
+    - `_in15`: Pointer to a `gf_t` element representing the sixteenth input data. Must not be null.
+    - `_in16`: Pointer to a `gf_t` element representing the seventeenth input data. Must not be null.
+    - `_in17`: Pointer to a `gf_t` element representing the eighteenth input data. Must not be null.
+    - `_in18`: Pointer to a `gf_t` element representing the nineteenth input data. Must not be null.
+    - `_in19`: Pointer to a `gf_t` element representing the twentieth input data. Must not be null.
+    - `_in20`: Pointer to a `gf_t` element representing the twenty-first input data. Must not be null.
+    - `_in21`: Pointer to a `gf_t` element representing the twenty-second input data. Must not be null.
+    - `_in22`: Pointer to a `gf_t` element representing the twenty-third input data. Must not be null.
+    - `_in23`: Pointer to a `gf_t` element representing the twenty-fourth input data. Must not be null.
+    - `_in24`: Pointer to a `gf_t` element representing the twenty-fifth input data. Must not be null.
+    - `_in25`: Pointer to a `gf_t` element representing the twenty-sixth input data. Must not be null.
+    - `_in26`: Pointer to a `gf_t` element representing the twenty-seventh input data. Must not be null.
+    - `_in27`: Pointer to a `gf_t` element representing the twenty-eighth input data. Must not be null.
+    - `_in28`: Pointer to a `gf_t` element representing the twenty-ninth input data. Must not be null.
+    - `_in29`: Pointer to a `gf_t` element representing the thirtieth input data. Must not be null.
+    - `_in30`: Pointer to a `gf_t` element representing the thirty-first input data. Must not be null.
+    - `_in31`: Pointer to a `gf_t` element representing the thirty-second input data. Must not be null.
+    - `_in32`: Pointer to a `gf_t` element representing the thirty-third input data. Must not be null.
+    - `_in33`: Pointer to a `gf_t` element representing the thirty-fourth input data. Must not be null.
+    - `_in34`: Pointer to a `gf_t` element representing the thirty-fifth input data. Must not be null.
+    - `_in35`: Pointer to a `gf_t` element representing the thirty-sixth input data. Must not be null.
+    - `_in36`: Pointer to a `gf_t` element representing the thirty-seventh input data. Must not be null.
+    - `_in37`: Pointer to a `gf_t` element representing the thirty-eighth input data. Must not be null.
+    - `_in38`: Pointer to a `gf_t` element representing the thirty-ninth input data. Must not be null.
+    - `_in39`: Pointer to a `gf_t` element representing the fortieth input data. Must not be null.
+    - `_in40`: Pointer to a `gf_t` element representing the forty-first input data. Must not be null.
+    - `_in41`: Pointer to a `gf_t` element representing the forty-second input data. Must not be null.
+    - `_in42`: Pointer to a `gf_t` element representing the forty-third input data. Must not be null.
+    - `_in43`: Pointer to a `gf_t` element representing the forty-fourth input data. Must not be null.
+    - `_in44`: Pointer to a `gf_t` element representing the forty-fifth input data. Must not be null.
+    - `_in45`: Pointer to a `gf_t` element representing the forty-sixth input data. Must not be null.
+    - `_in46`: Pointer to a `gf_t` element representing the forty-seventh input data. Must not be null.
+    - `_in47`: Pointer to a `gf_t` element representing the forty-eighth input data. Must not be null.
+    - `_in48`: Pointer to a `gf_t` element representing the forty-ninth input data. Must not be null.
+    - `_in49`: Pointer to a `gf_t` element representing the fiftieth input data. Must not be null.
+    - `_in50`: Pointer to a `gf_t` element representing the fifty-first input data. Must not be null.
+    - `_in51`: Pointer to a `gf_t` element representing the fifty-second input data. Must not be null.
+    - `_in52`: Pointer to a `gf_t` element representing the fifty-third input data. Must not be null.
+    - `_in53`: Pointer to a `gf_t` element representing the fifty-fourth input data. Must not be null.
+    - `_in54`: Pointer to a `gf_t` element representing the fifty-fifth input data. Must not be null.
+    - `_in55`: Pointer to a `gf_t` element representing the fifty-sixth input data. Must not be null.
+    - `_in56`: Pointer to a `gf_t` element representing the fifty-seventh input data. Must not be null.
+    - `_in57`: Pointer to a `gf_t` element representing the fifty-eighth input data. Must not be null.
+    - `_in58`: Pointer to a `gf_t` element representing the fifty-ninth input data. Must not be null.
+    - `_in59`: Pointer to a `gf_t` element representing the sixtieth input data. Must not be null.
+    - `_in60`: Pointer to a `gf_t` element representing the sixty-first input data. Must not be null.
+    - `_in61`: Pointer to a `gf_t` element representing the sixty-second input data. Must not be null.
+    - `_in62`: Pointer to a `gf_t` element representing the sixty-third input data. Must not be null.
+    - `_in63`: Pointer to a `gf_t` element representing the sixty-fourth input data. Must not be null.
+    - `_in64`: Pointer to a `gf_t` element representing the sixty-fifth input data. Must not be null.
+    - `_in65`: Pointer to a `gf_t` element representing the sixty-sixth input data. Must not be null.
+    - `_in66`: Pointer to a `gf_t` element representing the sixty-seventh input data. Must not be null.
+    - `_in67`: Pointer to a `gf_t` element representing the sixty-eighth input data. Must not be null.
+    - `_in68`: Pointer to a `gf_t` element representing the sixty-ninth input data. Must not be null.
+    - `_in69`: Pointer to a `gf_t` element representing the seventieth input data. Must not be null.
+    - `_in70`: Pointer to a `gf_t` element representing the seventy-first input data. Must not be null.
+    - `_in71`: Pointer to a `gf_t` element representing the seventy-second input data. Must not be null.
+    - `_in72`: Pointer to a `gf_t` element representing the seventy-third input data. Must not be null.
+    - `_in73`: Pointer to a `gf_t` element representing the seventy-fourth input data. Must not be null.
+    - `_in74`: Pointer to a `gf_t` element representing the seventy-fifth input data. Must not be null.
+    - `_in75`: Pointer to a `gf_t` element representing the seventy-sixth input data. Must not be null.
+    - `_in76`: Pointer to a `gf_t` element representing the seventy-seventh input data. Must not be null.
+    - `_in77`: Pointer to a `gf_t` element representing the seventy-eighth input data. Must not be null.
+    - `_in78`: Pointer to a `gf_t` element representing the seventy-ninth input data. Must not be null.
+    - `_in79`: Pointer to a `gf_t` element representing the eightieth input data. Must not be null.
+    - `_in80`: Pointer to a `gf_t` element representing the eighty-first input data. Must not be null.
+    - `_in81`: Pointer to a `gf_t` element representing the eighty-second input data. Must not be null.
+    - `_in82`: Pointer to a `gf_t` element representing the eighty-third input data. Must not be null.
+    - `_in83`: Pointer to a `gf_t` element representing the eighty-fourth input data. Must not be null.
+    - `_in84`: Pointer to a `gf_t` element representing the eighty-fifth input data. Must not be null.
+    - `_in85`: Pointer to a `gf_t` element representing the eighty-sixth input data. Must not be null.
+    - `_in86`: Pointer to a `gf_t` element representing the eighty-seventh input data. Must not be null.
+    - `_in87`: Pointer to a `gf_t` element representing the eighty-eighth input data. Must not be null.
+    - `_in88`: Pointer to a `gf_t` element representing the eighty-ninth input data. Must not be null.
+    - `_in89`: Pointer to a `gf_t` element representing the ninetieth input data. Must not be null.
+    - `_in90`: Pointer to a `gf_t` element representing the ninety-first input data. Must not be null.
+    - `_in91`: Pointer to a `gf_t` element representing the ninety-second input data. Must not be null.
+    - `_in92`: Pointer to a `gf_t` element representing the ninety-third input data. Must not be null.
+    - `_in93`: Pointer to a `gf_t` element representing the ninety-fourth input data. Must not be null.
+    - `_in94`: Pointer to a `gf_t` element representing the ninety-fifth input data. Must not be null.
+    - `_in95`: Pointer to a `gf_t` element representing the ninety-sixth input data. Must not be null.
+    - `_in96`: Pointer to a `gf_t` element representing the ninety-seventh input data. Must not be null.
+    - `_in97`: Pointer to a `gf_t` element representing the ninety-eighth input data. Must not be null.
+    - `_in98`: Pointer to a `gf_t` element representing the ninety-ninth input data. Must not be null.
+    - `_in99`: Pointer to a `gf_t` element representing the one hundredth input data. Must not be null.
+    - `_in100`: Pointer to a `gf_t` element representing the one hundred and first input data. Must not be null.
+    - `_in101`: Pointer to a `gf_t` element representing the one hundred and second input data. Must not be null.
+    - `_in102`: Pointer to a `gf_t` element representing the one hundred and third input data. Must not be null.
+    - `_in103`: Pointer to a `gf_t` element representing the one hundred and fourth input data. Must not be null.
+    - `_in104`: Pointer to a `gf_t` element representing the one hundred and fifth input data. Must not be null.
+    - `_in105`: Pointer to a `gf_t` element representing the one hundred and sixth input data. Must not be null.
+    - `_in106`: Pointer to a `gf_t` element representing the one hundred and seventh input data. Must not be null.
+    - `_in107`: Pointer to a `gf_t` element representing the one hundred and eighth input data. Must not be null.
+    - `_in108`: Pointer to a `gf_t` element representing the one hundred and ninth input data. Must not be null.
+    - `_in109`: Pointer to a `gf_t` element representing the one hundred and tenth input data. Must not be null.
+    - `_in110`: Pointer to a `gf_t` element representing the one hundred and eleventh input data. Must not be null.
+    - `_in111`: Pointer to a `gf_t` element representing the one hundred and twelfth input data. Must not be null.
+    - `_in112`: Pointer to a `gf_t` element representing the one hundred and thirteenth input data. Must not be null.
+    - `_in113`: Pointer to a `gf_t` element representing the one hundred and fourteenth input data. Must not be null.
+    - `_in114`: Pointer to a `gf_t` element representing the one hundred and fifteenth input data. Must not be null.
+    - `_in115`: Pointer to a `gf_t` element representing the one hundred and sixteenth input data. Must not be null.
+    - `_in116`: Pointer to a `gf_t` element representing the one hundred and seventeenth input data. Must not be null.
+    - `_in117`: Pointer to a `gf_t` element representing the one hundred and eighteenth input data. Must not be null.
+    - `_in118`: Pointer to a `gf_t` element representing the one hundred and nineteenth input data. Must not be null.
+    - `_in119`: Pointer to a `gf_t` element representing the one hundred and twentieth input data. Must not be null.
+    - `_in120`: Pointer to a `gf_t` element representing the one hundred and twenty-first input data. Must not be null.
+    - `_in121`: Pointer to a `gf_t` element representing the one hundred and twenty-second input data. Must not be null.
+    - `_in122`: Pointer to a `gf_t` element representing the one hundred and twenty-third input data. Must not be null.
+    - `_in123`: Pointer to a `gf_t` element representing the one hundred and twenty-fourth input data. Must not be null.
+    - `_in124`: Pointer to a `gf_t` element representing the one hundred and twenty-fifth input data. Must not be null.
+    - `_in125`: Pointer to a `gf_t` element representing the one hundred and twenty-sixth input data. Must not be null.
+    - `_in126`: Pointer to a `gf_t` element representing the one hundred and twenty-seventh input data. Must not be null.
+    - `_in127`: Pointer to a `gf_t` element representing the one hundred and twenty-eighth input data. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_fft_128_0`](wrapped_impl/fd_reedsol_fft_impl_128_0.c.driver.md#fd_reedsol_fft_128_0)  (Implementation)
+
+
+---
+### fd\_reedsol\_fft\_128\_128<!-- {{#callable_declaration:fd_reedsol_fft_128_128}} -->
+Performs a 128-point Reed-Solomon FFT on input data.
+- **Description**: This function applies a 128-point Fast Fourier Transform (FFT) specifically designed for Reed-Solomon error correction codes on the provided input data. It is intended for use in contexts where Reed-Solomon encoding or decoding is required. The function expects exactly 128 input elements, each represented as a pointer to a `gf_t` type, which is typically a Galois Field element. The function modifies the input data in place, so the input pointers must point to valid, writable memory locations. It is crucial to ensure that all input pointers are non-null and correctly initialized before calling this function to avoid undefined behavior.
+- **Inputs**:
+    - `_in00`: Pointer to the first Galois Field element. Must not be null.
+    - `_in01`: Pointer to the second Galois Field element. Must not be null.
+    - `_in02`: Pointer to the third Galois Field element. Must not be null.
+    - `_in03`: Pointer to the fourth Galois Field element. Must not be null.
+    - `_in04`: Pointer to the fifth Galois Field element. Must not be null.
+    - `_in05`: Pointer to the sixth Galois Field element. Must not be null.
+    - `_in06`: Pointer to the seventh Galois Field element. Must not be null.
+    - `_in07`: Pointer to the eighth Galois Field element. Must not be null.
+    - `_in08`: Pointer to the ninth Galois Field element. Must not be null.
+    - `_in09`: Pointer to the tenth Galois Field element. Must not be null.
+    - `_in10`: Pointer to the eleventh Galois Field element. Must not be null.
+    - `_in11`: Pointer to the twelfth Galois Field element. Must not be null.
+    - `_in12`: Pointer to the thirteenth Galois Field element. Must not be null.
+    - `_in13`: Pointer to the fourteenth Galois Field element. Must not be null.
+    - `_in14`: Pointer to the fifteenth Galois Field element. Must not be null.
+    - `_in15`: Pointer to the sixteenth Galois Field element. Must not be null.
+    - `_in16`: Pointer to the seventeenth Galois Field element. Must not be null.
+    - `_in17`: Pointer to the eighteenth Galois Field element. Must not be null.
+    - `_in18`: Pointer to the nineteenth Galois Field element. Must not be null.
+    - `_in19`: Pointer to the twentieth Galois Field element. Must not be null.
+    - `_in20`: Pointer to the twenty-first Galois Field element. Must not be null.
+    - `_in21`: Pointer to the twenty-second Galois Field element. Must not be null.
+    - `_in22`: Pointer to the twenty-third Galois Field element. Must not be null.
+    - `_in23`: Pointer to the twenty-fourth Galois Field element. Must not be null.
+    - `_in24`: Pointer to the twenty-fifth Galois Field element. Must not be null.
+    - `_in25`: Pointer to the twenty-sixth Galois Field element. Must not be null.
+    - `_in26`: Pointer to the twenty-seventh Galois Field element. Must not be null.
+    - `_in27`: Pointer to the twenty-eighth Galois Field element. Must not be null.
+    - `_in28`: Pointer to the twenty-ninth Galois Field element. Must not be null.
+    - `_in29`: Pointer to the thirtieth Galois Field element. Must not be null.
+    - `_in30`: Pointer to the thirty-first Galois Field element. Must not be null.
+    - `_in31`: Pointer to the thirty-second Galois Field element. Must not be null.
+    - `_in32`: Pointer to the thirty-third Galois Field element. Must not be null.
+    - `_in33`: Pointer to the thirty-fourth Galois Field element. Must not be null.
+    - `_in34`: Pointer to the thirty-fifth Galois Field element. Must not be null.
+    - `_in35`: Pointer to the thirty-sixth Galois Field element. Must not be null.
+    - `_in36`: Pointer to the thirty-seventh Galois Field element. Must not be null.
+    - `_in37`: Pointer to the thirty-eighth Galois Field element. Must not be null.
+    - `_in38`: Pointer to the thirty-ninth Galois Field element. Must not be null.
+    - `_in39`: Pointer to the fortieth Galois Field element. Must not be null.
+    - `_in40`: Pointer to the forty-first Galois Field element. Must not be null.
+    - `_in41`: Pointer to the forty-second Galois Field element. Must not be null.
+    - `_in42`: Pointer to the forty-third Galois Field element. Must not be null.
+    - `_in43`: Pointer to the forty-fourth Galois Field element. Must not be null.
+    - `_in44`: Pointer to the forty-fifth Galois Field element. Must not be null.
+    - `_in45`: Pointer to the forty-sixth Galois Field element. Must not be null.
+    - `_in46`: Pointer to the forty-seventh Galois Field element. Must not be null.
+    - `_in47`: Pointer to the forty-eighth Galois Field element. Must not be null.
+    - `_in48`: Pointer to the forty-ninth Galois Field element. Must not be null.
+    - `_in49`: Pointer to the fiftieth Galois Field element. Must not be null.
+    - `_in50`: Pointer to the fifty-first Galois Field element. Must not be null.
+    - `_in51`: Pointer to the fifty-second Galois Field element. Must not be null.
+    - `_in52`: Pointer to the fifty-third Galois Field element. Must not be null.
+    - `_in53`: Pointer to the fifty-fourth Galois Field element. Must not be null.
+    - `_in54`: Pointer to the fifty-fifth Galois Field element. Must not be null.
+    - `_in55`: Pointer to the fifty-sixth Galois Field element. Must not be null.
+    - `_in56`: Pointer to the fifty-seventh Galois Field element. Must not be null.
+    - `_in57`: Pointer to the fifty-eighth Galois Field element. Must not be null.
+    - `_in58`: Pointer to the fifty-ninth Galois Field element. Must not be null.
+    - `_in59`: Pointer to the sixtieth Galois Field element. Must not be null.
+    - `_in60`: Pointer to the sixty-first Galois Field element. Must not be null.
+    - `_in61`: Pointer to the sixty-second Galois Field element. Must not be null.
+    - `_in62`: Pointer to the sixty-third Galois Field element. Must not be null.
+    - `_in63`: Pointer to the sixty-fourth Galois Field element. Must not be null.
+    - `_in64`: Pointer to the sixty-fifth Galois Field element. Must not be null.
+    - `_in65`: Pointer to the sixty-sixth Galois Field element. Must not be null.
+    - `_in66`: Pointer to the sixty-seventh Galois Field element. Must not be null.
+    - `_in67`: Pointer to the sixty-eighth Galois Field element. Must not be null.
+    - `_in68`: Pointer to the sixty-ninth Galois Field element. Must not be null.
+    - `_in69`: Pointer to the seventieth Galois Field element. Must not be null.
+    - `_in70`: Pointer to the seventy-first Galois Field element. Must not be null.
+    - `_in71`: Pointer to the seventy-second Galois Field element. Must not be null.
+    - `_in72`: Pointer to the seventy-third Galois Field element. Must not be null.
+    - `_in73`: Pointer to the seventy-fourth Galois Field element. Must not be null.
+    - `_in74`: Pointer to the seventy-fifth Galois Field element. Must not be null.
+    - `_in75`: Pointer to the seventy-sixth Galois Field element. Must not be null.
+    - `_in76`: Pointer to the seventy-seventh Galois Field element. Must not be null.
+    - `_in77`: Pointer to the seventy-eighth Galois Field element. Must not be null.
+    - `_in78`: Pointer to the seventy-ninth Galois Field element. Must not be null.
+    - `_in79`: Pointer to the eightieth Galois Field element. Must not be null.
+    - `_in80`: Pointer to the eighty-first Galois Field element. Must not be null.
+    - `_in81`: Pointer to the eighty-second Galois Field element. Must not be null.
+    - `_in82`: Pointer to the eighty-third Galois Field element. Must not be null.
+    - `_in83`: Pointer to the eighty-fourth Galois Field element. Must not be null.
+    - `_in84`: Pointer to the eighty-fifth Galois Field element. Must not be null.
+    - `_in85`: Pointer to the eighty-sixth Galois Field element. Must not be null.
+    - `_in86`: Pointer to the eighty-seventh Galois Field element. Must not be null.
+    - `_in87`: Pointer to the eighty-eighth Galois Field element. Must not be null.
+    - `_in88`: Pointer to the eighty-ninth Galois Field element. Must not be null.
+    - `_in89`: Pointer to the ninetieth Galois Field element. Must not be null.
+    - `_in90`: Pointer to the ninety-first Galois Field element. Must not be null.
+    - `_in91`: Pointer to the ninety-second Galois Field element. Must not be null.
+    - `_in92`: Pointer to the ninety-third Galois Field element. Must not be null.
+    - `_in93`: Pointer to the ninety-fourth Galois Field element. Must not be null.
+    - `_in94`: Pointer to the ninety-fifth Galois Field element. Must not be null.
+    - `_in95`: Pointer to the ninety-sixth Galois Field element. Must not be null.
+    - `_in96`: Pointer to the ninety-seventh Galois Field element. Must not be null.
+    - `_in97`: Pointer to the ninety-eighth Galois Field element. Must not be null.
+    - `_in98`: Pointer to the ninety-ninth Galois Field element. Must not be null.
+    - `_in99`: Pointer to the one hundredth Galois Field element. Must not be null.
+    - `_in100`: Pointer to the one hundred and first Galois Field element. Must not be null.
+    - `_in101`: Pointer to the one hundred and second Galois Field element. Must not be null.
+    - `_in102`: Pointer to the one hundred and third Galois Field element. Must not be null.
+    - `_in103`: Pointer to the one hundred and fourth Galois Field element. Must not be null.
+    - `_in104`: Pointer to the one hundred and fifth Galois Field element. Must not be null.
+    - `_in105`: Pointer to the one hundred and sixth Galois Field element. Must not be null.
+    - `_in106`: Pointer to the one hundred and seventh Galois Field element. Must not be null.
+    - `_in107`: Pointer to the one hundred and eighth Galois Field element. Must not be null.
+    - `_in108`: Pointer to the one hundred and ninth Galois Field element. Must not be null.
+    - `_in109`: Pointer to the one hundred and tenth Galois Field element. Must not be null.
+    - `_in110`: Pointer to the one hundred and eleventh Galois Field element. Must not be null.
+    - `_in111`: Pointer to the one hundred and twelfth Galois Field element. Must not be null.
+    - `_in112`: Pointer to the one hundred and thirteenth Galois Field element. Must not be null.
+    - `_in113`: Pointer to the one hundred and fourteenth Galois Field element. Must not be null.
+    - `_in114`: Pointer to the one hundred and fifteenth Galois Field element. Must not be null.
+    - `_in115`: Pointer to the one hundred and sixteenth Galois Field element. Must not be null.
+    - `_in116`: Pointer to the one hundred and seventeenth Galois Field element. Must not be null.
+    - `_in117`: Pointer to the one hundred and eighteenth Galois Field element. Must not be null.
+    - `_in118`: Pointer to the one hundred and nineteenth Galois Field element. Must not be null.
+    - `_in119`: Pointer to the one hundred and twentieth Galois Field element. Must not be null.
+    - `_in120`: Pointer to the one hundred and twenty-first Galois Field element. Must not be null.
+    - `_in121`: Pointer to the one hundred and twenty-second Galois Field element. Must not be null.
+    - `_in122`: Pointer to the one hundred and twenty-third Galois Field element. Must not be null.
+    - `_in123`: Pointer to the one hundred and twenty-fourth Galois Field element. Must not be null.
+    - `_in124`: Pointer to the one hundred and twenty-fifth Galois Field element. Must not be null.
+    - `_in125`: Pointer to the one hundred and twenty-sixth Galois Field element. Must not be null.
+    - `_in126`: Pointer to the one hundred and twenty-seventh Galois Field element. Must not be null.
+    - `_in127`: Pointer to the one hundred and twenty-eighth Galois Field element. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_fft_128_128`](wrapped_impl/fd_reedsol_fft_impl_128_128.c.driver.md#fd_reedsol_fft_128_128)  (Implementation)
+
+
+---
+### fd\_reedsol\_ifft\_64\_0<!-- {{#callable_declaration:fd_reedsol_ifft_64_0}} -->
+Performs an inverse fast Fourier transform on 64 Galois field elements.
+- **Description**: This function is used to perform an inverse fast Fourier transform (IFFT) on 64 elements of a Galois field, which are provided as input pointers. It is typically used in error correction algorithms, such as Reed-Solomon codes, to transform frequency domain data back to the time domain. The function expects 64 pointers to `gf_t` elements, each representing a Galois field element. The input pointers must not be null, and the caller is responsible for ensuring that the memory locations pointed to by these pointers are valid and writable, as the function will modify the values in place.
+- **Inputs**:
+    - `_in00`: Pointer to the first Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in01`: Pointer to the second Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in02`: Pointer to the third Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in03`: Pointer to the fourth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in04`: Pointer to the fifth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in05`: Pointer to the sixth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in06`: Pointer to the seventh Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in07`: Pointer to the eighth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in08`: Pointer to the ninth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in09`: Pointer to the tenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in10`: Pointer to the eleventh Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in11`: Pointer to the twelfth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in12`: Pointer to the thirteenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in13`: Pointer to the fourteenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in14`: Pointer to the fifteenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in15`: Pointer to the sixteenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in16`: Pointer to the seventeenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in17`: Pointer to the eighteenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in18`: Pointer to the nineteenth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in19`: Pointer to the twentieth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in20`: Pointer to the twenty-first Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in21`: Pointer to the twenty-second Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in22`: Pointer to the twenty-third Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in23`: Pointer to the twenty-fourth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in24`: Pointer to the twenty-fifth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in25`: Pointer to the twenty-sixth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in26`: Pointer to the twenty-seventh Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in27`: Pointer to the twenty-eighth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in28`: Pointer to the twenty-ninth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in29`: Pointer to the thirtieth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in30`: Pointer to the thirty-first Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in31`: Pointer to the thirty-second Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in32`: Pointer to the thirty-third Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in33`: Pointer to the thirty-fourth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in34`: Pointer to the thirty-fifth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in35`: Pointer to the thirty-sixth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in36`: Pointer to the thirty-seventh Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in37`: Pointer to the thirty-eighth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in38`: Pointer to the thirty-ninth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in39`: Pointer to the fortieth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in40`: Pointer to the forty-first Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in41`: Pointer to the forty-second Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in42`: Pointer to the forty-third Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in43`: Pointer to the forty-fourth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in44`: Pointer to the forty-fifth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in45`: Pointer to the forty-sixth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in46`: Pointer to the forty-seventh Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in47`: Pointer to the forty-eighth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in48`: Pointer to the forty-ninth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in49`: Pointer to the fiftieth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in50`: Pointer to the fifty-first Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in51`: Pointer to the fifty-second Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in52`: Pointer to the fifty-third Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in53`: Pointer to the fifty-fourth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in54`: Pointer to the fifty-fifth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in55`: Pointer to the fifty-sixth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in56`: Pointer to the fifty-seventh Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in57`: Pointer to the fifty-eighth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in58`: Pointer to the fifty-ninth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in59`: Pointer to the sixtieth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in60`: Pointer to the sixty-first Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in61`: Pointer to the sixty-second Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in62`: Pointer to the sixty-third Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+    - `_in63`: Pointer to the sixty-fourth Galois field element. Must not be null and must point to a valid, writable `gf_t`.
+- **Output**: None
+- **See also**: [`fd_reedsol_ifft_64_0`](wrapped_impl/fd_reedsol_fft_impl_64_0.c.driver.md#fd_reedsol_ifft_64_0)  (Implementation)
+
+
+---
+### fd\_reedsol\_ifft\_64\_64<!-- {{#callable_declaration:fd_reedsol_ifft_64_64}} -->
+Performs an inverse fast Fourier transform on 64 input elements.
+- **Description**: This function is used to perform an inverse fast Fourier transform (IFFT) on 64 input elements, which are provided as pointers to `gf_t` types. It is typically used in applications involving signal processing or error correction where such transformations are necessary. The function modifies the input values in place, so the input pointers must point to valid memory locations that the caller owns. All input pointers must be non-null, and the function assumes that the data pointed to by these pointers is valid for the transformation.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`. Must not be null.
+    - `_in01`: Pointer to the second input element of type `gf_t`. Must not be null.
+    - `_in02`: Pointer to the third input element of type `gf_t`. Must not be null.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`. Must not be null.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`. Must not be null.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`. Must not be null.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`. Must not be null.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`. Must not be null.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`. Must not be null.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`. Must not be null.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`. Must not be null.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`. Must not be null.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`. Must not be null.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`. Must not be null.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`. Must not be null.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`. Must not be null.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`. Must not be null.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`. Must not be null.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`. Must not be null.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`. Must not be null.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`. Must not be null.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`. Must not be null.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`. Must not be null.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`. Must not be null.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`. Must not be null.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`. Must not be null.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`. Must not be null.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`. Must not be null.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`. Must not be null.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`. Must not be null.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`. Must not be null.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`. Must not be null.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`. Must not be null.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`. Must not be null.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`. Must not be null.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`. Must not be null.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`. Must not be null.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`. Must not be null.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`. Must not be null.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`. Must not be null.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`. Must not be null.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`. Must not be null.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`. Must not be null.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`. Must not be null.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`. Must not be null.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`. Must not be null.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`. Must not be null.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`. Must not be null.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`. Must not be null.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`. Must not be null.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`. Must not be null.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`. Must not be null.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`. Must not be null.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`. Must not be null.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`. Must not be null.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`. Must not be null.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`. Must not be null.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`. Must not be null.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`. Must not be null.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`. Must not be null.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`. Must not be null.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`. Must not be null.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`. Must not be null.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_ifft_64_64`](wrapped_impl/fd_reedsol_fft_impl_64_64.c.driver.md#fd_reedsol_ifft_64_64)  (Implementation)
+
+
+---
+### fd\_reedsol\_ifft\_64\_128<!-- {{#callable_declaration:fd_reedsol_ifft_64_128}} -->
+Performs an inverse fast Fourier transform on 64 input elements.
+- **Description**: This function is used to perform an inverse fast Fourier transform (IFFT) on 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in applications involving error correction or signal processing where such transformations are necessary. The function modifies the input values in place, so the input pointers must point to valid memory locations that the caller owns. All input pointers must be non-null, and the function assumes that the data pointed to by these pointers is correctly initialized before the call.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ifft_64_128`](wrapped_impl/fd_reedsol_fft_impl_64_128.c.driver.md#fd_reedsol_ifft_64_128)  (Implementation)
+
+
+---
+### fd\_reedsol\_fft\_64\_0<!-- {{#callable_declaration:fd_reedsol_fft_64_0}} -->
+Performs a 64-point Reed-Solomon FFT transformation on input data.
+- **Description**: This function applies a 64-point Fast Fourier Transform (FFT) specific to Reed-Solomon error correction on the provided input data. It is designed to be used in contexts where Reed-Solomon encoding or decoding is required. The function expects exactly 64 input elements, each represented by a pointer to a `gf_t` type, which is typically a Galois Field element used in error correction codes. The function modifies the input data in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all preconditions are met before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to the first Galois Field element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to the second Galois Field element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to the third Galois Field element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to the fourth Galois Field element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to the fifth Galois Field element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to the sixth Galois Field element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to the seventh Galois Field element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to the eighth Galois Field element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to the ninth Galois Field element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to the tenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to the eleventh Galois Field element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to the twelfth Galois Field element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to the thirteenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to the fourteenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to the fifteenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to the sixteenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to the seventeenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to the eighteenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to the nineteenth Galois Field element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to the twentieth Galois Field element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to the twenty-first Galois Field element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to the twenty-second Galois Field element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to the twenty-third Galois Field element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to the twenty-fourth Galois Field element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to the twenty-fifth Galois Field element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to the twenty-sixth Galois Field element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to the twenty-seventh Galois Field element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to the twenty-eighth Galois Field element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to the twenty-ninth Galois Field element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to the thirtieth Galois Field element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to the thirty-first Galois Field element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to the thirty-second Galois Field element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to the thirty-third Galois Field element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to the thirty-fourth Galois Field element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to the thirty-fifth Galois Field element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to the thirty-sixth Galois Field element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to the thirty-seventh Galois Field element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to the thirty-eighth Galois Field element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to the thirty-ninth Galois Field element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to the fortieth Galois Field element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to the forty-first Galois Field element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to the forty-second Galois Field element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to the forty-third Galois Field element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to the forty-fourth Galois Field element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to the forty-fifth Galois Field element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to the forty-sixth Galois Field element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to the forty-seventh Galois Field element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to the forty-eighth Galois Field element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to the forty-ninth Galois Field element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to the fiftieth Galois Field element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to the fifty-first Galois Field element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to the fifty-second Galois Field element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to the fifty-third Galois Field element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to the fifty-fourth Galois Field element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to the fifty-fifth Galois Field element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to the fifty-sixth Galois Field element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to the fifty-seventh Galois Field element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to the fifty-eighth Galois Field element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to the fifty-ninth Galois Field element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to the sixtieth Galois Field element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to the sixty-first Galois Field element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to the sixty-second Galois Field element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to the sixty-third Galois Field element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to the sixty-fourth Galois Field element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_fft_64_0`](wrapped_impl/fd_reedsol_fft_impl_64_0.c.driver.md#fd_reedsol_fft_64_0)  (Implementation)
+
+
+---
+### fd\_reedsol\_fft\_64\_64<!-- {{#callable_declaration:fd_reedsol_fft_64_64}} -->
+Performs a 64-point Reed-Solomon FFT on the input data.
+- **Description**: This function applies a 64-point Fast Fourier Transform (FFT) specifically designed for Reed-Solomon error correction on the provided input data. It is intended for use in scenarios where Reed-Solomon encoding or decoding is required. The function takes 64 input values, each represented by a pointer to a `gf_t` type, and performs in-place transformation, meaning the input data is directly modified to contain the transformed values. Users must ensure that all input pointers are valid and point to initialized `gf_t` values before calling this function. The function does not perform any input validation, so invalid pointers or uninitialized data may lead to undefined behavior.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` value representing the first input. Must be valid and initialized.
+    - `_in01`: Pointer to a `gf_t` value representing the second input. Must be valid and initialized.
+    - `_in02`: Pointer to a `gf_t` value representing the third input. Must be valid and initialized.
+    - `_in03`: Pointer to a `gf_t` value representing the fourth input. Must be valid and initialized.
+    - `_in04`: Pointer to a `gf_t` value representing the fifth input. Must be valid and initialized.
+    - `_in05`: Pointer to a `gf_t` value representing the sixth input. Must be valid and initialized.
+    - `_in06`: Pointer to a `gf_t` value representing the seventh input. Must be valid and initialized.
+    - `_in07`: Pointer to a `gf_t` value representing the eighth input. Must be valid and initialized.
+    - `_in08`: Pointer to a `gf_t` value representing the ninth input. Must be valid and initialized.
+    - `_in09`: Pointer to a `gf_t` value representing the tenth input. Must be valid and initialized.
+    - `_in10`: Pointer to a `gf_t` value representing the eleventh input. Must be valid and initialized.
+    - `_in11`: Pointer to a `gf_t` value representing the twelfth input. Must be valid and initialized.
+    - `_in12`: Pointer to a `gf_t` value representing the thirteenth input. Must be valid and initialized.
+    - `_in13`: Pointer to a `gf_t` value representing the fourteenth input. Must be valid and initialized.
+    - `_in14`: Pointer to a `gf_t` value representing the fifteenth input. Must be valid and initialized.
+    - `_in15`: Pointer to a `gf_t` value representing the sixteenth input. Must be valid and initialized.
+    - `_in16`: Pointer to a `gf_t` value representing the seventeenth input. Must be valid and initialized.
+    - `_in17`: Pointer to a `gf_t` value representing the eighteenth input. Must be valid and initialized.
+    - `_in18`: Pointer to a `gf_t` value representing the nineteenth input. Must be valid and initialized.
+    - `_in19`: Pointer to a `gf_t` value representing the twentieth input. Must be valid and initialized.
+    - `_in20`: Pointer to a `gf_t` value representing the twenty-first input. Must be valid and initialized.
+    - `_in21`: Pointer to a `gf_t` value representing the twenty-second input. Must be valid and initialized.
+    - `_in22`: Pointer to a `gf_t` value representing the twenty-third input. Must be valid and initialized.
+    - `_in23`: Pointer to a `gf_t` value representing the twenty-fourth input. Must be valid and initialized.
+    - `_in24`: Pointer to a `gf_t` value representing the twenty-fifth input. Must be valid and initialized.
+    - `_in25`: Pointer to a `gf_t` value representing the twenty-sixth input. Must be valid and initialized.
+    - `_in26`: Pointer to a `gf_t` value representing the twenty-seventh input. Must be valid and initialized.
+    - `_in27`: Pointer to a `gf_t` value representing the twenty-eighth input. Must be valid and initialized.
+    - `_in28`: Pointer to a `gf_t` value representing the twenty-ninth input. Must be valid and initialized.
+    - `_in29`: Pointer to a `gf_t` value representing the thirtieth input. Must be valid and initialized.
+    - `_in30`: Pointer to a `gf_t` value representing the thirty-first input. Must be valid and initialized.
+    - `_in31`: Pointer to a `gf_t` value representing the thirty-second input. Must be valid and initialized.
+    - `_in32`: Pointer to a `gf_t` value representing the thirty-third input. Must be valid and initialized.
+    - `_in33`: Pointer to a `gf_t` value representing the thirty-fourth input. Must be valid and initialized.
+    - `_in34`: Pointer to a `gf_t` value representing the thirty-fifth input. Must be valid and initialized.
+    - `_in35`: Pointer to a `gf_t` value representing the thirty-sixth input. Must be valid and initialized.
+    - `_in36`: Pointer to a `gf_t` value representing the thirty-seventh input. Must be valid and initialized.
+    - `_in37`: Pointer to a `gf_t` value representing the thirty-eighth input. Must be valid and initialized.
+    - `_in38`: Pointer to a `gf_t` value representing the thirty-ninth input. Must be valid and initialized.
+    - `_in39`: Pointer to a `gf_t` value representing the fortieth input. Must be valid and initialized.
+    - `_in40`: Pointer to a `gf_t` value representing the forty-first input. Must be valid and initialized.
+    - `_in41`: Pointer to a `gf_t` value representing the forty-second input. Must be valid and initialized.
+    - `_in42`: Pointer to a `gf_t` value representing the forty-third input. Must be valid and initialized.
+    - `_in43`: Pointer to a `gf_t` value representing the forty-fourth input. Must be valid and initialized.
+    - `_in44`: Pointer to a `gf_t` value representing the forty-fifth input. Must be valid and initialized.
+    - `_in45`: Pointer to a `gf_t` value representing the forty-sixth input. Must be valid and initialized.
+    - `_in46`: Pointer to a `gf_t` value representing the forty-seventh input. Must be valid and initialized.
+    - `_in47`: Pointer to a `gf_t` value representing the forty-eighth input. Must be valid and initialized.
+    - `_in48`: Pointer to a `gf_t` value representing the forty-ninth input. Must be valid and initialized.
+    - `_in49`: Pointer to a `gf_t` value representing the fiftieth input. Must be valid and initialized.
+    - `_in50`: Pointer to a `gf_t` value representing the fifty-first input. Must be valid and initialized.
+    - `_in51`: Pointer to a `gf_t` value representing the fifty-second input. Must be valid and initialized.
+    - `_in52`: Pointer to a `gf_t` value representing the fifty-third input. Must be valid and initialized.
+    - `_in53`: Pointer to a `gf_t` value representing the fifty-fourth input. Must be valid and initialized.
+    - `_in54`: Pointer to a `gf_t` value representing the fifty-fifth input. Must be valid and initialized.
+    - `_in55`: Pointer to a `gf_t` value representing the fifty-sixth input. Must be valid and initialized.
+    - `_in56`: Pointer to a `gf_t` value representing the fifty-seventh input. Must be valid and initialized.
+    - `_in57`: Pointer to a `gf_t` value representing the fifty-eighth input. Must be valid and initialized.
+    - `_in58`: Pointer to a `gf_t` value representing the fifty-ninth input. Must be valid and initialized.
+    - `_in59`: Pointer to a `gf_t` value representing the sixtieth input. Must be valid and initialized.
+    - `_in60`: Pointer to a `gf_t` value representing the sixty-first input. Must be valid and initialized.
+    - `_in61`: Pointer to a `gf_t` value representing the sixty-second input. Must be valid and initialized.
+    - `_in62`: Pointer to a `gf_t` value representing the sixty-third input. Must be valid and initialized.
+    - `_in63`: Pointer to a `gf_t` value representing the sixty-fourth input. Must be valid and initialized.
+- **Output**: None
+- **See also**: [`fd_reedsol_fft_64_64`](wrapped_impl/fd_reedsol_fft_impl_64_64.c.driver.md#fd_reedsol_fft_64_64)  (Implementation)
+
+
+---
+### fd\_reedsol\_fft\_64\_128<!-- {{#callable_declaration:fd_reedsol_fft_64_128}} -->
+Performs a 64-point FFT on 128-element input data.
+- **Description**: This function applies a 64-point Fast Fourier Transform (FFT) to a set of 128 input elements, modifying the input data in place. It is typically used in signal processing applications where such transformations are required. The function expects exactly 64 input pointers, each pointing to a valid `gf_t` element. The input data is transformed and the results are written back to the same memory locations. Ensure that all input pointers are valid and non-null before calling this function to avoid undefined behavior.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`. Must not be null.
+    - `_in01`: Pointer to the second input element of type `gf_t`. Must not be null.
+    - `_in02`: Pointer to the third input element of type `gf_t`. Must not be null.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`. Must not be null.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`. Must not be null.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`. Must not be null.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`. Must not be null.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`. Must not be null.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`. Must not be null.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`. Must not be null.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`. Must not be null.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`. Must not be null.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`. Must not be null.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`. Must not be null.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`. Must not be null.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`. Must not be null.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`. Must not be null.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`. Must not be null.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`. Must not be null.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`. Must not be null.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`. Must not be null.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`. Must not be null.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`. Must not be null.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`. Must not be null.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`. Must not be null.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`. Must not be null.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`. Must not be null.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`. Must not be null.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`. Must not be null.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`. Must not be null.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`. Must not be null.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`. Must not be null.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`. Must not be null.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`. Must not be null.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`. Must not be null.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`. Must not be null.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`. Must not be null.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`. Must not be null.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`. Must not be null.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`. Must not be null.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`. Must not be null.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`. Must not be null.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`. Must not be null.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`. Must not be null.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`. Must not be null.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`. Must not be null.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`. Must not be null.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`. Must not be null.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`. Must not be null.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`. Must not be null.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`. Must not be null.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`. Must not be null.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`. Must not be null.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`. Must not be null.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`. Must not be null.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`. Must not be null.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`. Must not be null.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`. Must not be null.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`. Must not be null.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`. Must not be null.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`. Must not be null.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`. Must not be null.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`. Must not be null.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_fft_64_128`](wrapped_impl/fd_reedsol_fft_impl_64_128.c.driver.md#fd_reedsol_fft_64_128)  (Implementation)
+
+

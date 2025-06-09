@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for building a software project. It defines rules to add header files and object files to the build process, specifically for components related to "fd_neigh4_map" and "fd_waltz". Additionally, it includes conditional logic to add more headers, objects, and a unit test for "fd_neigh4_netlink" and "fd_neigh4_probe" if the "FD_HAS_LINUX" flag is set, indicating platform-specific build instructions for Linux.

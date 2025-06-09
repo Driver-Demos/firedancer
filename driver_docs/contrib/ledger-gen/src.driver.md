@@ -1,0 +1,9 @@
+
+## Files
+- **[bpf_loader.rs](src/bpf_loader.rs.driver.md)**: The `bpf_loader.rs` file in the `firedancer` codebase provides functions for deploying, invoking, upgrading, closing, and redeploying Solana programs, handling different scenarios such as same-slot and different-slot operations.
+- **[instructions.rs](src/instructions.rs.driver.md)**: The `instructions.rs` file in the `firedancer` codebase provides functions for setting up, deploying, invoking, upgrading, and closing Solana programs, as well as creating nonce accounts, using various Solana SDK and client utilities.
+- **[ledgers.rs](src/ledgers.rs.driver.md)**: The `ledgers.rs` file in the `firedancer` codebase provides functions for deploying, upgrading, and managing BPF programs and stakes on the Solana blockchain using the `RpcClient` and `Keypair`.
+- **[main.rs](src/main.rs.driver.md)**: The `main.rs` file in the `firedancer` codebase sets up the workflow for creating ledgers, including setting up buffer accounts, executing program instructions, creating and sending transactions, and waiting for slots, with a focus on Solana blockchain interactions.
+- **[nonce.rs](src/nonce.rs.driver.md)**: The `nonce.rs` file in the `firedancer` codebase provides functionality for creating and managing nonce accounts on the Solana blockchain, including creating transactions with nonce blockhashes and confirming them.
+- **[stake.rs](src/stake.rs.driver.md)**: The `stake.rs` file in the `firedancer` codebase provides functions to create, manage, and move lamports and stakes between accounts using the Solana blockchain.
+- **[utils.rs](src/utils.rs.driver.md)**: The `utils.rs` file in the `firedancer` codebase provides utility functions for reading and verifying ELF files, creating and signing Solana transactions, and waiting for a specified number of slots using the Solana RPC client.

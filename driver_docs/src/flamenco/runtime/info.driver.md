@@ -1,0 +1,8 @@
+
+## Files
+- **[fd_instr_info.c](info/fd_instr_info.c.driver.md)**: The `fd_instr_info.c` file in the `firedancer` codebase provides functions for initializing, accumulating, and summing lamports in transaction instructions within the runtime information context.
+- **[fd_instr_info.h](info/fd_instr_info.h.driver.md)**: The `fd_instr_info.h` file in the `firedancer` codebase defines structures and functions for managing instruction accounts within a transaction, including handling account properties like writability and signer status, while capping the maximum number of accounts to 256 to maintain a low memory footprint.
+- **[fd_microblock_batch_info.h](info/fd_microblock_batch_info.h.driver.md)**: The `fd_microblock_batch_info.h` file defines the structure and functions for managing information about batches of microblocks, including counts of microblocks, signatures, transactions, and accounts, in the Firedancer codebase.
+- **[fd_microblock_info.h](info/fd_microblock_info.h.driver.md)**: The `fd_microblock_info.h` file defines the `fd_microblock_info` structure and provides function prototypes for managing microblock information in the Firedancer codebase.
+- **[fd_runtime_block_info.h](info/fd_runtime_block_info.h.driver.md)**: The `fd_runtime_block_info.h` file defines a structure for storing information about runtime blocks, including counts of microblocks, signatures, transactions, and accounts, as well as pointers to microblock batch information and raw block data.
+- **[Local.mk](info/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of header and object files related to runtime block and instruction information when `FD_HAS_INT128` is defined.

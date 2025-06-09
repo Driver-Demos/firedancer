@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for configuring the build process of a software project. It conditionally adds header files and object files related to the BLAKE3 cryptographic hash function, depending on the availability of specific CPU instruction sets (AVX512, AVX, SSE). It also defines targets for unit testing and, if hosted, fuzz testing, ensuring that the appropriate tests are compiled and linked with the necessary components.

@@ -1,0 +1,2 @@
+# Purpose
+This snippet is a conditional directive from a Makefile used in a software build process. It checks if the macro `FD_HAS_SSE` is defined, and if so, it adds several object files (`fd_quic_trace_frame`, `fd_quic_trace_main`, `fd_quic_trace_rx_tile`, `fd_quic_trace_log_tile`) to the `fddev_shared` target using a custom `add-objs` function. This setup is likely used to include specific source files in the build when SSE (Streaming SIMD Extensions) support is available.

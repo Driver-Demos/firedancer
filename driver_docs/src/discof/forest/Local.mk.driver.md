@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used in a build system to conditionally add object files and create a unit test target. If the macro `FD_HAS_INT128` is defined, it adds the object file `fd_discof` to the `fd_forest` target and sets up a unit test named `test_forest` that depends on several object files, including `fd_discof`, `fd_disco`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.

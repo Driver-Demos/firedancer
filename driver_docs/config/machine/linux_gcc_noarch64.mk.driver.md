@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet sets up a build environment for a software project targeting a 64-bit Linux architecture using GCC. It specifies the build directory and includes various configuration files to enable features such as debugging, security, optimization, and threading. Additionally, it defines and appends preprocessor flags to enable double precision and dynamic memory allocation using `alloca`.

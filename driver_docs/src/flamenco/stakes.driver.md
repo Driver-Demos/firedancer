@@ -1,0 +1,6 @@
+
+## Files
+- **[fd_stakes.c](stakes/fd_stakes.c.driver.md)**: The `fd_stakes.c` file in the `firedancer` codebase implements functions for managing and processing stake information, including accumulating stakes by node, sorting stake weights, exporting sorted stakes, and refreshing vote accounts with updated delegated stakes.
+- **[fd_stakes.h](stakes/fd_stakes.h.driver.md)**: The `fd_stakes.h` file in the `firedancer` codebase provides function prototypes and data structures for managing and processing stake delegations and vote accounts, including operations like activation, removal, and updating of stake delegations.
+- **[fd_stakes_from_snapshot.c](stakes/fd_stakes_from_snapshot.c.driver.md)**: The `fd_stakes_from_snapshot.c` file in the `firedancer` codebase provides functionality to derive epoch stake information from a snapshot, supporting modes to print available epochs, dump active stake per node identity, and dump leader schedules.
+- **[Local.mk](stakes/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `fd_stakes` component, including header and object file dependencies, and conditional binary creation based on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED`.

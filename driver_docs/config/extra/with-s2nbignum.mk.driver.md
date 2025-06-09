@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet checks for the existence of the `libs2nbignum.a` library file in the specified `$(OPT)/lib` directory. If the file exists, it sets a flag `FD_HAS_S2NBIGNUM` to 1, adds a preprocessor definition to `CFLAGS`, and appends the library path to `LDFLAGS`. If the file is not found, it issues a warning indicating that the `s2n-bignum` library is not installed and will be skipped.

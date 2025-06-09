@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation. It checks for the presence of specific features or capabilities (`FD_HAS_ATOMIC`, `FD_HAS_INT128`, `FD_HAS_SSE`) and, if all are defined, it includes headers and objects (`fd_bank_abi.h`, `fd_bank_abi`, `fd_discof`) into the build process. This ensures that certain components are only compiled when the necessary hardware or compiler support is available.

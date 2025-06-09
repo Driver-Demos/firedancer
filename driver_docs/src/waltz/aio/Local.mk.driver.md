@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile script used to automate the build process of a software project. It defines rules for adding header files and object files, creating unit tests, and executing those tests. The script specifically handles the inclusion of headers and objects related to `fd_aio`, `fd_aio_pcapng`, and `fd_aio_tango`, and sets up a unit test for `test_aio` using dependencies `fd_waltz` and `fd_util`.

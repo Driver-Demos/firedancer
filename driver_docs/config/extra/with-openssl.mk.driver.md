@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet checks for the presence of the OpenSSL static library `libssl.a` in a specified directory (`$(OPT)/lib`). If found, it sets the `OPENSSL_LIBS` variable to include both `libssl.a` and `libcrypto.a`, and updates `CPPFLAGS` to define preprocessor macros indicating OpenSSL's presence and compatibility with a specific API version while disabling deprecated features. If the library is not found, it outputs a message indicating that OpenSSL is not installed and skips related configurations.

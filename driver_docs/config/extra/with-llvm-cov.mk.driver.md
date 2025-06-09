@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet conditionally configures the build process to enable code coverage analysis when using the Clang compiler. If the `FD_USING_CLANG` variable is set to "1", it sets the `FD_HAS_COVERAGE` flag, and appends specific flags to `CPPFLAGS` and `LDFLAGS` to generate coverage data. If Clang is not being used, it issues a warning indicating that `llvm-cov` is requested but Clang is not in use.

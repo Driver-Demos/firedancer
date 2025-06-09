@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used to configure compiler and linker flags for building a software project. It sets flags for position-independent code (`-fPIC`), position-independent executables (`-pie`), and stack protection (`-fstack-protector-strong`). It also includes linker options for read-only relocations and immediate binding (`-Wl,-z,relro,-z,now`). Additionally, it conditionally defines `_FORTIFY_SOURCE` for enhanced security checks when optimization is enabled.

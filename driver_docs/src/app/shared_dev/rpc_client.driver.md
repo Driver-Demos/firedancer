@@ -1,0 +1,8 @@
+
+## Files
+- **[dump_rpc_client.c](rpc_client/dump_rpc_client.c.driver.md)**: The `dump_rpc_client.c` file in the `firedancer` codebase implements a simple RPC client that connects to a local server to request and print the transaction count.
+- **[fd_rpc_client.c](rpc_client/fd_rpc_client.c.driver.md)**: The `fd_rpc_client.c` file in the `firedancer` codebase implements an RPC client that manages network connections and requests to a remote server, including methods for sending requests, handling responses, and managing connection states.
+- **[fd_rpc_client.h](rpc_client/fd_rpc_client.h.driver.md)**: The `fd_rpc_client.h` file provides a basic and non-hardened implementation of an RPC client for retrieving information such as the latest block hash and transaction count from the Agave validator, with various functions for managing RPC requests and responses.
+- **[fd_rpc_client_private.h](rpc_client/fd_rpc_client_private.h.driver.md)**: The `fd_rpc_client_private.h` file defines private structures and data for managing RPC client requests and responses, including request state and network details, in the Firedancer codebase.
+- **[Local.mk](rpc_client/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase defines build and test configurations for the `rpc_client` component, including header and object files, as well as unit tests, conditional on the `FD_HAS_HOSTED` flag.
+- **[test_rpc_client.c](rpc_client/test_rpc_client.c.driver.md)**: The `test_rpc_client.c` file in the `firedancer` codebase implements a test suite for the RPC client, including tests for transaction count and latest block hash requests using a mock server.

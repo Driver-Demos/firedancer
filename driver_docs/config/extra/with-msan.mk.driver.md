@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used to configure a build system for a C++ project with memory sanitization enabled. It sets a flag `FD_HAS_MSAN` to indicate the presence of MemorySanitizer, and appends the necessary compiler (`CPPFLAGS`) and linker (`LDFLAGS`) flags to enable memory error detection. It also includes an additional configuration file, `with-libcxx.mk`, which likely contains further settings related to the C++ standard library.

@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation and linking of object files and unit tests in a software project. It checks for the presence of certain features, such as `FD_HAS_INT128` and `FD_HAS_SSE`, to conditionally add object files (`fd_fec_repair`, `fd_fec_chainer`, `fd_repair_tile`) to the build process. It also defines unit tests (`test_fec_repair`, `test_fec_chainer`) with their respective dependencies, ensuring that the tests are only built when the specified conditions are met.

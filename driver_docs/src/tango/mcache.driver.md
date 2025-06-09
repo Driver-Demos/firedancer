@@ -1,0 +1,7 @@
+
+## Files
+- **[fd_mcache.c](mcache/fd_mcache.c.driver.md)**: The `fd_mcache.c` file in the `firedancer` codebase provides functions for managing a memory cache, including creating, joining, leaving, and deleting shared memory caches, as well as accessing metadata and application-specific data within the cache.
+- **[fd_mcache.h](mcache/fd_mcache.h.driver.md)**: The `fd_mcache.h` file in the `firedancer` codebase provides definitions and functions for managing a memory cache (mcache) used for storing metadata of fragments, including APIs for construction, joining, leaving, publishing, and querying the mcache, with support for SSE and AVX optimizations.
+- **[fd_mcache_private.h](mcache/fd_mcache_private.h.driver.md)**: The `fd_mcache_private.h` file defines the structure and functions for managing the layout of a shared memory region used in the Firedancer mcache system, including constants and inline functions for accessing cache metadata.
+- **[Local.mk](mcache/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_mcache` component within the `tango/mcache` directory.
+- **[test_mcache.c](mcache/test_mcache.c.driver.md)**: The `test_mcache.c` file in the `firedancer` codebase contains unit tests for verifying the alignment, footprint, creation, joining, accessing, and destruction of memory caches (`mcache`) in the `fd_tango` module, including various edge cases and failure scenarios.

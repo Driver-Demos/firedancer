@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile used for configuring the build environment for a software project targeting FreeBSD with Clang on a noarch128 architecture. It sets the build directory and includes several configuration files to enable specific features such as Clang support, debugging, brutality, and optimization. Additionally, it defines and appends preprocessor flags to enable certain features like 128-bit integers, double precision, and stack allocation, while also setting environment, I/O, and logging styles to zero, indicating a non-hosted environment.

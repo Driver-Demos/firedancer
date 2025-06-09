@@ -1,0 +1,11 @@
+
+## Files
+- **[fd_sbpf_instr.h](sbpf/fd_sbpf_instr.h.driver.md)**: The `fd_sbpf_instr.h` file defines structures and functions for handling SBPF (Solana Berkeley Packet Filter) instructions, including opcode representations and conversions between instruction structures and unsigned long integers.
+- **[fd_sbpf_loader.c](sbpf/fd_sbpf_loader.c.driver.md)**: The `fd_sbpf_loader.c` file in the `firedancer` codebase implements an ELF loader for the sBPF virtual machine, handling error management, ELF file validation, section and program header processing, dynamic relocation, and program loading.
+- **[fd_sbpf_loader.h](sbpf/fd_sbpf_loader.h.driver.md)**: The `fd_sbpf_loader.h` file in the `firedancer` codebase provides functionality for preparing sBPF programs for execution, including parsing, dynamic relocation, and managing program structures and syscalls.
+- **[fd_sbpf_opcodes.h](sbpf/fd_sbpf_opcodes.h.driver.md)**: The `fd_sbpf_opcodes.h` file in the `firedancer` codebase defines macros and constants for constructing and representing SBPF (Solana Berkeley Packet Filter) opcodes, including various classes, modes, and specific instruction opcodes.
+- **[fuzz_sbpf_loader.c](sbpf/fuzz_sbpf_loader.c.driver.md)**: The `fuzz_sbpf_loader.c` file in the `firedancer` codebase implements a fuzz testing harness for loading and testing eBPF programs using the `fd_sbpf_loader` and related utilities.
+- **[Local.mk](sbpf/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, unit tests, and fuzz tests for the SBPF components, conditional on the `FD_HAS_HOSTED` flag.
+- **[test_sbpf_elf_peek.c](sbpf/test_sbpf_elf_peek.c.driver.md)**: The `test_sbpf_elf_peek.c` file contains tests for verifying the SBPF version compatibility of Solana program ELF files using the `fd_sbpf_elf_peek` function.
+- **[test_sbpf_load_prog.c](sbpf/test_sbpf_load_prog.c.driver.md)**: The `test_sbpf_load_prog.c` file in the `firedancer` codebase is a redundant test program for loading sBPF programs, which duplicates functionality found in `fd_sbpf_tool`.
+- **[test_sbpf_loader.c](sbpf/test_sbpf_loader.c.driver.md)**: The `test_sbpf_loader.c` file in the `firedancer` codebase contains a test for loading an SBPF program with duplicate entry points, ensuring that only the correct entry point is registered in the call destinations.

@@ -1,0 +1,2 @@
+# Purpose
+This file is a Protocol Buffers (proto3) definition file that specifies the structure of data for serialization. It defines a package named "shared" and includes three message types: `Header`, which contains a timestamp field using Google's protobuf timestamp; `Heartbeat`, which includes a count field of type uint64; and `Socket`, which contains an IP address as a string and a port as an int64. The file also imports the "google/protobuf/timestamp.proto" to utilize the timestamp functionality.

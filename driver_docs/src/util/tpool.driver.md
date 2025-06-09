@@ -1,0 +1,7 @@
+
+## Files
+- **[fd_map_reduce.h](tpool/fd_map_reduce.h.driver.md)**: The `fd_map_reduce.h` file in the `firedancer` codebase provides macros and inline functions for implementing high-performance, deterministic parallelized tree dispatch operations, similar to CUDA kernels, without requiring data transfer between CPU and GPU, and includes support for both map-reduce and for-all operations.
+- **[fd_tpool.cxx](tpool/fd_tpool.cxx.driver.md)**: The `fd_tpool.cxx` file in the `firedancer` codebase implements a thread pool with support for managing worker threads, executing tasks, and handling synchronization using pthreads when available.
+- **[fd_tpool.h](tpool/fd_tpool.h.driver.md)**: The `fd_tpool.h` file in the `firedancer` codebase provides APIs for creating and managing thread pools to efficiently execute thread-parallel jobs with low overhead and high scalability, including functions for task partitioning and execution across multiple threads.
+- **[Local.mk](tpool/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_tpool` component in the `tpool` utility.
+- **[test_tpool.c](tpool/test_tpool.c.driver.md)**: The `test_tpool.c` file in the `firedancer` codebase contains a comprehensive suite of tests and benchmarks for the thread pool functionality, including initialization, execution, and various task distribution strategies.

@@ -1,0 +1,7 @@
+
+## Files
+- **[fd_curve25519.c](ref/fd_curve25519.c.driver.md)**: The `fd_curve25519.c` file in the `firedancer` codebase implements operations for elliptic curve point addition, subtraction, doubling, and serialization/deserialization on the Curve25519, with optional optimizations for scalar multiplication.
+- **[fd_curve25519.h](ref/fd_curve25519.h.driver.md)**: The `fd_curve25519.h` file in the `firedancer` codebase provides the public API for Curve25519 operations, including functions for setting, negating, and comparing points in Extended Twisted Edwards Coordinates, as well as handling precomputed table formats.
+- **[fd_curve25519_secure.c](ref/fd_curve25519_secure.c.driver.md)**: The `fd_curve25519_secure.c` file in the `firedancer` codebase provides secure implementations of various operations on Ed25519 points, ensuring constant-time execution and register clearing to protect against side-channel attacks.
+- **[fd_f25519.c](ref/fd_f25519.c.driver.md)**: The `fd_f25519.c` file in the `firedancer` codebase provides a function to generate a random `fd_f25519_t` element, intended for testing purposes only, and not secure for cryptographic use.
+- **[fd_f25519.h](ref/fd_f25519.h.driver.md)**: The `fd_f25519.h` file in the `firedancer` codebase provides an implementation of operations on Curve25519 field elements, including addition, subtraction, multiplication, squaring, serialization, and conditional operations, with support for both 32-bit and 64-bit representations.

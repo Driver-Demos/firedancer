@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for building and testing components of a software project. It defines rules to add header files (`fd_shred.h`, `fd_deshredder.h`) and object files (`fd_shred`, `fd_deshredder`, `fd_ballet`) to the build process. It also specifies the creation and execution of a unit test (`test_shred`) and conditionally includes a fuzz test (`fuzz_shred_parse`) if the `FD_HAS_HOSTED` environment variable is set.

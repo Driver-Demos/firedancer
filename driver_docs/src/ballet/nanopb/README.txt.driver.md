@@ -1,0 +1,2 @@
+# Purpose
+This file serves as documentation for the inclusion and management of the Nanopb library within a software project. It specifies that the library is included as an exact copy from the "nanopb-0.4.9.1" tag without any modifications and advises against making local changes, suggesting upstream contributions or local patches instead. It also provides instructions for updating the library using `fetch.sh` and `nanopb_tag.txt` and directs users to the root NOTICE file for licensing details.

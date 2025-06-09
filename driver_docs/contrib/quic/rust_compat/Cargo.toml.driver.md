@@ -1,0 +1,2 @@
+# Purpose
+This file is a Cargo.toml configuration file for a Rust project named "firedancer-rust-quic-test" with version "0.1.0" and edition "2021". It specifies that the package should not be published and includes a custom build script "build.rs". The file lists build dependencies, such as "bindgen", and runtime dependencies, including "env_logger", "libc", "quiche", "quinn", "rustls", "rustls-post-quantum", and "tokio", with specific versions and features for each dependency.

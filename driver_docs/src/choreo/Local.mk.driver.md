@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is used to conditionally compile and set up the `fd_choreo` library and its associated unit tests if the `FD_HAS_INT128` flag is defined. It includes commands to create the library, add header files `fd_choreo_base.h` and `fd_choreo.h`, and define a unit test `test_choreo_base` that depends on multiple components, including `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util`.

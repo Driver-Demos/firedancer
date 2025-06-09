@@ -1,0 +1,2 @@
+# Purpose
+This Makefile is used to automate tasks in a software project. It defines the Python interpreter version to use and sets up commands for generating files (`fd_features_generated.h` and `fd_features_generated.c`) from a Python script (`gen_features.py`) and a JSON file (`feature_map.json`). Additionally, it includes a target to format the `gen_features.py` script using the Black code formatter.

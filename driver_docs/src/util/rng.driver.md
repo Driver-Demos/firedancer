@@ -1,0 +1,7 @@
+
+## Files
+- **[fd_rng.c](rng/fd_rng.c.driver.md)**: The `fd_rng.c` file in the `firedancer` codebase implements various random number generation functions, including robust, exponential, and normal distributions for both float and double precision, utilizing techniques like the ziggurat algorithm.
+- **[fd_rng.h](rng/fd_rng.h.driver.md)**: The `fd_rng.h` file in the `firedancer` codebase provides a high-quality, non-cryptographic pseudo-random number generator with features such as parallel generation, interprocess shared memory usage, and various random number generation methods, including integer, floating-point, and exponential distributions.
+- **[fd_rng_secure.c](rng/fd_rng_secure.c.driver.md)**: The `fd_rng_secure.c` file implements a platform-specific secure random number generator function, using `getrandom` for Linux and FreeBSD, `CCRandomGenerateBytes` for Apple, and logging a warning if the platform is unsupported.
+- **[Local.mk](rng/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the random number generator utilities, including `fd_rng` and `fd_rng_secure`.
+- **[test_rng.c](rng/test_rng.c.driver.md)**: The `test_rng.c` file in the `firedancer` codebase contains a comprehensive suite of tests for the random number generator (RNG) functionality, including alignment, footprint, sequence and index operations, domain testing, and secure RNG testing.

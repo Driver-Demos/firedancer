@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for building a software project. It defines the inclusion of header files and the compilation of object files related to AES (Advanced Encryption Standard) functionalities, specifically for different implementations and optimizations such as reference, x86, AES-NI, and GFNI. Additionally, it sets up a unit test for the AES components, ensuring they are built and tested within the `fd_ballet` and `fd_util` modules.

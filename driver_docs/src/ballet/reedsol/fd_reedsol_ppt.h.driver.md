@@ -1,0 +1,3299 @@
+# Purpose
+The provided C code is a header file that implements the Principal Pivot Transform (PPT) for the Reed-Solomon Fast Fourier Transform (FFT) operator, forming part of a larger library focused on error correction codes, particularly Reed-Solomon codes. These codes are essential in data transmission and storage systems for detecting and correcting errors. The code is auto-generated, suggesting it is part of a system that produces optimized implementations for specific parameters, focusing on the computation of the PPT for data shreds that are not powers of two. It defines macros and function prototypes for various configurations, such as `FD_REEDSOL_PPT_IMPL_64_36` and `FD_REEDSOL_PPT_IMPL_64_48`, which handle different numbers of data and parity symbols using Galois Field arithmetic. These internal components are designed for integration into larger systems, leveraging SIMD operations for performance, and are intended to be wrapped by higher-level functions or interfaces, providing flexible and efficient error correction solutions without directly defining public APIs.
+# Imports and Dependencies
+
+---
+- `fd_reedsol_fft.h`
+
+
+# Function Declarations (Public API)
+
+---
+### fd\_reedsol\_ppt\_32\_17<!-- {{#callable_declaration:fd_reedsol_ppt_32_17}} -->
+Generates a Reed-Solomon parity for 32 input elements.
+- **Description**: This function computes the Reed-Solomon parity for a set of 32 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. It is important to note that the function does not perform any input validation, so the caller must ensure that all inputs are correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must be valid and point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_17`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_17)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_18<!-- {{#callable_declaration:fd_reedsol_ppt_32_18}} -->
+Generates a Reed-Solomon parity for 32 input elements.
+- **Description**: This function computes the Reed-Solomon parity for a set of 32 input elements, each represented as a pointer to a gf_t type. It is typically used in error correction coding to generate parity data that can be used to detect and correct errors in transmitted data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. It is important to call this function with properly initialized input values to ensure correct parity generation.
+- **Inputs**:
+    - `_in00`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a gf_t element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_18`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_18)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_19<!-- {{#callable_declaration:fd_reedsol_ppt_32_19}} -->
+Performs a Reed-Solomon encoding operation on 32 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 32 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory locations. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and that the pointers are not null.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to a writable memory location.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_19`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_19)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_20<!-- {{#callable_declaration:fd_reedsol_ppt_32_20}} -->
+Performs a Reed-Solomon encoding operation on 32 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 32 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and that the pointers are not null.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_20`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_20)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_21<!-- {{#callable_declaration:fd_reedsol_ppt_32_21}} -->
+Generates a Reed-Solomon parity for 32 input elements.
+- **Description**: This function is used to compute the Reed-Solomon parity for a set of 32 input elements, which are represented as pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. It is important to note that the function does not perform any input validation, so the caller must ensure that all inputs are correctly initialized and valid before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_21`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_21)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_22<!-- {{#callable_declaration:fd_reedsol_ppt_32_22}} -->
+Generates a 32,22 Reed-Solomon parity check.
+- **Description**: This function is used to generate a Reed-Solomon parity check for a set of 32 input values, where 22 of these values are data and the remaining are parity. It is typically used in error correction scenarios where data integrity is critical. The function expects pointers to 32 `gf_t` elements, which it will read from and write back to. The caller must ensure that these pointers are valid and point to initialized `gf_t` values. The function modifies the input values in place to include the parity information.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` element. Must be valid and initialized. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_22`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_22)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_23<!-- {{#callable_declaration:fd_reedsol_ppt_32_23}} -->
+Generates a Reed-Solomon parity for 32 input elements.
+- **Description**: This function computes the Reed-Solomon parity for a set of 32 input elements, where the first 23 elements are data and the remaining 9 are parity. It is used in error correction coding to ensure data integrity. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when you need to generate parity for a block of data using Reed-Solomon coding.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to the second input element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to the third input element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to the fourth input element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to the fifth input element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to the sixth input element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to the seventh input element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to the eighth input element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to the ninth input element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to the tenth input element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to the eleventh input element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to the twelfth input element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to the thirteenth input element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to the fourteenth input element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to the fifteenth input element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to the sixteenth input element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to the seventeenth input element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to the eighteenth input element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to the nineteenth input element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to the twentieth input element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to the twenty-first input element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to the twenty-second input element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to the twenty-third input element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to the twenty-fourth input element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to the twenty-fifth input element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to the twenty-sixth input element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to the twenty-seventh input element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to the twenty-eighth input element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to the twenty-ninth input element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to the thirtieth input element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to the thirty-first input element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to the thirty-second input element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_23`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_23)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_24<!-- {{#callable_declaration:fd_reedsol_ppt_32_24}} -->
+Performs a Reed-Solomon encoding operation on 32 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 32 input elements, which are expected to be pointers to elements of a Galois Field. It is typically used in error correction and data integrity applications. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. It is important to note that the function does not perform any input validation, so the caller must ensure that all inputs are correctly initialized and valid before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a gf_t element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_24`](wrapped_impl/fd_reedsol_ppt_impl_17.c.driver.md#fd_reedsol_ppt_32_24)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_25<!-- {{#callable_declaration:fd_reedsol_ppt_32_25}} -->
+Generates a Reed-Solomon parity for 32 input elements.
+- **Description**: This function is used to compute the Reed-Solomon parity for a set of 32 input elements, which are represented as pointers to `gf_t` types. It is typically called in scenarios where error correction is needed, such as in data transmission or storage systems. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. It is important to note that the function does not perform any input validation, so the caller must ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_25`](wrapped_impl/fd_reedsol_ppt_impl_25.c.driver.md#fd_reedsol_ppt_32_25)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_26<!-- {{#callable_declaration:fd_reedsol_ppt_32_26}} -->
+Performs a Reed-Solomon encoding operation on 32 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 32 input elements, which are expected to be pointers to elements of a Galois Field. It is typically used in error correction coding to generate parity information from the input data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and that the pointers are not null.
+- **Inputs**:
+    - `_in00`: Pointer to a Galois Field element. Must not be null.
+    - `_in01`: Pointer to a Galois Field element. Must not be null.
+    - `_in02`: Pointer to a Galois Field element. Must not be null.
+    - `_in03`: Pointer to a Galois Field element. Must not be null.
+    - `_in04`: Pointer to a Galois Field element. Must not be null.
+    - `_in05`: Pointer to a Galois Field element. Must not be null.
+    - `_in06`: Pointer to a Galois Field element. Must not be null.
+    - `_in07`: Pointer to a Galois Field element. Must not be null.
+    - `_in08`: Pointer to a Galois Field element. Must not be null.
+    - `_in09`: Pointer to a Galois Field element. Must not be null.
+    - `_in10`: Pointer to a Galois Field element. Must not be null.
+    - `_in11`: Pointer to a Galois Field element. Must not be null.
+    - `_in12`: Pointer to a Galois Field element. Must not be null.
+    - `_in13`: Pointer to a Galois Field element. Must not be null.
+    - `_in14`: Pointer to a Galois Field element. Must not be null.
+    - `_in15`: Pointer to a Galois Field element. Must not be null.
+    - `_in16`: Pointer to a Galois Field element. Must not be null.
+    - `_in17`: Pointer to a Galois Field element. Must not be null.
+    - `_in18`: Pointer to a Galois Field element. Must not be null.
+    - `_in19`: Pointer to a Galois Field element. Must not be null.
+    - `_in20`: Pointer to a Galois Field element. Must not be null.
+    - `_in21`: Pointer to a Galois Field element. Must not be null.
+    - `_in22`: Pointer to a Galois Field element. Must not be null.
+    - `_in23`: Pointer to a Galois Field element. Must not be null.
+    - `_in24`: Pointer to a Galois Field element. Must not be null.
+    - `_in25`: Pointer to a Galois Field element. Must not be null.
+    - `_in26`: Pointer to a Galois Field element. Must not be null.
+    - `_in27`: Pointer to a Galois Field element. Must not be null.
+    - `_in28`: Pointer to a Galois Field element. Must not be null.
+    - `_in29`: Pointer to a Galois Field element. Must not be null.
+    - `_in30`: Pointer to a Galois Field element. Must not be null.
+    - `_in31`: Pointer to a Galois Field element. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_26`](wrapped_impl/fd_reedsol_ppt_impl_25.c.driver.md#fd_reedsol_ppt_32_26)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_27<!-- {{#callable_declaration:fd_reedsol_ppt_32_27}} -->
+Performs a Reed-Solomon encoding operation on 32 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 32 input elements, which are expected to be pointers to elements of a Galois Field. It is typically used in error correction coding to generate parity information from data elements. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be used when you need to encode data for error correction purposes, and it assumes that the input pointers are correctly initialized before the call.
+- **Inputs**:
+    - `_in00`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a Galois Field element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_27`](wrapped_impl/fd_reedsol_ppt_impl_25.c.driver.md#fd_reedsol_ppt_32_27)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_28<!-- {{#callable_declaration:fd_reedsol_ppt_32_28}} -->
+Generates parity data for a 32,28 Reed-Solomon code.
+- **Description**: This function is used to generate parity data for a Reed-Solomon code with 32 total symbols, of which 28 are data symbols and 4 are parity symbols. It is typically called when encoding data for error correction purposes. The function takes 32 input symbols, modifies them in place to include the parity symbols, and expects all input pointers to be valid and non-null. The caller must ensure that the input pointers point to valid memory locations capable of storing the modified symbols.
+- **Inputs**:
+    - `_in00`: Pointer to the first input symbol. Must not be null.
+    - `_in01`: Pointer to the second input symbol. Must not be null.
+    - `_in02`: Pointer to the third input symbol. Must not be null.
+    - `_in03`: Pointer to the fourth input symbol. Must not be null.
+    - `_in04`: Pointer to the fifth input symbol. Must not be null.
+    - `_in05`: Pointer to the sixth input symbol. Must not be null.
+    - `_in06`: Pointer to the seventh input symbol. Must not be null.
+    - `_in07`: Pointer to the eighth input symbol. Must not be null.
+    - `_in08`: Pointer to the ninth input symbol. Must not be null.
+    - `_in09`: Pointer to the tenth input symbol. Must not be null.
+    - `_in10`: Pointer to the eleventh input symbol. Must not be null.
+    - `_in11`: Pointer to the twelfth input symbol. Must not be null.
+    - `_in12`: Pointer to the thirteenth input symbol. Must not be null.
+    - `_in13`: Pointer to the fourteenth input symbol. Must not be null.
+    - `_in14`: Pointer to the fifteenth input symbol. Must not be null.
+    - `_in15`: Pointer to the sixteenth input symbol. Must not be null.
+    - `_in16`: Pointer to the seventeenth input symbol. Must not be null.
+    - `_in17`: Pointer to the eighteenth input symbol. Must not be null.
+    - `_in18`: Pointer to the nineteenth input symbol. Must not be null.
+    - `_in19`: Pointer to the twentieth input symbol. Must not be null.
+    - `_in20`: Pointer to the twenty-first input symbol. Must not be null.
+    - `_in21`: Pointer to the twenty-second input symbol. Must not be null.
+    - `_in22`: Pointer to the twenty-third input symbol. Must not be null.
+    - `_in23`: Pointer to the twenty-fourth input symbol. Must not be null.
+    - `_in24`: Pointer to the twenty-fifth input symbol. Must not be null.
+    - `_in25`: Pointer to the twenty-sixth input symbol. Must not be null.
+    - `_in26`: Pointer to the twenty-seventh input symbol. Must not be null.
+    - `_in27`: Pointer to the twenty-eighth input symbol. Must not be null.
+    - `_in28`: Pointer to the twenty-ninth input symbol. Must not be null.
+    - `_in29`: Pointer to the thirtieth input symbol. Must not be null.
+    - `_in30`: Pointer to the thirty-first input symbol. Must not be null.
+    - `_in31`: Pointer to the thirty-second input symbol. Must not be null.
+- **Output**: The input symbols are modified in place to include parity data.
+- **See also**: [`fd_reedsol_ppt_32_28`](wrapped_impl/fd_reedsol_ppt_impl_25.c.driver.md#fd_reedsol_ppt_32_28)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_29<!-- {{#callable_declaration:fd_reedsol_ppt_32_29}} -->
+Generates a Reed-Solomon parity for 32 input elements.
+- **Description**: This function computes the Reed-Solomon parity for a set of 32 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when all input elements are properly initialized, as it does not perform any input validation or error checking.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_29`](wrapped_impl/fd_reedsol_ppt_impl_25.c.driver.md#fd_reedsol_ppt_32_29)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_30<!-- {{#callable_declaration:fd_reedsol_ppt_32_30}} -->
+Generates a 32,30 Reed-Solomon parity check.
+- **Description**: This function is used to generate a Reed-Solomon parity check for a set of 32 input symbols, where 30 of them are data symbols and the remaining are parity symbols. It is typically used in error correction scenarios to ensure data integrity. The function modifies the input symbols in place, so the caller must ensure that the input pointers are valid and point to writable memory locations. It is important to provide exactly 32 input pointers, each pointing to a valid `gf_t` type, as the function does not perform any bounds checking or validation on the inputs.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` type representing the first input symbol. Must not be null.
+    - `_in01`: Pointer to a `gf_t` type representing the second input symbol. Must not be null.
+    - `_in02`: Pointer to a `gf_t` type representing the third input symbol. Must not be null.
+    - `_in03`: Pointer to a `gf_t` type representing the fourth input symbol. Must not be null.
+    - `_in04`: Pointer to a `gf_t` type representing the fifth input symbol. Must not be null.
+    - `_in05`: Pointer to a `gf_t` type representing the sixth input symbol. Must not be null.
+    - `_in06`: Pointer to a `gf_t` type representing the seventh input symbol. Must not be null.
+    - `_in07`: Pointer to a `gf_t` type representing the eighth input symbol. Must not be null.
+    - `_in08`: Pointer to a `gf_t` type representing the ninth input symbol. Must not be null.
+    - `_in09`: Pointer to a `gf_t` type representing the tenth input symbol. Must not be null.
+    - `_in10`: Pointer to a `gf_t` type representing the eleventh input symbol. Must not be null.
+    - `_in11`: Pointer to a `gf_t` type representing the twelfth input symbol. Must not be null.
+    - `_in12`: Pointer to a `gf_t` type representing the thirteenth input symbol. Must not be null.
+    - `_in13`: Pointer to a `gf_t` type representing the fourteenth input symbol. Must not be null.
+    - `_in14`: Pointer to a `gf_t` type representing the fifteenth input symbol. Must not be null.
+    - `_in15`: Pointer to a `gf_t` type representing the sixteenth input symbol. Must not be null.
+    - `_in16`: Pointer to a `gf_t` type representing the seventeenth input symbol. Must not be null.
+    - `_in17`: Pointer to a `gf_t` type representing the eighteenth input symbol. Must not be null.
+    - `_in18`: Pointer to a `gf_t` type representing the nineteenth input symbol. Must not be null.
+    - `_in19`: Pointer to a `gf_t` type representing the twentieth input symbol. Must not be null.
+    - `_in20`: Pointer to a `gf_t` type representing the twenty-first input symbol. Must not be null.
+    - `_in21`: Pointer to a `gf_t` type representing the twenty-second input symbol. Must not be null.
+    - `_in22`: Pointer to a `gf_t` type representing the twenty-third input symbol. Must not be null.
+    - `_in23`: Pointer to a `gf_t` type representing the twenty-fourth input symbol. Must not be null.
+    - `_in24`: Pointer to a `gf_t` type representing the twenty-fifth input symbol. Must not be null.
+    - `_in25`: Pointer to a `gf_t` type representing the twenty-sixth input symbol. Must not be null.
+    - `_in26`: Pointer to a `gf_t` type representing the twenty-seventh input symbol. Must not be null.
+    - `_in27`: Pointer to a `gf_t` type representing the twenty-eighth input symbol. Must not be null.
+    - `_in28`: Pointer to a `gf_t` type representing the twenty-ninth input symbol. Must not be null.
+    - `_in29`: Pointer to a `gf_t` type representing the thirtieth input symbol. Must not be null.
+    - `_in30`: Pointer to a `gf_t` type representing the thirty-first input symbol. Must not be null.
+    - `_in31`: Pointer to a `gf_t` type representing the thirty-second input symbol. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_30`](wrapped_impl/fd_reedsol_ppt_impl_25.c.driver.md#fd_reedsol_ppt_32_30)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_32\_31<!-- {{#callable_declaration:fd_reedsol_ppt_32_31}} -->
+Performs a Reed-Solomon encoding operation on 32 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 32 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that the inputs are correctly initialized and that the pointers are not null.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_32_31`](wrapped_impl/fd_reedsol_ppt_impl_25.c.driver.md#fd_reedsol_ppt_32_31)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_33<!-- {{#callable_declaration:fd_reedsol_ppt_64_33}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in error correction coding to generate parity information from the input data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when the input data is ready for encoding, and the caller is prepared to handle the modified data.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_33`](wrapped_impl/fd_reedsol_ppt_impl_33.c.driver.md#fd_reedsol_ppt_64_33)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_34<!-- {{#callable_declaration:fd_reedsol_ppt_64_34}} -->
+Generates a 64,34 Reed-Solomon parity check.
+- **Description**: This function is used to generate a Reed-Solomon parity check for a set of 64 input values, where 34 of these values are data and the rest are parity. It is typically used in error correction scenarios where data integrity is critical. The function expects 64 pointers to `gf_t` values, which it will read from and write back to. The caller must ensure that all pointers are valid and point to initialized `gf_t` values. The function modifies the input values in place, so the caller should ensure that the input data is backed up if needed before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in32`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in33`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in34`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in35`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in36`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in37`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in38`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in39`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in40`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in41`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in42`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in43`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in44`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in45`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in46`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in47`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in48`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in49`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in50`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in51`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in52`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in53`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in54`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in55`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in56`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in57`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in58`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in59`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in60`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in61`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in62`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+    - `_in63`: Pointer to a `gf_t` value. Must not be null. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_34`](wrapped_impl/fd_reedsol_ppt_impl_33.c.driver.md#fd_reedsol_ppt_64_34)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_35<!-- {{#callable_declaration:fd_reedsol_ppt_64_35}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and valid before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: The function modifies the input elements in place, updating the values pointed to by the input pointers.
+- **See also**: [`fd_reedsol_ppt_64_35`](wrapped_impl/fd_reedsol_ppt_impl_33.c.driver.md#fd_reedsol_ppt_64_35)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_36<!-- {{#callable_declaration:fd_reedsol_ppt_64_36}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_36`](wrapped_impl/fd_reedsol_ppt_impl_33.c.driver.md#fd_reedsol_ppt_64_36)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_37<!-- {{#callable_declaration:fd_reedsol_ppt_64_37}} -->
+Processes 64 input elements using a Reed-Solomon algorithm.
+- **Description**: This function applies a Reed-Solomon error correction algorithm to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in scenarios where data integrity is critical, such as in data transmission or storage systems. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory locations. It is important to note that the function does not perform any input validation, so the caller must ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_37`](wrapped_impl/fd_reedsol_ppt_impl_33.c.driver.md#fd_reedsol_ppt_64_37)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_38<!-- {{#callable_declaration:fd_reedsol_ppt_64_38}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction coding to generate parity information from the input data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when the input data is ready for encoding, and the caller should handle any necessary synchronization if used in a multithreaded context.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_38`](wrapped_impl/fd_reedsol_ppt_impl_33.c.driver.md#fd_reedsol_ppt_64_38)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_39<!-- {{#callable_declaration:fd_reedsol_ppt_64_39}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_39`](wrapped_impl/fd_reedsol_ppt_impl_33.c.driver.md#fd_reedsol_ppt_64_39)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_40<!-- {{#callable_declaration:fd_reedsol_ppt_64_40}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction coding to generate parity data from the input data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all input pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_40`](wrapped_impl/fd_reedsol_ppt_impl_40.c.driver.md#fd_reedsol_ppt_64_40)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_41<!-- {{#callable_declaration:fd_reedsol_ppt_64_41}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_41`](wrapped_impl/fd_reedsol_ppt_impl_40.c.driver.md#fd_reedsol_ppt_64_41)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_42<!-- {{#callable_declaration:fd_reedsol_ppt_64_42}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and valid before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_42`](wrapped_impl/fd_reedsol_ppt_impl_40.c.driver.md#fd_reedsol_ppt_64_42)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_43<!-- {{#callable_declaration:fd_reedsol_ppt_64_43}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and valid.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_43`](wrapped_impl/fd_reedsol_ppt_impl_40.c.driver.md#fd_reedsol_ppt_64_43)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_44<!-- {{#callable_declaration:fd_reedsol_ppt_64_44}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_44`](wrapped_impl/fd_reedsol_ppt_impl_40.c.driver.md#fd_reedsol_ppt_64_44)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_45<!-- {{#callable_declaration:fd_reedsol_ppt_64_45}} -->
+Generates a Reed-Solomon parity for 64 input symbols.
+- **Description**: This function is used to compute the parity symbols for a Reed-Solomon code with 64 input symbols and 45 data symbols. It is typically called when encoding data for error correction purposes. The function modifies the input symbols in place to include the parity information. It is important to ensure that all input pointers are valid and point to initialized `gf_t` values before calling this function. The function does not perform any input validation, so invalid pointers or uninitialized data may lead to undefined behavior.
+- **Inputs**:
+    - `_in00`: Pointer to the first input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in01`: Pointer to the second input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in02`: Pointer to the third input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in03`: Pointer to the fourth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in04`: Pointer to the fifth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in05`: Pointer to the sixth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in06`: Pointer to the seventh input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in07`: Pointer to the eighth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in08`: Pointer to the ninth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in09`: Pointer to the tenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in10`: Pointer to the eleventh input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in11`: Pointer to the twelfth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in12`: Pointer to the thirteenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in13`: Pointer to the fourteenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in14`: Pointer to the fifteenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in15`: Pointer to the sixteenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in16`: Pointer to the seventeenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in17`: Pointer to the eighteenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in18`: Pointer to the nineteenth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in19`: Pointer to the twentieth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in20`: Pointer to the twenty-first input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in21`: Pointer to the twenty-second input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in22`: Pointer to the twenty-third input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in23`: Pointer to the twenty-fourth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in24`: Pointer to the twenty-fifth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in25`: Pointer to the twenty-sixth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in26`: Pointer to the twenty-seventh input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in27`: Pointer to the twenty-eighth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in28`: Pointer to the twenty-ninth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in29`: Pointer to the thirtieth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in30`: Pointer to the thirty-first input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in31`: Pointer to the thirty-second input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in32`: Pointer to the thirty-third input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in33`: Pointer to the thirty-fourth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in34`: Pointer to the thirty-fifth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in35`: Pointer to the thirty-sixth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in36`: Pointer to the thirty-seventh input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in37`: Pointer to the thirty-eighth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in38`: Pointer to the thirty-ninth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in39`: Pointer to the fortieth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in40`: Pointer to the forty-first input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in41`: Pointer to the forty-second input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in42`: Pointer to the forty-third input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in43`: Pointer to the forty-fourth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in44`: Pointer to the forty-fifth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in45`: Pointer to the forty-sixth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in46`: Pointer to the forty-seventh input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in47`: Pointer to the forty-eighth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in48`: Pointer to the forty-ninth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in49`: Pointer to the fiftieth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in50`: Pointer to the fifty-first input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in51`: Pointer to the fifty-second input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in52`: Pointer to the fifty-third input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in53`: Pointer to the fifty-fourth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in54`: Pointer to the fifty-fifth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in55`: Pointer to the fifty-sixth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in56`: Pointer to the fifty-seventh input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in57`: Pointer to the fifty-eighth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in58`: Pointer to the fifty-ninth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in59`: Pointer to the sixtieth input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in60`: Pointer to the sixty-first input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in61`: Pointer to the sixty-second input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in62`: Pointer to the sixty-third input symbol. Must not be null and should point to a valid `gf_t` value.
+    - `_in63`: Pointer to the sixty-fourth input symbol. Must not be null and should point to a valid `gf_t` value.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_45`](wrapped_impl/fd_reedsol_ppt_impl_45.c.driver.md#fd_reedsol_ppt_64_45)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_46<!-- {{#callable_declaration:fd_reedsol_ppt_64_46}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction coding to generate parity data from the input data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when you need to encode data for error correction purposes, and it assumes that the input pointers are correctly initialized and non-null.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_46`](wrapped_impl/fd_reedsol_ppt_impl_45.c.driver.md#fd_reedsol_ppt_64_46)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_47<!-- {{#callable_declaration:fd_reedsol_ppt_64_47}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction coding to generate parity information from the input data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when you need to encode data for error correction purposes, and it assumes that the input pointers are correctly initialized before the call.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_47`](wrapped_impl/fd_reedsol_ppt_impl_45.c.driver.md#fd_reedsol_ppt_64_47)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_48<!-- {{#callable_declaration:fd_reedsol_ppt_64_48}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory locations. This function does not perform any input validation, so it is the caller's responsibility to ensure that all input pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_48`](wrapped_impl/fd_reedsol_ppt_impl_45.c.driver.md#fd_reedsol_ppt_64_48)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_49<!-- {{#callable_declaration:fd_reedsol_ppt_64_49}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction coding to generate parity data from the input data. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when the input data is ready for encoding, and the caller is prepared to handle the modified data.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_49`](wrapped_impl/fd_reedsol_ppt_impl_45.c.driver.md#fd_reedsol_ppt_64_49)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_50<!-- {{#callable_declaration:fd_reedsol_ppt_64_50}} -->
+Processes 64 input elements using a Reed-Solomon algorithm.
+- **Description**: This function applies a Reed-Solomon error correction algorithm to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in scenarios where data integrity is critical, such as in data transmission or storage systems. The function expects all input pointers to be valid and non-null, as it reads from and writes back to these locations. It is important to ensure that the input data is correctly initialized before calling this function, as it will modify the data in place.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_50`](wrapped_impl/fd_reedsol_ppt_impl_50.c.driver.md#fd_reedsol_ppt_64_50)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_51<!-- {{#callable_declaration:fd_reedsol_ppt_64_51}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction coding to generate parity data from the input elements. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and valid.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_51`](wrapped_impl/fd_reedsol_ppt_impl_50.c.driver.md#fd_reedsol_ppt_64_51)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_52<!-- {{#callable_declaration:fd_reedsol_ppt_64_52}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when the input data is ready for encoding, and it is important to ensure that all input pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_52`](wrapped_impl/fd_reedsol_ppt_impl_50.c.driver.md#fd_reedsol_ppt_64_52)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_53<!-- {{#callable_declaration:fd_reedsol_ppt_64_53}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_53`](wrapped_impl/fd_reedsol_ppt_impl_50.c.driver.md#fd_reedsol_ppt_64_53)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_54<!-- {{#callable_declaration:fd_reedsol_ppt_64_54}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation on 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_54`](wrapped_impl/fd_reedsol_ppt_impl_50.c.driver.md#fd_reedsol_ppt_64_54)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_55<!-- {{#callable_declaration:fd_reedsol_ppt_64_55}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of a Galois Field type. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when the input data is ready for encoding, and the caller is prepared to handle the modified data.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to the second input element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to the third input element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to the fourth input element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to the fifth input element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to the sixth input element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to the seventh input element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to the eighth input element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to the ninth input element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to the tenth input element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to the eleventh input element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to the twelfth input element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to the thirteenth input element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to the fourteenth input element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to the fifteenth input element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to the sixteenth input element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to the seventeenth input element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to the eighteenth input element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to the nineteenth input element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to the twentieth input element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to the twenty-first input element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to the twenty-second input element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to the twenty-third input element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to the twenty-fourth input element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to the twenty-fifth input element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to the twenty-sixth input element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to the twenty-seventh input element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to the twenty-eighth input element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to the twenty-ninth input element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to the thirtieth input element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to the thirty-first input element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to the thirty-second input element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to the thirty-third input element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to the thirty-fourth input element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to the thirty-fifth input element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to the thirty-sixth input element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to the thirty-seventh input element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to the thirty-eighth input element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to the thirty-ninth input element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to the fortieth input element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to the forty-first input element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to the forty-second input element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to the forty-third input element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to the forty-fourth input element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to the forty-fifth input element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to the forty-sixth input element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to the forty-seventh input element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to the forty-eighth input element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to the forty-ninth input element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to the fiftieth input element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to the fifty-first input element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to the fifty-second input element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to the fifty-third input element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to the fifty-fourth input element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to the fifty-fifth input element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to the fifty-sixth input element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to the fifty-seventh input element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to the fifty-eighth input element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to the fifty-ninth input element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to the sixtieth input element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to the sixty-first input element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to the sixty-second input element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to the sixty-third input element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to the sixty-fourth input element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_55`](wrapped_impl/fd_reedsol_ppt_impl_55.c.driver.md#fd_reedsol_ppt_64_55)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_56<!-- {{#callable_declaration:fd_reedsol_ppt_64_56}} -->
+Generates a 64-element Reed-Solomon parity check from 56 data elements.
+- **Description**: This function is used to compute a Reed-Solomon parity check for error detection and correction, taking 64 input elements where the first 56 are data elements and the remaining 8 are parity elements. It is typically used in data transmission and storage systems to ensure data integrity. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory locations. All input pointers must be non-null and point to valid `gf_t` elements.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in01`: Pointer to the second input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in02`: Pointer to the third input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in03`: Pointer to the fourth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in04`: Pointer to the fifth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in05`: Pointer to the sixth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in06`: Pointer to the seventh input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in07`: Pointer to the eighth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in08`: Pointer to the ninth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in09`: Pointer to the tenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in10`: Pointer to the eleventh input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in11`: Pointer to the twelfth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in12`: Pointer to the thirteenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in13`: Pointer to the fourteenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in14`: Pointer to the fifteenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in15`: Pointer to the sixteenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in16`: Pointer to the seventeenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in17`: Pointer to the eighteenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in18`: Pointer to the nineteenth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in19`: Pointer to the twentieth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in20`: Pointer to the twenty-first input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in21`: Pointer to the twenty-second input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in22`: Pointer to the twenty-third input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in23`: Pointer to the twenty-fourth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in24`: Pointer to the twenty-fifth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in25`: Pointer to the twenty-sixth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in26`: Pointer to the twenty-seventh input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in27`: Pointer to the twenty-eighth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in28`: Pointer to the twenty-ninth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in29`: Pointer to the thirtieth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in30`: Pointer to the thirty-first input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in31`: Pointer to the thirty-second input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in32`: Pointer to the thirty-third input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in33`: Pointer to the thirty-fourth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in34`: Pointer to the thirty-fifth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in35`: Pointer to the thirty-sixth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in36`: Pointer to the thirty-seventh input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in37`: Pointer to the thirty-eighth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in38`: Pointer to the thirty-ninth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in39`: Pointer to the fortieth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in40`: Pointer to the forty-first input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in41`: Pointer to the forty-second input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in42`: Pointer to the forty-third input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in43`: Pointer to the forty-fourth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in44`: Pointer to the forty-fifth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in45`: Pointer to the forty-sixth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in46`: Pointer to the forty-seventh input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in47`: Pointer to the forty-eighth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in48`: Pointer to the forty-ninth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in49`: Pointer to the fiftieth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in50`: Pointer to the fifty-first input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in51`: Pointer to the fifty-second input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in52`: Pointer to the fifty-third input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in53`: Pointer to the fifty-fourth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in54`: Pointer to the fifty-fifth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in55`: Pointer to the fifty-sixth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in56`: Pointer to the fifty-seventh input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in57`: Pointer to the fifty-eighth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in58`: Pointer to the fifty-ninth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in59`: Pointer to the sixtieth input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in60`: Pointer to the sixty-first input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in61`: Pointer to the sixty-second input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in62`: Pointer to the sixty-third input element. Must not be null and must point to a valid `gf_t` element.
+    - `_in63`: Pointer to the sixty-fourth input element. Must not be null and must point to a valid `gf_t` element.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_56`](wrapped_impl/fd_reedsol_ppt_impl_55.c.driver.md#fd_reedsol_ppt_64_56)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_57<!-- {{#callable_declaration:fd_reedsol_ppt_64_57}} -->
+Processes 64 input elements using a Reed-Solomon algorithm.
+- **Description**: This function applies a Reed-Solomon error correction algorithm to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in scenarios where data integrity is critical, such as in data transmission or storage systems. The function expects all input pointers to be valid and non-null, as it reads from and writes back to these locations. Users should ensure that the input data is correctly initialized before calling this function. The function does not return a value but modifies the input data in place.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in01`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in02`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in03`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in04`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in05`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in06`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in07`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in08`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in09`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in10`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in11`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in12`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in13`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in14`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in15`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in16`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in17`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in18`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in19`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in20`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in21`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in22`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in23`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in24`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in25`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in26`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in27`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in28`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in29`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in30`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in31`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in32`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in33`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in34`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in35`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in36`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in37`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in38`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in39`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in40`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in41`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in42`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in43`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in44`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in45`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in46`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in47`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in48`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in49`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in50`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in51`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in52`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in53`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in54`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in55`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in56`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in57`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in58`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in59`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in60`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in61`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in62`: Pointer to a `gf_t` element. Must be valid and non-null.
+    - `_in63`: Pointer to a `gf_t` element. Must be valid and non-null.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_57`](wrapped_impl/fd_reedsol_ppt_impl_55.c.driver.md#fd_reedsol_ppt_64_57)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_58<!-- {{#callable_declaration:fd_reedsol_ppt_64_58}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction coding to generate parity data from the input elements. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function should be called when the input data is ready for encoding, and it is important to ensure that all input pointers are non-null to avoid undefined behavior.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`. Must not be null.
+    - `_in01`: Pointer to the second input element of type `gf_t`. Must not be null.
+    - `_in02`: Pointer to the third input element of type `gf_t`. Must not be null.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`. Must not be null.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`. Must not be null.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`. Must not be null.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`. Must not be null.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`. Must not be null.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`. Must not be null.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`. Must not be null.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`. Must not be null.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`. Must not be null.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`. Must not be null.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`. Must not be null.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`. Must not be null.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`. Must not be null.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`. Must not be null.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`. Must not be null.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`. Must not be null.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`. Must not be null.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`. Must not be null.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`. Must not be null.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`. Must not be null.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`. Must not be null.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`. Must not be null.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`. Must not be null.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`. Must not be null.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`. Must not be null.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`. Must not be null.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`. Must not be null.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`. Must not be null.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`. Must not be null.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`. Must not be null.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`. Must not be null.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`. Must not be null.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`. Must not be null.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`. Must not be null.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`. Must not be null.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`. Must not be null.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`. Must not be null.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`. Must not be null.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`. Must not be null.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`. Must not be null.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`. Must not be null.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`. Must not be null.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`. Must not be null.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`. Must not be null.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`. Must not be null.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`. Must not be null.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`. Must not be null.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`. Must not be null.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`. Must not be null.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`. Must not be null.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`. Must not be null.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`. Must not be null.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`. Must not be null.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`. Must not be null.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`. Must not be null.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`. Must not be null.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`. Must not be null.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`. Must not be null.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`. Must not be null.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`. Must not be null.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`. Must not be null.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_58`](wrapped_impl/fd_reedsol_ppt_impl_55.c.driver.md#fd_reedsol_ppt_64_58)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_59<!-- {{#callable_declaration:fd_reedsol_ppt_64_59}} -->
+Processes 64 input elements using a Reed-Solomon algorithm.
+- **Description**: This function applies a Reed-Solomon algorithm to 64 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input data in place, so the caller must ensure that the input pointers are valid and point to writable memory. It is important to note that the function does not perform any input validation, so the caller must ensure that all inputs are correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_59`](wrapped_impl/fd_reedsol_ppt_impl_55.c.driver.md#fd_reedsol_ppt_64_59)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_60<!-- {{#callable_declaration:fd_reedsol_ppt_64_60}} -->
+Processes 64 input elements using a Reed-Solomon algorithm.
+- **Description**: This function applies a Reed-Solomon error correction algorithm to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in scenarios where data integrity is critical, such as in data transmission or storage systems. The function expects all input pointers to be valid and non-null, as it reads from and writes back to these locations. Users must ensure that the input pointers point to valid memory locations before calling this function. The function does not return a value but modifies the input data in place.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_60`](wrapped_impl/fd_reedsol_ppt_impl_60.c.driver.md#fd_reedsol_ppt_64_60)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_61<!-- {{#callable_declaration:fd_reedsol_ppt_64_61}} -->
+Processes 64 input elements using a Reed-Solomon algorithm.
+- **Description**: This function applies a Reed-Solomon error correction algorithm to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in scenarios where data integrity is critical, such as in data transmission or storage systems. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory locations. It is important to note that the function does not perform any input validation, so the caller must ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_61`](wrapped_impl/fd_reedsol_ppt_impl_60.c.driver.md#fd_reedsol_ppt_64_61)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_62<!-- {{#callable_declaration:fd_reedsol_ppt_64_62}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, which are expected to be pointers to elements of type `gf_t`. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input elements in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and valid before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_62`](wrapped_impl/fd_reedsol_ppt_impl_60.c.driver.md#fd_reedsol_ppt_64_62)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_64\_63<!-- {{#callable_declaration:fd_reedsol_ppt_64_63}} -->
+Performs a Reed-Solomon encoding operation on 64 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 64 input elements, each represented by a pointer to a `gf_t` type. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory locations. It is important to note that the function does not perform any input validation, so the caller must ensure that all pointers are non-null and correctly initialized before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_64_63`](wrapped_impl/fd_reedsol_ppt_impl_60.c.driver.md#fd_reedsol_ppt_64_63)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_128\_65<!-- {{#callable_declaration:fd_reedsol_ppt_128_65}} -->
+Performs a Reed-Solomon encoding operation on 128 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 128 input elements, which are expected to be pointers to `gf_t` types. It is typically used in error correction scenarios where data integrity is critical. The function modifies the input values in place, so the caller must ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so it is the caller's responsibility to ensure that all inputs are correctly initialized and valid before calling this function.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in64`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in65`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in66`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in67`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in68`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in69`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in70`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in71`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in72`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in73`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in74`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in75`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in76`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in77`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in78`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in79`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in80`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in81`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in82`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in83`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in84`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in85`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in86`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in87`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in88`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in89`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in90`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in91`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in92`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in93`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in94`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in95`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in96`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in97`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in98`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in99`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in100`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in101`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in102`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in103`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in104`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in105`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in106`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in107`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in108`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in109`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in110`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in111`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in112`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in113`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in114`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in115`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in116`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in117`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in118`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in119`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in120`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in121`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in122`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in123`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in124`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in125`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in126`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+    - `_in127`: Pointer to a `gf_t` element. Must not be null and should point to writable memory.
+- **Output**: The function modifies the input values in place, updating each `gf_t` element pointed to by the input pointers.
+- **See also**: [`fd_reedsol_ppt_128_65`](wrapped_impl/fd_reedsol_ppt_impl_65.c.driver.md#fd_reedsol_ppt_128_65)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_128\_66<!-- {{#callable_declaration:fd_reedsol_ppt_128_66}} -->
+Performs a Reed-Solomon encoding operation on 128 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 128 input elements, each represented by a pointer to a `gf_t` type. It is typically used in error correction scenarios where data integrity is critical. The function expects all input pointers to be valid and non-null, as it reads from and writes back to these locations. The caller must ensure that the input pointers point to valid memory locations before calling this function. The function does not return a value, but it modifies the data at the input locations to reflect the encoded result.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in64`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in65`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in66`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in67`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in68`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in69`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in70`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in71`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in72`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in73`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in74`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in75`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in76`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in77`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in78`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in79`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in80`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in81`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in82`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in83`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in84`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in85`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in86`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in87`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in88`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in89`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in90`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in91`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in92`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in93`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in94`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in95`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in96`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in97`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in98`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in99`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in100`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in101`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in102`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in103`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in104`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in105`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in106`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in107`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in108`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in109`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in110`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in111`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in112`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in113`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in114`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in115`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in116`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in117`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in118`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in119`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in120`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in121`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in122`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in123`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in124`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in125`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in126`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in127`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_128_66`](wrapped_impl/fd_reedsol_ppt_impl_65.c.driver.md#fd_reedsol_ppt_128_66)  (Implementation)
+
+
+---
+### fd\_reedsol\_ppt\_128\_67<!-- {{#callable_declaration:fd_reedsol_ppt_128_67}} -->
+Performs a Reed-Solomon encoding operation on 128 input elements.
+- **Description**: This function applies a Reed-Solomon encoding operation to 128 input elements, each represented by a pointer to a `gf_t` type. It is typically used in error correction scenarios where data integrity is critical. The function expects all input pointers to be valid and non-null, as it reads from and writes back to these locations. The caller must ensure that the input data is correctly initialized before calling this function. The function does not return a value, but it modifies the input data in place, reflecting the results of the encoding operation.
+- **Inputs**:
+    - `_in00`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in01`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in02`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in03`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in04`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in05`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in06`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in07`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in08`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in09`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in10`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in11`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in12`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in13`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in14`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in15`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in16`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in17`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in18`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in19`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in20`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in21`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in22`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in23`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in24`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in25`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in26`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in27`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in28`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in29`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in30`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in31`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in32`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in33`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in34`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in35`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in36`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in37`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in38`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in39`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in40`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in41`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in42`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in43`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in44`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in45`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in46`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in47`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in48`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in49`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in50`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in51`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in52`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in53`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in54`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in55`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in56`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in57`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in58`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in59`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in60`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in61`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in62`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in63`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in64`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in65`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in66`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in67`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in68`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in69`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in70`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in71`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in72`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in73`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in74`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in75`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in76`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in77`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in78`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in79`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in80`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in81`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in82`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in83`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in84`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in85`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in86`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in87`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in88`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in89`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in90`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in91`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in92`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in93`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in94`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in95`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in96`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in97`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in98`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in99`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in100`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in101`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in102`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in103`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in104`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in105`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in106`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in107`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in108`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in109`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in110`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in111`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in112`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in113`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in114`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in115`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in116`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in117`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in118`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in119`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in120`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in121`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in122`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in123`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in124`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in125`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in126`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+    - `_in127`: Pointer to a `gf_t` element. Must not be null. Caller retains ownership.
+- **Output**: None
+- **See also**: [`fd_reedsol_ppt_128_67`](wrapped_impl/fd_reedsol_ppt_impl_65.c.driver.md#fd_reedsol_ppt_128_67)  (Implementation)
+
+

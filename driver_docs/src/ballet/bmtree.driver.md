@@ -1,0 +1,9 @@
+
+## Files
+- **[fd_bmtree.c](bmtree/fd_bmtree.c.driver.md)**: The `fd_bmtree.c` file in the `firedancer` codebase provides a set of functions for creating and managing binary Merkle trees using the SHA-256 hash function, supporting different tree widths and including APIs for node hashing, tree commitment, and proof generation.
+- **[fd_bmtree.h](bmtree/fd_bmtree.h.driver.md)**: The `fd_bmtree.h` file in the `firedancer` codebase provides APIs for constructing and managing binary Merkle trees using the SHA256 hash function, including operations for creating trees, generating and verifying inclusion proofs, and handling both leaf-based and proof-based commitment calculations.
+- **[fd_wbmtree.c](bmtree/fd_wbmtree.c.driver.md)**: The `fd_wbmtree.c` file in the `firedancer` codebase implements functions for initializing, appending to, and finalizing a 32-bit wide Merkle tree using SHA-256 hashing.
+- **[fd_wbmtree.h](bmtree/fd_wbmtree.h.driver.md)**: The `fd_wbmtree.h` file declares an optimized implementation of a binary Merkle tree using the SHA-256 hash function, focusing on performance at the cost of memory usage.
+- **[fuzz_bmtree.c](bmtree/fuzz_bmtree.c.driver.md)**: The `fuzz_bmtree.c` file in the `firedancer` codebase implements a fuzz testing framework for binary Merkle trees, ensuring the integrity and correctness of tree operations under various conditions.
+- **[Local.mk](bmtree/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and conditional fuzz tests for the `bmtree` component.
+- **[test_bmtree.c](bmtree/test_bmtree.c.driver.md)**: The `test_bmtree.c` file in the `firedancer` codebase contains tests for the construction and verification of binary Merkle trees, including functions to test tree commitment, inclusion proofs, and benchmarking performance.

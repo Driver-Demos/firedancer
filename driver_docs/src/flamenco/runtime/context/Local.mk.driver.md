@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation in a build system. It checks if the macro `FD_HAS_INT128` is defined, and if so, it adds specific header files and object files related to execution contexts and capture contexts to the build process using custom functions `add-hdrs` and `add-objs`. This setup is likely used to manage dependencies and organize the build process for components that require 128-bit integer support.

@@ -1,0 +1,2 @@
+# Purpose
+This is a Makefile snippet used for compiling a software project. It sets preprocessor flags (`CPPFLAGS`) to define macros for conditional compilation and linker flags (`LDFLAGS`) to enhance security and link the real-time library. The file also conditionally sets a variable `FD_HAS_LINUX` if the operating system is detected as Linux, allowing for platform-specific compilation adjustments.

@@ -1,0 +1,10 @@
+
+## Files
+- **[fd_aio.c](aio/fd_aio.c.driver.md)**: The `fd_aio.c` file in the `firedancer` codebase provides stub implementations for asynchronous I/O functionality, including functions for alignment, footprint calculation, creation, joining, leaving, deletion, and error string retrieval.
+- **[fd_aio.h](aio/fd_aio.h.driver.md)**: The `fd_aio.h` file in the `firedancer` codebase defines an abstraction for asynchronous packet sending and receiving, providing structures and functions to facilitate integration with various low-level I/O libraries and hardware.
+- **[fd_aio_pcapng.c](aio/fd_aio_pcapng.c.driver.md)**: The `fd_aio_pcapng.c` file in the `firedancer` codebase implements functions for handling asynchronous I/O operations with PCAPNG packet capture, including sending packets and managing PCAPNG file headers.
+- **[fd_aio_pcapng.h](aio/fd_aio_pcapng.h.driver.md)**: The `fd_aio_pcapng.h` file in the `firedancer` codebase defines a structure and functions for implementing a man-in-the-middle asynchronous I/O that captures network packets to a PCAPNG file, supporting multiple writers on the same thread but not across threads.
+- **[fd_aio_tango.c](aio/fd_aio_tango.c.driver.md)**: The `fd_aio_tango.c` file in the `firedancer` codebase implements asynchronous input/output operations for sending and receiving packet data using a memory cache system.
+- **[fd_aio_tango.h](aio/fd_aio_tango.h.driver.md)**: The `fd_aio_tango.h` file in the `firedancer` codebase defines APIs for transmitting and receiving fragments using mcache and dcache structures, primarily for testing purposes without high performance support.
+- **[Local.mk](aio/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `aio` components within the `waltz` module.
+- **[test_aio.c](aio/test_aio.c.driver.md)**: The `test_aio.c` file in the `firedancer` codebase contains unit tests for the asynchronous I/O (AIO) functionality, including error handling and basic send operations.

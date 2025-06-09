@@ -1,0 +1,290 @@
+# Purpose
+This C source code file is auto-generated and provides specialized functions for performing Fast Fourier Transform (FFT) and Inverse Fast Fourier Transform (IFFT) operations on a set of 128 Galois Field elements. The file includes two primary functions: [`fd_reedsol_fft_128_0`](#fd_reedsol_fft_128_0) and [`fd_reedsol_ifft_128_0`](#fd_reedsol_ifft_128_0). These functions are designed to handle arrays of 128 elements, each represented by the `gf_t` type, which is typically used in error correction codes like Reed-Solomon. The functions utilize macros `FD_REEDSOL_GENERATE_FFT` and `FD_REEDSOL_GENERATE_IFFT` to perform the actual FFT and IFFT computations, respectively. These macros are likely defined in the included header file `fd_reedsol_fft.h`, which suggests that this file is part of a larger library or framework for Reed-Solomon coding.
+
+The code is structured to handle a specific size of input (128 elements), indicating that it provides narrow functionality tailored for a particular use case, likely within a larger system that requires efficient error correction or data integrity verification. The functions are marked with `FD_FN_UNSANITIZED`, which may imply that they are optimized for performance and assume that input data is already validated elsewhere. This file does not define a public API directly but rather implements specific operations that are likely invoked by other components of the system. The auto-generated nature of the file suggests that it is part of a code generation process, possibly to optimize performance for specific data sizes or configurations.
+# Imports and Dependencies
+
+---
+- `../fd_reedsol_fft.h`
+
+
+# Functions
+
+---
+### fd\_reedsol\_fft\_128\_0<!-- {{#callable:fd_reedsol_fft_128_0}} -->
+The function `fd_reedsol_fft_128_0` performs a Fast Fourier Transform (FFT) on 128 input elements using a Reed-Solomon code implementation.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`.
+    - `_in01`: Pointer to the second input element of type `gf_t`.
+    - `_in02`: Pointer to the third input element of type `gf_t`.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
+    - `_in64`: Pointer to the sixty-fifth input element of type `gf_t`.
+    - `_in65`: Pointer to the sixty-sixth input element of type `gf_t`.
+    - `_in66`: Pointer to the sixty-seventh input element of type `gf_t`.
+    - `_in67`: Pointer to the sixty-eighth input element of type `gf_t`.
+    - `_in68`: Pointer to the sixty-ninth input element of type `gf_t`.
+    - `_in69`: Pointer to the seventieth input element of type `gf_t`.
+    - `_in70`: Pointer to the seventy-first input element of type `gf_t`.
+    - `_in71`: Pointer to the seventy-second input element of type `gf_t`.
+    - `_in72`: Pointer to the seventy-third input element of type `gf_t`.
+    - `_in73`: Pointer to the seventy-fourth input element of type `gf_t`.
+    - `_in74`: Pointer to the seventy-fifth input element of type `gf_t`.
+    - `_in75`: Pointer to the seventy-sixth input element of type `gf_t`.
+    - `_in76`: Pointer to the seventy-seventh input element of type `gf_t`.
+    - `_in77`: Pointer to the seventy-eighth input element of type `gf_t`.
+    - `_in78`: Pointer to the seventy-ninth input element of type `gf_t`.
+    - `_in79`: Pointer to the eightieth input element of type `gf_t`.
+    - `_in80`: Pointer to the eighty-first input element of type `gf_t`.
+    - `_in81`: Pointer to the eighty-second input element of type `gf_t`.
+    - `_in82`: Pointer to the eighty-third input element of type `gf_t`.
+    - `_in83`: Pointer to the eighty-fourth input element of type `gf_t`.
+    - `_in84`: Pointer to the eighty-fifth input element of type `gf_t`.
+    - `_in85`: Pointer to the eighty-sixth input element of type `gf_t`.
+    - `_in86`: Pointer to the eighty-seventh input element of type `gf_t`.
+    - `_in87`: Pointer to the eighty-eighth input element of type `gf_t`.
+    - `_in88`: Pointer to the eighty-ninth input element of type `gf_t`.
+    - `_in89`: Pointer to the ninetieth input element of type `gf_t`.
+    - `_in90`: Pointer to the ninety-first input element of type `gf_t`.
+    - `_in91`: Pointer to the ninety-second input element of type `gf_t`.
+    - `_in92`: Pointer to the ninety-third input element of type `gf_t`.
+    - `_in93`: Pointer to the ninety-fourth input element of type `gf_t`.
+    - `_in94`: Pointer to the ninety-fifth input element of type `gf_t`.
+    - `_in95`: Pointer to the ninety-sixth input element of type `gf_t`.
+    - `_in96`: Pointer to the ninety-seventh input element of type `gf_t`.
+    - `_in97`: Pointer to the ninety-eighth input element of type `gf_t`.
+    - `_in98`: Pointer to the ninety-ninth input element of type `gf_t`.
+    - `_in99`: Pointer to the one hundredth input element of type `gf_t`.
+    - `_in100`: Pointer to the one hundred and first input element of type `gf_t`.
+    - `_in101`: Pointer to the one hundred and second input element of type `gf_t`.
+    - `_in102`: Pointer to the one hundred and third input element of type `gf_t`.
+    - `_in103`: Pointer to the one hundred and fourth input element of type `gf_t`.
+    - `_in104`: Pointer to the one hundred and fifth input element of type `gf_t`.
+    - `_in105`: Pointer to the one hundred and sixth input element of type `gf_t`.
+    - `_in106`: Pointer to the one hundred and seventh input element of type `gf_t`.
+    - `_in107`: Pointer to the one hundred and eighth input element of type `gf_t`.
+    - `_in108`: Pointer to the one hundred and ninth input element of type `gf_t`.
+    - `_in109`: Pointer to the one hundred and tenth input element of type `gf_t`.
+    - `_in110`: Pointer to the one hundred and eleventh input element of type `gf_t`.
+    - `_in111`: Pointer to the one hundred and twelfth input element of type `gf_t`.
+    - `_in112`: Pointer to the one hundred and thirteenth input element of type `gf_t`.
+    - `_in113`: Pointer to the one hundred and fourteenth input element of type `gf_t`.
+    - `_in114`: Pointer to the one hundred and fifteenth input element of type `gf_t`.
+    - `_in115`: Pointer to the one hundred and sixteenth input element of type `gf_t`.
+    - `_in116`: Pointer to the one hundred and seventeenth input element of type `gf_t`.
+    - `_in117`: Pointer to the one hundred and eighteenth input element of type `gf_t`.
+    - `_in118`: Pointer to the one hundred and nineteenth input element of type `gf_t`.
+    - `_in119`: Pointer to the one hundred and twentieth input element of type `gf_t`.
+    - `_in120`: Pointer to the one hundred and twenty-first input element of type `gf_t`.
+    - `_in121`: Pointer to the one hundred and twenty-second input element of type `gf_t`.
+    - `_in122`: Pointer to the one hundred and twenty-third input element of type `gf_t`.
+    - `_in123`: Pointer to the one hundred and twenty-fourth input element of type `gf_t`.
+    - `_in124`: Pointer to the one hundred and twenty-fifth input element of type `gf_t`.
+    - `_in125`: Pointer to the one hundred and twenty-sixth input element of type `gf_t`.
+    - `_in126`: Pointer to the one hundred and twenty-seventh input element of type `gf_t`.
+    - `_in127`: Pointer to the one hundred and twenty-eighth input element of type `gf_t`.
+- **Control Flow**:
+    - The function begins by dereferencing each of the 128 input pointers to obtain the actual `gf_t` values and assigns them to local variables `in00` to `in127`.
+    - It then calls the macro `FD_REEDSOL_GENERATE_FFT` with the size 128, an offset 0, and the 128 local variables as arguments, which performs the FFT operation on these values.
+    - Finally, the function updates the original input pointers with the transformed values by assigning the local variables back to the dereferenced pointers.
+- **Output**: The function does not return a value; it modifies the input data in place by updating the values pointed to by the input pointers with the results of the FFT operation.
+
+
+---
+### fd\_reedsol\_ifft\_128\_0<!-- {{#callable:fd_reedsol_ifft_128_0}} -->
+The function `fd_reedsol_ifft_128_0` performs an inverse fast Fourier transform (IFFT) on 128 Galois field elements.
+- **Inputs**:
+    - `_in00`: Pointer to the first Galois field element input.
+    - `_in01`: Pointer to the second Galois field element input.
+    - `_in02`: Pointer to the third Galois field element input.
+    - `_in03`: Pointer to the fourth Galois field element input.
+    - `_in04`: Pointer to the fifth Galois field element input.
+    - `_in05`: Pointer to the sixth Galois field element input.
+    - `_in06`: Pointer to the seventh Galois field element input.
+    - `_in07`: Pointer to the eighth Galois field element input.
+    - `_in08`: Pointer to the ninth Galois field element input.
+    - `_in09`: Pointer to the tenth Galois field element input.
+    - `_in10`: Pointer to the eleventh Galois field element input.
+    - `_in11`: Pointer to the twelfth Galois field element input.
+    - `_in12`: Pointer to the thirteenth Galois field element input.
+    - `_in13`: Pointer to the fourteenth Galois field element input.
+    - `_in14`: Pointer to the fifteenth Galois field element input.
+    - `_in15`: Pointer to the sixteenth Galois field element input.
+    - `_in16`: Pointer to the seventeenth Galois field element input.
+    - `_in17`: Pointer to the eighteenth Galois field element input.
+    - `_in18`: Pointer to the nineteenth Galois field element input.
+    - `_in19`: Pointer to the twentieth Galois field element input.
+    - `_in20`: Pointer to the twenty-first Galois field element input.
+    - `_in21`: Pointer to the twenty-second Galois field element input.
+    - `_in22`: Pointer to the twenty-third Galois field element input.
+    - `_in23`: Pointer to the twenty-fourth Galois field element input.
+    - `_in24`: Pointer to the twenty-fifth Galois field element input.
+    - `_in25`: Pointer to the twenty-sixth Galois field element input.
+    - `_in26`: Pointer to the twenty-seventh Galois field element input.
+    - `_in27`: Pointer to the twenty-eighth Galois field element input.
+    - `_in28`: Pointer to the twenty-ninth Galois field element input.
+    - `_in29`: Pointer to the thirtieth Galois field element input.
+    - `_in30`: Pointer to the thirty-first Galois field element input.
+    - `_in31`: Pointer to the thirty-second Galois field element input.
+    - `_in32`: Pointer to the thirty-third Galois field element input.
+    - `_in33`: Pointer to the thirty-fourth Galois field element input.
+    - `_in34`: Pointer to the thirty-fifth Galois field element input.
+    - `_in35`: Pointer to the thirty-sixth Galois field element input.
+    - `_in36`: Pointer to the thirty-seventh Galois field element input.
+    - `_in37`: Pointer to the thirty-eighth Galois field element input.
+    - `_in38`: Pointer to the thirty-ninth Galois field element input.
+    - `_in39`: Pointer to the fortieth Galois field element input.
+    - `_in40`: Pointer to the forty-first Galois field element input.
+    - `_in41`: Pointer to the forty-second Galois field element input.
+    - `_in42`: Pointer to the forty-third Galois field element input.
+    - `_in43`: Pointer to the forty-fourth Galois field element input.
+    - `_in44`: Pointer to the forty-fifth Galois field element input.
+    - `_in45`: Pointer to the forty-sixth Galois field element input.
+    - `_in46`: Pointer to the forty-seventh Galois field element input.
+    - `_in47`: Pointer to the forty-eighth Galois field element input.
+    - `_in48`: Pointer to the forty-ninth Galois field element input.
+    - `_in49`: Pointer to the fiftieth Galois field element input.
+    - `_in50`: Pointer to the fifty-first Galois field element input.
+    - `_in51`: Pointer to the fifty-second Galois field element input.
+    - `_in52`: Pointer to the fifty-third Galois field element input.
+    - `_in53`: Pointer to the fifty-fourth Galois field element input.
+    - `_in54`: Pointer to the fifty-fifth Galois field element input.
+    - `_in55`: Pointer to the fifty-sixth Galois field element input.
+    - `_in56`: Pointer to the fifty-seventh Galois field element input.
+    - `_in57`: Pointer to the fifty-eighth Galois field element input.
+    - `_in58`: Pointer to the fifty-ninth Galois field element input.
+    - `_in59`: Pointer to the sixtieth Galois field element input.
+    - `_in60`: Pointer to the sixty-first Galois field element input.
+    - `_in61`: Pointer to the sixty-second Galois field element input.
+    - `_in62`: Pointer to the sixty-third Galois field element input.
+    - `_in63`: Pointer to the sixty-fourth Galois field element input.
+    - `_in64`: Pointer to the sixty-fifth Galois field element input.
+    - `_in65`: Pointer to the sixty-sixth Galois field element input.
+    - `_in66`: Pointer to the sixty-seventh Galois field element input.
+    - `_in67`: Pointer to the sixty-eighth Galois field element input.
+    - `_in68`: Pointer to the sixty-ninth Galois field element input.
+    - `_in69`: Pointer to the seventieth Galois field element input.
+    - `_in70`: Pointer to the seventy-first Galois field element input.
+    - `_in71`: Pointer to the seventy-second Galois field element input.
+    - `_in72`: Pointer to the seventy-third Galois field element input.
+    - `_in73`: Pointer to the seventy-fourth Galois field element input.
+    - `_in74`: Pointer to the seventy-fifth Galois field element input.
+    - `_in75`: Pointer to the seventy-sixth Galois field element input.
+    - `_in76`: Pointer to the seventy-seventh Galois field element input.
+    - `_in77`: Pointer to the seventy-eighth Galois field element input.
+    - `_in78`: Pointer to the seventy-ninth Galois field element input.
+    - `_in79`: Pointer to the eightieth Galois field element input.
+    - `_in80`: Pointer to the eighty-first Galois field element input.
+    - `_in81`: Pointer to the eighty-second Galois field element input.
+    - `_in82`: Pointer to the eighty-third Galois field element input.
+    - `_in83`: Pointer to the eighty-fourth Galois field element input.
+    - `_in84`: Pointer to the eighty-fifth Galois field element input.
+    - `_in85`: Pointer to the eighty-sixth Galois field element input.
+    - `_in86`: Pointer to the eighty-seventh Galois field element input.
+    - `_in87`: Pointer to the eighty-eighth Galois field element input.
+    - `_in88`: Pointer to the eighty-ninth Galois field element input.
+    - `_in89`: Pointer to the ninetieth Galois field element input.
+    - `_in90`: Pointer to the ninety-first Galois field element input.
+    - `_in91`: Pointer to the ninety-second Galois field element input.
+    - `_in92`: Pointer to the ninety-third Galois field element input.
+    - `_in93`: Pointer to the ninety-fourth Galois field element input.
+    - `_in94`: Pointer to the ninety-fifth Galois field element input.
+    - `_in95`: Pointer to the ninety-sixth Galois field element input.
+    - `_in96`: Pointer to the ninety-seventh Galois field element input.
+    - `_in97`: Pointer to the ninety-eighth Galois field element input.
+    - `_in98`: Pointer to the ninety-ninth Galois field element input.
+    - `_in99`: Pointer to the one hundredth Galois field element input.
+    - `_in100`: Pointer to the one hundred and first Galois field element input.
+    - `_in101`: Pointer to the one hundred and second Galois field element input.
+    - `_in102`: Pointer to the one hundred and third Galois field element input.
+    - `_in103`: Pointer to the one hundred and fourth Galois field element input.
+    - `_in104`: Pointer to the one hundred and fifth Galois field element input.
+    - `_in105`: Pointer to the one hundred and sixth Galois field element input.
+    - `_in106`: Pointer to the one hundred and seventh Galois field element input.
+    - `_in107`: Pointer to the one hundred and eighth Galois field element input.
+    - `_in108`: Pointer to the one hundred and ninth Galois field element input.
+    - `_in109`: Pointer to the one hundred and tenth Galois field element input.
+    - `_in110`: Pointer to the one hundred and eleventh Galois field element input.
+    - `_in111`: Pointer to the one hundred and twelfth Galois field element input.
+    - `_in112`: Pointer to the one hundred and thirteenth Galois field element input.
+    - `_in113`: Pointer to the one hundred and fourteenth Galois field element input.
+    - `_in114`: Pointer to the one hundred and fifteenth Galois field element input.
+    - `_in115`: Pointer to the one hundred and sixteenth Galois field element input.
+    - `_in116`: Pointer to the one hundred and seventeenth Galois field element input.
+    - `_in117`: Pointer to the one hundred and eighteenth Galois field element input.
+    - `_in118`: Pointer to the one hundred and nineteenth Galois field element input.
+    - `_in119`: Pointer to the one hundred and twentieth Galois field element input.
+    - `_in120`: Pointer to the one hundred and twenty-first Galois field element input.
+    - `_in121`: Pointer to the one hundred and twenty-second Galois field element input.
+    - `_in122`: Pointer to the one hundred and twenty-third Galois field element input.
+    - `_in123`: Pointer to the one hundred and twenty-fourth Galois field element input.
+    - `_in124`: Pointer to the one hundred and twenty-fifth Galois field element input.
+    - `_in125`: Pointer to the one hundred and twenty-sixth Galois field element input.
+    - `_in126`: Pointer to the one hundred and twenty-seventh Galois field element input.
+    - `_in127`: Pointer to the one hundred and twenty-eighth Galois field element input.
+- **Control Flow**:
+    - The function begins by dereferencing each of the 128 input pointers to obtain the actual Galois field elements.
+    - It then calls the macro `FD_REEDSOL_GENERATE_IFFT` with the 128 elements as arguments, which performs the inverse FFT operation.
+    - Finally, the function updates the original input pointers with the transformed Galois field elements.
+- **Output**: The function does not return a value; it modifies the input pointers in place to store the results of the inverse FFT.
+
+

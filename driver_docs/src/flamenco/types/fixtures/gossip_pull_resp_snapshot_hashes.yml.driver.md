@@ -1,0 +1,2 @@
+# Purpose
+This YAML file contains metadata related to a network response, specifically a "pull response" in a distributed system. It includes a public key (`pubkey`) and a list of CRDS (Conflict-free Replicated Data Structures) entries, each with a signature and associated data. The data section details snapshot hashes, including the source public key, a list of slot-hash pairs, and a wallclock timestamp, which are used for data consistency and synchronization across nodes.

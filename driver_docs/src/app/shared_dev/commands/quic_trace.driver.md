@@ -1,0 +1,8 @@
+
+## Files
+- **[fd_quic_trace.h](quic_trace/fd_quic_trace.h.driver.md)**: The `fd_quic_trace.h` file in the `firedancer` codebase defines structures and functions for tracing QUIC connections, including mapping peer connection IDs to connection indices and handling trace contexts and frames.
+- **[fd_quic_trace_frame.c](quic_trace/fd_quic_trace_frame.c.driver.md)**: The `fd_quic_trace_frame.c` file in the `firedancer` codebase implements functions for tracing and parsing various QUIC protocol frames, including handling specific frame types and logging relevant information.
+- **[fd_quic_trace_log_tile.c](quic_trace/fd_quic_trace_log_tile.c.driver.md)**: The `fd_quic_trace_log_tile.c` file in the `firedancer` codebase implements functions for processing QUIC trace logs, including handling connection close events and managing fragments during the logging process.
+- **[fd_quic_trace_main.c](quic_trace/fd_quic_trace_main.c.driver.md)**: The `fd_quic_trace_main.c` file in the `firedancer` codebase provides the main implementation for the `fddev quic-trace` subcommand, which is designed to tap QUIC traffic on a live system by joining remote `fd_quic_tile` objects in a read-only manner to minimize impact on production systems.
+- **[fd_quic_trace_rx_tile.c](quic_trace/fd_quic_trace_rx_tile.c.driver.md)**: The `fd_quic_trace_rx_tile.c` file in the `firedancer` codebase implements passive decryption of incoming QUIC packets by simulating the setup and run loop of a real `fd_quic_tile`.
+- **[Local.mk](quic_trace/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of object files related to QUIC trace functionality when SSE support is enabled.

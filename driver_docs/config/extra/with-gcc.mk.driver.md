@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is used to configure a build system to compile a project using the GNU Compiler Collection (GCC). It sets the C and C++ compilers to `gcc` and `g++`, respectively, and specifies that the linker should also use `g++`. The file defines preprocessor and linker flags to indicate the use of GCC, ensuring that the project is compiled with static linking for the GCC runtime library. Additionally, it sets a flag `FD_USING_GCC` to denote that GCC is being used, with a note that it should not be set simultaneously with a similar flag for Clang.

@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is used to automate the build and testing process for a software project. It defines rules to add header files (`fd_ar.h`, `fd_tar.h`) and object files (`fd_ar`, `fd_tar_writer`, `fd_tar_reader`) to the build. It also specifies the creation and execution of unit tests (`test_ar`, `test_tar`) and conditionally includes a fuzz test (`fuzz_tar`) if the `FD_HAS_HOSTED` variable is defined.

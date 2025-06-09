@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet checks for the presence of specific static library files (`librocksdb.a`, `libsnappy.a`, and `libzstd.a`) in a specified directory (`$(OPT)/lib`). If all libraries are found, it sets a flag (`FD_HAS_ROCKSDB`) and appends necessary compilation flags to `CFLAGS` for building with RocksDB support. If any library is missing, it issues a warning and skips the RocksDB integration.

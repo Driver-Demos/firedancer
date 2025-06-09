@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is used to configure the build environment for a software project. It sets the build directory to `linux/gcc/noarch128` and includes several configuration files to extend the build setup with additional features such as GCC support, debugging, security, optimization, and threading. It also defines preprocessor flags and variables to enable specific features like 128-bit integers, double precision, and dynamic memory allocation using `alloca`.

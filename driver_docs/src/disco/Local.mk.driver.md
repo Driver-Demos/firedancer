@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is used to automate the build and testing process for a software library named `fd_disco`. It defines the creation of the library, specifies the header files `fd_disco_base.h` and `fd_disco.h` to be included, sets up a unit test named `test_disco_base` that depends on the `fd_disco`, `fd_tango`, and `fd_util` components, and finally, it runs the specified unit test.

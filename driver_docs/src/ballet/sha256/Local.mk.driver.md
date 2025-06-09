@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile script used to manage the build process for a software project involving SHA-256 cryptographic functions. It conditionally adds headers, object files, and assembly files based on the availability of specific hardware features like SHANI, AVX, and AVX512. Additionally, it defines and runs unit tests and, if hosted, a fuzz test for the SHA-256 implementation, ensuring the code is correctly compiled and tested under various configurations.

@@ -1,0 +1,6 @@
+
+## Files
+- **[fd_ghost.c](ghost/fd_ghost.c.driver.md)**: The `fd_ghost.c` file in the `firedancer` codebase implements functions for managing and manipulating a data structure called "ghost," which includes operations for creating, joining, leaving, deleting, initializing, verifying, inserting nodes, replaying votes, publishing, and printing the ghost structure.
+- **[fd_ghost.h](ghost/fd_ghost.h.driver.md)**: The `fd_ghost.h` file in the `firedancer` codebase implements Solana's LMD-GHOST fork choice rule, providing structures and functions for managing and traversing a tree of nodes representing blockchain slots, with operations for voting, querying, and publishing within the context of a distributed system.
+- **[Local.mk](ghost/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `fd_ghost` and `fd_choreo` components, including header and object file additions and conditional unit test creation based on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED` flags.
+- **[test_ghost.c](ghost/test_ghost.c.driver.md)**: The `test_ghost.c` file in the `firedancer` codebase contains a series of test functions for validating the behavior of the `fd_ghost` data structure, including operations like insertion, voting, publishing, and querying within a tree-like structure.

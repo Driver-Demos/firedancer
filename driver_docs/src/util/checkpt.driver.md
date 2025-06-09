@@ -1,0 +1,8 @@
+
+## Files
+- **[fd_checkpt.c](checkpt/fd_checkpt.c.driver.md)**: The `fd_checkpt.c` file in the `firedancer` codebase implements functions for initializing, managing, and finalizing checkpoint streams, including support for raw and LZ4-compressed frame styles, with error handling and buffer management.
+- **[fd_checkpt.h](checkpt/fd_checkpt.h.driver.md)**: The `fd_checkpt.h` file in the `firedancer` codebase provides APIs for fast parallel compressed checkpoint and restore operations, supporting both streaming and memory-mapped I/O modes with frame styles such as RAW and LZ4.
+- **[fd_restore.c](checkpt/fd_restore.c.driver.md)**: The `fd_restore.c` file in the `firedancer` codebase provides functionality for initializing, managing, and finalizing data restoration streams, including support for LZ4 decompression.
+- **[Local.mk](checkpt/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests related to checkpoint functionality, including `fd_checkpt`, `fd_restore`, and associated tests.
+- **[test_checkpt_mmio.c](checkpt/test_checkpt_mmio.c.driver.md)**: The `test_checkpt_mmio.c` file in the `firedancer` codebase contains a comprehensive set of tests for checkpoint and restore operations using memory-mapped I/O, including various frame styles and error handling scenarios.
+- **[test_checkpt_stream.c](checkpt/test_checkpt_stream.c.driver.md)**: The `test_checkpt_stream.c` file in the `firedancer` codebase contains a comprehensive set of tests for checkpoint and restore operations using streams, including various buffer sizes and frame styles, with support for both raw and LZ4 compressed frames.

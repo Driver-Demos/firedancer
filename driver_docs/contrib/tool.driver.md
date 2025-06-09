@@ -1,0 +1,10 @@
+
+## Files
+- **[block_production.py](tool/block_production.py.driver.md)**: The `block_production.py` file in the `firedancer` codebase is a script that connects to a Solana RPC client to retrieve and display upcoming leader slots for a given public key.
+- **[c.vim](tool/c.vim.driver.md)**: The `c.vim` file provides syntax highlighting definitions for Firedancer style code, including keywords for versioning, build targets, primitive types, compiler tricks, optimizer hints, atomic operations, logging, and testing.
+- **[fd_gdb](tool/fd_gdb.driver.md)**: The `fd_gdb` file is a shell script that executes GDB with a command to source the `fd_gdb.py` script from the `contrib/gdb` directory.
+- **[leak-detector.py](tool/leak-detector.py.driver.md)**: The `leak-detector.py` file is a tool for detecting memory leaks by analyzing log files for allocation and deallocation operations, and reporting unfreed memory addresses along with their backtraces.
+- **[lint.cfg](tool/lint.cfg.driver.md)**: The `lint.cfg` file in the `firedancer` codebase configures code formatting rules for the Uncrustify tool, specifying settings such as tab sizes, spacing rules, and alignment preferences.
+- **[load_gen.py](tool/load_gen.py.driver.md)**: The `load_gen.py` file in the `firedancer` codebase is a tool for generating and sending various types of transactions to Solana blockchain nodes, including system transfers, token transfers, and nano token transfers, while also monitoring transaction throughput.
+- **[load_gen2.py](tool/load_gen2.py.driver.md)**: The `load_gen2.py` file in the `firedancer` codebase is a tool for generating and sending Solana transactions to specified TPU endpoints, supporting different transaction types and monitoring transaction throughput.
+- **[txn-gen.py](tool/txn-gen.py.driver.md)**: The `txn-gen.py` file in the `firedancer` codebase is a Python script designed to generate and send various types of transactions to specified TPU UDP endpoints, utilizing Solana's blockchain infrastructure and supporting functionalities such as account creation, token transfers, and transaction monitoring.

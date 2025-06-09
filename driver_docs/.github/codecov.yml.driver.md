@@ -1,0 +1,2 @@
+# Purpose
+This YAML configuration file is used to manage code coverage reporting settings for a project. It specifies that project-wide and patch-specific coverage status reporting are turned off, and comments are disabled. Additionally, it defines flags for "clusterfuzz" and "ledgers" with a "carryforward" option set to true, indicating that coverage data for these flags should be carried forward, likely for periodic or nightly reporting.

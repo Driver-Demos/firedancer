@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation in a software build process. It checks for the presence of specific features or environments, such as hosted environments, Linux, and architecture support for sandboxing. If all conditions are met, it adds the header file `fd_sandbox.h`, the object files `fd_sandbox` and `fd_util`, and sets up a unit test named `test_sandbox` that depends on `fd_util`.

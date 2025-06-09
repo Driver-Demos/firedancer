@@ -1,0 +1,11 @@
+
+## Files
+- **[fd_xdp1.c](xdp/fd_xdp1.c.driver.md)**: The `fd_xdp1.c` file in the `firedancer` codebase implements functions for generating and installing an eBPF program for XDP (Express Data Path) to handle UDP traffic on specified ports, including creating necessary BPF maps and handling kernel compatibility issues.
+- **[fd_xdp1.h](xdp/fd_xdp1.h.driver.md)**: The `fd_xdp1.h` file in the `firedancer` codebase defines structures and functions for installing and managing BPF programs that filter and pass UDP traffic through XSK maps on specified network interfaces.
+- **[fd_xdp_license.h](xdp/fd_xdp_license.h.driver.md)**: The `fd_xdp_license.h` file defines the software license for the Firedancer project as "Apache-2.0".
+- **[fd_xdp_redirect_user.c](xdp/fd_xdp_redirect_user.c.driver.md)**: The `fd_xdp_redirect_user.c` file in the `firedancer` codebase provides functions to activate and deactivate XDP sockets by updating and deleting elements in a BPF map on a Linux system.
+- **[fd_xdp_redirect_user.h](xdp/fd_xdp_redirect_user.h.driver.md)**: The `fd_xdp_redirect_user.h` file in the `firedancer` codebase provides functions to activate and deactivate XSK file descriptors in an XDP redirect program's XSKMAP for network traffic management.
+- **[fd_xsk.c](xdp/fd_xsk.c.driver.md)**: The `fd_xsk.c` file in the `firedancer` codebase implements functions for creating, configuring, and managing AF_XDP sockets on Linux systems with XDP support, including memory mapping and unmapping of XSK rings, setting up UMEM regions, and handling socket initialization and cleanup.
+- **[fd_xsk.h](xdp/fd_xsk.h.driver.md)**: The `fd_xsk.h` file in the `firedancer` codebase provides definitions and functions for managing AF_XDP sockets, including handling RX/TX buffers and memory management for kernel-bypass networking on Linux systems.
+- **[Local.mk](xdp/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects for building and testing components related to XDP and eBPF under certain conditions.
+- **[test_xdp_ebpf.c](xdp/test_xdp_ebpf.c.driver.md)**: The `test_xdp_ebpf.c` file in the `firedancer` codebase implements unit tests for the `ebpf_xdp_flow` using the `bpf(2)` syscall in `BPF_PROG_TEST_RUN` mode, specifically targeting the Linux operating system with XDP support.

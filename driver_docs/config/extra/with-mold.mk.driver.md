@@ -1,0 +1,2 @@
+# Purpose
+This configuration file is designed to optimize the linking process in a software build system by switching the default linker to 'mold', a faster alternative, particularly beneficial for large binaries. It sets the `MOLD_LDFLAGS` variable to use 'mold' and includes a conditional check to accommodate older versions of GCC that do not recognize the `-fuse-ld=mold` flag, instead using the `-B` option to specify the path to 'mold'. The `LDFLAGS` variable is then appended with the `MOLD_LDFLAGS` to ensure the linker configuration is applied during the build process.

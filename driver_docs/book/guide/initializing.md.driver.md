@@ -1,0 +1,18 @@
+# Purpose
+The provided content is a detailed configuration guide for the `fdctl configure` command, which is used to set up the host operator system for the Firedancer application. This file is a configuration document that outlines the necessary steps and commands to ensure that Firedancer runs optimally on a system. It provides narrow functionality, focusing specifically on configuring system resources such as memory pages, kernel parameters, CPU cores, and network device settings. The document is organized into several conceptual components, each representing a stage of configuration, such as `hugetlbfs`, `sysctl`, `hyperthreads`, `ethtool-channels`, `ethtool-gro`, and `ethtool-loopback`. Each stage has specific requirements and commands to be executed, often requiring root privileges, to optimize system performance for Firedancer. This configuration is crucial for the codebase as it ensures that the system environment is correctly set up to support the high-performance requirements of the Firedancer application.
+# Content Summary
+The provided document outlines the configuration process for setting up the host operator system to run Firedancer efficiently using the `fdctl configure` command. This command is essential for ensuring that the system's resources and settings are optimized for Firedancer's operation. The configuration process involves several stages, each addressing specific system components and settings.
+
+1. **hugetlbfs**: This stage reserves huge (2MiB) and gigantic (1GiB) memory pages from the Linux kernel, which are crucial for Firedancer's performance. The process involves increasing the number of available pages in the kernel and assigning them to Firedancer by mounting `hugetlbfs` at specific paths. This stage requires root privileges and must be performed after every system reboot.
+
+2. **sysctl**: This stage configures kernel parameters to optimize system performance for Firedancer. It ensures that certain parameters meet minimum requirements, such as file mapping and opening limits, and network settings for loopback communication. The `init` mode requires root privileges or `CAP_SYS_ADMIN`, while the `fini` mode does not alter kernel parameters.
+
+3. **hyperthreads**: This stage manages CPU core allocation, ensuring that critical Firedancer jobs have dedicated cores by disabling hyperthreaded pairs. This is crucial for maintaining performance and avoiding interruptions. The stage requires root privileges and is dependent on the system's CPU topology.
+
+4. **ethtool-channels**: This stage configures the network device's channel count to match the number of `net` tiles in Firedancer, optimizing network performance through receive side scaling (RSS). It requires root privileges and is dependent on the number of `net` tiles configured.
+
+5. **ethtool-gro**: This stage disables the `generic-receive-offload` feature on network devices, which is incompatible with XDP, a technology used by Firedancer. It requires root privileges and must be run after each system boot.
+
+6. **ethtool-loopback**: This stage disables `tx-udp-segmentation` on the loopback device, necessary for proper communication between Agave clients and Firedancer over loopback. It also requires root privileges and is essential for systems using Frankendancer.
+
+The `fdctl configure` command can be executed in different modes: `init` to configure stages, `check` to verify configuration without making changes, and `fini` to reverse configurations if possible. Each stage has specific privilege requirements and dependencies, and some stages need to be re-executed after system reboots to maintain the configuration.

@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation. It checks for the presence of the `FD_HAS_INT128` and `FD_HAS_SSE` flags, and if both are defined, it adds specific headers and object files (`fd_restart.h`, `fd_restart`, `fd_restart_tile`, and `fd_discof`) to the build process. This ensures that these components are only included when the necessary features are available.

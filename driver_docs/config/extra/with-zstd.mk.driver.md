@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet checks for the presence of the `libzstd.a` library in a specified directory (`$(OPT)/lib`). If the library is found, it sets a flag (`FD_HAS_ZSTD`) and updates the compiler (`CFLAGS`) and linker (`LDFLAGS`) flags to include support for Zstandard compression. If the library is not found, it issues a warning indicating that Zstandard is not installed and will be skipped.

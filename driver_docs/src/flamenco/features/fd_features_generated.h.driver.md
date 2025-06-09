@@ -1,0 +1,248 @@
+# Purpose
+This C source code file defines a union named `fd_features` that encapsulates a collection of feature flags, each represented as an `ulong`. The file is auto-generated, as indicated by the comment at the top, and is not intended to be manually edited. The union contains an array `f` of feature flags, with each flag corresponding to a specific feature identified by a unique hexadecimal identifier. The total number of features is defined by the macro `FD_FEATURE_ID_CNT`, which is set to 234. Each feature flag is associated with a specific functionality or configuration option, such as enabling or disabling certain system calls, adjusting transaction processing parameters, or modifying program execution behaviors.
+
+The file is designed to be included in a larger codebase, as suggested by the inclusion guard and the error directive that ensures it is included only through `fd_features.h`. This setup indicates that the file is part of a modular system where features can be toggled or configured at compile-time or runtime, likely for a blockchain or distributed ledger system given the context of features like `secp256k1_program_enabled` and `zk_token_sdk_enabled`. The union structure allows for efficient storage and access to these feature flags, facilitating the management of system capabilities and experimental features. The use of unique identifiers for each feature suggests a need for precise control and tracking of feature states across different environments or versions of the software.
+# Data Structures
+
+---
+### fd\_features
+- **Type**: `union`
+- **Members**:
+    - `f`: An array of unsigned long integers representing feature flags.
+    - `deprecate_rewards_sysvar`: A feature flag for deprecating the rewards sysvar.
+    - `pico_inflation`: A feature flag for enabling pico inflation.
+    - `devnet_and_testnet`: A feature flag for devnet and testnet environments.
+    - `full_inflation_vote`: A feature flag for enabling full inflation vote.
+    - `full_inflation_enable`: A feature flag for enabling full inflation.
+    - `secp256k1_program_enabled`: A feature flag for enabling the secp256k1 program.
+    - `spl_token_v2_multisig_fix`: A feature flag for fixing multisig in SPL token v2.
+    - `no_overflow_rent_distribution`: A feature flag for preventing overflow in rent distribution.
+    - `filter_stake_delegation_accounts`: A feature flag for filtering stake delegation accounts.
+    - `require_custodian_for_locked_stake_authorize`: A feature flag for requiring a custodian for locked stake authorization.
+    - `spl_token_v2_self_transfer_fix`: A feature flag for fixing self-transfer in SPL token v2.
+    - `warp_timestamp_again`: A feature flag for warping timestamps again.
+    - `check_init_vote_data`: A feature flag for checking initial vote data.
+    - `secp256k1_recover_syscall_enabled`: A feature flag for enabling secp256k1 recover syscall.
+    - `system_transfer_zero_check`: A feature flag for checking zero in system transfers.
+    - `blake3_syscall_enabled`: A feature flag for enabling the Blake3 syscall.
+    - `dedupe_config_program_signers`: A feature flag for deduplicating config program signers.
+    - `verify_tx_signatures_len`: A feature flag for verifying transaction signature lengths.
+    - `vote_stake_checked_instructions`: A feature flag for checked instructions in vote stake.
+    - `rent_for_sysvars`: A feature flag for enabling rent for sysvars.
+    - `libsecp256k1_0_5_upgrade_enabled`: A feature flag for upgrading to libsecp256k1 version 0.5.
+    - `tx_wide_compute_cap`: A feature flag for transaction-wide compute cap.
+    - `spl_token_v2_set_authority_fix`: A feature flag for fixing set authority in SPL token v2.
+    - `merge_nonce_error_into_system_error`: A feature flag for merging nonce errors into system errors.
+    - `disable_fees_sysvar`: A feature flag for disabling fees sysvar.
+    - `stake_merge_with_unmatched_credits_observed`: A feature flag for merging stakes with unmatched credits observed.
+    - `zk_token_sdk_enabled`: A feature flag for enabling zk token SDK.
+    - `curve25519_syscall_enabled`: A feature flag for enabling Curve25519 syscall.
+    - `versioned_tx_message_enabled`: A feature flag for enabling versioned transaction messages.
+    - `libsecp256k1_fail_on_bad_count`: A feature flag for failing on bad count in libsecp256k1.
+    - `libsecp256k1_fail_on_bad_count2`: A feature flag for a second check on bad count in libsecp256k1.
+    - `instructions_sysvar_owned_by_sysvar`: A feature flag for sysvar ownership of instructions sysvar.
+    - `stake_program_advance_activating_credits_observed`: A feature flag for advancing stake program with activating credits observed.
+    - `credits_auto_rewind`: A feature flag for auto-rewinding credits.
+    - `demote_program_write_locks`: A feature flag for demoting program write locks.
+    - `ed25519_program_enabled`: A feature flag for enabling the ed25519 program.
+    - `return_data_syscall_enabled`: A feature flag for enabling return data syscall.
+    - `reduce_required_deploy_balance`: A feature flag for reducing required deploy balance.
+    - `sol_log_data_syscall_enabled`: A feature flag for enabling sol log data syscall.
+    - `stakes_remove_delegation_if_inactive`: A feature flag for removing delegation if stakes are inactive.
+    - `do_support_realloc`: A feature flag for supporting reallocation.
+    - `prevent_calling_precompiles_as_programs`: A feature flag for preventing precompiles from being called as programs.
+    - `optimize_epoch_boundary_updates`: A feature flag for optimizing epoch boundary updates.
+    - `remove_native_loader`: A feature flag for removing the native loader.
+    - `send_to_tpu_vote_port`: A feature flag for sending to TPU vote port.
+    - `requestable_heap_size`: A feature flag for requestable heap size.
+    - `disable_fee_calculator`: A feature flag for disabling the fee calculator.
+    - `add_compute_budget_program`: A feature flag for adding a compute budget program.
+    - `nonce_must_be_writable`: A feature flag for ensuring nonce must be writable.
+    - `spl_token_v3_3_0_release`: A feature flag for the release of SPL token v3.3.0.
+    - `leave_nonce_on_success`: A feature flag for leaving nonce on success.
+    - `reject_empty_instruction_without_program`: A feature flag for rejecting empty instructions without a program.
+    - `fixed_memcpy_nonoverlapping_check`: A feature flag for fixed memcpy non-overlapping check.
+    - `reject_non_rent_exempt_vote_withdraws`: A feature flag for rejecting non-rent exempt vote withdraws.
+    - `evict_invalid_stakes_cache_entries`: A feature flag for evicting invalid stakes cache entries.
+    - `allow_votes_to_directly_update_vote_state`: A feature flag for allowing votes to directly update vote state.
+    - `cap_accounts_data_len`: A feature flag for capping accounts data length.
+    - `max_tx_account_locks`: A feature flag for maximum transaction account locks.
+    - `require_rent_exempt_accounts`: A feature flag for requiring rent-exempt accounts.
+    - `filter_votes_outside_slot_hashes`: A feature flag for filtering votes outside slot hashes.
+    - `update_syscall_base_costs`: A feature flag for updating syscall base costs.
+    - `stake_deactivate_delinquent_instruction`: A feature flag for deactivating delinquent stake instructions.
+    - `stake_redelegate_instruction`: A feature flag for redelegating stake instructions.
+    - `vote_withdraw_authority_may_change_authorized_voter`: A feature flag for changing authorized voter in vote withdraw authority.
+    - `spl_associated_token_account_v1_0_4`: A feature flag for SPL associated token account v1.0.4.
+    - `reject_vote_account_close_unless_zero_credit_epoch`: A feature flag for rejecting vote account close unless zero credit epoch.
+    - `add_get_processed_sibling_instruction_syscall`: A feature flag for adding get processed sibling instruction syscall.
+    - `bank_transaction_count_fix`: A feature flag for fixing bank transaction count.
+    - `disable_bpf_deprecated_load_instructions`: A feature flag for disabling deprecated BPF load instructions.
+    - `disable_bpf_unresolved_symbols_at_runtime`: A feature flag for disabling unresolved BPF symbols at runtime.
+    - `record_instruction_in_transaction_context_push`: A feature flag for recording instruction in transaction context push.
+    - `syscall_saturated_math`: A feature flag for enabling syscall saturated math.
+    - `check_physical_overlapping`: A feature flag for checking physical overlapping.
+    - `limit_secp256k1_recovery_id`: A feature flag for limiting secp256k1 recovery ID.
+    - `disable_deprecated_loader`: A feature flag for disabling deprecated loader.
+    - `check_slice_translation_size`: A feature flag for checking slice translation size.
+    - `stake_split_uses_rent_sysvar`: A feature flag for using rent sysvar in stake split.
+    - `add_get_minimum_delegation_instruction_to_stake_program`: A feature flag for adding get minimum delegation instruction to stake program.
+    - `error_on_syscall_bpf_function_hash_collisions`: A feature flag for erroring on syscall BPF function hash collisions.
+    - `reject_callx_r10`: A feature flag for rejecting callx r10.
+    - `drop_redundant_turbine_path`: A feature flag for dropping redundant turbine path.
+    - `executables_incur_cpi_data_cost`: A feature flag for executables incurring CPI data cost.
+    - `fix_recent_blockhashes`: A feature flag for fixing recent blockhashes.
+    - `update_rewards_from_cached_accounts`: A feature flag for updating rewards from cached accounts.
+    - `enable_partitioned_epoch_reward`: A feature flag for enabling partitioned epoch reward.
+    - `spl_token_v3_4_0`: A feature flag for SPL token v3.4.0.
+    - `spl_associated_token_account_v1_1_0`: A feature flag for SPL associated token account v1.1.0.
+    - `default_units_per_instruction`: A feature flag for default units per instruction.
+    - `stake_allow_zero_undelegated_amount`: A feature flag for allowing zero undelegated amount in stake.
+    - `require_static_program_ids_in_transaction`: A feature flag for requiring static program IDs in transactions.
+    - `stake_raise_minimum_delegation_to_1_sol`: A feature flag for raising minimum delegation to 1 SOL in stake.
+    - `stake_minimum_delegation_for_rewards`: A feature flag for minimum delegation for rewards in stake.
+    - `add_set_compute_unit_price_ix`: A feature flag for adding set compute unit price instruction.
+    - `disable_deploy_of_alloc_free_syscall`: A feature flag for disabling deploy of alloc-free syscall.
+    - `include_account_index_in_rent_error`: A feature flag for including account index in rent error.
+    - `add_shred_type_to_shred_seed`: A feature flag for adding shred type to shred seed.
+    - `warp_timestamp_with_a_vengeance`: A feature flag for warping timestamp with a vengeance.
+    - `separate_nonce_from_blockhash`: A feature flag for separating nonce from blockhash.
+    - `enable_durable_nonce`: A feature flag for enabling durable nonce.
+    - `vote_state_update_credit_per_dequeue`: A feature flag for updating vote state credit per dequeue.
+    - `quick_bail_on_panic`: A feature flag for quick bail on panic.
+    - `nonce_must_be_authorized`: A feature flag for ensuring nonce must be authorized.
+    - `nonce_must_be_advanceable`: A feature flag for ensuring nonce must be advanceable.
+    - `vote_authorize_with_seed`: A feature flag for authorizing vote with seed.
+    - `cap_accounts_data_size_per_block`: A feature flag for capping accounts data size per block.
+    - `preserve_rent_epoch_for_rent_exempt_accounts`: A feature flag for preserving rent epoch for rent-exempt accounts.
+    - `enable_bpf_loader_extend_program_ix`: A feature flag for enabling BPF loader extend program instruction.
+    - `enable_early_verification_of_account_modifications`: A feature flag for enabling early verification of account modifications.
+    - `skip_rent_rewrites`: A feature flag for skipping rent rewrites.
+    - `prevent_crediting_accounts_that_end_rent_paying`: A feature flag for preventing crediting accounts that end rent paying.
+    - `cap_bpf_program_instruction_accounts`: A feature flag for capping BPF program instruction accounts.
+    - `loosen_cpi_size_restriction`: A feature flag for loosening CPI size restriction.
+    - `use_default_units_in_fee_calculation`: A feature flag for using default units in fee calculation.
+    - `compact_vote_state_updates`: A feature flag for compacting vote state updates.
+    - `incremental_snapshot_only_incremental_hash_calculation`: A feature flag for incremental snapshot with only incremental hash calculation.
+    - `disable_cpi_setting_executable_and_rent_epoch`: A feature flag for disabling CPI setting executable and rent epoch.
+    - `on_load_preserve_rent_epoch_for_rent_exempt_accounts`: A feature flag for preserving rent epoch for rent-exempt accounts on load.
+    - `account_hash_ignore_slot`: A feature flag for ignoring slot in account hash.
+    - `set_exempt_rent_epoch_max`: A feature flag for setting exempt rent epoch max.
+    - `relax_authority_signer_check_for_lookup_table_creation`: A feature flag for relaxing authority signer check for lookup table creation.
+    - `stop_sibling_instruction_search_at_parent`: A feature flag for stopping sibling instruction search at parent.
+    - `vote_state_update_root_fix`: A feature flag for fixing vote state update root.
+    - `cap_accounts_data_allocations_per_transaction`: A feature flag for capping accounts data allocations per transaction.
+    - `epoch_accounts_hash`: A feature flag for epoch accounts hash.
+    - `remove_deprecated_request_unit_ix`: A feature flag for removing deprecated request unit instruction.
+    - `disable_rehash_for_rent_epoch`: A feature flag for disabling rehash for rent epoch.
+    - `increase_tx_account_lock_limit`: A feature flag for increasing transaction account lock limit.
+    - `limit_max_instruction_trace_length`: A feature flag for limiting maximum instruction trace length.
+    - `check_syscall_outputs_do_not_overlap`: A feature flag for checking syscall outputs do not overlap.
+    - `enable_bpf_loader_set_authority_checked_ix`: A feature flag for enabling BPF loader set authority checked instruction.
+    - `enable_alt_bn128_syscall`: A feature flag for enabling alt_bn128 syscall.
+    - `enable_program_redeployment_cooldown`: A feature flag for enabling program redeployment cooldown.
+    - `commission_updates_only_allowed_in_first_half_of_epoch`: A feature flag for allowing commission updates only in the first half of the epoch.
+    - `enable_turbine_fanout_experiments`: A feature flag for enabling turbine fanout experiments.
+    - `disable_turbine_fanout_experiments`: A feature flag for disabling turbine fanout experiments.
+    - `drop_merkle_shreds`: A feature flag for dropping Merkle shreds.
+    - `keep_merkle_shreds`: A feature flag for keeping Merkle shreds.
+    - `move_serialized_len_ptr_in_cpi`: A feature flag for moving serialized length pointer in CPI.
+    - `update_hashes_per_tick`: A feature flag for updating hashes per tick.
+    - `enable_big_mod_exp_syscall`: A feature flag for enabling big modular exponentiation syscall.
+    - `disable_builtin_loader_ownership_chains`: A feature flag for disabling builtin loader ownership chains.
+    - `cap_transaction_accounts_data_size`: A feature flag for capping transaction accounts data size.
+    - `remove_congestion_multiplier_from_fee_calculation`: A feature flag for removing congestion multiplier from fee calculation.
+    - `enable_request_heap_frame_ix`: A feature flag for enabling request heap frame instruction.
+    - `prevent_rent_paying_rent_recipients`: A feature flag for preventing rent-paying rent recipients.
+    - `delay_visibility_of_program_deployment`: A feature flag for delaying visibility of program deployment.
+    - `apply_cost_tracker_during_replay`: A feature flag for applying cost tracker during replay.
+    - `deplete_cu_meter_on_vm_failure`: A feature flag for depleting CU meter on VM failure.
+    - `bpf_account_data_direct_mapping`: A feature flag for BPF account data direct mapping.
+    - `add_set_tx_loaded_accounts_data_size_instruction`: A feature flag for adding set transaction loaded accounts data size instruction.
+    - `switch_to_new_elf_parser`: A feature flag for switching to a new ELF parser.
+    - `round_up_heap_size`: A feature flag for rounding up heap size.
+    - `remove_bpf_loader_incorrect_program_id`: A feature flag for removing BPF loader incorrect program ID.
+    - `include_loaded_accounts_data_size_in_fee_calculation`: A feature flag for including loaded accounts data size in fee calculation.
+    - `native_programs_consume_cu`: A feature flag for native programs consuming compute units.
+    - `simplify_writable_program_account_check`: A feature flag for simplifying writable program account check.
+    - `stop_truncating_strings_in_syscalls`: A feature flag for stopping truncation of strings in syscalls.
+    - `clean_up_delegation_errors`: A feature flag for cleaning up delegation errors.
+    - `vote_state_add_vote_latency`: A feature flag for adding vote latency in vote state.
+    - `checked_arithmetic_in_fee_validation`: A feature flag for checked arithmetic in fee validation.
+    - `last_restart_slot_sysvar`: A feature flag for last restart slot sysvar.
+    - `reduce_stake_warmup_cooldown`: A feature flag for reducing stake warmup cooldown.
+    - `revise_turbine_epoch_stakes`: A feature flag for revising turbine epoch stakes.
+    - `enable_poseidon_syscall`: A feature flag for enabling Poseidon syscall.
+    - `timely_vote_credits`: A feature flag for timely vote credits.
+    - `remaining_compute_units_syscall_enabled`: A feature flag for enabling remaining compute units syscall.
+    - `enable_loader_v4`: A feature flag for enabling loader v4.
+    - `require_rent_exempt_split_destination`: A feature flag for requiring rent-exempt split destination.
+    - `better_error_codes_for_tx_lamport_check`: A feature flag for better error codes for transaction lamport check.
+    - `enable_alt_bn128_compression_syscall`: A feature flag for enabling alt_bn128 compression syscall.
+    - `programify_feature_gate_program`: A feature flag for programifying feature gate program.
+    - `update_hashes_per_tick2`: A feature flag for a second update of hashes per tick.
+    - `update_hashes_per_tick3`: A feature flag for a third update of hashes per tick.
+    - `update_hashes_per_tick4`: A feature flag for a fourth update of hashes per tick.
+    - `update_hashes_per_tick5`: A feature flag for a fifth update of hashes per tick.
+    - `update_hashes_per_tick6`: A feature flag for a sixth update of hashes per tick.
+    - `validate_fee_collector_account`: A feature flag for validating fee collector account.
+    - `enable_zk_transfer_with_fee`: A feature flag for enabling zk transfer with fee.
+    - `drop_legacy_shreds`: A feature flag for dropping legacy shreds.
+    - `consume_blockstore_duplicate_proofs`: A feature flag for consuming blockstore duplicate proofs.
+    - `index_erasure_conflict_duplicate_proofs`: A feature flag for indexing erasure conflict duplicate proofs.
+    - `curve25519_restrict_msm_length`: A feature flag for restricting MSM length in Curve25519.
+    - `allow_commission_decrease_at_any_time`: A feature flag for allowing commission decrease at any time.
+    - `merkle_conflict_duplicate_proofs`: A feature flag for Merkle conflict duplicate proofs.
+    - `disable_bpf_loader_instructions`: A feature flag for disabling BPF loader instructions.
+    - `deprecate_executable_meta_update_in_bpf_loader`: A feature flag for deprecating executable meta update in BPF loader.
+    - `enable_zk_proof_from_account`: A feature flag for enabling zk proof from account.
+    - `cost_model_requested_write_lock_cost`: A feature flag for cost model requested write lock cost.
+    - `enable_gossip_duplicate_proof_ingestion`: A feature flag for enabling gossip duplicate proof ingestion.
+    - `enable_chained_merkle_shreds`: A feature flag for enabling chained Merkle shreds.
+    - `remove_rounding_in_fee_calculation`: A feature flag for removing rounding in fee calculation.
+    - `enable_tower_sync_ix`: A feature flag for enabling tower sync instruction.
+    - `deprecate_unused_legacy_vote_plumbing`: A feature flag for deprecating unused legacy vote plumbing.
+    - `reward_full_priority_fee`: A feature flag for rewarding full priority fee.
+    - `disable_rent_fees_collection`: A feature flag for disabling rent fees collection.
+    - `add_new_reserved_account_keys`: A feature flag for adding new reserved account keys.
+    - `chained_merkle_conflict_duplicate_proofs`: A feature flag for chained Merkle conflict duplicate proofs.
+    - `simplify_alt_bn128_syscall_error_codes`: A feature flag for simplifying alt_bn128 syscall error codes.
+    - `abort_on_invalid_curve`: A feature flag for aborting on invalid curve.
+    - `ed25519_precompile_verify_strict`: A feature flag for strict verification in ed25519 precompile.
+    - `zk_elgamal_proof_program_enabled`: A feature flag for enabling zk ElGamal proof program.
+    - `move_stake_and_move_lamports_ixs`: A feature flag for moving stake and move lamports instructions.
+    - `deprecate_legacy_vote_ixs`: A feature flag for deprecating legacy vote instructions.
+    - `partitioned_epoch_rewards_superfeature`: A feature flag for partitioned epoch rewards superfeature.
+    - `enable_secp256r1_precompile`: A feature flag for enabling secp256r1 precompile.
+    - `get_sysvar_syscall_enabled`: A feature flag for enabling get sysvar syscall.
+    - `disable_sbpf_v0_execution`: A feature flag for disabling SBPF v0 execution.
+    - `reenable_sbpf_v0_execution`: A feature flag for re-enabling SBPF v0 execution.
+    - `enable_sbpf_v1_deployment_and_execution`: A feature flag for enabling SBPF v1 deployment and execution.
+    - `enable_sbpf_v2_deployment_and_execution`: A feature flag for enabling SBPF v2 deployment and execution.
+    - `enable_sbpf_v3_deployment_and_execution`: A feature flag for enabling SBPF v3 deployment and execution.
+    - `migrate_feature_gate_program_to_core_bpf`: A feature flag for migrating feature gate program to core BPF.
+    - `migrate_config_program_to_core_bpf`: A feature flag for migrating config program to core BPF.
+    - `migrate_address_lookup_table_program_to_core_bpf`: A feature flag for migrating address lookup table program to core BPF.
+    - `migrate_stake_program_to_core_bpf`: A feature flag for migrating stake program to core BPF.
+    - `enable_get_epoch_stake_syscall`: A feature flag for enabling get epoch stake syscall.
+    - `disable_account_loader_special_case`: A feature flag for disabling account loader special case.
+    - `remove_accounts_executable_flag_checks`: A feature flag for removing accounts executable flag checks.
+    - `fix_alt_bn128_multiplication_input_length`: A feature flag for fixing alt_bn128 multiplication input length.
+    - `lift_cpi_caller_restriction`: A feature flag for lifting CPI caller restriction.
+    - `accounts_lt_hash`: A feature flag for accounts LT hash.
+    - `remove_accounts_delta_hash`: A feature flag for removing accounts delta hash.
+    - `snapshots_lt_hash`: A feature flag for snapshots LT hash.
+    - `reserve_minimal_cus_for_builtin_instructions`: A feature flag for reserving minimal CUs for builtin instructions.
+    - `raise_block_limits_to_50m`: A feature flag for raising block limits to 50 million.
+    - `move_precompile_verification_to_svm`: A feature flag for moving precompile verification to SVM.
+    - `enable_transaction_loading_failure_fees`: A feature flag for enabling transaction loading failure fees.
+    - `disable_partitioned_rent_collection`: A feature flag for disabling partitioned rent collection.
+    - `vote_only_full_fec_sets`: A feature flag for voting only full FEC sets.
+    - `drop_unchained_merkle_shreds`: A feature flag for dropping unchained Merkle shreds.
+    - `verify_retransmitter_signature`: A feature flag for verifying retransmitter signature.
+    - `enable_turbine_extended_fanout_experiments`: A feature flag for enabling turbine extended fanout experiments.
+    - `vote_only_retransmitter_signed_fec_sets`: A feature flag for voting only retransmitter signed FEC sets.
+    - `mask_out_rent_epoch_in_vm_serialization`: A feature flag for masking out rent epoch in VM serialization.
+- **Description**: The `fd_features` union is a comprehensive data structure designed to manage a wide array of feature flags within a system. It consists of an array of unsigned long integers, each representing a specific feature flag, and a structured list of named feature flags, each associated with a unique identifier. This union allows for efficient storage and retrieval of feature states, enabling dynamic feature management and configuration within the system. The feature flags cover a broad range of functionalities, from enabling specific syscalls and program upgrades to managing transaction and account behaviors, providing a flexible and scalable approach to feature management.
+
+

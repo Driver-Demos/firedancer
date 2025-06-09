@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet that sets compilation and linking flags for building a C++ project. `CPPFLAGS` is augmented with `-g` to include debugging information and `-fno-omit-frame-pointer` to retain the frame pointer for better debugging and profiling. `LDFLAGS` is appended with `-rdynamic` to ensure that all symbols are added to the dynamic symbol table, which is useful for debugging and dynamic linking.

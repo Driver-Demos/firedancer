@@ -1,0 +1,2 @@
+# Purpose
+This snippet is a conditional directive from a Makefile, used in build automation. It checks if the `FD_HAS_ROCKSDB` variable is defined, and if so, it adds `fd_shredcap.h` to the list of headers and `fd_shredcap` and `fd_flamenco` to the list of object files to be compiled. This configuration is likely used to include specific components in the build process when RocksDB support is enabled.

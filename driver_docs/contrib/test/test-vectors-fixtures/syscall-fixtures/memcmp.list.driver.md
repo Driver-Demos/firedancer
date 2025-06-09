@@ -1,0 +1,2 @@
+# Purpose
+The file lists paths to specific test fixture files used for testing the `memcmp` system call within a software project. Each entry represents a unique test case, identified by a hash and a numerical identifier, stored in the `dump/test-vectors/syscall/fixtures/memcmp/` directory. These fixtures are likely used to validate the behavior and correctness of the `memcmp` function under various conditions.

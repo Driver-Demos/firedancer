@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet checks for the presence of the `libsecp256k1.a` library in a specified directory. If the library is found, it sets a flag `FD_HAS_SECP256K1` to 1, adds a preprocessor definition to `CFLAGS`, and appends the library path to `LDFLAGS` for linking. If the library is not found, it issues a warning message indicating that `secp256k1` is not installed and will be skipped.

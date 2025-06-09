@@ -1,0 +1,11 @@
+
+## Files
+- **[fd_ar.c](archive/fd_ar.c.driver.md)**: The `fd_ar.c` file in the `firedancer` codebase provides functions for reading and parsing headers from archive files, including handling ASCII to long conversions and checking for valid archive file formats.
+- **[fd_ar.h](archive/fd_ar.h.driver.md)**: The `fd_ar.h` file in the `firedancer` codebase provides a simple streaming reader for AR(5) archive files, including functions to initialize and read the next file in the archive while handling various error conditions.
+- **[fd_tar.h](archive/fd_tar.h.driver.md)**: The `fd_tar.h` file in the `firedancer` codebase provides an implementation of the ustar and old-GNU TAR file formats, specifically designed for loading and writing Solana snapshots, and includes functionality for both reading and writing TAR archives using a callback API.
+- **[fd_tar_reader.c](archive/fd_tar_reader.c.driver.md)**: The `fd_tar_reader.c` file in the `firedancer` codebase implements a TAR file reader that processes TAR headers and data, utilizing callback functions for file and data handling.
+- **[fd_tar_writer.c](archive/fd_tar_writer.c.driver.md)**: The `fd_tar_writer.c` file in the `firedancer` codebase provides functionality for creating and managing tar archives, including writing file headers, data, and handling file alignment and checksums.
+- **[fuzz_tar.c](archive/fuzz_tar.c.driver.md)**: The `fuzz_tar.c` file in the `firedancer` codebase implements a fuzz testing harness for TAR file reading, utilizing the LLVM fuzzer to test the `fd_tar` functionality.
+- **[Local.mk](archive/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and conditional fuzz tests for the `fd_ar` and `fd_tar` components within the `fd_util` module.
+- **[test_ar.c](archive/test_ar.c.driver.md)**: The `test_ar.c` file in the `firedancer` codebase contains unit tests for validating the functionality of reading AR archive files, including tests for valid archives, empty archives, and handling of invalid archive formats.
+- **[test_tar.c](archive/test_tar.c.driver.md)**: The `test_tar.c` file in the `firedancer` codebase tests the functionality of reading and verifying the size of a TAR archive header using the `fd_tar_meta_get_size` function.

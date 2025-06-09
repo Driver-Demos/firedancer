@@ -1,0 +1,2 @@
+# Purpose
+This snippet is a Makefile segment used to conditionally compile and run unit tests for a software project. It checks for the presence of `FD_HAS_INT128` and `FD_HAS_SECP256K1` flags, and if both are defined, it invokes the `make-unit-test` function to set up and execute the `test_consensus` and `test_gossip_echo_vote` unit tests, linking them with specified libraries such as `fd_disco`, `fd_choreo`, and others, along with `SECP256K1_LIBS`.

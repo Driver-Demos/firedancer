@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet sets up a build configuration for a software project. It specifies the build directory as `linux/clang/noarch64` and includes several configuration files to extend the build setup with additional features such as Clang support, debugging, security, optimization, and threading. It also defines preprocessor flags and variables to enable double precision and stack allocation features.

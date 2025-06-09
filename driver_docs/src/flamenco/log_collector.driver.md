@@ -1,0 +1,6 @@
+
+## Files
+- **[fd_log_collector.h](log_collector/fd_log_collector.h.driver.md)**: The `fd_log_collector.h` file in the `firedancer` codebase provides an implementation for a log collector, including functions for initializing, deleting, and managing logs, as well as handling various logging scenarios such as program invocation, success, failure, and consumption of compute units.
+- **[fd_log_collector_base.h](log_collector/fd_log_collector_base.h.driver.md)**: The `fd_log_collector_base.h` file defines the base structure and constants for a log collector in the Firedancer codebase, including buffer size limits and serialization details.
+- **[Local.mk](log_collector/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase defines build instructions for the `log_collector` component, including header file addition and unit test creation, conditional on the presence of 128-bit integer support.
+- **[test_log_collector.c](log_collector/test_log_collector.c.driver.md)**: The `test_log_collector.c` file contains various test functions for the `fd_log_collector` component, focusing on different scenarios such as message byte limits, single log limits, and message equivalences, to ensure proper logging behavior and handling of log truncation.

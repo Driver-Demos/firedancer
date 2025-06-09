@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile script used to automate the process of building and testing a software project. It defines targets for adding header files and object files, creating unit tests for specific components (`test_sqrt`, `test_fxp`, `test_stat`), and executing these unit tests. The script leverages macros to streamline the inclusion and testing of various components within the project.

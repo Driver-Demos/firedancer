@@ -1,0 +1,2 @@
+# Purpose
+This YAML file contains metadata for a pull response in a distributed network system. It includes a public key (`pubkey`) and a list of CRDS (Conflict-free Replicated Data Structures) entries, each with a signature and associated data. The data specifies details about a node instance, including its origin (`from`), wallclock time, timestamp, and a unique token, which are used for synchronization and validation purposes within the network.

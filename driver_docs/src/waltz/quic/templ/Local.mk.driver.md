@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile script used for automating the build process of a software project. It defines rules to add header files and object files, create and run unit tests, and create fuzz tests for components related to QUIC (Quick UDP Internet Connections) transport parameters. The script utilizes custom functions such as `add-hdrs`, `add-objs`, `make-unit-test`, and `make-fuzz-test` to streamline these tasks.

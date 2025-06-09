@@ -1,0 +1,11 @@
+## Folders
+- **[block-fixtures](test-vectors-fixtures/block-fixtures.driver.md)**: The `block-fixtures` folder in the `firedancer` codebase contains a file, `block-fixtures.list`, which provides a list of file paths to block fixture test vectors used for testing purposes.
+- **[elf-loader-fixtures](test-vectors-fixtures/elf-loader-fixtures.driver.md)**: The `elf-loader-fixtures` folder in the `firedancer` codebase contains a file named `elf-loader-fixtures.list`, which includes a list of test vector fixture file paths for the ELF loader, intended for testing purposes.
+- **[instr-fixtures](test-vectors-fixtures/instr-fixtures.driver.md)**: The `instr-fixtures` folder in the `firedancer` codebase contains a collection of list files that specify paths to test vector fixtures for various BPF components and functionalities, including address lookup tables, loader programs, compute budgets, staking, system validation, voting, and the `zk_sdk` component.
+- **[precompile-fixtures](test-vectors-fixtures/precompile-fixtures.driver.md)**: The `precompile-fixtures` folder in the `firedancer` codebase contains lists of file paths to test vector fixtures for cryptographic algorithms including Ed25519, secp256k1, and secp256r1.
+- **[syscall-fixtures](test-vectors-fixtures/syscall-fixtures.driver.md)**: The `syscall-fixtures` folder in the `firedancer` codebase contains a comprehensive collection of files listing test vector fixtures for various syscalls, including cryptographic operations, memory functions, and system variables, to ensure the correctness and reliability of these operations.
+- **[txn-fixtures](test-vectors-fixtures/txn-fixtures.driver.md)**: The `txn-fixtures` folder in the `firedancer` codebase contains a file, `program-tests.list`, which provides a structured list of file paths to `.fix` files used for testing transaction-related functionalities.
+- **[vm-interp-fixtures](test-vectors-fixtures/vm-interp-fixtures.driver.md)**: The `vm-interp-fixtures` folder in the `firedancer` codebase contains a file listing paths to test vector fixtures for the VM interpreter.
+
+## Files
+- **[test-vectors-commit-sha.txt](test-vectors-fixtures/test-vectors-commit-sha.txt.driver.md)**: The `test-vectors-commit-sha.txt` file in the `firedancer` codebase contains the commit SHA for the main branch.

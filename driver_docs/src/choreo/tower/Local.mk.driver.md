@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile segment used for conditional compilation in a software project. It checks for the presence of specific features or libraries, such as `FD_HAS_INT128`, `FD_HAS_SECP256K1`, and `FD_HAS_HOSTED`, to conditionally add headers, objects, and unit tests related to the `fd_tower` and associated components. The configuration ensures that certain build steps are executed only if the required conditions are met, optimizing the build process for different environments or feature sets.

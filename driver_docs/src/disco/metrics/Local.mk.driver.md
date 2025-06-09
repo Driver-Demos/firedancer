@@ -1,0 +1,2 @@
+# Purpose
+This is a Makefile snippet used for managing the build process of a software project. It defines rules to add header files (`fd_prometheus.h`, `fd_metrics.h`) and object files (`fd_prometheus`, `fd_metrics`, `fd_disco`) to the build. Additionally, it conditionally includes `fd_metric_tile` and `fd_disco` object files if the `FD_HAS_SSE` flag is set, indicating support for SSE (Streaming SIMD Extensions) instructions.

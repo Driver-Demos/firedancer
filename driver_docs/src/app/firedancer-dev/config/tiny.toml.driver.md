@@ -1,0 +1,2 @@
+# Purpose
+This configuration file defines various settings for a software system, organizing them into sections such as `hugetlbfs`, `runtime`, `layout`, and `tiles`. It specifies parameters like memory allocation (`heap_size_gib`), runtime limits (`max_live_slots`, `snapshot_grace_period_seconds`), and tile configurations for execution and verification. Additionally, it configures network-related settings under `tiles.gui`, including HTTP and WebSocket connection limits and buffer sizes.

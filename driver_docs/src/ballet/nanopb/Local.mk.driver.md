@@ -1,0 +1,2 @@
+# Purpose
+The file is a Makefile snippet used in a build system to manage dependencies and compilation targets. It defines two calls to a macro `add-hdrs` and `add-objs`, which respectively add header files (`pb_firedancer.h`, `pb_common.h`, `pb_decode.h`, `pb_encode.h`, `pb.h`) and object files (`pb_common`, `pb_decode`, `pb_encode`) to the `fd_ballet` target, facilitating the organization and compilation of these components within the project.

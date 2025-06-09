@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is used to configure a build environment for a software project. It sets the build directory to `linux/clang/minimal` and includes several configuration files to extend the build with additional features such as Clang support, debugging, security, brutality, and optimization. Additionally, it modifies the C preprocessor flags to enable POSIX-style logging, aiding in cross-platform development.

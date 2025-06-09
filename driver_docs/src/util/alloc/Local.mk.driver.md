@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile script used for building and testing components of a software project. It defines build rules and dependencies by adding object files (`fd_alloc`, `fd_util`), header files (`fd_alloc.h`), and specifies the creation of a binary (`fd_alloc_ctl`). It also sets up a unit test (`test_alloc`) and includes a command to execute the test, as well as adding test scripts for `test_alloc_ctl`.

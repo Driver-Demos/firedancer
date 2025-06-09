@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for building and testing components of a software project. It defines rules to add header files (`fd_bmtree.h`, `fd_wbmtree.h`) and object files (`fd_bmtree`, `fd_wbmtree`) to the build process, and specifies the creation and execution of a unit test (`test_bmtree`) and a conditional fuzz test (`fuzz_bmtree`) if the `FD_HAS_HOSTED` environment variable is set.

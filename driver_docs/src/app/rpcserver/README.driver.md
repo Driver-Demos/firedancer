@@ -1,0 +1,2 @@
+# Purpose
+The file provides documentation for an RPC implementation specific to the Firedancer validator, explicitly stating that it is incompatible with Frankendancer, which uses a different RPC service. It warns users that the service is under active development and subject to API changes without notice, and it includes a sample command line for running the RPC server with specified funk and blockstore files.

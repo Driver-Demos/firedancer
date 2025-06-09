@@ -1,0 +1,2 @@
+# Purpose
+This Makefile is used to automate the simulation of a Verilog hardware design using the Cocotb framework. It specifies the simulator to be used (defaulting to Questa), the module name, the directory for RTL (Register Transfer Level) files, and the top-level module for simulation. It also lists the Verilog source files required for the simulation, including those from the Xilinx Vivado library and custom RTL files. The file concludes by including a Cocotb configuration makefile to integrate with the Cocotb simulation environment.

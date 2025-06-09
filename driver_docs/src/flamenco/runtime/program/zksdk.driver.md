@@ -1,0 +1,14 @@
+## Folders
+- **[instructions](zksdk/instructions.driver.md)**: The `instructions` folder in the `firedancer` codebase contains a collection of source and header files that implement and define functions, structures, and tests for verifying various cryptographic proofs and operations, such as batched grouped ciphertext validity, range proofs, ciphertext equality, and public key validity, using zero-knowledge proofs.
+- **[merlin](zksdk/merlin.driver.md)**: The `merlin` folder in the `firedancer` codebase contains the implementation and testing of the Merlin cryptographic transcript protocol, including source code, header definitions, a makefile for build specifications, and a test suite.
+- **[rangeproofs](zksdk/rangeproofs.driver.md)**: The `rangeproofs` folder in the `firedancer` codebase contains source and header files for implementing, verifying, and optimizing cryptographic range proofs, utilizing various architectures and protocols, and includes a makefile for build configuration.
+- **[tests](zksdk/tests.driver.md)**: The `tests` folder in the `firedancer` codebase contains a bash script for testing ledger creation with ZK SDK transactions using Solana and SPL Token dependencies.
+- **[transcript](zksdk/transcript.driver.md)**: The `transcript` folder in the `firedancer` codebase contains the `fd_zksdk_transcript.h` file, which provides definitions and functions for managing zero-knowledge proof transcripts using the Merlin and rangeproofs libraries.
+
+## Files
+- **[fd_zksdk.c](zksdk/fd_zksdk.c.driver.md)**: The `fd_zksdk.c` file in the `firedancer` codebase implements functions for processing and verifying zero-knowledge proofs, including handling account borrowing and context state management, as part of a runtime program for zk-SDK.
+- **[fd_zksdk.h](zksdk/fd_zksdk.h.driver.md)**: The `fd_zksdk.h` file in the `firedancer` codebase declares functions for processing and verifying proofs and managing context accounts within the zkSDK framework.
+- **[fd_zksdk_private.h](zksdk/fd_zksdk_private.h.driver.md)**: The `fd_zksdk_private.h` file in the `firedancer` codebase defines internal structures, constants, and function prototypes for verifying various zero-knowledge proof instructions related to ciphertext and public key validity.
+- **[Local.mk](zksdk/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally adds headers, objects, and unit tests for the `fd_zksdk` and related components based on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED` flags.
+- **[README.md](zksdk/README.md.driver.md)**: The `README.md` file provides an overview of the Solana ZK SDK implementation and the `ZkE1Gama1Proof11111111111111111111111111111` program.
+- **[test_zksdk.c](zksdk/test_zksdk.c.driver.md)**: The `test_zksdk.c` file contains a unit test for verifying the validity of public keys using zk-SDK in the Firedancer project.

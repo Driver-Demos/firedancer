@@ -1,0 +1,2 @@
+# Purpose
+This is a Makefile script used for building and testing components of a software project. It conditionally compiles different object files based on the presence of threading support (`FD_HAS_THREADS`) and defines unit tests for components like `test_cpuset` and `test_tile`. The script uses custom functions such as `add-hdrs`, `add-objs`, `make-unit-test`, and `run-unit-test` to manage dependencies and automate the build and test processes.

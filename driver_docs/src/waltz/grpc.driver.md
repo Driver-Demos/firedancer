@@ -1,0 +1,9 @@
+
+## Files
+- **[fd_grpc_client.c](grpc/fd_grpc_client.c.driver.md)**: The `fd_grpc_client.c` file in the `firedancer` codebase implements a gRPC client with support for HTTP/2 communication, including stream management, request handling, and optional OpenSSL integration for secure connections.
+- **[fd_grpc_client.h](grpc/fd_grpc_client.h.driver.md)**: The `fd_grpc_client.h` file provides an API for dispatching unary and server-streaming gRPC requests over HTTP/2+TLS, including metrics tracking, callback functions, and request management for the Firedancer project.
+- **[fd_grpc_client_private.h](grpc/fd_grpc_client_private.h.driver.md)**: The `fd_grpc_client_private.h` file defines the internal structures and state management for a gRPC client, including stream handling and connection management, within the Firedancer codebase.
+- **[fd_grpc_codec.c](grpc/fd_grpc_codec.c.driver.md)**: The `fd_grpc_codec.c` file in the `firedancer` codebase implements functions for generating and parsing gRPC headers over HTTP/2, including handling content types, user agents, and status codes.
+- **[fd_grpc_codec.h](grpc/fd_grpc_codec.h.driver.md)**: The `fd_grpc_codec.h` file in the `firedancer` codebase provides helper functions and structures for handling gRPC over HTTP/2, including definitions for gRPC status codes and functions for generating and reading gRPC request and response headers.
+- **[Local.mk](grpc/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the build configuration for gRPC components, including headers, object files, and unit tests for `fd_grpc_codec` and `fd_grpc_client`.
+- **[test_grpc_codec.c](grpc/test_grpc_codec.c.driver.md)**: The `test_grpc_codec.c` file in the `firedancer` codebase contains a test function for generating and verifying HTTP/2 request headers for gRPC communication, including handling of authorization headers.

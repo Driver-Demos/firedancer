@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile segment that conditionally includes headers and compiles objects and binaries based on the presence of certain features. It checks for the `FD_HAS_INT128` and `FD_HAS_HOSTED` flags to determine whether to add specific headers and objects, and to create a binary and a unit test for the `fd_voter` component, utilizing dependencies like `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util`.

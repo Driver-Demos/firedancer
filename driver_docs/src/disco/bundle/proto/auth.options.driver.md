@@ -1,0 +1,2 @@
+# Purpose
+The file defines the maximum size constraints for various fields involved in an authentication process. It specifies the size limits for public keys, challenges, signed challenges, refresh tokens, and token values within different authentication request and response structures. This ensures that the data used in these processes adheres to predefined size limitations for security and consistency.

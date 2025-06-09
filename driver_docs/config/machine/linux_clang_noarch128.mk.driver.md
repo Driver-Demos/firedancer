@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is used to configure the build environment for a software project. It sets the build directory to `linux/clang/noarch128` and includes several configuration files to enable specific build features such as Clang support, debugging, security, optimization, and threading. Additionally, it defines preprocessor flags and variables to indicate the presence of certain features like 128-bit integers, double precision, and stack allocation.

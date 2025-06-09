@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet is configuring a build process for a software project with fuzz testing capabilities. It includes an additional configuration file, `config/extra/with-handholding.mk`, and sets a flag `FD_HAS_FUZZ` to indicate the presence of fuzz testing. It modifies the `CPPFLAGS` and `LDFLAGS` to include specific compiler and linker options for enabling fuzzing and coverage analysis, such as `-fsanitize=fuzzer-no-link` and `-fsanitize-coverage=inline-8bit-counters`.

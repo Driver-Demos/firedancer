@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for configuring a build process with specific compiler settings. It sets the C and C++ compilers to `hfuzz-clang` and `hfuzz-clang++`, respectively, and uses `hfuzz-clang++` as the linker. Additionally, it appends the `-fno-omit-frame-pointer` flag to `CPPFLAGS` to ensure frame pointers are not omitted, which is useful for debugging and profiling. The `FD_HAS_FUZZ` variable is set to `1`, indicating that fuzzing capabilities are enabled in the build.

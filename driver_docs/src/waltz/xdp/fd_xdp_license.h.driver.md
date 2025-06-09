@@ -1,0 +1,2 @@
+# Purpose
+This code is a simple C preprocessor directive that defines a macro named `FD_LICENSE` with the value `"Apache-2.0"`. It is likely part of a larger codebase where licensing information needs to be consistently referenced or displayed. By defining this macro, the code ensures that the license type can be easily updated or checked throughout the project without having to manually change multiple instances. This approach is useful for maintaining clarity and consistency regarding the software's licensing terms.

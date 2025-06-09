@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation in a software build process. It checks for the presence of specific features or environments—`FD_HAS_HOSTED`, `FD_HAS_THREADS`, and `FD_HAS_LINUX`—and, if all are defined, it adds certain header files and object files related to topology and discovery to the build process. This ensures that the relevant components are only included when the specified conditions are met.

@@ -1,0 +1,2 @@
+# Purpose
+This is a Makefile snippet that conditionally includes headers, object files, and unit tests for a component named `fd_rpc_client` if the `FD_HAS_HOSTED` variable is defined. It adds the header `fd_rpc_client.h`, compiles the object `fd_rpc_client` with `fddev_shared`, and sets up unit tests `test_rpc_client` and `dump_rpc_client` with dependencies on shared libraries `fddev_shared`, `fd_waltz`, `fd_ballet`, and `fd_util`, and executes the `test_rpc_client` unit test.

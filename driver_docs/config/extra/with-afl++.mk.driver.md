@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used to configure the build process for a software project that incorporates fuzz testing. It sets a flag indicating the presence of fuzzing capabilities, checks for the presence of the AFL (American Fuzzy Lop) library, and adjusts compiler and linker flags to include sanitization and coverage options necessary for fuzz testing. The file ensures that the necessary AFL libraries and runtime objects are linked during the build process.

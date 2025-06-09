@@ -1,0 +1,10 @@
+
+## Files
+- **[fd_dbl_buf.c](mib/fd_dbl_buf.c.driver.md)**: The `fd_dbl_buf.c` file in the `firedancer` codebase implements a double buffer system with functions for creating, joining, leaving, deleting, inserting into, and reading from the buffer, while ensuring memory alignment and integrity checks.
+- **[fd_dbl_buf.h](mib/fd_dbl_buf.h.driver.md)**: The `fd_dbl_buf.h` file provides a concurrent lock-free double buffer implementation for a single producer and multiple consumers, optimized for rare updates and frequent polling, within the `firedancer` codebase.
+- **[fd_netdev_netlink.c](mib/fd_netdev_netlink.c.driver.md)**: The `fd_netdev_netlink.c` file in the `firedancer` codebase implements functions for initializing and loading network device tables using netlink on Linux systems.
+- **[fd_netdev_netlink.h](mib/fd_netdev_netlink.h.driver.md)**: The `fd_netdev_netlink.h` file provides APIs for importing network interfaces from Linux netlink in the `firedancer` codebase.
+- **[fd_netdev_tbl.c](mib/fd_netdev_tbl.c.driver.md)**: The `fd_netdev_tbl.c` file in the `firedancer` codebase implements functions for managing a network device table, including creating, joining, resetting, and deleting network device tables, as well as printing their status.
+- **[fd_netdev_tbl.h](mib/fd_netdev_tbl.h.driver.md)**: The `fd_netdev_tbl.h` file in the `firedancer` codebase provides a network interface table API, including structures and functions for managing network devices and their operational statuses.
+- **[Local.mk](mib/Local.mk.driver.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers and object files for `fd_dbl_buf` and `fd_netdev_tbl`, and conditionally includes `fd_netdev_netlink` and its unit test if `FD_HAS_LINUX` is defined.
+- **[test_netdev_netlink.c](mib/test_netdev_netlink.c.driver.md)**: The `test_netdev_netlink.c` file in the `firedancer` codebase is a test program that initializes and manages network device tables using netlink, including creating a workspace, loading interfaces, and dumping the interface table.

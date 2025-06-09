@@ -1,0 +1,388 @@
+# Purpose
+This C source code file is an auto-generated implementation of functions related to Reed-Solomon error correction, specifically for generating parity-check matrices. The file includes multiple functions, each named `fd_reedsol_ppt_64_xx`, where `xx` varies from 45 to 49. These functions are designed to work with 64 input elements of type `gf_t`, which likely represents elements in a Galois Field, a common mathematical structure used in error correction algorithms. The functions perform operations on these inputs using a macro `FD_REEDSOL_GENERATE_PPT`, which is presumably defined in the included header file `fd_reedsol_ppt.h`. This macro likely encapsulates the core logic for generating the parity-check matrices necessary for the Reed-Solomon encoding process.
+
+The primary purpose of this file is to provide specific implementations of Reed-Solomon encoding for different configurations, as indicated by the varying function names. Each function takes 64 pointers to `gf_t` types, processes them, and updates the values in place. The functions are marked with `FD_FN_UNSANITIZED`, suggesting that they are optimized for performance and may not include safety checks, which is typical in high-performance computing scenarios where Reed-Solomon codes are often applied, such as in data storage and transmission systems. This file is part of a larger library and is intended to be used as a backend component, providing specialized functionality for error correction without defining a public API or external interface directly.
+# Imports and Dependencies
+
+---
+- `../fd_reedsol_ppt.h`
+
+
+# Functions
+
+---
+### fd\_reedsol\_ppt\_64\_45<!-- {{#callable:fd_reedsol_ppt_64_45}} -->
+The function `fd_reedsol_ppt_64_45` processes 64 input elements using a Reed-Solomon error correction algorithm with a specific configuration of 64 total elements and 45 data elements.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`.
+    - `_in01`: Pointer to the second input element of type `gf_t`.
+    - `_in02`: Pointer to the third input element of type `gf_t`.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
+- **Control Flow**:
+    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values and assigns them to local variables `in00` to `in63`.
+    - It then calls the macro `FD_REEDSOL_GENERATE_PPT` with the parameters 64, 45, and the 64 local variables, which likely performs the Reed-Solomon error correction algorithm.
+    - After the macro call, the function updates the original input pointers with the potentially modified values from the local variables.
+- **Output**: The function does not return a value; it modifies the input data in place.
+
+
+---
+### fd\_reedsol\_ppt\_64\_46<!-- {{#callable:fd_reedsol_ppt_64_46}} -->
+The function `fd_reedsol_ppt_64_46` performs a Reed-Solomon encoding operation on 64 input elements using a specific configuration and updates the input elements with the result.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`.
+    - `_in01`: Pointer to the second input element of type `gf_t`.
+    - `_in02`: Pointer to the third input element of type `gf_t`.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
+- **Control Flow**:
+    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values.
+    - It then calls the macro `FD_REEDSOL_GENERATE_PPT` with the parameters 64, 46, and the 64 dereferenced input values.
+    - The macro presumably performs some form of Reed-Solomon encoding or processing on these values.
+    - After the macro call, the function updates each of the original input pointers with the potentially modified `gf_t` values.
+- **Output**: The function does not return a value; it modifies the input data in place.
+
+
+---
+### fd\_reedsol\_ppt\_64\_47<!-- {{#callable:fd_reedsol_ppt_64_47}} -->
+The function `fd_reedsol_ppt_64_47` processes 64 input elements using a Reed-Solomon error correction algorithm with specific parameters and updates the input elements with the processed values.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`.
+    - `_in01`: Pointer to the second input element of type `gf_t`.
+    - `_in02`: Pointer to the third input element of type `gf_t`.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
+- **Control Flow**:
+    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values.
+    - It then calls the macro `FD_REEDSOL_GENERATE_PPT` with parameters 64 and 47, along with the 64 dereferenced input values, to perform the Reed-Solomon error correction processing.
+    - After the processing, the function updates each of the original input pointers with the processed `gf_t` values.
+- **Output**: The function does not return a value; it modifies the input data in place.
+
+
+---
+### fd\_reedsol\_ppt\_64\_48<!-- {{#callable:fd_reedsol_ppt_64_48}} -->
+The function `fd_reedsol_ppt_64_48` performs a Reed-Solomon encoding operation on 64 input elements using a specific configuration and updates the input elements with the result.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`.
+    - `_in01`: Pointer to the second input element of type `gf_t`.
+    - `_in02`: Pointer to the third input element of type `gf_t`.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
+- **Control Flow**:
+    - Initialize local variables `in00` to `in63` by dereferencing the corresponding input pointers `_in00` to `_in63`.
+    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters `64`, `48`, and the local variables `in00` to `in63` to perform the Reed-Solomon encoding operation.
+    - Update the input pointers `_in00` to `_in63` with the values of the local variables `in00` to `in63`.
+- **Output**: The function does not return a value; it modifies the input elements in place.
+
+
+---
+### fd\_reedsol\_ppt\_64\_49<!-- {{#callable:fd_reedsol_ppt_64_49}} -->
+The function `fd_reedsol_ppt_64_49` performs a Reed-Solomon encoding operation on 64 input elements using a specific configuration and updates the input pointers with the results.
+- **Inputs**:
+    - `_in00`: Pointer to the first input element of type `gf_t`.
+    - `_in01`: Pointer to the second input element of type `gf_t`.
+    - `_in02`: Pointer to the third input element of type `gf_t`.
+    - `_in03`: Pointer to the fourth input element of type `gf_t`.
+    - `_in04`: Pointer to the fifth input element of type `gf_t`.
+    - `_in05`: Pointer to the sixth input element of type `gf_t`.
+    - `_in06`: Pointer to the seventh input element of type `gf_t`.
+    - `_in07`: Pointer to the eighth input element of type `gf_t`.
+    - `_in08`: Pointer to the ninth input element of type `gf_t`.
+    - `_in09`: Pointer to the tenth input element of type `gf_t`.
+    - `_in10`: Pointer to the eleventh input element of type `gf_t`.
+    - `_in11`: Pointer to the twelfth input element of type `gf_t`.
+    - `_in12`: Pointer to the thirteenth input element of type `gf_t`.
+    - `_in13`: Pointer to the fourteenth input element of type `gf_t`.
+    - `_in14`: Pointer to the fifteenth input element of type `gf_t`.
+    - `_in15`: Pointer to the sixteenth input element of type `gf_t`.
+    - `_in16`: Pointer to the seventeenth input element of type `gf_t`.
+    - `_in17`: Pointer to the eighteenth input element of type `gf_t`.
+    - `_in18`: Pointer to the nineteenth input element of type `gf_t`.
+    - `_in19`: Pointer to the twentieth input element of type `gf_t`.
+    - `_in20`: Pointer to the twenty-first input element of type `gf_t`.
+    - `_in21`: Pointer to the twenty-second input element of type `gf_t`.
+    - `_in22`: Pointer to the twenty-third input element of type `gf_t`.
+    - `_in23`: Pointer to the twenty-fourth input element of type `gf_t`.
+    - `_in24`: Pointer to the twenty-fifth input element of type `gf_t`.
+    - `_in25`: Pointer to the twenty-sixth input element of type `gf_t`.
+    - `_in26`: Pointer to the twenty-seventh input element of type `gf_t`.
+    - `_in27`: Pointer to the twenty-eighth input element of type `gf_t`.
+    - `_in28`: Pointer to the twenty-ninth input element of type `gf_t`.
+    - `_in29`: Pointer to the thirtieth input element of type `gf_t`.
+    - `_in30`: Pointer to the thirty-first input element of type `gf_t`.
+    - `_in31`: Pointer to the thirty-second input element of type `gf_t`.
+    - `_in32`: Pointer to the thirty-third input element of type `gf_t`.
+    - `_in33`: Pointer to the thirty-fourth input element of type `gf_t`.
+    - `_in34`: Pointer to the thirty-fifth input element of type `gf_t`.
+    - `_in35`: Pointer to the thirty-sixth input element of type `gf_t`.
+    - `_in36`: Pointer to the thirty-seventh input element of type `gf_t`.
+    - `_in37`: Pointer to the thirty-eighth input element of type `gf_t`.
+    - `_in38`: Pointer to the thirty-ninth input element of type `gf_t`.
+    - `_in39`: Pointer to the fortieth input element of type `gf_t`.
+    - `_in40`: Pointer to the forty-first input element of type `gf_t`.
+    - `_in41`: Pointer to the forty-second input element of type `gf_t`.
+    - `_in42`: Pointer to the forty-third input element of type `gf_t`.
+    - `_in43`: Pointer to the forty-fourth input element of type `gf_t`.
+    - `_in44`: Pointer to the forty-fifth input element of type `gf_t`.
+    - `_in45`: Pointer to the forty-sixth input element of type `gf_t`.
+    - `_in46`: Pointer to the forty-seventh input element of type `gf_t`.
+    - `_in47`: Pointer to the forty-eighth input element of type `gf_t`.
+    - `_in48`: Pointer to the forty-ninth input element of type `gf_t`.
+    - `_in49`: Pointer to the fiftieth input element of type `gf_t`.
+    - `_in50`: Pointer to the fifty-first input element of type `gf_t`.
+    - `_in51`: Pointer to the fifty-second input element of type `gf_t`.
+    - `_in52`: Pointer to the fifty-third input element of type `gf_t`.
+    - `_in53`: Pointer to the fifty-fourth input element of type `gf_t`.
+    - `_in54`: Pointer to the fifty-fifth input element of type `gf_t`.
+    - `_in55`: Pointer to the fifty-sixth input element of type `gf_t`.
+    - `_in56`: Pointer to the fifty-seventh input element of type `gf_t`.
+    - `_in57`: Pointer to the fifty-eighth input element of type `gf_t`.
+    - `_in58`: Pointer to the fifty-ninth input element of type `gf_t`.
+    - `_in59`: Pointer to the sixtieth input element of type `gf_t`.
+    - `_in60`: Pointer to the sixty-first input element of type `gf_t`.
+    - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
+    - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
+    - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
+- **Control Flow**:
+    - Initialize local variables `in00` to `in63` by dereferencing the corresponding input pointers `_in00` to `_in63`.
+    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters `64`, `49`, and the local variables `in00` to `in63` to perform the Reed-Solomon encoding operation.
+    - Update the input pointers `_in00` to `_in63` with the values of the local variables `in00` to `in63`.
+- **Output**: The function does not return a value; it modifies the input pointers in place with the encoded results.
+
+

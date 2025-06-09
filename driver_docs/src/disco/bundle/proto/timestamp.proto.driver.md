@@ -1,0 +1,2 @@
+# Purpose
+This file defines a Protocol Buffers (proto3) message schema for a `Timestamp` within the `google.protobuf` package. The `Timestamp` message consists of two fields: `seconds`, an `int64` representing the number of seconds since the Unix epoch, and `nanos`, an `int32` representing the fractional seconds in nanoseconds. This schema is used to serialize and deserialize timestamp data in a language-agnostic manner.

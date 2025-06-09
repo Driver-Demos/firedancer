@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile script used to manage the build process of a software project. It defines rules to add header files and object files, create a unit test for `test_base64`, and conditionally create fuzz tests for `fuzz_base64_dec` and `fuzz_base64_enc` if the `FD_HAS_HOSTED` variable is set. The script utilizes custom functions like `add-hdrs`, `add-objs`, `make-unit-test`, and `make-fuzz-test` to streamline these tasks.

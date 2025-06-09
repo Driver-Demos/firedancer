@@ -1,0 +1,2 @@
+# Purpose
+This file is a Makefile snippet used for conditional compilation in a software build process. It checks for the presence of certain features or libraries, such as `FD_HAS_INT128`, `FD_HAS_SSE`, and `FD_HAS_ZSTD`, and conditionally adds headers and object files to the build process using custom macros like `add-hdrs` and `add-objs`. If the required `zstd` library is not installed, it issues a warning and skips building the `fd_replay_tile` component.

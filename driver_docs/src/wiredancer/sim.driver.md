@@ -1,0 +1,14 @@
+## Folders
+- **[ed25519_point_add](sim/ed25519_point_add.driver.md)**: The `ed25519_point_add` folder in the `firedancer` codebase contains a `Makefile` for simulating the ED25519 point addition module using Verilog and Questa, and a `test.py` script for verifying the module's functionality with cocotb.
+- **[ed25519_point_dbl](sim/ed25519_point_dbl.driver.md)**: The `ed25519_point_dbl` folder in the `firedancer` codebase contains configuration and testing files for simulating and verifying the ED25519 point doubling operation in a hardware design using Verilog and cocotb.
+- **[ed25519_sigverify_0](sim/ed25519_sigverify_0.driver.md)**: The `ed25519_sigverify_0` folder in the `firedancer` codebase contains a `Makefile` for configuring and running Verilog simulations and a `test.py` file for cocotb-based testing of the `ed25519_sigverify_0` module.
+- **[ed25519_sigverify_1](sim/ed25519_sigverify_1.driver.md)**: The `ed25519_sigverify_1` folder in the `firedancer` codebase contains a `Makefile` for building a simulation environment and a `test.py` script for testing the ED25519 signature verification module.
+- **[mul_wide](sim/mul_wide.driver.md)**: The `mul_wide` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog module using Questa and a `test.py` script for testing wide multiplication functionality with cocotb.
+- **[schl_cpu](sim/schl_cpu.driver.md)**: The `schl_cpu` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog-based CPU module with Questa and a `test.py` script for verifying the CPU simulation using the cocotb framework.
+- **[sha512_modq_meta](sim/sha512_modq_meta.driver.md)**: The `sha512_modq_meta` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog module using Questa and a `test.py` script for cocotb-based testing of SHA-512 modulo Q metadata processing in hardware design.
+- **[sha512_pre](sim/sha512_pre.driver.md)**: The `sha512_pre` folder in the `firedancer` codebase contains configuration and testing scripts for simulating and verifying the SHA-512 preprocessing logic using Verilog and cocotb.
+- **[top_f1](sim/top_f1.driver.md)**: The `top_f1` folder in the `firedancer` codebase contains a `Makefile` for configuring and building a Verilog simulation environment with Questa, and a `test.py` file for simulating and verifying hardware design behavior using cocotb.
+- **[top_f1_models](sim/top_f1.driver.md_models)**: The `top_f1_models` folder in the `firedancer` codebase contains SystemVerilog modules and a cocotb-based test script for simulating and verifying hardware designs related to Ed25519 signature verification, hash data processing, and includes a Makefile for building the simulation environment.
+
+## Files
+- **[README.md](sim/README.md.driver.md)**: The `README.md` file provides instructions for running simulations for RTL verification and testing using Cocotb and Questa within the `firedancer` codebase.

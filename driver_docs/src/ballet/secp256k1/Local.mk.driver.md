@@ -1,0 +1,2 @@
+# Purpose
+This Makefile snippet conditionally includes and tests the secp256k1 cryptographic library if it is available. If the `FD_HAS_SECP256K1` flag is defined, it adds the necessary headers and object files, sets up unit and fuzz tests for secp256k1, and runs the unit test. If the library is not available, it issues a warning indicating that secp256k1 functionality is disabled due to the absence of `libsecp256k1`.
