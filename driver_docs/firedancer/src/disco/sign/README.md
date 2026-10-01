@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Signing tile implementation, seccomp filter policy, security policies, and Makefile logic for SSE support.
+Ed25519 signing tile, seccomp policy, build rule, and generated syscall filter.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
+- **[generated](generated/README.md)**: Seccomp filter for write and fsync on stdout and logfile_fd.
 
 ## Files
-- **[fd_sign_tile.c](fd_sign_tile.c.md)**: Implements a signing tile for Firedancer, handling key management, signing operations, and security checks.
-- **[fd_sign_tile.seccomppolicy](fd_sign_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
-- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects for `fd_sign_tile` and `fd_disco` if `FD_HAS_ALLOCA` is defined.
+- **[fd_sign_tile.c](fd_sign_tile.c.md)**: Ed25519 signing tile with key switch, request authorization, and metrics reporting.
+- **[fd_sign_tile.seccomppolicy](fd_sign_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
+- **[Local.mk](Local.mk.md)**: Build rule that adds fd_sign_tile to fd_disco when FD_HAS_ALLOCA is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

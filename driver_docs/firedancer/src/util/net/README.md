@@ -3,34 +3,34 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Ethernet, IGMP, IPv4, IPv6, UDP, and PCAP utilities and tests, with fuzz testing and a Makefile.
+Ethernet, IP, IGMP, UDP, PCAP, and PCAPNG helpers, tests, and fuzzers.
 
 
 ## Files
-- **[fd_eth.c](fd_eth.c.md)**: Implements Ethernet frame checksum calculation and MAC address conversion from string to byte array.
-- **[fd_eth.h](fd_eth.h.md)**: Header file for Ethernet protocol utilities, including structures, constants, and functions for handling Ethernet headers, MAC addresses, and VLAN tags.
-- **[fd_gre.h](fd_gre.h.md)**: Defines a union for a GRE header with flags, version, and protocol fields.
-- **[fd_igmp.h](fd_igmp.h.md)**: Defines data structures and functions for handling IGMP messages in an IPv4 network.
-- **[fd_ip4.c](fd_ip4.c.md)**: Converts a string representation of an IPv4 address to a 32-bit integer format.
-- **[fd_ip4.h](fd_ip4.h.md)**: Header file defining structures, macros, and functions for handling IPv4 headers and addresses.
-- **[fd_ip6.h](fd_ip6.h.md)**: Functions for handling IPv4-mapped IPv6 addresses, including conversion and checking.
-- **[fd_net_headers.h](fd_net_headers.h.md)**: Defines structures and functions to construct and deconstruct Ethernet, IPv4, and UDP network headers.
-- **[fd_pcap.c](fd_pcap.c.md)**: Implements functions for reading and writing PCAP files, including packet iteration and header management.
-- **[fd_pcap.h](fd_pcap.h.md)**: Header file for handling pcap file operations, including iterating, reading, and writing packets.
-- **[fd_pcapng.c](fd_pcapng.c.md)**: Functions for reading and writing pcapng files, including handling of various block types and options.
-- **[fd_pcapng.h](fd_pcapng.h.md)**: Header file for reading and writing pcapng files, including structures and functions for handling packet capture data.
-- **[fd_pcapng_private.h](fd_pcapng_private.h.md)**: Defines data structures and constants for handling PCAP Next Generation (pcapng) file blocks.
-- **[fd_udp.h](fd_udp.h.md)**: Defines structures and functions for handling UDP headers, including checksum computation and validation.
-- **[fuzz_pcap.c](fuzz_pcap.c.md)**: Fuzz testing for pcap file parsing using LLVM's libFuzzer.
-- **[fuzz_pcapng.c](fuzz_pcapng.c.md)**: Fuzz testing for pcapng file parsing with LLVM fuzzer integration.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, building objects, and running unit and fuzz tests for network utilities.
-- **[test_eth.c](test_eth.c.md)**: Tests for Ethernet header types, MAC address conversion, and frame checksum validation.
-- **[test_igmp.c](test_igmp.c.md)**: Tests for IGMP data structures and their memory layout in the Firedancer codebase.
-- **[test_ip4.c](test_ip4.c.md)**: Unit tests for IPv4 address conversion, public/private address checks, and header field assertions.
-- **[test_ip6.c](test_ip6.c.md)**: Tests IPv6 to IPv4 address mapping and validation functions.
-- **[test_pcap.c](test_pcap.c.md)**: A unit test for reading and writing pcap files, including command-line argument handling and validation.
-- **[test_pcapng.c](test_pcapng.c.md)**: Tests for writing and reading pcapng blocks, including SHB, IDB, EPB, and TLS key logs.
-- **[test_udp.c](test_udp.c.md)**: Tests for UDP header alignment, size, and field offsets in the Firedancer codebase.
+- **[fd_eth.c](fd_eth.c.md)**: The `fd_eth.c` file in the `firedancer` codebase provides functions for appending an Ethernet frame check sequence (FCS) using a CRC table, converting ASCII characters to hexadecimal digits, and converting a string representation of a MAC address to a byte array.
+- **[fd_eth.h](fd_eth.h.md)**: The `fd_eth.h` file in the `firedancer` codebase provides definitions and utilities for handling Ethernet protocol details, including structures for Ethernet headers and VLAN tags, functions for MAC address manipulation, and methods for computing frame check sequences.
+- **[fd_gre.h](fd_gre.h.md)**: GRE header definition with flags_version and protocol fields.
+- **[fd_igmp.h](fd_igmp.h.md)**: The `fd_igmp.h` file in the `firedancer` codebase defines structures and functions for handling IGMP (Internet Group Management Protocol) messages, including types, checksum validation, and message construction.
+- **[fd_ip4.c](fd_ip4.c.md)**: Converts dotted-decimal IPv4 strings to a packed IPv4 address.
+- **[fd_ip4.h](fd_ip4.h.md)**: IPv4 header constants, fields, address helpers, checksum, and parsing functions.
+- **[fd_ip6.h](fd_ip6.h.md)**: The `fd_ip6.h` file in the `firedancer` codebase provides utility functions for handling IPv6 addresses, specifically for mapping IPv4 addresses to IPv6 and checking if an IPv6 address is an IPv4-mapped address.
+- **[fd_net_headers.h](fd_net_headers.h.md)**: Ethernet, IPv4, and UDP header helpers for packet build and parse.
+- **[fd_pcap.c](fd_pcap.c.md)**: PCAP packet iteration and write helpers for Ethernet, cooked SLL, VLAN, IP, and UDP frames.
+- **[fd_pcap.h](fd_pcap.h.md)**: PCAP iterator and packet read/write helpers for Ethernet frames and headers.
+- **[fd_pcapng.c](fd_pcapng.c.md)**: The `fd_pcapng.c` file in the `firedancer` codebase provides functions for reading and writing pcapng files, including handling various block types and options, with specific support for Linux and FreeBSD systems.
+- **[fd_pcapng.h](fd_pcapng.h.md)**: The `fd_pcapng.h` file in the `firedancer` codebase provides an API for reading and writing pcapng files, including support for handling packet data, metadata, and decryption secrets, with a focus on little-endian files and UTF-8 formatted strings.
+- **[fd_pcapng_private.h](fd_pcapng_private.h.md)**: The `fd_pcapng_private.h` file in the `firedancer` codebase defines private structures and constants for handling PCAP Next Generation (pcapng) file blocks, including various block types and options for network packet capture data.
+- **[fd_udp.h](fd_udp.h.md)**: The `fd_udp.h` file in the `firedancer` codebase defines structures and functions for handling UDP headers, including checksum computation and endianness reversal.
+- **[fuzz_pcap.c](fuzz_pcap.c.md)**: The `fuzz_pcap.c` file in the `firedancer` codebase implements a fuzzing test for processing pcap data, initializing a fuzzer environment and iterating over packets in a pcap file.
+- **[fuzz_pcapng.c](fuzz_pcapng.c.md)**: The `fuzz_pcapng.c` file in the `firedancer` codebase implements a fuzzing test for pcapng data, initializing a fake pcapng state and iterating over frames to ensure coverage and validate data integrity.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and fuzz tests for network-related components such as Ethernet, IP, IGMP, UDP, and PCAP within the `fd_util` directory.
+- **[test_eth.c](test_eth.c.md)**: The `test_eth.c` file in the `firedancer` codebase contains unit tests for Ethernet-related functionalities, including MAC address conversion, frame checksum calculations, and VLAN tagging.
+- **[test_igmp.c](test_igmp.c.md)**: The `test_igmp.c` file in the `firedancer` codebase contains unit tests for verifying the structure and type definitions related to IGMP (Internet Group Management Protocol) within the `fd_igmp_t` and `fd_ip4_igmp_t` data structures.
+- **[test_ip4.c](test_ip4.c.md)**: The `test_ip4.c` file in the `firedancer` codebase contains unit tests for various IPv4 address and header functionalities, including conversion from string to IP address, checking if an IP address is public, and verifying multicast and broadcast address properties.
+- **[test_ip6.c](test_ip6.c.md)**: The `test_ip6.c` file in the `firedancer` codebase tests the functionality of converting and verifying IPv4-mapped IPv6 addresses.
+- **[test_pcap.c](test_pcap.c.md)**: The `test_pcap.c` file in the `firedancer` codebase is a test program for reading and processing packets from a pcap file, with options to stream input and output, and includes unit tests for packet iteration and validation.
+- **[test_pcapng.c](test_pcapng.c.md)**: The `test_pcapng.c` file in the `firedancer` codebase contains tests for writing and reading various pcapng blocks, including section header blocks, interface description blocks, packets, and TLS key logs, using the `fd_pcapng` library.
+- **[test_udp.c](test_udp.c.md)**: The `test_udp.c` file in the `firedancer` codebase contains unit tests for verifying the alignment, size, and offset of fields in UDP and IP4/UDP header structures.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

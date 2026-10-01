@@ -3,45 +3,45 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Memory management, file I/O, threading, networking, logging, and utility functions with tests and build scripts.
+Base utilities, hashing, platform checks, and subfolders for memory, I/O, threading, networking, and tests.
 
 ## Folders
-- **[alloc](alloc/README.md)**: Memory allocator implementation, configuration, control utilities, tests, and build scripts.
-- **[archive](archive/README.md)**: Functions and tests for AR and TAR archive file handling, including reading, writing, and fuzz testing.
-- **[bits](bits/README.md)**: Bit manipulation and arithmetic functions, type-generic macros, floating-point operations, and related tests.
-- **[checkpt](checkpt/README.md)**: Functions and tests for checkpoint management, compression, restoration, and LZ4 support.
-- **[clock](clock/README.md)**: Clock synchronization and recalibration functions, shared memory APIs, build configuration, and tests.
-- **[cstr](cstr/README.md)**: Functions and APIs for C string manipulation, conversion, formatting, tokenization, and related tests.
-- **[env](env/README.md)**: Command-line argument and environment variable parsing, APIs, Makefile, and tests for `fd_env`.
-- **[fibre](fibre/README.md)**: Implements and tests cooperative threading, scheduling, and communication with fibres in Firedancer.
-- **[hist](hist/README.md)**: Fixed-size exponential histogram structure and functions, Makefile, and tests for `fd_histf`.
-- **[io](io/README.md)**: POSIX-style file I/O operations, platform-agnostic stream I/O API, Makefile, and I/O tests.
-- **[log](log/README.md)**: Wrappers for trace points, logging system implementation, logging utilities, makefile rules, and tests.
-- **[math](math/README.md)**: Primitives and tests for fixed-point arithmetic, integer square roots, and statistical functions.
-- **[net](net/README.md)**: Ethernet, IGMP, IPv4, IPv6, UDP, and PCAP utilities and tests, with fuzz testing and a Makefile.
-- **[pod](pod/README.md)**: Macros, functions, APIs, command-line tools, and tests for managing and querying POD structures.
-- **[racesan](racesan/README.md)**: Race condition detection and handling utilities with asynchronous context management, testing, and documentation.
-- **[rng](rng/README.md)**: Functions for random number generation, secure RNG, tests, and a Makefile for the RNG module.
-- **[sandbox](sandbox/README.md)**: Functions and tests for Linux sandboxing, seccomp filtering, and namespace management with architecture-specific policies.
-- **[sanitize](sanitize/README.md)**: Address and memory sanitization, backtrace logging, fuzz testing, and related build configurations.
-- **[scratch](scratch/README.md)**: Thread-local variables, APIs, Makefile, and tests for scratch memory allocation.
-- **[shmem](shmem/README.md)**: NUMA and shared memory management functions, utilities, scripts, and tests for the Firedancer project.
-- **[simd](simd/README.md)**: APIs and tests for SIMD operations using AVX, AVX512, and SSE intrinsics on various data types.
-- **[spad](spad/README.md)**: Functions and APIs for shared memory management, Makefile for build configuration, and tests for memory operations.
-- **[tile](tile/README.md)**: Functions and tests for CPU affinity, thread management, and tile-based parallel processing on Linux.
-- **[tmpl](tmpl/README.md)**: Templates and tests for high-performance data structures and algorithms, including maps, queues, trees, and sets.
-- **[tpool](tpool/README.md)**: Macros, functions, and APIs for thread pools, with tests, benchmarks, and makefile rules.
-- **[wksp](wksp/README.md)**: API, functions, utilities, and tests for managing NUMA-aware shared memory workspaces in Firedancer.
+- **[alloc](alloc/README.md)**: Lockfree workspace allocation API, size-class config, CLI tools, build rules, and tests.
+- **[archive](archive/README.md)**: AR and TAR archive readers, writer, tests, fuzzers, and build rules.
+- **[bits](bits/README.md)**: Bit manipulation, floating-point, saturating, and 128-bit arithmetic helpers with tests.
+- **[checkpt](checkpt/README.md)**: The `checkpt` folder in the `firedancer` codebase contains source files and tests for implementing and verifying checkpoint and restore operations, supporting both raw and LZ4-compressed frame styles, with functionality for both streaming and memory-mapped I/O modes.
+- **[clock](clock/README.md)**: Clock synchronization APIs, calibration, monotonic time estimation, and unit tests.
+- **[cstr](cstr/README.md)**: C string parsing, formatting, tokenizing, hashing, UTF-8 append, and tests.
+- **[env](env/README.md)**: Environment and command-line parsing helpers, source, makefile, and tests for stripping keys and converting values.
+- **[fibre](fibre/README.md)**: The `fibre` folder in the `firedancer` codebase contains the implementation and testing of a cooperative threading library using fibers, with files for defining and managing fibers, a makefile for conditional building, and a test suite for validating fiber functionalities.
+- **[hist](hist/README.md)**: Fixed-size exponential histogram functions and unit tests.
+- **[io](io/README.md)**: The `io` folder in the `firedancer` codebase contains source and header files for performing high-performance I/O operations, a makefile for building and testing these components, and a test suite for validating various I/O functionalities.
+- **[log](log/README.md)**: Logging, backtrace, and trace-point helpers with build rules and unit tests.
+- **[math](math/README.md)**: The `math` folder in the `firedancer` codebase contains a collection of files providing implementations and tests for fixed-point arithmetic, square root calculations, and statistical functions, along with a makefile for building and testing these mathematical utilities.
+- **[net](net/README.md)**: Ethernet, IP, IGMP, UDP, PCAP, and PCAPNG helpers, tests, and fuzzers.
+- **[pod](pod/README.md)**: Typed key-value pod APIs, CLI tools, format helpers, build rules, and unit tests.
+- **[racesan](racesan/README.md)**: Data race detector and fuzzer for shared-memory concurrent algorithms on x86 TSO.
+- **[rng](rng/README.md)**: Non-cryptographic and secure RNG functions, distributions, and tests.
+- **[sandbox](sandbox/README.md)**: Linux sandbox setup, seccomp, Landlock, namespaces, limits, and tests.
+- **[sanitize](sanitize/README.md)**: Memory and compiler sanitizer APIs, backtrace printing, fuzz stubs, and canary test code.
+- **[scratch](scratch/README.md)**: Thread-local scratch allocation APIs, frame tracking, and unit tests.
+- **[shmem](shmem/README.md)**: NUMA-aware shared memory APIs, admin and CLI tools, helpers, and tests.
+- **[simd](simd/README.md)**: SIMD headers and unit tests for SSE, AVX, and AVX-512 vector operations.
+- **[spad](spad/README.md)**: APIs, debug checks, and unit tests for persistent shared scratch-pad memory with frames and alloc/trim operations.
+- **[tile](tile/README.md)**: The `tile` folder in the `firedancer` codebase contains source files and tests for managing CPU affinity, task dispatching, and tile execution with and without threading support, along with a makefile for compilation and testing.
+- **[tmpl](tmpl/README.md)**: Data structure templates and tests for maps, sets, queues, trees, pools, sorting, and vectors.
+- **[tpool](tpool/README.md)**: Thread pool APIs, map-reduce helpers, build rules, and tests.
+- **[wksp](wksp/README.md)**: The `wksp` folder in the `firedancer` codebase contains a comprehensive set of files for managing and testing NUMA-aware and TLB-efficient workspaces, including APIs, utilities, checkpointing, restoration, and various test programs to ensure robust memory management and inter-process communication.
 
 ## Files
-- **[fd_hash.c](fd_hash.c.md)**: Implements a hash function based on xxhash-r39 with additional memory copying functionality.
-- **[fd_util.c](fd_util.c.md)**: Utility functions for booting, halting, and system polling in the Firedancer codebase.
-- **[fd_util.h](fd_util.h.md)**: Header file for utility functions and services in the Firedancer codebase, including logging and memory management.
-- **[fd_util_base.h](fd_util_base.h.md)**: Defines macros and functions for compiler checks, build target capabilities, memory operations, atomic operations, and other utilities for a base development environment.
-- **[fuzz_hash.c](fuzz_hash.c.md)**: Fuzz testing for hash functions with initialization and input processing.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fd_util` library with unit and fuzz tests.
-- **[test_util.c](test_util.c.md)**: A test utility that initializes, logs a notice, and halts the Firedancer application.
-- **[test_util_base.c](test_util_base.c.md)**: Tests for data type compatibility, arithmetic operations, memory handling, and system environment assumptions.
+- **[fd_hash.c](fd_hash.c.md)**: The `fd_hash.c` file in the `firedancer` codebase provides an implementation of a hash function based on xxhash-r39, including functions for hashing data and copying memory while hashing.
+- **[fd_util.c](fd_util.c.md)**: Boot and halt routines, tick count wrapper, yield, and poll syscall helpers.
+- **[fd_util.h](fd_util.h.md)**: Boot and halt utility services, plus a hosted poll syscall wrapper.
+- **[fd_util_base.h](fd_util_base.h.md)**: Base macros, types, and target capability checks for portable low-level C/C++ code.
+- **[fuzz_hash.c](fuzz_hash.c.md)**: Fuzzer initialization and a hash memcpy versus hash consistency check.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_util library, unit tests, and fuzz test, with UBSan gating.
+- **[test_util.c](test_util.c.md)**: The `test_util.c` file contains a simple test program that initializes and halts the Firedancer utility framework, logging a "pass" message.
+- **[test_util_base.c](test_util_base.c.md)**: Runtime and compile-time tests for platform assumptions, utilities, memory, hashing, and imports.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

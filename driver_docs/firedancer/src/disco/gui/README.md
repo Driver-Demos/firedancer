@@ -3,29 +3,29 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-JavaScript, CSS, and HTML for GUI, seccomp policies, bandwidth measurement, GUI implementation, JSONP formatting, server handling, security policies, Makefile, and Sankey diagram generation.
+React UI assets, WebSocket GUI state, peer metrics, JSON formatting, live tables, and build rules.
 
 ## Folders
-- **[dist_alpha](dist_alpha/README.md)**: JavaScript modules for UI, HTML for GUI, and a list of software dependencies with licenses.
-- **[dist_dev](dist_dev/README.md)**: JavaScript and CSS files for UI, HTML document for GUI, and dependency license information.
-- **[dist_stable](dist_stable/README.md)**: Styles, scripts, and HTML for the Firedancer GUI, plus a list of software dependencies and licenses.
-- **[generated](generated/README.md)**: Seccomp filter policies for GUI syscall handling and structures for static HTTP file management.
+- **[dist_alpha](dist_alpha/README.md)**: React UI assets, entry page, and third-party dependency licenses for validator and slot views
+- **[dist_dev](dist_dev/README.md)**: HTML entry page, dependency licenses, and React UI assets for the app bundle
+- **[dist_stable](dist_stable/README.md)**: HTML entry page and assets for the Firedancer app with dashboard UI styles and helpers
+- **[generated](generated/README.md)**: Generated seccomp rules and HTTP static file tables for GUI assets.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in version control for the GUI component.
-- **[bandwidth.py](bandwidth.py.md)**: Measures and prints incoming bandwidth from a WebSocket connection using Zstandard decompression.
-- **[fd_gui.c](fd_gui.c.md)**: Implementation of a graphical user interface (GUI) for monitoring and managing blockchain metrics, transactions, and network status, with functions for handling slot events, leader schedules, and plugin messages.
-- **[fd_gui.h](fd_gui.h.md)**: Header file for the Firedancer GUI, defining data structures, constants, and functions for managing slots, transactions, and network interactions.
-- **[fd_gui_live_table_tmpl.c](fd_gui_live_table_tmpl.c.md)**: Generates prototypes, inlines, and implementations for multi-sorted table views with fixed row capacity.
-- **[fd_gui_peers.c](fd_gui_peers.c.md)**: Implements functions for managing peer connections and gossip message handling in a GUI context, including alignment, footprint calculation, and WebSocket communication.
-- **[fd_gui_peers.h](fd_gui_peers.h.md)**: Defines methods and data structures for managing and updating metrics and metadata of Solana cluster peers on the Gossip network, including WebSocket client message handling.
-- **[fd_gui_printf.c](fd_gui_printf.c.md)**: Functions for formatting and sending JSONP responses for various GUI data, including slot, peer, and transaction information.
-- **[fd_gui_printf.h](fd_gui_printf.h.md)**: Functions to format GUI state as JSON messages for WebSocket communication.
-- **[fd_gui_tile.c](fd_gui_tile.c.md)**: Implements a GUI tile for the Firedancer project, handling HTTP requests, WebSocket connections, and various message types for frontend and backend communication.
-- **[fd_gui_tile.seccomppolicy](fd_gui_tile.seccomppolicy.md)**: Defines seccomp policy rules for logging and HTTP server operations using file descriptors.
-- **[Local.mk](Local.mk.md)**: Makefile for building and compressing GUI components with conditional compilation and unit testing.
-- **[sankey_debug.py](sankey_debug.py.md)**: Scrapes a URL or file for Prometheus metrics, parses them, and prints a Sankey diagram of the data flow.
-- **[test_live_table.c](test_live_table.c.md)**: Tests for the live table implementation, including sorting and key management functionalities.
+- **[.gitignore](.gitignore.md)**: Ignored build output directories for stable, alpha, and dev comparison artifacts.
+- **[bandwidth.py](bandwidth.py.md)**: Measures and prints incoming WebSocket bandwidth by topic and key.
+- **[fd_gui.c](fd_gui.c.md)**: WebSocket GUI state updates, slot tracking, metrics snapshots, and transaction waterfall handling.
+- **[fd_gui.h](fd_gui.h.md)**: GUI state, constants, structs, and APIs for slot, shred, txn, and leader tracking.
+- **[fd_gui_live_table_tmpl.c](fd_gui_live_table_tmpl.c.md)**: Template for multi-sorted live tables with treap-backed iterators and sort-key management.
+- **[fd_gui_peers.c](fd_gui_peers.c.md)**: Gossip peer GUI state, metrics aggregation, WebSocket updates, and viewport handling.
+- **[fd_gui_peers.h](fd_gui_peers.h.md)**: Peer metrics, gossip stats, live tables, and WebSocket handlers for Solana cluster peers.
+- **[fd_gui_printf.c](fd_gui_printf.c.md)**: JSONP helpers for GUI summary, slot, peer, shred, and metric responses.
+- **[fd_gui_printf.h](fd_gui_printf.h.md)**: JSON formatting functions for GUI state, peers, slots, and live stats.
+- **[fd_gui_tile.c](fd_gui_tile.c.md)**: GUI tile with HTTP/WebSocket serving and event handling for frontend and cluster updates
+- **[fd_gui_tile.seccomppolicy](fd_gui_tile.seccomppolicy.md)**: Seccomp policy for GUI HTTP logging, socket accept, read, send, close, and poll.
+- **[Local.mk](Local.mk.md)**: Build rules for GUI headers, objects, tests, and compressed frontend assets.
+- **[sankey_debug.py](sankey_debug.py.md)**: Parses Prometheus metrics and prints Sankey flow counts for transaction stages.
+- **[test_live_table.c](test_live_table.c.md)**: Tests live table insertion, sorting, key removal, and column lookup.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

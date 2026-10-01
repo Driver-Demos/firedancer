@@ -3,66 +3,66 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, structures, and tests for managing runtime contexts, transactions, accounts, and system variables in Firedancer.
+Context, program, sysvar, and transaction runtime code with tests and build rules
 
 ## Folders
-- **[context](context/README.md)**: Functions, structures, and makefile for managing capture, execution epoch, instruction, slot, and transaction contexts in a runtime environment.
-- **[info](info/README.md)**: Functions and data structures for managing transaction instructions and Makefile logic for 128-bit support.
-- **[program](program/README.md)**: Zero-knowledge proof verification, address lookup, BPF management, built-in programs, compute budget, configuration, loader v4, native CPI, precompiles, stake, system, vote, and ZK ElGamal proof programs with related utilities and documentation.
-- **[sysvar](sysvar/README.md)**: Functions, constants, and tests for managing system variables like clock, epoch rewards, and rent in the Firedancer runtime.
-- **[tests](tests/README.md)**: Test harnesses, APIs, scripts, and makefiles for fuzz testing, block execution, and ledger backtests.
+- **[context](context/README.md)**: Context management for capture, instruction, and transaction execution, with build rules.
+- **[info](info/README.md)**: Instruction account metadata, signer and writable checks, and lamport sum helpers with build rules.
+- **[program](program/README.md)**: Runtime program handlers, precompiles, native CPI helpers, and build rules for Solana programs.
+- **[sysvar](sysvar/README.md)**: Sysvar account update, cache, and test code for clock, rent, hashes, history, rewards, and schedule.
+- **[tests](tests/README.md)**: Runtime fuzz harnesses, Solana compatibility tests, ledger backtests, and Protobuf helpers.
 
 ## Files
-- **[extract_traces.py](extract_traces.py.md)**: Processes and compares trace logs from Firedancer and Solana to find matching traces.
-- **[fd_acc_mgr.c](fd_acc_mgr.c.md)**: Functions for accessing account metadata in a read-only manner and error handling in the Firedancer runtime.
-- **[fd_acc_mgr.h](fd_acc_mgr.h.md)**: APIs for managing Solana account databases, including error handling and metadata operations.
-- **[fd_alut_interp.h](fd_alut_interp.h.md)**: APIs for interpreting Solana address lookup table usages, including functions for creating, deleting, and resolving indirect account references.
-- **[fd_bank.c](fd_bank.c.md)**: Implements functions and macros for managing bank structures, including alignment, footprint calculations, and operations on copy-on-write (CoW) pools.
-- **[fd_bank.h](fd_bank.h.md)**: Header file for managing bank states in Solana, including structures, functions, and concurrency controls.
-- **[fd_bank_hash_cmp.c](fd_bank_hash_cmp.c.md)**: Functions for managing and comparing bank hash data structures, including insertion and validation.
-- **[fd_bank_hash_cmp.h](fd_bank_hash_cmp.h.md)**: Defines data structures and functions for bank hash comparison, including locking and insertion operations.
-- **[fd_blockhashes.c](fd_blockhashes.c.md)**: Manages blockhashes with functions to initialize, push, pop, and check their age in a deque structure.
-- **[fd_blockhashes.h](fd_blockhashes.h.md)**: A blockhash queue API for managing consensus-relevant data structures in a slot bank.
-- **[fd_borrowed_account.c](fd_borrowed_account.c.md)**: Functions for managing and modifying borrowed account data, ownership, lamports, and executable status.
-- **[fd_borrowed_account.h](fd_borrowed_account.h.md)**: Defines the `fd_borrowed_account_t` structure and related functions for managing borrowed accounts in transactions.
-- **[fd_compute_budget_details.c](fd_compute_budget_details.c.md)**: Initializes a `fd_compute_budget_details_t` structure with default values for compute budget details.
-- **[fd_compute_budget_details.h](fd_compute_budget_details.h.md)**: Defines a structure and function for managing compute budget details in transactions.
-- **[fd_core_bpf_migration.c](fd_core_bpf_migration.c.md)**: Implements functions and structures for migrating built-in programs to core BPF in a runtime environment.
-- **[fd_cost_tracker.c](fd_cost_tracker.c.md)**: Implements a cost tracking system for transactions, including functions for cost calculation and validation.
-- **[fd_cost_tracker.h](fd_cost_tracker.h.md)**: Block-level cost tracker for transaction limits, including CU consumption and account data size, with error handling for limit violations.
-- **[fd_executor.c](fd_executor.c.md)**: Implements transaction execution logic, including account management, fee validation, and instruction processing for a blockchain runtime.
-- **[fd_executor.h](fd_executor.h.md)**: Header file for transaction execution and validation in the Firedancer runtime.
-- **[fd_executor_err.h](fd_executor_err.h.md)**: Defines instruction error types and codes for the Firedancer executor runtime.
-- **[fd_hashes.c](fd_hashes.c.md)**: Functions for hashing account data and updating ledger hashes using BLAKE3 and SHA-256 algorithms.
-- **[fd_hashes.h](fd_hashes.h.md)**: Functions for computing and updating cryptographic bank hashes for completed slots.
-- **[fd_pubkey_utils.c](fd_pubkey_utils.c.md)**: Functions for creating and deriving program-derived addresses (PDAs) using SHA-256 hashing and validation.
-- **[fd_pubkey_utils.h](fd_pubkey_utils.h.md)**: Utilities for creating and deriving program-derived addresses (PDAs) with custom error handling.
-- **[fd_rocksdb.c](fd_rocksdb.c.md)**: Functions for initializing, creating, destroying, and manipulating RocksDB databases with column families.
-- **[fd_rocksdb.h](fd_rocksdb.h.md)**: Defines data structures and functions for managing RocksDB databases, including initialization, iteration, and data manipulation.
-- **[fd_runtime.c](fd_runtime.c.md)**: Runtime helpers for transaction execution, epoch processing, and bank initialization in the Firedancer codebase.
-- **[fd_runtime.h](fd_runtime.h.md)**: Header file for the Firedancer runtime, defining constants, data structures, and functions for transaction execution and block management.
-- **[fd_runtime_const.h](fd_runtime_const.h.md)**: Defines constants for runtime configuration, including account limits and memory requirements.
-- **[fd_runtime_err.h](fd_runtime_err.h.md)**: Defines runtime execution success and transaction error codes for the Firedancer Flamenco runtime.
-- **[fd_runtime_init.c](fd_runtime_init.c.md)**: Restores feature activation states in a bank from an accounts database using feature account data.
-- **[fd_runtime_init.h](fd_runtime_init.h.md)**: APIs for backing up and restoring a Solana runtime environment without depending on fd_executor.h.
-- **[fd_runtime_stack.h](fd_runtime_stack.h.md)**: Defines `fd_runtime_stack_t`, a union for temporary runtime data storage in slot level calculations.
-- **[fd_system_ids.c](fd_system_ids.c.md)**: Defines public key constants and functions for checking active, pending, and specific reserved keys.
-- **[fd_system_ids.h](fd_system_ids.h.md)**: Defines constants for system and program IDs, and functions to check if a public key is reserved.
-- **[fd_system_ids_pp.h](fd_system_ids_pp.h.md)**: Defines system and program IDs as macros for preprocessor-time use with unsigned integer representation.
-- **[fd_txn_account.c](fd_txn_account.c.md)**: Functions for managing transaction accounts, including creation, joining, deletion, and metadata manipulation.
-- **[fd_txn_account.h](fd_txn_account.h.md)**: Defines `fd_txn_account_t`, a non-thread-safe wrapper for database records with transaction execution and reference counting.
-- **[fd_txncache.c](fd_txncache.c.md)**: Implements a transaction cache system for managing and querying transactions and blockhashes in a blockchain environment.
-- **[fd_txncache.h](fd_txncache.h.md)**: Header file for a concurrent transaction cache that stores and queries transaction message hashes to prevent double execution.
-- **[fd_txncache_private.h](fd_txncache_private.h.md)**: Defines data structures and constants for managing transaction caches in a concurrent environment.
-- **[fd_txncache_shmem.c](fd_txncache_shmem.c.md)**: Implements shared memory management for transaction caching, including alignment, footprint calculation, and initialization functions.
-- **[fd_txncache_shmem.h](fd_txncache_shmem.h.md)**: Defines shared memory structures and functions for transaction caching in the Firedancer runtime.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests to the `fd_flamenco` runtime in the `firedancer` codebase.
-- **[test_bank.c](test_bank.c.md)**: Tests for bank advancement and fork tree management in a runtime environment.
-- **[test_cost_tracker.c](test_cost_tracker.c.md)**: Tests the functionality of the cost tracker in the Firedancer runtime environment.
-- **[test_hashes.c](test_hashes.c.md)**: Tests for hash functions in the Firedancer codebase, including account hash and bank hash computations.
-- **[test_system_ids.c](test_system_ids.c.md)**: Tests for verifying system and program IDs using base58 decoding and public key comparison.
-- **[test_txn_account.c](test_txn_account.c.md)**: Tests for transaction account creation, joining, and manipulation in the Firedancer runtime.
-- **[test_txncache.c](test_txncache.c.md)**: Tests for transaction cache functionality, including memory management and query operations.
+- **[extract_traces.py](extract_traces.py.md)**: The `extract_traces.py` file in the `firedancer` codebase is a script that reads and compares execution traces from Firedancer and Solana log files to find and report the best matching traces.
+- **[fd_acc_mgr.c](fd_acc_mgr.c.md)**: Readonly account metadata lookup and error string mapping.
+- **[fd_acc_mgr.h](fd_acc_mgr.h.md)**: Account database APIs, error codes, and account meta helpers for Solana records.
+- **[fd_alut_interp.h](fd_alut_interp.h.md)**: Solana address lookup table interpreter APIs for resolving indirect transaction account references.
+- **[fd_bank.c](fd_bank.c.md)**: Bank pool management, copy-on-write field access, root advancement, and stake delegation updates.
+- **[fd_bank.h](fd_bank.h.md)**: Bank and fork-tree state management for Solana runtime, with CoW pools and locks.
+- **[fd_bank_hash_cmp.c](fd_bank_hash_cmp.c.md)**: Bank hash comparison state, locking, insert, and stake-based mismatch checks.
+- **[fd_bank_hash_cmp.h](fd_bank_hash_cmp.h.md)**: Bank hash comparison data structures and functions for insert, lock, and check operations.
+- **[fd_blockhashes.c](fd_blockhashes.c.md)**: Deque and hash map management for blockhash insertion, removal, and age checks.
+- **[fd_blockhashes.h](fd_blockhashes.h.md)**: Blockhash queue API with deque and hash map storage, plus init, push, pop, age check, and peek.
+- **[fd_borrowed_account.c](fd_borrowed_account.c.md)**: Account mutation helpers for data, owner, lamports, executable flag, and resize delta.
+- **[fd_borrowed_account.h](fd_borrowed_account.h.md)**: Borrowed account accessors, mutators, and permission checks for runtime account handling.
+- **[fd_compute_budget_details.c](fd_compute_budget_details.c.md)**: Initializes compute budget details with default limits, sizes, and counters.
+- **[fd_compute_budget_details.h](fd_compute_budget_details.h.md)**: Compute budget fields and initialization prototype for transaction limits and heap size.
+- **[fd_core_bpf_migration.c](fd_core_bpf_migration.c.md)**: Core BPF migration logic for builtin program and buffer account conversion.
+- **[fd_cost_tracker.c](fd_cost_tracker.c.md)**: Transaction cost tracking, limit checks, and per-account cost accounting for runtime transactions.
+- **[fd_cost_tracker.h](fd_cost_tracker.h.md)**: Block-level cost tracking for CU, vote, writable account, and account data limits.
+- **[fd_executor.c](fd_executor.c.md)**: Transaction execution, account loading, fee validation, and instruction stack checks.
+- **[fd_executor.h](fd_executor.h.md)**: Transaction execution and verification APIs, account setup, and compute-unit accounting helpers.
+- **[fd_executor_err.h](fd_executor_err.h.md)**: Instruction error kinds and negative error codes for executor runtime.
+- **[fd_hashes.c](fd_hashes.c.md)**: Account lthash and bank hash calculation, plus bank lthash updates and account capture writes.
+- **[fd_hashes.h](fd_hashes.h.md)**: Bank hash and account lthash functions for slot state updates and hashing.
+- **[fd_pubkey_utils.c](fd_pubkey_utils.c.md)**: PDA derivation and seed-based pubkey creation with SHA-256 and ed25519 validation.
+- **[fd_pubkey_utils.h](fd_pubkey_utils.h.md)**: Pubkey seed and program-address derivation helpers with custom error codes.
+- **[fd_rocksdb.c](fd_rocksdb.c.md)**: RocksDB column-family init, iteration, slot lookup, copy, and insert helpers.
+- **[fd_rocksdb.h](fd_rocksdb.h.md)**: RocksDB wrappers, column family indexes, and root-slot iteration helpers.
+- **[fd_runtime.c](fd_runtime.c.md)**: Transaction execution, epoch transitions, genesis setup, fee handling, and bank hash updates.
+- **[fd_runtime.h](fd_runtime.h.md)**: Runtime constants, memory footprint macros, and transaction and block execution function prototypes.
+- **[fd_runtime_const.h](fd_runtime_const.h.md)**: Runtime bounds and constants for vote, stake, slot, account, and stake instruction limits.
+- **[fd_runtime_err.h](fd_runtime_err.h.md)**: Transaction and execution error codes for runtime processing.
+- **[fd_runtime_init.c](fd_runtime_init.c.md)**: Restores feature activation state from account data into the bank.
+- **[fd_runtime_init.h](fd_runtime_init.h.md)**: APIs for restoring Solana runtime feature accounts from the accounts database.
+- **[fd_runtime_stack.h](fd_runtime_stack.h.md)**: Temporary runtime stack memory for clock sysvar, BPF migration, and stake reward calculations.
+- **[fd_system_ids.c](fd_system_ids.c.md)**: Reserved pubkey constants and lookup functions for active, pending, and secp256r1 keys.
+- **[fd_system_ids.h](fd_system_ids.h.md)**: Reserved Solana sysvar and program IDs, plus reserved-key check prototypes.
+- **[fd_system_ids_pp.h](fd_system_ids_pp.h.md)**: Macros for Solana program and sysvar public key byte IDs.
+- **[fd_txn_account.c](fd_txn_account.c.md)**: Transaction account lifecycle, access control, and account field update helpers.
+- **[fd_txn_account.h](fd_txn_account.h.md)**: Transaction account wrapper with constructors, accessors, mutators, and borrow tracking.
+- **[fd_txncache.c](fd_txncache.c.md)**: Transaction cache management for forks, blockhashes, insertion, query, and root advancement.
+- **[fd_txncache.h](fd_txncache.h.md)**: Concurrent transaction cache API for forked blockhash and txnhash insert and query.
+- **[fd_txncache_private.h](fd_txncache_private.h.md)**: Private shared-memory txncache structs, constants, and pool/map/list helpers.
+- **[fd_txncache_shmem.c](fd_txncache_shmem.c.md)**: Shared-memory layout and initialization for the transaction cache, with size checks and join.
+- **[fd_txncache_shmem.h](fd_txncache_shmem.h.md)**: Shared-memory txn cache layout and init/join function prototypes.
+- **[Local.mk](Local.mk.md)**: Build rules for flamenco runtime headers, objects, and unit tests.
+- **[test_bank.c](test_bank.c.md)**: Tests bank fork advancement, pruning, copy-on-write fields, and stake delegation queries.
+- **[test_cost_tracker.c](test_cost_tracker.c.md)**: Tests fd_cost_tracker allocation, init, join, and basic error cases.
+- **[test_hashes.c](test_hashes.c.md)**: Tests account, bank, and lthash update hash functions.
+- **[test_system_ids.c](test_system_ids.c.md)**: The `test_system_ids.c` file in the `firedancer` codebase contains tests for verifying the correctness of public key decoding and classification functions related to Solana system IDs.
+- **[test_txn_account.c](test_txn_account.c.md)**: Tests transaction account creation, join, leave, delete, and field access.
+- **[test_txncache.c](test_txncache.c.md)**: Unit tests for txn cache creation, join, insert, query, and root advance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
