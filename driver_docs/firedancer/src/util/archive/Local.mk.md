@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, unit tests, and fuzz tests for archive utilities.
+Build rules for archive headers, objects, unit tests, and fuzz tests.
 
 # Purpose
-The Makefile script defines build and test procedures for a software project. It adds header files `fd_ar.h` and `fd_tar.h` and object files `fd_ar`, `fd_tar_writer`, and `fd_tar_reader` with dependencies on `fd_util`. It creates and runs unit tests for `test_ar` and `test_tar`, also dependent on `fd_util`. If the `FD_HAS_HOSTED` condition is true, it creates fuzz tests for `fuzz_tar` and `fuzz_ar`, with dependencies on `fd_ballet` and `fd_util`.
+This build file adds the `fd_ar.h` and `fd_tar.h` headers, builds the `fd_ar`, `fd_tar_writer`, and `fd_tar_reader` objects with `fd_util`, and defines unit tests for `test_ar` and `test_tar` that run after build. When `FD_HAS_HOSTED` is set, it also defines fuzz tests for `fuzz_tar` and `fuzz_ar` with `fd_ballet` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

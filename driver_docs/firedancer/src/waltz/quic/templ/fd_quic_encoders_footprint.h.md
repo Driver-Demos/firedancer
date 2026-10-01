@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines macros for calculating the upper bound of QUIC encoder footprints without encoding data.
+The `fd_quic_encoders_footprint.h` file defines macros for calculating the upper bound of the footprint of QUIC encoders without actually encoding the data in the `firedancer` codebase.
 
 # Purpose
-The code defines a set of macros for calculating the footprint of QUIC (Quick UDP Internet Connections) encoders in terms of the number of bytes they consume. It provides a mechanism to determine the upper bound of the encoded data size without actually performing the encoding. The macro `FD_TEMPL_ENCODE_FP(TYPE)` returns the size of a specific QUIC type, while `FD_TEMPL_DEF_STRUCT_BEGIN(NAME)` and `FD_TEMPL_DEF_STRUCT_END(NAME)` define a function that calculates the total footprint for a given structure. Various macros such as `FD_TEMPL_MBR_FRAME_TYPE`, `FD_TEMPL_MBR_ELEM`, `FD_TEMPL_MBR_ELEM_PKTNUM`, `FD_TEMPL_MBR_ELEM_VARINT`, `FD_TEMPL_MBR_ELEM_VAR`, `FD_TEMPL_MBR_ELEM_VAR_RAW`, and `FD_TEMPL_MBR_ELEM_RAW` are used to increment the buffer size based on different elements and their worst-case sizes. This code is useful for estimating the memory requirements of QUIC frames without actual data encoding.
+This C header file defines a set of macros for calculating the footprint, or the upper bound of the number of bytes, required to encode various QUIC (Quick UDP Internet Connections) protocol data structures without actually performing the encoding. The macros are designed to be used in conjunction with specific data types and structures, prefixed with `fd_quic_`, to determine the size of encoded data. The file includes macros for handling different types of data elements, such as frame types, packet numbers, variable-length integers, and raw byte arrays, each contributing a specific number of bytes to the total footprint. The macros are structured to facilitate the definition of functions that compute the total byte size needed for encoding, which is useful for memory allocation and buffer management in QUIC implementations. The inclusion of "fd_quic_dft.h" suggests that this file is part of a larger framework or library for handling QUIC protocol operations.
 # Imports and Dependencies
 
 ---

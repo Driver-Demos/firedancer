@@ -3,31 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Identifies functions with `is` prefix that return non-boolean values.
+CodeQL query that flags `is`-named functions with non-boolean return ranges.
 
 # Purpose
-This code is a query written for a static analysis tool, specifically targeting C++ code. It identifies functions that are named with the `is` prefix, which typically suggests a boolean return type, but actually return values outside the standard boolean range of 0 and 1. The purpose of this query is to highlight potential issues in code correctness and maintainability by flagging functions that may mislead developers due to their naming conventions.
-
-The code defines a class `IsFunction` that extends the `Function` class. This class is used to identify functions whose names match a specific pattern, indicating they are likely intended to return boolean values. The pattern is defined using the `matches` method with the expression `"%\\_is\\_%"`, which captures functions with names containing the substring `is`. The class also checks that the function's return type is an `IntegralType` and excludes a specific function named `fd_bn254_pairing_is_one_syscall` from this analysis.
-
-The query then uses a `from` clause to iterate over instances of `IsFunction` and their associated return statements. It calculates the lower and upper bounds of the return values using range analysis. If the bounds fall outside the range of 0 to 1, the query selects these return statements and generates a warning message. This message indicates that the function's name suggests a boolean return type, but the actual return value range is different, which could lead to misunderstandings in the code's behavior.
-# Imports and Dependencies
-
----
-- `cpp`
-- `semmle.code.cpp.rangeanalysis.new.SimpleRangeAnalysis`
-
-
-# Data Structures
-
----
-### IsFunction
-- **Type**: ``class``
-- **Members**:
-    - ``IsFunction``: Represents a function whose name suggests it returns a boolean value (0 or 1).
-- **Description**: Identifies functions with names that suggest a boolean return type, specifically those starting with the `is` prefix, but which return values outside the typical boolean range of 0 and 1. The `IsFunction` class extends the `Function` class and includes a constructor that matches function names with the pattern `%_is_%`, checks if the function type is an `IntegralType`, and excludes specific function names like `fd_bn254_pairing_is_one_syscall`. The class is used in a query to find return statements within these functions where the return value's range is not limited to 0 or 1.
-
-
+This query identifies C++ functions whose names use the `is` pattern but whose return values are not limited to the boolean range of `0` and `1`. The `IsFunction` class selects integral functions with names that match `"%\\_is\\_%"` and excludes `fd_bn254_pairing_is_one_syscall`, which is documented as returning values in `[-1, 0]`. The main query checks each `ReturnStmt` in such functions with `SimpleRangeAnalysis` and reports a warning when the returned expression can produce a value below `0` or above `1`. The result helps find naming and return-type mismatches that can affect correctness and maintainability.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,41 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Formats Solana block data for testing by processing transactions and writing binary output.
+Formats block JSON into binary transaction records for replay tests.
 
 # Purpose
-The code is a Python script designed to process and format blockchain transaction data for testing purposes. It reads JSON input from the standard input, which contains transaction data, and decodes the transaction information using the `solders` library. The script extracts transaction details such as compute units consumed, binary transaction data, and account keys. It then writes this information in a structured binary format to the standard output. This output can be used as input for further testing, as indicated by the example usage comment at the top of the script.
-
-The script uses several key components, including the `solders.transaction.VersionedTransaction` class to handle transaction data and the `solders.pubkey.Pubkey` class to manage public keys. It also utilizes the `base64` module to decode transaction data and the `struct` module to pack data into a binary format. The script maintains a dictionary, `pubkey_to_idx_ver`, to track the index and version of each public key, ensuring that each key is correctly referenced in the output. This script is intended to be used in a pipeline where it processes transaction data and outputs it in a format suitable for testing blockchain-related functionalities.
-# Imports and Dependencies
-
----
-- `solders`
-- `solders.transaction.Transaction`
-- `solders.transaction.VersionedTransaction`
-- `solders.pubkey.Pubkey`
-- `base64`
-- `json`
-- `struct`
-- `sys`
-
-
-# Global Variables
-
----
-### pubkey\_to\_idx\_ver
-- **Type**: ``dict``
-- **Description**: A dictionary that maps public keys to a tuple containing an index and a version number. The keys are instances of `Pubkey`, and the values are tuples of two integers.
-- **Use**: Used to track the index and version of public keys encountered in transactions.
-
-
----
-### j
-- **Type**: ``dict``
-- **Description**: The variable `j` is a dictionary that is created by loading JSON data from the standard input using the `json.load` function. This dictionary contains transaction data, which is accessed in the subsequent code.
-- **Use**: Stores JSON data from standard input to be processed in a loop iterating over its 'transactions' key.
-
-
+This script reads a JSON block stream from `stdin`, decodes each transaction, and writes a compact binary format to `stdout`. It uses `solders` to parse `VersionedTransaction` data, extracts loaded address table entries, and records compute units, transaction size, and account counts with `struct.pack`. The file also keeps a global `pubkey_to_idx_ver` map so repeated public keys get stable indices and version values across all transactions in the input. Its purpose is narrow: it converts Solana block data into a binary test input for `test_rdisp`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

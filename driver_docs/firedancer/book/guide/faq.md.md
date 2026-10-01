@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Frequently asked questions about Frankendancer hardware, binaries, branches, errors, compatibility, monitoring, and delinquency.
+The `faq.md` file in the `firedancer` codebase provides answers to frequently asked questions about running and troubleshooting the Frankendancer validator, including hardware requirements, obtaining binaries, and monitoring node status.
 
 # Purpose
-The content is a Frequently Asked Questions (FAQ) section for the Frankendancer software. It provides detailed answers to common questions users may have about hardware requirements, obtaining binaries, building from specific branches or tags, resolving startup errors, compatibility with Agave, monitoring node status, and addressing node delinquency. Each question is addressed with references to relevant sections in the documentation, such as the Getting Started guide, troubleshooting guide, and monitoring guide, to provide users with comprehensive instructions and solutions. The FAQ aims to assist users in effectively setting up, running, and maintaining their Frankendancer nodes.
+The provided content is a section of a Frequently Asked Questions (FAQ) document for a software project named Frankendancer. This document is structured using collapsible sections, each addressing a specific question related to the setup, operation, and troubleshooting of Frankendancer. It provides guidance on hardware requirements, obtaining and building binaries, selecting the appropriate code branch or tag, resolving startup errors, compatibility with Agave validator formats, monitoring node status, and addressing node delinquency issues. The document also includes references to additional guides such as "Getting Started," "Troubleshooting," "Monitoring," and "Tuning" for more detailed instructions and solutions. This FAQ is designed to assist users in effectively deploying and maintaining their Frankendancer nodes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
