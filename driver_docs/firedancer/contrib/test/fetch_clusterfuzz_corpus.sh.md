@@ -3,21 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fetch_clusterfuzz_corpus.sh` file is a Bash script that downloads and extracts the latest ClusterFuzz corpus from Google Cloud Storage into a local directory, while warning that it is destructive.
+Downloads and extracts the latest ClusterFuzz corpus from Google Cloud Storage.
 
 # Purpose
-This Bash script is designed to automate the process of downloading the latest corpus data from a Google Cloud Storage bucket associated with ClusterFuzz, a fuzzing infrastructure. The script provides a narrow functionality focused on managing and updating the corpus data for fuzz testing, which is crucial for software testing and security analysis. It is an executable script that performs a series of operations: it clears any existing corpus directory, lists directories in a specified Google Cloud Storage path, and iteratively downloads and extracts the latest corpus files into a structured local directory. The script is marked as "Destructive" because it removes the existing corpus directory before downloading new data, ensuring that only the latest corpus is retained.
-# Imports and Dependencies
-
----
-- `gcloud`
-- `sed`
-- `mktemp`
-- `unzip`
-- `find`
-- `mv`
-
-
+This script is a Bash executable that downloads the latest ClusterFuzz corpus from a Google Cloud Storage bucket. It removes any existing local `corpus` directory and then lists directories in the specified Google Cloud Storage path. For each directory, it extracts the target name, creates a corresponding directory structure locally, and downloads the latest corpus zip file. The script then unzips the contents into a temporary directory and moves the files into the appropriate local corpus directory, cleaning up temporary files and directories afterward. The script is marked as destructive because it deletes the existing `corpus` directory before downloading new data.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

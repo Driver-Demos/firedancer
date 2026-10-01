@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_dcache.c` file in the `firedancer` codebase provides functions for managing a data cache, including calculating required data sizes, aligning and creating new caches, joining and leaving caches, and checking the safety of compacting a cache.
+Functions for managing and validating a data cache, including creation, alignment, and safety checks.
 
 # Purpose
-This C source code file provides a set of functions for managing a data cache (dcache) in shared memory. The primary functionality includes calculating the required data size for the cache, aligning and computing the footprint of the cache, and creating, joining, leaving, and deleting a cache in shared memory. The code is designed to handle memory alignment and overflow issues robustly, ensuring that operations on the cache are safe and efficient. The functions also include mechanisms for logging warnings when invalid parameters or states are detected, which aids in debugging and maintaining the integrity of the cache operations.
+The code provides functionality for managing a data cache (`dcache`) in a shared memory environment. It includes functions to calculate the required data size for a cache ([`fd_dcache_req_data_sz`](<#fd_dcache_req_data_sz>)), align data to cache boundaries ([`fd_dcache_align`](<#fd_dcache_align>)), and compute the total footprint of the cache ([`fd_dcache_footprint`](<#fd_dcache_footprint>)). The code also provides functions to create ([`fd_dcache_new`](<#fd_dcache_new>)), join ([`fd_dcache_join`](<#fd_dcache_join>)), leave ([`fd_dcache_leave`](<#fd_dcache_leave>)), and delete ([`fd_dcache_delete`](<#fd_dcache_delete>)) a data cache. These operations ensure that the cache is correctly initialized, aligned, and managed within the shared memory space.
 
-The file defines several functions that operate on a data cache, such as [`fd_dcache_new`](#fd_dcache_new), which initializes a new cache in a given shared memory region, and [`fd_dcache_join`](#fd_dcache_join), which allows a process to access an existing cache. It also includes utility functions like [`fd_dcache_req_data_sz`](#fd_dcache_req_data_sz) to calculate the required data size based on parameters like MTU, depth, and burst, and [`fd_dcache_compact_is_safe`](#fd_dcache_compact_is_safe) to check if compacting the cache is safe given certain constraints. The code relies on a private header (`fd_dcache_private.h`) for internal structures and constants, indicating that it is part of a larger library or system where the cache is a critical component. The functions are designed to be used as part of a broader application, providing a public API for cache management while abstracting the underlying details.
+The code defines several utility functions to access cache properties, such as [`fd_dcache_data_sz`](<#fd_dcache_data_sz>) and [`fd_dcache_app_sz`](<#fd_dcache_app_sz>), which return the sizes of the data and application sections of the cache, respectively. It also includes functions to get the local address of the application section ([`fd_dcache_app_laddr_const`](<#fd_dcache_app_laddr_const>) and [`fd_dcache_app_laddr`](<#fd_dcache_app_laddr>)). Additionally, the function [`fd_dcache_compact_is_safe`](<#fd_dcache_compact_is_safe>) checks if it is safe to compact the cache based on alignment, size, and other constraints. The code uses macros and functions from the included header `fd_dcache_private.h` to perform operations like alignment checks and memory setting, ensuring that the cache operations are performed safely and efficiently.
 # Imports and Dependencies
 
 ---
@@ -19,195 +19,216 @@ The file defines several functions that operate on a data cache, such as [`fd_dc
 
 ---
 ### fd\_dcache\_req\_data\_sz<!-- {{#callable:fd_dcache_req_data_sz}} -->
-The `fd_dcache_req_data_sz` function calculates the required data size for a dcache based on the given MTU, depth, burst, and compactness parameters, ensuring no overflow occurs.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L3>)
+
+Calculates the required data size for a cache based on the given parameters.
 - **Inputs**:
-    - `mtu`: The maximum transmission unit size, which determines the slot footprint.
-    - `depth`: The depth of the dcache, representing the number of slots.
-    - `burst`: The burst size, which is added to the depth to determine the total number of slots.
-    - `compact`: A flag indicating whether the dcache should be compacted, affecting the total slot count.
-- **Control Flow**:
-    - Check if `mtu`, `depth`, or `burst` is zero and return 0 if any are, as these are invalid inputs.
-    - Calculate the slot footprint using `FD_DCACHE_SLOT_FOOTPRINT(mtu)` and return 0 if it results in zero, indicating an overflow.
-    - Calculate the total slot count as `depth + burst` and check for overflow by ensuring it is not less than `depth`.
-    - If `compact` is true, increment the slot count by 1.
-    - Check if the slot count is zero or if multiplying it by the slot footprint would overflow `ULONG_MAX`, returning 0 in either case.
-    - Return the product of `slot_footprint` and `slot_cnt` as the required data size.
-- **Output**: The function returns an unsigned long integer representing the required data size for the dcache, or 0 if any input validation fails or an overflow is detected.
+    - `mtu`: The maximum transmission unit size.
+    - `depth`: The depth of the cache.
+    - `burst`: The burst size for the cache.
+    - `compact`: A flag indicating whether the cache should be compacted.
+- **Logic and Control Flow**:
+    - Check if `mtu`, `depth`, or `burst` is zero and return 0 if any are zero.
+    - Calculate `slot_footprint` using `FD_DCACHE_SLOT_FOOTPRINT(mtu)` and return 0 if it results in zero.
+    - Calculate `slot_cnt` as the sum of `depth` and `burst`, and add 1 if `compact` is true.
+    - Check for overflow in `slot_cnt` and return 0 if overflow is detected.
+    - Return the product of `slot_footprint` and `slot_cnt`.
+- **Output**: Returns the calculated data size as an unsigned long integer, or 0 if any checks fail.
 
 
 ---
 ### fd\_dcache\_align<!-- {{#callable:fd_dcache_align}} -->
-The `fd_dcache_align` function returns the alignment size required for a dcache, defined by the constant `FD_DCACHE_ALIGN`.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L25>)
+
+Returns the alignment value for the data cache.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined to return an unsigned long integer (`ulong`).
-    - It directly returns the value of the constant `FD_DCACHE_ALIGN`.
-- **Output**: The function outputs an unsigned long integer representing the alignment size for a dcache.
+- **Logic and Control Flow**:
+    - Returns the constant `FD_DCACHE_ALIGN`.
+- **Output**: The function returns an unsigned long integer representing the alignment value for the data cache.
 
 
 ---
 ### fd\_dcache\_footprint<!-- {{#callable:fd_dcache_footprint}} -->
-The `fd_dcache_footprint` function calculates the total memory footprint required for a data cache, including data, application, and header sizes, ensuring alignment and checking for overflow.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L30>)
+
+Calculates the total memory footprint required for data and application storage, including alignment and header size, while checking for overflow conditions.
 - **Inputs**:
-    - `data_sz`: The size of the data portion of the cache in bytes.
-    - `app_sz`: The size of the application portion of the cache in bytes.
-- **Control Flow**:
-    - Align the data size `data_sz` to the nearest multiple of `FD_DCACHE_ALIGN` and store it in `data_footprint`.
-    - Check if `data_footprint` is less than `data_sz`, indicating an overflow, and return 0 if true.
-    - Align the application size `app_sz` to the nearest multiple of `FD_DCACHE_ALIGN` and store it in `app_footprint`.
-    - Check if `app_footprint` is less than `app_sz`, indicating an overflow, and return 0 if true.
-    - Calculate the total footprint by adding `data_footprint` and `app_footprint`.
-    - Check if the total footprint is less than `data_footprint`, indicating an overflow, and return 0 if true.
-    - Add the size of `fd_dcache_private_hdr_t` to the total footprint to account for the header and guard.
-    - Check if the total footprint is less than the size of `fd_dcache_private_hdr_t`, indicating an overflow, and return 0 if true.
-    - Return the calculated total footprint.
-- **Output**: The function returns the total memory footprint required for the data cache, or 0 if any overflow is detected during calculations.
+    - `data_sz`: The size of the data storage in bytes.
+    - `app_sz`: The size of the application storage in bytes.
+- **Logic and Control Flow**:
+    - Align `data_sz` to `FD_DCACHE_ALIGN` using `fd_ulong_align_up` and store the result in `data_footprint`.
+    - Check if `data_footprint` is less than `data_sz` to detect overflow; return 0 if true.
+    - Align `app_sz` to `FD_DCACHE_ALIGN` using `fd_ulong_align_up` and store the result in `app_footprint`.
+    - Check if `app_footprint` is less than `app_sz` to detect overflow; return 0 if true.
+    - Calculate the total `footprint` by adding `data_footprint` and `app_footprint`.
+    - Check if `footprint` is less than `data_footprint` to detect overflow; return 0 if true.
+    - Add the size of `fd_dcache_private_hdr_t` to `footprint`.
+    - Check if `footprint` is less than the size of `fd_dcache_private_hdr_t` to detect overflow; return 0 if true.
+    - Return the calculated `footprint`.
+- **Output**: The total memory footprint in bytes, or 0 if an overflow condition is detected.
 
 
 ---
 ### fd\_dcache\_new<!-- {{#callable:fd_dcache_new}} -->
-The `fd_dcache_new` function initializes a shared memory region for a data cache with specified data and application sizes, ensuring proper alignment and setting up necessary headers.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L49>)
+
+Initializes a shared memory region as a new dcache with specified data and application sizes.
 - **Inputs**:
-    - `shmem`: A pointer to the shared memory region to be initialized.
-    - `data_sz`: The size of the data portion of the cache.
-    - `app_sz`: The size of the application-specific portion of the cache.
-- **Control Flow**:
-    - Check if the `shmem` pointer is NULL and log a warning if it is, returning NULL.
-    - Verify that `shmem` is aligned according to `fd_dcache_align()` and log a warning if it is not, returning NULL.
-    - Calculate the total footprint required for the cache using `fd_dcache_footprint(data_sz, app_sz)` and log a warning if the footprint is zero, returning NULL.
+    - `shmem`: Pointer to the shared memory region to initialize.
+    - `data_sz`: Size of the data section in the dcache.
+    - `app_sz`: Size of the application section in the dcache.
+- **Logic and Control Flow**:
+    - Check if `shmem` is NULL; if so, log a warning and return NULL.
+    - Check if `shmem` is aligned according to [`fd_dcache_align`](<#fd_dcache_align>); if not, log a warning and return NULL.
+    - Calculate the footprint using [`fd_dcache_footprint`](<#fd_dcache_footprint>) with `data_sz` and `app_sz`; if the footprint is zero, log a warning and return NULL.
     - Initialize the memory region pointed to by `shmem` to zero for the size of `fd_dcache_private_hdr_t`.
-    - Cast `shmem` to a `fd_dcache_private_hdr_t` pointer and set its `data_sz`, `app_sz`, and `app_off` fields.
-    - Zero out the application-specific portion of the cache starting at the offset `app_off`.
-    - Use memory fences to ensure memory operations are completed before setting the `magic` field to `FD_DCACHE_MAGIC`.
+    - Cast `shmem` to `fd_dcache_private_hdr_t` and set `data_sz`, `app_sz`, and `app_off` in the header.
+    - Set the application section of the memory to zero starting from `app_off` for `app_sz` bytes.
+    - Use memory fences to ensure memory operations are completed before setting the `magic` field in the header to `FD_DCACHE_MAGIC`.
     - Return the `shmem` pointer.
-- **Output**: Returns the initialized shared memory pointer if successful, or NULL if any checks fail.
-- **Functions called**:
-    - [`fd_dcache_align`](#fd_dcache_align)
-    - [`fd_dcache_footprint`](#fd_dcache_footprint)
+- **Output**: Returns the pointer to the initialized shared memory region, or NULL if initialization fails.
+- **Functions Called**:
+    - [`fd_dcache_align`](<#fd_dcache_align>)
+    - [`fd_dcache_footprint`](<#fd_dcache_footprint>)
 
 
 ---
 ### fd\_dcache\_join<!-- {{#callable:fd_dcache_join}} -->
-The `fd_dcache_join` function validates a shared memory dcache and returns a pointer to its data section if valid.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L87>)
+
+Validates and joins a shared memory dcache object, returning a pointer to the dcache data if successful.
 - **Inputs**:
-    - `shdcache`: A pointer to the shared memory dcache to be validated and joined.
-- **Control Flow**:
+    - `shdcache`: A pointer to the shared memory dcache object to join.
+- **Logic and Control Flow**:
     - Check if `shdcache` is NULL; if so, log a warning and return NULL.
-    - Check if `shdcache` is aligned according to [`fd_dcache_align`](#fd_dcache_align); if not, log a warning and return NULL.
-    - Cast `shdcache` to a `fd_dcache_private_hdr_t` pointer and check if its `magic` field matches `FD_DCACHE_MAGIC`; if not, log a warning and return NULL.
-    - If all checks pass, return the result of `fd_dcache_private_dcache(hdr)`, which points to the data section of the dcache.
-- **Output**: A pointer to the data section of the dcache if valid, otherwise NULL.
-- **Functions called**:
-    - [`fd_dcache_align`](#fd_dcache_align)
-    - [`fd_dcache_private_dcache`](fd_dcache_private.h.md#fd_dcache_private_dcache)
+    - Check if `shdcache` is aligned according to [`fd_dcache_align`](<#fd_dcache_align>); if not, log a warning and return NULL.
+    - Cast `shdcache` to a `fd_dcache_private_hdr_t` pointer and check if the `magic` field matches `FD_DCACHE_MAGIC`; if not, log a warning and return NULL.
+    - Return the result of `fd_dcache_private_dcache(hdr)` which provides access to the dcache data.
+- **Output**: A pointer to the dcache data if the join is successful, or NULL if any validation fails.
+- **Functions Called**:
+    - [`fd_dcache_align`](<#fd_dcache_align>)
+    - [`fd_dcache_private_dcache`](<fd_dcache_private.h.md#fd_dcache_private_dcache>)
 
 
 ---
 ### fd\_dcache\_leave<!-- {{#callable:fd_dcache_leave}} -->
-The `fd_dcache_leave` function returns a pointer to the private header of a given dcache, performing a const cast in the process.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L109>)
+
+Returns a pointer to the private header of a data cache if the input is valid.
 - **Inputs**:
-    - `dcache`: A constant pointer to an unsigned char representing the dcache to be left.
-- **Control Flow**:
-    - Check if the input `dcache` is NULL using `FD_UNLIKELY`; if so, log a warning and return NULL.
-    - Return a pointer to the private header of the dcache by calling [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const) with a const cast.
-- **Output**: A void pointer to the private header of the dcache, or NULL if the input is invalid.
-- **Functions called**:
-    - [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const)
+    - `dcache`: A constant pointer to an unsigned character array representing the data cache.
+- **Logic and Control Flow**:
+    - Check if `dcache` is NULL using `FD_UNLIKELY`.
+    - If `dcache` is NULL, log a warning message 'NULL dcache' and return NULL.
+    - If `dcache` is not NULL, return a pointer to the private header of the data cache by calling [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>) and casting the result to `void *`.
+- **Output**: A pointer to the private header of the data cache, or NULL if the input is invalid.
+- **Functions Called**:
+    - [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>)
 
 
 ---
 ### fd\_dcache\_delete<!-- {{#callable:fd_dcache_delete}} -->
-The `fd_dcache_delete` function validates and deletes a shared data cache by resetting its magic number to zero, ensuring it is no longer recognized as a valid cache.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L120>)
+
+Validates and deletes a dcache by checking its alignment, magic number, and then clearing its magic number.
 - **Inputs**:
-    - `shdcache`: A pointer to the shared data cache to be deleted.
-- **Control Flow**:
-    - Check if the `shdcache` pointer is NULL; if so, log a warning and return NULL.
-    - Verify if `shdcache` is aligned according to [`fd_dcache_align`](#fd_dcache_align); if not, log a warning and return NULL.
-    - Cast `shdcache` to a `fd_dcache_private_hdr_t` pointer and check if its magic number matches `FD_DCACHE_MAGIC`; if not, log a warning and return NULL.
-    - Use memory fences to ensure memory operations are completed before and after setting the magic number to zero.
+    - `shdcache`: A pointer to the shared dcache memory to be deleted.
+- **Logic and Control Flow**:
+    - Check if `shdcache` is NULL; if so, log a warning and return NULL.
+    - Check if `shdcache` is aligned according to [`fd_dcache_align`](<#fd_dcache_align>); if not, log a warning and return NULL.
+    - Cast `shdcache` to a `fd_dcache_private_hdr_t` pointer and check if its `magic` field matches `FD_DCACHE_MAGIC`; if not, log a warning and return NULL.
+    - Use memory fence operations to ensure memory ordering, then set the `magic` field to 0 to mark the dcache as deleted.
     - Return the `shdcache` pointer.
 - **Output**: Returns the `shdcache` pointer if successful, or NULL if any validation fails.
-- **Functions called**:
-    - [`fd_dcache_align`](#fd_dcache_align)
+- **Functions Called**:
+    - [`fd_dcache_align`](<#fd_dcache_align>)
 
 
 ---
 ### fd\_dcache\_data\_sz<!-- {{#callable:fd_dcache_data_sz}} -->
-The `fd_dcache_data_sz` function retrieves the data size from a given dcache header.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L146>)
+
+Retrieves the data size from the cache header.
 - **Inputs**:
-    - `dcache`: A pointer to a constant unsigned character array representing the dcache from which the data size is to be retrieved.
-- **Control Flow**:
-    - The function calls [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const) with the `dcache` pointer to obtain a constant pointer to the dcache header structure.
-    - It accesses the `data_sz` field of the returned header structure and returns its value.
-- **Output**: The function returns an unsigned long integer representing the size of the data in the dcache.
-- **Functions called**:
-    - [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const)
+    - `dcache`: A pointer to a constant unsigned character array representing the data cache.
+- **Logic and Control Flow**:
+    - Calls the function [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>) with `dcache` as an argument to obtain a pointer to the cache header.
+    - Accesses the `data_sz` field of the cache header and returns its value.
+- **Output**: Returns an unsigned long integer representing the size of the data in the cache.
+- **Functions Called**:
+    - [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>)
 
 
 ---
 ### fd\_dcache\_app\_sz<!-- {{#callable:fd_dcache_app_sz}} -->
-The `fd_dcache_app_sz` function retrieves the application size from a given dcache header.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L151>)
+
+Retrieves the application size from the dcache header.
 - **Inputs**:
-    - `dcache`: A pointer to a constant unsigned character array representing the dcache from which the application size is to be retrieved.
-- **Control Flow**:
-    - The function calls [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const) with the `dcache` pointer to obtain a constant pointer to the dcache header.
-    - It accesses the `app_sz` field of the returned header structure and returns its value.
-- **Output**: The function returns an unsigned long integer representing the application size stored in the dcache header.
-- **Functions called**:
-    - [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const)
+    - `dcache`: A pointer to a constant unsigned character array representing the dcache from which to retrieve the application size.
+- **Logic and Control Flow**:
+    - Call [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>) with `dcache` to get a pointer to the dcache header.
+    - Access the `app_sz` field of the header and return its value.
+- **Output**: Returns the application size as an unsigned long integer.
+- **Functions Called**:
+    - [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>)
 
 
 ---
 ### fd\_dcache\_app\_laddr\_const<!-- {{#callable:fd_dcache_app_laddr_const}} -->
-The function `fd_dcache_app_laddr_const` returns a constant pointer to the application-specific data section within a dcache structure.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L156>)
+
+Returns a constant pointer to the application-specific data section within a dcache.
 - **Inputs**:
-    - `dcache`: A constant pointer to the dcache from which the application-specific data section address is to be retrieved.
-- **Control Flow**:
-    - Retrieve the constant header of the dcache using [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const) function.
-    - Calculate the address of the application-specific data section by adding the offset `hdr->app_off` to the base address of the header.
+    - `dcache`: A constant pointer to the dcache from which to retrieve the application-specific data section.
+- **Logic and Control Flow**:
+    - Call [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>) with `dcache` to get a constant pointer to the dcache header.
+    - Calculate the address of the application-specific data section by adding `hdr->app_off` to the header pointer.
     - Return the calculated address as a constant pointer to `uchar`.
 - **Output**: A constant pointer to the application-specific data section within the dcache.
-- **Functions called**:
-    - [`fd_dcache_private_hdr_const`](fd_dcache_private.h.md#fd_dcache_private_hdr_const)
+- **Functions Called**:
+    - [`fd_dcache_private_hdr_const`](<fd_dcache_private.h.md#fd_dcache_private_hdr_const>)
 
 
 ---
 ### fd\_dcache\_app\_laddr<!-- {{#callable:fd_dcache_app_laddr}} -->
-The `fd_dcache_app_laddr` function calculates and returns the starting address of the application-specific data region within a given dcache.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L162>)
+
+Calculates the local address of the application data section within a data cache.
 - **Inputs**:
-    - `dcache`: A pointer to the dcache from which the application-specific data address is to be calculated.
-- **Control Flow**:
-    - Retrieve the private header of the dcache using [`fd_dcache_private_hdr`](fd_dcache_private.h.md#fd_dcache_private_hdr) function.
-    - Calculate the application-specific data address by adding the `app_off` offset from the header to the base address of the header.
-    - Return the calculated address as a pointer to `uchar`.
-- **Output**: A pointer to the starting address of the application-specific data region within the dcache.
-- **Functions called**:
-    - [`fd_dcache_private_hdr`](fd_dcache_private.h.md#fd_dcache_private_hdr)
+    - `dcache`: A pointer to the data cache from which to calculate the application data section's local address.
+- **Logic and Control Flow**:
+    - Call [`fd_dcache_private_hdr`](<fd_dcache_private.h.md#fd_dcache_private_hdr>) with `dcache` to obtain the private header of the data cache.
+    - Calculate the local address of the application data section by adding the `app_off` offset from the header to the base address of the header.
+    - Return the calculated local address as a pointer to `uchar`.
+- **Output**: A pointer to the local address of the application data section within the data cache.
+- **Functions Called**:
+    - [`fd_dcache_private_hdr`](<fd_dcache_private.h.md#fd_dcache_private_hdr>)
 
 
 ---
 ### fd\_dcache\_compact\_is\_safe<!-- {{#callable:fd_dcache_compact_is_safe}} -->
-The function `fd_dcache_compact_is_safe` checks if a given dcache configuration is safe for compacting based on alignment, size, and depth constraints.
+[View Source →](<../../../../../src/tango/dcache/fd_dcache.c#L168>)
+
+Checks if a data cache can be safely compacted based on alignment, size, and depth constraints.
 - **Inputs**:
     - `base`: A pointer to the base address, which must be double chunk aligned.
-    - `dcache`: A pointer to the dcache, which must be aligned and within the address space defined by the base.
+    - `dcache`: A pointer to the data cache, which must be aligned and within the address space defined by the base.
     - `mtu`: The maximum transmission unit, which must be non-zero and within a valid range.
-    - `depth`: The depth of the dcache, which must be non-zero and within a valid range.
-- **Control Flow**:
-    - Check if the base is double chunk aligned; if not, log a warning and return 0.
-    - Ensure the dcache address is not before the base; if it is, log a warning and return 0.
-    - Verify the dcache is not NULL and is properly aligned; if not, log a warning and return 0.
-    - Calculate the data size of the dcache and ensure it does not cause overflow; if it does, log a warning and return 0.
-    - Compute chunk0 and chunk1 to determine the chunk range covered by the dcache relative to the base.
-    - Check if the chunk range exceeds UINT_MAX; if it does, log a warning and return 0.
-    - Validate that the mtu is non-zero and does not cause overflow when adjusted; if it does, log a warning and return 0.
-    - Calculate chunk_mtu to ensure it is non-zero and sufficient for mtu fragmentation.
-    - Ensure the depth is non-zero and does not exceed the maximum allowable depth; if it does, log a warning and return 0.
-    - Calculate the required number of chunks and ensure the dcache can accommodate them; if not, log a warning and return 0.
-    - If all checks pass, return 1 indicating the configuration is safe for compacting.
-- **Output**: Returns 1 if the dcache configuration is safe for compacting, otherwise returns 0.
-- **Functions called**:
-    - [`fd_dcache_data_sz`](#fd_dcache_data_sz)
+    - `depth`: The depth of the data cache, which must be non-zero and within a valid range.
+- **Logic and Control Flow**:
+    - Check if `base` is double chunk aligned; if not, log a warning and return 0.
+    - Ensure `dcache` is not before `base`; if it is, log a warning and return 0.
+    - Verify `dcache` is not NULL and is properly aligned; if not, log a warning and return 0.
+    - Calculate `data_sz` using [`fd_dcache_data_sz`](<#fd_dcache_data_sz>) and check for overflow; if overflow occurs, log a warning and return 0.
+    - Compute `chunk0` and `chunk1` to determine the chunk range; ensure `chunk1` does not exceed `UINT_MAX`; if it does, log a warning and return 0.
+    - Check if `mtu` is non-zero and calculate `mtu_up` and `chunk_mtu`; ensure no overflow occurs; if overflow occurs, log a warning and return 0.
+    - Verify `depth` is non-zero and calculate `depth_max`; ensure `depth` does not exceed `depth_max`; if it does, log a warning and return 0.
+    - Calculate `chunk_req` and ensure the available chunk range is sufficient; if not, log a warning and return 0.
+    - If all checks pass, return 1 indicating the data cache can be safely compacted.
+- **Output**: Returns 1 if the data cache can be safely compacted, otherwise returns 0.
+- **Functions Called**:
+    - [`fd_dcache_data_sz`](<#fd_dcache_data_sz>)
 
 
 

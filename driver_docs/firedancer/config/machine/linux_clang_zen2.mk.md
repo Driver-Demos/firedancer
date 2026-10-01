@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_clang_zen2.mk` file in the `firedancer` codebase configures the build environment for a Zen 2 architecture using Clang, with various optimizations and features enabled such as SSE, AVX, and AESNI.
+Makefile for configuring a build environment with Clang for Zen 2 architecture, including various optimizations and security features.
 
 # Purpose
-The provided content is a Makefile, which is used to automate the build process of a software project. The `BUILDDIR` variable specifies the directory structure for the build, targeting a Linux environment with Clang compiler optimizations for the Zen 2 architecture. The file includes several configuration files, each adding specific build options such as debugging, security, optimization, and threading capabilities. The `CPPFLAGS` are set to include specific compiler flags that define macros and enable certain processor features, such as support for 128-bit integers, double precision, and various x86 instruction set extensions like SSE, AVX, and AES-NI. These settings ensure that the build process is tailored to leverage specific hardware capabilities and compiler features for optimized performance.
+The Makefile configuration specifies the build directory and includes several configuration files to set up the build environment for a software project. The `BUILDDIR` variable is set to `linux/clang/zen2`, indicating the target build directory. The file includes multiple configuration files from the `config/extra` directory, each adding specific build options such as support for Clang, x86-64 architecture, debugging, security, optimization, and threading. The `CPPFLAGS` variable is used to define preprocessor flags, including architecture-specific flags like `-march=znver1` and `-mtune=znver1`, due to Clang 15's lack of support for `znver2`. Additionally, several feature macros are defined, such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and others, to enable specific hardware and software capabilities during the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

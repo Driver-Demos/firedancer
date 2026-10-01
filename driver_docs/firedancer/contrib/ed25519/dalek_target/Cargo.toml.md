@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Cargo.toml` file in the `firedancer` codebase specifies the package configuration for the `dalek_target` library, including its dependencies and crate type.
+Configuration for the `dalek_target` package, specifying dependencies and library type.
 
 # Purpose
-The file is a Cargo.toml configuration file for a Rust project. It specifies the package metadata, including the name "dalek_target", version "0.1.0", and edition "2021", and indicates that the package should not be published. The library is configured to compile as a "cdylib" crate type, and it has a dependency on the "ed25519-dalek" library version "1.0.1".
+The `Cargo.toml` file specifies metadata and configuration for a Rust package. The `[package]` section defines the package name as `dalek_target`, sets the version to `0.1.0`, specifies the Rust edition as `2021`, and indicates that the package should not be published. The `[lib]` section sets the crate type to `cdylib`, which is a dynamic system library. The `[dependencies]` section lists `ed25519-dalek` as a dependency with a fixed version of `1.0.1`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
