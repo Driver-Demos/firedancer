@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_sock_tile to fd_disco when FD_HAS_ALLOCA is set.
+Makefile logic to conditionally add objects `fd_sock_tile` and `fd_disco` if `FD_HAS_ALLOCA` is defined.
 
 # Purpose
-This makefile fragment adds `fd_disco` to the `fd_sock_tile` object list only when `FD_HAS_ALLOCA` is defined. The `ifdef` and `endif` directives control conditional build inclusion for code that depends on `alloca` support.
+The `Makefile` snippet uses a conditional directive to check if the macro `FD_HAS_ALLOCA` is defined. If it is defined, the `add-objs` function is called with the arguments `fd_sock_tile` and `fd_disco`, which likely adds these object files to the build process. This conditional inclusion allows for flexibility in the build configuration based on the presence of the `FD_HAS_ALLOCA` macro.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

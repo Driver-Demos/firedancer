@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build system, CodeQL, source tree, and testing docs, plus technical notes in `rant`.
+Discussions on custom integer types, build system documentation, CodeQL guide, source tree organization, and testing documentation.
 
 ## Folders
-- **[rant](rant/README.md)**: The `rant` folder in the `firedancer` codebase contains documentation files that provide in-depth discussions on specific technical decisions, such as defining custom integer types and the use of the `-fomit-frame-pointer` compile flag.
+- **[rant](rant/README.md)**: Discussions on custom integer types and the relevance of the `-fomit-frame-pointer` compile flag.
 
 ## Files
-- **[build-system.md](build-system.md.md)**: The `build-system.md` file in the `firedancer` codebase provides a detailed explanation of the build system philosophy, process, and dependencies for building Firedancer from source, emphasizing simplicity, robustness, and minimal external dependencies.
-- **[codeql.md](codeql.md.md)**: The `codeql.md` file provides a quickstart guide for running CodeQL queries on the Firedancer repository, including setup instructions and steps for creating a CodeQL database from scratch.
-- **[organization.txt](organization.txt.md)**: Source tree organization and important files for Firedancer.
-- **[testing.md](testing.md.md)**: The `testing.md` file in the `firedancer` codebase provides detailed guidelines and configurations for testing the Firedancer system, including recommended system setups, instructions for running unit and fuzz tests, and best practices for ensuring test reliability and determinism.
+- **[build-system.md](build-system.md.md)**: Documentation of the build system and source code management for Firedancer, focusing on simplicity and robustness.
+- **[codeql.md](codeql.md.md)**: Quickstart guide for running CodeQL queries on the Firedancer repository using a GitHub-hosted database.
+- **[organization.txt](organization.txt.md)**: Documentation of the Firedancer source tree structure and important files.
+- **[testing.md](testing.md.md)**: Documentation for testing Firedancer, including system configuration, unit and fuzz tests, sanitizers, and best practices.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header guard and include for `fd_flamenco_base.h`.
+Header file for including `fd_flamenco_base.h` in the Firedancer Flamenco module.
 
 # Purpose
-This header file defines an include guard for `fd_flamenco_h` and prevents multiple inclusion during compilation. It includes `fd_flamenco_base.h`, which provides the main declarations for the Flamenco code. The file does not define functions, types, or variables by itself. It serves as a top-level header that exposes the base Flamenco interface through a single include.
+This code is a simple C header file that uses include guards to prevent multiple inclusions of the same header file. The macro `HEADER_fd_src_flamenco_fd_flamenco_h` is defined to ensure that the contents of the file are only included once during compilation. The file includes another header file, `fd_flamenco_base.h`, which suggests that it is part of a larger codebase where `fd_flamenco_base.h` provides foundational definitions or declarations needed by other components. The use of include guards is a common practice to avoid redefinition errors and to manage dependencies in C projects.
+# Imports and Dependencies
+
+---
+- `fd_flamenco_base.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
