@@ -3,48 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for the sysvar last restart slot functionality in the Firedancer runtime.
+Tests decode footprint and alignment for the last restart slot sysvar.
 
 # Purpose
-This code is a C test suite designed to validate the functionality and constraints of the `sysvar_last_restart_slot` feature. It includes two static functions: [`test_sysvar_last_restart_slot_bounds`](<#test_sysvar_last_restart_slot_bounds>) and [`test_sysvar_last_restart_slot`](<#test_sysvar_last_restart_slot>). The [`test_sysvar_last_restart_slot_bounds`](<#test_sysvar_last_restart_slot_bounds>) function checks the size and alignment of a static data array against predefined constants, ensuring that the binary encoding and footprint of the `sysvar_last_restart_slot` are correct. The [`test_sysvar_last_restart_slot`](<#test_sysvar_last_restart_slot>) function calls [`test_sysvar_last_restart_slot_bounds`](<#test_sysvar_last_restart_slot_bounds>) and is intended to include additional tests, as indicated by the placeholder comment. The code uses macros and types defined in the included headers to perform these tests.
-# Imports and Dependencies
-
----
-- `fd_sysvar_last_restart_slot.h`
-- `../../types/fd_types.h`
-
-
-# Functions
-
----
-### test\_sysvar\_last\_restart\_slot\_bounds<!-- {{#callable:test_sysvar_last_restart_slot_bounds}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/sysvar/test_sysvar_last_restart_slot.c#L4>)
-
-Validates the size, decoding footprint, and alignment of a sysvar account's last restart slot data.
-- **Inputs**: None
-- **Logic and Control Flow**:
-    - Defines a static array `data` representing a real sysvar account observed on-chain.
-    - Checks if the size of `data` matches `FD_SYSVAR_LAST_RESTART_SLOT_BINCODE_SZ`.
-    - Initializes a `fd_bincode_decode_ctx_t` context `ctx` with `data` and its endpoint.
-    - Initializes `obj_sz` to zero and checks if the decoding footprint of the sysvar last restart slot is successful and matches `FD_SYSVAR_LAST_RESTART_SLOT_FOOTPRINT`.
-    - Verifies that the alignment of the sysvar last restart slot matches `FD_SYSVAR_LAST_RESTART_SLOT_ALIGN`.
-- **Output**: No output is returned; the function performs assertions to validate conditions.
-
-
----
-### test\_sysvar\_last\_restart\_slot<!-- {{#callable:test_sysvar_last_restart_slot}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/sysvar/test_sysvar_last_restart_slot.c#L18>)
-
-Calls the [`test_sysvar_last_restart_slot_bounds`](<#test_sysvar_last_restart_slot_bounds>) function to perform boundary tests on the sysvar last restart slot.
-- **Inputs**: None
-- **Logic and Control Flow**:
-    - Calls the [`test_sysvar_last_restart_slot_bounds`](<#test_sysvar_last_restart_slot_bounds>) function to execute boundary tests.
-    - Contains a placeholder comment indicating that more tests should be added.
-- **Output**: No output is returned as the function is of type `void`.
-- **Functions Called**:
-    - [`test_sysvar_last_restart_slot_bounds`](<#test_sysvar_last_restart_slot_bounds>)
-
-
+A small C test file verifies the `fd_sol_sysvar_last_restart_slot` decode interface and its size and alignment limits. The function [`test_sysvar_last_restart_slot_bounds`](<#test_sysvar_last_restart_slot_bounds>) uses a fixed byte array that represents a real on-chain sysvar account and checks that the encoded size matches `FD_SYSVAR_LAST_RESTART_SLOT_BINCODE_SZ`. It then calls `fd_sol_sysvar_last_restart_slot_decode_footprint` to confirm the decoded object footprint, and it checks the alignment value returned by `fd_sol_sysvar_last_restart_slot_align`. The wrapper function [`test_sysvar_last_restart_slot`](<#test_sysvar_last_restart_slot>) runs the bounds test and leaves a placeholder for more tests.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
