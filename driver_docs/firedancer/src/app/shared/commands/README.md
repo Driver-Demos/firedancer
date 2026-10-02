@@ -3,33 +3,33 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Command-line argument parsing, monitoring, execution, key management, memory, network configuration, and version commands.
+CLI commands for configure, monitor, run, watch, identity, keys, memory, metrics, network, ready, help, and version.
 
 ## Folders
-- **[configure](configure/README.md)**: Command-line argument parsing and execution, configuration management, network device and kernel parameter setup, and hyperthreading checks.
-- **[monitor](monitor/README.md)**: Seccomp filter policy, utility functions, terminal-based monitoring tool, and security policies for Firedancer.
-- **[run](run/README.md)**: Seccomp filter policies, syscall handling rules, and Firedancer application initialization and execution.
-- **[watch](watch/README.md)**: Implements a terminal GUI command to monitor Firedancer with security policies and architecture-specific syscall handling.
+- **[configure](configure/README.md)**: Configuration stages and system setup for network devices, huge pages, hyperthreads, snapshots, and sysctl settings.
+- **[monitor](monitor/README.md)**: Terminal GUI for tile and link metrics, helper output functions, and seccomp policy files.
+- **[run](run/README.md)**: Boot, setup, and sandbox execution code with seccomp policies and generated syscall allowlists.
+- **[watch](watch/README.md)**: Terminal GUI and seccomp policy for monitoring Firedancer metrics, snapshots, gossip, repair, and replay.
 
 ## Files
-- **[get_identity.c](get_identity.c.md)**: Defines a command to retrieve and print the current active identity of a running validator.
-- **[get_identity.h](get_identity.h.md)**: Header file for the `get_identity` command function and associated action in the Firedancer codebase.
-- **[help.c](help.c.md)**: Defines a help command function that prints usage instructions and available subcommands.
-- **[help.h](help.h.md)**: Header file for the help command function and related action in the Firedancer application.
-- **[keys.c](keys.c.md)**: Handles key management commands, including generating new keypairs and printing public keys.
-- **[keys.h](keys.h.md)**: Function prototypes and an external action for handling key command arguments and execution.
-- **[mem.c](mem.c.md)**: Defines a command to print workspace memory and tile topology information.
-- **[mem.h](mem.h.md)**: Header file for memory command function and action in the Firedancer application.
-- **[metrics.c](metrics.c.md)**: Implements a command to print current validator Prometheus metrics to STDOUT using HTTP server.
-- **[metrics.h](metrics.h.md)**: Defines a function and an external action for handling metrics commands.
-- **[netconf.c](netconf.c.md)**: Prints network configuration details including interfaces, IPv4 routes, and neighbor tables.
-- **[netconf.h](netconf.h.md)**: Header file for the netconf command function and related action in the Firedancer application.
-- **[ready.c](ready.c.md)**: Function to wait for all tiles to be ready and log their status in a distributed system.
-- **[ready.h](ready.h.md)**: Declares the `ready_cmd_fn` function and the `fd_action_ready` external action.
-- **[set_identity.c](set_identity.c.md)**: Implements a state machine for switching the identity of a validator, ensuring data consistency during the process.
-- **[set_identity.h](set_identity.h.md)**: Header file for the `set_identity` command function and related action in the Firedancer codebase.
-- **[version.c](version.c.md)**: Defines a command to display the current software version and commit reference.
-- **[version.h](version.h.md)**: Defines the version command function and action for the Firedancer application.
+- **[get_identity.c](get_identity.c.md)**: Reads the active identity key from the shred tile and prints it in base58.
+- **[get_identity.h](get_identity.h.md)**: Prototypes for the get_identity command function and action.
+- **[help.c](help.c.md)**: The `help.c` file in the `firedancer` codebase implements a command function that displays usage information and available subcommands for the application.
+- **[help.h](help.h.md)**: The `help.h` file declares the function `help_cmd_fn` and the external variable `fd_action_help` for handling help commands in the `firedancer` application.
+- **[keys.c](keys.c.md)**: Generates keypairs or prints a public key from a key file.
+- **[keys.h](keys.h.md)**: The `keys.h` file in the `firedancer` codebase declares functions and an external action related to command handling for keys, including argument parsing and command execution.
+- **[mem.c](mem.c.md)**: Prints workspace memory and tile topology information.
+- **[mem.h](mem.h.md)**: The `mem.h` file in the `firedancer` codebase declares a function prototype for `mem_cmd_fn` and an external action `fd_action_mem` related to memory commands.
+- **[metrics.c](metrics.c.md)**: Prints Prometheus metrics to STDOUT after rebuilding the selected topology.
+- **[metrics.h](metrics.h.md)**: Metrics command prototype and action declaration.
+- **[netconf.c](netconf.c.md)**: Prints interfaces, IPv4 routes, and neighbor table from shared network state.
+- **[netconf.h](netconf.h.md)**: The `netconf.h` file declares a function for network configuration commands and an external action related to network configuration in the Firedancer application.
+- **[ready.c](ready.c.md)**: Waits for all non-agave tiles to reach ready status and logs when all tiles are ready.
+- **[ready.h](ready.h.md)**: The `ready.h` file in the `firedancer` codebase declares the `ready_cmd_fn` function and the `fd_action_ready` external action for handling readiness commands.
+- **[set_identity.c](set_identity.c.md)**: State machine for switching a running validator identity key and pausing, flushing, and resuming tiles.
+- **[set_identity.h](set_identity.h.md)**: The `set_identity.h` file declares the `set_identity_cmd_fn` function and the `fd_action_set_identity` action for setting identity configurations in the Firedancer application.
+- **[version.c](version.c.md)**: Prints the software version and commit reference for the version command.
+- **[version.h](version.h.md)**: The `version.h` file in the `firedancer` codebase declares the `version_cmd_fn` function and the `fd_action_version` action for handling version-related commands.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

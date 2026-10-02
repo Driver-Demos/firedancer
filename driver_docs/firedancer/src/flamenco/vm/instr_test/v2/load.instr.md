@@ -3,35 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for load instructions with various offsets and registers, including verification and error cases.
+Tests load instructions and verifier checks for byte, halfword, word, and doubleword loads.
 
 # Purpose
-This file contains a series of test cases for verifying the behavior of load instructions in a software system, likely related to a virtual machine or an emulator. The file specifies different load operations such as `ldxb`, `ldxh`, `ldxw`, and `ldxdw`, which load bytes, half-words, words, and double words, respectively, from memory into registers. Each test case includes parameters like operation code (`op`), destination register (`dst`), source register (`src`), offset (`off`), and immediate value (`imm`), followed by the expected result or error status. The file also includes verification steps marked with `vfy` to ensure the correctness of the operations, and some entries are marked as invalid due to removal by a specific identifier (`SIMD-0173`). Additionally, the file defines region boundaries to test load operations across different memory regions. This metadata is crucial for ensuring the correct implementation and validation of memory access instructions within the codebase.
-# Content Summary
-The provided content is a configuration file that appears to define a series of operations for a virtual machine or an emulator. The operations involve loading data from memory into registers using different opcodes. The file specifies various load operations, including `ldxb`, `ldxh`, `ldxw`, `ldxdw`, and `lddw`, which correspond to loading bytes, half-words, words, double words, and immediate values into registers, respectively.
-
-Key details include:
-
-1. **Input Data**: The file begins with an input data sequence `00010203040506070809101112131415`, which is likely used as the source data for the load operations.
-
-2. **Operation Format**: Each operation is defined with a specific opcode (`op`), destination register (`dst`), source register (`src`), offset (`off`), and immediate value (`imm`). The result of the operation is indicated as either `ok` or `err`, showing whether the operation was successful or resulted in an error.
-
-3. **Verification and Errors**: Some operations are marked with `vfy`, indicating they are for verification purposes. These operations are noted as having an "invalid ix" and are removed under a reference `SIMD-0173`.
-
-4. **Region Boundaries**: The file specifies region boundaries at offsets `04`, `08`, `09`, and `10`. These boundaries may define memory regions that affect how data is loaded or accessed.
-
-5. **Load Operations**:
-   - `ldxb`: Loads a byte from memory into a register.
-   - `ldxh`: Loads a half-word (2 bytes) from memory into a register.
-   - `ldxw`: Loads a word (4 bytes) from memory into a register.
-   - `ldxdw`: Loads a double word (8 bytes) from memory into a register.
-   - `lddw`: Loads an immediate value directly into a register.
-
-6. **Error Handling**: Errors occur when operations attempt to access memory outside defined boundaries or when invalid instructions are executed. These errors are marked with `err`.
-
-7. **Comments and Annotations**: The file includes comments to describe the operations and their outcomes. Annotations such as `# invalid ix - removed SIMD-0173` provide context for why certain operations are marked for verification or removal.
-
-Developers working with this file should understand the structure of the operations, the significance of the opcodes, and the conditions under which operations succeed or fail. This understanding is crucial for debugging and extending the functionality of the virtual machine or emulator.
+This file defines test cases for BPF load instructions and their verifier checks. It covers byte, halfword, word, and doubleword loads with `ldxb`, `ldxh`, `ldxw`, `ldxdw`, and `lddw`, and it records the expected result for each case as `ok`, `err`, or `vfy`. The entries use register, source, and offset values to verify correct data reads, alignment rules, and access limits across memory regions. The `region_boundary` values add boundary tests that confirm load behavior when an access crosses or reaches a region edge.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,36 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements ultra high performance dynamic key-value maps with compile-time bounded size and static inline APIs.
+Header-only template for bounded open-addressing key-value maps with insert, remove, and query.
 
 # Purpose
-The code defines a template for creating ultra-high-performance dynamic key-value maps with a bounded compile-time size in C. It is designed to be included in other C files to generate specific map types by defining certain macros such as `MAP_NAME`, `MAP_T`, and `MAP_LG_SLOT_CNT`. The code provides a set of static inline functions that operate on these maps, allowing for operations such as creating a new map, joining and leaving a map, inserting and removing keys, and querying the map. The maps use a linear probing technique for collision resolution and support memoization to optimize key comparison operations.
+`fd_map.c` defines a template for a fixed-size, open-addressed hash map that is generated at compile time by macros. It is intended to be included in a C compilation unit or header to create a map type with a chosen name, key type, value layout, and slot count. The file provides the public API for map setup and teardown in shared memory style, including `align`, `footprint`, `new`, `join`, `leave`, and `delete`, along with map operations such as `insert`, `remove`, `clear`, `query`, and `query_const`.
 
-The code is structured to be header-only, meaning it can be included multiple times in different compilation units to create different map types. It provides a flexible interface for defining custom key and hash types, as well as custom behaviors for key comparison and movement. The code also includes error handling for misconfigurations and provides options for optimizing query operations based on expected usage patterns. The template is designed to work with both plain old data (POD) types and non-POD C++ structures, with specific provisions for handling non-POD types during map operations.
-# Imports and Dependencies
-
----
-- `../bits/fd_bits.h`
-- `../log/fd_log.h`
-
-
-# Functions
-
----
-### MAP\_<!-- {{#callable:MAP_}} -->
-[View Source →](<../../../../../src/util/tmpl/fd_map.c#L477>)
-
-Provides a const-correct query operation for a map to find a key and return the corresponding map entry or a null entry if the key is not found.
-- **Inputs**:
-    - ``map``: A pointer to a constant map of type `MAP_T` to query.
-    - ``key``: The key of type `MAP_KEY_T` to search for in the map.
-    - ``null``: A pointer to a constant map entry of type `MAP_T` to return if the key is not found.
-- **Logic and Control Flow**:
-    - Calls the non-const `MAP_(query)` function with the provided `map`, `key`, and `null` arguments cast to non-const types.
-    - Returns the result of the `MAP_(query)` function cast back to a const type.
-- **Output**: A pointer to a constant map entry of type `MAP_T` that holds the key, or the `null` entry if the key is not found.
-
-
+The map uses linear probing with a power-of-two slot count and supports optional hash memoization through the `MAP_HASH` field. It also supports custom key types and custom move, equality, and hash functions through macros such as `MAP_KEY_T`, `MAP_KEY_MOVE`, `MAP_KEY_EQUAL`, and `MAP_KEY_HASH`. The implementation is header-only style, uses `static inline` functions, and is designed for fast insertion and lookup with bounded storage size.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

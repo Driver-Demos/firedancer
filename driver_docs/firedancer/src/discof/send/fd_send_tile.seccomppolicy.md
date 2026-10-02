@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging and randomness in the Firedancer send tile component.
+The `quic.seccomppolicy` file defines security policies for logging and randomness in the QUIC protocol, specifying conditions for writing and syncing log messages and using cryptographic randomness.
 
 # Purpose
-The configuration file defines logging behavior for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above also directed to the STDERR pipe. The file descriptor for logging is identified by `logfile_fd`, which can be disabled by configuration. The `write` operation checks if the file descriptor is either STDERR (descriptor 2) or `logfile_fd`, ensuring that all messages are logged appropriately. Additionally, for messages of 'WARNING' level and above, the `fsync` operation ensures that the log file is immediately synchronized to disk when using `logfile_fd`. The file also notes that QUIC uses `getrandom` for generating cryptographically secure randomness.
+The provided file contents appear to be a configuration or policy file that outlines logging and randomness behavior for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above being directed to STDERR and immediately synchronized to disk using `fsync` for reliability. The configuration uses a file descriptor, `logfile_fd`, to manage where logs are written, and ensures that critical messages are promptly recorded. Additionally, it mentions the use of `getrandom` for generating cryptographically secure random numbers, which is crucial for secure operations, such as those in the QUIC protocol. This setup ensures robust logging and secure random number generation, which are essential for maintaining system integrity and security.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
