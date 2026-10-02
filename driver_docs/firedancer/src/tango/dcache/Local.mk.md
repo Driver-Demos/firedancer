@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for `fd_dcache` in the `firedancer` codebase.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_dcache` component, and includes commands to build and run the `test_dcache` unit test.
 
 # Purpose
-The `Makefile` content defines build and test instructions for a software project. It uses a series of `$(call ...)` functions to add headers and objects, create a unit test, and run the unit test. Specifically, it adds the header `fd_dcache.h`, includes the objects `fd_dcache` and `fd_tango`, and sets up a unit test named `test_dcache` that depends on `fd_tango` and `fd_util`. Finally, it runs the `test_dcache` unit test.
+The file is a Makefile snippet used for building and testing components in a software project. It specifies the inclusion of a header file `fd_dcache.h`, adds object files `fd_dcache` and `fd_tango` to the build, defines a unit test named `test_dcache` that depends on `fd_tango` and `fd_util`, and executes the `test_dcache` unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Function for copying HTTP/2 transmission operations between connection and stream buffers.
+The `fd_h2_tx.c` file implements a function for handling HTTP/2 transmission operations, managing data frames, and updating connection and stream states within the Firedancer project.
 
 # Purpose
-The code defines a function [`fd_h2_tx_op_copy`](<#fd_h2_tx_op_copy>) that is part of an HTTP/2 transmission system. This function is responsible for managing the transmission of data frames over an HTTP/2 connection. It operates by copying data from a transmission operation (`tx_op`) into a transmission buffer (`rbuf_tx`) associated with a specific connection (`conn`) and stream (`stream`). The function ensures that the data is transmitted in compliance with the constraints of the connection's and stream's transmission windows, as well as the maximum frame size allowed by the peer's settings.
+The provided C code is part of a library or module that facilitates data transmission over HTTP/2 connections. It specifically implements a function, [`fd_h2_tx_op_copy`](#fd_h2_tx_op_copy), which is responsible for managing the transmission of data from a stream buffer to a connection buffer, adhering to the constraints and state of the HTTP/2 protocol. The function ensures that data is sent in frames that respect the connection's and stream's window sizes, as well as the maximum frame size allowed by the peer's settings. It also handles the state of the stream, ensuring that data is only sent if the stream is in an appropriate state (open or closing for receiving) and manages the end-of-stream condition by setting the `END_STREAM` flag when necessary.
 
-The function checks the state of the stream to ensure it is open or in a closing state before proceeding with data transmission. It calculates the maximum payload size that can be sent in a single frame, considering the available space in the buffer, the remaining data size, and the connection's constraints. If the entire chunk of data is transmitted and the `fin` flag is set, the function marks the end of the stream. The function updates the transmission windows and the remaining data size after each frame is sent. This code is part of a broader HTTP/2 implementation, likely intended to be used within a larger system that manages HTTP/2 connections and streams.
+The code is structured to be part of a larger system, as indicated by the inclusion of headers like "fd_h2_tx.h", "fd_h2_conn.h", and "fd_h2_stream.h", which likely define the data structures and constants used in the function. The function does not define a public API or external interface directly but is likely a utility function used internally within the library to handle the low-level details of data transmission in an HTTP/2 context. The use of macros like `FD_UNLIKELY` suggests performance optimizations, hinting that this code is designed for high-performance environments where efficient data handling is critical.
 # Imports and Dependencies
 
 ---
@@ -21,34 +21,29 @@ The function checks the state of the stream to ensure it is open or in a closing
 
 ---
 ### fd\_h2\_tx\_op\_copy<!-- {{#callable:fd_h2_tx_op_copy}} -->
-[View Source →](<../../../../../src/waltz/h2/fd_h2_tx.c#L5>)
-
-Copies data from a transmission operation to a buffer while managing flow control and stream state.
+The `fd_h2_tx_op_copy` function manages the transmission of data frames over an HTTP/2 connection, ensuring that data is sent according to the available window sizes and stream states.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
-    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the stream.
-    - `rbuf_tx`: A pointer to an `fd_h2_rbuf_t` structure representing the transmission buffer.
-    - `tx_op`: A pointer to an `fd_h2_tx_op_t` structure representing the transmission operation.
-- **Logic and Control Flow**:
-    - Calculate the minimum of the connection's and stream's transmission window sizes to determine the `quota` for data transmission.
-    - Return immediately if `quota` is less than zero, indicating no available window for transmission.
-    - Check if the stream state is `FD_H2_STREAM_STATE_CLOSED` and return if true, as no data can be sent on a closed stream.
-    - Ensure the stream state is either `FD_H2_STREAM_STATE_OPEN` or `FD_H2_STREAM_STATE_CLOSING_RX`; return if not, as data transmission is not allowed in other states.
-    - Enter a loop to process data transmission while `quota` is positive.
-    - Calculate the remaining size of the data chunk, available buffer space, and maximum frame size to determine the `payload_sz` for the current frame.
-    - Break the loop if `payload_sz` is less than or equal to zero, indicating no data can be sent.
-    - Check if the remaining size of the data chunk is zero and the `fin` flag is set; if so, set the `END_STREAM` flag and close the stream's transmission.
-    - Prepare the transmission by calling [`fd_h2_tx_prepare`](<fd_h2_conn.h.md#fd_h2_tx_prepare>) with the appropriate parameters.
-    - Push the data chunk into the buffer using [`fd_h2_rbuf_push`](<fd_h2_rbuf.h.md#fd_h2_rbuf_push>).
-    - Commit the transmission with [`fd_h2_tx_commit`](<fd_h2_conn.h.md#fd_h2_tx_commit>).
-    - Update the `tx_op` chunk pointer and size, and decrement the connection's and stream's transmission windows and `quota` by `payload_sz`.
-- **Output**: No explicit return value; modifies the state of the connection, stream, and transmission operation.
-- **Functions Called**:
-    - [`fd_h2_rbuf_free_sz`](<fd_h2_rbuf.h.md#fd_h2_rbuf_free_sz>)
-    - [`fd_h2_stream_close_tx`](<fd_h2_stream.h.md#fd_h2_stream_close_tx>)
-    - [`fd_h2_tx_prepare`](<fd_h2_conn.h.md#fd_h2_tx_prepare>)
-    - [`fd_h2_rbuf_push`](<fd_h2_rbuf.h.md#fd_h2_rbuf_push>)
-    - [`fd_h2_tx_commit`](<fd_h2_conn.h.md#fd_h2_tx_commit>)
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
+    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream.
+    - `rbuf_tx`: A pointer to an `fd_h2_rbuf_t` structure used as the transmission buffer.
+    - `tx_op`: A pointer to an `fd_h2_tx_op_t` structure containing the data chunk and its size to be transmitted.
+- **Control Flow**:
+    - Calculate the minimum transmission quota based on the connection and stream window sizes.
+    - Return immediately if the quota is negative or if the stream is closed or in an invalid state for transmission.
+    - Enter a loop to send data frames while there is quota available.
+    - Calculate the maximum payload size for the current frame based on the remaining chunk size, buffer space, and maximum frame size.
+    - Break the loop if the payload size is zero or negative.
+    - Determine if the END_STREAM flag should be set and close the stream's transmission if necessary.
+    - Prepare the transmission buffer with the frame header and push the data chunk into the buffer.
+    - Commit the transmission, updating the chunk pointer, chunk size, and reducing the connection and stream window sizes by the payload size.
+    - Repeat the loop until the quota is exhausted.
+- **Output**: The function does not return a value; it modifies the state of the connection, stream, and transmission operation structures to reflect the data transmission.
+- **Functions called**:
+    - [`fd_h2_rbuf_free_sz`](fd_h2_rbuf.h.md#fd_h2_rbuf_free_sz)
+    - [`fd_h2_stream_close_tx`](fd_h2_stream.h.md#fd_h2_stream_close_tx)
+    - [`fd_h2_tx_prepare`](fd_h2_conn.h.md#fd_h2_tx_prepare)
+    - [`fd_h2_rbuf_push`](fd_h2_rbuf.h.md#fd_h2_rbuf_push)
+    - [`fd_h2_tx_commit`](fd_h2_conn.h.md#fd_h2_tx_commit)
 
 
 
