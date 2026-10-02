@@ -3,39 +3,39 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, APIs, tests, and fuzz testing for Curve25519, Ed25519, Ristretto255, and X25519 cryptographic operations.
+Curve25519, Ed25519, X25519, and Ristretto255 APIs, tables, tests, and fuzzers.
 
 ## Folders
-- **[avx512](avx512/README.md)**: Functions, APIs, and tests for Curve25519 and ED25519 operations using AVX-512 vectorization.
-- **[ref](ref/README.md)**: Functions and APIs for Curve25519 point and field operations, including secure and test implementations.
-- **[table](table/README.md)**: Precomputed tables and constants for Ed25519 elliptic curve operations and finite field arithmetic.
+- **[avx512](avx512/README.md)**: The `avx512` folder in the `firedancer` codebase contains source files and headers implementing optimized elliptic curve and finite field arithmetic operations for the Curve25519 and ED25519 protocols using AVX-512 instructions, along with a makefile and test suite for these implementations.
+- **[ref](ref/README.md)**: The `ref` folder in the `firedancer` codebase contains source and header files implementing and providing APIs for secure and optimized operations on Curve25519 and Ed25519, including elliptic curve arithmetic and field element manipulations.
+- **[table](table/README.md)**: Auto-generated Ed25519 and Curve25519 precomputed tables and constants for AVX-512 and reference code.
 
 ## Files
-- **[fd_curve25519.c](fd_curve25519.c.md)**: Implements secure and optimized operations for Curve25519, including point serialization, scalar multiplication, and multi-scalar multiplication.
-- **[fd_curve25519.h](fd_curve25519.h.md)**: Public API for Curve25519 operations, including point addition, multiplication, and serialization.
-- **[fd_curve25519_scalar.c](fd_curve25519_scalar.c.md)**: Implements scalar reduction, multiplication-addition, and windowed non-adjacent form for Curve25519.
-- **[fd_curve25519_scalar.h](fd_curve25519_scalar.h.md)**: Public API for Curve25519 scalar operations, including reduction, validation, and arithmetic functions.
-- **[fd_curve25519_secure.c](fd_curve25519_secure.c.md)**: Implements secure constant-time operations for Curve25519, including scalar multiplication and table selection.
-- **[fd_curve25519_tables.c](fd_curve25519_tables.c.md)**: Generates precomputation tables for Curve25519 and Ristretto255 used in cryptographic operations.
-- **[fd_ed25519.h](fd_ed25519.h.md)**: APIs for ED25519 signature computations, including key generation, signing, verification, and error handling.
-- **[fd_ed25519_user.c](fd_ed25519_user.c.md)**: Functions for Ed25519 key generation, signing, verification, and error handling based on RFC 8032.
-- **[fd_f25519.c](fd_f25519.c.md)**: Implements functions for arithmetic operations on the finite field F_25519, including exponentiation, inversion, and square root ratio computation.
-- **[fd_f25519.h](fd_f25519.h.md)**: Public field API for the base field of curve25519, including arithmetic operations and constants.
-- **[fd_ristretto255.c](fd_ristretto255.c.md)**: Functions for converting between byte arrays and Ristretto255 points, mapping and hashing to the Ristretto255 curve.
-- **[fd_ristretto255.h](fd_ristretto255.h.md)**: Public API for ristretto255 group elements, specifically for Solana VM syscall sol_curve_group_op.
-- **[fd_x25519.c](fd_x25519.c.md)**: Implements constant-time X25519 elliptic curve operations for secure key exchange.
-- **[fd_x25519.h](fd_x25519.h.md)**: API for X25519 ECDH key exchange, including key and shared secret derivation functions.
-- **[fuzz_ed25519_sigverify.c](fuzz_ed25519_sigverify.c.md)**: Fuzz testing for ED25519 signature verification using LLVM's libFuzzer.
-- **[fuzz_ed25519_sigverify_diff.c](fuzz_ed25519_sigverify_diff.c.md)**: Fuzz testing for verifying and signing ED25519 signatures using C and Rust implementations.
-- **[fuzz_ed25519_verify.c](fuzz_ed25519_verify.c.md)**: Fuzz testing for ED25519 signature verification using random data inputs.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for cryptographic operations in the fd_ballet module.
-- **[test_ed25519.c](test_ed25519.c.md)**: Tests for Ed25519 and Curve25519 cryptographic operations, including key generation, signing, verification, and field element arithmetic.
-- **[test_ed25519_cctv.c](test_ed25519_cctv.c.md)**: Contains test vectors for Ed25519 signature verification using a static array of structured test cases.
-- **[test_ed25519_signature_malleability.c](test_ed25519_signature_malleability.c.md)**: Tests Ed25519 signature malleability using predefined pass and fail binary data.
-- **[test_ed25519_wycheproof.c](test_ed25519_wycheproof.c.md)**: Test cases for verifying Ed25519 signatures using Wycheproof test vectors.
-- **[test_ristretto255.c](test_ristretto255.c.md)**: Tests for Ristretto255 point operations, including decompression, compression, addition, subtraction, and scalar multiplication.
-- **[test_x25519.c](test_x25519.c.md)**: Tests and benchmarks for X25519 key exchange and public key derivation using predefined test vectors.
-- **[test_x25519_wycheproof.c](test_x25519_wycheproof.c.md)**: Verifies X25519 key exchange using Wycheproof test vectors with structures for test data and results.
+- **[fd_curve25519.c](fd_curve25519.c.md)**: The `fd_curve25519.c` file in the `firedancer` codebase provides implementations for various operations on Curve25519, including point serialization/deserialization, scalar multiplication, and multi-scalar multiplication, with optimizations for secure and efficient computation.
+- **[fd_curve25519.h](fd_curve25519.h.md)**: The `fd_curve25519.h` file in the `firedancer` codebase provides the public API for Curve25519 operations, including point addition, doubling, subtraction, scalar multiplication, serialization, and validation, with support for both affine and precomputed formats.
+- **[fd_curve25519_scalar.c](fd_curve25519_scalar.c.md)**: The `fd_curve25519_scalar.c` file in the `firedancer` codebase implements functions for scalar operations on Curve25519, including scalar reduction, multiplication and addition, and windowed non-adjacent form (wNAF) conversion.
+- **[fd_curve25519_scalar.h](fd_curve25519_scalar.h.md)**: The `fd_curve25519_scalar.h` file provides the public API for Curve25519 scalar operations, including functions for reduction, validation, multiplication, addition, subtraction, negation, setting, conversion from 64-bit integers, inversion, and batch inversion, with a focus on non-constant time operations that should not be exposed to secret data.
+- **[fd_curve25519_secure.c](fd_curve25519_secure.c.md)**: The `fd_curve25519_secure.c` file in the `firedancer` codebase provides secure implementations of Curve25519 operations, ensuring constant-time execution and memory sanitization to protect sensitive data.
+- **[fd_curve25519_tables.c](fd_curve25519_tables.c.md)**: The `fd_curve25519_tables.c` file in the `firedancer` codebase is responsible for generating precomputation tables for Curve25519 and Ed25519 operations, which are stored in the `table/` directory, and includes functions for creating field constants, point constants, and various precomputed tables for cryptographic operations.
+- **[fd_ed25519.h](fd_ed25519.h.md)**: The `fd_ed25519.h` file in the `firedancer` codebase provides APIs for ED25519 signature computations, including functions for generating public keys from private keys, signing messages, verifying signatures, batch verification, and converting error codes to human-readable strings.
+- **[fd_ed25519_user.c](fd_ed25519_user.c.md)**: The `fd_ed25519_user.c` file in the `firedancer` codebase implements functions for generating public keys from private keys, signing messages, verifying signatures, and handling errors using the Ed25519 digital signature algorithm.
+- **[fd_f25519.c](fd_f25519.c.md)**: The `fd_f25519.c` file in the `firedancer` codebase provides implementations for various mathematical operations on the finite field F25519, including exponentiation, inversion, and computing square roots of ratios.
+- **[fd_f25519.h](fd_f25519.h.md)**: The `fd_f25519.h` file in the `firedancer` codebase provides the public API for operations on the base field of curve25519, including arithmetic operations, serialization, and vectorized computations, with a focus on constant-time operations for security.
+- **[fd_ristretto255.c](fd_ristretto255.c.md)**: The `fd_ristretto255.c` file in the `firedancer` codebase provides functions for working with Ristretto255 points, including converting points to and from byte arrays, mapping bytes to the Ristretto group, and hashing to the curve.
+- **[fd_ristretto255.h](fd_ristretto255.h.md)**: The `fd_ristretto255.h` file provides a public API for operations on ristretto255 group elements, specifically for use in the Solana virtual machine syscall `sol_curve_group_op`, ensuring stability across different backends.
+- **[fd_x25519.c](fd_x25519.c.md)**: The `fd_x25519.c` file in the `firedancer` codebase implements the X25519 elliptic curve Diffie-Hellman key exchange protocol, including constant-time scalar multiplication and public key exchange functions.
+- **[fd_x25519.h](fd_x25519.h.md)**: The `fd_x25519.h` file provides an API for performing X25519 Elliptic Curve Diffie-Hellman (ECDH) key exchange, including functions for generating public keys and computing shared secrets.
+- **[fuzz_ed25519_sigverify.c](fuzz_ed25519_sigverify.c.md)**: The `fuzz_ed25519_sigverify.c` file in the `firedancer` codebase implements a fuzzing test for verifying Ed25519 signatures, ensuring the correctness of signature generation and verification processes.
+- **[fuzz_ed25519_sigverify_diff.c](fuzz_ed25519_sigverify_diff.c.md)**: The `fuzz_ed25519_sigverify_diff.c` file in the `firedancer` codebase implements a fuzz testing framework to compare the signature verification and signing functions of C and Rust implementations of the Ed25519 algorithm.
+- **[fuzz_ed25519_verify.c](fuzz_ed25519_verify.c.md)**: The `fuzz_ed25519_verify.c` file in the `firedancer` codebase implements a fuzzer for testing the verification of random data using the Ed25519 signature scheme.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and fuzz tests for the `ed25519` module within the `ballet` directory.
+- **[test_ed25519.c](test_ed25519.c.md)**: The `test_ed25519.c` file in the `firedancer` codebase contains a comprehensive suite of tests for the Ed25519 cryptographic functions, including tests for field element operations, scalar operations, point validation, signature generation and verification, and batch verification, with additional tests for compliance with Wycheproof and CCTV test vectors.
+- **[test_ed25519_cctv.c](test_ed25519_cctv.c.md)**: The `test_ed25519_cctv.c` file in the `firedancer` codebase defines a data structure and initializes a set of test vectors for verifying the Ed25519 digital signature scheme, using a static constant array of test cases to ensure the correctness of signature verification implementations, with each test case containing fields such as a test case ID, message, signature, public key, and an expected verification result.
+- **[test_ed25519_signature_malleability.c](test_ed25519_signature_malleability.c.md)**: The `test_ed25519_signature_malleability.c` file tests the malleability of Ed25519 signatures by verifying that certain signatures should fail and others should pass using predefined binary data.
+- **[test_ed25519_wycheproof.c](test_ed25519_wycheproof.c.md)**: The `test_ed25519_wycheproof.c` file in the `firedancer` codebase contains a series of test cases for verifying Ed25519 signatures using data generated by `gen_wycheproofs.py`, with each test case including a message, signature, public key, and expected verification result.
+- **[test_ristretto255.c](test_ristretto255.c.md)**: The `test_ristretto255.c` file in the `firedancer` codebase contains tests for Ristretto255 point operations, including decompression, compression, addition, subtraction, scalar multiplication, and multi-scalar multiplication, as well as validation and benchmarking of these operations.
+- **[test_x25519.c](test_x25519.c.md)**: The `test_x25519.c` file in the `firedancer` codebase contains tests and benchmarks for the X25519 elliptic curve Diffie-Hellman key exchange implementation, including validation against test vectors and Wycheproof test cases.
+- **[test_x25519_wycheproof.c](test_x25519_wycheproof.c.md)**: The file `test_x25519_wycheproof.c` in the `firedancer` codebase defines a static dataset of test vectors for verifying the X25519 key exchange implementation against known test vectors from the Wycheproof project, using a data structure that includes fields for test case identifiers, comments, shared secrets, private and public keys, and expected outcomes, to ensure comprehensive testing of cryptographic operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

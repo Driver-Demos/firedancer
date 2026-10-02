@@ -3,20 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and headers for eBPF XDP programs, XDP socket management, and related unit tests.
+eBPF packet filters, AF_XDP socket management, GRE header injection, and tests.
 
 
 ## Files
-- **[fd_xdp1.c](fd_xdp1.c.md)**: Implements an eBPF program for packet classification in an XDP context, including installation and management of BPF maps and programs.
-- **[fd_xdp1.h](fd_xdp1.h.md)**: Header file for installing and managing BPF programs to filter UDP traffic on specified ports.
-- **[fd_xdp_license.h](fd_xdp_license.h.md)**: Defines the software license as "Apache-2.0".
-- **[fd_xdp_redirect_user.c](fd_xdp_redirect_user.c.md)**: Functions to activate and deactivate XDP sockets on Linux using BPF map operations.
-- **[fd_xdp_redirect_user.h](fd_xdp_redirect_user.h.md)**: Functions to activate and deactivate XSK file descriptors in an XDP redirect program's XSKMAP.
-- **[fd_xsk.c](fd_xsk.c.md)**: Functions for managing XDP socket (XSK) operations, including initialization, memory mapping, and cleanup.
-- **[fd_xsk.h](fd_xsk.h.md)**: Manages an XSK file descriptor for AF_XDP sockets, providing RX/TX buffers and memory management.
-- **[inject_gre_header.py](inject_gre_header.py.md)**: Injects GRE and inner IPv4 headers into packet data and processes multiple packet files.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for XDP components in the Firedancer project.
-- **[test_xdp_ebpf.c](test_xdp_ebpf.c.md)**: Unit tests for eBPF XDP programs using BPF_PROG_TEST_RUN mode on Linux.
+- **[fd_xdp1.c](fd_xdp1.c.md)**: Generates and installs an XDP eBPF packet filter for UDP and GRE traffic.
+- **[fd_xdp1.h](fd_xdp1.h.md)**: XDP BPF program generation and installation for UDP port filtering and XSK map setup.
+- **[fd_xdp_license.h](fd_xdp_license.h.md)**: The `fd_xdp_license.h` file defines the software license for the Firedancer project as "Apache-2.0".
+- **[fd_xdp_redirect_user.c](fd_xdp_redirect_user.c.md)**: The `fd_xdp_redirect_user.c` file in the `firedancer` codebase provides functions to activate and deactivate XDP sockets by updating and deleting elements in a BPF map on a Linux system.
+- **[fd_xdp_redirect_user.h](fd_xdp_redirect_user.h.md)**: The `fd_xdp_redirect_user.h` file in the `firedancer` codebase provides functions to activate and deactivate XSK file descriptors in an XDP redirect program's XSKMAP for network traffic management.
+- **[fd_xsk.c](fd_xsk.c.md)**: The `fd_xsk.c` file in the `firedancer` codebase implements functions for creating, configuring, and managing AF_XDP sockets on Linux systems with XDP support, including memory mapping and unmapping of XSK rings, setting up UMEM regions, and handling socket initialization and cleanup.
+- **[fd_xsk.h](fd_xsk.h.md)**: The `fd_xsk.h` file in the `firedancer` codebase provides definitions and functions for managing AF_XDP sockets, including handling RX/TX buffers and memory management for kernel-bypass networking on Linux systems.
+- **[inject_gre_header.py](inject_gre_header.py.md)**: Injects GRE and inner IPv4 headers into packet files.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects for building and testing components related to XDP and eBPF under certain conditions.
+- **[test_xdp_ebpf.c](test_xdp_ebpf.c.md)**: XDP eBPF unit tests for packet redirect and pass cases.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

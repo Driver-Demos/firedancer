@@ -3,56 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Parses and configures DNS resolver settings from `/etc/resolv.conf` into a `fd_resolvconf_t` structure.
+Parses resolv.conf options and nameserver entries into a resolver config.
 
 # Purpose
-The code defines a function [`fd_get_resolv_conf`](<#fd_get_resolv_conf>) that reads and parses the system's DNS resolver configuration from the `/etc/resolv.conf` file. It initializes a `fd_resolvconf_t` structure with default values for DNS query parameters such as `ndots`, `timeout`, and `attempts`. The function attempts to open and read the resolver configuration file, extracting options like `ndots`, `attempts`, and `timeout` from the "options" line, and collecting nameserver addresses from "nameserver" lines. If the file cannot be accessed or no nameservers are found, it defaults to using the local loopback address `127.0.0.1` as the nameserver.
+[`fd_get_resolv_conf`](<#fd_get_resolv_conf>) reads resolver settings from `/etc/resolv.conf` and stores them in an `fd_resolvconf_t` structure. It sets default values for `ndots`, `timeout`, and `attempts`, then parses the file for `options` and `nameserver` lines. The function accepts only valid, non-truncated lines, extracts `ndots`, `attempts`, and `timeout` values with upper limits, and converts each `nameserver` entry into an IP literal address.
 
-The function uses several utility functions and macros, such as `fd_io_fgets` for reading lines from the file and `fd_lookup_ipliteral` for interpreting IP addresses. It also handles potential errors during file operations, logging them using `FD_LOG_ERR`. The function is part of a broader system for managing DNS configurations, as indicated by its reliance on external utilities and logging mechanisms. The code is intended to be part of a larger application or library that requires DNS resolution capabilities.
-# Imports and Dependencies
-
----
-- `fd_lookup.h`
-- `ctype.h`
-- `errno.h`
-- `fcntl.h`
-- `unistd.h`
-- `string.h`
-- `stdlib.h`
-- `netinet/in.h`
-- `../../util/cstr/fd_cstr.h`
-- `../../util/log/fd_log.h`
-- `../../util/io/fd_io.h`
-- `fd_io_readline.h`
-
-
-# Functions
-
----
-### fd\_get\_resolv\_conf<!-- {{#callable:fd_get_resolv_conf}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_resolvconf.c#L14>)
-
-Parses the `/etc/resolv.conf` file to configure DNS resolver settings in the `fd_resolvconf_t` structure.
-- **Inputs**:
-    - `conf`: A pointer to an `fd_resolvconf_t` structure where the function will store the DNS resolver configuration.
-- **Logic and Control Flow**:
-    - Initialize default values for `ndots`, `timeout`, and `attempts` in the `conf` structure.
-    - Check if the file descriptor `fd_etc_resolv_conf_fd` is valid; if not, jump to `no_resolv_conf` label.
-    - Attempt to seek to the start of the file using `lseek`; log an error if it fails.
-    - Initialize a buffered input stream to read from the file descriptor.
-    - Read lines from the file using [`fd_io_fgets`](<fd_io_readline.c.md#fd_io_fgets>) until EOF or an error occurs.
-    - Ignore lines that do not end with a newline character to avoid misinterpretation.
-    - Parse lines starting with 'options' to extract `ndots`, `attempts`, and `timeout` values, updating the `conf` structure with these values if they are valid and within specified limits.
-    - Parse lines starting with 'nameserver' to extract IP addresses, storing them in the `conf->ns` array, up to a maximum defined by `MAXNS`.
-    - If no nameservers are found, default to using '127.0.0.1' as the nameserver.
-    - Set the `nns` field in the `conf` structure to the number of nameservers found.
-- **Output**: Returns 0 after processing the resolver configuration.
-- **Functions Called**:
-    - [`fd_io_fgets`](<fd_io_readline.c.md#fd_io_fgets>)
-    - [`fd_io_fgetc`](<fd_io_readline.c.md#fd_io_fgetc>)
-    - [`fd_lookup_ipliteral`](<fd_lookup_ipliteral.c.md#fd_lookup_ipliteral>)
-
-
+The code also handles the case where `/etc/resolv.conf` is not available or does not contain any usable name server entries. In that case, it adds `127.0.0.1` as the default name server. The file is a C source file that implements a resolver configuration loader for use by other code in the project, and it depends on internal I/O, logging, and address parsing helpers.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

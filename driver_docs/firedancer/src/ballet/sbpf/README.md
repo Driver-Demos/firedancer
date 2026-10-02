@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures, functions, and tests for handling, loading, and validating sBPF instructions and programs.
+SBPF instruction, opcode, ELF loader, test, and fuzzing utilities.
 
 
 ## Files
-- **[fd_sbpf_instr.h](fd_sbpf_instr.h.md)**: Defines data structures and functions for handling sBPF instructions and opcodes.
-- **[fd_sbpf_loader.c](fd_sbpf_loader.c.md)**: Implements an ELF loader for the sBPF virtual machine, including functions for parsing, validating, and relocating ELF files.
-- **[fd_sbpf_loader.h](fd_sbpf_loader.h.md)**: Header file for preparing sBPF programs for execution, including parsing, dynamic relocation, and error handling.
-- **[fd_sbpf_opcodes.h](fd_sbpf_opcodes.h.md)**: Defines macros and constants for constructing and using SBPF opcodes in the Firedancer project.
-- **[fuzz_sbpf_loader.c](fuzz_sbpf_loader.c.md)**: Fuzz testing for the SBPF loader with syscall handling and program loading validation.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and defining unit and fuzz tests for SBPF components.
-- **[test_sbpf_elf_peek.c](test_sbpf_elf_peek.c.md)**: Tests for verifying SBPF ELF version handling and parsing using various configurations and binaries.
-- **[test_sbpf_load_prog.c](test_sbpf_load_prog.c.md)**: A test program for loading and processing sBPF programs, with redundant functionality noted.
-- **[test_sbpf_loader.c](test_sbpf_loader.c.md)**: Tests for the SBPF loader, focusing on duplicate entry points and zero text count scenarios.
+- **[fd_sbpf_instr.h](fd_sbpf_instr.h.md)**: SBPF instruction and opcode bitfield definitions with pack, unpack, and start/end checks.
+- **[fd_sbpf_loader.c](fd_sbpf_loader.c.md)**: ELF parsing, validation, relocation, and loading for sBPF programs.
+- **[fd_sbpf_loader.h](fd_sbpf_loader.h.md)**: sBPF ELF parsing, relocation, program loading, and version feature checks.
+- **[fd_sbpf_opcodes.h](fd_sbpf_opcodes.h.md)**: The `fd_sbpf_opcodes.h` file in the `firedancer` codebase defines macros and constants for constructing and representing SBPF (Solana Berkeley Packet Filter) opcodes, including various classes, modes, and specific instruction opcodes.
+- **[fuzz_sbpf_loader.c](fuzz_sbpf_loader.c.md)**: Fuzzes SBPF program loading with a fixed syscall set.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, unit tests, and fuzz tests for the SBPF components, conditional on the `FD_HAS_HOSTED` flag.
+- **[test_sbpf_elf_peek.c](test_sbpf_elf_peek.c.md)**: Tests sbpf ELF version detection and strict parsing.
+- **[test_sbpf_load_prog.c](test_sbpf_load_prog.c.md)**: Loads an sBPF ELF, applies relocations, and writes the rodata segment.
+- **[test_sbpf_loader.c](test_sbpf_loader.c.md)**: Tests SBPF loader handling of duplicate entrypoint symbols and zero text sections.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

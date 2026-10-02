@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Utility methods, data structures, parsing, fuzz testing, and tests for Solana transactions and compact-u16 format.
+Compact-u16 utilities, transaction parsing and structures, fuzzing, and tests.
 
 
 ## Files
-- **[fd_compact_u16.h](fd_compact_u16.h.md)**: Utility methods for encoding and decoding Solana's compact-u16 format for unsigned 16-bit numbers.
-- **[fd_txn.h](fd_txn.h.md)**: Defines data structures and functions for representing and parsing Solana transactions, including instructions, account addresses, and transaction properties.
-- **[fd_txn_parse.c](fd_txn_parse.c.md)**: Parses Solana transaction payloads with safety checks and updates transaction structures.
-- **[fuzz_txn_parse.c](fuzz_txn_parse.c.md)**: Fuzz testing for transaction parsing with initialization and input handling functions.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit and fuzz tests for transaction parsing.
-- **[test_compact_u16.c](test_compact_u16.c.md)**: Tests the decoding function `fd_cu16_dec` for correctness and domain validation against encoding.
-- **[test_txn.c](test_txn.c.md)**: Tests for transaction account categories and size calculations in the Firedancer codebase.
-- **[test_txn_parse.c](test_txn_parse.c.md)**: Tests for transaction parsing correctness, mutation, and performance using various transaction fixtures.
+- **[fd_compact_u16.h](fd_compact_u16.h.md)**: The `fd_compact_u16.h` file declares utility methods for encoding and decoding the compact-u16 format used in Solana transactions, providing functions for reading, validating, and encoding 16-bit unsigned integers in a variable-length format.
+- **[fd_txn.h](fd_txn.h.md)**: The `fd_txn.h` file in the `firedancer` codebase defines the structure and functions for handling Solana transactions, including transaction components like instructions, account addresses, and address lookup tables, as well as utilities for parsing and analyzing these transactions.
+- **[fd_txn_parse.c](fd_txn_parse.c.md)**: The `fd_txn_parse.c` file in the `firedancer` codebase implements a function to parse Solana transaction payloads, ensuring safety and correctness through a series of checks and validations.
+- **[fuzz_txn_parse.c](fuzz_txn_parse.c.md)**: The `fuzz_txn_parse.c` file in the `firedancer` codebase implements a fuzzing test for transaction parsing, ensuring that the transaction data is correctly parsed and meets certain size constraints.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and conditional fuzz tests for the transaction parsing component in the `ballet/txn` directory.
+- **[test_compact_u16.c](test_compact_u16.c.md)**: The `test_compact_u16.c` file in the `firedancer` codebase tests the decoding function `fd_cu16_dec` to ensure it is the inverse of the encoding function for 16-bit unsigned integers, verifying its injective and surjective properties within its domain.
+- **[test_txn.c](test_txn.c.md)**: The `test_txn.c` file in the `firedancer` codebase contains tests for transaction structures, including account category iteration and validation of transaction size constraints.
+- **[test_txn_parse.c](test_txn_parse.c.md)**: The `test_txn_parse.c` file in the `firedancer` codebase contains tests for parsing and validating various transaction binaries, including correctness, mutation, and performance tests, using the `fd_txn_parse` function.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

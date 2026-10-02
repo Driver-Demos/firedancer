@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Styles and scripts for AG Grid components, UI rendering, data visualization, and state management.
+React dashboard and AG Grid assets with CSS theme styles and JS UI helpers
 
 
 ## Files
-- **[index-_St8gGTN.css](index-_St8gGTN.css.md)**: Defines styles for AG Grid components using CSS variables for themes, layout, and responsive design.
-- **[index-BNE2PWJE.js](index-BNE2PWJE.js.md)**: Integrates functionalities for UI rendering, data visualization, state management, and routing in web applications.
-- **[index-Cp1rgQgi.css](index-Cp1rgQgi.css.md)**: Defines custom properties and styles for a web application, supporting theming, responsiveness, and UI components.
-- **[index-nbedvaiz.js](index-nbedvaiz.js.md)**: Integrates with AG Grid to manage data grids, including drag-and-drop, filtering, pagination, and event handling.
+- **[index-_St8gGTN.css](index-_St8gGTN.css.md)**: Sets Quartz AG Grid theme variables and styles for layout, icons, menus, filters, and rows.
+- **[index-BNE2PWJE.js](index-BNE2PWJE.js.md)**: Provides React UI, router, chart, state, and data validation helpers for a Solana dashboard.
+- **[index-Cp1rgQgi.css](index-Cp1rgQgi.css.md)**: Provides Radix Themes tokens, component styles, and responsive utility classes.
+- **[index-nbedvaiz.js](index-nbedvaiz.js.md)**: Implements AG Grid core services, APIs, and a React table view.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
