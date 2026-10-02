@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components related to `fd_pod` and `fd_util`.
+The `Local.mk` file in the `firedancer` codebase specifies build instructions for headers, objects, unit tests, binaries, and test scripts related to the `fd_pod` and `fd_util` components.
 
 # Purpose
-The Makefile content defines build and test instructions for a software project. It adds header files `fd_pod.h` and `fd_pod_format.h` to the build process using the `add-hdrs` function. It compiles object files for `fd_pod` and `fd_util` with the `add-objs` function. The `make-unit-test` function creates a unit test named `test_pod` using `fd_util`. The `make-bin` function builds an executable named `fd_pod_ctl` using `fd_util`. The `add-test-scripts` function includes test scripts for `test_pod_ctl`, and the `run-unit-test` function executes the `test_pod` unit test.
+This Makefile snippet is used to automate the build process for a software project. It defines rules to add header files (`fd_pod.h`, `fd_pod_format.h`), compile object files (`fd_pod`, `fd_util`), create a unit test (`test_pod`), build a binary (`fd_pod_ctl`), add test scripts (`test_pod_ctl`), and execute the unit test (`test_pod`).
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
