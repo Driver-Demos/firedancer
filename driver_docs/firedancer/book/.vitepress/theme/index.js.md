@@ -3,15 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Imports and exports the default VitePress theme with custom CSS.
+The `index.js` file in the `firedancer` codebase sets up the default theme for a VitePress site and imports custom CSS styling.
 
 # Purpose
-The code imports the default theme from `vitepress` and a custom CSS file named `custom.css`. It then exports the `DefaultTheme` as the default export of the module. This code provides narrow functionality by customizing the appearance of a VitePress site through CSS while maintaining the default theme settings. It acts as a configuration file for styling purposes in a VitePress project.
+This code is a configuration file for a VitePress project, which is a static site generator powered by Vite. It imports the default theme from VitePress and applies custom styles through an external CSS file named `custom.css`. The file exports the `DefaultTheme`, indicating that it is intended to customize the appearance of a VitePress site by extending or modifying the default theme with additional styles. This code provides narrow functionality focused on theming and styling, rather than broader application logic or functionality.
 # Imports and Dependencies
 
 ---
 - `vitepress/theme`
-- `./custom.css`
 
 
 

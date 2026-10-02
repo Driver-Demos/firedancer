@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fuzz testing for `fd_h2` connection-level APIs to find crashes, spinloops, and other bugs.
+The `fuzz_h2.c` file in the `firedancer` codebase implements a fuzz testing framework for the `fd_h2` connection-level APIs, aiming to identify crashes, spinloops, and other bugs.
 
 # Purpose
-The code in `fuzz_h2.c` is a fuzz testing suite for the `fd_h2` connection-level APIs. It is designed to identify potential issues such as crashes, spin loops, and other bugs in the HTTP/2 connection handling logic. The code initializes a testing context with structures for connection, stream, and transmission operations, and it uses a set of callback functions to simulate various HTTP/2 events and states. These callbacks handle stream creation, querying, connection establishment, finalization, headers processing, data reception, stream resets, and window updates.
+The provided C source code file, `fuzz_h2.c`, is designed to test the robustness and reliability of HTTP/2 connection-level APIs, specifically those defined in the `fd_h2` library. The primary purpose of this file is to identify potential issues such as crashes, infinite loops, and other bugs within the HTTP/2 connection handling logic. It achieves this by simulating various HTTP/2 operations and monitoring the system's response to these operations. The code is structured to work with a fuzzing framework, as indicated by the presence of functions like [`LLVMFuzzerInitialize`](#llvmfuzzerinitialize) and [`LLVMFuzzerTestOneInput`](#llvmfuzzertestoneinput), which are typical entry points for fuzz testing.
 
-The [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>) function is the main entry point for the fuzzing process. It initializes the testing context, sets up random number generation, and simulates HTTP/2 client or server connections based on a seed value. The function processes input data in chunks, simulating the reception and transmission of HTTP/2 frames. It uses the `fd_h2` API to manage the connection state and invoke the appropriate callbacks. The function checks for conditions that indicate a successful test, such as ensuring that all streams are closed and the connection is finalized correctly. The code is intended to be used with a fuzzing framework like LLVM's libFuzzer to automate the testing process and uncover edge cases in the HTTP/2 implementation.
+The file includes several callback functions that handle different HTTP/2 events, such as stream creation, connection establishment, and data reception. These callbacks are registered in a `fd_h2_callbacks_t` structure, which is used during the fuzzing process to simulate real-world HTTP/2 interactions. The code also manages internal state through structures like `fuzz_h2_ctx_t`, which encapsulates the context for a single fuzzing session, including buffers and connection objects. Additionally, the code uses random number generation to introduce variability in the test inputs, further enhancing the fuzzing process's effectiveness. Overall, this file is a specialized tool for testing and validating the stability of HTTP/2 connection handling in the `fd_h2` library.
 # Imports and Dependencies
 
 ---
@@ -22,311 +22,285 @@ The [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>) function is the main e
 
 ---
 ### fuzz\_h2\_ctx\_t
-- **Type**: `static FD_TL fuzz_h2_ctx_t`
-- **Description**: Represents a global context structure for handling HTTP/2 connections and streams in the fuzzing process. It contains buffers, connection, stream, and transmission operation structures necessary for managing HTTP/2 communication.
-- **Use**: Used to maintain and manipulate the state of HTTP/2 connections and streams during fuzz testing.
+- **Type**: `struct fuzz_h2_ctx`
+- **Description**: The `fuzz_h2_ctx_t` is a structure that encapsulates various components necessary for managing an HTTP/2 connection in a fuzz testing environment. It includes a transmission buffer (`rbuf_tx`), a connection object (`conn`), a stream object (`stream`), and a transmission operation object (`tx_op`). These components are used to simulate and test the behavior of HTTP/2 connections under various conditions.
+- **Use**: This variable is used to maintain the state and manage operations of an HTTP/2 connection during fuzz testing, allowing the program to simulate different scenarios and detect potential issues.
 
 
 ---
 ### fd\_rng\_t
-- **Type**: ``fd_rng_t``
-- **Description**: Represents a random number generator instance used in the fuzzing process. It is defined as a static array of one element, `g_rng`, which is initialized and used to generate random numbers during the execution of the fuzzing tests.
-- **Use**: Used to initialize and manage a random number generator for generating random values in the fuzzing tests.
+- **Type**: `fd_rng_t`
+- **Description**: The `fd_rng_t` type is a data structure used for random number generation. It is part of the Fast Data (FD) library, which provides utilities for high-performance computing. This specific instance, `g_rng`, is a global array of one `fd_rng_t` object, used to maintain the state of the random number generator.
+- **Use**: The `g_rng` variable is used to initialize and manage the state of a random number generator for the fuzzing operations in the program.
 
 
 ---
 ### g\_stream\_cnt
-- **Type**: ``long``
-- **Description**: Counts the number of active streams in the HTTP/2 connection context. It is used to detect unbalanced callbacks, which can indicate a stream leak.
-- **Use**: Increments when a new stream is created and decrements when a stream is closed or reset.
+- **Type**: `long`
+- **Description**: The `g_stream_cnt` is a static thread-local global variable of type `long` that tracks the number of active HTTP/2 streams in the fuzzing context. It is used to detect stream leaks by ensuring that stream creation and closure are balanced.
+- **Use**: `g_stream_cnt` is incremented when a new stream is created and decremented when a stream is closed, helping to ensure that all streams are properly managed and closed.
 
 
 ---
 ### g\_conn\_final\_cnt
-- **Type**: ``long``
-- **Description**: Counts the number of times a connection has reached its final state in the HTTP/2 fuzz testing context. It is incremented in the `cb_conn_final` callback function when a connection is finalized.
-- **Use**: Tracks the number of finalized connections to ensure proper connection lifecycle management during fuzz testing.
+- **Type**: `long`
+- **Description**: The `g_conn_final_cnt` is a static thread-local long integer variable that counts the number of times a connection has been finalized in the fuzzing process of HTTP/2 connections. It is incremented in the `cb_conn_final` callback function, which is triggered when a connection is finalized.
+- **Use**: This variable is used to track the number of finalized connections to ensure that the connection lifecycle is correctly managed during fuzz testing.
 
 
 ---
 ### fuzz\_h2\_cb
-- **Type**: ``fd_h2_callbacks_t``
-- **Description**: Defines a set of callback functions for handling HTTP/2 connection and stream events. These callbacks include functions for stream creation, querying, connection establishment, finalization, handling headers and data, resetting streams, and updating window sizes.
-- **Use**: Used to provide specific implementations for handling various HTTP/2 protocol events during fuzz testing.
+- **Type**: `fd_h2_callbacks_t`
+- **Description**: The `fuzz_h2_cb` is a static instance of the `fd_h2_callbacks_t` structure, which is used to define a set of callback functions for handling various HTTP/2 events. These callbacks include functions for stream creation, querying, connection establishment, finalization, handling headers, data, reset streams, and window updates.
+- **Use**: This variable is used to provide the necessary callback functions to the HTTP/2 connection handling logic, allowing it to respond to different events during the fuzz testing process.
 
 
 # Data Structures
 
 ---
 ### fuzz\_h2\_ctx
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `rbuf_tx`: An array of one `fd_h2_rbuf_t` structure for transmit buffer management.
-    - `conn`: An array of one `fd_h2_conn_t` structure for managing HTTP/2 connection state.
-    - `stream`: An array of one `fd_h2_stream_t` structure for managing HTTP/2 stream state.
-    - `tx_op`: An array of one `fd_h2_tx_op_t` structure for managing transmit operations.
-- **Description**: Contains arrays of structures that manage the state and operations of an HTTP/2 connection, including transmit buffers, connection state, stream state, and transmit operations.
+    - `rbuf_tx`: An array of one fd_h2_rbuf_t structure, representing the transmission buffer for HTTP/2 operations.
+    - `conn`: An array of one fd_h2_conn_t structure, representing the HTTP/2 connection context.
+    - `stream`: An array of one fd_h2_stream_t structure, representing the HTTP/2 stream context.
+    - `tx_op`: An array of one fd_h2_tx_op_t structure, representing the transmission operation context for HTTP/2.
+- **Description**: The `fuzz_h2_ctx` structure is designed to encapsulate the context required for fuzz testing HTTP/2 connection-level APIs. It includes buffers and contexts for managing HTTP/2 connections, streams, and transmission operations, facilitating the testing of various scenarios to identify potential crashes or bugs in the HTTP/2 implementation.
 
 
 ---
 ### fuzz\_h2\_ctx\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``rbuf_tx``: An array of one `fd_h2_rbuf_t` structure for transmission buffer management.
-    - ``conn``: An array of one `fd_h2_conn_t` structure representing the connection.
-    - ``stream``: An array of one `fd_h2_stream_t` structure representing the stream.
-    - ``tx_op``: An array of one `fd_h2_tx_op_t` structure for transmission operations.
-- **Description**: Defines a context structure for fuzz testing HTTP/2 connections, containing buffers, connection, stream, and transmission operation structures to manage and test the connection-level APIs for potential issues.
+    - `rbuf_tx`: An array of one fd_h2_rbuf_t structure used for transmission buffering.
+    - `conn`: An array of one fd_h2_conn_t structure representing the connection context.
+    - `stream`: An array of one fd_h2_stream_t structure representing the stream context.
+    - `tx_op`: An array of one fd_h2_tx_op_t structure used for transmission operations.
+- **Description**: The `fuzz_h2_ctx_t` structure is designed to encapsulate the context required for fuzz testing HTTP/2 connection-level APIs. It includes buffers for transmission, a connection context, a stream context, and operations for managing transmission. This structure is used to simulate and test various scenarios in HTTP/2 communication, ensuring robustness against crashes, spinloops, and other potential bugs.
 
 
 # Functions
 
 ---
 ### test\_response\_continue<!-- {{#callable:test_response_continue}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L33>)
-
-Checks if the current stream has a valid ID, copies a transmission operation, and cleans up resources if the stream is closed.
+The `test_response_continue` function checks if a stream is active and performs a copy operation, then cleans up if the stream is closed.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Checks if `g_ctx.stream->stream_id` is zero; if true, exits the function.
-    - Calls [`fd_h2_tx_op_copy`](<fd_h2_tx.c.md#fd_h2_tx_op_copy>) to copy the transmission operation from `g_ctx.conn`, `g_ctx.stream`, and `g_ctx.rbuf_tx` to `g_ctx.tx_op`.
-    - Checks if `g_ctx.stream->state` is `FD_H2_STREAM_STATE_CLOSED`; if true, decrements `g_stream_cnt`, and clears `g_ctx.tx_op` and `g_ctx.stream` using `memset`.
-- **Output**: No output is returned.
-- **Functions Called**:
-    - [`fd_h2_tx_op_copy`](<fd_h2_tx.c.md#fd_h2_tx_op_copy>)
+- **Control Flow**:
+    - Check if the current stream's ID is non-zero; if zero, exit the function.
+    - Call [`fd_h2_tx_op_copy`](fd_h2_tx.c.md#fd_h2_tx_op_copy) to copy transmission operation data from the context's connection, stream, and transmission buffer to the transmission operation.
+    - Check if the stream's state is `FD_H2_STREAM_STATE_CLOSED`.
+    - If the stream is closed, decrement the global stream count `g_stream_cnt`.
+    - Clear the transmission operation and stream data using `memset`.
+- **Output**: The function does not return any value.
+- **Functions called**:
+    - [`fd_h2_tx_op_copy`](fd_h2_tx.c.md#fd_h2_tx_op_copy)
 
 
 ---
 ### test\_response\_init<!-- {{#callable:test_response_init}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L44>)
-
-Initializes an HTTP/2 response by sending a headers frame and preparing a transmission operation.
+The `test_response_init` function initializes an HTTP/2 response by sending a status header and preparing a transmission operation for a given stream.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection. It is not used in the function.
-    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream for which the response is initialized.
-- **Logic and Control Flow**:
-    - Ignore the `conn` parameter as it is not used in the function.
-    - Retrieve the `stream_id` from the `stream` parameter.
-    - Access the global transmission buffer `rbuf_tx` from `g_ctx`.
-    - Define an HPACK-encoded header array `hpack` with a status code of 200.
-    - Call [`fd_h2_tx`](<fd_h2_conn.h.md#fd_h2_tx>) to send a headers frame with the `hpack` data, setting the `FD_H2_FLAG_END_HEADERS` flag and using the `stream_id`.
-    - Access the global transmission operation `tx_op` from `g_ctx`.
-    - Initialize `tx_op` with the message "Ok", a length of 2, and the `FD_H2_FLAG_END_STREAM` flag using `fd_h2_tx_op_init`.
-    - Call [`test_response_continue`](<#test_response_continue>) to proceed with the response handling.
-- **Output**: No direct output is returned from the function.
-- **Functions Called**:
-    - [`fd_h2_tx`](<fd_h2_conn.h.md#fd_h2_tx>)
-    - [`test_response_continue`](<#test_response_continue>)
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection; it is not used in the function.
+    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream for which the response is being initialized.
+- **Control Flow**:
+    - The function begins by ignoring the `conn` parameter and retrieves the `stream_id` from the `stream` parameter.
+    - It sets up a buffer `rbuf_tx` from the global context `g_ctx` to prepare for transmission.
+    - A header array `hpack` is defined with a single value representing the HTTP/2 status code 200.
+    - The [`fd_h2_tx`](fd_h2_conn.h.md#fd_h2_tx) function is called to send the `hpack` header as a HEADERS frame with the END_HEADERS flag for the specified `stream_id`.
+    - A transmission operation `tx_op` is initialized from the global context `g_ctx` with the message "Ok", a length of 2, and the END_STREAM flag using `fd_h2_tx_op_init`.
+    - The function calls [`test_response_continue`](#test_response_continue) to proceed with any further response handling.
+- **Output**: The function does not return any value; it performs operations to initialize and send an HTTP/2 response for a given stream.
+- **Functions called**:
+    - [`fd_h2_tx`](fd_h2_conn.h.md#fd_h2_tx)
+    - [`test_response_continue`](#test_response_continue)
 
 
 ---
 ### cb\_stream\_create<!-- {{#callable:cb_stream_create}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L59>)
-
-Creates a new HTTP/2 stream if no stream currently exists in the global context.
+The `cb_stream_create` function initializes a new HTTP/2 stream if no stream is currently active and returns a pointer to it.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
-    - `stream_id`: An unsigned integer representing the stream identifier.
-- **Logic and Control Flow**:
-    - Check if `g_ctx.stream->stream_id` is non-zero, indicating an existing stream; if so, return `NULL`.
-    - Initialize the stream using `fd_h2_stream_init` with `g_ctx.stream`.
-    - Increment the global stream count `g_stream_cnt`.
-    - Return the pointer to the newly initialized stream `g_ctx.stream`.
-- **Output**: Returns a pointer to the newly created `fd_h2_stream_t` if successful, or `NULL` if a stream already exists.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
+    - `stream_id`: An unsigned integer representing the ID of the stream to be created.
+- **Control Flow**:
+    - The function begins by casting the `conn` and `stream_id` parameters to void to indicate they are unused.
+    - It checks if the global context's stream (`g_ctx.stream`) already has a non-zero `stream_id`.
+    - If a stream is already active (`stream_id` is non-zero), the function returns `NULL`, indicating that a new stream cannot be created.
+    - If no stream is active, it initializes the stream using `fd_h2_stream_init` and increments the global stream count `g_stream_cnt`.
+    - Finally, it returns a pointer to the newly initialized stream (`g_ctx.stream`).
+- **Output**: A pointer to the newly created `fd_h2_stream_t` structure if successful, or `NULL` if a stream is already active.
 
 
 ---
 ### cb\_stream\_query<!-- {{#callable:cb_stream_query}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L71>)
-
-Queries the current stream in the global context to check if it matches the given stream ID.
+The `cb_stream_query` function checks if a given stream ID matches the current stream's ID in the global context and returns the stream if it matches, otherwise returns NULL.
 - **Inputs**:
     - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
-    - `stream_id`: An unsigned integer representing the stream ID to query.
-- **Logic and Control Flow**:
-    - Assert that the `conn` parameter is equal to the global context connection `g_ctx.conn`.
-    - Check if the stream ID of the global context stream `g_ctx.stream` is not equal to the provided `stream_id`.
-    - If the stream IDs do not match, return `NULL`.
-    - If the stream IDs match, return the global context stream `g_ctx.stream`.
-- **Output**: Returns a pointer to the `fd_h2_stream_t` structure if the stream ID matches, otherwise returns `NULL`.
+    - `stream_id`: An unsigned integer representing the ID of the stream to query.
+- **Control Flow**:
+    - Assert that the provided connection pointer `conn` is the same as the global context's connection `g_ctx.conn`.
+    - Check if the stream ID of the global context's stream `g_ctx.stream->stream_id` is equal to the provided `stream_id`.
+    - If the stream IDs do not match, return NULL.
+    - If the stream IDs match, return the stream from the global context `g_ctx.stream`.
+- **Output**: Returns a pointer to the `fd_h2_stream_t` structure if the stream ID matches, otherwise returns NULL.
 
 
 ---
 ### cb\_conn\_established<!-- {{#callable:cb_conn_established}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L79>)
-
-Verifies that the connection pointer `conn` matches the global context connection `g_ctx.conn`.
+The `cb_conn_established` function asserts that the provided connection is the same as the global context connection and then returns.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection to be verified.
-- **Logic and Control Flow**:
-    - Use the `assert` function to check if the `conn` pointer is equal to `g_ctx.conn`.
-    - Return from the function after the assertion.
-- **Output**: No output is produced; the function performs an assertion check and returns void.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection that has been established.
+- **Control Flow**:
+    - The function begins by asserting that the `conn` argument is equal to the global context's connection `g_ctx.conn`.
+    - After the assertion, the function immediately returns without performing any additional operations.
+- **Output**: The function does not produce any output or return any value; it simply performs an assertion check and returns.
 
 
 ---
 ### cb\_conn\_final<!-- {{#callable:cb_conn_final}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L85>)
-
-Handles the finalization of an HTTP/2 connection by resetting stream count and incrementing a finalization counter.
+The `cb_conn_final` function finalizes an HTTP/2 connection by resetting the stream count and incrementing the connection finalization count.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
+    - `conn`: A pointer to the `fd_h2_conn_t` structure representing the HTTP/2 connection to be finalized.
     - `h2_err`: An unsigned integer representing the HTTP/2 error code, which is not used in this function.
     - `closed_by`: An integer indicating who closed the connection, expected to be either 0 or 1.
-- **Logic and Control Flow**:
-    - Asserts that the `conn` pointer is equal to `g_ctx.conn` to ensure the correct connection context.
-    - Asserts that `closed_by` is either 0 or 1 to validate the input.
-    - Ignores the `h2_err` parameter as it is not used in the function.
-    - Sets the global stream count `g_stream_cnt` to 0, indicating no active streams.
-    - Increments the global connection finalization counter `g_conn_final_cnt` by 1.
-- **Output**: No output is returned as the function's return type is `void`.
+- **Control Flow**:
+    - The function asserts that the `conn` pointer matches the global context connection `g_ctx.conn`.
+    - It asserts that `closed_by` is either 0 or 1, ensuring valid input.
+    - The `h2_err` parameter is explicitly ignored using a cast to void.
+    - The global stream count `g_stream_cnt` is reset to 0, indicating no active streams.
+    - The global connection finalization count `g_conn_final_cnt` is incremented by 1, tracking the number of times a connection has been finalized.
+- **Output**: The function does not return any value; it is a `void` function.
 
 
 ---
 ### cb\_headers<!-- {{#callable:cb_headers}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L97>)
-
-Processes HTTP/2 headers from a data stream and handles errors or stream completion.
+The `cb_headers` function processes HTTP/2 headers from a data stream, handling errors and potentially initiating a response if the end of the stream is indicated.
 - **Inputs**:
-    - `conn`: A pointer to the `fd_h2_conn_t` structure representing the HTTP/2 connection.
-    - `stream`: A pointer to the `fd_h2_stream_t` structure representing the HTTP/2 stream.
-    - `data`: A pointer to the data buffer containing the headers to be processed.
-    - `data_sz`: The size of the data buffer in bytes.
-    - `flags`: Flags indicating specific conditions or states, such as `FD_H2_FLAG_END_STREAM`.
-- **Logic and Control Flow**:
-    - Initialize an HPACK reader with the provided data and size using `fd_hpack_rd_init`.
-    - Enter a loop that continues until [`fd_hpack_rd_done`](<fd_hpack.h.md#fd_hpack_rd_done>) returns true, indicating all headers are processed.
-    - Within the loop, allocate a static buffer `scratch_buf` for temporary storage and set `scratch` to point to it.
-    - Attempt to read the next header using [`fd_hpack_rd_next`](<fd_hpack.c.md#fd_hpack_rd_next>), passing the HPACK reader, a header structure, and the scratch buffer.
-    - If an error occurs during header reading (`err` is non-zero), call [`fd_h2_conn_error`](<fd_h2_conn.h.md#fd_h2_conn_error>) with the connection and error code, then return.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
+    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream.
+    - `data`: A constant pointer to the data buffer containing the HTTP/2 headers to be processed.
+    - `data_sz`: An unsigned long representing the size of the data buffer.
+    - `flags`: An unsigned long representing flags that may include `FD_H2_FLAG_END_STREAM` to indicate the end of the stream.
+- **Control Flow**:
+    - Initialize an `fd_hpack_rd_t` structure for reading HPACK-encoded headers from the data buffer.
+    - Enter a loop that continues until all headers are read from the `hpack_rd` structure.
+    - Within the loop, allocate a static buffer `scratch_buf` for temporary storage and attempt to read the next header using [`fd_hpack_rd_next`](fd_hpack.c.md#fd_hpack_rd_next).
+    - If an error occurs during header reading, call [`fd_h2_conn_error`](fd_h2_conn.h.md#fd_h2_conn_error) with the connection and error code, then return immediately.
     - After processing all headers, check if the `FD_H2_FLAG_END_STREAM` flag is set in `flags`.
-    - If the flag is set, call [`test_response_init`](<#test_response_init>) to initialize a response for the stream.
-- **Output**: No direct output is returned, but the function may modify the connection or stream state and initiate a response if the end of the stream is reached.
-- **Functions Called**:
-    - [`fd_hpack_rd_done`](<fd_hpack.h.md#fd_hpack_rd_done>)
-    - [`fd_hpack_rd_next`](<fd_hpack.c.md#fd_hpack_rd_next>)
-    - [`fd_h2_conn_error`](<fd_h2_conn.h.md#fd_h2_conn_error>)
-    - [`test_response_init`](<#test_response_init>)
+    - If the end of the stream is indicated, call [`test_response_init`](#test_response_init) to initiate a response.
+- **Output**: The function does not return a value; it performs operations on the connection and stream based on the headers processed.
+- **Functions called**:
+    - [`fd_hpack_rd_done`](fd_hpack.h.md#fd_hpack_rd_done)
+    - [`fd_hpack_rd_next`](fd_hpack.c.md#fd_hpack_rd_next)
+    - [`fd_h2_conn_error`](fd_h2_conn.h.md#fd_h2_conn_error)
+    - [`test_response_init`](#test_response_init)
 
 
 ---
 ### cb\_data<!-- {{#callable:cb_data}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L121>)
-
-Handles data callback for an HTTP/2 connection and initiates a response if the end of the stream is flagged.
+The `cb_data` function processes incoming data for an HTTP/2 stream and initiates a response if the data marks the end of the stream.
 - **Inputs**:
-    - `conn`: A pointer to the `fd_h2_conn_t` structure representing the HTTP/2 connection.
-    - `stream`: A pointer to the `fd_h2_stream_t` structure representing the HTTP/2 stream.
-    - `data`: A pointer to the data received, though it is not used in this function.
-    - `data_sz`: The size of the data received, though it is not used in this function.
-    - `flags`: Flags associated with the data, used to check if the end of the stream is reached.
-- **Logic and Control Flow**:
-    - Asserts that the `conn` pointer is equal to the global connection context `g_ctx.conn`.
-    - Ignores the `stream`, `data`, `data_sz`, and `flags` parameters using `(void)` casting.
-    - Checks if the `flags` parameter has the `FD_H2_FLAG_END_STREAM` flag set.
-    - If the end of the stream flag is set, calls [`test_response_init`](<#test_response_init>) with `conn` and `stream` as arguments.
-- **Output**: No output is returned from this function.
-- **Functions Called**:
-    - [`test_response_init`](<#test_response_init>)
+    - `conn`: A pointer to the HTTP/2 connection object (`fd_h2_conn_t`).
+    - `stream`: A pointer to the HTTP/2 stream object (`fd_h2_stream_t`).
+    - `data`: A pointer to the data received (void pointer).
+    - `data_sz`: The size of the data received (unsigned long).
+    - `flags`: Flags associated with the data, indicating specific conditions or states (unsigned long).
+- **Control Flow**:
+    - The function asserts that the connection (`conn`) is the same as the global context connection (`g_ctx.conn`).
+    - The function ignores the `stream`, `data`, `data_sz`, and `flags` parameters by casting them to void, indicating they are unused in the current implementation.
+    - It checks if the `flags` parameter has the `FD_H2_FLAG_END_STREAM` flag set, which indicates the end of the stream.
+    - If the end of the stream is detected, it calls [`test_response_init`](#test_response_init) to initiate a response for the stream.
+- **Output**: The function does not return any value; it is a void function.
+- **Functions called**:
+    - [`test_response_init`](#test_response_init)
 
 
 ---
 ### cb\_rst\_stream<!-- {{#callable:cb_rst_stream}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L135>)
-
-Resets the HTTP/2 stream context and decrements the stream count when a stream reset occurs.
+The `cb_rst_stream` function resets a stream by clearing its data and decrementing the global stream count.
 - **Inputs**:
-    - `conn`: A pointer to the `fd_h2_conn_t` connection object, which must match the global context connection.
+    - `conn`: A pointer to the `fd_h2_conn_t` connection object, which should match the global context connection.
     - `stream`: A pointer to the `fd_h2_stream_t` stream object, which is not used in the function.
     - `error_code`: An unsigned integer representing the error code, which is not used in the function.
-    - `closed_by`: An integer indicating who closed the stream, expected to be 0 or 1.
-- **Logic and Control Flow**:
-    - Ignore `stream` and `error_code` parameters as they are not used in the function.
-    - Assert that the `conn` parameter matches the global context connection `g_ctx.conn`.
-    - Assert that `closed_by` is either 0 or 1.
-    - Reset the global context stream `g_ctx.stream` by setting its memory to zero.
-    - Decrement the global stream count `g_stream_cnt`.
-- **Output**: No output is returned from this function.
+    - `closed_by`: An integer indicating who closed the stream, expected to be either 0 or 1.
+- **Control Flow**:
+    - The function begins by asserting that the provided connection matches the global context connection.
+    - It asserts that the `closed_by` parameter is either 0 or 1.
+    - The function then clears the global context's stream data using `memset`.
+    - Finally, it decrements the global stream count `g_stream_cnt`.
+- **Output**: The function does not return any value.
 
 
 ---
 ### cb\_window\_update<!-- {{#callable:cb_window_update}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L148>)
-
-Does nothing and returns immediately.
+The `cb_window_update` function is a placeholder callback for handling HTTP/2 window update events, but it currently performs no operations.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure, representing the connection.
-    - `increment`: An unsigned integer representing the increment value for the window update.
-- **Logic and Control Flow**:
-    - The function takes two parameters: `conn` and `increment`, but does not use them.
-    - The function body contains only a return statement, indicating no operations are performed.
-- **Output**: No output is produced as the function returns immediately without performing any operations.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
+    - `increment`: An unsigned integer representing the window size increment.
+- **Control Flow**:
+    - The function takes two parameters, `conn` and `increment`, but does not use them.
+    - Both parameters are explicitly marked as unused with `(void)` casts to avoid compiler warnings.
+    - The function immediately returns without performing any operations.
+- **Output**: The function does not produce any output or side effects.
 
 
 ---
 ### cb\_stream\_window\_update<!-- {{#callable:cb_stream_window_update}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L155>)
-
-Does nothing and returns immediately.
+The `cb_stream_window_update` function is a placeholder callback for handling stream window updates in an HTTP/2 connection, but it currently performs no operations.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
-    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the stream.
-    - `increment`: An unsigned integer representing the increment value for the window update.
-- **Logic and Control Flow**:
-    - The function takes three parameters: `conn`, `stream`, and `increment`, but does not use them.
-    - The function immediately returns without performing any operations.
-- **Output**: No output is produced as the function returns immediately without performing any operations.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
+    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream.
+    - `increment`: An unsigned integer representing the amount by which the stream's window size should be increased.
+- **Control Flow**:
+    - The function takes three parameters: a connection, a stream, and an increment value.
+    - All parameters are cast to void to indicate they are unused, effectively making the function a no-op.
+    - The function returns immediately without performing any operations.
+- **Output**: The function does not produce any output or side effects.
 
 
 ---
 ### LLVMFuzzerInitialize<!-- {{#callable:LLVMFuzzerInitialize}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L175>)
-
-Initializes the fuzzer environment by setting up the shell, disabling signal handlers, and configuring logging.
+The `LLVMFuzzerInitialize` function initializes the environment for fuzz testing by setting environment variables, bootstrapping the system, registering a cleanup function, and configuring logging behavior.
 - **Inputs**:
-    - `argc`: A pointer to the argument count, typically passed from the command line.
-    - `argv`: A pointer to the argument vector, typically passed from the command line.
-- **Logic and Control Flow**:
-    - Sets the environment variable `FD_LOG_BACKTRACE` to `0` to disable backtrace logging.
-    - Calls `fd_boot` with `argc` and `argv` to initialize the environment.
-    - Registers `fd_halt` to be called at program exit using `atexit`.
-    - Sets the core log level to `1` using `fd_log_level_core_set`, which causes the program to crash on an info log.
-- **Output**: Returns `0` to indicate successful initialization.
+    - `argc`: A pointer to an integer representing the number of command-line arguments.
+    - `argv`: A pointer to an array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Set the environment variable 'FD_LOG_BACKTRACE' to '0' to disable backtraces in logs.
+    - Call `fd_boot` with `argc` and `argv` to perform system initialization.
+    - Register `fd_halt` to be called on program exit using `atexit`.
+    - Set the core log level to 1 using `fd_log_level_core_set`, which causes the program to crash on info log messages.
+    - Return 0 to indicate successful initialization.
+- **Output**: The function returns an integer value of 0, indicating successful initialization.
 
 
 ---
 ### LLVMFuzzerTestOneInput<!-- {{#callable:LLVMFuzzerTestOneInput}} -->
-[View Source →](<../../../../../src/waltz/h2/fuzz_h2.c#L186>)
-
-Tests HTTP/2 connection-level APIs by simulating data transmission and reception, checking for errors and state consistency.
+The function `LLVMFuzzerTestOneInput` tests the HTTP/2 connection-level APIs by simulating data transmission and reception, using a fuzzing approach to identify potential issues like crashes or bugs.
 - **Inputs**:
-    - `data`: A pointer to the input data buffer, which contains the data to be processed.
-    - `size`: The size of the input data buffer in bytes.
-- **Logic and Control Flow**:
+    - `data`: A pointer to an array of unsigned characters representing the input data to be fuzzed.
+    - `size`: The size of the input data array, indicating how much data is available for processing.
+- **Control Flow**:
     - Initialize the global context `g_ctx` to zero.
-    - Check if `size` is less than 4; if true, return -1.
-    - Load a 4-byte seed from `data`, adjust `data` and `size` accordingly.
-    - Create and join a new random number generator `rng` using the seed.
-    - Initialize receive and transmit buffers `rbuf_rx` and `rbuf_tx`.
-    - Initialize the connection as a client or server based on the seed value.
-    - Set the maximum frame size for the connection to 256 bytes.
-    - Reset global counters `g_stream_cnt` and `g_conn_final_cnt`.
-    - Enter a loop that continues while `size` is greater than zero.
-    - Transmit control frames using [`fd_h2_tx_control`](<fd_h2_conn.c.md#fd_h2_tx_control>) and update `rbuf_tx` offsets.
-    - Check if the connection is dead; if true, assert conditions and break the loop.
-    - Determine the chunk size for data processing and check buffer space; break if insufficient.
-    - Push data into the receive buffer `rbuf_rx` and adjust `data` and `size`.
-    - Receive data using [`fd_h2_rx`](<fd_h2_conn.c.md#fd_h2_rx>) and process it with callbacks.
-    - Transmit final control frames after the loop.
-    - Assert conditions on stream and connection counters and states.
-    - Delete the random number generator `rng`.
-- **Output**: Returns 0 after processing the input data and simulating the HTTP/2 connection.
-- **Functions Called**:
-    - [`fd_h2_conn_init_server`](<fd_h2_conn.c.md#fd_h2_conn_init_server>)
-    - [`fd_h2_tx_control`](<fd_h2_conn.c.md#fd_h2_tx_control>)
-    - [`fd_h2_rbuf_used_sz`](<fd_h2_rbuf.h.md#fd_h2_rbuf_used_sz>)
-    - [`fd_h2_rbuf_push`](<fd_h2_rbuf.h.md#fd_h2_rbuf_push>)
-    - [`fd_h2_rx`](<fd_h2_conn.c.md#fd_h2_rx>)
+    - Check if the input size is less than 4; if so, return -1 as the input is too small to process.
+    - Load a seed value from the first 4 bytes of the input data and adjust the data pointer and size accordingly.
+    - Create and join a new random number generator using the seed value.
+    - Initialize receive and transmit buffers (`rbuf_rx` and `rbuf_tx`) and a scratch buffer for temporary data storage.
+    - Determine if the connection should be initialized as a client or server based on the seed value and set the maximum frame size.
+    - Reset global counters for stream and connection finalization.
+    - Enter a loop to process the input data while there is data remaining.
+    - Transmit control frames using [`fd_h2_tx_control`](fd_h2_conn.c.md#fd_h2_tx_control) and update the transmit buffer offsets.
+    - Check if the connection is dead; if so, assert conditions and break the loop.
+    - Determine the chunk size to process next, ensuring it does not exceed the receive buffer size, and push the data chunk into the receive buffer.
+    - Call [`fd_h2_rx`](fd_h2_conn.c.md#fd_h2_rx) to process the received data and handle it according to the HTTP/2 protocol.
+    - After exiting the loop, perform a final control frame transmission.
+    - Assert conditions to ensure stream and connection states are consistent.
+    - Delete the random number generator and return 0 to indicate successful execution.
+- **Output**: Returns 0 on successful execution, or -1 if the input size is less than 4.
+- **Functions called**:
+    - [`fd_h2_conn_init_server`](fd_h2_conn.c.md#fd_h2_conn_init_server)
+    - [`fd_h2_tx_control`](fd_h2_conn.c.md#fd_h2_tx_control)
+    - [`fd_h2_rbuf_used_sz`](fd_h2_rbuf.h.md#fd_h2_rbuf_used_sz)
+    - [`fd_h2_rbuf_push`](fd_h2_rbuf.h.md#fd_h2_rbuf_push)
+    - [`fd_h2_rx`](fd_h2_conn.c.md#fd_h2_rx)
 
 
 
