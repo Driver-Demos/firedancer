@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for tile stack operations and tile-to-tile dispatch functionality in the Firedancer codebase.
+The `test_tile.c` file in the `firedancer` codebase contains tests for tile stack operations and tile execution management, including dispatching tasks to different tiles and verifying their execution.
 
 # Purpose
-The code is a C program designed to test and validate the functionality of a multi-tile execution environment. It includes functions to check the stack properties of tiles, such as stack boundaries and estimated free and used stack space. The program uses a series of assertions (`FD_TEST`) to ensure that the stack grows from high to low and that the estimated free and used stack space are within expected limits. The [`test_stack`](<#test_stack>) function is conditionally compiled based on the presence of AddressSanitizer (`FD_HAS_ASAN`), which suggests that the stack testing is not performed when AddressSanitizer is enabled.
+This C source code file is designed to test and validate the functionality of a multi-tile execution environment, likely within a parallel computing or distributed system framework. The code includes a main function and a secondary function, [`tile_main`](#tile_main), which are used to initialize and manage the execution of tasks across multiple "tiles" or processing units. The file includes tests for stack management, tile identification, and task dispatching, ensuring that the system's assumptions about stack growth and tile execution are correct. The [`test_stack`](#test_stack) function checks the integrity of stack operations, while the [`tile_main`](#tile_main) function verifies the correct dispatch and execution of tasks on different tiles, including checks for tile-to-tile dispatch and execution state validation.
 
-The main functionality of the program is implemented in the [`main`](<#main>) and [`tile_main`](<#tile_main>) functions. These functions initialize the environment, log tile information, and perform tests on tile execution. The program verifies the number of tiles, their identifiers, and their indices. It also tests the ability to dispatch tasks to different tiles using `fd_tile_exec_new`, ensuring that tasks cannot be dispatched to tile 0 or the current tile. The program checks the execution status and results of dispatched tasks, ensuring that they complete successfully. The code is structured to run in a hosted environment, with additional checks for CPU assignments to tiles when `FD_HAS_HOSTED` is defined. The program concludes by logging a "pass" message and halting the environment.
+The code is structured to provide a comprehensive test suite for the tile execution environment, utilizing assertions and logging to ensure that each component behaves as expected. It includes checks for the number of tiles, their identifiers, and their indices, as well as the ability to dispatch tasks to different tiles and verify their execution. The file is not intended to be a standalone application but rather a test harness for validating the underlying system's capabilities. It does not define public APIs or external interfaces but instead focuses on internal testing and validation of the tile execution framework.
 # Imports and Dependencies
 
 ---
@@ -19,78 +19,67 @@ The main functionality of the program is implemented in the [`main`](<#main>) an
 
 ---
 ### \_argv
-- **Type**: ``char const * []``
-- **Description**: An array of constant character pointers that contains the strings "Hey" and "You", followed by a NULL pointer to indicate the end of the array.
-- **Use**: Used as a reference for command-line arguments in the `tile_main` and `main` functions.
+- **Type**: `char const * _argv[]`
+- **Description**: The `_argv` variable is a global array of constant character pointers, initialized with two string literals, "Hey" and "You", followed by a NULL pointer. This array is used to simulate command-line arguments for testing purposes.
+- **Use**: This variable is used in the `tile_main` and `main` functions to provide a consistent set of arguments for testing the execution of tiles.
 
 
 # Functions
 
 ---
 ### test\_stack<!-- {{#callable:test_stack}} -->
-[View Source →](<../../../../../src/util/tile/test_tile.c#L45>)
-
-Tests the stack memory boundaries and estimates for a tile in a multi-tile system.
+The `test_stack` function tests the stack memory boundaries and usage estimates for a tile, ensuring they are within expected limits and assumptions.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Calls `fd_tile_stack0` to get the initial stack pointer `stack0`.
-    - If `stack0` is zero, verifies that `fd_tile_stack1`, `fd_tile_stack_sz`, `fd_tile_stack_est_free`, and `fd_tile_stack_est_used` all return zero using `FD_TEST`.
-    - If `stack0` is not zero, retrieves `stack1`, `stack_sz`, `stack_est_free`, and `stack_est_used` using respective functions and performs boundary and size checks with `FD_TEST`.
-    - Checks that the estimated free stack space is greater than the estimated used stack space.
-    - Verifies that the sum of estimated free and used stack space is approximately equal to the total stack size, allowing for a margin of 64 bytes.
-    - Allocates a small memory block on the stack and checks its address is within the stack boundaries.
-    - Logs a notice message indicating stack testing.
-    - Iterates over the stack memory range from `stack0` to `stack1`, accessing each byte to ensure memory is valid.
-- **Output**: No output is returned; the function performs internal tests and logs results.
+- **Control Flow**:
+    - The function begins by obtaining the initial stack pointer `stack0` using `fd_tile_stack0()`.
+    - If `stack0` is zero, it checks that other stack-related functions return zero, indicating no stack is present.
+    - If `stack0` is non-zero, it retrieves the end stack pointer `stack1`, stack size `stack_sz`, estimated free stack `stack_est_free`, and estimated used stack `stack_est_used`.
+    - It verifies that `stack1` is greater than `stack0`, and that the stack size matches the difference between `stack1` and `stack0`.
+    - The function checks that the estimated free and used stack sizes are within the total stack size and that more stack is free than used.
+    - It performs a sanity check to ensure the sum of estimated free and used stack sizes is approximately equal to the total stack size.
+    - A memory location on the stack is accessed to ensure it lies within the stack boundaries.
+    - A notice log is generated, and a loop reads each byte in the stack range to ensure no memory access violations occur.
+- **Output**: The function does not return any value; it performs tests and logs results to verify stack properties.
 
 
 ---
 ### tile\_main<!-- {{#callable:tile_main}} -->
-[View Source →](<../../../../../src/util/tile/test_tile.c#L49>)
-
-Executes and tests tile-based execution logic, including dispatching tasks to different tiles and verifying execution conditions.
+The `tile_main` function tests the execution and dispatching of tasks across different tiles in a multi-tile system.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Logs and verifies the number of tiles using `fd_tile_cnt()` and checks it is within valid range.
-    - Logs and verifies tile IDs using `fd_tile_id0()`, `fd_tile_id1()`, and `fd_tile_id()`, ensuring they are consistent with the tile count and index.
-    - Flushes the log buffer using `fd_log_flush()`.
-    - Calls `test_stack()` to perform stack-related tests.
-    - Verifies that the current tile ID matches the log thread ID using `fd_log_thread_id()`.
-    - Checks that `argc` matches the tile index and `argv` matches the global `_argv`.
-    - Attempts to dispatch a new task to tile 0 and the current tile, expecting failure.
-    - If the current tile index is the second last, dispatches a task to the next tile and verifies execution properties using `fd_tile_exec_new()`, `fd_tile_exec()`, `fd_tile_exec_by_id()`, `fd_tile_exec_idx()`, `fd_tile_exec_task()`, `fd_tile_exec_argc()`, and `fd_tile_exec_argv()`.
-    - Checks if the dispatched task is done using `fd_tile_exec_done()` and deletes the task using `fd_tile_exec_delete()`, verifying the return value and ensuring no failure.
-- **Output**: Returns the input `argc` value.
-- **Functions Called**:
-    - [`test_stack`](<#test_stack>)
+    - `argc`: The number of command-line arguments passed to the function, representing the current tile index.
+    - `argv`: An array of command-line arguments, expected to match a predefined set of arguments.
+- **Control Flow**:
+    - Log and validate the number of tiles, tile IDs, and tile index using `FD_LOG_NOTICE` and `FD_TEST` macros.
+    - Flush the log buffer using `fd_log_flush()`.
+    - Call `test_stack()` to perform stack-related tests.
+    - Validate that the current tile ID matches the log thread ID.
+    - Check that `argc` matches the current tile index and `argv` matches the predefined `_argv`.
+    - Attempt to dispatch a new task to tile 0 and the current tile, expecting failure.
+    - If the current tile index is the second last tile, dispatch a task to the next tile and perform various checks on the execution object.
+    - Return `argc` as the function's result.
+- **Output**: The function returns the `argc` value, which represents the current tile index.
+- **Functions called**:
+    - [`test_stack`](#test_stack)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/tile/test_tile.c#L95>)
-
-Initializes the system, validates tile configurations, and executes tasks across multiple tiles.
+The `main` function initializes the environment, validates tile and CPU configurations, and executes tasks across multiple tiles, ensuring correct execution and cleanup.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the system with command-line arguments.
-    - Retrieves the number of tiles using `fd_tile_cnt` and logs it.
-    - Validates the tile count is within acceptable limits using `FD_TEST`.
-    - Logs and validates tile IDs and indices using `fd_tile_id0`, `fd_tile_id1`, `fd_tile_id`, and `fd_tile_idx`.
-    - Flushes the log buffer with `fd_log_flush`.
-    - Calls [`test_stack`](<#test_stack>) to perform stack-related tests.
-    - If `FD_HAS_HOSTED` is defined, retrieves the CPU count and iterates over each tile to log and validate CPU assignments.
-    - Flushes the log buffer again with `fd_log_flush`.
-    - Validates that the current tile ID matches the log thread ID.
-    - Iterates over each tile (except the first and last) to execute `tile_main` on each tile using `fd_tile_exec_new`.
-    - Validates the execution context and results for each tile using `FD_TEST`.
-    - Logs a success message and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`test_stack`](<#test_stack>)
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the environment using `fd_boot` with `argc` and `argv`.
+    - Retrieve the number of tiles using `fd_tile_cnt` and log the count.
+    - Validate the tile count is within expected bounds and log tile IDs and indices.
+    - Flush the log buffer to ensure all messages are outputted.
+    - Call `test_stack` to perform stack-related tests.
+    - If `FD_HAS_HOSTED` is defined, retrieve the CPU count and iterate over each tile to validate CPU assignments, logging results and warnings as necessary.
+    - Flush the log buffer again.
+    - Ensure the current tile ID matches the log thread ID.
+    - Iterate over each tile (except the first and last) to execute `tile_main` on each tile, validating execution and cleanup.
+    - Log a 'pass' message and halt the program.
+- **Output**: The function returns 0, indicating successful execution.
 
 
 

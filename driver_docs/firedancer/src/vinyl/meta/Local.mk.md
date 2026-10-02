@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and running unit tests for `fd_vinyl_meta`.
+Build rules for fd_vinyl_meta and its unit test.
 
 # Purpose
-This Makefile snippet automates the build process for a software project. It adds the header file `fd_vinyl_meta.h` to the build system, compiles the object files `fd_vinyl_meta` and `fd_vinyl`, and sets up a unit test named `test_vinyl_meta`. The unit test depends on the components `fd_vinyl`, `fd_tango`, and `fd_util`. Finally, it runs the unit test `test_vinyl_meta` to verify the functionality of the code.
+Build rules add the `fd_vinyl_meta.h` header and the `fd_vinyl_meta` object to the `fd_vinyl` target. The file also defines the `test_vinyl_meta` unit test, links it with `fd_vinyl`, `fd_tango`, and `fd_util`, and adds a rule to run that test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a store tile for data fragments and Makefile logic for conditional object addition.
+Storage context initialization and blockstore fragment insertion, with conditional build rules.
 
 
 ## Files
-- **[fd_store_tile.c](fd_store_tile.c.md)**: Implements a store tile for managing and processing data fragments in a distributed system.
-- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects `fd_store_tile` and `fd_discoh` if `FD_HAS_ALLOCA` is defined.
+- **[fd_store_tile.c](fd_store_tile.c.md)**: The `fd_store_tile.c` file in the `firedancer` codebase implements the initialization and management of a storage context for processing and inserting data fragments into a blockstore, including handling memory alignment and footprint calculations.
+- **[Local.mk](Local.mk.md)**: Build rule that adds fd_store_tile to fd_discoh when FD_HAS_ALLOCA is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
