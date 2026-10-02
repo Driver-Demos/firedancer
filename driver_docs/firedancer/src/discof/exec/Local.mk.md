@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_exec_tile objects to fd_discof when FD_HAS_INT128 is set.
+Makefile logic to add objects for `fd_exec_tile` and `fd_discof` if `FD_HAS_INT128` is defined.
 
 # Purpose
-Conditionally adds the `fd_exec_tile` object file to the `fd_discof` build target when `FD_HAS_INT128` is defined. The `ifdef` block limits this build step to systems that support 128-bit integer types.
+The `Makefile` snippet uses a conditional directive to check if the macro `FD_HAS_INT128` is defined. If it is defined, the `add-objs` function is called with the arguments `fd_exec_tile` and `fd_discof`. This operation adds the object files associated with these targets to the build process, indicating that they are only included when the `FD_HAS_INT128` feature is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
