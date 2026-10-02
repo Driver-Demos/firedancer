@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_ed25519_user.c` file in the `firedancer` codebase implements functions for generating public keys from private keys, signing messages, verifying signatures, and handling errors using the Ed25519 digital signature algorithm.
+Functions for Ed25519 key generation, signing, verification, and error handling based on RFC 8032.
 
 # Purpose
-This C source code file implements cryptographic functions for the Edwards-Curve Digital Signature Algorithm (EdDSA), specifically using the Ed25519 variant. The file provides functions for generating public keys from private keys, signing messages, and verifying signatures, all in accordance with RFC 8032. The key generation function, `fd_ed25519_public_from_private`, derives a public key from a given private key using SHA-512 hashing and scalar multiplication on the elliptic curve. The `fd_ed25519_sign` function creates a digital signature for a message using the private key, while the [`fd_ed25519_verify`](#fd_ed25519_verify) function checks the validity of a signature against a message and a public key. Additionally, the file includes a batch verification function, [`fd_ed25519_verify_batch_single_msg`](#fd_ed25519_verify_batch_single_msg), which allows for the simultaneous verification of multiple signatures on the same message, optimizing performance for batch operations.
+The code implements cryptographic operations based on the Edwards-Curve Digital Signature Algorithm (EdDSA), specifically using the Ed25519 variant. It provides functions for key generation, signing, and verification of digital signatures. The function `fd_ed25519_public_from_private` generates a public key from a given private key using a series of cryptographic transformations as specified in RFC 8032. The `fd_ed25519_sign` function creates a digital signature for a given message using a private key and a public key, following the EdDSA signing procedure. The [`fd_ed25519_verify`](<#fd_ed25519_verify>) function checks the validity of a signature against a message and a public key, ensuring the integrity and authenticity of the message.
 
-The code is structured to ensure security and efficiency, with explicit memory sanitization to prevent sensitive data leakage. It uses fixed-base scalar multiplication and constant-time operations to mitigate timing attacks. The file also includes error handling through the [`fd_ed25519_strerror`](#fd_ed25519_strerror) function, which translates error codes into human-readable messages. This code is intended to be part of a larger cryptographic library, as indicated by the inclusion of specific headers like "fd_ed25519.h" and "fd_curve25519.h", and it provides a focused set of functionalities related to Ed25519 cryptographic operations.
+Additionally, the code includes a batch verification function, [`fd_ed25519_verify_batch_single_msg`](<#fd_ed25519_verify_batch_single_msg>), which allows for the verification of multiple signatures on a single message, optimizing the process for multiple verifications. The [`fd_ed25519_strerror`](<#fd_ed25519_strerror>) function provides human-readable error messages corresponding to various error codes that may arise during the cryptographic operations. The code relies on SHA-512 hashing and operations on elliptic curve points, ensuring secure and efficient cryptographic processes.
 # Imports and Dependencies
 
 ---
@@ -20,64 +20,70 @@ The code is structured to ensure security and efficiency, with explicit memory s
 
 ---
 ### fd\_ed25519\_verify<!-- {{#callable:fd_ed25519_verify}} -->
-The `fd_ed25519_verify` function verifies an Ed25519 digital signature for a given message using a public key.
+[View Source →](<../../../../../src/ballet/ed25519/fd_ed25519_user.c#L135>)
+
+Verifies an Ed25519 digital signature against a given message and public key.
 - **Inputs**:
-    - `msg`: A pointer to the message data to be verified.
-    - `msg_sz`: The size of the message in bytes.
-    - `sig`: A pointer to the 64-byte signature to be verified.
-    - `public_key`: A pointer to the 32-byte public key used for verification.
-    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing during verification.
-- **Control Flow**:
-    - Split the signature into two 32-byte halves: `r` and `S`.
+    - `msg`: The message data to verify, represented as an array of unsigned characters.
+    - `msg_sz`: The size of the message data in bytes.
+    - `sig`: The signature to verify, represented as an array of 64 unsigned characters.
+    - `public_key`: The public key used for verification, represented as an array of 32 unsigned characters.
+    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing operations.
+- **Logic and Control Flow**:
+    - Split the signature into two 32-byte halves, `r` and `S`.
     - Validate the scalar `S` using `fd_curve25519_scalar_validate`.
     - Decompress the public key and point `r` concurrently using `fd_ed25519_point_frombytes_2x`.
     - Check if the decompression was successful and if the points are of small order using `fd_ed25519_affine_is_small_order`.
-    - Compute the SHA-512 hash of the concatenated data (dom2, `R`, `A`, and the message) and reduce it to a scalar `k`.
-    - Compute the point `Rcmp` using the double scalar multiplication with the base point and compare it with the decompressed point `R`.
-    - Return `FD_ED25519_SUCCESS` if the points match, otherwise return an error code indicating the type of failure.
-- **Output**: Returns an integer indicating the result of the verification: `FD_ED25519_SUCCESS` for a valid signature, or an error code (`FD_ED25519_ERR_SIG`, `FD_ED25519_ERR_PUBKEY`, or `FD_ED25519_ERR_MSG`) for an invalid signature.
-- **Functions called**:
-    - [`fd_ed25519_point_eq_z1`](avx512/fd_curve25519.h.md#fd_ed25519_point_eq_z1)
+    - Compute the SHA-512 hash of the concatenated data and reduce it to a scalar `k`.
+    - Calculate the point `Rcmp` using `fd_ed25519_double_scalar_mul_base` with the negated public key and scalar `S`.
+    - Compare the computed point `Rcmp` with the decompressed point `R` using [`fd_ed25519_point_eq_z1`](<ref/fd_curve25519.h.md#fd_ed25519_point_eq_z1>).
+    - Return `FD_ED25519_SUCCESS` if the points match, otherwise return an error code.
+- **Output**: Returns `FD_ED25519_SUCCESS` if the signature is valid, or an error code such as `FD_ED25519_ERR_SIG`, `FD_ED25519_ERR_PUBKEY`, or `FD_ED25519_ERR_MSG` if the verification fails.
+- **Functions Called**:
+    - [`fd_ed25519_point_eq_z1`](<ref/fd_curve25519.h.md#fd_ed25519_point_eq_z1>)
 
 
 ---
 ### fd\_ed25519\_verify\_batch\_single\_msg<!-- {{#callable:fd_ed25519_verify_batch_single_msg}} -->
-The function `fd_ed25519_verify_batch_single_msg` verifies a batch of Ed25519 signatures for a single message using public keys and SHA-512 contexts.
+[View Source →](<../../../../../src/ballet/ed25519/fd_ed25519_user.c#L232>)
+
+Verifies a batch of Ed25519 signatures for a single message using public keys and SHA-512 contexts.
 - **Inputs**:
-    - `msg`: A pointer to the message data to be verified.
+    - `msg`: The message to verify, represented as an array of unsigned characters.
     - `msg_sz`: The size of the message in bytes.
     - `signatures`: An array of signatures, each 64 bytes long, for each batch item.
     - `pubkeys`: An array of public keys, each 32 bytes long, for each batch item.
     - `shas`: An array of SHA-512 contexts, one for each batch item.
     - `batch_sz`: The number of signatures and public keys to verify in the batch.
-- **Control Flow**:
-    - Check if the batch size is zero or exceeds the maximum allowed (16); if so, return an error code for a bad signature.
-    - Initialize arrays for points R, Aprime, and scalars k for the maximum batch size.
-    - Iterate over each item in the batch to validate scalars, decompress public keys and points, check for low order points, and compute scalars k_j.
-    - For each batch item, validate the scalar S and decompress the public key and point r concurrently.
-    - Check if the decompression was successful and if the points are not of small order; return appropriate error codes if checks fail.
-    - Compute the scalar k_j using SHA-512 on the concatenation of r, public key, and message, then reduce it modulo the curve order.
-    - For each batch item, compute the double scalar multiplication and check if the resulting point matches the expected R point; return an error code for a bad message if they do not match.
-    - Return success if all batch items are verified successfully.
-- **Output**: Returns an integer indicating the success or failure of the batch verification, with specific error codes for bad signatures, public keys, or messages.
-- **Functions called**:
-    - [`fd_ed25519_verify`](#fd_ed25519_verify)
-    - [`fd_ed25519_point_eq_z1`](avx512/fd_curve25519.h.md#fd_ed25519_point_eq_z1)
+- **Logic and Control Flow**:
+    - Check if `batch_sz` is zero or greater than the maximum allowed (`MAX`), returning an error if true.
+    - Initialize arrays for points `R`, `Aprime`, and scalars `k` for the batch.
+    - For each item in the batch, validate the scalar `S` from the signature.
+    - Decompress the public key and point `r` from the signature, checking for errors and small order points.
+    - Compute the scalar `k_j` using SHA-512 on the concatenation of `r`, public key, and message.
+    - For each item, compute the point using double scalar multiplication and check if it matches the point `R` from the signature.
+    - Return success if all verifications pass, otherwise return an error code.
+- **Output**: Returns `FD_ED25519_SUCCESS` if all signatures are valid, or an error code if any signature is invalid.
+- **Functions Called**:
+    - [`fd_ed25519_verify`](<#fd_ed25519_verify>)
+    - [`fd_ed25519_point_eq_z1`](<ref/fd_curve25519.h.md#fd_ed25519_point_eq_z1>)
 
 
 ---
 ### fd\_ed25519\_strerror<!-- {{#callable:fd_ed25519_strerror}} -->
-The `fd_ed25519_strerror` function returns a human-readable string describing an error code related to Ed25519 operations.
+[View Source →](<../../../../../src/ballet/ed25519/fd_ed25519_user.c#L312>)
+
+Maps error codes to their corresponding error message strings for the Ed25519 algorithm.
 - **Inputs**:
-    - `err`: An integer representing the error code for which a descriptive string is needed.
-- **Control Flow**:
-    - The function uses a switch statement to match the input error code against predefined constants.
-    - If the error code matches `FD_ED25519_SUCCESS`, it returns the string "success".
-    - If the error code matches `FD_ED25519_ERR_SIG`, it returns the string "bad signature".
-    - If the error code matches `FD_ED25519_ERR_PUBKEY`, it returns the string "bad public key".
-    - If the error code matches `FD_ED25519_ERR_MSG`, it returns the string "bad message".
-    - If the error code does not match any predefined constants, it returns the string "unknown".
-- **Output**: A constant character pointer to a string describing the error code.
+    - `err`: An integer representing the error code to be translated into a human-readable string.
+- **Logic and Control Flow**:
+    - Use a switch statement to check the value of `err`.
+    - If `err` is `FD_ED25519_SUCCESS`, return the string "success".
+    - If `err` is `FD_ED25519_ERR_SIG`, return the string "bad signature".
+    - If `err` is `FD_ED25519_ERR_PUBKEY`, return the string "bad public key".
+    - If `err` is `FD_ED25519_ERR_MSG`, return the string "bad message".
+    - If `err` does not match any known error codes, return the string "unknown".
+- **Output**: A constant character pointer to a string that describes the error.
 
 
 

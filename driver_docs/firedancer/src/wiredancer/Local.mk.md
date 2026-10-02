@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally builds the `fd_wiredancer` library and adds headers and objects if `FD_HAS_WIREDANCER` is defined.
+Makefile for building the `fd_wiredancer` library with specified headers and objects if `FD_HAS_WIREDANCER` is defined.
 
 # Purpose
-This file is a Makefile snippet used for conditional compilation. It checks if the `FD_HAS_WIREDANCER` flag is defined, and if so, it triggers the creation of a library named `fd_wiredancer`, adds the header file `c/wd_f1.h`, and includes the object files from `c/wd_f1` for the `fd_wiredancer` library.
+The `Makefile` snippet conditionally includes the `fd_wiredancer` library if the `FD_HAS_WIREDANCER` flag is defined. It uses the `make-lib` function to create the library and adds the header file `c/wd_f1.h` and the object files from the `c/wd_f1` directory to the build process. This setup ensures that the `fd_wiredancer` components are only included when the specified condition is met.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

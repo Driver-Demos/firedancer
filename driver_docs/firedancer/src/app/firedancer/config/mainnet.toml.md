@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Mainnet gossip entrypoints, expected genesis hash, and funk memory limits.
+Configuration for mainnet with gossip entrypoints, consensus hash, and funk settings.
 
 # Purpose
-This configuration file sets Solana network parameters for gossip, consensus, and `funk`. It defines the `entrypoints` used for peer discovery on mainnet-beta, the `expected_genesis_hash` used to verify the cluster genesis state, and `funk` memory and account record limits through `heap_size_gib` and `max_account_records`.
+The configuration file defines settings for a Solana network node. Under the `gossip` section, it specifies a list of entry points for the node to connect to the Solana mainnet-beta network, using specified hostnames and port `8001`. The `consensus` section sets the `expected_genesis_hash`, which is a unique identifier for the blockchain's genesis block, ensuring the node connects to the correct network. The `funk` section configures the node's resource usage, setting the `heap_size_gib` to 600 GiB and limiting `max_account_records` to 1,100,000,000, which controls memory allocation and the maximum number of account records the node can handle.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
