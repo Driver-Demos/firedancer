@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Styles, scripts, and HTML for the Firedancer GUI, plus a list of software dependencies and licenses.
+HTML entry page and assets for the Firedancer app with dashboard UI styles and helpers
 
 ## Folders
-- **[assets](assets/README.md)**: Styles and scripts for AG Grid components, UI rendering, data visualization, and state management.
+- **[assets](assets/README.md)**: React dashboard and AG Grid assets with CSS theme styles and JS UI helpers
 
 ## Files
-- **[index.html](index.html.md)**: HTML document for the Firedancer GUI with preloaded assets and a root div for content rendering.
-- **[LICENSE_DEPENDENCIES](LICENSE_DEPENDENCIES.md)**: A list of software dependencies with their licenses, versions, and descriptions.
+- **[index.html](index.html.md)**: HTML entry page that preloads assets and loads the Firedancer app.
+- **[LICENSE_DEPENDENCIES](LICENSE_DEPENDENCIES.md)**: License list for React, Radix UI, TanStack, D3, Nivo, AG Grid, and other packages.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

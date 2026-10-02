@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for compiling and simulating Verilog sources with Questa and Cocotb in a specific directory.
+The `Makefile` in the `firedancer/src/wiredancer/sim/top_f1_models` directory is used to configure and build a simulation environment for Verilog modules using the Questa simulator, with various source files and compilation arguments specified.
 
 # Purpose
-The `Makefile` is used to automate the build process for a simulation environment. It defines several variables and paths necessary for compiling and simulating Verilog and SystemVerilog source files. The `SIM` variable specifies the simulator to use, defaulting to `questa`, while `MODULE` and `TOPLEVEL` define the test module and top-level module, respectively. The `VERILOG_SOURCES` variable lists all the source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files located in the `RTL_DIR` and `SIM_DIR` directories. The `COMPILE_ARGS` variable includes additional compilation arguments, such as the path to the instruction ROM memory initialization file. The `Makefile` also includes a reference to a simulation makefile provided by `cocotb`, which is a coroutine-based co-simulation library for writing testbenches in Python.
+This Makefile is designed for setting up and managing the simulation environment for a hardware design project, specifically using the Questa simulation tool. It defines various variables and paths necessary for the simulation, such as the simulation tool (`SIM`), the module name (`MODULE`), and directories for RTL (Register Transfer Level) and simulation files. The file lists a comprehensive set of Verilog source files (`VERILOG_SOURCES`) that are required for the simulation, including both standard library files from Xilinx Vivado and custom RTL files located in specified directories. The `TOPLEVEL` variable specifies the top-level module for the simulation, and additional simulation arguments (`SIM_ARGS`) and compile arguments (`COMPILE_ARGS`) are provided to configure the simulation environment further. The Makefile concludes by including another Makefile from the cocotb configuration, which likely provides additional rules and settings for running the simulation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

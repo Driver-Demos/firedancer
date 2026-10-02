@@ -3,26 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines histogram metrics for measuring various delays in the Proof of History (PoH) process.
+Generated histogram metric definitions for PoH delay timings.
 
 # Purpose
-This C header file defines a set of metrics related to Proof of History (PoH) operations, specifically focusing on various delay times during slot leadership in a distributed system. The file includes definitions for histograms that measure delays such as the time between becoming a leader and receiving the bank, the first microblock, and completing the slot. Each metric is characterized by an offset, name, type, description, conversion factor, and minimum and maximum values. The file is automatically generated and should not be manually edited. It includes necessary dependencies from `fd_metrics_base.h` and `fd_metrics_enums.h`, and declares an external array `FD_METRICS_POH` to store metadata for these metrics.
-# Imports and Dependencies
-
----
-- `../fd_metrics_base.h`
-- `fd_metrics_enums.h`
-
-
-# Global Variables
-
----
-### FD\_METRICS\_POH
-- **Type**: ``fd_metrics_meta_t` array`
-- **Description**: An array of `fd_metrics_meta_t` structures that contains metadata for various metrics related to Proof of History (PoH) delays. Each element in the array represents a specific metric, such as delays in leader slot initiation, microblock reception, slot completion, and bundle initialization.
-- **Use**: Used to store and access metadata for PoH-related metrics in a structured format.
-
-
+This generated header defines the `poh` metrics group for the metrics system and gives each metric a fixed offset, name, type, description, converter, and valid range. It declares four histogram metrics: `poh_begin_leader_delay_seconds`, `poh_first_microblock_delay_seconds`, `poh_slot_done_delay_seconds`, and `poh_bundle_initialize_delay_seconds`, which measure delays during slot leadership and slot setup. The file includes shared metrics headers and exposes the `FD_METRICS_POH` metadata array through `FD_METRICS_POH_TOTAL`, so other parts of the codebase can register and use these metrics in a consistent way.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
