@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Creates and checks the ledger rocksdb blockstore, including genesis block0 generation.
+Blockstore configuration for the Agave validator, including block creation and validation checks.
 
 
 ## Files
-- **[blockstore.c](blockstore.c.md)**: Creates and checks the ledger rocksdb blockstore, including genesis block0 generation.
+- **[blockstore.c](blockstore.c.md)**: Implements blockstore configuration, including initialization, finalization, and validation functions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
