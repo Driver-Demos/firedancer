@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration files for Firedancer with settings for instance management, networks, and Solana parameters.
+Default, devnet, mainnet, and testnet validator configuration files for paths, networking, snapshots, tiles, and limits.
 
 
 ## Files
-- **[default.toml](default.toml.md)**: Configuration settings for a Firedancer instance, including user permissions, file paths, logging, network, and tile management.
-- **[devnet.toml](devnet.toml.md)**: Configuration file for Solana devnet with gossip entrypoints and expected genesis hash.
-- **[mainnet.toml](mainnet.toml.md)**: Configuration for mainnet with gossip entrypoints, consensus hash, and funk settings.
-- **[testnet.toml](testnet.toml.md)**: Configuration settings for the Solana testnet, including gossip entrypoints and consensus parameters.
+- **[default.toml](default.toml.md)**: Default Firedancer validator configuration for paths, networking, snapshots, tiles, and development options.
+- **[devnet.toml](devnet.toml.md)**: Devnet gossip entrypoints and expected genesis hash configuration.
+- **[mainnet.toml](mainnet.toml.md)**: Mainnet gossip entrypoints, expected genesis hash, and funk memory limits.
+- **[testnet.toml](testnet.toml.md)**: Testnet gossip entrypoints, genesis hash, funk heap and account limits, layout, and snapshot source settings
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
