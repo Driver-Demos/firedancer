@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-AF_XDP and UDP socket tiles, common net APIs, topology setup, and build rules
+Socket management, seccomp policies, XDP networking APIs, topology support routines, and Makefile logic.
 
 ## Folders
-- **[sock](sock/README.md)**: UDP socket tile, private state, build rule, and seccomp policy for network I/O and logging
-- **[xdp](xdp/README.md)**: AF_XDP tile code, tests, build rules, and seccomp policy files for packet routing and socket I/O.
+- **[sock](sock/README.md)**: Socket management and seccomp policies for network tiles, with architecture-specific configurations.
+- **[xdp](xdp/README.md)**: Seccomp filter policy, AF_XDP and fd_tango translation, Makefile logic, and seccomp policy rules.
 
 ## Files
-- **[fd_net_common.h](fd_net_common.h.md)**: Common definitions for net tile implementations, including REPAIR_PING_SZ.
-- **[fd_net_tile.h](fd_net_tile.h.md)**: APIs for XDP networking, RX packet bounds checks, and topology link setup.
-- **[fd_net_tile_topo.c](fd_net_tile_topo.c.md)**: Topology routines for net and sock tiles, links, and UMEM setup.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_net_tile.h and fd_net_tile_topo when FD_HAS_ALLOCA is set.
+- **[fd_net_common.h](fd_net_common.h.md)**: Common definitions for network tile implementations, including the size of a repair protocol ping packet.
+- **[fd_net_tile.h](fd_net_tile.h.md)**: APIs for XDP networking in a Firedancer topology using the 'net' tile, including packet handling.
+- **[fd_net_tile_topo.c](fd_net_tile_topo.c.md)**: Topology support routines for configuring network tiles with XDP and socket providers.
+- **[Local.mk](Local.mk.md)**: Makefile logic for adding headers and objects if `FD_HAS_ALLOCA` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
