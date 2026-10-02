@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_reedsol_encode_16.c` file in the `firedancer` codebase implements a function for encoding data using Reed-Solomon error correction, specifically generating parity shreds for a given set of data shreds.
+Auto-generated C code for encoding data and parity shreds using Reed-Solomon error correction.
 
 # Purpose
-This C source code file contains an auto-generated function, [`fd_reedsol_private_encode_16`](#fd_reedsol_private_encode_16), which is part of a Reed-Solomon encoding implementation. The function is designed to generate parity shreds from a set of data shreds, which is a common operation in error correction coding. The function takes in parameters specifying the size of each shred, pointers to the data shreds, the count of data shreds, pointers to the parity shreds, and the count of parity shreds. The core functionality involves iterating over the data shreds, loading them into Galois field elements, and then using a series of macro-generated operations to compute the necessary parity shreds. These operations include inverse fast Fourier transforms (IFFT) and fast Fourier transforms (FFT), which are typical in the context of Reed-Solomon encoding for generating parity information.
+The code defines a function [`fd_reedsol_private_encode_16`](<#fd_reedsol_private_encode_16>) that is part of an auto-generated file. This function is responsible for encoding data using Reed-Solomon error correction codes. It takes in a specified number of data shreds and parity shreds, and it generates parity shreds based on the input data shreds. The function uses a series of operations involving Galois Field arithmetic to compute the parity shreds, which are essential for data recovery in the event of data loss or corruption.
 
-The code is highly specialized and optimized for performance, as indicated by the use of macros like `FD_REEDSOL_GENERATE_IFFT` and `FD_REEDSOL_GENERATE_FFT`, which likely expand into efficient, low-level operations. The function is unsanitized, suggesting it is intended for use in controlled environments where input validation is handled elsewhere. The use of Galois field arithmetic is central to the function's operation, as Reed-Solomon codes rely on this mathematical structure for their error-correcting capabilities. The function does not define a public API or external interface directly but is likely part of a larger library where it serves as a backend utility for encoding data with error correction capabilities.
+The function operates by iterating over the data shreds and applying a series of transformations, including inverse fast Fourier transforms (IFFT) and fast Fourier transforms (FFT), to generate the required parity shreds. The function handles different numbers of data shreds by using a switch-case structure to apply the appropriate operations for each case. The function also includes logic to handle cases where the number of parity shreds required exceeds the initial set of generated parity shreds, by producing additional parity shreds as needed. The function is marked with `FD_FN_UNSANITIZED`, indicating that it may not perform input validation or error checking, and it is intended for internal use within a larger system that implements Reed-Solomon encoding.
 # Imports and Dependencies
 
 ---
@@ -19,25 +19,28 @@ The code is highly specialized and optimized for performance, as indicated by th
 
 ---
 ### fd\_reedsol\_private\_encode\_16<!-- {{#callable:fd_reedsol_private_encode_16}} -->
-The function `fd_reedsol_private_encode_16` generates parity shreds for Reed-Solomon encoding using a specified number of data shreds and parity shreds.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_encode_16.c#L4>)
+
+Encodes data shreds into parity shreds using Reed-Solomon encoding with a maximum of 16 data shreds.
 - **Inputs**:
     - `shred_sz`: The size of each shred in bytes.
-    - `data_shred`: An array of pointers to the data shreds to be encoded.
-    - `data_shred_cnt`: The number of data shreds provided.
-    - `parity_shred`: An array of pointers where the generated parity shreds will be stored.
-    - `parity_shred_cnt`: The number of parity shreds to be generated.
-- **Control Flow**:
-    - Initialize 16 variables to zero to hold data shreds.
+    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred.
+    - `data_shred_cnt`: The number of data shreds.
+    - `parity_shred`: A pointer to an array of pointers, each pointing to a parity shred.
+    - `parity_shred_cnt`: The number of parity shreds to produce.
+- **Logic and Control Flow**:
+    - Initialize 16 Galois field variables to zero.
     - Iterate over each position in the shreds up to `shred_sz`.
-    - Load data shreds into the initialized variables based on `data_shred_cnt` using a switch-case structure with fall-through logic.
-    - Generate parity shreds using either IFFT or PPT functions depending on the number of data shreds.
-    - Store the generated parity shreds into the `parity_shred` array, ensuring only the required number of parity shreds are stored.
-    - If more parity shreds are needed, additional parity shreds are generated using FFT and IFFT functions in a loop until all required parity shreds are produced.
-    - Adjust `shred_pos` to handle cases where `shred_sz` is not divisible by 32.
-- **Output**: The function does not return a value but modifies the `parity_shred` array to contain the generated parity shreds.
-- **Functions called**:
-    - [`gf_ldu`](fd_reedsol_arith_none.h.md#gf_ldu)
-    - [`gf_stu`](fd_reedsol_arith_none.h.md#gf_stu)
+    - Load data shreds into Galois field variables based on `data_shred_cnt`.
+    - Use a switch statement to apply different Reed-Solomon encoding functions (`FD_REEDSOL_GENERATE_IFFT` or `FD_REEDSOL_GENERATE_PPT`) based on `data_shred_cnt`.
+    - Calculate the total number of shreds and store the generated parity shreds into `parity_shred` array.
+    - If more parity shreds are needed, generate additional parity shreds using `FD_REEDSOL_GENERATE_FFT` and store them.
+    - Repeat the process until all required parity shreds are produced.
+    - Adjust `shred_pos` to handle shred sizes not divisible by 32.
+- **Output**: No direct output; the function modifies the `parity_shred` array in place to store the generated parity shreds.
+- **Functions Called**:
+    - [`gf_ldu`](<fd_reedsol_arith_none.h.md#gf_ldu>)
+    - [`gf_stu`](<fd_reedsol_arith_none.h.md#gf_stu>)
 
 
 

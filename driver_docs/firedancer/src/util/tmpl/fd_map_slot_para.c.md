@@ -3,23 +3,45 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header-only template for concurrent persistent shared maps with linear probing and version locks.
+Prototypes, inlines, and implementations for concurrent persistent shared maps using linear probing and cuckoo hashing techniques.
 
 # Purpose
-This file generates a parameterized concurrent shared-memory map API in C. It is a template-style implementation that uses macros such as `MAP_NAME`, `MAP_ELE_T`, and `MAP_KEY_T` to create a map type and its functions for a chosen element type and key type. The map uses linear probing with version locks to support concurrent insert, modify, remove, query, and iteration operations. It also supports persistent shared memory, inter-process use, relocation, and optional key memoization for faster hash and compare operations.
+The code defines a template for generating concurrent persistent shared maps using linear probing with enhancements from cuckoo hashing to improve concurrent performance. It supports multiple concurrent operations with performance comparable to single-threaded maps for non-conflicting operations. The map operations can be serialized, and the map does not require a key sentinel or a guarantee of free elements in the store. The insert, modify, and query operations have a configurable worst-case O(1) cost, while the remove operation's cost is not configurable but remains efficient for reasonable fill ratios.
 
-The file defines the public interface and the implementation for map lifecycle and access functions such as `mymap_new`, `mymap_join`, `mymap_leave`, `mymap_delete`, `mymap_prepare`, `mymap_publish`, `mymap_cancel`, `mymap_remove`, `mymap_query_try`, `mymap_query_test`, `mymap_lock_range`, `mymap_iter_init`, `mymap_iter_next`, `mymap_verify`, and `mymap_strerror`. It also provides helper functions for hashing, key comparison, backoff, lock mapping, and element access. The code is written as a header-style generator that can emit declarations, local-only inline code, or full implementations, depending on `MAP_IMPL_STYLE`.
-# Function Declarations (Public API)
+The code provides a comprehensive API for managing these maps, including functions for creating, joining, and deleting maps, as well as for performing operations like insert, modify, query, and remove. It supports asynchronous execution and can handle non-plain-old-data keys and values. The map can be persisted beyond the lifetime of the creating process, used inter-process, and relocated in memory. The implementation prioritizes massive concurrency, high performance, and efficient cache and file system access patterns. The code is designed to be included in a compilation unit to generate different types of concurrent maps, with options for library header prototypes and implementations.
+# Imports and Dependencies
 
 ---
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
+- `fd_map.h`
+- `../bits/fd_bits.h`
+- `../log/fd_log.h`
+
+
+# Global Variables
+
+---
+### MAP\_
+- **Type**: `MAP_(iter_t)`
+- **Description**: Represents an iterator for traversing elements in a map data structure. It holds the state necessary to iterate over elements with the same hash value in the map.
+- **Use**: Used to iterate over elements in a map, maintaining the current position and state of the iteration.
+
+
+# Functions
+
+---
+### MAP\_<!-- {{#callable:MAP_}} -->
+[View Source →](<../../../../../src/util/tmpl/fd_map_slot_para.c#L2404>)
+
+Maps error codes to human-readable error messages.
+- **Inputs**:
+    - `err`: An integer representing an error code, which can be one of `FD_MAP_SUCCESS`, `FD_MAP_ERR_INVAL`, `FD_MAP_ERR_AGAIN`, `FD_MAP_ERR_FULL`, or `FD_MAP_ERR_KEY`.
+- **Logic and Control Flow**:
+    - Uses a `switch` statement to match the `err` code to predefined cases.
+    - Returns a corresponding string message for each known error code.
+    - If the `err` code does not match any predefined case, returns "unknown".
+- **Output**: A constant character pointer to a string describing the error.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

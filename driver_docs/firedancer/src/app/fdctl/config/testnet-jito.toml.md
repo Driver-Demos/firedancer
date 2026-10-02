@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `testnet-jito.toml` file in the `firedancer` codebase configures various settings for a Solana testnet environment, including gossip entry points, consensus parameters, RPC settings, and tiles bundle and GUI configurations.
+Configuration file for the Solana testnet with settings for gossip, snapshots, consensus, RPC, and tiles.
 
 # Purpose
-This configuration file is designed for setting up a Solana validator node on a testnet environment. It specifies various operational parameters such as the `scratch_directory` for temporary data storage and the `gossip` section, which lists entry points for network communication. The `snapshots` section defines the minimum download speed for snapshot data, ensuring efficient data synchronization. The `consensus` section includes paths to key files for validator identity and voting, as well as a list of known validators and the expected genesis hash for network integrity. The `rpc` section configures the remote procedure call server, including its port and access settings. Additional sections like `layout`, `reporting`, and `tiles.bundle` provide configurations for data handling, metrics reporting, and integration with external services, respectively, while `tiles.gui` sets the listening address for the graphical user interface.
+The configuration file defines settings for a Solana validator node. The `scratch_directory` specifies the directory for temporary data storage. The `[gossip]` section lists entry points for network communication with other nodes. The `[snapshots]` section sets the minimum download speed for snapshots, ensuring efficient data synchronization. The `[consensus]` section includes paths to key files and a list of known validators, which are essential for maintaining consensus and validating transactions. The `[rpc]` section configures the RPC server, including the port and API access settings. The `[layout]` section configures shred tiles to manage computational overhead. The `[reporting]` section provides metrics configuration for performance monitoring. The `[tiles.bundle]` section enables a bundle service with specified URLs and program addresses for tip distribution and payment. Finally, the `[tiles.gui]` section sets the listening address for the graphical user interface.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

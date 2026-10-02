@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Thread pool APIs, map-reduce helpers, build rules, and tests.
+Macros, functions, and APIs for thread pools, with tests, benchmarks, and makefile rules.
 
 
 ## Files
-- **[fd_map_reduce.h](fd_map_reduce.h.md)**: The `fd_map_reduce.h` file in the `firedancer` codebase provides macros and inline functions for implementing high-performance, deterministic parallelized tree dispatch operations, similar to CUDA kernels, without requiring data transfer between CPU and GPU, and includes support for both map-reduce and for-all operations.
-- **[fd_tpool.cxx](fd_tpool.cxx.md)**: The `fd_tpool.cxx` file in the `firedancer` codebase implements a thread pool with support for managing worker threads, executing tasks, and handling synchronization using pthreads when available.
-- **[fd_tpool.h](fd_tpool.h.md)**: The `fd_tpool.h` file in the `firedancer` codebase provides APIs for creating and managing thread pools to efficiently execute thread-parallel jobs with low overhead and high scalability, including functions for task partitioning and execution across multiple threads.
-- **[Local.mk](Local.mk.md)**: Build rules for tpool headers, objects, and unit test.
-- **[test_tpool.c](test_tpool.c.md)**: The `test_tpool.c` file in the `firedancer` codebase contains a comprehensive suite of tests and benchmarks for the thread pool functionality, including initialization, execution, and various task distribution strategies.
+- **[fd_map_reduce.h](fd_map_reduce.h.md)**: Macros and inline functions for high-performance parallelized map-reduce operations using thread pools.
+- **[fd_tpool.cxx](fd_tpool.cxx.md)**: Implementation of a thread pool with worker management and task execution capabilities.
+- **[fd_tpool.h](fd_tpool.h.md)**: APIs for creating and managing thread pools to efficiently execute parallel tasks with low overhead.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests related to thread pool utilities.
+- **[test_tpool.c](test_tpool.c.md)**: Tests and benchmarks for thread pool operations, including initialization, execution, and partitioning.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
