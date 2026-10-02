@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for initializing, appending data to, and finalizing a Keccak-256 hash computation.
+The `fd_keccak256.c` file in the `firedancer` codebase implements functions for initializing, appending data to, and finalizing a Keccak-256 hash computation, as well as managing memory alignment and lifecycle for the hash state.
 
 # Purpose
-The code provides an implementation of the Keccak-256 cryptographic hash function. It includes functions to manage the lifecycle of a `fd_keccak256_t` structure, which represents the state of a Keccak-256 hash computation. The functions [`fd_keccak256_new`](<#fd_keccak256_new>), [`fd_keccak256_join`](<#fd_keccak256_join>), [`fd_keccak256_leave`](<#fd_keccak256_leave>), and [`fd_keccak256_delete`](<#fd_keccak256_delete>) handle memory alignment, initialization, and cleanup of the hash state. The [`fd_keccak256_init`](<#fd_keccak256_init>), [`fd_keccak256_append`](<#fd_keccak256_append>), and [`fd_keccak256_fini`](<#fd_keccak256_fini>) functions manage the process of hashing data, including initializing the state, appending data to be hashed, and finalizing the hash computation to produce the output hash.
+This C source code file provides a comprehensive implementation of the Keccak-256 cryptographic hash function, which is a variant of the SHA-3 standard. The file defines a series of functions that manage the lifecycle of a Keccak-256 hashing operation, including initialization, data appending, and finalization to produce the hash output. The code is structured to handle memory alignment and integrity checks, ensuring that the operations are performed on correctly aligned memory blocks and that the state of the hash object is valid. The functions [`fd_keccak256_new`](#fd_keccak256_new), [`fd_keccak256_join`](#fd_keccak256_join), [`fd_keccak256_leave`](#fd_keccak256_leave), and [`fd_keccak256_delete`](#fd_keccak256_delete) manage the creation, validation, and deletion of the hash state in shared memory, while [`fd_keccak256_init`](#fd_keccak256_init), [`fd_keccak256_append`](#fd_keccak256_append), and [`fd_keccak256_fini`](#fd_keccak256_fini) handle the core hashing process.
 
-The code also provides a convenience function, [`fd_keccak256_hash`](<#fd_keccak256_hash>), which performs a complete hash operation on a given data input, returning the resulting hash. The implementation ensures that memory is correctly aligned and initialized, and it uses a series of memory fence operations to maintain consistency in the state transitions. The code is designed to be used as part of a larger system, where it can be included and called to perform Keccak-256 hashing operations. The use of macros and function calls to check for alignment and state validity ensures that the operations are performed safely and correctly.
+The file is intended to be part of a larger library, as indicated by the inclusion of header files and the use of macros for logging and memory operations. It provides a public API for performing Keccak-256 hashing, with functions like [`fd_keccak256_hash`](#fd_keccak256_hash) offering a straightforward interface for hashing data in a single call. The code emphasizes robustness and correctness, with checks for null pointers, memory alignment, and state integrity. This implementation is suitable for applications requiring secure hashing, such as data integrity verification and cryptographic applications.
 # Imports and Dependencies
 
 ---
@@ -20,176 +20,155 @@ The code also provides a convenience function, [`fd_keccak256_hash`](<#fd_keccak
 
 ---
 ### fd\_keccak256\_align<!-- {{#callable:fd_keccak256_align}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L4>)
-
-Returns the alignment requirement for the Keccak-256 hash function.
+The `fd_keccak256_align` function returns the alignment requirement for the Keccak-256 hashing context.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Return the value of `FD_KECCAK256_ALIGN`.
-- **Output**: The alignment requirement as an `ulong` value.
+- **Control Flow**:
+    - The function is defined to return an unsigned long integer.
+    - It directly returns the value of the macro `FD_KECCAK256_ALIGN`.
+- **Output**: The function returns an unsigned long integer representing the alignment requirement for the Keccak-256 hashing context.
 
 
 ---
 ### fd\_keccak256\_footprint<!-- {{#callable:fd_keccak256_footprint}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L9>)
-
-Returns the constant `FD_KECCAK256_FOOTPRINT`.
+The function `fd_keccak256_footprint` returns the memory footprint size required for a Keccak-256 hash context.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Return the value of the constant `FD_KECCAK256_FOOTPRINT`.
-- **Output**: The function returns an `ulong` which is the value of `FD_KECCAK256_FOOTPRINT`.
+- **Control Flow**:
+    - The function is defined to return an unsigned long integer.
+    - It directly returns the value of the macro `FD_KECCAK256_FOOTPRINT`.
+- **Output**: The function outputs an unsigned long integer representing the memory footprint size for a Keccak-256 hash context.
 
 
 ---
 ### fd\_keccak256\_new<!-- {{#callable:fd_keccak256_new}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L14>)
-
-Initializes a new `fd_keccak256_t` structure in shared memory, ensuring proper alignment and setting a magic number.
+The `fd_keccak256_new` function initializes a new Keccak-256 hashing context in a given shared memory region.
 - **Inputs**:
-    - `shmem`: A pointer to shared memory where the `fd_keccak256_t` structure will be initialized.
-- **Logic and Control Flow**:
-    - Cast `shmem` to a `fd_keccak256_t` pointer named `sha`.
-    - Check if `shmem` is NULL; if true, log a warning and return NULL.
-    - Check if `shmem` is aligned according to [`fd_keccak256_align`](<#fd_keccak256_align>); if not, log a warning and return NULL.
-    - Get the footprint size using [`fd_keccak256_footprint`](<#fd_keccak256_footprint>).
-    - Set the memory at `sha` to zero using `fd_memset` with the footprint size.
-    - Use `FD_COMPILER_MFENCE` to ensure memory operations are completed before setting the magic number.
-    - Set the `magic` field of `sha` to `FD_KECCAK256_MAGIC` using `FD_VOLATILE`.
-    - Use `FD_COMPILER_MFENCE` again to ensure the magic number is set before returning.
-    - Return the pointer `sha` cast to `void *`.
-- **Output**: A pointer to the initialized `fd_keccak256_t` structure, or NULL if there is an error.
-- **Functions Called**:
-    - [`fd_keccak256_align`](<#fd_keccak256_align>)
-    - [`fd_keccak256_footprint`](<#fd_keccak256_footprint>)
+    - `shmem`: A pointer to a shared memory region where the Keccak-256 context will be initialized.
+- **Control Flow**:
+    - Cast the `shmem` pointer to a `fd_keccak256_t` pointer named `sha`.
+    - Check if `shmem` is NULL; if so, log a warning and return NULL.
+    - Check if `shmem` is aligned according to [`fd_keccak256_align`](#fd_keccak256_align); if not, log a warning and return NULL.
+    - Retrieve the footprint size using [`fd_keccak256_footprint`](#fd_keccak256_footprint).
+    - Zero out the memory region pointed to by `sha` using `fd_memset`.
+    - Set a memory fence using `FD_COMPILER_MFENCE`.
+    - Set the `magic` field of `sha` to `FD_KECCAK256_MAGIC` using a volatile store.
+    - Set another memory fence using `FD_COMPILER_MFENCE`.
+    - Return the pointer to the initialized `fd_keccak256_t` structure.
+- **Output**: A pointer to the initialized `fd_keccak256_t` structure, or NULL if initialization fails due to NULL or misaligned `shmem`.
+- **Functions called**:
+    - [`fd_keccak256_align`](#fd_keccak256_align)
+    - [`fd_keccak256_footprint`](#fd_keccak256_footprint)
 
 
 ---
 ### fd\_keccak256\_join<!-- {{#callable:fd_keccak256_join}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L39>)
-
-Validates and returns a pointer to a `fd_keccak256_t` structure if the input is correctly aligned and initialized.
+The `fd_keccak256_join` function validates and returns a pointer to a `fd_keccak256_t` structure if the input shared memory is correctly aligned and initialized.
 - **Inputs**:
-    - `shsha`: A pointer to a memory location that is expected to be a `fd_keccak256_t` structure.
-- **Logic and Control Flow**:
-    - Check if `shsha` is NULL; if true, log a warning and return NULL.
-    - Check if `shsha` is aligned according to [`fd_keccak256_align`](<#fd_keccak256_align>); if not, log a warning and return NULL.
+    - `shsha`: A pointer to shared memory that is expected to contain a `fd_keccak256_t` structure.
+- **Control Flow**:
+    - Check if `shsha` is NULL; if so, log a warning and return NULL.
+    - Check if `shsha` is aligned according to [`fd_keccak256_align`](#fd_keccak256_align); if not, log a warning and return NULL.
     - Cast `shsha` to a `fd_keccak256_t` pointer named `sha`.
     - Check if `sha->magic` equals `FD_KECCAK256_MAGIC`; if not, log a warning and return NULL.
     - Return the `sha` pointer.
 - **Output**: A pointer to a `fd_keccak256_t` structure if all checks pass, otherwise NULL.
-- **Functions Called**:
-    - [`fd_keccak256_align`](<#fd_keccak256_align>)
+- **Functions called**:
+    - [`fd_keccak256_align`](#fd_keccak256_align)
 
 
 ---
 ### fd\_keccak256\_leave<!-- {{#callable:fd_keccak256_leave}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L62>)
-
-Returns the input `fd_keccak256_t` pointer if it is not NULL, otherwise logs a warning and returns NULL.
+The `fd_keccak256_leave` function checks if the provided `fd_keccak256_t` pointer is non-null and returns it as a void pointer.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_keccak256_t` structure.
-- **Logic and Control Flow**:
-    - Check if `sha` is NULL using `FD_UNLIKELY`.
-    - If `sha` is NULL, log a warning with the message "NULL sha" and return NULL.
-    - If `sha` is not NULL, return the `sha` pointer cast to a `void *`.
-- **Output**: A `void *` pointer to the `fd_keccak256_t` structure, or NULL if the input is NULL.
+    - `sha`: A pointer to an `fd_keccak256_t` structure, which represents the state of a Keccak-256 hash operation.
+- **Control Flow**:
+    - Check if the `sha` pointer is NULL using `FD_UNLIKELY`; if it is NULL, log a warning and return NULL.
+    - If `sha` is not NULL, cast it to a void pointer and return it.
+- **Output**: Returns the input `sha` pointer cast to a void pointer, or NULL if the input is NULL.
 
 
 ---
 ### fd\_keccak256\_delete<!-- {{#callable:fd_keccak256_delete}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L73>)
-
-Deletes a `fd_keccak256_t` object by verifying its alignment and magic number, then invalidating it.
+The `fd_keccak256_delete` function validates and clears a `fd_keccak256_t` structure by setting its magic number to zero, effectively marking it as deleted.
 - **Inputs**:
-    - `shsha`: A pointer to the `fd_keccak256_t` object to delete.
-- **Logic and Control Flow**:
-    - Check if `shsha` is NULL; if so, log a warning and return NULL.
-    - Check if `shsha` is aligned according to [`fd_keccak256_align`](<#fd_keccak256_align>); if not, log a warning and return NULL.
+    - `shsha`: A pointer to a `fd_keccak256_t` structure that is to be deleted.
+- **Control Flow**:
+    - Check if `shsha` is NULL and log a warning if true, returning NULL.
+    - Check if `shsha` is aligned according to `fd_keccak256_align()` and log a warning if not, returning NULL.
     - Cast `shsha` to a `fd_keccak256_t` pointer named `sha`.
-    - Check if `sha->magic` equals `FD_KECCAK256_MAGIC`; if not, log a warning and return NULL.
-    - Use memory fence operations to ensure memory operations are completed before and after setting `sha->magic` to 0.
-    - Return the `sha` pointer cast back to `void *`.
-- **Output**: A pointer to the deleted `fd_keccak256_t` object, or NULL if an error occurred.
-- **Functions Called**:
-    - [`fd_keccak256_align`](<#fd_keccak256_align>)
+    - Check if `sha->magic` is equal to `FD_KECCAK256_MAGIC` and log a warning if not, returning NULL.
+    - Use memory fence operations to ensure memory ordering and set `sha->magic` to 0, marking it as deleted.
+    - Return the `sha` pointer cast back to a `void *`.
+- **Output**: A pointer to the `fd_keccak256_t` structure that was deleted, or NULL if any validation checks fail.
+- **Functions called**:
+    - [`fd_keccak256_align`](#fd_keccak256_align)
 
 
 ---
 ### fd\_keccak256\_init<!-- {{#callable:fd_keccak256_init}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L100>)
-
-Initializes a `fd_keccak256_t` structure by resetting its state and setting the padding start index to zero.
+The `fd_keccak256_init` function initializes a `fd_keccak256_t` structure by zeroing its state and setting the padding start index to zero.
 - **Inputs**:
     - `sha`: A pointer to a `fd_keccak256_t` structure that will be initialized.
-- **Logic and Control Flow**:
-    - Call `fd_memset` to set all bytes of `sha->state` to zero.
-    - Set `sha->padding_start` to zero.
-    - Return the pointer `sha`.
-- **Output**: Returns the initialized `fd_keccak256_t` structure pointer.
+- **Control Flow**:
+    - The function uses `fd_memset` to set all bytes of the `state` array within the `sha` structure to zero.
+    - The `padding_start` field of the `sha` structure is set to zero.
+    - The function returns the pointer to the initialized `fd_keccak256_t` structure.
+- **Output**: A pointer to the initialized `fd_keccak256_t` structure.
 
 
 ---
 ### fd\_keccak256\_append<!-- {{#callable:fd_keccak256_append}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L109>)
-
-Appends data to the Keccak-256 state and processes it in blocks.
+The `fd_keccak256_append` function appends data to a Keccak-256 hash state, processing it in blocks and updating the state accordingly.
 - **Inputs**:
     - `sha`: A pointer to the `fd_keccak256_t` structure representing the current state of the Keccak-256 hash.
-    - `_data`: A pointer to the data to append to the hash state.
-    - `sz`: The size of the data to append, in bytes.
-- **Logic and Control Flow**:
-    - Check if `sz` is zero; if true, return `sha` immediately as no data needs appending.
-    - Unpack the state, state bytes, and padding start from the `sha` structure.
-    - Cast `_data` to a `uchar` pointer named `data`.
-    - Initialize `state_idx` with `padding_start`.
-    - Iterate over each byte of `data` using a loop that runs `sz` times.
-    - For each byte, XOR it with the corresponding byte in `state_bytes` at `state_idx`.
-    - Increment `state_idx` after each XOR operation.
-    - If `state_idx` reaches `FD_KECCAK256_RATE`, call [`fd_keccak256_core`](<fd_keccak256_private.h.md#fd_keccak256_core>) to process the current block and reset `state_idx` to zero.
-    - Update `sha->padding_start` with the current `state_idx`.
+    - `_data`: A pointer to the data to be appended to the hash state.
+    - `sz`: The size of the data to be appended, in bytes.
+- **Control Flow**:
+    - Check if the size of the data (`sz`) is zero; if so, return the current hash state without modification.
+    - Unpack the current state, state bytes, and padding start from the `sha` structure.
+    - Cast the input data to a byte array for processing.
+    - Iterate over each byte of the input data, XORing it with the corresponding byte in the state bytes array.
+    - Increment the state index after each byte is processed.
+    - If the state index reaches the rate limit (`FD_KECCAK256_RATE`), process the current state with [`fd_keccak256_core`](fd_keccak256_private.h.md#fd_keccak256_core) and reset the state index to zero.
+    - Update the `padding_start` in the `sha` structure with the current state index.
     - Return the updated `sha` structure.
-- **Output**: Returns a pointer to the updated `fd_keccak256_t` structure.
-- **Functions Called**:
-    - [`fd_keccak256_core`](<fd_keccak256_private.h.md#fd_keccak256_core>)
+- **Output**: Returns a pointer to the updated `fd_keccak256_t` structure, representing the new state of the hash after appending the data.
+- **Functions called**:
+    - [`fd_keccak256_core`](fd_keccak256_private.h.md#fd_keccak256_core)
 
 
 ---
 ### fd\_keccak256\_fini<!-- {{#callable:fd_keccak256_fini}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L141>)
-
-Finalizes the Keccak-256 hash computation and stores the result in the provided buffer.
+The `fd_keccak256_fini` function finalizes the Keccak-256 hashing process by appending padding, processing the final block, and copying the hash result to the provided output buffer.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_keccak256_t` structure that holds the current state of the hash computation.
+    - `sha`: A pointer to an `fd_keccak256_t` structure that holds the current state of the Keccak-256 hash computation.
     - `hash`: A pointer to a buffer where the final hash result will be stored.
-- **Logic and Control Flow**:
-    - Unpack the state, state bytes, and padding start from the `sha` structure.
-    - Append the terminating message byte by XORing the byte at `padding_start` with `0x01` and the last byte of the rate with `0x80`.
-    - Call [`fd_keccak256_core`](<fd_keccak256_private.h.md#fd_keccak256_core>) to process the final block of the state.
-    - Copy the resulting hash from the state to the `hash` buffer using `fd_memcpy`.
+- **Control Flow**:
+    - Unpack the state, state_bytes, and padding_start from the `sha` structure.
+    - Append the terminating message byte by XORing the byte at `padding_start` with 0x01 and the last byte of the rate with 0x80.
+    - Call [`fd_keccak256_core`](fd_keccak256_private.h.md#fd_keccak256_core) to process the final block of the state.
+    - Copy the resulting hash from the state to the provided `hash` buffer using `fd_memcpy`.
 - **Output**: Returns a pointer to the `hash` buffer containing the final hash result.
-- **Functions Called**:
-    - [`fd_keccak256_core`](<fd_keccak256_private.h.md#fd_keccak256_core>)
+- **Functions called**:
+    - [`fd_keccak256_core`](fd_keccak256_private.h.md#fd_keccak256_core)
 
 
 ---
 ### fd\_keccak256\_hash<!-- {{#callable:fd_keccak256_hash}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256.c#L164>)
-
-Computes the Keccak-256 hash of the input data and stores it in the provided hash buffer.
+The `fd_keccak256_hash` function computes the Keccak-256 hash of the given data and stores the result in the provided hash buffer.
 - **Inputs**:
-    - `_data`: Pointer to the input data to hash.
-    - `sz`: Size of the input data in bytes.
-    - `_hash`: Pointer to the buffer where the computed hash will be stored.
-- **Logic and Control Flow**:
-    - Initialize a `fd_keccak256_t` structure `sha` for hashing.
-    - Call [`fd_keccak256_init`](<#fd_keccak256_init>) to initialize the `sha` structure.
-    - Call [`fd_keccak256_append`](<#fd_keccak256_append>) to process the input data `_data` of size `sz` and update the `sha` state.
-    - Call [`fd_keccak256_fini`](<#fd_keccak256_fini>) to finalize the hash computation and store the result in `_hash`.
-- **Output**: Returns a pointer to the buffer `_hash` containing the computed hash.
-- **Functions Called**:
-    - [`fd_keccak256_init`](<#fd_keccak256_init>)
-    - [`fd_keccak256_append`](<#fd_keccak256_append>)
-    - [`fd_keccak256_fini`](<#fd_keccak256_fini>)
+    - `_data`: A pointer to the input data that needs to be hashed.
+    - `sz`: The size in bytes of the input data.
+    - `_hash`: A pointer to the buffer where the resulting hash will be stored.
+- **Control Flow**:
+    - Initialize a `fd_keccak256_t` structure `sha` using [`fd_keccak256_init`](#fd_keccak256_init).
+    - Append the input data to the `sha` structure using [`fd_keccak256_append`](#fd_keccak256_append), passing the data pointer and its size.
+    - Finalize the hash computation and store the result in the provided hash buffer using [`fd_keccak256_fini`](#fd_keccak256_fini).
+    - Return the pointer to the hash buffer.
+- **Output**: A pointer to the buffer containing the computed Keccak-256 hash.
+- **Functions called**:
+    - [`fd_keccak256_init`](#fd_keccak256_init)
+    - [`fd_keccak256_append`](#fd_keccak256_append)
+    - [`fd_keccak256_fini`](#fd_keccak256_fini)
 
 
 

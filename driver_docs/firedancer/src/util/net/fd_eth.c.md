@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements Ethernet frame checksum calculation and MAC address conversion from string to byte array.
+The `fd_eth.c` file in the `firedancer` codebase provides functions for appending an Ethernet frame check sequence (FCS) using a CRC table, converting ASCII characters to hexadecimal digits, and converting a string representation of a MAC address to a byte array.
 
 # Purpose
-The code provides functionality for Ethernet frame checksum calculation and MAC address conversion. It includes a function [`fd_eth_fcs_append`](<#fd_eth_fcs_append>) that calculates the Frame Check Sequence (FCS) for Ethernet frames using a precomputed table of CRC-32 values. This function takes a seed value, a buffer, and its size as inputs, and returns the computed CRC value. The table used for CRC calculation is defined as a static array within the function, which is a common approach to optimize the performance of CRC calculations.
+The provided C source code file is designed to perform operations related to Ethernet frame checksums and MAC address conversions. It includes a function [`fd_eth_fcs_append`](#fd_eth_fcs_append) that calculates the Frame Check Sequence (FCS) for Ethernet frames using a CRC-32 algorithm. This function utilizes a precomputed table of CRC values to efficiently compute the checksum for a given buffer of data. The table is a static array of 256 unsigned integers, which is a common optimization technique for CRC calculations to speed up the process by avoiding repeated calculations.
 
-Additionally, the code includes a utility function [`fd_cstr_to_mac_addr`](<#fd_cstr_to_mac_addr>) that converts a string representation of a MAC address into its binary form. This function uses an inline helper function [`ascii_to_xdigit`](<#ascii_to_xdigit>) to convert ASCII characters to hexadecimal digits. The [`fd_cstr_to_mac_addr`](<#fd_cstr_to_mac_addr>) function checks for valid input and ensures the MAC address string is correctly formatted with colon separators. If the input is valid, it populates the provided `mac` array with the binary representation of the MAC address. The code is structured to be part of a larger system, likely related to network programming, where these utilities are used for processing Ethernet frames and MAC addresses.
+Additionally, the file contains a utility function [`fd_cstr_to_mac_addr`](#fd_cstr_to_mac_addr) that converts a string representation of a MAC address into its binary form. This function ensures that the input string is correctly formatted as a MAC address (e.g., "00:1A:2B:3C:4D:5E") and converts each pair of hexadecimal digits into a byte. The function [`ascii_to_xdigit`](#ascii_to_xdigit) is used internally to convert ASCII characters to their hexadecimal digit values. This code is likely part of a larger library or application dealing with network communications, where efficient and accurate processing of Ethernet frames and MAC addresses is crucial.
 # Imports and Dependencies
 
 ---
@@ -19,58 +19,47 @@ Additionally, the code includes a utility function [`fd_cstr_to_mac_addr`](<#fd_
 
 ---
 ### fd\_eth\_fcs\_append<!-- {{#callable:fd_eth_fcs_append}} -->
-[View Source →](<../../../../../src/util/net/fd_eth.c#L5>)
-
-Calculates the Frame Check Sequence (FCS) for a given buffer using a CRC-32 algorithm.
+The `fd_eth_fcs_append` function calculates the Frame Check Sequence (FCS) for a given buffer using a CRC-32 algorithm, starting from a specified seed value.
 - **Inputs**:
     - `seed`: An initial CRC value used to start the calculation.
-    - `buf`: A pointer to the buffer containing the data for which the FCS is calculated.
+    - `buf`: A pointer to the buffer containing the data for which the FCS is to be calculated.
     - `sz`: The size of the buffer in bytes.
-- **Logic and Control Flow**:
-    - Initialize `crc` by inverting the `seed` value.
-    - Cast the `buf` pointer to a `uchar` pointer `p`.
-    - Iterate over each byte in the buffer while `sz` is greater than zero.
-    - For each byte, update `crc` by shifting it right by 8 bits, XORing it with the table value indexed by the XOR of the current byte and the least significant byte of `crc`.
-    - Decrement `sz` and increment the buffer pointer `p`.
-    - Return the bitwise NOT of the final `crc` value.
-- **Output**: Returns the calculated FCS as an unsigned integer.
+- **Control Flow**:
+    - Initialize the CRC value by inverting the seed.
+    - Cast the buffer pointer to a pointer to unsigned characters for byte-wise processing.
+    - Iterate over each byte in the buffer, updating the CRC value using a lookup table and bitwise operations.
+    - Invert the final CRC value before returning it.
+- **Output**: The function returns the computed CRC-32 value as an unsigned integer.
 
 
 ---
 ### ascii\_to\_xdigit<!-- {{#callable:ascii_to_xdigit}} -->
-[View Source →](<../../../../../src/util/net/fd_eth.c#L53>)
-
-Converts an ASCII character representing a hexadecimal digit to its numeric value, returning 16 for non-hexadecimal characters.
+The `ascii_to_xdigit` function converts a single ASCII character representing a hexadecimal digit into its corresponding numeric value, returning 16 for non-hexadecimal characters.
 - **Inputs**:
-    - `c`: An ASCII character to convert to a hexadecimal digit.
-- **Logic and Control Flow**:
+    - `c`: A character representing a potential hexadecimal digit.
+- **Control Flow**:
     - Convert the input character `c` to an unsigned long integer `ul`.
-    - Subtract the ASCII value of '0' from `ul` and use unsigned arithmetic to ensure values below '0' and above 'f' map to values >= 55.
-    - Use a bit field and range test to determine if `c` is a hexadecimal digit by checking a 64-bit table encoded as an unsigned long integer.
-    - If `c` is a hexadecimal digit, calculate its numeric value using `(ul & 15UL) + 9UL*(ulong)(ul>(ulong)(uchar)'9')`.
-    - Return 16 if `c` is not a hexadecimal digit.
-- **Output**: Returns the numeric value of the hexadecimal digit represented by `c`, or 16 if `c` is not a valid hexadecimal digit.
+    - Calculate the index for a lookup in a 64-bit table to determine if `c` is a valid hexadecimal digit using bit manipulation and range checking.
+    - Use `fd_ulong_if` to return the numeric value of the hexadecimal digit if valid, or 16 if not.
+    - The numeric value is calculated as `(ul & 15UL) + 9UL*(ulong)(ul>(ulong)(uchar)'9')`, which adjusts for characters 'A'-'F' and 'a'-'f'.
+- **Output**: Returns an unsigned long integer representing the numeric value of the hexadecimal digit, or 16 if the character is not a valid hexadecimal digit.
 
 
 ---
 ### fd\_cstr\_to\_mac\_addr<!-- {{#callable:fd_cstr_to_mac_addr}} -->
-[View Source →](<../../../../../src/util/net/fd_eth.c#L81>)
-
-Converts a colon-separated MAC address string to a 6-byte MAC address array.
+The `fd_cstr_to_mac_addr` function converts a string representation of a MAC address into a byte array.
 - **Inputs**:
-    - `s`: A pointer to a null-terminated string representing a MAC address in colon-separated format (e.g., "01:23:45:67:89:AB").
-    - `mac`: A pointer to an array of unsigned characters where the function will store the converted MAC address.
-- **Logic and Control Flow**:
-    - Check if either `s` or `mac` is NULL; if so, return NULL.
-    - Iterate over each of the 6 MAC address bytes.
-    - For each byte, convert the first character to a hexadecimal digit using [`ascii_to_xdigit`](<#ascii_to_xdigit>); if conversion fails, return NULL.
-    - Convert the second character to a hexadecimal digit using [`ascii_to_xdigit`](<#ascii_to_xdigit>); if conversion fails, return NULL.
-    - If not the last byte, check if the next character is a colon; if not, return NULL.
-    - Combine the two hexadecimal digits into a single byte and store it in the `mac` array.
-    - Advance the string pointer by 3 to skip the processed byte and the colon separator.
-- **Output**: Returns a pointer to the `mac` array containing the converted MAC address, or NULL if an error occurs during conversion.
-- **Functions Called**:
-    - [`ascii_to_xdigit`](<#ascii_to_xdigit>)
+    - `s`: A pointer to a null-terminated string representing a MAC address in the format 'XX:XX:XX:XX:XX:XX', where 'XX' are hexadecimal digits.
+    - `mac`: A pointer to an array of unsigned characters where the converted MAC address will be stored.
+- **Control Flow**:
+    - Check if either input pointer is NULL and return NULL if so.
+    - Iterate over each pair of hexadecimal digits in the input string, expecting a colon ':' separator between each pair except the last.
+    - Convert each pair of hexadecimal characters to a byte using the [`ascii_to_xdigit`](#ascii_to_xdigit) function and store it in the `mac` array.
+    - If any character is not a valid hexadecimal digit or if the expected colon is missing, return NULL.
+    - After processing all pairs, return the `mac` array.
+- **Output**: Returns a pointer to the `mac` array containing the converted MAC address, or NULL if the input string is invalid or if any input pointer is NULL.
+- **Functions called**:
+    - [`ascii_to_xdigit`](#ascii_to_xdigit)
 
 
 
