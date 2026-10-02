@@ -3,24 +3,53 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Template for multi-sorted live tables with treap-backed iterators and sort-key management.
+Generates prototypes, inlines, and implementations for multi-sorted table views with fixed row capacity.
 
 # Purpose
-This file is a C template that generates a live table API for rows with multiple sortable columns. It defines the data structures, prototypes, inline helpers, and implementations needed to manage a table stored in shared memory, with row access by index or pointer, insertion and removal, and forward iteration in sorted order. The table uses one doubly linked list and up to `LIVE_TABLE_MAX_SORT_KEY_CNT` treaps to maintain multiple active sort orders at the same time. It also provides helpers for null values, index and element conversion, column name lookup, and table verification.
+The code is a C template for generating prototypes, inlines, and implementations for multi-sorted views of tables. It allows for the creation of data structures that can sort and iterate over tables with multiple columns, where the number of columns is fixed at compile-time, and the number of rows is fixed at runtime. The code is designed to work with other data structures such as pools, treaps, heaps, and maps, and supports operations like inter-process usage, memory relocation, and serialization. The template is an extension of the `fd_treap` API, and it provides a set of functions to manage and manipulate these multi-sorted views.
 
-The main purpose of the file is to build a multi-sorted view over an underlying row pool. A sort key is defined by column indices and sort directions, and the code compares rows with `mytable_lt`-style logic through column-specific comparison functions. When a caller requests iteration for a sort key, the code finds an existing matching treap or creates a new one, then returns a forward iterator over that order. The file is intended to be included after the caller defines macros such as `LIVE_TABLE_NAME`, `LIVE_TABLE_ROW_T`, and `LIVE_TABLE_COLUMNS`, so it acts as a header-style code generator for a table-specific API.
-# Function Declarations (Public API)
+The code defines a set of macros and functions that facilitate the creation and management of tables with multiple sorting keys. It includes definitions for data structures such as `myrow_t` and `LIVE_TABLE_(t)`, which represent rows and tables, respectively. The code also provides functions for inserting and removing rows, iterating over sorted rows, and verifying the integrity of the sorting keys. The template uses a combination of static and dynamic memory management techniques to handle the storage and sorting of table rows. The code is intended to be included in other C files, where specific table configurations are defined using macros like `LIVE_TABLE_NAME`, `LIVE_TABLE_COLUMN_CNT`, and `LIVE_TABLE_COLUMNS`.
+# Imports and Dependencies
 
 ---
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
-- `LIVE_TABLE_`
+- `stddef.h`
+- `../../util/log/fd_log.h`
+- `../../util/bits/fd_bits.h`
+- `../../util/math/fd_stat.h`
+- `../../util/tmpl/fd_treap.c`
+- `../../util/tmpl/fd_dlist.c`
+
+
+# Global Variables
+
+---
+### LIVE\_TABLE\_
+- **Type**: `LIVE_TABLE_(fwd_iter_t)`
+- **Description**: `LIVE_TABLE_(fwd_iter_t)` is a type definition for a forward iterator used in the context of a live table implementation. It is defined as a typedef of `LIVE_TABLE_(private_treap_fwd_iter_t)`, which is likely a structure or type that facilitates iteration over elements in a live table.
+- **Use**: Used to iterate over elements in a live table in a forward direction, typically from the smallest to the largest value.
+
+
+# Functions
+
+---
+### LIVE\_TABLE\_<!-- {{#callable:LIVE_TABLE_}} -->
+[View Source →](<../../../../../src/disco/gui/fd_gui_live_table_tmpl.c#L725>)
+
+Verifies the integrity of active treaps and sort keys in a live table structure.
+- **Inputs**:
+    - ``join``: A pointer to a `LIVE_TABLE_(t)` structure representing the live table to verify.
+    - ``pool``: A pointer to a constant `LIVE_TABLE_ROW_T` structure representing the pool of rows associated with the live table.
+- **Logic and Control Flow**:
+    - Store the current active sort key index in `prev_sk_idx`.
+    - Iterate over each possible sort key index up to `LIVE_TABLE_MAX_SORT_KEY_CNT`.
+    - For each index, check if the treap is active using `join->treaps_is_active[i]`.
+    - If the treap is active, set `LIVE_TABLE_(private_active_sort_key_idx)` to the current index `i`.
+    - Verify the treap at the current index using `LIVE_TABLE_(private_treap_verify)`. If verification fails, log a critical error and exit.
+    - Verify the sort key at the current index using `LIVE_TABLE_(verify_sort_key)`. If verification fails, print the sort key and log a critical error.
+    - Restore the original active sort key index from `prev_sk_idx`.
+- **Output**: Returns 0 after verifying all active treaps and sort keys.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `metrics.md` file in the `firedancer` codebase provides an overview of the internal performance counters exposed via a Prometheus HTTP endpoint, detailing the types of metrics available and their intended use for developers and diagnostics.
+Documentation for Firedancer's internal performance counters exposed via a Prometheus HTTP endpoint.
 
 # Purpose
-The provided content is a documentation excerpt detailing the configuration and usage of performance metrics in the Firedancer software. It explains that Firedancer maintains internal performance counters for developers and monitoring tools, which are exposed through a Prometheus HTTP endpoint. The configuration snippet in TOML format specifies the port (7999) on which the Prometheus metrics are accessible. The document includes an example of how to retrieve these metrics using a curl command, showcasing the `gauge` metric type with process IDs for different components. Additionally, it warns that these metrics are intended for developer and diagnostic purposes only, and may change without notice. The document also outlines the three types of metrics supported by Firedancer, adhering to the Prometheus data model: `counter`, `gauge`, and `histogram`.
+Firedancer uses internal performance counters to help developers and monitoring tools track system performance. These metrics are accessible through a Prometheus HTTP endpoint, which is configured to listen on port 7999 as specified in the `config.toml` file. Users can retrieve metrics by sending a request to `http://localhost:7999/metrics`, which returns data such as process IDs for different components like `net`, `quic`, `verify`, and `dedup`. The metrics follow the Prometheus data model and include three types: `counter`, `gauge`, and `histogram`. It is important to note that these metrics are intended for developer and diagnostic use, and the endpoint or data may change without notice.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

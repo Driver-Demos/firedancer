@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL test pack, lock file, README, and query tests for C++ queries
+CodeQL test configurations, dependencies, metric tests, and documentation.
 
 ## Folders
-- **[query-tests](query-tests/README.md)**: CodeQL tests for metric enum access, nonbinary is-style returns, and trivial memcpy alerts
+- **[query-tests](query-tests/README.md)**: Defines metric types, functions, and tests for enum-based metrics, instruction accounts, and `memcpy` operations.
 
 ## Files
-- **[codeql-pack.lock.yml](codeql-pack.lock.yml.md)**: CodeQL pack lock file listing dependency versions.
-- **[InlineExpectationsTestQuery.ql](InlineExpectationsTestQuery.ql.md)**: Test postprocessing for inline expectations, with a relative URL formatter for locations.
-- **[qlpack.yml](qlpack.yml.md)**: CodeQL test pack for C++ queries with fd-nightly-queries dependency.
-- **[README.md](README.md.md)**: Instructions for CodeQL query tests and expected results.
+- **[codeql-pack.lock.yml](codeql-pack.lock.yml.md)**: Specifies dependencies and their versions for a CodeQL package.
+- **[InlineExpectationsTestQuery.ql](InlineExpectationsTestQuery.ql.md)**: Defines a test post-processing module for inline expectations in CodeQL queries.
+- **[qlpack.yml](qlpack.yml.md)**: Configuration for CodeQL tests with dependencies on `fd-nightly-queries` and `cpp-all`.
+- **[README.md](README.md.md)**: Documentation for CodeQL tests in the Firedancer codebase, detailing test structure and contribution guidelines.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
