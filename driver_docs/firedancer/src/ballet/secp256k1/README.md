@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `secp256k1` folder in the `firedancer` codebase contains implementation, API definitions, testing, and build configuration files for handling secp256k1 signature computations and public key recovery.
+Implements and tests secp256k1 ECDSA public key recovery with fuzz testing and a Makefile for builds.
 
 
 ## Files
-- **[fd_secp256k1.c](fd_secp256k1.c.md)**: The `fd_secp256k1.c` file implements a function to recover a public key from a message hash and a recoverable ECDSA signature using the secp256k1 library.
-- **[fd_secp256k1.h](fd_secp256k1.h.md)**: The `fd_secp256k1.h` file provides APIs for secp256k1 signature computations, specifically including a function to recover a public key from a recoverable SECP256K1 signature.
-- **[fuzz_secp256k1_recover.c](fuzz_secp256k1_recover.c.md)**: The `fuzz_secp256k1_recover.c` file in the `firedancer` codebase implements a fuzzing test for the secp256k1 public key recovery function, verifying the ability to recover and match public keys from given message and signature inputs.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase configures the build process for secp256k1-related headers, objects, unit tests, and fuzz tests, with conditional inclusion based on the presence of the `libsecp256k1` library.
-- **[test_secp256k1.c](test_secp256k1.c.md)**: The `test_secp256k1.c` file in the `firedancer` codebase contains tests for the `fd_secp256k1_recover` function, including correctness checks against known public keys and performance benchmarks.
+- **[fd_secp256k1.c](fd_secp256k1.c.md)**: Implements ECDSA public key recovery from a signature using the secp256k1 library.
+- **[fd_secp256k1.h](fd_secp256k1.h.md)**: APIs for secp256K1 signature computations, including public key recovery from signatures.
+- **[fuzz_secp256k1_recover.c](fuzz_secp256k1_recover.c.md)**: Fuzz testing for secp256k1 public key recovery using LLVM's libFuzzer.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing secp256k1 components with conditional library checks.
+- **[test_secp256k1.c](test_secp256k1.c.md)**: Tests for the `fd_secp256k1_recover` function, including performance benchmarks and correctness checks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

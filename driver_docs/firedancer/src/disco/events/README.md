@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Circular queue implementation, header, build rules, and tests.
+Circular queue implementation and tests with a Makefile for integration in the Firedancer codebase.
 
 
 ## Files
-- **[fd_circq.c](fd_circq.c.md)**: The `fd_circq.c` file implements a circular queue data structure with functions for creating, joining, leaving, deleting, pushing, and popping messages, as well as verifying and evicting messages within the queue.
-- **[fd_circq.h](fd_circq.h.md)**: The `fd_circq.h` file defines a fixed-size circular buffer structure for storing a queue of messages, with operations to push and pop messages while managing metadata within the buffer itself.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_circq` and related components within the `disco/events` directory.
-- **[test_circq.c](test_circq.c.md)**: Tests fd_circq push and pop behavior, random use, and size bounds.
+- **[fd_circq.c](fd_circq.c.md)**: Implements a circular queue for message storage with functions for creation, manipulation, and verification.
+- **[fd_circq.h](fd_circq.h.md)**: Defines a fixed-size circular buffer for message queuing with push and pop operations, including metadata handling.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for `fd_circq` in the `firedancer` codebase.
+- **[test_circq.c](test_circq.c.md)**: Tests for circular queue operations and boundary conditions in the Firedancer codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

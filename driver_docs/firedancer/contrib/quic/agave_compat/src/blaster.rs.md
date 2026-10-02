@@ -3,39 +3,41 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `blaster.rs` file in the `firedancer` codebase implements a function to send random-sized batches of predefined data to a specified destination using a QUIC connection.
+A function to send random-sized data batches to a specified destination using a QUIC connection.
 
 # Purpose
-The provided Rust code defines a function named `blast`, which is designed to send a continuous stream of data packets to a specified destination address. This function utilizes the Solana client and connection cache libraries to establish a connection to the target address, which is resolved from a string to a socket address. The core functionality of the `blast` function is to repeatedly send batches of data, where each batch consists of a random number of packets, each containing a random subset of a predefined buffer of bytes. The buffer is a large array of bytes, and the function uses the `rand` crate to generate random numbers for determining the size and content of each packet within the batch.
+The code defines a function named `blast` that sends a batch of data packets to a specified destination address using a connection from a connection cache. The function takes a `String` parameter `dst`, which represents the destination address. It resolves this address to a socket address using the `to_socket_addrs` method. The function uses a constant buffer `BUF` of 1193 bytes, which contains predefined data to be sent. The `ConnectionCache` and `ClientConnection` from the `solana_client` and `solana_connection_cache` crates are used to manage and retrieve connections for sending data.
 
-The `blast` function is a specialized utility that appears to be used for testing or stress-testing network connections by sending a high volume of data packets. It does not define a public API or external interface, as it is marked with the `pub(crate)` visibility, indicating that it is intended for use within the current crate only. The function leverages the `ConnectionCache` and `ClientConnection` from the Solana libraries to manage network connections efficiently. The use of a loop to continuously send data and the logging of the number of packets sent suggest that this function is intended for scenarios where monitoring the throughput or performance of a network connection is necessary.
+The `blast` function creates a batch of data packets with random sizes and sends them in a loop using the `send_data_batch` method of the `ClientConnection`. The loop continues indefinitely, generating a random number of packets to send in each iteration. The function uses a random number generator from the `rand` crate to determine the number of packets and their sizes. It also keeps track of the total number of packets sent and logs this information to the standard error output every time an additional 10,000 packets are sent. The function handles any errors that occur during the sending process by printing the error details.
 # Imports and Dependencies
 
 ---
 - `rand`
 - `solana_client`
 - `solana_connection_cache`
-- `std`
+- `std::net::ToSocketAddrs`
 
 
 # Functions
 
 ---
 ### blast
-The `blast` function sends random-sized batches of predefined data to a specified destination address using a connection cache.
+Sends random-sized batches of predefined data to a specified destination address in an infinite loop.
 - **Inputs**:
     - `dst`: A `String` representing the destination address to which data will be sent.
-- **Control Flow**:
-    - Convert the destination string `dst` into a socket address using `to_socket_addrs` and retrieve the first address.
+- **Logic and Control Flow**:
+    - Convert the `dst` string to a socket address using `to_socket_addrs` and retrieve the first address.
     - Define a constant buffer `BUF` containing a predefined array of bytes.
-    - Create a new QUIC connection cache with a specified name and size, and retrieve a connection for the socket address.
-    - Initialize a vector `batch` to hold batches of data to be sent, with a capacity of 1024.
-    - Initialize a random number generator `rng` and two counters `sent` and `sent_stat` to track the number of batches sent.
-    - Enter an infinite loop where a random number `cnt` is generated to determine the number of data batches to send in this iteration.
-    - Clear the `batch` vector and fill it with `cnt` random-sized slices of `BUF`, each converted to a vector.
-    - Attempt to send the batch of data using the connection; if an error occurs, print the error message.
-    - Increment the `sent` counter by `cnt` and check if the difference between `sent` and `sent_stat` exceeds 10000; if so, print the total number of batches sent and update `sent_stat`.
-- **Output**: The function does not return any value; it continuously sends data batches to the specified destination.
+    - Create a new QUIC connection cache with a specified name and size.
+    - Retrieve a connection from the connection cache using the socket address.
+    - Initialize a vector `batch` to store batches of data to send.
+    - Create a random number generator `rng` and initialize counters `sent` and `sent_stat` to zero.
+    - Enter an infinite loop to repeatedly send data batches.
+    - In each iteration, generate a random count `cnt` for the number of batches to send, clear the `batch` vector, and fill it with random-sized slices of `BUF`.
+    - Attempt to send the data batch using the connection; if an error occurs, print the error.
+    - Increment the `sent` counter by the number of batches sent.
+    - If the difference between `sent` and `sent_stat` exceeds 10,000, print the total number of batches sent and update `sent_stat`.
+- **Output**: This function does not return a value; it operates indefinitely, sending data batches to the specified destination.
 
 
 
