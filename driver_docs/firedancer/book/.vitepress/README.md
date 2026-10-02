@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `.vitepress` folder in the `firedancer` codebase contains configuration and theme setup files for a VitePress site, including a `config.mts` for site configuration, a `version-plugin.js` for version management, and a `theme` folder for styling.
+CSS styles and JavaScript for VitePress theme, configuration for documentation site, and version plugin.
 
 ## Folders
-- **[theme](theme/README.md)**: The `theme` folder in the `firedancer` codebase contains files for setting up and styling a VitePress site's theme, including a `custom.css` for defining table metrics styles and an `index.js` for configuring the default theme and importing custom styles.
+- **[theme](theme/README.md)**: CSS styles for table metrics and JavaScript for importing and exporting the default VitePress theme.
 
 ## Files
-- **[config.mts](config.mts.md)**: The `config.mts` file in the `firedancer` codebase configures the VitePress site for the Firedancer documentation, including site metadata, navigation, sidebar structure, and plugins.
-- **[version-plugin.js](version-plugin.js.md)**: The `version-plugin.js` file defines a VitePress plugin that fetches the latest release version of the `firedancer` repository from GitHub and replaces occurrences of `__FD_LATEST_VERSION__` in markdown files with this version.
+- **[config.mts](config.mts.md)**: Configuration for the Firedancer documentation site using VitePress with custom plugins and theme settings.
+- **[version-plugin.js](version-plugin.js.md)**: Fetches the latest release version from GitHub and replaces placeholders in markdown files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

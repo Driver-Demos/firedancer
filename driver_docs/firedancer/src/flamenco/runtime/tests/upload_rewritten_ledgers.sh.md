@@ -3,10 +3,41 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Uploads ledger tarballs to GCS if the target file does not already exist.
+Uploads rewritten ledger files to Google Cloud Storage if they do not already exist.
 
 # Purpose
-This shell script processes a list of ledger names and packages each ledger directory into a `tar.gz` archive. It reads command-line options for the ledger list file and the ledger base directory, then changes into the ledger location before it starts work. For each line in `LEDGER_LIST`, it parses the `-l` argument, builds the archive name, and checks whether the archive already exists in the `gs://firedancer-ci-resources/` bucket. If the file is not present, it uploads the archive with `gsutil cp`; if it is present, it skips the upload.
+This script processes command-line arguments to manage and upload ledger files to a Google Cloud Storage bucket. It accepts two primary options: `-l` or `--ledger-list` to specify a file containing a list of ledgers, and `-i` or `--ledgers-location` to define the directory where these ledgers are located. The script iterates over the provided arguments, storing them in variables for later use. If an unknown option is encountered, the script outputs an error message and exits.
+
+The script changes the current directory to the specified ledgers location and reads each line from the ledger list file. For each line, it parses key-value pairs, where keys are prefixed with a dash. It constructs a tarball for each ledger and checks if a corresponding file already exists in the Google Cloud Storage path. If the file does not exist, the script uploads the tarball to the specified cloud storage path using the `gsutil` command. This ensures that each ledger is archived and stored in the cloud if it is not already present.
+# Imports and Dependencies
+
+---
+- `gsutil`
+
+
+# Global Variables
+
+---
+### LEDGER\_LIST
+- **Type**: `string`
+- **Description**: Contains the path to a file that lists ledger entries. Each line in the file represents a ledger entry with key-value pairs.
+- **Use**: Used to read ledger entries from a file for processing in a loop.
+
+
+---
+### LEDGERS\_LOCATION
+- **Type**: `string`
+- **Description**: Specifies the directory path where the script changes its working directory to process ledger files. It is set by the `-i` or `--ledgers-location` command-line option.
+- **Use**: Used to change the current working directory to the specified location for processing ledger files.
+
+
+---
+### POSITION\_ARGS
+- **Type**: `array`
+- **Description**: An array that stores positional arguments passed to the script that do not match any predefined options. These arguments are collected and stored for later use.
+- **Use**: Stores non-option command-line arguments for further processing.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

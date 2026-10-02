@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_reedsol_recover_256.c` file in the `firedancer` codebase implements a function for recovering data using Reed-Solomon error correction for a set of 256 shreds, handling cases of erasure and corruption.
+Auto-generated C code for recovering data using Reed-Solomon error correction with 256 shreds.
 
 # Purpose
-This C source code file is part of an implementation of Reed-Solomon error correction, specifically designed to recover data from a set of shreds (data fragments) when some of them are missing or corrupted. The function [`fd_reedsol_private_recover_var_256`](#fd_reedsol_private_recover_var_256) is the primary component of this file, and it is responsible for reconstructing the original data from a combination of data and parity shreds. The function takes in parameters such as the size of each shred, pointers to the shreds, the count of data and parity shreds, and an array indicating which shreds are erased. It uses a series of operations involving Galois Field arithmetic to perform the recovery, leveraging the properties of Reed-Solomon codes to regenerate missing data.
+The code defines a function [`fd_reedsol_private_recover_var_256`](<#fd_reedsol_private_recover_var_256>), which is part of a Reed-Solomon error correction implementation. This function is responsible for recovering data from a set of shreds, which are fragments of data that include both original data and parity information. The function takes parameters such as the size of each shred, pointers to the shreds, the count of data and parity shreds, and an array indicating which shreds are erased. The function uses these inputs to attempt to reconstruct the original data by leveraging the properties of Reed-Solomon codes, which are capable of correcting errors and recovering lost data.
 
-The code is highly specialized and optimized for performance, as evidenced by the use of macros and manual loop unrolling to handle up to 256 shreds. It includes operations such as loading data into vectors, performing inverse and forward Fast Fourier Transforms (IFFT and FFT), and checking for data integrity by comparing regenerated shreds with existing ones. The file is auto-generated, indicating that it is likely part of a larger system where such functions are generated based on specific parameters or configurations. The function does not define a public API or external interface directly, as it is marked as a private function, suggesting it is intended for internal use within a library or application that implements Reed-Solomon error correction.
+The function operates by first determining which shreds are available and which are erased. It then generates a permutation index (`pi`) based on the erased shreds and performs a series of operations involving loading, multiplying, and transforming the data using finite field arithmetic. The function checks for data integrity by comparing regenerated shreds with existing ones and returns an error code if any discrepancies are found. The function uses several helper functions and macros, such as `GF_MUL_VAR`, `fd_reedsol_ifft_256_0`, and `fd_reedsol_fft_256_0`, to perform the necessary mathematical operations. The function is part of a broader library for error correction and is not intended to be used as a standalone executable.
 # Imports and Dependencies
 
 ---
@@ -20,32 +20,36 @@ The code is highly specialized and optimized for performance, as evidenced by th
 
 ---
 ### fd\_reedsol\_private\_recover\_var\_256<!-- {{#callable:fd_reedsol_private_recover_var_256}} -->
-The function `fd_reedsol_private_recover_var_256` attempts to recover data from a set of shreds using Reed-Solomon error correction, ensuring that the data is consistent and uncorrupted.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_recover_256.c#L5>)
+
+Recovers data from shreds using Reed-Solomon error correction by processing erased and non-erased shreds.
 - **Inputs**:
     - `shred_sz`: The size of each shred in bytes.
-    - `shred`: An array of pointers to the shreds, where each pointer points to a shred of data.
-    - `data_shred_cnt`: The number of data shreds available.
-    - `parity_shred_cnt`: The number of parity shreds available.
-    - `erased`: An array indicating which shreds are erased (1 if erased, 0 if not).
-- **Control Flow**:
-    - Initialize arrays `_erased` and `pi` to track erased shreds and permutation indices, respectively.
-    - Calculate the total number of shreds (`shred_cnt`) and count the number of loaded data shreds (`loaded_cnt`).
-    - If the number of loaded data shreds is less than `data_shred_cnt`, return an error indicating partial data.
-    - Generate permutation indices using [`fd_reedsol_private_gen_pi_256`](fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_256).
-    - Iterate over each position in the shreds, loading data into vectors, filling erased vectors with zeros.
-    - Multiply each vector by its corresponding permutation index.
-    - Perform inverse FFT, generate derivatives, and perform FFT on the vectors.
-    - Multiply the vectors by their permutation indices again.
-    - Store, compare, or reload shred data based on whether they are erased or not, updating a difference variable to track inconsistencies.
-    - If any difference is detected, return an error indicating corruption.
-    - Advance the shred position and repeat until all positions are processed.
-    - Return success if all operations complete without detecting corruption.
-- **Output**: Returns an integer status code: `FD_REEDSOL_SUCCESS` on successful recovery, `FD_REEDSOL_ERR_PARTIAL` if not enough data shreds are available, or `FD_REEDSOL_ERR_CORRUPT` if a corruption is detected.
-- **Functions called**:
-    - [`fd_reedsol_private_gen_pi_256`](fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_256)
-    - [`gf_ldu`](fd_reedsol_arith_none.h.md#gf_ldu)
-    - [`fd_reedsol_ifft_256_0`](wrapped_impl/fd_reedsol_fft_impl_256_0.c.md#fd_reedsol_ifft_256_0)
-    - [`fd_reedsol_fft_256_0`](wrapped_impl/fd_reedsol_fft_impl_256_0.c.md#fd_reedsol_fft_256_0)
+    - `shred`: A pointer to an array of pointers, each pointing to a shred of data.
+    - `data_shred_cnt`: The number of data shreds.
+    - `parity_shred_cnt`: The number of parity shreds.
+    - `erased`: An array indicating which shreds are erased (1) and which are not (0).
+- **Logic and Control Flow**:
+    - Initialize arrays `_erased` and `pi` to track erased shreds and permutation indices.
+    - Calculate the total number of shreds as the sum of data and parity shreds.
+    - Iterate over 256 possible shreds to determine which shreds to load based on the `erased` array and update `_erased` and `loaded_cnt`.
+    - If the number of loaded shreds is less than `data_shred_cnt`, return `FD_REEDSOL_ERR_PARTIAL`.
+    - Generate permutation indices using [`fd_reedsol_private_gen_pi_256`](<fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_256>).
+    - Initialize `diff` to zero to track differences in regenerated shreds.
+    - Iterate over each position in the shreds, loading non-erased shreds into variables and setting erased ones to zero.
+    - Multiply each loaded shred by its corresponding permutation index.
+    - Perform inverse FFT, derivative generation, and FFT on the loaded shreds.
+    - Multiply the erased shreds by their permutation indices again.
+    - Use a switch statement to handle storing, comparing, and reloading shreds based on their erased status.
+    - If any differences are detected in the regenerated shreds, return `FD_REEDSOL_ERR_CORRUPT`.
+    - Advance the shred position by `GF_WIDTH` and adjust if necessary.
+    - Return `FD_REEDSOL_SUCCESS` if all operations complete without error.
+- **Output**: Returns an integer status code: `FD_REEDSOL_SUCCESS` on successful recovery, `FD_REEDSOL_ERR_PARTIAL` if not enough data shreds are loaded, or `FD_REEDSOL_ERR_CORRUPT` if a corruption is detected.
+- **Functions Called**:
+    - [`fd_reedsol_private_gen_pi_256`](<fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_256>)
+    - [`gf_ldu`](<fd_reedsol_arith_none.h.md#gf_ldu>)
+    - [`fd_reedsol_ifft_256_0`](<wrapped_impl/fd_reedsol_fft_impl_256_0.c.md#fd_reedsol_ifft_256_0>)
+    - [`fd_reedsol_fft_256_0`](<wrapped_impl/fd_reedsol_fft_impl_256_0.c.md#fd_reedsol_fft_256_0>)
 
 
 

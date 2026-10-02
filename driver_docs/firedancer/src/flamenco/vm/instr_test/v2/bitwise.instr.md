@@ -3,28 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `bitwise.instr` file in the `firedancer` codebase contains test cases for various bitwise operations, including OR and AND operations on 32-bit and 64-bit registers with both immediate values and other registers, as well as validation checks for invalid source and destination registers.
+Tests for bitwise operations including OR, AND, and HOR with both register and immediate values.
 
 # Purpose
-The provided content appears to be a test or verification file for a software component that deals with bitwise operations on registers, specifically for a processor or virtual machine. This file contains a series of test cases for different operations such as OR, AND, and HOR (likely a custom operation), each with variations for 32-bit and 64-bit registers, and using either immediate values or other registers as operands. Each line specifies an operation code (`op`), destination (`dst`), source (`src`), and offset (`off`), along with initial register values and expected results, indicating whether the operation is valid (`ok`) or invalid (`vfy`). The file's narrow functionality is to ensure that these operations are correctly implemented and to verify the handling of edge cases, such as invalid source or destination registers. This file is crucial for maintaining the integrity and correctness of the bitwise operation logic within the codebase, serving as a regression test suite to catch errors during development.
+The file contains a series of test cases for verifying the behavior of bitwise operations in a processor or emulator. Each line represents a test case for a specific operation, such as `or32`, `or64`, `and32`, `and64`, and `hor64`, with variations for register-to-immediate and register-to-register operations. The test cases specify the operation code (`op`), destination register (`dst`), source register (`src`), offset (`off`), initial register values, and immediate values where applicable. The expected result of the operation is indicated after the `: ok` or `: vfy` markers, with `ok` denoting a valid operation and `vfy` indicating an invalid operation due to incorrect source or destination registers. This file is crucial for ensuring that the bitwise operations perform correctly and handle edge cases, such as truncation and invalid inputs, as expected in the codebase.
 # Content Summary
-The provided content appears to be a set of test cases or configuration entries for a processor or virtual machine instruction set, specifically focusing on bitwise operations such as OR, AND, and HOR (likely a variant of OR). Each entry is structured to test specific operations with different operand configurations, including both immediate values and register-to-register operations. The operations are categorized by their bit-width (32-bit and 64-bit) and the type of operands (register and immediate).
+The provided content is a series of test cases for bitwise operations on registers, specifically for a hypothetical processor or virtual machine. Each line represents a test case for a specific operation, with the following key components:
 
-Key technical details include:
+1. **Operation Code (op):** Each test case begins with an operation code (e.g., `op=44`, `op=4c`, `op=47`, etc.) that specifies the type of bitwise operation being tested. The operations include `or32`, `or64`, `and32`, `and64`, and `hor64`, which indicate logical OR, AND, and horizontal OR operations on 32-bit and 64-bit registers.
 
-1. **Operation Codes (op):** Each line begins with an operation code (e.g., `op=44`, `op=4c`, `op=47`, etc.), which identifies the specific instruction being tested. These codes are crucial for understanding which operation is being executed.
+2. **Destination and Source Registers (dst, src):** The `dst` and `src` fields specify the destination and source registers involved in the operation. The destination register is where the result of the operation is stored.
 
-2. **Operands and Offsets:** The entries specify destination (`dst`) and source (`src`) registers, along with an offset (`off`). The destination and source registers are denoted by hexadecimal values, indicating which registers are involved in the operation.
+3. **Offset (off):** The `off` field is present in each test case, though its specific role is not detailed in the content. It may be used for addressing or as part of the operation's execution context.
 
-3. **Immediate Values and Register Values:** For operations involving immediate values, the `imm` field specifies the immediate value used in the operation. For register-to-register operations, the source register value is provided.
+4. **Initial Register Values and Immediate Values (rX, imm):** The initial values of the registers (`r0`, `r1`, etc.) and any immediate values (`imm`) used in the operation are specified. These values are in hexadecimal or binary format.
 
-4. **Result Verification:** Each entry concludes with a result verification, indicated by `: ok` or `: vfy`. The `: ok` entries show the expected result in the destination register after the operation, while `: vfy` entries indicate verification failures, often due to invalid source or destination registers.
+5. **Expected Result (ok, vfy):** Each test case concludes with an expected result. The `ok` keyword indicates that the operation should complete successfully, with the resulting value of the destination register provided. The `vfy` keyword indicates that the operation is expected to be invalid, typically due to an invalid source or destination register.
 
-5. **Truncation and Sign Extension:** Some operations involve truncation of upper bits or sign extension, as noted in comments. This is important for understanding how the operations handle bit-width differences.
+6. **Comments:** Comments at the end of each line provide additional context, such as "truncate upper" or "nop" (no operation), which describe the expected behavior or result of the operation.
 
-6. **Invalid Operations:** Entries marked with `: vfy` highlight invalid operations, which are useful for testing error handling and validation logic within the instruction set.
-
-Overall, this file serves as a comprehensive test suite for validating the correctness and robustness of bitwise operations within a processor or virtual machine environment, ensuring that both valid and invalid scenarios are adequately covered.
+These test cases are used to verify the correct implementation of the bitwise operations in the processor or virtual machine. They ensure that the operations produce the expected results and handle invalid cases appropriately.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

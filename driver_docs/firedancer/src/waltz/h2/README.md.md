@@ -3,28 +3,32 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.md` file in the `firedancer/src/waltz/h2` directory provides an overview of the HTTP/2 framing layer implementation, highlighting its limitations and quirks, such as the lack of support for HPACK dynamic tables, server push, and certain HTTP/2 priority and state features.
+Implementation of the HTTP/2 framing layer with limitations on HPACK, server push, and priority support.
 
 # Purpose
-This document appears to be a README file that provides detailed information about a specific implementation of the HTTP/2 framing layer within a software codebase. It outlines the limitations and specific behaviors of the library, such as the lack of support for certain HTTP/2 features like server push, priority hints, and the HPACK dynamic table. The document clarifies that this library is not a full HTTP library but focuses solely on the framing layer, which is a narrow functionality. It also highlights potential compatibility issues and quirks related to HTTP/2, such as header sequences and server-initiated streams. Additionally, the file includes a section on code coverage, providing a shell command for generating coverage reports using tools like `llvm-cov` and `genhtml`, which is relevant for developers looking to test and validate the implementation's robustness.
+The directory contains an implementation of the HTTP/2 framing layer, which is responsible for managing the structure and transmission of data frames in HTTP/2 communication. This implementation does not function as a complete HTTP library, as it lacks the full HTTP protocol handling described in RFC 9113 Section 8. The library does not support certain features such as HPACK fragmentation, server push, HTTP/2 priority hints, and the HPACK dynamic table, which may lead to compatibility issues when operating as a server. Additionally, the library does not correctly handle the `END_STREAM` flag in combination with `CONTINUATION` frames. The document also highlights some quirks of the HTTP/2 protocol, such as the ability to send multiple field blocks and the server's capability to initiate streams. The coverage section provides a command sequence for generating code coverage reports using `llvm-cov` and `genhtml`, which are tools for analyzing and visualizing test coverage data.
 # Content Summary
-This document provides an overview of the HTTP/2 framing layer implementation contained within a specific directory. It is crucial to note that this is not a full HTTP library; it only provides the framing layer, meaning it lacks the complete HTTP protocol as defined in RFC 9113 Section 8.
+This document provides information about a directory containing an implementation of the HTTP/2 framing layer. It is important to note that this is not a complete HTTP library; it only provides the framing layer, excluding the functionalities described in RFC 9113 Section 8.
 
 Key technical details include:
 
-1. **HPACK Fragmentation**: The library assumes that a single HPACK header record is not fragmented across multiple HTTP frames. If fragmentation occurs, it will result in a connection error labeled as COMPRESSION_ERROR.
+1. **HPACK Fragmentation**: The library assumes that a single header record (HPACK record) is not fragmented across multiple HTTP frames. If fragmentation occurs, it will result in a connection error with the code COMPRESSION_ERROR.
 
-2. **Server Push**: The library does not support HTTP/2 Server Push, as the PUSH_PROMISE feature is disabled via SETTINGS.
+2. **Server Push**: The library does not support HTTP Server Push, as the PUSH_PROMISE feature is disabled via SETTINGS.
 
-3. **Priority Handling**: HTTP/2 priority hints are ignored by this implementation.
+3. **Priority**: HTTP/2 priority hints are ignored by this implementation.
 
-4. **HPACK Dynamic Table**: The dynamic table, which is used for stateful HTTP header compression, is disabled. This may lead to compatibility issues, particularly when the server is running, due to potential race conditions with client requests.
+4. **HPACK Dynamic Table**: The dynamic table, which provides stateful HTTP header compression, is not supported. This may lead to compatibility issues when operating as a server, particularly due to a race condition between disabling the dynamic table and the client's initial requests.
 
-5. **END_STREAM/CONTINUATION State**: The library does not correctly support the scenario where a HEADERS frame with the END_STREAM flag is followed by CONTINUATION frames on the same stream.
+5. **END_STREAM / CONTINUATION State**: The library does not correctly support the scenario where a HEADERS frame with the END_STREAM flag is followed by CONTINUATION frames on the same stream.
 
-The document also highlights some general quirks of HTTP/2, such as the ability to send multiple field blocks (headers or trailers) before data, which can create the appearance of conflicting headers, and the capability for servers to initiate streams, which is distinct from server push or regular responses.
+The document also highlights some general quirks of HTTP/2:
 
-Finally, the document includes a section on code coverage, providing a shell command for generating a coverage report using tools like `llvm-cov` and `genhtml`. This command is intended for use with a fuzz testing corpus, which should be specified by the user.
+- **Header Sequence**: Multiple field blocks, such as headers or trailers, can be sent before data, potentially causing conflicting headers or out-of-band data transmission.
+
+- **Server Requests**: The server can initiate streams, which is separate from server push or regular responses, and is akin to the server sending HTTP requests to the client.
+
+Finally, the document includes a shell script for coverage testing using `clang` and `llvm-cov`. This script compiles the code with coverage instrumentation, runs a fuzz test, and generates a coverage report in lcov format, which is then converted to an HTML report using `genhtml`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
