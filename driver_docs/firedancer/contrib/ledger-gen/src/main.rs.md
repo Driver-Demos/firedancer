@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `main.rs` file in the `firedancer` codebase sets up the workflow for creating ledgers, including setting up buffer accounts, executing program instructions, creating and sending transactions, and waiting for slots, with a focus on Solana blockchain interactions.
+Main function for setting up and managing Solana ledger transactions using RPC clients and keypairs.
 
 # Purpose
-This Rust source code file is a script designed to interact with the Solana blockchain, specifically for managing and deploying programs on the network. It sets up the necessary environment to connect to a Solana node using the `RpcClient` with a specified commitment level. The script reads a keypair file to identify the payer account, which is essential for signing transactions on the blockchain. The main functionality revolves around creating and managing ledgers, as indicated by the commented-out function calls to `ledgers::bpf_loader_ledger` and `ledgers::stake_ledger`. These functions likely handle the deployment and management of programs and stakes on the Solana network.
+This code is a Rust program that interacts with the Solana blockchain. It sets up a connection to a Solana node using the `RpcClient` from the `solana_client` crate, with a specified commitment level. The program reads a keypair file to identify the payer for transactions, which is necessary for signing and sending transactions on the blockchain. The code also includes functionality to read and verify an ELF file, which is likely a compiled Solana program, and prepares account data for transactions.
 
-The script imports several modules, such as `ledgers`, `instructions`, `utils`, `bpf_loader`, `nonce`, and `stake`, which suggests a modular design where each module encapsulates specific functionality related to blockchain operations. The workflow comments provide a high-level overview of the steps involved in creating ledgers, including setting up buffer accounts, executing program instructions, creating and signing transactions, and sending them to the network. The script is intended to be run as a standalone program, as indicated by the `main` function and the usage instructions provided in the comments. This file does not define public APIs or external interfaces but rather serves as an executable script for blockchain operations.
+The program is organized into several modules: `ledgers`, `instructions`, `utils`, `bpf_loader`, `nonce`, and `stake`. These modules are likely responsible for handling different aspects of interacting with the Solana blockchain, such as managing ledgers, creating and sending transactions, and handling specific Solana program instructions. The main function outlines a workflow for creating ledgers, deploying, invoking, upgrading, and closing programs, and sending transactions. The program is intended to be run with a specified payer file, and it provides a framework for executing a sequence of blockchain operations, although the specific ledger functions are commented out and need to be activated for execution.
 # Imports and Dependencies
 
 ---
@@ -21,17 +21,15 @@ The script imports several modules, such as `ledgers`, `instructions`, `utils`, 
 
 ---
 ### main
-The `main` function sets up an RPC client connection, reads a keypair file for the payer, and prepares program and account data for further ledger operations.
+Sets up the RPC client, reads the payer keypair, and prepares program and account data for ledger operations.
 - **Inputs**: None
-- **Control Flow**:
-    - Initialize an `RpcClient` with a processed commitment level to connect to a local Solana node.
-    - Create an `Arc` wrapped `RpcClient` with a confirmed commitment level for shared ownership and potential concurrent access.
-    - Retrieve the file path for the payer's keypair from command-line arguments, expecting it to be provided in the format 'payer=/path/to/file'.
-    - Read the keypair file from the specified path to obtain the payer's credentials.
-    - Read and verify the ELF file 'helloworld.so' to obtain program data, handling any errors that may occur.
-    - Prepare a vector of bytes to represent account data, initialized with zeros.
-    - Commented out calls to `ledgers::bpf_loader_ledger` and `ledgers::stake_ledger` indicate where ledger operations would be performed.
-- **Output**: The function does not return any value; it sets up the environment and prepares data for ledger operations.
+- **Logic and Control Flow**:
+    - Creates an `RpcClient` with a processed commitment level and an `Arc` wrapped `RpcClient` with a confirmed commitment level, both pointing to a local Solana node.
+    - Retrieves the payer file path from the command-line arguments, expecting it in the format 'payer=/path/to/file'.
+    - Reads the keypair from the specified payer file path using `read_keypair_file`.
+    - Reads and verifies the ELF file 'helloworld.so' to obtain the program data using `utils::read_and_verify_elf`.
+    - Initializes a vector `account_data` with four zero bytes.
+- **Output**: No output is returned as this is the `main` function of a Rust program.
 
 
 

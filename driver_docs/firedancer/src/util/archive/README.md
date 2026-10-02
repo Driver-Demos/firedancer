@@ -3,20 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-AR and TAR archive readers, writer, tests, fuzzers, and build rules.
+Functions and tests for AR and TAR archive file handling, including reading, writing, and fuzz testing.
 
 
 ## Files
-- **[fd_ar.c](fd_ar.c.md)**: The `fd_ar.c` file in the `firedancer` codebase provides functions for reading and parsing headers from archive files, including handling ASCII to long conversions and checking for valid archive file formats.
-- **[fd_ar.h](fd_ar.h.md)**: Streaming AR archive reader API and file metadata structure.
-- **[fd_tar.h](fd_tar.h.md)**: USTAR/old-GNU TAR reader and writer for Solana snapshot streams.
-- **[fd_tar_reader.c](fd_tar_reader.c.md)**: The `fd_tar_reader.c` file in the `firedancer` codebase implements a TAR file reader that processes TAR headers and data, utilizing callback functions for file and data handling.
-- **[fd_tar_writer.c](fd_tar_writer.c.md)**: The `fd_tar_writer.c` file in the `firedancer` codebase provides functionality for creating and managing tar archives, including writing file headers, data, and handling file alignment and checksums.
-- **[fuzz_ar.c](fuzz_ar.c.md)**: LLVM fuzzer harness for fd_ar_read_init and fd_ar_read_next on memory files.
-- **[fuzz_tar.c](fuzz_tar.c.md)**: The `fuzz_tar.c` file in the `firedancer` codebase implements a fuzz testing harness for TAR file reading, utilizing the LLVM fuzzer to test the `fd_tar` functionality.
-- **[Local.mk](Local.mk.md)**: Build rules for archive headers, objects, unit tests, and fuzz tests.
-- **[test_ar.c](test_ar.c.md)**: The `test_ar.c` file in the `firedancer` codebase contains unit tests for validating the functionality of reading AR archive files, including tests for valid archives, empty archives, and handling of invalid archive formats.
-- **[test_tar.c](test_tar.c.md)**: The `test_tar.c` file in the `firedancer` codebase tests the functionality of reading and verifying the size of a TAR archive header using the `fd_tar_meta_get_size` function.
+- **[fd_ar.c](fd_ar.c.md)**: Functions for reading and parsing headers from ar archive files, including error handling and metadata extraction.
+- **[fd_ar.h](fd_ar.h.md)**: A simple streaming AR archive reader with functions to initialize and read archive files.
+- **[fd_tar.h](fd_tar.h.md)**: Implements a TAR file format handler for reading and writing Solana snapshots using ustar and old-GNU versions.
+- **[fd_tar_reader.c](fd_tar_reader.c.md)**: Implements a TAR file reader with functions for processing headers and reading data.
+- **[fd_tar_writer.c](fd_tar_writer.c.md)**: Functions for creating and managing TAR archive files, including writing headers and file data.
+- **[fuzz_ar.c](fuzz_ar.c.md)**: Fuzz testing for archive reading functions using LLVM's libFuzzer.
+- **[fuzz_tar.c](fuzz_tar.c.md)**: Fuzz testing for TAR file reading functionality using LLVM's libFuzzer.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, unit tests, and fuzz tests for archive utilities.
+- **[test_ar.c](test_ar.c.md)**: Unit tests for validating AR archive file handling, including valid, empty, and invalid cases.
+- **[test_tar.c](test_tar.c.md)**: Tests the TAR archive header for correct file size calculation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
