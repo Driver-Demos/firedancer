@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the build configuration for the `fdctl_platform` library, including headers and object files for configuration parsing and system utilities.
+Makefile for building protocol-agnostic fdctl code with config parsing and system utilities.
 
 # Purpose
-The provided content is from a Makefile, which is used to automate the build process of a software project. This Makefile snippet defines the compilation and linking instructions for various components of a project, specifically focusing on a protocol-agnostic component named `fdctl_platform`. It utilizes macros such as `make-lib`, `add-hdrs`, and `add-objs` to manage the inclusion of header files and object files, ensuring that dependencies like `fd_config_extract`, `fd_cap_chk`, `fd_sys_util`, `fd_net_util`, and `fd_file_util` are correctly compiled and linked with the `fdctl_platform` library. This setup facilitates modular development by organizing system utilities and configuration parsing utilities, which are essential for the functionality of the `fdctl_platform`.
+The Makefile content defines build instructions for a software project. It uses a function `make-lib` to create a library named `fdctl_platform`, which is protocol-agnostic and depends on other components like `ballet` and `util`. The file specifies header files and object files for different utilities, such as configuration parsing (`fd_config_extract.h`), system utilities (`fd_sys_util.h`), network utilities (`fd_net_util.h`), and file utilities (`fd_file_util.h`). Each utility is associated with the `fdctl_platform` library, ensuring that the necessary components are compiled and linked correctly during the build process. The use of `add-hdrs` and `add-objs` functions helps organize and manage the inclusion of headers and object files in the build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

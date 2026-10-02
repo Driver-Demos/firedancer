@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Commands for blockstore configuration, validator TPS benchmarks, and development validator threads.
+Blockstore configuration for Agave validator and commands for testing TPS benchmarks and starting a development validator.
 
 ## Folders
-- **[configure](configure/README.md)**: Creates and checks the ledger rocksdb blockstore, including genesis block0 generation.
+- **[configure](configure/README.md)**: Blockstore configuration for the Agave validator, including block creation and validation checks.
 
 ## Files
-- **[bench.c](bench.c.md)**: The `bench.c` file in the `firedancer` codebase implements a command for testing validator TPS benchmarks, including the creation of a persistent thread for the `agave_boot` function.
-- **[dev.c](dev.c.md)**: The `dev.c` file in the `firedancer` codebase defines functions for spawning a development validator thread using `pthread` and integrates it into a command structure.
+- **[bench.c](bench.c.md)**: Implements a command for testing validator TPS benchmarks using multithreading.
+- **[dev.c](dev.c.md)**: Defines and implements a command to start a development validator using pthreads.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
