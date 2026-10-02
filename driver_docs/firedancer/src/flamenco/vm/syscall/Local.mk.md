@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build configuration for compiling and testing VM syscalls with specific dependencies and conditions.
+Build rules and unit tests for VM syscall headers, objects, and tests.
 
 # Purpose
-The content is part of a Makefile used in a software build system. It includes conditional directives that check for the presence of certain features or environments, such as `FD_HAS_INT128`, `FD_HAS_HOSTED`, and `FD_HAS_SECP256K1`. If these conditions are met, the Makefile adds specific header files and object files to the build process using the `add-hdrs` and `add-objs` functions. It also defines unit tests for various components, such as `test_vm_syscall_cpi`, `test_vm_syscall_curve`, and `test_vm_syscalls`, using the `make-unit-test` function. Finally, it executes these unit tests with the `run-unit-test` function to ensure the correctness of the components within the specified environment.
+This Makefile fragment adds the `fd_vm_syscall.h`, `fd_vm_syscall_macros.h`, and `fd_vm_cpi.h` header files to the build when `FD_HAS_INT128`, `FD_HAS_HOSTED`, and `FD_HAS_SECP256K1` are defined. It also adds the `fd_vm_syscall`, `fd_vm_syscall_cpi`, `fd_vm_syscall_hash`, `fd_vm_syscall_crypto`, `fd_vm_syscall_curve`, `fd_vm_syscall_pda`, `fd_vm_syscall_runtime`, and `fd_vm_syscall_util` object files to the `fd_flamenco` target. The file defines three unit test targets, `test_vm_syscall_cpi`, `test_vm_syscall_curve`, and `test_vm_syscalls`, and links them against `fd_flamenco`, `fd_funk`, `fd_util`, and `fd_ballet`. It then runs the `test_vm_syscalls`, `test_vm_syscall_cpi`, and `test_vm_syscall_curve` tests as part of the build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

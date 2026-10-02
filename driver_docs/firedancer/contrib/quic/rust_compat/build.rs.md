@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build script for setting up library paths, linking static libraries, and generating Rust bindings.
+The `build.rs` file in the `firedancer` codebase sets up the build process for the `agave_compat` module by configuring library paths, linking static libraries, and generating Rust bindings using `bindgen`.
 
 # Purpose
-This code is a build script for a Rust project, typically named `build.rs`. It configures the build process by specifying library paths and generating Rust bindings for C/C++ code. The script starts by determining the path to the project's root directory using the `CARGO_MANIFEST_DIR` environment variable. It constructs paths to the `build/native/gcc` directory, where it expects to find static libraries and include files. The script then instructs Cargo to link against several static libraries, such as `fd_quic`, `fd_waltz`, and others, by using the `cargo:rustc-link-lib` directive. It also specifies that the build should be re-triggered if any of these libraries change.
+This Rust code is a build script, typically named `build.rs`, used in a Rust project to automate the process of generating bindings and linking external libraries. The script is executed before the main build process of the Rust project, and its primary purpose is to configure the build environment by specifying library search paths and linking static libraries. It begins by determining the path to the project's root directory using the `CARGO_MANIFEST_DIR` environment variable and constructs paths to the necessary build and include directories. The script then specifies several static libraries to be linked, such as `fd_quic`, `fd_waltz`, and others, by printing directives for the Rust compiler to follow. Additionally, it ensures that the build process is re-triggered if any of the specified static libraries change.
 
-Additionally, the script uses the `bindgen` tool to generate Rust bindings for C/C++ code. It specifies a header file, `wrapper.h`, and configures `bindgen` to include types, functions, and variables that match certain patterns (e.g., starting with `fd_`). The generated bindings are written to a file in the output directory specified by the `OUT_DIR` environment variable. This process allows Rust code to interface with the C/C++ libraries, facilitating integration between Rust and native code components.
+A significant component of this script is the use of the `bindgen` library, which generates Rust FFI (Foreign Function Interface) bindings to C libraries. The script configures `bindgen` to generate bindings for types, functions, and variables that match specific patterns (e.g., starting with `fd_` or `FD_`). It specifies a header file, `wrapper.h`, as the entry point for generating these bindings and sets the C standard to C17. The generated bindings are written to a file in the output directory specified by the `OUT_DIR` environment variable. This build script is crucial for integrating C libraries into a Rust project, ensuring that the necessary components are correctly linked and accessible from Rust code.
 # Imports and Dependencies
 
 ---
@@ -21,19 +21,20 @@ Additionally, the script uses the `bindgen` tool to generate Rust bindings for C
 
 ---
 ### main
-Configures the build environment for a Rust project by setting library paths, linking static libraries, and generating Rust bindings for C/C++ headers.
+The `main` function configures the build environment for a Rust project by setting up library paths, linking static libraries, and generating Rust bindings for C/C++ headers.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Retrieve the `CARGO_MANIFEST_DIR` environment variable and create a `PathBuf` object `build_path` by navigating up three directories and appending 'build/native/gcc'.
-    - Clone `build_path` to `lib_path` and append 'lib' to it.
-    - Print the library search path using `println!` with the `lib_path`.
-    - Iterate over a list of library names, printing link instructions and change detection instructions for each library.
-    - Print a link instruction for the `stdc++` library.
-    - Clone `build_path` to `include_path` and append 'include' to it.
-    - Create a `bindgen::Builder` to generate Rust bindings from the `wrapper.h` header file, specifying include paths and allowing specific types, functions, and variables.
-    - Print a change detection instruction for `wrapper.h`.
-    - Retrieve the `OUT_DIR` environment variable, create a `PathBuf` `out_path`, and write the generated bindings to a file named `bindings.rs` in `out_path`.
-- **Output**: No return value; side effects include printing configuration instructions and writing a file.
+- **Control Flow**:
+    - Retrieve the `CARGO_MANIFEST_DIR` environment variable to determine the base directory for the project.
+    - Construct a `PathBuf` object to represent the build path by navigating up three directories from the manifest directory and appending 'build/native/gcc'.
+    - Clone the build path to create a library path, append 'lib', and print a directive to link against this library path.
+    - Iterate over a list of library names, printing directives to link each library statically and to rerun the build script if the corresponding library file changes.
+    - Print a directive to link against the 'stdc++' library statically.
+    - Clone the build path again to create an include path and append 'include'.
+    - Use `bindgen` to generate Rust bindings for C/C++ headers, specifying the header file, include path, and patterns for types, functions, and variables to include.
+    - Print a directive to rerun the build script if the 'wrapper.h' file changes.
+    - Retrieve the `OUT_DIR` environment variable to determine the output directory for generated files.
+    - Write the generated bindings to a file named 'bindings.rs' in the output directory.
+- **Output**: The function does not return a value, but it produces side effects by configuring the build environment, printing build directives, and generating a Rust bindings file.
 
 
 
