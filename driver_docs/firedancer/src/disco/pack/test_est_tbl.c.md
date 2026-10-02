@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for the `fd_est_tbl` functions using various statistical distributions.
+The `test_est_tbl.c` file contains a test suite for the `fd_est_tbl` module, verifying its functionality with various statistical distributions and ensuring the accuracy of mean and variance estimations.
 
 # Purpose
-The code is a C program that tests the functionality of an estimation table, which is likely defined in the included header file `fd_est_tbl.h`. The program initializes a random number generator and performs a series of tests on the estimation table to verify its behavior with different statistical distributions. The main components of the code include the creation and joining of an estimation table, updating the table with values from various distributions, and estimating statistical properties such as mean and variance. The tests cover scenarios with empty queries, single entry normal distributions, exponential distributions, and mixed distributions, ensuring that the estimation table provides accurate statistical estimates.
+This C source code file is an executable program designed to test and validate the functionality of an estimation table, likely part of a larger library or system. The code includes the necessary headers and defines a main function that initializes a random number generator and performs a series of tests on the estimation table. The primary purpose of the program is to ensure that the estimation table correctly handles different statistical distributions, including normal and exponential distributions, and mixed distributions. The tests involve updating the table with data points and verifying that the estimated means and variances fall within expected ranges, using statistical properties and predefined thresholds.
 
-The program uses several functions and macros, such as `fd_est_tbl_new`, `fd_est_tbl_join`, `fd_est_tbl_update`, and `fd_est_tbl_estimate`, to interact with the estimation table. It also employs logging and testing macros like `FD_LOG_NOTICE` and `FD_TEST` to document the progress and validate the results of the tests. The code is structured to run as an executable, with a [`main`](<#main>) function that orchestrates the setup, execution, and validation of the tests. The program concludes by cleaning up resources and halting execution, indicating successful completion if all tests pass.
+The code is structured around a series of tests that are logged and validated using assertions. It uses a custom random number generator to simulate data points from various distributions, which are then fed into the estimation table. The program checks the alignment and footprint of the table, ensuring it meets specific requirements. It also verifies that the table returns default values when queried with no data and that it accurately estimates statistical properties when populated with data. The use of logging and assertions indicates that this code is intended for debugging and validation purposes, providing a robust mechanism to ensure the reliability and accuracy of the estimation table's implementation.
 # Imports and Dependencies
 
 ---
@@ -20,41 +20,37 @@ The program uses several functions and macros, such as `fd_est_tbl_new`, `fd_est
 
 ---
 ### scratch
-- **Type**: ``uchar[]``
-- **Description**: An array of unsigned characters (`uchar`) with a size determined by the macro `FD_EST_TBL_FOOTPRINT(TBL_SZ)`. The array is aligned according to the alignment specified by `FD_EST_TBL_ALIGN`.
-- **Use**: Used as a memory buffer for the function `fd_est_tbl_new` to create a new estimation table.
+- **Type**: `uchar array`
+- **Description**: The `scratch` variable is a static array of unsigned characters (uchar) with a size determined by the macro `FD_EST_TBL_FOOTPRINT(TBL_SZ)`. It is aligned according to the alignment specified by `FD_EST_TBL_ALIGN`. This array serves as a memory buffer for the estimation table operations.
+- **Use**: The `scratch` array is used as a memory buffer to initialize and manage the estimation table (`fd_est_tbl`) in the program.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/disco/pack/test_est_tbl.c#L5>)
-
-Initializes and tests an estimation table with various statistical distributions using random number generation.
+The `main` function initializes a random number generator and an estimation table, performs statistical tests on various distributions, and validates the results against expected statistical properties.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Verifies alignment and footprint of the estimation table using `FD_TEST`.
-    - Creates and joins an estimation table `tbl` with a default value of 1234 using [`fd_est_tbl_new`](<fd_est_tbl.h.md#fd_est_tbl_new>) and [`fd_est_tbl_join`](<fd_est_tbl.h.md#fd_est_tbl_join>).
-    - Tests the estimation table with an empty query to ensure it returns the default value.
-    - Updates the estimation table with values and tests the estimates for a normal distribution in bin 1.
-    - Calculates and verifies the mean and variance for the normal distribution using statistical properties.
-    - Tests the estimation table with an exponential distribution in bin 2 and verifies the results.
-    - Simulates mixed distributions in bins 3 to 7, updating the table and verifying the mean and variance against analytical values.
-    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
-    - Logs the success of the tests and halts the program with `fd_halt`.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_est_tbl_align`](<fd_est_tbl.h.md#fd_est_tbl_align>)
-    - [`fd_est_tbl_footprint`](<fd_est_tbl.h.md#fd_est_tbl_footprint>)
-    - [`fd_est_tbl_new`](<fd_est_tbl.h.md#fd_est_tbl_new>)
-    - [`fd_est_tbl_join`](<fd_est_tbl.h.md#fd_est_tbl_join>)
-    - [`fd_est_tbl_estimate`](<fd_est_tbl.h.md#fd_est_tbl_estimate>)
-    - [`fd_est_tbl_update`](<fd_est_tbl.h.md#fd_est_tbl_update>)
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program environment with `fd_boot` and set up a random number generator `rng`.
+    - Verify alignment and footprint of the estimation table using `FD_TEST`.
+    - Create and join an estimation table `tbl` with a default value of 1234.
+    - Test the estimation table with an empty query to ensure it returns the default value.
+    - Update the table with values and test the estimation for a single entry normal distribution in bin 1.
+    - Calculate and validate the mean and variance for a normal distribution with known parameters.
+    - Test the estimation table with an exponential distribution in bin 2, validating the mean and variance.
+    - Simulate mixed distributions in bins 3 to 7, updating the table and validating the results against analytic expectations.
+    - Delete the random number generator and halt the program.
+- **Output**: The function returns an integer status code, typically 0, indicating successful execution.
+- **Functions called**:
+    - [`fd_est_tbl_align`](fd_est_tbl.h.md#fd_est_tbl_align)
+    - [`fd_est_tbl_footprint`](fd_est_tbl.h.md#fd_est_tbl_footprint)
+    - [`fd_est_tbl_new`](fd_est_tbl.h.md#fd_est_tbl_new)
+    - [`fd_est_tbl_join`](fd_est_tbl.h.md#fd_est_tbl_join)
+    - [`fd_est_tbl_estimate`](fd_est_tbl.h.md#fd_est_tbl_estimate)
+    - [`fd_est_tbl_update`](fd_est_tbl.h.md#fd_est_tbl_update)
 
 
 

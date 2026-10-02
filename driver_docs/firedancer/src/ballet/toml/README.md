@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Backtracking recursive-descent parser, APIs, fuzz testing, and build configuration for TOML files.
+The `toml` folder in the `firedancer` codebase contains implementations for parsing TOML files, including a recursive descent parser, APIs for configuration file parsing, fuzz testing capabilities, and a makefile for build configuration.
 
 
 ## Files
-- **[fd_toml.c](fd_toml.c.md)**: A backtracking recursive-descent parser for TOML files, including functions for parsing various TOML data types and handling errors.
-- **[fd_toml.h](fd_toml.h.md)**: APIs for parsing TOML config files with error handling and deserialization into fd_pod structures.
-- **[fuzz_toml.c](fuzz_toml.c.md)**: Fuzz testing for TOML parsing using LLVM's libFuzzer framework.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and conditional fuzz tests for the `fd_toml` component.
+- **[fd_toml.c](fd_toml.c.md)**: The `fd_toml.c` file in the `firedancer` codebase implements a backtracking recursive descent parser for TOML files, handling various data types and structures, and providing error handling and memory management functionalities.
+- **[fd_toml.h](fd_toml.h.md)**: The `fd_toml.h` file in the `firedancer` codebase provides APIs for parsing TOML configuration files, including error handling and mapping TOML types to `fd_pod` types, while noting certain deviations from the TOML specification.
+- **[fuzz_toml.c](fuzz_toml.c.md)**: The `fuzz_toml.c` file in the `firedancer` codebase implements a fuzz testing interface for parsing TOML data using the LLVM fuzzer.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and conditional fuzz test setup for the TOML component in the `ballet` module.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
