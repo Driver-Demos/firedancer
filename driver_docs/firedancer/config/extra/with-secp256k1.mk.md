@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-secp256k1.mk` file in the `firedancer` codebase checks for the presence of the `libsecp256k1.a` library and sets compilation flags accordingly, or issues a warning if the library is not installed.
+Makefile configuration to check for and link the secp256k1 library if available.
 
 # Purpose
-This Makefile snippet checks for the presence of the `libsecp256k1.a` library in a specified directory. If the library is found, it sets a flag `FD_HAS_SECP256K1` to 1, adds a preprocessor definition to `CFLAGS`, and appends the library path to `LDFLAGS` for linking. If the library is not found, it issues a warning message indicating that `secp256k1` is not installed and will be skipped.
+The `Makefile` snippet checks for the presence of the `libsecp256k1.a` library in the specified `$(OPT)/lib` directory. If the library exists, it sets the `FD_HAS_SECP256K1` flag to 1, adds a preprocessor definition `-DFD_HAS_SECP256K1=1` to `CFLAGS`, and appends the library path to `LDFLAGS` for linking. If the library is not found, it issues a warning message indicating that `secp256k1` is not installed and will be skipped.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CPPFLAGS flags enabling handholding checks for multiple Firedancer modules
+Defines preprocessor flags to enable "handholding" features in various components.
 
 # Purpose
-These `CPPFLAGS` entries define preprocessor macros that enable `HANDHOLDING` support across multiple `fd` components at build time. Each `-D` option sets a named flag such as `FD_EQVOC_USE_HANDHOLDING`, `FD_GHOST_USE_HANDHOLDING`, and `FD_RUNTIME_ERR_HANDHOLDING` to `1`, so the source code can include the related checks, messages, or helper logic during compilation. The list applies the same build setting to modules for transaction handling, runtime errors, replay, voting, repair, and other internal subsystems.
+The configuration file sets preprocessor flags for a C or C++ build system. Each line adds a definition to the `CPPFLAGS` variable, which is used during the compilation process. The flags define macros such as `FD_EQVOC_USE_HANDHOLDING`, `FD_GHOST_USE_HANDHOLDING`, and others, indicating that the "handholding" feature is enabled for various components of the software. This setup allows the compiler to conditionally include or exclude code sections based on these macro definitions, facilitating feature toggling or debugging.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
