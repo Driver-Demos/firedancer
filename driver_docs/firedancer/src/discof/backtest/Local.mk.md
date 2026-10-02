@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile logic for conditional compilation based on INT128 and RocksDB availability.
+Build rules that add backtest objects when int128 and RocksDB are available.
 
 # Purpose
-The `Makefile` content checks for the presence of two conditions: `FD_HAS_INT128` and `FD_HAS_ROCKSDB`. If both conditions are true, it adds the objects `fd_backtest_rocksdb` and `fd_backtest_tile` to the `fd_discof` target. If `FD_HAS_ROCKSDB` is not defined, it issues a warning message indicating that RocksDB is not installed and the backtest will be skipped.
+Build logic adds `fd_backtest_rocksdb` and `fd_backtest_tile` to `fd_discof` only when both `FD_HAS_INT128` and `FD_HAS_ROCKSDB` are defined. If `FD_HAS_ROCKSDB` is not defined, the file emits a warning that `rocksdb` is not installed and skips the backtest targets.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for `fd_fseq` in the `firedancer` codebase.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_fseq` and `fd_tango` components, and includes a command to run the `test_fseq` unit test.
 
 # Purpose
-The `Makefile` content defines build and test instructions for a software project. It adds the header file `fd_fseq.h` to the build process and includes object files `fd_fseq` and `fd_tango`. It also specifies a unit test named `test_fseq`, which depends on `fd_tango` and `fd_util`, and includes instructions to run this unit test.
+The file is a Makefile snippet used for building and testing components in a software project. It defines build rules by adding headers and object files for `fd_fseq` and `fd_tango`, sets up a unit test named `test_fseq` with dependencies on `fd_tango` and `fd_util`, and specifies the execution of this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
