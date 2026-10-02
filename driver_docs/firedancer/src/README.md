@@ -3,26 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, configurations, and tools for Firedancer applications, cryptography, Solana protocols, networking, and FPGA operations.
+Blockchain, cryptography, networking, FPGA, and utility modules with tests and build rules.
 
 ## Folders
-- **[app](app/README.md)**: Functions, configurations, build files, and tools for Firedancer applications, debugging, development, and RPC server.
-- **[ballet](ballet/README.md)**: Cryptographic functions, data structures, encoding/decoding, hash functions, elliptic curve operations, and build configurations with tests and optimizations.
-- **[choreo](choreo/README.md)**: Functions, structures, APIs, and tests for epoch management, equivocation detection, fork management, Solana's LMD-GHOST and TowerBFT algorithms, and voter state management.
-- **[disco](disco/README.md)**: Seccomp policies, transaction management, network tools, GUI components, and Firedancer topology functions.
-- **[discof](discof/README.md)**: Backtesting, bank operations, execution logic, forest data structures, genesis management, gossip protocol, IP echo, PoH, reassembly, repair, replay, resolution, restoration, transaction sending, shred capture, tower management, seccomp policies, and Makefile logic with related functions.
-- **[discoh](discoh/README.md)**: Data structures, functions, and Makefiles for transaction processing, PoH, resolution, and storage.
-- **[flamenco](flamenco/README.md)**: Tools, functions, and tests for Solana blockchain data management, protocol implementation, and runtime operations, with Makefiles and a virtual machine for sBPF programs.
-- **[funk](funk/README.md)**: Functions, data structures, and tests for the `fd_funk` module, including memory management, transactions, and concurrency.
-- **[groove](groove/README.md)**: Header and source files for error handling, memory management, and testing in the `fd_groove` module.
-- **[tango](tango/README.md)**: Functions, APIs, data structures, tests for CNC, data cache, flow control, sequence numbers, memory cache, transactional cache, time performance, benchmarking, command-line tools, Makefiles, and scripts for inter-process communication and fragment processing.
-- **[util](util/README.md)**: Memory management, file I/O, threading, networking, logging, and utility functions with tests and build scripts.
-- **[vinyl](vinyl/README.md)**: Functions, headers, makefiles, and tests for managing bstream blocks, I/O operations, metadata, and error codes.
-- **[waltz](waltz/README.md)**: Stubs, abstractions, and tests for asynchronous I/O, eBPF macros, gRPC and HTTP/2 implementations, IPv4 FIB management, network device management, OpenSSL error mapping, QUIC protocol, DNS resolution, TLS operations, UDP socket abstraction, XDP functions, and token bucket structure.
-- **[wiredancer](wiredancer/README.md)**: FPGA operations, PCIe communication, Ed25519 verification, simulations, tests, and AWS-F1 performance tools.
+- **[app](app/README.md)**: Configuration, debugging, development, ledger, platform, shared, and data capture tools.
+- **[ballet](ballet/README.md)**: Cryptographic, encoding, parsing, and transaction modules with tests and build rules.
+- **[choreo](choreo/README.md)**: Consensus constants, epoch, equivocation, fork-choice, notarization, TowerBFT, and voter state code.
+- **[disco](disco/README.md)**: Transaction processing, network, security, metrics, and tile support code with headers and build rules
+- **[discof](discof/README.md)**: Tile logic, replay, repair, restore, gossip, send, and backtest support with seccomp and build rules.
+- **[discoh](discoh/README.md)**: Transaction processing, PoH scheduling, resolution, and storage helpers with fd_discoh build rules.
+- **[flamenco](flamenco/README.md)**: Account, capture, feature, genesis, gossip, leader, log, program cache, reward, runtime, stake, txn, type, and VM code with lock headers and tests
+- **[funk](funk/README.md)**: Workspace-backed txn, rec, and value APIs, tests, and a benchmark for record and transaction maps.
+- **[groove](groove/README.md)**: Headers, source files, build config, and unit tests for groove data, metadata, volumes, and error handling.
+- **[tango](tango/README.md)**: Shared-memory caches, flow control, sequence, tempo, and control tools with tests and scripts
+- **[util](util/README.md)**: Base utilities, hashing, platform checks, and subfolders for memory, I/O, threading, networking, and tests.
+- **[vinyl](vinyl/README.md)**: Base types, error codes, I/O, metadata, and bstream helpers for vinyl storage.
+- **[waltz](waltz/README.md)**: Network, protocol, and build components for AIO, eBPF, gRPC, HTTP/2, HTTP, IP, MIB, neighbor, OpenSSL, QUIC, DNS, TLS, UDP, XDP, RTT, and token bucket handling.
+- **[wiredancer](wiredancer/README.md)**: PCIe, ED25519, DMA, FPGA RTL, simulation, and test tools for AWS-F1.
 
 ## Files
-- **[.clangd](.clangd.md)**: Configuration for Clangd with compile flags and warnings for C and C++ files.
+- **[.clangd](.clangd.md)**: Clangd compile flags and warning settings for C and C++ source files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

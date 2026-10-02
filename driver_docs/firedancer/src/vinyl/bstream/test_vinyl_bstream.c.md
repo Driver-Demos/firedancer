@@ -3,45 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Unit tests for the `fd_vinyl_bstream` module, verifying static assertions, sequence comparisons, control encoding, and hash tests.
+Unit tests for vinyl bstream constants, encoding, hashing, and validation.
 
 # Purpose
-The code is a C program designed to perform unit tests on various components of a system related to `fd_vinyl_bstream`, which appears to be a data streaming or storage mechanism. The program includes a series of static assertions to verify that certain compile-time constants and data structure alignments meet expected values. These assertions ensure that the system's configuration is correct before runtime. The main function initializes a random number generator and executes a loop to perform multiple tests on sequence comparison, control encoding and decoding, block hashing, and pair testing. These tests validate the correctness of operations such as sequence comparisons, control type and style extraction, and data integrity checks through hashing.
-
-The program also includes tests for different scenarios, such as null buffers, incorrect buffer sizes, and corrupted data, to ensure robustness against various edge cases. It uses functions like `fd_vinyl_seq_lt`, `fd_vinyl_bstream_ctl`, and `fd_vinyl_bstream_pair_test` to perform these validations. Additionally, the program logs the results of certain operations and checks the conversion between control styles and their string representations. The code is structured to be executed as a standalone application, with a [`main`](<#main>) function that orchestrates the testing process and logs the outcomes.
-# Imports and Dependencies
-
----
-- `../fd_vinyl.h`
-- `stddef.h`
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/vinyl/bstream/test_vinyl_bstream.c#L38>)
-
-Executes a series of tests on random number generation, sequence comparison, control encoding/decoding, block hashing, and pair testing for the `fd_vinyl` library.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Initialize the environment with `fd_boot` and set up a random number generator `rng`.
-    - Iterate 1,000,000 times, generating random numbers `r` and `s` for testing.
-    - Perform sequence comparison tests using `fd_vinyl_seq_lt`, `fd_vinyl_seq_gt`, `fd_vinyl_seq_le`, `fd_vinyl_seq_ge`, `fd_vinyl_seq_eq`, and `fd_vinyl_seq_ne`.
-    - Test control encoding and decoding with `fd_vinyl_bstream_ctl_type`, `fd_vinyl_bstream_ctl_style`, and `fd_vinyl_bstream_ctl_sz`.
-    - Verify pair size calculation with `fd_vinyl_bstream_pair_sz`.
-    - Conduct single block hash tests using `fd_vinyl_bstream_hash`, `fd_vinyl_bstream_block_hash`, and `fd_vinyl_bstream_block_test`.
-    - Perform pair tests with `fd_vinyl_bstream_pair_test` and `fd_vinyl_bstream_pair_test_fast`, including various error scenarios.
-    - Test zero padding with `fd_vinyl_bstream_zpad_test`.
-    - Log the results of style string conversions using `fd_vinyl_bstream_ctl_style_cstr`.
-    - Test conversion from string to control style with `fd_cstr_to_vinyl_bstream_ctl_style`.
-    - Clean up the random number generator with `fd_rng_delete` and `fd_rng_leave`.
-    - Log a success message and halt the program with `fd_halt`.
-- **Output**: Returns 0 to indicate successful execution.
-
-
+This file is a unit test for the `fd_vinyl_bstream` data format and its helper functions. It uses `FD_STATIC_ASSERT` checks to verify fixed sizes, alignments, constant values, and field offsets for the block, header, and footer types. The [`main`](<#main>) function then runs many random tests to check sequence comparison, control word encoding and decoding, pair size calculation, block hash generation and validation, pair validation in slow and fast forms, zero-pad validation, and string conversion for control styles. It ends by checking error cases and valid cases, then prints `pass` when all tests succeed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

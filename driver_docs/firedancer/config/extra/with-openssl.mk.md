@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for OpenSSL library detection and setup.
+The `with-openssl.mk` file in the `firedancer` codebase checks for the presence of OpenSSL libraries and sets compilation flags accordingly, or logs a message if OpenSSL is not installed.
 
 # Purpose
-The `Makefile` snippet checks for the presence of the OpenSSL static library `libssl.a` in a specified directory `$(OPT)/lib`. If the library exists, it sets the `OPENSSL_LIBS` variable to include both `libssl.a` and `libcrypto.a`. It also defines the `FD_HAS_OPENSSL` variable as `1` and appends preprocessor flags to `CPPFLAGS` to indicate OpenSSL compatibility and to disable deprecated features. If the library is not found, it outputs a message indicating that OpenSSL is not installed and skips related configurations.
+This Makefile snippet checks for the presence of the OpenSSL static library `libssl.a` in a specified directory (`$(OPT)/lib`). If found, it sets the `OPENSSL_LIBS` variable to include both `libssl.a` and `libcrypto.a`, and updates `CPPFLAGS` to define preprocessor macros indicating OpenSSL's presence and compatibility with a specific API version while disabling deprecated features. If the library is not found, it outputs a message indicating that OpenSSL is not installed and skips related configurations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

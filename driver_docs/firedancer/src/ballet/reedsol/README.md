@@ -3,202 +3,41 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Reed-Solomon error correction tools with C code, APIs, arithmetic operations, encoding, recovery, and testing.
+Reed-Solomon encode, recover, FFT, PPT, arithmetic, tests, and code generators.
 
 ## Folders
-- **[wrapped_impl](wrapped_impl/README.md)**: Auto-generated C code for Reed-Solomon FFT operations and encoding functions, plus a related Makefile.
+- **[wrapped_impl](wrapped_impl/README.md)**: The `wrapped_impl` folder in the `firedancer` codebase contains auto-generated C files implementing forward and inverse fast Fourier transforms (FFT and IFFT) and Reed-Solomon parity processing functions, along with a makefile for building these implementations.
 
 ## Files
-- **[fd_reedsol.c](fd_reedsol.c.md)**: Implements Reed-Solomon encoding and recovery functions with error handling for data shreds.
-- **[fd_reedsol.h](fd_reedsol.h.md)**: APIs for Reed-Solomon encoding and recovery of data shreds, optimized for Solana's Turbine.
-- **[fd_reedsol_arith_avx2.h](fd_reedsol_arith_avx2.h.md)**: Header file for AVX2-optimized arithmetic operations in Reed-Solomon error correction.
-- **[fd_reedsol_arith_gfni.h](fd_reedsol_arith_gfni.h.md)**: Defines arithmetic operations for Galois Field using AVX instructions with specific compiler conditions.
-- **[fd_reedsol_arith_none.h](fd_reedsol_arith_none.h.md)**: Defines arithmetic operations for Galois Field elements using lookup tables in the Firedancer codebase.
-- **[fd_reedsol_encode_128.c](fd_reedsol_encode_128.c.md)**: Auto-generated C code for encoding data and parity shreds using Reed-Solomon error correction.
-- **[fd_reedsol_encode_16.c](fd_reedsol_encode_16.c.md)**: Auto-generated C code for encoding data and parity shreds using Reed-Solomon error correction.
-- **[fd_reedsol_encode_32.c](fd_reedsol_encode_32.c.md)**: Auto-generated C code for encoding data and parity shreds using Reed-Solomon error correction.
-- **[fd_reedsol_encode_64.c](fd_reedsol_encode_64.c.md)**: Auto-generated C code for encoding data and parity shreds using Reed-Solomon algorithm.
-- **[fd_reedsol_fderiv.h](fd_reedsol_fderiv.h.md)**: Auto-generated macros for computing the formal derivative of polynomials over GF(2^8).
-- **[fd_reedsol_fft.h](fd_reedsol_fft.h.md)**: Implements FFT and IFFT operations for Reed-Solomon codes on Galois Field elements.
-- **[fd_reedsol_gfni_32.S](fd_reedsol_gfni_32.S.md)**: Assembly implementation of an FFT-like algorithm for computing Reed-Solomon parity using Intel GFNI instructions.
-- **[fd_reedsol_pi.c](fd_reedsol_pi.c.md)**: Implements Reed-Solomon erasure correction using Fast Walsh-Hadamard Transform with AVX optimizations.
-- **[fd_reedsol_ppt.h](fd_reedsol_ppt.h.md)**: null and must point to writable memory.
-    - `_in58`: Pointer to the fifty-ninth input element. Must not be null and must point to writable memory.
-    - `_in59`: Pointer to the sixtieth input element. Must not be null and must point to writable memory.
-    - `_in60`: Pointer to the sixty-first input element. Must not be null and must point to writable memory.
-    - `_in61`: Pointer to the sixty-second input element. Must not be null and must point to writable memory.
-    - `_in62`: Pointer to the sixty-third input element. Must not be null and must point to writable memory.
-    - `_in63`: Pointer to the sixty-fourth input element. Must not be null and must point to writable memory.
-- **Output**: None
-- **See Also**: [`fd_reedsol_ppt_64_61`](<firedancer/src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_60.c#callable:fd_reedsol_ppt_64_61>)  (Implementation)
-
-
----
-### fd\_reedsol\_ppt\_64\_62<!-- {{#callable_declaration:fd_reedsol_ppt_64_62}} -->
-[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_ppt.h#L8489>)
-
-Processes 64 input elements for Reed-Solomon encoding.
-- **Description**: Use this function to perform Reed-Solomon encoding on 64 input elements. Each input element is a pointer to a `gf_t` type, which represents a Galois Field element. The function modifies the input elements in place, so ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so the caller must ensure that all pointers are non-null and correctly initialized before calling. It is typically used in error correction coding scenarios where data integrity is critical.
-- **Inputs**:
-    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-- **Output**: None
-- **See Also**: [`fd_reedsol_ppt_64_62`](<firedancer/src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_60.c#callable:fd_reedsol_ppt_64_62>)  (Implementation)
-
-
----
-### fd\_reedsol\_ppt\_64\_63<!-- {{#callable_declaration:fd_reedsol_ppt_64_63}} -->
-[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_ppt.h#L8630>)
-
-Processes 64 input elements for Reed-Solomon encoding.
-- **Description**: Use this function to perform Reed-Solomon encoding on 64 input elements. Each input element is a pointer to a `gf_t` type, which represents a Galois Field element. The function modifies the input elements in place, so ensure that the input pointers are valid and point to writable memory. This function does not perform any input validation, so the caller must ensure that all pointers are non-null and correctly initialized before calling. It is typically used in error correction coding scenarios where data integrity is critical.
-- **Inputs**:
-    - `_in00`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in01`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in02`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in03`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in04`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in05`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in06`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in07`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in08`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in09`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in10`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in11`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in12`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in13`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in14`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in15`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in16`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in17`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in18`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in19`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in20`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in21`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in22`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in23`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in24`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in25`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in26`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in27`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in28`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in29`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in30`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in31`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in32`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in33`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in34`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in35`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in36`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in37`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in38`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in39`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in40`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in41`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in42`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in43`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in44`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in45`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in46`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in47`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in48`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in49`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in50`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in51`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in52`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in53`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in54`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in55`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in56`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in57`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in58`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in59`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in60`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in61`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in62`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-    - `_in63`: Pointer to a `gf_t` element. Must not be null and must point to writable memory.
-- **Output**: None
-- **See Also**: [`fd_reedsol_ppt_64_63`](<firedancer/src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_60.c#callable:fd_reedsol_ppt_64_63>)  (Implementation)
-
-
-Provides macros and functions for Reed-Solomon error correction using Galois Field arithmetic.
-- **[fd_reedsol_private.h](fd_reedsol_private.h.md)**: Internal function declarations for Reed-Solomon encoding, recovery, and Galois Field arithmetic selection.
-- **[fd_reedsol_recover_128.c](fd_reedsol_recover_128.c.md)**: Auto-generated C code for recovering 128 Reed-Solomon encoded shreds with error checking.
-- **[fd_reedsol_recover_16.c](fd_reedsol_recover_16.c.md)**: Auto-generated C code for recovering data from Reed-Solomon encoded shreds with error checking.
-- **[fd_reedsol_recover_256.c](fd_reedsol_recover_256.c.md)**: Auto-generated C code for recovering data using Reed-Solomon error correction with 256 shreds.
-- **[fd_reedsol_recover_32.c](fd_reedsol_recover_32.c.md)**: Auto-generated C code for recovering 32 Reed-Solomon shreds with error checking and correction.
-- **[fd_reedsol_recover_64.c](fd_reedsol_recover_64.c.md)**: Auto-generated C code for recovering 64 Reed-Solomon shreds with error checking and correction.
-- **[fuzz_reedsol.c](fuzz_reedsol.c.md)**: Fuzz testing for Reed-Solomon encoding and decoding with error detection and recovery.
-- **[gen_tbls.py](gen_tbls.py.md)**: Generates and writes Galois field constant tables for GFNI, AVX, and generic use to binary files.
-- **[generate_encode.py](generate_encode.py.md)**: Generates C code for Reed-Solomon encoding functions with varying data and parity shred counts.
-- **[generate_fderiv.py](generate_fderiv.py.md)**: Generates a header file for computing the formal derivative of polynomials over GF(2^8) using macros.
-- **[generate_fft.py](generate_fft.py.md)**: Generates C header and implementation files for FFT and IFFT operations on Reed-Solomon erasure codes.
-- **[generate_ppt.py](generate_ppt.py.md)**: Generates C header and implementation files for the Principal Pivot Transform in Reed-Solomon FFT operations.
-- **[generate_recover.py](generate_recover.py.md)**: Generates C code for Reed-Solomon erasure recovery functions with variable parameters.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing Reed-Solomon encoding and recovery components in the firedancer codebase.
-- **[test_reedsol.c](test_reedsol.c.md)**: Tests for Reed-Solomon encoding and decoding, including performance and linearity checks.
+- **[fd_reedsol.c](fd_reedsol.c.md)**: The `fd_reedsol.c` file in the `firedancer` codebase implements functions for encoding and recovering data using Reed-Solomon error correction, as well as providing error string representations.
+- **[fd_reedsol.h](fd_reedsol.h.md)**: Reed-Solomon encode and recover APIs for data and parity shreds.
+- **[fd_reedsol_arith_avx2.h](fd_reedsol_arith_avx2.h.md)**: The `fd_reedsol_arith_avx2.h` file in the `firedancer` codebase provides AVX2-optimized arithmetic operations for Reed-Solomon error correction, including definitions and macros for operations like addition, multiplication, and logical operations on Galois fields.
+- **[fd_reedsol_arith_gfni.h](fd_reedsol_arith_gfni.h.md)**: The `fd_reedsol_arith_gfni.h` file in the `firedancer` codebase provides definitions and macros for Galois Field arithmetic operations using AVX instructions, specifically optimized for use with the Reed-Solomon error correction algorithm.
+- **[fd_reedsol_arith_none.h](fd_reedsol_arith_none.h.md)**: The `fd_reedsol_arith_none.h` file defines arithmetic operations for Galois fields used in the Firedancer codebase, including addition, multiplication, and storage operations, while ensuring it is included only through `fd_reedsol_private.h`.
+- **[fd_reedsol_encode_128.c](fd_reedsol_encode_128.c.md)**: The `fd_reedsol_encode_128.c` file in the `firedancer` codebase implements a function for encoding data shreds into parity shreds using a Reed-Solomon encoding scheme for 128 data inputs.
+- **[fd_reedsol_encode_16.c](fd_reedsol_encode_16.c.md)**: The `fd_reedsol_encode_16.c` file in the `firedancer` codebase implements a function for encoding data using Reed-Solomon error correction, specifically generating parity shreds for a given set of data shreds.
+- **[fd_reedsol_encode_32.c](fd_reedsol_encode_32.c.md)**: The `fd_reedsol_encode_32.c` file in the `firedancer` codebase implements a function for encoding data shreds into parity shreds using Reed-Solomon error correction, specifically handling up to 32 data shreds.
+- **[fd_reedsol_encode_64.c](fd_reedsol_encode_64.c.md)**: The `fd_reedsol_encode_64.c` file in the `firedancer` codebase implements a function for encoding data shreds and generating parity shreds using Reed-Solomon error correction for 64 data inputs.
+- **[fd_reedsol_fderiv.h](fd_reedsol_fderiv.h.md)**: The `fd_reedsol_fderiv.h` file in the `firedancer` codebase provides an auto-generated implementation for computing the formal derivative of a polynomial over a finite field, specifically using the `FD_REEDSOL_GEN_FDERIV` macro for vectorized computation.
+- **[fd_reedsol_fft.h](fd_reedsol_fft.h.md)**: The `fd_reedsol_fft.h` file in the `firedancer` codebase is a C header file that implements specialized Fast Fourier Transform (FFT) and Inverse Fast Fourier Transform (IFFT) operations for Reed-Solomon error correction codes, providing macros and function declarations for transforming polynomials between the "evaluation basis" and the "coefficient basis" within the Galois Field GF(2^8), with functions like `fd_reedsol_fft_256_0`, `fd_reedsol_ifft_256_0`, `fd_reedsol_fft_128_0`, `fd_reedsol_ifft_128_0`, `fd_reedsol_fft_64_0`, and `fd_reedsol_ifft_64_0` facilitating these operations on data sets of varying sizes.
+- **[fd_reedsol_gfni_32.S](fd_reedsol_gfni_32.S.md)**: The `fd_reedsol_gfni_32.S` file implements an optimized FFT-like algorithm for computing Reed-Solomon parity using Intel's GFNI instructions, achieving faster performance than compiled C code by leveraging assembly language.
+- **[fd_reedsol_pi.c](fd_reedsol_pi.c.md)**: Fast Walsh-Hadamard based Pi generation for Reed-Solomon erasure recovery.
+- **[fd_reedsol_ppt.h](fd_reedsol_ppt.h.md)**: The `fd_reedsol_ppt.h` file in the Firedancer codebase is a C header file that implements the Principal Pivot Transform (PPT) for the Reed-Solomon Fast Fourier Transform (FFT) operator, providing macros and function prototypes for various configurations to handle different numbers of data and parity symbols using Galois Field arithmetic, and is part of a larger library focused on error correction codes, particularly Reed-Solomon codes, which are essential for data transmission and storage systems.
+- **[fd_reedsol_private.h](fd_reedsol_private.h.md)**: The `fd_reedsol_private.h` file in the `firedancer` codebase contains internal function declarations for encoding and recovering data using Reed-Solomon codes, with support for various Galois Field arithmetic implementations.
+- **[fd_reedsol_recover_128.c](fd_reedsol_recover_128.c.md)**: The `fd_reedsol_recover_128.c` file contains an auto-generated implementation for recovering data using Reed-Solomon error correction with a focus on handling 128 shreds.
+- **[fd_reedsol_recover_16.c](fd_reedsol_recover_16.c.md)**: The `fd_reedsol_recover_16.c` file in the `firedancer` codebase implements a function for recovering data using Reed-Solomon error correction with a focus on handling 16 shreds at a time.
+- **[fd_reedsol_recover_256.c](fd_reedsol_recover_256.c.md)**: The `fd_reedsol_recover_256.c` file in the `firedancer` codebase implements a function for recovering data using Reed-Solomon error correction for a set of 256 shreds, handling cases of erasure and corruption.
+- **[fd_reedsol_recover_32.c](fd_reedsol_recover_32.c.md)**: The `fd_reedsol_recover_32.c` file in the `firedancer` codebase implements a function for recovering data using Reed-Solomon error correction for 32 shreds, handling erasures and verifying data integrity.
+- **[fd_reedsol_recover_64.c](fd_reedsol_recover_64.c.md)**: The `fd_reedsol_recover_64.c` file in the `firedancer` codebase implements a function for recovering data using Reed-Solomon error correction for 64 shreds, handling erasures and verifying data integrity.
+- **[fuzz_reedsol.c](fuzz_reedsol.c.md)**: The `fuzz_reedsol.c` file in the `firedancer` codebase implements a fuzz testing function for Reed-Solomon encoding and decoding, ensuring data integrity and error detection capabilities.
+- **[gen_tbls.py](gen_tbls.py.md)**: The `gen_tbls.py` file in the `firedancer` codebase generates and writes out various constant tables for Galois Field arithmetic, including GFNI, AVX, and generic constants, to binary files.
+- **[generate_encode.py](generate_encode.py.md)**: The `generate_encode.py` file in the `firedancer` codebase generates C code for encoding Reed-Solomon erasure codes, creating functions to handle different ranges of data and parity shreds.
+- **[generate_fderiv.py](generate_fderiv.py.md)**: The `generate_fderiv.py` file in the `firedancer` codebase generates a C header file that implements the formal derivative computation of polynomials over a finite field, specifically for use with Reed-Solomon error correction codes.
+- **[generate_fft.py](generate_fft.py.md)**: The `generate_fft.py` file in the `firedancer` codebase is responsible for generating C header and implementation files that define and implement FFT-like operators for transforming polynomials between evaluation and coefficient bases, specifically for use with Reed-Solomon erasure codes.
+- **[generate_ppt.py](generate_ppt.py.md)**: The `generate_ppt.py` file in the `firedancer` codebase is responsible for generating C header and implementation files that define and implement the Principal Pivot Transform (PPT) for Reed-Solomon FFT operations, including macros and functions for various sizes and configurations.
+- **[generate_recover.py](generate_recover.py.md)**: The `generate_recover.py` file in the `firedancer` codebase generates C source files for Reed-Solomon error recovery functions, tailored for different numbers of shreds and maximum shreds.
+- **[Local.mk](Local.mk.md)**: Build rules for reed-solomon objects, GFNI asm, and tests.
+- **[test_reedsol.c](test_reedsol.c.md)**: Reed-Solomon encode, recover, FFT, PPT, and linearity tests.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
