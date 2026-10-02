@@ -3,77 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines structures and functions for handling instruction accounts and bank status checks.
+Tests nonbinary return values from functions using is-style names.
 
 # Purpose
-The code defines several components related to financial transaction processing. It includes definitions, structures, and functions that handle account and bank information. The `fd_instr_info_t` structure holds information about accounts, including a count of accounts and an array indicating whether each account is a signer. The `fd_bank_t` structure contains a single integer field for flags, which can indicate the status of a bank, such as whether it is "dead."
+This file defines a small set of C types, constants, and helper functions that model instruction account data and bank state, then expose simple checks on that data. The `fd_instr_info_t` type stores an account count and a fixed array of account records with a signer flag. The `fd_bank_t` type stores a flag field. The [`fd_instr_acc_is_signer_idx`](<#fd_instr_acc_is_signer_idx>) function checks whether a requested account index exists and returns the signer state for that account, or returns `FD_EXECUTOR_INSTR_ERR_MISSING_ACC` when the index is outside the account count. The [`fd_banks_is_bank_dead`](<#fd_banks_is_bank_dead>) inline function tests the `FD_BANK_FLAGS_DEAD` bit in a bank record and returns the masked flag value.
 
-The code provides functions to check specific conditions related to these structures. The [`fd_instr_acc_is_signer_idx`](<#fd_instr_acc_is_signer_idx>) function checks if a given account index is a signer, returning an error code if the index is out of bounds. The [`fd_banks_is_bank_dead`](<#fd_banks_is_bank_dead>) function checks if a bank is marked as "dead" by examining its flags. Additionally, the [`fd_bn254_pairing_is_one_syscall`](<#fd_bn254_pairing_is_one_syscall>) function checks if an input size matches a specific value, returning an error if it does not. The code includes error definitions and uses macros to handle specific conditions, indicating its role in a larger system where these checks are necessary for transaction validation or processing.
-# Data Structures
-
----
-### fd\_instr\_info\_t
-- **Type**: ``struct``
-- **Members**:
-    - ``acct_cnt``: Stores the number of accounts in the `accounts` array.
-    - ``accounts``: An array of 10 structures, each containing an `is_signer` field.
-    - ``is_signer``: Indicates if the account is a signer (1 for true, 0 for false).
-- **Description**: Defines a structure that holds information about accounts related to an instruction, including the count of accounts and an array of account structures that specify whether each account is a signer.
-
-
----
-### fd\_bank\_t
-- **Type**: ``struct``
-- **Members**:
-    - ``flags``: An integer that stores the status flags for the bank.
-- **Description**: Defines a structure with a single member `flags` that holds status information for a bank, such as whether the bank is dead or active.
-
-
-# Functions
-
----
-### fd\_instr\_acc\_is\_signer\_idx<!-- {{#callable:fd_instr_acc_is_signer_idx}} -->
-[View Source →](<../../../../../../../contrib/codeql/test/query-tests/NonBinaryIsFunction/NonBinaryIsFunction.c#L19>)
-
-Checks if the account at a given index in the instruction is a signer.
-- **Inputs**:
-    - `instr`: A pointer to a `fd_instr_info_t` structure that contains account information.
-    - `idx`: A short integer representing the index of the account to check.
-- **Logic and Control Flow**:
-    - Check if `idx` is greater than or equal to `instr->acct_cnt` using `FD_UNLIKELY` macro.
-    - If true, return `FD_EXECUTOR_INSTR_ERR_MISSING_ACC` (-33) indicating a missing account.
-    - Otherwise, return the boolean value of `instr->accounts[idx].is_signer` using double negation to ensure the result is either 0 or 1.
-- **Output**: Returns -33 if the index is out of bounds, otherwise returns 1 if the account is a signer, or 0 if it is not.
-
-
----
-### fd\_banks\_is\_bank\_dead<!-- {{#callable:fd_banks_is_bank_dead}} -->
-[View Source →](<../../../../../../../contrib/codeql/test/query-tests/NonBinaryIsFunction/NonBinaryIsFunction.c#L30>)
-
-Checks if a bank is marked as dead by examining its flags.
-- **Inputs**:
-    - `bank`: A pointer to an `fd_bank_t` structure representing the bank to check.
-- **Logic and Control Flow**:
-    - Accesses the `flags` field of the `fd_bank_t` structure pointed to by `bank`.
-    - Performs a bitwise AND operation between `bank->flags` and the constant `FD_BANK_FLAGS_DEAD`.
-    - Returns the result of the bitwise operation, which indicates if the bank is dead.
-- **Output**: An integer that is non-zero if the bank is dead, and zero if it is not.
-
-
----
-### fd\_bn254\_pairing\_is\_one\_syscall<!-- {{#callable:fd_bn254_pairing_is_one_syscall}} -->
-[View Source →](<../../../../../../../contrib/codeql/test/query-tests/NonBinaryIsFunction/NonBinaryIsFunction.c#L37>)
-
-Checks if the input size is exactly 128 and returns a status code accordingly.
-- **Inputs**:
-    - `in_sz`: The size of the input, expected to be an unsigned long integer.
-- **Logic and Control Flow**:
-    - Check if `in_sz` is not equal to 128UL.
-    - If `in_sz` is not equal to 128UL, return -1.
-    - If `in_sz` is equal to 128UL, return 0.
-- **Output**: Returns 0 if `in_sz` is 128, otherwise returns -1.
-
-
+The file also defines [`fd_bn254_pairing_is_one_syscall`](<#fd_bn254_pairing_is_one_syscall>), which performs a size check on an input buffer length and returns `0` only when the size is exactly `128UL`, and `-1` for any other size. Overall, the file contains narrow utility logic for validation and state checks, with no public interface beyond these small helper functions and constants.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

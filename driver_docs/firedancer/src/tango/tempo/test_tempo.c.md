@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for the `fd_tempo` module, including wallclock, tickcount, and asynchronous timing functions.
+The `test_tempo.c` file in the `firedancer` codebase contains a series of tests for the `fd_tempo` module, including wallclock and tickcount models, tick per nanosecond calculations, and various asynchronous timing functions.
 
 # Purpose
-The code is an executable C program designed to test and validate various timing and random number generation functionalities. It begins by initializing a random number generator using `fd_rng_new` and `fd_rng_join`. The program then performs a series of tests on timing models and functions, such as `fd_tempo_wallclock_model`, `fd_tempo_tickcount_model`, and `fd_tempo_tick_per_ns`, to ensure they return valid and consistent results. These functions are tested for their ability to provide accurate timing measurements, and the results are logged using `FD_LOG_NOTICE`.
+This C source code file is an executable program designed to test and validate various timing and random number generation functionalities provided by the `fd_tango` library. The program initializes a random number generator and performs a series of tests on functions related to time measurement and random number generation. It includes tests for wall clock and tick count models, which are used to measure time intervals and their precision. The program also evaluates the performance of functions that calculate the average and root mean square (RMS) of ticks per nanosecond, ensuring their outputs are within expected ranges. Additionally, it tests the `fd_tempo_observe_pair` function to observe and log time differences between pairs of time points, and it verifies the behavior of the `fd_tempo_lazy_default` and `fd_tempo_async_min` functions, which are likely related to lazy evaluation and asynchronous timing.
 
-The program also tests the `fd_tempo_observe_pair` function to measure time intervals and validate the consistency of observed timing pairs. Additionally, it checks the behavior of the `fd_tempo_lazy_default` function with various input values to ensure it returns expected results. The code includes tests for asynchronous timing functions, such as `fd_tempo_async_min` and `fd_tempo_async_reload`, to verify their correctness in generating timing intervals. The program concludes by cleaning up the random number generator and logging a "pass" message before halting execution with `fd_halt`.
+The code is structured to perform rigorous testing by using assertions (`FD_TEST`) to ensure that the functions behave as expected under various conditions. It logs the results of these tests using `FD_LOG_NOTICE`, providing detailed output for each test iteration. The program is intended to be run as a standalone executable, as indicated by the presence of a [`main`](#main) function, and it does not define any public APIs or external interfaces. Instead, it serves as a comprehensive test suite for the timing and random number generation capabilities of the `fd_tango` library, ensuring their reliability and correctness.
 # Imports and Dependencies
 
 ---
@@ -19,23 +19,21 @@ The program also tests the `fd_tempo_observe_pair` function to measure time inte
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/tango/tempo/test_tempo.c#L3>)
-
-Initializes the environment, performs various timing and random number generation tests, and logs the results.
+The `main` function initializes the environment, performs various timing and randomness tests, and logs the results.
 - **Inputs**:
     - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - If `FD_HAS_DOUBLE` is defined, performs timing tests using `fd_tempo_wallclock_model`, `fd_tempo_tickcount_model`, and `fd_tempo_tick_per_ns`, logging results and verifying values with `FD_TEST`.
-    - Performs observation tests using `fd_tempo_observe_pair`, logging and verifying time differences.
-    - Tests `fd_tempo_lazy_default` with various values, verifying expected results with `FD_TEST`.
-    - Tests `fd_tempo_async_min` and verifies the result is a power of two using `fd_ulong_is_pow2`.
-    - Runs a loop to test `fd_tempo_async_reload` with random values, verifying constraints with `FD_TEST`.
-    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
-    - Logs a final notice indicating the tests passed and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the environment using `fd_boot` with command-line arguments.
+    - Create and join a random number generator using `fd_rng_new` and `fd_rng_join`.
+    - If `FD_HAS_DOUBLE` is defined, perform timing tests using `fd_tempo_wallclock_model`, `fd_tempo_tickcount_model`, and `fd_tempo_tick_per_ns`, logging results and verifying outputs with `FD_TEST`.
+    - Perform a series of tests using `fd_tempo_observe_pair` to measure time differences and log results.
+    - Test the `fd_tempo_lazy_default` function with various inputs to verify expected outputs using `FD_TEST`.
+    - Test the `fd_tempo_async_min` function to ensure it returns a power of two using `FD_TEST`.
+    - Run a loop to test `fd_tempo_async_reload` with random values, verifying the results with `FD_TEST`.
+    - Delete the random number generator using `fd_rng_delete` and `fd_rng_leave`.
+    - Log a 'pass' message and halt the program using `fd_halt`.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Protobuf and gRPC definitions, gRPC server implementation, build script, and package configuration.
+Protocol buffers, a gRPC test server, and Rust build and package files.
 
 ## Folders
-- **[protos](protos/README.md)**: Protobuf and gRPC definitions for authentication, block engine, bundle processing, packets, relayers, and shared data.
-- **[src](src/README.md)**: Implements a gRPC server with authentication and block engine validation services.
+- **[protos](protos/README.md)**: The `protos` folder in the `firedancer` codebase contains protocol buffer definitions for various components such as authentication, block engine systems, bundles, network packets, relayers, and shared structures, facilitating communication and data handling within the bundle-test-server.
+- **[src](src/README.md)**: gRPC test server with REPL commands to kill streams or restart the server.
 
 ## Files
-- **[build.rs](build.rs.md)**: Build script for compiling protocol buffer files into server code using Tonic and Prost.
-- **[Cargo.toml](Cargo.toml.md)**: Configuration for the `bundle-test-server` package with dependencies and build settings.
+- **[build.rs](build.rs.md)**: Builds gRPC server code from protos and sets PROTOC when needed.
+- **[Cargo.toml](Cargo.toml.md)**: Rust package manifest with tonic, prost, tokio, and test dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
