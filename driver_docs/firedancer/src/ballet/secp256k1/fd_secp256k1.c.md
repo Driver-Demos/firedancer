@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_secp256k1.c` file implements a function to recover a public key from a message hash and a recoverable ECDSA signature using the secp256k1 library.
+Implements ECDSA public key recovery from a signature using the secp256k1 library.
 
 # Purpose
-This C source code file provides a specific cryptographic functionality related to the recovery of public keys from ECDSA (Elliptic Curve Digital Signature Algorithm) signatures using the secp256k1 curve, which is widely used in blockchain technologies like Bitcoin. The primary function, [`fd_secp256k1_recover`](#fd_secp256k1_recover), is designed to recover a public key from a given message hash, signature, and recovery ID. It utilizes the secp256k1 library, specifically its recovery module, to perform this task. The function checks the validity of the recovery ID and uses several secp256k1 functions to parse the recoverable signature, recover the public key, and serialize it into an uncompressed format. The function ensures that the public key is correctly extracted by skipping the first byte, which is a prefix added by the secp256k1 library.
+The code defines a function [`fd_secp256k1_recover`](<#fd_secp256k1_recover>) that performs the recovery of a public key from a given message hash and a recoverable ECDSA (Elliptic Curve Digital Signature Algorithm) signature. This function is part of a cryptographic module that interfaces with the `secp256k1` library, which is commonly used for cryptographic operations in blockchain technologies, such as Bitcoin. The function takes four parameters: a pointer to store the recovered public key, a constant pointer to the message hash, a constant pointer to the signature, and an integer representing the recovery ID. 
 
-The code is intended to be part of a larger system, likely a cryptographic library or application that deals with digital signatures and public key cryptography. It does not define a public API or external interface by itself but rather provides a utility function that can be used internally or by other components of the system. The inclusion of header files and the use of specific secp256k1 functions indicate that this file is meant to be compiled and linked with the secp256k1 library, leveraging its capabilities for cryptographic operations. The function is robustly designed with error checking to handle invalid inputs gracefully, returning `NULL` in case of any failure during the recovery process.
+The function uses several components from the `secp256k1` library, including `secp256k1_ecdsa_recoverable_signature`, `secp256k1_pubkey`, and functions like `secp256k1_ecdsa_recoverable_signature_parse_compact`, `secp256k1_ecdsa_recover`, and `secp256k1_ec_pubkey_serialize`. It checks the validity of the recovery ID and performs the recovery process, serializing the public key in an uncompressed format. The function returns a pointer to the recovered public key or `NULL` if any step in the process fails. This code is intended to be part of a larger cryptographic library and does not define a public API or external interface on its own.
 # Imports and Dependencies
 
 ---
@@ -21,19 +21,21 @@ The code is intended to be part of a larger system, likely a cryptographic libra
 
 ---
 ### fd\_secp256k1\_recover<!-- {{#callable:fd_secp256k1_recover}} -->
-The `fd_secp256k1_recover` function recovers a public key from a given ECDSA signature and message hash using the secp256k1 curve.
+[View Source →](<../../../../../src/ballet/secp256k1/fd_secp256k1.c#L6>)
+
+Recovers a public key from a given ECDSA signature and message hash using the secp256k1 library.
 - **Inputs**:
     - `public_key`: A pointer to a memory location where the recovered public key will be stored.
     - `msg_hash`: A pointer to the hash of the message that was signed.
-    - `sig`: A pointer to the ECDSA signature from which the public key is to be recovered.
+    - `sig`: A pointer to the ECDSA signature from which the public key will be recovered.
     - `recovery_id`: An integer representing the recovery ID, which must be between 0 and 3 inclusive.
-- **Control Flow**:
-    - Check if the recovery_id is within the valid range (0 to 3); if not, return NULL.
-    - Parse the compact ECDSA signature using the provided signature and recovery ID; if parsing fails, return NULL.
-    - Recover the internal public key from the parsed signature and message hash; if recovery fails, return NULL.
-    - Serialize the internal public key into an uncompressed format; if serialization fails, return NULL.
-    - Copy the serialized public key (excluding the first byte) to the provided public_key location and return it.
-- **Output**: A pointer to the recovered public key, or NULL if any step in the recovery process fails.
+- **Logic and Control Flow**:
+    - Check if `recovery_id` is between 0 and 3; return `NULL` if not.
+    - Parse the compact ECDSA signature using `secp256k1_ecdsa_recoverable_signature_parse_compact`; return `NULL` if parsing fails.
+    - Recover the public key using `secp256k1_ecdsa_recover`; return `NULL` if recovery fails.
+    - Serialize the recovered public key using `secp256k1_ec_pubkey_serialize`; return `NULL` if serialization fails.
+    - Copy the serialized public key (excluding the first byte) to the `public_key` location and return the pointer to `public_key`.
+- **Output**: A pointer to the recovered public key, or `NULL` if any step in the recovery process fails.
 
 
 
