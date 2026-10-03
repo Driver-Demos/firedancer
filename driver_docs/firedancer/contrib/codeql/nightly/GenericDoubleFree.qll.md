@@ -3,14 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `GenericDoubleFree.qll` file in the `firedancer` codebase defines a CodeQL module for detecting double free vulnerabilities by configuring data flow analysis to identify sources, barriers, and sinks related to potential double free operations.
+Defines a data flow configuration to detect double free vulnerabilities in C++ code.
 
 # Purpose
-This code defines a module for data flow analysis in C++ code, specifically targeting the detection of double-free vulnerabilities. It imports necessary components from a C++ data flow library and defines a class `CandidateCall` that filters out certain files and function calls that are not relevant to the analysis. The `CandidateCall` class is used to identify function calls that should be considered in the data flow analysis, excluding those from test files, certain CI files, and specific source files like "main.c" and "spy.c".
+The code defines a configuration for a data flow analysis module, specifically targeting the detection of double-free vulnerabilities in C++ code. It imports necessary modules, such as `cpp` and `semmle.code.cpp.dataflow.new.DataFlow`, which are likely part of a larger static analysis framework. The code defines a `CandidateCall` class that extends `Call`, filtering out certain files like `main.c` and `spy.c` from analysis, which suggests these files are not relevant for the double-free detection.
 
-The core functionality is encapsulated in the `DoubleFreeConfig` module, which implements the `DataFlow::StateConfigSig` interface. This module defines a `FlowState` type and three predicates: `isSource`, `isBarrier`, and `isSink`. These predicates are used to identify the sources, barriers, and sinks of data flow within the code, based on the function calls identified by `CandidateCall`. The `doubleMatch` and `barrierMatch` parameters are used to match function names to determine if they are sources, barriers, or sinks in the context of double-free vulnerabilities.
-
-Overall, this file provides a specialized configuration for a data flow analysis tool, focusing on identifying potential double-free issues in C++ code. It leverages a structured approach to filter relevant function calls and define the flow of data through the code, which is crucial for detecting and preventing security vulnerabilities related to improper memory management.
+The `DoubleFreeConfig` module implements the `DataFlow::StateConfigSig` interface, indicating it is part of a data flow analysis configuration. It defines a `FlowState` as a string and includes predicates `isSource`, `isBarrier`, and `isSink`. These predicates determine the roles of nodes in the data flow graph concerning double-free vulnerabilities. The `isSource` predicate identifies nodes that can potentially introduce a double-free condition, `isBarrier` identifies nodes that can interrupt the flow, and `isSink` identifies nodes where the double-free condition might manifest. The use of `regcap` functions `doubleMatch` and `barrierMatch` suggests pattern matching on function names to classify nodes in the data flow.
 # Imports and Dependencies
 
 ---
@@ -22,21 +20,21 @@ Overall, this file provides a specialized configuration for a data flow analysis
 
 ---
 ### CandidateCall
-- **Type**: `class`
+- **Type**: ``class``
 - **Members**:
-    - `CandidateCall`: Constructor that filters out certain file names from being considered as valid calls.
-- **Description**: The `CandidateCall` class is a specialized extension of the `Call` class, designed to represent function calls that are candidates for further analysis in a data flow context. It includes a constructor that excludes calls originating from files with specific base names, such as those matching test patterns or specific filenames like 'main.c' and 'spy.c'. This filtering is intended to focus the analysis on relevant calls, avoiding noise from test or auxiliary files.
+    - ``CandidateCall``: Extends the `Call` class and represents a call that does not match certain file name patterns.
+- **Description**: Represents a specialized call that excludes certain file names from consideration, such as those matching patterns like "test%", "%_ci.%", "main.c", and "spy.c". This class is used in the context of data flow analysis to identify specific function calls that should be excluded from analysis based on their file location.
 
 
 ---
 ### DoubleFreeConfig
-- **Type**: `module`
+- **Type**: ``module``
 - **Members**:
-    - `FlowState`: A type alias for string, representing the state in the data flow.
-    - `isSource`: A predicate that determines if a given node is a source in the data flow based on a CandidateCall and a matching state.
-    - `isBarrier`: A predicate that identifies if a node acts as a barrier in the data flow using a CandidateCall and a matching state.
-    - `isSink`: A predicate that checks if a node is a sink in the data flow by evaluating a CandidateCall and a matching state.
-- **Description**: The DoubleFreeConfig module is a configuration for data flow analysis, implementing the DataFlow::StateConfigSig interface. It defines a flow state as a string and includes predicates to identify sources, barriers, and sinks in the data flow based on the presence of CandidateCall instances and their associated states. This configuration is used to track and analyze potential double-free vulnerabilities in code by matching function call targets against specified patterns.
+    - ``FlowState``: Defines a type alias for `string`.
+    - ``isSource``: Defines a predicate to identify source nodes in the data flow based on a `CandidateCall` and `FlowState`.
+    - ``isBarrier``: Defines a predicate to identify barrier nodes in the data flow based on a `CandidateCall` and `FlowState`.
+    - ``isSink``: Defines a predicate to identify sink nodes in the data flow based on a `CandidateCall` and `FlowState`.
+- **Description**: Implements the `DataFlow::StateConfigSig` interface to configure data flow analysis for detecting double free vulnerabilities by defining source, barrier, and sink predicates using `CandidateCall` and `FlowState`.
 
 
 

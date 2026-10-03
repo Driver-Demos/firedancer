@@ -3,15 +3,47 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prototypes for serializing instruction sysvar accounts and updating the current instruction index.
+Functions for serializing account instructions and updating the current instruction index.
 
 # Purpose
-This header file declares the interface for the `fd_sysvar_instructions` sysvar support in the Flamenco runtime. It includes the base type definitions and the instruction info type, then exposes two functions: [`fd_sysvar_instructions_serialize_account`](<#fd_sysvar_instructions_serialize_account>), which writes instruction data into a transaction account, and [`fd_sysvar_instructions_update_current_instr_idx`](<#fd_sysvar_instructions_update_current_instr_idx>), which stores the current instruction index in a transaction account record. The file uses include guards and `FD_PROTOTYPES_BEGIN` / `FD_PROTOTYPES_END` to control symbol visibility and prevent multiple inclusion.
+The code is a C header file that declares functions for handling system variables related to instructions in a runtime environment. It includes necessary dependencies from other header files, such as `fd_flamenco_base.h`, `fd_types.h`, and `fd_instr_info.h`. The file defines two function prototypes: [`fd_sysvar_instructions_serialize_account`](<#fd_sysvar_instructions_serialize_account>), which serializes account-related instruction data within a transaction context, and [`fd_sysvar_instructions_update_current_instr_idx`](<#fd_sysvar_instructions_update_current_instr_idx>), which updates the current instruction index in a transaction account. The use of include guards ensures that the header file is only included once during compilation to prevent redefinition errors.
+# Imports and Dependencies
+
+---
+- `../../fd_flamenco_base.h`
+- `../../types/fd_types.h`
+- `../info/fd_instr_info.h`
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_sysvar_instructions_serialize_account`
-- `fd_sysvar_instructions_update_current_instr_idx`
+### fd\_sysvar\_instructions\_serialize\_account<!-- {{#callable_declaration:fd_sysvar_instructions_serialize_account}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/sysvar/fd_sysvar_instructions.h#L8>)
+
+Serializes instruction data into a transaction account.
+- **Description**: Use this function to serialize a list of instructions into a specified transaction account within the given transaction context. Ensure that the transaction context is properly initialized and that the account for sysvar instructions is included in the borrowed accounts list before calling this function. The function assumes that the account is mutable and will allocate memory if necessary. It sets default values for the account's owner, lamports, and executable status, and then serializes the instruction data into the account's data field.
+- **Inputs**:
+    - `txn_ctx`: A pointer to a `fd_exec_txn_ctx_t` structure representing the transaction context. Must not be null and must be properly initialized with the sysvar instructions account included in the borrowed accounts list.
+    - `instrs`: A pointer to an array of `fd_instr_info_t` structures containing the instructions to serialize. Must not be null and must point to a valid array of instructions.
+    - `instrs_cnt`: The number of instructions in the `instrs` array. Must be a non-negative value and should accurately reflect the number of instructions to serialize.
+- **Output**: None
+- **See Also**: [`fd_sysvar_instructions_serialize_account`](<fd_sysvar_instructions.c.md#fd_sysvar_instructions_serialize_account>)  (Implementation)
+
+
+---
+### fd\_sysvar\_instructions\_update\_current\_instr\_idx<!-- {{#callable_declaration:fd_sysvar_instructions_update_current_instr_idx}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/sysvar/fd_sysvar_instructions.h#L15>)
+
+Updates the current instruction index in a transaction account.
+- **Description**: Use this function to set the current instruction index in the given transaction account record. This function must be called with a valid transaction account pointer that has sufficient data length to store a `ushort` value. If the data length of the account is less than the size of a `ushort`, the function will return without making any changes. Ensure that the transaction account is properly initialized and has enough space before calling this function.
+- **Inputs**:
+    - `rec`: A pointer to a `fd_txn_account_t` structure representing the transaction account. Must not be null and must have a data length of at least the size of a `ushort`. The caller retains ownership.
+    - `current_instr_idx`: A `ushort` value representing the current instruction index to store in the transaction account. Must be a valid index within the context of the transaction.
+- **Output**: None
+- **See Also**: [`fd_sysvar_instructions_update_current_instr_idx`](<fd_sysvar_instructions.c.md#fd_sysvar_instructions_update_current_instr_idx>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
