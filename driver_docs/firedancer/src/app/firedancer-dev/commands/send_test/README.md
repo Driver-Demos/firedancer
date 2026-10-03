@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules, send tile tests, and helpers for mock gossip, stake, and vote data.
+Makefile logic, a command-line tool for send tile testing, and helper functions for gossip and stake handling.
 
 
 ## Files
-- **[Local.mk](Local.mk.md)**: Build rule that adds send_test objects when FD_HAS_INT128 is defined.
-- **[send_test.c](send_test.c.md)**: Tests the send tile with mock or live gossip, stake, and vote outputs.
-- **[send_test_helpers.c](send_test_helpers.c.md)**: Helpers for parsing mock gossip and stake data and publishing test messages.
+- **[Local.mk](Local.mk.md)**: Makefile logic to add `send_test` objects if `FD_HAS_INT128` is defined.
+- **[send_test.c](send_test.c.md)**: A command-line tool for testing the send tile in the Firedancer application, using specified gossip and stake files.
+- **[send_test_helpers.c](send_test_helpers.c.md)**: Helper functions and data structures for handling gossip messages, stake weights, and test triggers in the Firedancer application.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
