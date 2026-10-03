@@ -3,49 +3,49 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configurations for various build options, compiler settings, and library integrations.
+Makefile fragments for build flags, sanitizers, fuzzing, linkers, architectures, and optional libraries.
 
 
 ## Files
-- **[with-afl++.mk](with-afl++.mk.md)**: Makefile configuration for integrating AFL++ fuzzing with specific compiler and linker flags.
-- **[with-arm.mk](with-arm.mk.md)**: Makefile for cross-compiling with Arm architecture support, setting flags and toolchain options.
-- **[with-asan.mk](with-asan.mk.md)**: Configuration for enabling AddressSanitizer (ASAN) with specific compiler flags and options.
-- **[with-brutality.mk](with-brutality.mk.md)**: Makefile configuration for compiler warning flags with specific settings for Clang and GCC.
-- **[with-clang.mk](with-clang.mk.md)**: Configuration for building with Clang, including workarounds for strict build issues and library linking.
-- **[with-debug.mk](with-debug.mk.md)**: Makefile settings to enable debug information and dynamic linking.
-- **[with-deepasan.mk](with-deepasan.mk.md)**: Configuration for enabling AddressSanitizer and LeakSanitizer in the build process.
-- **[with-extra-brutality.mk](with-extra-brutality.mk.md)**: Makefile configuration for setting compiler flags with extra warnings and attributes for Clang and GCC.
-- **[with-fuzz.mk](with-fuzz.mk.md)**: Makefile settings for fuzz testing with specific compiler and linker flags.
-- **[with-gcc.mk](with-gcc.mk.md)**: Makefile configuration for using GCC as the compiler and linker with specific flags.
-- **[with-handholding.mk](with-handholding.mk.md)**: Defines preprocessor flags to enable "handholding" features in various components.
-- **[with-honggfuzz.mk](with-honggfuzz.mk.md)**: Makefile settings for using honggfuzz with specific compiler and linker options.
-- **[with-hosted.mk](with-hosted.mk.md)**: Makefile configuration for setting compiler and linker flags with platform-specific options.
-- **[with-libcxx.mk](with-libcxx.mk.md)**: Allows replacement of the default C++ standard library with libc++ for MSan builds.
-- **[with-lld.mk](with-lld.mk.md)**: Adds the linker flag to use the LLVM linker (lld).
-- **[with-llvm-cov.mk](with-llvm-cov.mk.md)**: Makefile configuration for enabling LLVM coverage with Clang in the Firedancer project.
-- **[with-lz4.mk](with-lz4.mk.md)**: Makefile logic to check for LZ4 library and set compilation flags accordingly.
-- **[with-mold.mk](with-mold.mk.md)**: Configures the linker to use 'mold' for faster linking of large binaries.
-- **[with-msan-pre.mk](with-msan-pre.mk.md)**: Makefile configuration for compiling dependencies with MemorySanitizer using -fsanitize=memory.
-- **[with-msan.mk](with-msan.mk.md)**: Makefile configuration for enabling MemorySanitizer with optional origin tracking.
-- **[with-no-deps-pre.mk](with-no-deps-pre.mk.md)**: Sets the OPT variable to a nonexistent path.
-- **[with-no-deps.mk](with-no-deps.mk.md)**: Includes a reference to `with-no-deps-pre.mk`.
-- **[with-offline-replay.mk](with-offline-replay.mk.md)**: Makefile configuration for offline replay and usage tracking in the Firedancer project.
-- **[with-openssl.mk](with-openssl.mk.md)**: Makefile configuration for OpenSSL library detection and setup.
-- **[with-optimization.mk](with-optimization.mk.md)**: Makefile settings for enabling or disabling optimization flags in C++ and Rust builds.
-- **[with-perf.mk](with-perf.mk.md)**: Makefile configuration to add compiler flags for performance profiling.
-- **[with-racesan.mk](with-racesan.mk.md)**: Makefile configuration to enable race condition sanitizer with `FD_HAS_RACESAN` flag.
-- **[with-rocksdb.mk](with-rocksdb.mk.md)**: Configures build settings for RocksDB with optional io_uring support in the Firedancer project.
-- **[with-rpath.mk](with-rpath.mk.md)**: Makefile for linking libraries with rpath using LDFLAGS.
-- **[with-s2nbignum.mk](with-s2nbignum.mk.md)**: Checks for the presence of `s2n-bignum` library and sets compilation flags accordingly.
-- **[with-secp256k1.mk](with-secp256k1.mk.md)**: Makefile configuration to check for and link the secp256k1 library if available.
-- **[with-security.mk](with-security.mk.md)**: Makefile settings for security flags in C/C++ compilation and linking.
-- **[with-static.mk](with-static.mk.md)**: Makefile for a fully static build, not compatible with glibc.
-- **[with-threads.mk](with-threads.mk.md)**: Makefile configuration for enabling thread and atomic support with specific compiler and linker flags.
-- **[with-ubsan.mk](with-ubsan.mk.md)**: Configures UBSan with various sanitizers for undefined behavior detection in the build process.
-- **[with-ucontext.mk](with-ucontext.mk.md)**: Makefile configuration to use `libucontext` if available, setting flags for `ucontext` support.
-- **[with-wd-f1.mk](with-wd-f1.mk.md)**: Configuration file for AWS-F1 with include paths, preprocessor flags, and linker flags.
-- **[with-x86-64.mk](with-x86-64.mk.md)**: Makefile configuration for x86-64 architecture with compiler-specific flags and additional includes.
-- **[with-zstd.mk](with-zstd.mk.md)**: Makefile configuration to check for zstd library and set flags if available.
+- **[with-afl++.mk](with-afl++.mk.md)**: The `with-afl++.mk` file in the `firedancer` codebase configures build settings for fuzz testing with AFL++, including setting compiler and linker flags and requiring the AFL_LIB environment variable.
+- **[with-arm.mk](with-arm.mk.md)**: Arm cross-compilation settings and Arm-specific build flags, with extra includes for native builds.
+- **[with-asan.mk](with-asan.mk.md)**: The `with-asan.mk` file in the `firedancer` codebase configures AddressSanitizer (ASAN) settings, including compiler and linker flags, to detect memory errors during development.
+- **[with-brutality.mk](with-brutality.mk.md)**: The `with-brutality.mk` file in the `firedancer` codebase configures compiler flags for strict code warnings and error handling, with specific adjustments for Clang and GCC compilers.
+- **[with-clang.mk](with-clang.mk.md)**: The `with-clang.mk` file in the `firedancer` codebase configures the build system to use Clang as the compiler, while addressing specific issues and limitations related to strict Clang builds, such as handling packed structure elements and unused command line arguments.
+- **[with-debug.mk](with-debug.mk.md)**: Debug build flags for CPPFLAGS and LDFLAGS.
+- **[with-deepasan.mk](with-deepasan.mk.md)**: The `with-deepasan.mk` file in the `firedancer` codebase configures build flags for enabling AddressSanitizer and LeakSanitizer with specific compiler and linker options.
+- **[with-extra-brutality.mk](with-extra-brutality.mk.md)**: The `with-extra-brutality.mk` file in the `firedancer` codebase configures additional compiler flags for Clang and GCC to enforce stricter code checks and diagnostics.
+- **[with-fuzz.mk](with-fuzz.mk.md)**: The `with-fuzz.mk` file in the `firedancer` codebase configures build settings for fuzz testing, including compiler and linker flags for sanitization and coverage.
+- **[with-gcc.mk](with-gcc.mk.md)**: The `with-gcc.mk` file in the `firedancer` codebase configures the build system to use GCC as the compiler and linker, setting relevant flags and defining `FD_USING_GCC`.
+- **[with-handholding.mk](with-handholding.mk.md)**: CPPFLAGS flags enabling handholding checks for multiple Firedancer modules
+- **[with-honggfuzz.mk](with-honggfuzz.mk.md)**: The `with-honggfuzz.mk` file configures the Firedancer project to use Honggfuzz for fuzz testing by setting the compiler and linker to `hfuzz-clang` and enabling frame pointers.
+- **[with-hosted.mk](with-hosted.mk.md)**: The `with-hosted.mk` file in the `firedancer` codebase sets compilation and linking flags for a hosted environment, including platform-specific settings for Linux.
+- **[with-libcxx.mk](with-libcxx.mk.md)**: The `with-libcxx.mk` file in the `firedancer` codebase provides a makefile configuration to replace the default C++ standard library with libc++, particularly useful for building with MemorySanitizer (MSan).
+- **[with-lld.mk](with-lld.mk.md)**: The `with-lld.mk` file in the `firedancer` codebase adds a linker flag to use the LLVM linker (`lld`) by appending `-fuse-ld=lld` to `LDFLAGS`.
+- **[with-llvm-cov.mk](with-llvm-cov.mk.md)**: The `with-llvm-cov.mk` file in the `firedancer` codebase configures build settings for code coverage using `llvm-cov` when Clang is being used, and issues a warning if Clang is not used.
+- **[with-lz4.mk](with-lz4.mk.md)**: The `with-lz4.mk` file in the `firedancer` codebase checks for the presence of the `liblz4.a` library and sets compilation flags accordingly, or logs a message if the library is not installed.
+- **[with-mold.mk](with-mold.mk.md)**: The `with-mold.mk` file configures the build system to use the 'mold' linker for faster linking of large binaries, with special handling for older GCC versions.
+- **[with-msan-pre.mk](with-msan-pre.mk.md)**: The `with-msan-pre.mk` file in the `firedancer` codebase configures the build process to use MemorySanitizer by recompiling all dependencies with the `-fsanitize=memory` flag.
+- **[with-msan.mk](with-msan.mk.md)**: The `with-msan.mk` file in the `firedancer` codebase configures the build system to enable memory sanitizer (MSAN) by setting relevant compiler and linker flags.
+- **[with-no-deps-pre.mk](with-no-deps-pre.mk.md)**: The `with-no-deps-pre.mk` file in the `firedancer` codebase sets an option path to a non-existent directory.
+- **[with-no-deps.mk](with-no-deps.mk.md)**: The `with-no-deps.mk` file in the `firedancer` codebase references another makefile, `with-no-deps-pre.mk`.
+- **[with-offline-replay.mk](with-offline-replay.mk.md)**: The `with-offline-replay.mk` file in the `firedancer` codebase configures compilation flags to enable offline replay and track usage in the build process.
+- **[with-openssl.mk](with-openssl.mk.md)**: The `with-openssl.mk` file in the `firedancer` codebase checks for the presence of OpenSSL libraries and sets compilation flags accordingly, or logs a message if OpenSSL is not installed.
+- **[with-optimization.mk](with-optimization.mk.md)**: The `with-optimization.mk` file in the `firedancer` codebase configures compiler optimization flags for C++ and Rust, enabling high optimization unless explicitly disabled.
+- **[with-perf.mk](with-perf.mk.md)**: The `with-perf.mk` file in the `firedancer` codebase adds compiler flags to disable frame pointer omission and inlining for performance analysis.
+- **[with-racesan.mk](with-racesan.mk.md)**: Build flag that defines FD_HAS_RACESAN and adds it to CPPFLAGS.
+- **[with-rocksdb.mk](with-rocksdb.mk.md)**: Build flags and library links for RocksDB, Snappy, Zstd, and optional liburing.
+- **[with-rpath.mk](with-rpath.mk.md)**: The `with-rpath.mk` file in the `firedancer` codebase is used to link libraries with rpath by appending the `-Wl,-rpath,${LD_LIBRARY_PATH}` option to `LDFLAGS`.
+- **[with-s2nbignum.mk](with-s2nbignum.mk.md)**: The `with-s2nbignum.mk` file in the `firedancer` codebase checks for the presence of the `s2n-bignum` library and sets compilation flags accordingly, or issues a warning if the library is not installed.
+- **[with-secp256k1.mk](with-secp256k1.mk.md)**: The `with-secp256k1.mk` file in the `firedancer` codebase checks for the presence of the `libsecp256k1.a` library and sets compilation flags accordingly, or issues a warning if the library is not installed.
+- **[with-security.mk](with-security.mk.md)**: The `with-security.mk` file in the `firedancer` codebase configures compiler and linker flags to enhance security, including position-independent code, stack protection, and optional fortification source.
+- **[with-static.mk](with-static.mk.md)**: The `with-static.mk` file in the `firedancer` codebase configures the build process to produce a fully static build by adding the `-static` flag to `LDFLAGS`, noting that it is not compatible with glibc.
+- **[with-threads.mk](with-threads.mk.md)**: The `with-threads.mk` file in the `firedancer` codebase configures build settings to enable threading and atomic operations by setting appropriate compiler and linker flags.
+- **[with-ubsan.mk](with-ubsan.mk.md)**: The `with-ubsan.mk` file in the `firedancer` codebase configures the build system to enable various undefined behavior sanitizers for enhanced error detection during compilation.
+- **[with-ucontext.mk](with-ucontext.mk.md)**: The `with-ucontext.mk` file in the `firedancer` codebase configures the build system to use `libucontext` if it is available, setting flags to indicate the presence of `ucontext.h` which is no longer part of POSIX.
+- **[with-wd-f1.mk](with-wd-f1.mk.md)**: The `with-wd-f1.mk` file in the `firedancer` codebase configures compilation flags and library paths for AWS-F1 FPGA development, including specific include directories and preprocessor definitions.
+- **[with-x86-64.mk](with-x86-64.mk.md)**: The `with-x86-64.mk` file in the `firedancer` codebase configures compiler flags for x86-64 architecture, including specific settings for GCC and Clang, and includes additional configuration files for various libraries.
+- **[with-zstd.mk](with-zstd.mk.md)**: The `with-zstd.mk` file in the `firedancer` codebase checks for the presence of the `libzstd.a` library and sets compilation flags accordingly, or issues a warning if the library is not installed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
