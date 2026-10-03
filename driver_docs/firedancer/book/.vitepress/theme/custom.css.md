@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CSS styles for table metrics, including font sizes, colors, and layout adjustments for dark and light themes.
+The `custom.css` file in the `firedancer` codebase defines styles for table metrics, including font sizes, padding, and color schemes for both dark and light modes.
 
 # Purpose
-The CSS styles define the appearance of a table with the class `metrics`. The styles set the font size and padding for table data cells, and specify the width and font properties for the first three columns of the table. The styles also define color and font weight for elements with the classes `metrics-name` and `metrics-enum`, with different color schemes for dark and non-dark themes. The use of CSS variables, such as `var(--vp-font-family-mono)`, allows for consistent styling across the application. These styles ensure that the table is visually organized and adapts to different themes.
+The provided content is a CSS stylesheet that defines the styling rules for a table with the class `.metrics`. It specifies the font size and padding for table data cells, and sets specific widths and font properties for the first three columns of the table. Additionally, it includes styling rules for elements with the classes `.metrics-name` and `.metrics-enum`, adjusting their color and font weight based on whether the page is in dark mode or not. This stylesheet is likely used to ensure consistent and visually appealing presentation of metric data across different themes in a web application.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

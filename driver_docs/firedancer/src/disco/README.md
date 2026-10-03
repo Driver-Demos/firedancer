@@ -3,40 +3,40 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Transaction filtering, network, topology, GUI, signing, verification, and storage tools.
+Transaction processing, network, security, metrics, and tile support code with headers and build rules
 
 ## Folders
-- **[archiver](archiver/README.md)**: Seccomp filter policies, security policies, archiver tile implementations, and a Makefile for fd_archiver.
-- **[bundle](bundle/README.md)**: Seccomp policy, proto files, auth, gRPC client, crank, tile, keepalive, fuzz tests, and unit tests.
-- **[cswtch](cswtch/README.md)**: Seccomp filter policy, context switch monitoring, security policies, and Makefile logic for tiles.
-- **[dedup](dedup/README.md)**: Deduplication service, seccomp filter policy, security policy, Makefile config, and unit tests.
-- **[events](events/README.md)**: Circular queue implementation and tests with a Makefile for integration in the Firedancer codebase.
-- **[genesis](genesis/README.md)**: Functions for blockchain cluster identification, macros for cluster identifiers, and Makefile logic.
-- **[gui](gui/README.md)**: GUI assets, seccomp policy, bandwidth metrics, live tables, peers, JSONP, HTTP/WebSocket handling, and tests.
-- **[keyguard](keyguard/README.md)**: Digital signature creation, transaction authorization, client-server communication, key management, and testing.
-- **[metrics](metrics/README.md)**: Classes, functions, and policies for metrics parsing, HTTP servers, Prometheus integration, and code generation.
-- **[net](net/README.md)**: Socket management, seccomp policies, XDP networking APIs, topology support routines, and Makefile logic.
-- **[netlink](netlink/README.md)**: Network topology management and monitoring using Netlink, seccomp policies, and architecture checks.
-- **[pack](pack/README.md)**: Transaction packing, conflict detection, cost and pacing tools, seccomp policy, and tests.
-- **[pcap](pcap/README.md)**: Replays and tests PCAP files with flow control, diagnostics, and shared memory configurations.
-- **[plugin](plugin/README.md)**: Defines seccomp filter policies, message structures, plugin tiles, and Makefile logic for Firedancer.
-- **[quic](quic/README.md)**: QUIC server tile implementation, TPU/QUIC protocol handling, seccomp policy, and QUIC metrics testing.
-- **[shred](shred/README.md)**: FEC, shred destination, stake, and tile processing with tests and seccomp policy.
-- **[sign](sign/README.md)**: Signing tile implementation, seccomp filter policy, security policies, and Makefile logic for SSE support.
-- **[stem](stem/README.md)**: Multiplexes input streams and defines data structures for managing and publishing fragments.
-- **[store](store/README.md)**: Functions for memory-backed store management, high-performance in-memory storage, build configuration, and tests.
-- **[topo](topo/README.md)**: Functions and data structures for CPU and Firedancer topology management, including initialization, logging, and resource management.
-- **[verify](verify/README.md)**: Seccomp filter policy, transaction verification, security policies, build logic, and test programs.
+- **[archiver](archiver/README.md)**: Generated seccomp policies, fragment handling, replay, and file writing code with build rules.
+- **[bundle](bundle/README.md)**: Auth, client, crank, keepalive, tests, fuzzers, proto, and seccomp policy for bundle handling.
+- **[cswtch](cswtch/README.md)**: Context-switch metrics, seccomp policy, and build rules for fd_cswtch_tile.
+- **[dedup](dedup/README.md)**: Dedup tile source, build rules, seccomp policy, generated filter, and unit tests.
+- **[events](events/README.md)**: Circular queue implementation, header, build rules, and tests.
+- **[genesis](genesis/README.md)**: The `genesis` folder in the `firedancer` codebase contains source and header files for identifying and naming blockchain clusters based on genesis hash values, along with a makefile for conditional compilation settings.
+- **[gui](gui/README.md)**: React UI assets, WebSocket GUI state, peer metrics, JSON formatting, live tables, and build rules.
+- **[keyguard](keyguard/README.md)**: Signing request authorization, client handling, key loading, and key switch APIs with tests.
+- **[metrics](metrics/README.md)**: XML metric generation, Prometheus rendering, shared-memory layouts, and seccomp rules for disco metrics.
+- **[net](net/README.md)**: AF_XDP and UDP socket tiles, common net APIs, topology setup, and build rules
+- **[netlink](netlink/README.md)**: Netlink tile APIs, event loop, seccomp policy, and build rules for link, route, and neighbor updates.
+- **[pack](pack/README.md)**: Transaction packing, cost, rebate, deduplication, and test code with seccomp policy.
+- **[pcap](pcap/README.md)**: PCAP replay tile API, implementation, build rules, and unit tests.
+- **[plugin](plugin/README.md)**: Message types, tile forwarding logic, seccomp policy, and build rules for plugin updates.
+- **[quic](quic/README.md)**: QUIC server tile, TPU reassembly, metrics tests, seccomp policy, and build rules.
+- **[shred](shred/README.md)**: Shred processing, FEC, stake-based destination logic, tests, and seccomp policy.
+- **[sign](sign/README.md)**: Ed25519 signing tile, seccomp policy, build rule, and generated syscall filter.
+- **[stem](stem/README.md)**: Multiplexes input fragments to outputs with flow control, callbacks, housekeeping, and metrics.
+- **[store](store/README.md)**: In-memory FEC set store with insert, query, link, publish, clear, and tree-print operations.
+- **[topo](topo/README.md)**: CPU topology, workspace, tile execution, and topology builder helpers with conditional build rules.
+- **[verify](verify/README.md)**: Transaction verification tile, helpers, tests, build rules, and seccomp policy.
 
 ## Files
-- **[fd_disco.h](fd_disco.h.md)**: Defines the `fd_shred_dest_wire` structure with network-related fields and includes related headers.
-- **[fd_disco_base.h](fd_disco_base.h.md)**: Defines constants, functions, and macros for network packet handling and signature generation in the Firedancer codebase.
-- **[fd_txn_m.h](fd_txn_m.h.md)**: Defines the structure and functions for handling parsed meta transactions, including payload management and source identification.
-- **[fd_txn_p.h](fd_txn_p.h.md)**: Defines structures and macros for handling transactions with attributes for execution and account data.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fd_disco` library and its unit tests.
-- **[README.md](README.md.md)**: Documentation of the Frankendancer transaction filtering pipeline for block production, including architecture and operational details.
-- **[test_disco_base.c](test_disco_base.c.md)**: A stub for future tests with random number generation setup and teardown.
-- **[tiles.h](tiles.h.md)**: Defines data structures for handling shreds, banks, microblocks, and PoH initialization in Firedancer.
+- **[fd_disco.h](fd_disco.h.md)**: Packed wire format for shred destination pubkey, version, IPv4 address, and UDP port.
+- **[fd_disco_base.h](fd_disco_base.h.md)**: Signature encodings, MTU limits, and workspace helpers for disco packet handling.
+- **[fd_txn_m.h](fd_txn_m.h.md)**: Parsed meta transaction layout, source tags, bundle fields, and footprint helpers.
+- **[fd_txn_p.h](fd_txn_p.h.md)**: Packed transaction record with CU fields, source data, flags, and expanded account lookup tables.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build and test instructions for the `fd_disco` library, including header files and a unit test for `test_disco_base`.
+- **[README.md](README.md.md)**: Historical transaction filtering pipeline for block production and validator block packing.
+- **[test_disco_base.c](test_disco_base.c.md)**: The `test_disco_base.c` file in the `firedancer` codebase is a stub for future tests, initializing and cleaning up a random number generator.
+- **[tiles.h](tiles.h.md)**: Data structures for shred batches, leader state, bank, microblock, and PoH messages.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
