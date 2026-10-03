@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `set_identity.h` file declares the `set_identity_cmd_fn` function and the `fd_action_set_identity` action for setting identity configurations in the Firedancer application.
+Header file for the `set_identity` command function and related action in the Firedancer codebase.
 
 # Purpose
-This code is a C header file that defines the interface for a command related to setting an identity within an application. It includes a function prototype for [`set_identity_cmd_fn`](#set_identity_cmd_fn), which takes pointers to `args_t` and `config_t` structures, suggesting it processes command-line arguments and configuration data. The file also declares an external variable `fd_action_set_identity`, likely representing an action or command that can be executed within the application. The inclusion of `fd_config.h` indicates that this header relies on configuration settings defined elsewhere. The use of include guards prevents multiple inclusions of this header file, ensuring efficient compilation.
+This code is a C header file that declares a function and an external variable related to setting an identity in an application. The function [`set_identity_cmd_fn`](<#set_identity_cmd_fn>) takes pointers to `args_t` and `config_t` structures as parameters, indicating it likely processes command arguments and configuration data. The header also declares an external variable `fd_action_set_identity` of type `action_t`, which suggests it is used to represent or trigger the identity-setting action. The file includes a configuration header `fd_config.h` and uses macros `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` to manage function prototype declarations. The header guard prevents multiple inclusions of this file, ensuring that the declarations are only processed once during compilation.
 # Imports and Dependencies
 
 ---
@@ -17,22 +17,24 @@ This code is a C header file that defines the interface for a command related to
 
 ---
 ### fd\_action\_set\_identity
-- **Type**: `action_t`
-- **Description**: The variable `fd_action_set_identity` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is located in another source file.
-- **Use**: This variable is used to represent an action related to setting identity, likely within a larger application framework that handles various actions.
+- **Type**: ``action_t``
+- **Description**: `fd_action_set_identity` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is located in another source file.
+- **Use**: Used to reference an action related to setting identity within the application.
 
 
 # Function Declarations (Public API)
 
 ---
 ### set\_identity\_cmd\_fn<!-- {{#callable_declaration:set_identity_cmd_fn}} -->
-Sets the identity configuration using the provided arguments.
-- **Description**: This function is used to configure the identity settings based on the provided arguments and configuration structure. It should be called when there is a need to update or set identity parameters within the application. The function requires valid pointers to both the arguments and configuration structures, and it is expected that these structures are properly initialized before calling the function. The caller must ensure that the pointers are not null to avoid undefined behavior.
+[View Source →](<../../../../../../src/app/shared/commands/set_identity.h#L6>)
+
+Executes the identity setting command.
+- **Description**: Use this function to execute a command that sets identity parameters based on the provided arguments and configuration. It is important to ensure that both `args` and `config` are properly initialized and valid before calling this function. This function does not return a value and does not handle errors internally, so any necessary error checking should be performed prior to invocation.
 - **Inputs**:
-    - `args`: A pointer to an args_t structure containing the arguments for setting the identity. Must not be null and should be properly initialized before calling the function.
-    - `config`: A pointer to a config_t structure that holds the configuration settings to be applied. Must not be null and should be properly initialized before calling the function.
+    - `args`: A pointer to an `args_t` structure containing the arguments for the identity setting command. Must not be null and should be properly initialized before use.
+    - `config`: A pointer to a `config_t` structure containing configuration data necessary for the command. Must not be null and should be properly initialized before use.
 - **Output**: None
-- **See also**: [`set_identity_cmd_fn`](set_identity.c.md#set_identity_cmd_fn)  (Implementation)
+- **See Also**: [`set_identity_cmd_fn`](<set_identity.c.md#set_identity_cmd_fn>)  (Implementation)
 
 
 

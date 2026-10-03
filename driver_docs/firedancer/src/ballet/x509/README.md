@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Mock X.509 certificate generation, Ed25519 public key parsing, and tests.
+Mock X.509 certificate generation, public key extraction, and testing with a Makefile for build and tests.
 
 
 ## Files
-- **[fd_x509_mock.c](fd_x509_mock.c.md)**: Mock X.509 certificate generation and public key extraction for two certificate formats.
-- **[fd_x509_mock.h](fd_x509_mock.h.md)**: Mock X.509 certificate generation and Ed25519 public key parsing for QUIC peer-to-peer use.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_x509_mock` component within the `ballet/x509` directory.
-- **[test_x509.c](test_x509.c.md)**: The `test_x509.c` file in the `firedancer` codebase contains tests for verifying the functionality of X.509 certificate handling, including public key extraction and certificate integrity checks.
+- **[fd_x509_mock.c](fd_x509_mock.c.md)**: Implements mock X.509 certificate generation and public key extraction functions.
+- **[fd_x509_mock.h](fd_x509_mock.h.md)**: Generates mock X.509 certificates for QUIC peer-to-peer use with functions for creation and public key extraction.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for x509 in the firedancer codebase.
+- **[test_x509.c](test_x509.c.md)**: Tests for X.509 certificate mock functions, including public key extraction and certificate validation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
