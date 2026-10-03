@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, data structures, macros, and tests for IPv4 neighbor discovery, ARP, and netlink integration.
+The `neigh` folder in the `firedancer` codebase contains source files and headers for managing IPv4 neighbor discovery and mapping, including handling ARP requests, netlink message processing, and neighbor probing, with a focus on Linux environments.
 
 
 ## Files
-- **[fd_neigh4_map.c](fd_neigh4_map.c.md)**: Functions for printing IPv4 and MAC address mappings from a neighbor map to a file.
-- **[fd_neigh4_map.h](fd_neigh4_map.h.md)**: Defines data structures and functions for IPv4 neighbor discovery using ARP, including logging and printing.
-- **[fd_neigh4_map_defines.h](fd_neigh4_map_defines.h.md)**: Defines macros for a hash map with specific types and a hash function for IPv4 addresses.
-- **[fd_neigh4_netlink.c](fd_neigh4_netlink.c.md)**: Handles IPv4 neighbor table updates using netlink messages for adding, removing, or updating entries.
-- **[fd_neigh4_netlink.h](fd_neigh4_netlink.h.md)**: APIs for importing IPv4 neighbors from Linux netlink, assuming 6-byte link-layer addresses.
-- **[fd_neigh4_probe.c](fd_neigh4_probe.c.md)**: Initializes, finalizes, and sends probe packets to Ethernet neighbors using a UDP socket.
-- **[fd_neigh4_probe.h](fd_neigh4_probe.h.md)**: Implements a mechanism to trigger ARP requests using UDP packets with minimal privileges.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests related to `fd_neigh4` in the `firedancer` project.
-- **[test_neigh4_netlink.c](test_neigh4_netlink.c.md)**: Tests the functionality of dumping neighbor tables for all Ethernet interfaces using netlink.
+- **[fd_neigh4_map.c](fd_neigh4_map.c.md)**: The `fd_neigh4_map.c` file in the `firedancer` codebase implements functions for handling IPv4 neighbor mappings, including printing the mappings to a file.
+- **[fd_neigh4_map.h](fd_neigh4_map.h.md)**: The `fd_neigh4_map.h` file defines structures and functions for managing IPv4 neighbor discovery using ARP, including printing the routing table, within the Firedancer codebase.
+- **[fd_neigh4_map_defines.h](fd_neigh4_map_defines.h.md)**: The `fd_neigh4_map_defines.h` file defines macros for a hash map implementation, specifying the map name, element type, key type, key, and key hash function.
+- **[fd_neigh4_netlink.c](fd_neigh4_netlink.c.md)**: The `fd_neigh4_netlink.c` file in the `firedancer` codebase handles the sending and processing of netlink messages related to IPv4 neighbor table updates, including adding, updating, or removing entries based on the received netlink messages.
+- **[fd_neigh4_netlink.h](fd_neigh4_netlink.h.md)**: The `fd_neigh4_netlink.h` file provides APIs for importing IPv4 neighbors from Linux netlink, including functions to request a dump of the IPv4 neighbor table and to ingest netlink messages for updating the neighbor table.
+- **[fd_neigh4_probe.c](fd_neigh4_probe.c.md)**: The `fd_neigh4_probe.c` file in the `firedancer` codebase implements functions for initializing, finalizing, and executing IPv4 neighbor probing using UDP sockets with rate limiting and delay management.
+- **[fd_neigh4_probe.h](fd_neigh4_probe.h.md)**: The `fd_neigh4_probe.h` file in the `firedancer` codebase implements a mechanism for triggering ARP requests in Linux using empty UDP packets to facilitate neighbor discovery with minimal privileges.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers and object files for the `fd_neigh4_map` and conditionally for `fd_neigh4_netlink` and `fd_neigh4_probe` if `FD_HAS_LINUX` is defined, as well as a unit test for `test_neigh4_netlink`.
+- **[test_neigh4_netlink.c](test_neigh4_netlink.c.md)**: The `test_neigh4_netlink.c` file in the `firedancer` codebase tests the functionality of dumping and managing neighbor tables for network interfaces using netlink in a Linux environment.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
