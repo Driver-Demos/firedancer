@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally adds headers, objects, and unit tests for the sandbox utility based on the presence of hosted, Linux, and architecture support.
+Makefile configuration for building and testing the fd_sandbox component on supported architectures.
 
 # Purpose
-This file is a Makefile snippet used for conditional compilation in a software build process. It checks for the presence of specific features or environments, such as hosted environments, Linux, and architecture support for sandboxing. If all conditions are met, it adds the header file `fd_sandbox.h`, the object files `fd_sandbox` and `fd_util`, and sets up a unit test named `test_sandbox` that depends on `fd_util`.
+The makefile snippet conditionally includes headers, objects, and unit tests for a sandbox feature. It checks if the macros `FD_HAS_HOSTED`, `FD_HAS_LINUX`, and `FD_ARCH_SUPPORTS_SANDBOX` are defined. If all conditions are met, it adds the header `fd_sandbox.h`, the object files `fd_sandbox` and `fd_util`, and creates a unit test named `test_sandbox` that depends on `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

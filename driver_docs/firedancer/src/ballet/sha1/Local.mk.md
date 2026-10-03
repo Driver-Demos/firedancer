@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the SHA-1 implementation, including running the `test_sha1` unit test.
+Makefile for adding headers, objects, and unit tests for SHA1 in the firedancer codebase.
 
 # Purpose
-The file is a Makefile snippet used for building and testing components in a software project. It defines build rules by adding header files (`fd_sha1.h`) and object files (`fd_sha1`, `fd_ballet`) to the build process. It also specifies the creation and execution of a unit test named `test_sha1`, which depends on the `fd_ballet` and `fd_util` components.
+The content is a Makefile script that manages the build process for a software project. It adds the header file `fd_sha1.h` and object files `fd_sha1` and `fd_ballet` to the build. It also defines a unit test named `test_sha1`, which depends on the `fd_ballet` and `fd_util` components. Finally, it runs the `test_sha1` unit test to verify the functionality of the code.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

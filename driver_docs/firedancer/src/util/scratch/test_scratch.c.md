@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_scratch.c` file in the `firedancer` codebase contains a comprehensive test suite for validating the functionality and safety of the scratch memory allocation system, including alignment, allocation, deallocation, and memory safety checks.
+Tests the functionality and safety of the scratch memory allocator in various scenarios.
 
 # Purpose
-This C source code file is an executable program designed to test and validate the functionality of a memory management system, specifically focusing on a scratch memory allocator. The program includes various tests to ensure that the scratch memory allocator behaves correctly under different conditions, such as alignment requirements, allocation sizes, and memory frame management. The code uses a combination of static and dynamic memory allocation techniques, depending on the availability of the `alloca` function, to manage memory regions for testing. It also employs a random number generator to simulate various allocation scenarios and stress-test the allocator's robustness.
+The code is a C program that tests the functionality of a memory management system, specifically focusing on scratch memory allocation. It includes a [`main`](<#main>) function that initializes a random number generator and sets up memory regions for testing. The program uses conditional compilation to handle different memory allocation strategies, either using stack allocation with `alloca` or static memory allocation. It verifies memory alignment and footprint calculations for both scratch memory and frame memory, ensuring that the memory management system adheres to expected alignment and size constraints.
 
-The program is structured around a series of tests that verify the alignment and footprint calculations of the scratch memory, the safety of push and pop operations on memory frames, and the correct behavior of memory allocation and deallocation. It uses assertions (`FD_TEST`) to ensure that each operation meets the expected conditions, and it includes mechanisms to handle memory poisoning checks when compiled with AddressSanitizer support (`FD_HAS_DEEPASAN`). The code is comprehensive in its testing approach, covering edge cases such as zero-size allocations and non-multiple size behaviors. The program concludes by cleaning up resources and logging a success message if all tests pass, indicating that the scratch memory allocator is functioning as intended.
+The program performs a series of tests to validate the behavior of the scratch memory system, including pushing and popping memory frames, allocating and deallocating memory with various alignments and sizes, and checking the safety of memory operations. It uses assertions (`FD_TEST`) to ensure that the memory operations are performed correctly and that the memory regions are properly aligned and managed. The code also includes tests for memory poisoning and access safety using AddressSanitizer (ASAN) when enabled. The program concludes by cleaning up resources and logging a success message if all tests pass.
 # Imports and Dependencies
 
 ---
@@ -19,46 +19,49 @@ The program is structured around a series of tests that verify the alignment and
 
 ---
 ### uchar
-- **Type**: `uchar`
-- **Description**: The `uchar` type is a typedef for an unsigned character, typically used to represent small integer values or raw byte data. In this code, it is used to define the `smem` array, which is a static global variable.
-- **Use**: The `uchar` type is used to define the `smem` array, which serves as a memory buffer aligned according to `FD_SCRATCH_SMEM_ALIGN`.
+- **Type**: ``uchar``
+- **Description**: `uchar` is a typedef for an unsigned character type, typically used to represent small integer values or characters in a range from 0 to 255.
+- **Use**: Used to define the type of elements in the `smem` array for memory allocation and alignment purposes.
 
 
 ---
 ### ulong
-- **Type**: `ulong`
-- **Description**: The `ulong` type is a typedef for an unsigned long integer, which is a data type used to store non-negative integer values. It is typically used when a larger range of values is needed than what a standard unsigned integer can provide.
-- **Use**: The `ulong` type is used throughout the code to define variables and arrays that require a large range of non-negative integer values, such as loop counters and memory size specifications.
+- **Type**: ``ulong``
+- **Description**: `ulong` is a static global array of unsigned long integers with a size defined by the `DEPTH` macro, which is set to 16. This array is aligned according to the `FD_SCRATCH_FMEM_ALIGN` attribute.
+- **Use**: Used to store a fixed number of unsigned long integers for memory management operations in the program.
 
 
 ---
 ### \_fmem
-- **Type**: `void *`
-- **Description**: The `_fmem` variable is a global pointer of type `void *`. It is used to store a reference to a memory location, specifically the `fmem` array, which is used in the context of the `fd_scratch_detach` function.
-- **Use**: This variable is used to hold the address of the `fmem` array after detaching it from the scratch memory system.
+- **Type**: ``void *``
+- **Description**: A pointer to a memory location, used to store the address of the `fmem` array.
+- **Use**: Used to store the address of the `fmem` array when detaching scratch memory.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and tests a scratch memory allocator by performing various memory allocation, alignment, and deallocation operations, ensuring correct behavior through assertions and random testing.
+[View Source →](<../../../../../src/util/scratch/test_scratch.c#L11>)
+
+Initializes and tests a scratch memory allocator with various alignment and size configurations, ensuring correct memory management and alignment.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program with `fd_boot` and set up a random number generator `rng`.
-    - Allocate scratch memory `smem` and frame memory `fmem` if `FD_HAS_ALLOCA` is defined, otherwise use static memory.
-    - Perform a series of assertions to verify memory alignment and footprint calculations for scratch memory and frame memory.
-    - Attach the scratch memory and frame memory using `fd_scratch_attach`.
-    - Push and pop frames to test the frame stack operations, ensuring correct frame usage and free counts.
-    - Allocate memory with various alignments and sizes, testing alignment and allocation behavior, including edge cases like zero size.
-    - Perform a million iterations of random operations including reset, push, pop, and allocation, using random bits to decide actions.
-    - Within each iteration, test memory access and alignment, and use `fd_asan_test` to check memory poisoning if `FD_HAS_DEEPASAN` is defined.
-    - Reset the scratch memory and perform nested scope tests to ensure frame usage is correctly managed.
-    - Detach the scratch memory and frame memory, ensuring they are correctly returned to their initial state.
-    - Delete the random number generator and log a success message before halting the program.
-- **Output**: The function returns an integer status code, typically 0 for successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Allocates memory for scratch memory (`smem`) and frame memory (`fmem`) using `fd_alloca` and `fd_alloca_check` if `FD_HAS_ALLOCA` is defined.
+    - Performs alignment and footprint checks on scratch memory and frame memory using `FD_TEST`.
+    - Attaches the scratch memory and frame memory using `fd_scratch_attach`.
+    - Pushes and pops frames to test frame usage and free space using `fd_scratch_push` and `fd_scratch_pop`.
+    - Allocates memory with various alignments and sizes using `fd_scratch_alloc`, `fd_scratch_prepare`, `fd_scratch_publish`, and `fd_scratch_trim`.
+    - Performs memory access tests to ensure memory is correctly allocated and aligned, using `FD_TEST` and `fd_asan_test` if `FD_HAS_DEEPASAN` is defined.
+    - Resets the scratch memory using `fd_scratch_reset` and tests frame usage within nested scopes using `FD_SCRATCH_SCOPE_BEGIN` and `FD_SCRATCH_SCOPE_END`.
+    - Detaches the scratch memory using `fd_scratch_detach` and verifies the detachment.
+    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
+    - Logs a success message and halts the program using `FD_LOG_NOTICE` and `fd_halt`.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 
