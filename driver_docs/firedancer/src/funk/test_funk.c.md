@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Unit tests for the `fd_funk` module, verifying memory alignment, workspace operations, and transaction limits.
+The `test_funk.c` file in the `firedancer` codebase contains a unit test for the `fd_funk` module, verifying its functionality related to memory alignment, workspace management, and transaction handling.
 
 # Purpose
-The code is a C program designed to perform unit testing on the `fd_funk` module, which is part of a larger software system. The program begins by checking if the `FD_HAS_HOSTED` macro is defined, indicating that the environment supports hosted capabilities. It then initializes the environment and processes command-line arguments to configure various parameters such as workspace name, page size, page count, CPU affinity, workspace tag, seed, transaction maximum, and record maximum. These parameters are used to set up a workspace and allocate shared memory for testing the `fd_funk` functionalities.
+This C source code file is a unit test for the `fd_funk` module, which appears to be a component of a larger system that deals with memory management and transaction handling. The code is structured to run tests only if the `FD_HAS_HOSTED` macro is defined, indicating that it requires a hosted environment to execute. The main functionality of this file is to validate the behavior of the `fd_funk` module by testing various scenarios of memory allocation, initialization, joining, and deletion of `fd_funk` objects within a workspace. It uses a series of assertions and logging to ensure that the `fd_funk` module behaves as expected under different configurations and inputs.
 
-The main functionality of the code involves creating, joining, verifying, and deleting instances of `fd_funk` within a shared memory workspace. It performs a series of tests to ensure that the `fd_funk` module behaves as expected under various conditions, including edge cases like zero transactions or records. The program uses assertions to validate the alignment and footprint of the `fd_funk` instances and checks the integrity of the workspace operations. If the tests pass, the program logs a success message and halts; otherwise, it logs errors and exits. If the `FD_HAS_HOSTED` macro is not defined, the program logs a warning and exits without performing the tests.
+The code begins by setting up the environment and parsing command-line arguments to configure the test parameters, such as workspace name, page size, and transaction limits. It then attempts to attach to or create a workspace, allocate shared memory, and perform a series of tests on the `fd_funk` functions. These tests include checking alignment, footprint calculations, and the creation and joining of `fd_funk` instances. The code also tests edge cases, such as zero transaction or record limits, and ensures that resources are properly cleaned up after the tests. The file serves as a comprehensive test suite for the `fd_funk` module, ensuring its reliability and correctness in managing transactions and memory within a specified workspace.
 # Imports and Dependencies
 
 ---
@@ -19,18 +19,16 @@ The main functionality of the code involves creating, joining, verifying, and de
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/funk/test_funk.c#L118>)
-
-Initializes the environment and logs a warning if FD_HAS_HOSTED capabilities are not available, then halts execution.
+The `main` function initializes the environment and logs a warning if the `FD_HAS_HOSTED` capability is not available, then halts execution.
 - **Inputs**:
-    - `argc`: The count of command-line arguments.
-    - `argv`: The array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Logs a warning message indicating that the unit test requires `FD_HAS_HOSTED` capabilities.
-    - Calls `fd_halt` to stop further execution.
-    - Returns 0 to indicate successful termination.
-- **Output**: Returns 0, indicating successful termination of the program.
+    - `argc`: The count of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - Log a warning message indicating that the unit test requires `FD_HAS_HOSTED` capabilities.
+    - Call `fd_halt` to stop further execution of the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

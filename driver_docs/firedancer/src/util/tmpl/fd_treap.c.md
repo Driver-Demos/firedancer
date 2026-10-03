@@ -3,88 +3,28 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generates high-performance treap data structures, combining binary search trees and heaps, with customizable API options.
+Template for high-performance treaps with queries, insert, remove, merge, iteration, and verification.
 
 # Purpose
-The code is a C implementation of a high-performance treap data structure, which is a hybrid of a binary search tree and a heap. The treap is designed to be well-balanced on average, providing efficient operations for insertion, deletion, and querying. The implementation is intended for use in environments where performance and memory efficiency are critical. It supports features such as persistence, concurrent usage, inter-process communication, and memory relocation. The code is structured to allow for tight integration with other data structures like pools and maps.
+`fd_treap.c` is a C template that generates a treap API for a user-defined element type. It defines a binary search tree and heap hybrid that stores links by index into a caller-managed pool. The file supports multiple build styles: local use, header-only use, or separate library implementation. It also lets the caller choose the treap name, element type, query type, comparison functions, index type, and field names used for parent, left, right, and priority data. The file provides the core treap operations: creation, join, leave, delete, query, range query, insert, remove, merge, iteration, and verification.
 
-The code defines a set of macros and functions that allow users to generate customized treap implementations by specifying element types, comparison functions, and other parameters. It includes functions for creating, joining, and deleting treaps, as well as for inserting and removing elements. The code also provides iterators for traversing the treap in both forward and reverse order. Additionally, it includes mechanisms for verifying the integrity of the treap and optimizing iteration performance. The implementation is designed to be flexible, allowing for various configurations and optimizations based on user needs.
-# Imports and Dependencies
-
----
-- `../log/fd_log.h`
-
-
-# Global Variables
+The implementation is designed for tight coupling with shared pools and other data structures. It includes helpers for index and pointer conversion, null handling, priority seeding, and optional iteration optimization with `next` and `prev` links. The code keeps the treap valid by maintaining both the binary search tree order and the heap order during insert, remove, and merge operations. It also supports in-order forward and reverse iteration, and it includes a verification function that checks tree structure, ordering, heap priority, and optional iteration links.
+# Function Declarations (Public API)
 
 ---
-### TREAP\_
-- **Type**: `ulong`
-- **Description**: Represents a reverse iterator type for a treap data structure. It is used to iterate over elements in a treap from the largest to the smallest value.
-- **Use**: Used in functions that perform reverse iteration over a treap.
-
-
----
-### \_p\_child
-- **Type**: `TREAP_IDX_T *`
-- **Description**: A pointer to the root index of a treap data structure. It is initialized to point to the root of the treap.
-- **Use**: Used to traverse or modify the treap structure starting from the root.
-
-
----
-### \_p\_pnext
-- **Type**: `TREAP_IDX_T*`
-- **Description**: A pointer to the index of the next node in a treap data structure. It is initialized to point to the first element of the treap.
-- **Use**: Used to keep track of the next node's index in the treap during operations such as insertion.
-
-
----
-### \_p\_nprev
-- **Type**: `TREAP_IDX_T *`
-- **Description**: A pointer to the last node's index in a treap data structure. It is used to track the previous node's index during node insertion operations when iteration optimization is enabled.
-- **Use**: Used to maintain a reference to the previous node's index in the treap when inserting a new node, facilitating the linking of nodes in a doubly-linked list manner for optimized iteration.
-
-
----
-### i
-- **Type**: `ulong`
-- **Description**: `i` is a global variable of type `ulong` initialized to `TREAP_IDX_NULL`. It is used in a loop that runs indefinitely.
-- **Use**: Used as a loop control variable in an infinite loop.
-
-
----
-### n\_prio
-- **Type**: `ulong`
-- **Description**: Represents the priority of a node in a treap data structure. It is initialized with the priority value of the node at index `n` in the `pool` array.
-- **Use**: Used to store and compare the priority of nodes during treap operations such as insertion and balancing.
-
-
-# Functions
-
----
-### TREAP\_<!-- {{#callable:TREAP_}} -->
-[View Source →](<../../../../../src/util/tmpl/fd_treap.c#L1448>)
-
-Validates the structure and properties of a treap data structure.
-- **Inputs**:
-    - ``treap``: A pointer to a `TREAP_(t)` structure representing the treap to verify.
-    - ``pool``: A pointer to a `TREAP_T` array representing the storage pool for treap elements.
-- **Logic and Control Flow**:
-    - Check if `treap` is not NULL.
-    - Validate `ele_max` is less than or equal to `TREAP_IDX_NULL`.
-    - Validate `ele_cnt` is less than or equal to `ele_max`.
-    - If `ele_max` is non-zero, check if `pool` is not NULL.
-    - Find the leftmost element in the treap by traversing left children from the root.
-    - If `TREAP_OPTIMIZE_ITERATION` is enabled, verify `treap->first` is the leftmost element found.
-    - Perform an in-order traversal of the treap starting from the leftmost element.
-    - During traversal, ensure no cycles exist and indices are valid.
-    - Check ordering of elements and heap property for each node.
-    - Advance to the successor of each node, handling cases with and without right subtrees.
-    - If `TREAP_OPTIMIZE_ITERATION` is enabled, verify `treap->last` is the last element visited.
-    - Ensure the number of visited elements matches `ele_cnt`.
-- **Output**: Returns 0 if the treap is valid, or -1 if any validation fails.
-
-
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
+- `TREAP_`
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
