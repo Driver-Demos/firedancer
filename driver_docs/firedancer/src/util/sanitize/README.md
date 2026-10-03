@@ -3,20 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Address and memory sanitization, backtrace logging, fuzz testing, and related build configurations.
+Memory and compiler sanitizer APIs, backtrace printing, fuzz stubs, and canary test code.
 
 
 ## Files
-- **[fd_asan.c](fd_asan.c.md)**: Implements address sanitization and tracking with ASAN, including address watching and backtrace logging.
-- **[fd_asan.h](fd_asan.h.md)**: Header file for integrating AddressSanitizer (ASan) functionality to manage memory poisoning and access checks.
-- **[fd_backtrace.c](fd_backtrace.c.md)**: Prints a backtrace to a file descriptor using the execinfo library.
-- **[fd_backtrace.h](fd_backtrace.h.md)**: Header file for printing a backtrace to a specified file descriptor.
-- **[fd_fuzz.h](fd_fuzz.h.md)**: Header file for fuzz testing with a function prototype for LLVMFuzzerMutate.
-- **[fd_fuzz_stub.c](fd_fuzz_stub.c.md)**: A stub fuzz harness for regression testing without a fuzz engine, simulating libFuzzer command-line.
-- **[fd_msan.h](fd_msan.h.md)**: Header file for MemorySanitizer integration, providing functions to mark and check memory initialization.
-- **[fd_sanitize.h](fd_sanitize.h.md)**: APIs for compiler sanitizers to detect errors like out-of-bounds memory access and undefined behavior.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, creating a library, and setting flags for sanitization and fuzzing.
-- **[test_fuzz_canary_canary.c](test_fuzz_canary_canary.c.md)**: A canary file for testing the canary finder in the fuzzing process.
+- **[fd_asan.c](fd_asan.c.md)**: The `fd_asan.c` file in the `firedancer` codebase implements address sanitization functionality, including watching and checking memory addresses for poisoning status.
+- **[fd_asan.h](fd_asan.h.md)**: The `fd_asan.h` file in the `firedancer` codebase provides an interface for integrating AddressSanitizer (ASan) functionality to track and manage memory regions, allowing for the detection of out-of-bounds errors in memory accesses.
+- **[fd_backtrace.c](fd_backtrace.c.md)**: The `fd_backtrace.c` file provides a function to print a backtrace to a specified file descriptor using the `execinfo` library.
+- **[fd_backtrace.h](fd_backtrace.h.md)**: The `fd_backtrace.h` file declares a function for printing a backtrace to a specified file descriptor.
+- **[fd_fuzz.h](fd_fuzz.h.md)**: Fuzzing support macros and the LLVMFuzzerMutate prototype.
+- **[fd_fuzz_stub.c](fd_fuzz_stub.c.md)**: The `fd_fuzz_stub.c` file in the `firedancer` codebase provides a stub fuzz harness for build targets without a fuzz engine, allowing regression testing against existing input files but not actual fuzz exploration.
+- **[fd_msan.h](fd_msan.h.md)**: The `fd_msan.h` file in the `firedancer` codebase provides functions for marking memory as uninitialized or initialized and checking memory initialization status, leveraging MemorySanitizer (MSan) to detect uninitialized memory access.
+- **[fd_sanitize.h](fd_sanitize.h.md)**: The `fd_sanitize.h` file in the `firedancer` codebase provides APIs for compiler sanitizers, such as AddressSanitizer, to detect errors like out-of-bounds memory accesses and undefined behavior.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that manages the inclusion of headers, creation of a library, and conditional compilation flags for sanitization utilities.
+- **[test_fuzz_canary_canary.c](test_fuzz_canary_canary.c.md)**: The `test_fuzz_canary_canary.c` file contains a canary function intended to be detected by a canary finder as a test of the finder's effectiveness.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A backtracking recursive-descent parser for TOML files, including functions for parsing various TOML data types and handling errors.
+The `fd_toml.c` file in the `firedancer` codebase implements a backtracking recursive descent parser for TOML files, handling various data types and structures, and providing error handling and memory management functionalities.
 
 # Purpose
-The code is a C implementation of a TOML (Tom's Obvious, Minimal Language) parser. It is designed to read and interpret TOML configuration files, converting them into a structured format that can be used by other parts of a program. The parser uses a backtracking recursive descent approach, which allows it to handle the nested and hierarchical nature of TOML data. The main components of the code include structures for managing the parser's state (`fd_toml_parser_t`) and cursor (`fd_toml_cur_t`), functions for parsing different TOML elements such as keys, values, arrays, tables, and various data types (e.g., strings, integers, floats, and dates), and error handling mechanisms.
+The provided C source code file implements a parser for TOML (Tom's Obvious, Minimal Language) configuration files. The code is designed to read and interpret TOML data, converting it into a structured format that can be stored in a "pod" (presumably a data structure for holding parsed data). The parser is implemented as a backtracking recursive descent parser, which allows it to handle the hierarchical and nested nature of TOML files. The code includes functions for parsing various TOML constructs such as keys, values, arrays, tables, and different data types like strings, integers, floats, and dates.
 
-The parser is implemented as a collection of functions that each handle specific aspects of the TOML syntax. These functions are used to parse keys, values, and tables, and to manage whitespace and comments. The code also includes functions for handling different data types, such as strings, booleans, integers, floats, and date-time values. The parser accumulates parsed data into a `pod` structure, which is a user-provided memory region for storing the parsed results. The [`fd_toml_parse`](<#fd_toml_parse>) function is the entry point for parsing a TOML document, and it returns an error code indicating the success or failure of the parsing operation. The code also provides a function [`fd_toml_strerror`](<#fd_toml_strerror>) to convert error codes into human-readable error messages.
+Key components of the code include the `fd_toml_parser_t` structure, which maintains the state of the parser, including the current position in the input data, error status, and buffers for temporary data storage. The parser functions are organized to handle different TOML syntax elements, with utility functions for handling specific parsing tasks like whitespace, comments, and escape sequences. The code also includes error handling mechanisms, with functions to report errors and manage memory efficiently during parsing. This file is intended to be part of a larger library, as indicated by its inclusion of external headers and its focus on parsing logic rather than standalone execution.
 # Imports and Dependencies
 
 ---
@@ -23,1671 +23,1236 @@ The parser is implemented as a collection of functions that each handle specific
 
 ---
 ### fd\_toml\_cur
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``lineno``: Stores the current line number in the TOML data being parsed.
-    - ``data``: Points to the current position in the TOML data being parsed.
-- **Description**: Represents a cursor used in the TOML parsing process, allowing the parser to track the current line number and position within the TOML data. This structure is essential for implementing backtracking and error reporting during parsing.
+    - `lineno`: Stores the current line number being processed in the TOML data.
+    - `data`: Points to the current position in the TOML data being parsed.
+- **Description**: The `fd_toml_cur` structure is a cursor object used in the TOML parsing process. It maintains the current line number and a pointer to the current position in the TOML data, allowing the parser to track its progress through the input. This structure is designed to be safely copied via assignment, facilitating backtracking during parsing.
 
 
 ---
 ### fd\_toml\_cur\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``lineno``: Stores the current line number in the TOML data being parsed.
-    - ``data``: Points to the current position in the TOML data being parsed.
-- **Description**: `fd_toml_cur_t` is a cursor object used in the TOML parsing process. It keeps track of the current line number and the current position in the TOML data, allowing the parser to navigate through the data efficiently. This structure supports backtracking by allowing the cursor to be copied and restored to a previous state.
+    - `lineno`: Stores the current line number being processed by the parser.
+    - `data`: Points to the current position in the TOML data being parsed.
+- **Description**: The `fd_toml_cur_t` structure is a cursor object used in the TOML parser to track the current position within the TOML data being processed. It contains a line number to keep track of the current line in the data, which is useful for error reporting and debugging, and a pointer to the current data position, allowing the parser to efficiently navigate through the TOML input. This structure is designed to be safely copied via assignment, facilitating backtracking during parsing.
 
 
 ---
 ### fd\_toml\_parser
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``c``: Holds the current state of the parser cursor.
-    - ``data_end``: Points to one past the end of the data being parsed.
-    - ``pod``: User-provided memory area for storing parsed data.
-    - ``error``: Indicates if a fatal error occurred during parsing.
-    - ``scratch``: Base address of the scratch buffer for temporary data storage.
-    - ``scratch_cur``: Points to the next free byte in the scratch buffer.
-    - ``scratch_end``: Points to one past the end of the scratch buffer.
-    - ``key_len``: Stores the length of the current key being parsed.
-    - ``key``: Holds the current key as a null-terminated string.
-- **Description**: Manages the state and buffers required for parsing TOML data, including cursor position, error tracking, and temporary storage for keys and values.
+    - `c`: A cursor object used for backtracking and tracking the current position in the TOML data.
+    - `data_end`: A pointer to the end of the TOML data, marking one past the end of file.
+    - `pod`: A user-provided memory region where parsed data is stored.
+    - `error`: An integer indicating if a fatal error occurred during parsing.
+    - `scratch`: A buffer used for temporarily storing strings during parsing.
+    - `scratch_cur`: A pointer to the next free byte in the scratch buffer.
+    - `scratch_end`: A pointer to the end of the scratch buffer, marking one past the last valid byte.
+    - `key_len`: The length of the current key being parsed.
+    - `key`: A character array storing the current key as a C-style string.
+- **Description**: The `fd_toml_parser` structure is designed to manage the state of a TOML parser, including the current position in the data, error tracking, and temporary storage for keys and values. It uses a cursor (`fd_toml_cur_t`) to facilitate backtracking and line number tracking, and it maintains a scratch buffer for handling strings during parsing. The structure also includes a user-provided memory region (`pod`) for storing parsed data, and it tracks errors that occur during parsing with an integer flag. The `key` array and `key_len` field are used to manage the current key being processed.
 
 
 ---
 ### fd\_toml\_parser\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``c``: Holds the current state of the parser cursor.
-    - ``data_end``: Points to one past the end of the input data.
-    - ``pod``: User-provided memory region for storing parsed data.
-    - ``error``: Indicates if a fatal error occurred during parsing.
-    - ``scratch``: Base address of the scratch buffer for temporary data storage.
-    - ``scratch_cur``: Points to the next free byte in the scratch buffer.
-    - ``scratch_end``: Points to one past the end of the scratch buffer.
-    - ``key_len``: Length of the current key being parsed.
-    - ``key``: Buffer for storing the current key as a C-string.
-- **Description**: Manages the internal state of a TOML parser, including the lexer/parser logic, unescaping and buffering logic, and data composition into a `fd_pod_t`. It maintains the current parsing position, error state, and temporary storage for keys and values.
+    - `c`: A cursor object representing the current position in the TOML data being parsed.
+    - `data_end`: A pointer to the end of the TOML data, marking one past the last character.
+    - `pod`: A user-provided buffer where parsed TOML data is stored.
+    - `error`: An integer indicating if a fatal error occurred during parsing.
+    - `scratch`: A buffer used for temporary storage of strings during parsing.
+    - `scratch_cur`: A pointer to the next free byte in the scratch buffer.
+    - `scratch_end`: A pointer to the end of the scratch buffer, marking one past the last byte.
+    - `key_len`: The length of the current key being parsed.
+    - `key`: A character array storing the current key as a C-string, with a maximum length defined by FD_TOML_PATH_MAX.
+- **Description**: The `fd_toml_parser_t` structure is used to maintain the state of the TOML parser, including the current position in the input data, buffers for temporary storage, and error handling. It facilitates the parsing of TOML data into a structured format stored in a user-provided buffer, handling keys and values, and managing memory efficiently during the parsing process.
 
 
 ---
 ### fd\_toml\_dec
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``res``: Stores the result of the parsed integer.
-    - ``len``: Indicates the length of the parsed integer.
-    - ``neg``: A flag that indicates if the integer is negative.
-- **Description**: Defines a structure to represent a decimal integer with fields for the result, length, and a flag for negativity. This structure is used in parsing operations to store and manage integer values extracted from TOML data.
+    - `res`: Stores the result of the parsed integer value.
+    - `len`: Indicates the length of the parsed integer string.
+    - `neg`: A flag indicating if the parsed integer is negative.
+- **Description**: The `fd_toml_dec` structure is used to represent a decimal integer parsed from a TOML file. It contains fields to store the result of the parsed integer (`res`), the length of the parsed integer string (`len`), and a flag (`neg`) to indicate if the integer is negative. This structure is part of the TOML parsing process, specifically for handling decimal integers.
 
 
 ---
 ### fd\_toml\_dec\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``res``: Stores the result of the decimal integer parsing.
-    - ``len``: Indicates the length of the parsed integer.
-    - ``neg``: A flag indicating if the parsed integer is negative.
-- **Description**: `fd_toml_dec_t` is a structure used to represent a parsed decimal integer in the TOML parser. It contains fields to store the result of the parsing, the length of the parsed integer, and a flag to indicate if the integer is negative. This structure is used internally to handle the parsing of decimal integers within the TOML data.
+    - `res`: Stores the result of the parsed decimal integer.
+    - `len`: Indicates the length of the parsed integer string.
+    - `neg`: A flag indicating if the parsed integer is negative.
+- **Description**: The `fd_toml_dec_t` structure is used to represent a parsed decimal integer from a TOML file. It contains fields to store the result of the parsing (`res`), the length of the parsed integer string (`len`), and a flag (`neg`) to indicate if the integer is negative. This structure is part of the TOML parsing process, specifically for handling decimal integers, and is used to facilitate the conversion of string representations of numbers into their numeric form.
 
 
 # Functions
 
 ---
 ### fd\_toml\_str\_init<!-- {{#callable:fd_toml_str_init}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L55>)
-
 Initializes the scratch buffer pointer in the `fd_toml_parser_t` structure.
 - **Inputs**:
     - `parser`: A pointer to an instance of `fd_toml_parser_t`, which holds the state of the TOML parser.
-- **Logic and Control Flow**:
-    - Sets the `scratch_cur` member of the `parser` to point to the beginning of the `scratch` buffer.
-- **Output**: This function does not return a value; it modifies the state of the `parser` directly.
+- **Control Flow**:
+    - The function directly assigns the base of the scratch buffer (`parser->scratch`) to the current scratch pointer (`parser->scratch_cur`).
+- **Output**: The function does not return a value; it modifies the state of the `fd_toml_parser_t` instance by updating the `scratch_cur` pointer.
 
 
 ---
 ### fd\_toml\_str\_append<!-- {{#callable:fd_toml_str_append}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L60>)
-
-Appends data to the scratch buffer of a `fd_toml_parser_t` structure.
+Appends a specified amount of data to the scratch buffer of a TOML parser.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the parser state.
-    - `data`: Pointer to the data to be appended to the scratch buffer.
-    - `sz`: Size in bytes of the data to be appended.
-- **Logic and Control Flow**:
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the state of the TOML parser.
+    - `data`: A pointer to the data to be appended to the scratch buffer.
+    - `sz`: The size in bytes of the data to be appended.
+- **Control Flow**:
     - Checks if there is enough space in the scratch buffer to append the new data.
-    - If there is not enough space, sets an error code in the parser and returns 0.
-    - If there is enough space, copies the data into the scratch buffer and updates the current position.
+    - If there is insufficient space, sets an error code in the parser and returns 0.
+    - If there is enough space, copies the data into the scratch buffer at the current position.
+    - Updates the current position in the scratch buffer to reflect the new end after appending the data.
     - Returns 1 to indicate success.
-- **Output**: Returns 1 on success, or 0 if there was an error due to insufficient space in the scratch buffer.
+- **Output**: Returns 1 on successful appending of data, or 0 if there was an error due to insufficient space.
 
 
 ---
-### fd\_toml\_advance<!-- {{#callable:fd_toml_advance}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L112>)
-
-Advances the parser cursor by 'n' characters and counts the number of new lines encountered.
+### fd\_toml\_str\_append\_utf8<!-- {{#callable:fd_toml_str_append_utf8}} -->
+Appends the UTF-8 encoding of a given Unicode code point to the scratch buffer of a TOML parser.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-    - `n`: The number of characters to advance the parser cursor.
-- **Logic and Control Flow**:
-    - Retrieve the current position from `parser->c.data` and calculate the next position by adding `n`.
-    - Check if the next position exceeds `parser->data_end`, logging a critical error if it does.
-    - Initialize a line counter to zero.
-    - Iterate from the current position to the next position, incrementing the line counter for each newline character encountered.
-    - Update the line number in `parser->c.lineno` with the counted lines.
-    - Set the current position in `parser->c.data` to the next position.
-- **Output**: The function does not return a value; it modifies the state of the `parser` by updating the cursor position and line number.
+    - `parser`: A pointer to an instance of `fd_toml_parser_t`, which holds the state of the TOML parser including the scratch buffer.
+    - `rune`: A long integer representing a Unicode code point to be appended in UTF-8 encoding.
+- **Control Flow**:
+    - Checks if there is enough space in the scratch buffer to append up to 4 bytes (the maximum size of a UTF-8 encoded character).
+    - If there is insufficient space, it sets an error code in the parser and returns 0.
+    - If there is enough space, it calls `fd_cstr_append_utf8` to append the UTF-8 representation of the `rune` to the scratch buffer.
+    - Updates the current position in the scratch buffer to reflect the newly appended data.
+    - Returns 1 to indicate success.
+- **Output**: Returns 1 on successful appending of the UTF-8 encoded character, or 0 if there was an error due to insufficient space.
 
 
 ---
 ### fd\_toml\_advance\_inline<!-- {{#callable:fd_toml_advance_inline}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L132>)
-
-Advances the parser cursor by a specified number of characters.
+Advances the parser's cursor by a specified number of characters.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-    - `n`: The number of characters to advance the parser cursor.
-- **Logic and Control Flow**:
-    - The function directly increments the `data` pointer of the `c` member in the `parser` structure by `n` characters.
-- **Output**: The function does not return a value.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+    - `n`: An unsigned long integer representing the number of characters to advance the parser's cursor.
+- **Control Flow**:
+    - The function directly increments the `data` pointer of the `fd_toml_cur` structure within the `parser` by `n` characters.
+    - No bounds checking is performed, so it is assumed that the caller ensures that advancing by `n` does not exceed the limits of the data being parsed.
+- **Output**: This function does not return a value; it modifies the internal state of the parser by moving the cursor forward.
 
 
 ---
 ### fd\_toml\_upsert\_empty\_pod<!-- {{#callable:fd_toml_upsert_empty_pod}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L138>)
-
-Inserts a new subpod into the parser's pod if it does not already exist.
+Inserts a new empty subpod into the given `fd_toml_parser_t` if it does not already exist.
 - **Inputs**:
-    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if a subpod exists for the given key in the parser's pod using `fd_pod_query_subpod`.
-    - If the subpod does not exist, allocates memory for a new subpod using `fd_pod_new`.
-    - Inserts the new subpod into the pod with `fd_pod_insert`.
-    - If insertion fails, sets an error code in the parser and returns 0.
-    - If the insertion is successful, deletes the temporary subpod and returns 1.
-- **Output**: Returns 1 if the subpod is successfully inserted or already exists; returns 0 if an error occurs.
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that contains the current state of the TOML parser, including the pod and key.
+- **Control Flow**:
+    - Checks if a subpod with the specified key exists in the current pod using `fd_pod_query_subpod`.
+    - If the subpod does not exist, allocates memory for a new subpod using `fd_pod_new` and `fd_pod_join`.
+    - Attempts to insert the new subpod into the pod with `fd_pod_insert`.
+    - If the insertion fails, sets an error code in the parser and returns 0.
+    - If the insertion is successful, cleans up the subpod using `fd_pod_delete` and `fd_pod_leave`.
+    - Returns 1 to indicate success.
+- **Output**: Returns 1 if the operation is successful, or 0 if an error occurs during insertion.
 
 
 ---
 ### fd\_toml\_parse\_ws<!-- {{#callable:fd_toml_parse_ws}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L195>)
-
-Parses whitespace characters from the input data.
+The `fd_toml_parse_ws` function skips whitespace characters (spaces and tabs) in the TOML parser.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are more characters available for parsing using [`fd_toml_avail`](<#fd_toml_avail>).
-    - Reads the first character from the input data.
-    - If the character is not a space (' ') or a tab ('	'), the loop breaks.
-    - Advances the parser cursor by one character using [`fd_toml_advance_inline`](<#fd_toml_advance_inline>).
-- **Output**: Returns 1 to indicate successful parsing of whitespace.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the current state of the TOML parser.
+- **Control Flow**:
+    - The function enters a while loop that continues as long as there are available characters to parse.
+    - Within the loop, it checks the first character of the current data in the parser.
+    - If the character is not a space (' ') or a tab ('\t'), the loop breaks.
+    - If the character is a space or tab, the function advances the parser's cursor by one character using [`fd_toml_advance_inline`](#fd_toml_advance_inline).
+- **Output**: The function returns 1 to indicate successful parsing of whitespace.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_comment<!-- {{#callable:fd_toml_parse_comment}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L213>)
-
-Parses a TOML comment starting with the '#' character.
+Parses a TOML comment starting with '#' and advances the parser cursor until the end of the comment.
 - **Inputs**:
-    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Check if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If the first character is not '#', return 0.
-    - Advance the parser cursor by one character to skip the '#' character.
-    - Enter a loop to continue parsing characters while they are available.
-    - Check if the current character is a valid non-eol character (tab, printable ASCII, or non-ASCII).
-    - If valid, advance the cursor by one character; otherwise, break the loop.
-- **Output**: Returns 1 if a comment is successfully parsed, otherwise returns 0.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+- **Control Flow**:
+    - Check if there are available bytes to parse using [`fd_toml_avail`](#fd_toml_avail).
+    - If the first character is not '#', return 0 indicating no comment was found.
+    - Advance the cursor to skip the '#' character.
+    - Enter a loop that continues as long as there are available bytes.
+    - Within the loop, check if the current character is a valid non-eol character (tab, printable ASCII, or non-ASCII).
+    - If valid, advance the cursor to the next character; otherwise, break the loop.
+    - Return 1 indicating a successful comment parse.
+- **Output**: Returns 1 if a comment was successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+
+
+---
+### fd\_toml\_parse\_quotation\_mark<!-- {{#callable:fd_toml_parse_quotation_mark}} -->
+Parses a quotation mark from the TOML input stream.
+- **Inputs**:
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+- **Control Flow**:
+    - Checks if there are available bytes to parse using [`fd_toml_avail`](#fd_toml_avail).
+    - If no bytes are available, returns 0 indicating failure.
+    - Checks if the current character is a quotation mark ("), returning 0 if it is not.
+    - Advances the parser cursor by one character using [`fd_toml_advance_inline`](#fd_toml_advance_inline).
+    - Returns 1 indicating success if the quotation mark was successfully parsed.
+- **Output**: Returns 1 if a quotation mark was successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_basic\_unescaped<!-- {{#callable:fd_toml_parse_basic_unescaped}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L245>)
-
 Parses a basic unescaped character in TOML format.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Check if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If no bytes are available, return 0.
-    - Retrieve the first character from the parser's data.
-    - Check if the character is a valid basic unescaped character.
-    - If the character is valid, append it to the current string buffer using [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>).
-    - Advance the parser cursor by one character using [`fd_toml_advance`](<#fd_toml_advance>).
-    - Return 1 to indicate success.
-- **Output**: Returns 1 if a valid basic unescaped character is parsed successfully, otherwise returns 0.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
-
-
----
-### fd\_toml\_parse\_escaped<!-- {{#callable:fd_toml_parse_escaped}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L287>)
-
-Parses escaped characters in a TOML string.
-- **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are at least two characters available for parsing.
-    - Validates that the first character is a backslash ('\').
-    - Advances the parser cursor by two characters.
-    - Uses a switch statement to handle different escape sequences.
-    - For specific escape sequences ('b', 'f', 'n', 'r', 't', '"', '\'), appends the corresponding character to the output.
-    - For Unicode escape sequences ('u' and 'U'), checks for valid hexadecimal digits and converts them to a Unicode code point.
-    - Advances the parser cursor appropriately after processing each escape sequence.
-    - Returns 1 on successful parsing of an escape sequence, or 0 on failure.
-- **Output**: Returns 1 if an escape sequence is successfully parsed and appended; otherwise, returns 0.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>)
-    - [`fd_toml_xdigit`](<#fd_toml_xdigit>)
-    - [`fd_toml_str_append_utf8`](<#fd_toml_str_append_utf8>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser, including the cursor position and the data being parsed.
+- **Control Flow**:
+    - First, it checks if there are any bytes available for parsing using [`fd_toml_avail`](#fd_toml_avail). If not, it returns 0.
+    - It retrieves the current character from the parser's data.
+    - It checks if the character is a valid basic unescaped character (space, tab, specific ASCII characters, or non-ASCII). If not, it returns 0.
+    - If the character is valid, it appends the character to the current string buffer using [`fd_toml_str_append_byte`](#fd_toml_str_append_byte).
+    - The parser cursor is then advanced by one character using [`fd_toml_advance`](#fd_toml_advance).
+    - Finally, it returns 1 to indicate success.
+- **Output**: Returns 1 if a valid basic unescaped character was parsed and appended; otherwise, returns 0.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_str_append_byte`](#fd_toml_str_append_byte)
+    - [`fd_toml_advance`](#fd_toml_advance)
 
 
 ---
 ### fd\_toml\_parse\_basic\_char<!-- {{#callable:fd_toml_parse_basic_char}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L350>)
-
-Parses a basic character from the TOML input.
+Parses a basic character from the TOML input, handling both unescaped and escaped characters.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if a basic unescaped character can be parsed using [`fd_toml_parse_basic_unescaped`](<#fd_toml_parse_basic_unescaped>).
-    - If the first check fails, it attempts to parse an escaped character using [`fd_toml_parse_escaped`](<#fd_toml_parse_escaped>).
-    - Returns 1 if either parsing succeeds, otherwise returns 0.
-- **Output**: Returns 1 on successful parsing of a basic character, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_parse_basic_unescaped`](<#fd_toml_parse_basic_unescaped>)
-    - [`fd_toml_parse_escaped`](<#fd_toml_parse_escaped>)
-
-
----
-### fd\_toml\_parse\_basic\_string<!-- {{#callable:fd_toml_parse_basic_string}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L359>)
-
-Parses a basic TOML string enclosed in quotation marks.
-- **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the parser state.
-- **Logic and Control Flow**:
-    - Checks for the opening quotation mark using [`fd_toml_parse_quotation_mark`](<#fd_toml_parse_quotation_mark>).
-    - Initializes the scratch buffer for string storage with [`fd_toml_str_init`](<#fd_toml_str_init>).
-    - Enters a loop to parse basic characters using [`fd_toml_parse_basic_char`](<#fd_toml_parse_basic_char>) until no more characters can be parsed.
-    - Checks for the closing quotation mark using [`fd_toml_parse_quotation_mark`](<#fd_toml_parse_quotation_mark>).
-- **Output**: Returns 1 on successful parsing of the string, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_parse_quotation_mark`](<#fd_toml_parse_quotation_mark>)
-    - [`fd_toml_str_init`](<#fd_toml_str_init>)
-    - [`fd_toml_parse_basic_char`](<#fd_toml_parse_basic_char>)
-
-
----
-### fd\_toml\_parse\_apostrophe<!-- {{#callable:fd_toml_parse_apostrophe}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L370>)
-
-Parses an apostrophe character from the input data.
-- **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Check if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If no bytes are available, return 0.
-    - Check if the current character is an apostrophe (`'`).
-    - If the character is not an apostrophe, return 0.
-    - Advance the parser cursor by one character using [`fd_toml_advance_inline`](<#fd_toml_advance_inline>).
-    - Return 1 to indicate success.
-- **Output**: Returns 1 if an apostrophe is successfully parsed; otherwise, returns 0.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+- **Control Flow**:
+    - The function first attempts to parse a basic unescaped character using [`fd_toml_parse_basic_unescaped`](#fd_toml_parse_basic_unescaped).
+    - If the first parsing attempt fails, it then attempts to parse an escaped character using [`fd_toml_parse_escaped`](#fd_toml_parse_escaped).
+    - If both parsing attempts fail, the function returns 0, indicating no character was parsed.
+- **Output**: Returns 1 if a basic character (either unescaped or escaped) was successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_basic_unescaped`](#fd_toml_parse_basic_unescaped)
+    - [`fd_toml_parse_escaped`](#fd_toml_parse_escaped)
 
 
 ---
 ### fd\_toml\_parse\_literal\_char<!-- {{#callable:fd_toml_parse_literal_char}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L380>)
-
-Parses a literal character from the TOML input.
+Parses a literal character from the TOML input and appends it to the parser's scratch buffer.
 - **Inputs**:
-    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If no bytes are available, returns 0.
-    - Reads the first character from the parser's data.
-    - Checks if the character is within the valid ranges (0x09, 0x20-0x26, 0x28-0x7E, or >=0x80).
-    - If the character is valid, appends it to the current string using [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>).
-    - Advances the parser cursor by one character using [`fd_toml_advance`](<#fd_toml_advance>).
-    - Returns 1 to indicate success.
-- **Output**: Returns 1 on success, indicating a valid literal character was parsed, or 0 if the character is invalid or no bytes are available.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser, including the input data and the scratch buffer.
+- **Control Flow**:
+    - First, it checks if there are any characters available for parsing using [`fd_toml_avail`](#fd_toml_avail). If not, it returns 0.
+    - It retrieves the first character from the parser's current data.
+    - It checks if the character is a valid literal character based on specified ranges (tab, space, and non-ASCII characters). If the character is invalid, it returns 0.
+    - If the character is valid, it appends the character to the scratch buffer using [`fd_toml_str_append_byte`](#fd_toml_str_append_byte).
+    - Finally, it advances the parser's cursor by one character using [`fd_toml_advance`](#fd_toml_advance) and returns 1 to indicate success.
+- **Output**: Returns 1 if a valid literal character was parsed and appended, or 0 if no character was available or if the character was invalid.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_str_append_byte`](#fd_toml_str_append_byte)
+    - [`fd_toml_advance`](#fd_toml_advance)
 
 
 ---
 ### fd\_toml\_parse\_literal\_string<!-- {{#callable:fd_toml_parse_literal_string}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L401>)
-
 Parses a TOML literal string enclosed in apostrophes.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the parser state.
-- **Logic and Control Flow**:
-    - Checks for the opening apostrophe using [`fd_toml_parse_apostrophe`](<#fd_toml_parse_apostrophe>).
-    - Initializes the string buffer with [`fd_toml_str_init`](<#fd_toml_str_init>).
-    - Enters a loop to parse characters using [`fd_toml_parse_literal_char`](<#fd_toml_parse_literal_char>) until no more valid characters are found.
-    - Checks for the closing apostrophe using [`fd_toml_parse_apostrophe`](<#fd_toml_parse_apostrophe>).
-- **Output**: Returns 1 on successful parsing of the literal string, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_apostrophe`](<#fd_toml_parse_apostrophe>)
-    - [`fd_toml_str_init`](<#fd_toml_str_init>)
-    - [`fd_toml_parse_literal_char`](<#fd_toml_parse_literal_char>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Checks for the opening apostrophe using [`fd_toml_parse_apostrophe`](#fd_toml_parse_apostrophe) and returns 0 if not found.
+    - Initializes the string buffer using [`fd_toml_str_init`](#fd_toml_str_init).
+    - Enters a loop to parse literal characters using [`fd_toml_parse_literal_char`](#fd_toml_parse_literal_char) until no more valid characters are found.
+    - Checks for the closing apostrophe using [`fd_toml_parse_apostrophe`](#fd_toml_parse_apostrophe) and returns 0 if not found.
+    - Returns 1 to indicate successful parsing of the literal string.
+- **Output**: Returns 1 if the literal string is successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_apostrophe`](#fd_toml_parse_apostrophe)
+    - [`fd_toml_str_init`](#fd_toml_str_init)
+    - [`fd_toml_parse_literal_char`](#fd_toml_parse_literal_char)
 
 
 ---
 ### fd\_toml\_parse\_quoted\_key<!-- {{#callable:fd_toml_parse_quoted_key}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L412>)
-
-Parses a quoted key from TOML format, which can be either a basic string or a literal string.
+Parses a quoted key in TOML format, which can be either a basic string or a literal string.
 - **Inputs**:
-    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if parsing a basic string is successful using [`fd_toml_parse_basic_string`](<#fd_toml_parse_basic_string>).
-    - If the first parsing attempt fails, it checks if parsing a literal string is successful using [`fd_toml_parse_literal_string`](<#fd_toml_parse_literal_string>).
-    - Returns 1 if either parsing attempt is successful, otherwise returns 0.
-- **Output**: Returns 1 on successful parsing of a quoted key, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_parse_basic_string`](<#fd_toml_parse_basic_string>)
-    - [`fd_toml_parse_literal_string`](<#fd_toml_parse_literal_string>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser.
+- **Control Flow**:
+    - The function first attempts to parse a basic string using [`fd_toml_parse_basic_string`](#fd_toml_parse_basic_string).
+    - If the basic string parsing is successful, it returns 1.
+    - If the basic string parsing fails, it attempts to parse a literal string using [`fd_toml_parse_literal_string`](#fd_toml_parse_literal_string).
+    - If the literal string parsing is successful, it returns 1.
+    - If both parsing attempts fail, it returns 0.
+- **Output**: Returns 1 if a quoted key is successfully parsed (either as a basic or literal string), otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_basic_string`](#fd_toml_parse_basic_string)
+    - [`fd_toml_parse_literal_string`](#fd_toml_parse_literal_string)
 
 
 ---
 ### fd\_toml\_is\_unquoted\_key\_char<!-- {{#callable:fd_toml_is_unquoted_key_char}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L421>)
-
-Checks if a character is valid as an unquoted key character in TOML.
+The `fd_toml_is_unquoted_key_char` function checks if a given character is valid as an unquoted key character in TOML syntax.
 - **Inputs**:
-    - `c`: An integer representing the character to check.
-- **Logic and Control Flow**:
-    - Evaluates if the character `c` is within the ranges of uppercase letters, lowercase letters, digits, or is one of the characters '-' or '_'.
-    - Returns 1 (true) if `c` is a valid unquoted key character, otherwise returns 0 (false).
-- **Output**: Returns 1 if the character is valid for an unquoted key, otherwise returns 0.
-
-
----
-### fd\_toml\_parse\_unquoted\_key<!-- {{#callable:fd_toml_parse_unquoted_key}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L430>)
-
-Parses an unquoted key from a TOML document.
-- **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the parser state.
-- **Logic and Control Flow**:
-    - Check if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - Retrieve the first character from the parser's data.
-    - Check if the character is a valid unquoted key character using [`fd_toml_is_unquoted_key_char`](<#fd_toml_is_unquoted_key_char>).
-    - Initialize the string buffer for the key using [`fd_toml_str_init`](<#fd_toml_str_init>).
-    - Append the first character to the string buffer using [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>).
-    - Advance the parser cursor by one character using [`fd_toml_advance_inline`](<#fd_toml_advance_inline>).
-    - Enter a loop to continue parsing characters as long as there are available bytes.
-    - In each iteration, check if the next character is a valid unquoted key character.
-    - If valid, append the character to the string buffer and advance the cursor.
-    - If not valid, exit the loop.
-- **Output**: Returns 1 on success, indicating that an unquoted key was successfully parsed.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_is_unquoted_key_char`](<#fd_toml_is_unquoted_key_char>)
-    - [`fd_toml_str_init`](<#fd_toml_str_init>)
-    - [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `c`: An integer representing a character to be checked.
+- **Control Flow**:
+    - The function evaluates whether the character `c` falls within the ranges of uppercase letters (A-Z), lowercase letters (a-z), digits (0-9), or is one of the special characters '-' or '_'.
+    - It uses bitwise OR operations to combine the results of these checks into a single integer value.
+- **Output**: Returns a non-zero integer (true) if `c` is a valid unquoted key character, otherwise returns 0 (false).
 
 
 ---
 ### fd\_toml\_parse\_simple\_key<!-- {{#callable:fd_toml_parse_simple_key}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L454>)
-
 Parses a simple key from TOML format, which can be either quoted or unquoted.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if the next token is a quoted key by calling [`fd_toml_parse_quoted_key`](<#fd_toml_parse_quoted_key>).
-    - If the quoted key parsing fails, checks if the next token is an unquoted key by calling [`fd_toml_parse_unquoted_key`](<#fd_toml_parse_unquoted_key>).
-    - If both parsing attempts fail, returns 0 indicating failure.
-    - If either parsing succeeds, proceeds to the 'add' section.
-    - In the 'add' section, calculates the total length of the key and checks if it exceeds the maximum allowed size.
-    - If the key length is valid, appends the parsed key to the `parser->key` buffer and updates the key length.
-- **Output**: Returns 1 on success, indicating a key was successfully parsed and added; returns 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_quoted_key`](<#fd_toml_parse_quoted_key>)
-    - [`fd_toml_parse_unquoted_key`](<#fd_toml_parse_unquoted_key>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the TOML parser, including the cursor position and the current key being parsed.
+- **Control Flow**:
+    - The function first attempts to parse a quoted key using [`fd_toml_parse_quoted_key`](#fd_toml_parse_quoted_key). If successful, it proceeds to the 'add' section.
+    - If the quoted key parsing fails, it attempts to parse an unquoted key using [`fd_toml_parse_unquoted_key`](#fd_toml_parse_unquoted_key). If successful, it also proceeds to the 'add' section.
+    - If both parsing attempts fail, the function returns 0, indicating no key was parsed.
+    - In the 'add' section, it calculates the total length of the key by combining the length of the previously stored key and the newly parsed suffix.
+    - If the total key length exceeds the maximum allowed size, a warning is logged, and an error is set before returning 0.
+    - If the key length is valid, the new key is constructed by appending the parsed suffix to the existing key, and the function returns 1 to indicate success.
+- **Output**: Returns 1 if a simple key was successfully parsed and added to the parser's state; returns 0 if parsing fails or if the key is too long.
+- **Functions called**:
+    - [`fd_toml_parse_quoted_key`](#fd_toml_parse_quoted_key)
+    - [`fd_toml_parse_unquoted_key`](#fd_toml_parse_unquoted_key)
 
 
 ---
 ### fd\_toml\_parse\_dot\_sep<!-- {{#callable:fd_toml_parse_dot_sep}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L483>)
-
-Parses whitespace, expects a dot character, and then parses whitespace again.
+Parses a dot separator in TOML syntax, ensuring whitespace around it.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) to skip any leading whitespace.
-    - Uses `EXPECT_CHAR` macro to check for a dot character.
-    - Calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) again to skip any trailing whitespace.
-- **Output**: Returns 1 on success, indicating that the dot separator was successfully parsed.
-- **Functions Called**:
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+- **Control Flow**:
+    - Calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) to skip any whitespace before the dot.
+    - Uses the `EXPECT_CHAR` macro to check for the presence of a '.' character.
+    - Calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) again to skip any whitespace after the dot.
+    - Returns 1 to indicate successful parsing.
+- **Output**: Returns 1 on successful parsing of the dot separator; otherwise, it returns 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_parse_ws`](#fd_toml_parse_ws)
 
 
 ---
 ### fd\_toml\_parse\_dotted\_key<!-- {{#callable:fd_toml_parse_dotted_key}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L493>)
-
-Parses a dotted key in TOML format.
+Parses a dotted key in TOML format, which consists of a simple key followed by zero or more dot-separated simple keys.
 - **Inputs**:
-    - `parser`: Pointer to an `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Checks if the initial simple key can be parsed using [`fd_toml_parse_simple_key`](<#fd_toml_parse_simple_key>).
-    - Enters a loop to parse additional simple keys separated by dots.
-    - Within the loop, checks for available data and attempts to parse a dot separator using [`fd_toml_parse_dot_sep`](<#fd_toml_parse_dot_sep>).
-    - If the key length exceeds the maximum size, sets an error and returns 0.
-    - Adds a dot to the key and attempts to parse another simple key.
-- **Output**: Returns 1 on success, indicating that a dotted key was successfully parsed; returns 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_simple_key`](<#fd_toml_parse_simple_key>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_parse_dot_sep`](<#fd_toml_parse_dot_sep>)
-
-
----
-### fd\_toml\_parse\_key<!-- {{#callable:fd_toml_parse_key}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L516>)
-
-Parses a key in TOML format.
-- **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_dotted_key`](<#fd_toml_parse_dotted_key>) to parse a dotted key format.
-    - Returns the result of the [`fd_toml_parse_dotted_key`](<#fd_toml_parse_dotted_key>) function.
-- **Output**: Returns an integer indicating success (1) or failure (0) of the key parsing.
-- **Functions Called**:
-    - [`fd_toml_parse_dotted_key`](<#fd_toml_parse_dotted_key>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser, including the input data and the current position in the data.
+- **Control Flow**:
+    - The function first attempts to parse a simple key using [`fd_toml_parse_simple_key`](#fd_toml_parse_simple_key). If this fails, it returns 0.
+    - It enters a loop that continues as long as there are more characters available to parse.
+    - Within the loop, it attempts to parse a dot separator using [`fd_toml_parse_dot_sep`](#fd_toml_parse_dot_sep). If this fails, the loop breaks.
+    - If the dot separator is successfully parsed, it checks if there is enough space in the `key` buffer to add a trailing dot. If not, it sets an error and returns 0.
+    - The function then adds a dot to the `key` and attempts to parse another simple key. If this fails, it returns 0.
+    - The loop continues until no more dot-separated simple keys can be parsed.
+- **Output**: Returns 1 if the dotted key is successfully parsed, or 0 if an error occurs during parsing.
+- **Functions called**:
+    - [`fd_toml_parse_simple_key`](#fd_toml_parse_simple_key)
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_parse_dot_sep`](#fd_toml_parse_dot_sep)
 
 
 ---
 ### fd\_toml\_parse\_keyval\_sep<!-- {{#callable:fd_toml_parse_keyval_sep}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L523>)
-
-Parses whitespace, an equals sign, and additional whitespace in a TOML key-value separator.
+Parses the key-value separator in TOML syntax, which is expected to be an equals sign surrounded by optional whitespace.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) to skip any leading whitespace.
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+- **Control Flow**:
+    - Calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) to skip any leading whitespace.
     - Checks if there are available characters to parse; if not, returns 0.
     - Checks if the current character is an equals sign ('='); if not, returns 0.
-    - Advances the parser cursor by one character to skip the equals sign.
-    - Calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) again to skip any trailing whitespace.
+    - Advances the parser cursor past the equals sign.
+    - Calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) again to skip any trailing whitespace.
     - Returns 1 to indicate successful parsing of the key-value separator.
-- **Output**: Returns 1 on success, indicating that a key-value separator was successfully parsed; returns 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+- **Output**: Returns 1 if the key-value separator is successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_ws`](#fd_toml_parse_ws)
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_ml\_basic\_string\_delim<!-- {{#callable:fd_toml_parse_ml_basic_string_delim}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L535>)
-
-Processes the multi-line basic string delimiter in a TOML parser.
+Parses a multi-line basic string delimiter consisting of three consecutive double quotes.
 - **Inputs**:
-    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Checks if the parser's current position plus 3 exceeds the end of the data.
-    - Validates that the next three characters are all double quotes (`"""`).
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Checks if the remaining data in the parser is sufficient to read three characters.
+    - Verifies that the first three characters are all double quotes ('"').
     - Advances the parser's cursor by three characters if the checks pass.
+    - Returns 1 on success, or 0 if any check fails.
 - **Output**: Returns 1 if the delimiter is successfully parsed, otherwise returns 0.
-- **Functions Called**:
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+- **Functions called**:
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_mlb\_unescaped<!-- {{#callable:fd_toml_parse_mlb_unescaped}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L547>)
-
-Processes unescaped characters in a TOML multiline basic string.
+Parses unescaped characters in a TOML multiline basic string.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_basic_unescaped`](<#fd_toml_parse_basic_unescaped>) with the provided `parser`.
-    - Returns the result of the [`fd_toml_parse_basic_unescaped`](<#fd_toml_parse_basic_unescaped>) function.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+- **Control Flow**:
+    - The function calls [`fd_toml_parse_basic_unescaped`](#fd_toml_parse_basic_unescaped) with the provided `parser`.
+    - The result of the call to [`fd_toml_parse_basic_unescaped`](#fd_toml_parse_basic_unescaped) is returned directly.
 - **Output**: Returns an integer indicating success (1) or failure (0) of parsing unescaped characters.
-- **Functions Called**:
-    - [`fd_toml_parse_basic_unescaped`](<#fd_toml_parse_basic_unescaped>)
+- **Functions called**:
+    - [`fd_toml_parse_basic_unescaped`](#fd_toml_parse_basic_unescaped)
 
 
 ---
 ### fd\_toml\_parse\_mlb\_escaped\_nl<!-- {{#callable:fd_toml_parse_mlb_escaped_nl}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L554>)
-
-Processes escaped newline sequences in TOML parsing.
+Parses a multiline TOML escaped newline sequence.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are at least two characters available for parsing.
-    - Validates that the first character is a backslash ('\').
-    - Advances the parser cursor by one character.
-    - Parses optional whitespace after the backslash.
-    - Checks if there is a newline character following the whitespace.
-    - Advances the cursor while skipping any whitespace characters (spaces, tabs, newlines) until a non-whitespace character is found.
-- **Output**: Returns 1 on successful parsing of the escaped newline sequence, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
-
-
----
-### fd\_toml\_parse\_mlb\_content<!-- {{#callable:fd_toml_parse_mlb_content}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L576>)
-
-Parses multiline basic content in TOML format.
-- **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - Attempts to parse unescaped characters using [`fd_toml_parse_mlb_unescaped`](<#fd_toml_parse_mlb_unescaped>).
-    - Attempts to parse escaped characters using [`fd_toml_parse_escaped`](<#fd_toml_parse_escaped>).
-    - Checks if the current character is a newline and appends it if true.
-    - Attempts to parse escaped newlines using [`fd_toml_parse_mlb_escaped_nl`](<#fd_toml_parse_mlb_escaped_nl>).
-    - Returns 0 if no parsing was successful.
-- **Output**: Returns 1 if parsing is successful, otherwise returns 0.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_parse_mlb_unescaped`](<#fd_toml_parse_mlb_unescaped>)
-    - [`fd_toml_parse_escaped`](<#fd_toml_parse_escaped>)
-    - [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
-    - [`fd_toml_parse_mlb_escaped_nl`](<#fd_toml_parse_mlb_escaped_nl>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Checks if there are at least 2 characters available for parsing; if not, returns 0.
+    - Verifies that the first character is a backslash ('\'); if not, returns 0.
+    - Advances the parser cursor by 1 character.
+    - Calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) to parse any whitespace following the backslash.
+    - Checks if there is at least one character available; if not, returns 0.
+    - Checks if the next character is a newline ('\n'); if not, returns 0.
+    - Enters a loop to consume any whitespace characters (spaces, tabs, newlines) until a non-whitespace character is encountered.
+- **Output**: Returns 1 if the parsing of the escaped newline sequence is successful, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_parse_ws`](#fd_toml_parse_ws)
+    - [`fd_toml_advance`](#fd_toml_advance)
 
 
 ---
 ### fd\_toml\_parse\_mlb\_quotes<!-- {{#callable:fd_toml_parse_mlb_quotes}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L594>)
-
-Counts and processes quotes in a multiline basic string.
+Parses multiline basic quotes in TOML format.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the parser state.
-- **Logic and Control Flow**:
-    - Initialize a pointer `begin` to the current data position in the parser.
-    - Count the number of consecutive double quotes (`"`) while advancing the parser.
-    - If the count of quotes is zero or greater than five, return 0.
-    - If the count is less than three, append the quotes to the parser's scratch buffer and return 1.
-    - If the count is exactly three, return 0.
-    - If the count is greater than three, backtrack the parser by three quotes and append the remaining quotes to the scratch buffer, then return 1.
-- **Output**: Returns 1 if quotes are processed successfully, otherwise returns 0.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_str_append`](<#fd_toml_str_append>)
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Initializes a pointer `begin` to the current position in the parser's data.
+    - Counts the number of consecutive double quotes ("), advancing the parser's cursor for each quote found.
+    - If no quotes are found or if more than five quotes are found, returns 0.
+    - If fewer than three quotes are found, appends the quotes to the parser's scratch buffer and returns 1.
+    - If exactly three quotes are found, returns 0 without appending.
+    - If more than three quotes are found, backtracks the cursor by three positions, adjusts the quote count, appends the remaining quotes to the scratch buffer, and returns 1.
+- **Output**: Returns 1 on successful parsing of quotes, 0 on failure.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_str_append`](#fd_toml_str_append)
 
 
 ---
 ### fd\_toml\_parse\_ml\_basic\_body<!-- {{#callable:fd_toml_parse_ml_basic_body}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L621>)
-
 Parses the body of a multiline basic string in TOML format.
 - **Inputs**:
-    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - The function enters a loop that continues to parse `mlb_content` until no more content can be parsed.
-    - Inside an infinite loop, it checks for `mlb_quotes` and `mlb_content`, breaking if either fails to parse.
-    - After parsing, it attempts to parse any trailing `mlb_quotes` before returning success.
-- **Output**: Returns 1 on successful parsing of the multiline basic body.
-- **Functions Called**:
-    - [`fd_toml_parse_mlb_content`](<#fd_toml_parse_mlb_content>)
-    - [`fd_toml_parse_mlb_quotes`](<#fd_toml_parse_mlb_quotes>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - The function first enters a loop to parse any content in the multiline basic string until no more content can be parsed.
+    - It then enters an infinite loop where it attempts to parse quotes followed by content, breaking if either fails.
+    - After parsing, it attempts to parse any trailing quotes.
+- **Output**: Returns 1 on successful parsing of the multiline basic body, or 0 if an error occurs.
+- **Functions called**:
+    - [`fd_toml_parse_mlb_content`](#fd_toml_parse_mlb_content)
+    - [`fd_toml_parse_mlb_quotes`](#fd_toml_parse_mlb_quotes)
 
 
 ---
 ### fd\_toml\_parse\_ml\_basic\_string<!-- {{#callable:fd_toml_parse_ml_basic_string}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L635>)
-
 Parses a multiline basic string in TOML format.
 - **Inputs**:
-    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks for the start delimiter of a multiline basic string using [`fd_toml_parse_ml_basic_string_delim`](<#fd_toml_parse_ml_basic_string_delim>).
-    - Returns 0 if the delimiter is not found or if there are no available characters to parse.
-    - Advances the parser if the first character is a newline.
-    - Initializes the string buffer using [`fd_toml_str_init`](<#fd_toml_str_init>).
-    - Parses the body of the multiline basic string using [`fd_toml_parse_ml_basic_body`](<#fd_toml_parse_ml_basic_body>).
-    - Checks for the end delimiter of the multiline basic string using [`fd_toml_parse_ml_basic_string_delim`](<#fd_toml_parse_ml_basic_string_delim>).
-    - Returns 1 if the parsing is successful.
-- **Output**: Returns 1 on successful parsing of the multiline basic string, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_ml_basic_string_delim`](<#fd_toml_parse_ml_basic_string_delim>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
-    - [`fd_toml_str_init`](<#fd_toml_str_init>)
-    - [`fd_toml_parse_ml_basic_body`](<#fd_toml_parse_ml_basic_body>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Checks for the presence of the multiline basic string delimiter using [`fd_toml_parse_ml_basic_string_delim`](#fd_toml_parse_ml_basic_string_delim).
+    - If the delimiter is found, it checks if there are available characters to parse.
+    - If the first character is a newline, it advances the parser cursor.
+    - Initializes the string buffer using [`fd_toml_str_init`](#fd_toml_str_init).
+    - Parses the body of the multiline basic string using [`fd_toml_parse_ml_basic_body`](#fd_toml_parse_ml_basic_body).
+    - Finally, checks for the closing delimiter using [`fd_toml_parse_ml_basic_string_delim`](#fd_toml_parse_ml_basic_string_delim).
+- **Output**: Returns 1 on successful parsing of the multiline basic string, or 0 if any parsing step fails.
+- **Functions called**:
+    - [`fd_toml_parse_ml_basic_string_delim`](#fd_toml_parse_ml_basic_string_delim)
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance`](#fd_toml_advance)
+    - [`fd_toml_str_init`](#fd_toml_str_init)
+    - [`fd_toml_parse_ml_basic_body`](#fd_toml_parse_ml_basic_body)
 
 
 ---
 ### fd\_toml\_parse\_mll\_quotes<!-- {{#callable:fd_toml_parse_mll_quotes}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L652>)
-
-Counts and processes single quotes in a TOML multiline literal.
+Parses multiline literal quotes in a TOML document.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Initialize a pointer `begin` to the current data position in the parser.
-    - Count the number of consecutive single quotes (`'`) while advancing the parser.
-    - If the count of quotes is zero or greater than five, return 0.
-    - If the count is less than three, append the quotes to the parser's scratch buffer and return 1.
-    - If the count is exactly three, return 0.
-    - If the count is greater than three, backtrack the parser by three quotes, adjust the count, and append the remaining quotes to the scratch buffer before returning 1.
-- **Output**: Returns 1 on success or 0 on failure, indicating whether the quotes were processed correctly.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_str_append`](<#fd_toml_str_append>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
+- **Control Flow**:
+    - Initializes a pointer `begin` to the current position in the parser's data.
+    - Counts the number of consecutive single quotes (`'`) encountered in the input.
+    - If no quotes are found or if more than 5 quotes are found, returns 0.
+    - If fewer than 3 quotes are found, appends them to the current string buffer and returns 1.
+    - If exactly 3 quotes are found, returns 0 without appending.
+    - If more than 3 quotes are found, backtracks the cursor by 3 positions, adjusts the quote count, and appends the remaining quotes to the string buffer before returning 1.
+- **Output**: Returns 1 on success (quotes processed), 0 on failure (invalid quote count).
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_str_append`](#fd_toml_str_append)
 
 
 ---
 ### fd\_toml\_parse\_mll\_content<!-- {{#callable:fd_toml_parse_mll_content}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L680>)
-
-Parses multiline literal content from a TOML file.
+Parses a single character from the TOML input and appends it to the current string buffer if it is valid.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If no bytes are available, returns 0.
-    - Retrieves the first character from the parser's data.
-    - Checks if the character is a valid multiline literal character.
-    - If valid, appends the character to the current string buffer using [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>).
-    - Advances the parser cursor by one character using [`fd_toml_advance`](<#fd_toml_advance>).
-    - Returns 1 to indicate successful parsing.
-- **Output**: Returns 1 on successful parsing of a character, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser, including the input data and the current position.
+- **Control Flow**:
+    - Checks if there are any bytes available for parsing using [`fd_toml_avail`](#fd_toml_avail).
+    - Retrieves the current character from the parser's data.
+    - Validates the character against a set of acceptable ranges (whitespace, printable ASCII, and non-ASCII characters).
+    - If the character is valid, it appends the character to the parser's scratch buffer using [`fd_toml_str_append_byte`](#fd_toml_str_append_byte).
+    - Advances the parser's cursor by one character using [`fd_toml_advance`](#fd_toml_advance).
+- **Output**: Returns 1 if a character was successfully parsed and appended, or 0 if there was an error or if the character was invalid.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_str_append_byte`](#fd_toml_str_append_byte)
+    - [`fd_toml_advance`](#fd_toml_advance)
 
 
 ---
 ### fd\_toml\_parse\_ml\_literal\_body<!-- {{#callable:fd_toml_parse_ml_literal_body}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L702>)
-
-Parses the body of a multiline literal string in TOML format.
+Parses the body of a multiline literal in TOML format.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the parser state and data.
-- **Logic and Control Flow**:
-    - Continuously parses `mll_content` until no more content is available.
-    - Enters an infinite loop to parse quotes and content pairs.
-    - Breaks the loop if parsing quotes or content fails.
-    - Continues to parse additional content after each pair of quotes.
-    - Finalizes by parsing any remaining quotes.
-- **Output**: Returns 1 on successful parsing of the multiline literal body.
-- **Functions Called**:
-    - [`fd_toml_parse_mll_content`](<#fd_toml_parse_mll_content>)
-    - [`fd_toml_parse_mll_quotes`](<#fd_toml_parse_mll_quotes>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - The function first enters a loop to parse any initial content using [`fd_toml_parse_mll_content`](#fd_toml_parse_mll_content) until no more content can be parsed.
+    - It then enters an infinite loop where it attempts to parse quotes using [`fd_toml_parse_mll_quotes`](#fd_toml_parse_mll_quotes) followed by content using [`fd_toml_parse_mll_content`](#fd_toml_parse_mll_content).
+    - If quotes are successfully parsed, it continues to parse additional content until no more can be parsed.
+    - Finally, it attempts to parse any trailing quotes before returning success.
+- **Output**: Returns 1 on successful parsing of the multiline literal body, or 0 if an error occurs.
+- **Functions called**:
+    - [`fd_toml_parse_mll_content`](#fd_toml_parse_mll_content)
+    - [`fd_toml_parse_mll_quotes`](#fd_toml_parse_mll_quotes)
 
 
 ---
 ### fd\_toml\_parse\_ml\_literal\_string\_delim<!-- {{#callable:fd_toml_parse_ml_literal_string_delim}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L716>)
-
-Parses a multi-line literal string delimiter in TOML format.
+Parses the delimiter for a multiline literal string in TOML format.
 - **Inputs**:
-    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if the remaining data in the parser is less than 3 bytes; if so, returns 0.
-    - Checks if the next three characters in the parser's data are all single quotes (`'`); if not, returns 0.
-    - Advances the parser's cursor by 3 bytes if the checks pass.
-    - Returns 1 to indicate successful parsing.
-- **Output**: Returns 1 on success, indicating that the multi-line literal string delimiter was successfully parsed; returns 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
+- **Control Flow**:
+    - Checks if there are at least three characters available in the input data.
+    - Verifies that the next three characters are all single quotes (''').
+    - Advances the parser cursor by three characters if the checks pass.
+    - Returns 1 to indicate success or 0 to indicate failure.
+- **Output**: Returns 1 if the delimiter is successfully parsed; otherwise, returns 0.
+- **Functions called**:
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_ml\_literal\_string<!-- {{#callable:fd_toml_parse_ml_literal_string}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L729>)
-
 Parses a multiline literal string from a TOML document.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks for the opening delimiter of the multiline literal string using [`fd_toml_parse_ml_literal_string_delim`](<#fd_toml_parse_ml_literal_string_delim>).
-    - Returns 0 if the delimiter is not found or if there are no bytes available for parsing.
-    - Advances the parser if the first character is a newline.
-    - Initializes the string buffer using [`fd_toml_str_init`](<#fd_toml_str_init>).
-    - Parses the body of the multiline literal string using [`fd_toml_parse_ml_literal_body`](<#fd_toml_parse_ml_literal_body>).
-    - Checks for the closing delimiter of the multiline literal string using [`fd_toml_parse_ml_literal_string_delim`](<#fd_toml_parse_ml_literal_string_delim>).
-    - Returns 1 if the parsing is successful.
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Checks for the opening delimiter of the multiline literal string using [`fd_toml_parse_ml_literal_string_delim`](#fd_toml_parse_ml_literal_string_delim).
+    - If the delimiter is not found, returns 0 indicating failure.
+    - Checks if there are available characters to parse using [`fd_toml_avail`](#fd_toml_avail).
+    - If the first character is a newline, advances the parser cursor.
+    - Initializes the string buffer for the parser using [`fd_toml_str_init`](#fd_toml_str_init).
+    - Parses the body of the multiline literal string using [`fd_toml_parse_ml_literal_body`](#fd_toml_parse_ml_literal_body).
+    - Checks for the closing delimiter of the multiline literal string using [`fd_toml_parse_ml_literal_string_delim`](#fd_toml_parse_ml_literal_string_delim).
+    - Returns 1 indicating success if all checks pass.
 - **Output**: Returns 1 on successful parsing of the multiline literal string, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_ml_literal_string_delim`](<#fd_toml_parse_ml_literal_string_delim>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
-    - [`fd_toml_str_init`](<#fd_toml_str_init>)
-    - [`fd_toml_parse_ml_literal_body`](<#fd_toml_parse_ml_literal_body>)
+- **Functions called**:
+    - [`fd_toml_parse_ml_literal_string_delim`](#fd_toml_parse_ml_literal_string_delim)
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance`](#fd_toml_advance)
+    - [`fd_toml_str_init`](#fd_toml_str_init)
+    - [`fd_toml_parse_ml_literal_body`](#fd_toml_parse_ml_literal_body)
 
 
 ---
 ### fd\_toml\_parse\_string<!-- {{#callable:fd_toml_parse_string}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L744>)
-
-Parses a TOML string and appends it to the parser's output.
+Parses a TOML string from the input and appends it to the parser's pod.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks for various types of strings using `SUB_PARSE` macro to call specific parsing functions.
-    - If a string is successfully parsed, it proceeds to append a null byte to the current scratch buffer.
-    - Inserts the parsed string into the output pod using `fd_pod_insert`.
-    - Handles errors by setting the parser's error state and returning 0 if any operation fails.
-- **Output**: Returns 1 on successful parsing and insertion, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_ml_basic_string`](<#fd_toml_parse_ml_basic_string>)
-    - [`fd_toml_parse_basic_string`](<#fd_toml_parse_basic_string>)
-    - [`fd_toml_parse_ml_literal_string`](<#fd_toml_parse_ml_literal_string>)
-    - [`fd_toml_parse_literal_string`](<#fd_toml_parse_literal_string>)
-    - [`fd_toml_str_append_byte`](<#fd_toml_str_append_byte>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser.
+- **Control Flow**:
+    - The function first attempts to parse a multiline basic string using [`fd_toml_parse_ml_basic_string`](#fd_toml_parse_ml_basic_string).
+    - If that fails, it tries to parse a basic string with [`fd_toml_parse_basic_string`](#fd_toml_parse_basic_string).
+    - Next, it attempts to parse a multiline literal string with [`fd_toml_parse_ml_literal_string`](#fd_toml_parse_ml_literal_string).
+    - Finally, it tries to parse a literal string using [`fd_toml_parse_literal_string`](#fd_toml_parse_literal_string).
+    - If any of these parsing attempts succeed, it proceeds to append a null byte to the parsed string.
+    - Then, it inserts the parsed string into the pod using `fd_pod_insert`.
+    - If any parsing attempt fails, the function returns 0, indicating failure.
+- **Output**: Returns 1 on successful parsing and insertion of the string into the pod, or 0 on failure.
+- **Functions called**:
+    - [`fd_toml_parse_ml_basic_string`](#fd_toml_parse_ml_basic_string)
+    - [`fd_toml_parse_basic_string`](#fd_toml_parse_basic_string)
+    - [`fd_toml_parse_ml_literal_string`](#fd_toml_parse_ml_literal_string)
+    - [`fd_toml_parse_literal_string`](#fd_toml_parse_literal_string)
+    - [`fd_toml_str_append_byte`](#fd_toml_str_append_byte)
 
 
 ---
 ### fd\_toml\_parse\_boolean<!-- {{#callable:fd_toml_parse_boolean}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L765>)
-
 Parses a boolean value from the TOML input.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current parsing state.
-- **Logic and Control Flow**:
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current parsing state and data.
+- **Control Flow**:
     - Checks if there are enough characters left in the input to read 'true' or 'false'.
-    - Compares the current data with the string 'true' or 'false'.
-    - Advances the parser cursor if a match is found.
-    - Inserts the parsed boolean value into the pod structure.
-    - Handles errors by setting the error state in the parser.
-- **Output**: Returns 1 if a boolean value is successfully parsed and inserted; otherwise, returns 0.
-- **Functions Called**:
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - If the first four characters match 'true', advances the cursor and sets the boolean value to 1.
+    - If the first five characters match 'false', advances the cursor and sets the boolean value to 0.
+    - If a valid boolean is found, attempts to insert the boolean value into the parser's pod.
+    - If insertion fails, sets an error code and returns 0.
+    - Returns 1 if a boolean value is successfully parsed and inserted.
+- **Output**: Returns 1 if a boolean value ('true' or 'false') is successfully parsed and inserted into the pod; otherwise, returns 0.
+- **Functions called**:
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_ws\_comment\_newline\_inner<!-- {{#callable:fd_toml_parse_ws_comment_newline_inner}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L791>)
-
-Processes whitespace, comments, and newlines in a TOML parser.
+Parses whitespace, comments, and newlines in a TOML document.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are available characters to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If the first character is a space or tab, it advances the cursor by one using [`fd_toml_advance_inline`](<#fd_toml_advance_inline>).
-    - Calls [`fd_toml_parse_comment`](<#fd_toml_parse_comment>) to process a comment if the first character is not whitespace.
-    - Checks again for available characters and ensures the next character is a newline.
-    - Advances the cursor by one if the newline is found.
-- **Output**: Returns 1 on successful parsing of whitespace, comments, and newline; returns 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_comment`](<#fd_toml_parse_comment>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Checks if there are available characters to parse using [`fd_toml_avail`](#fd_toml_avail).
+    - If the current character is a space or tab, it advances the cursor by one character and returns 1.
+    - Calls [`fd_toml_parse_comment`](#fd_toml_parse_comment) to parse a comment if the current character is not whitespace.
+    - Checks again for available characters after parsing the comment.
+    - If the next character is a newline, it advances the cursor and returns 1.
+    - If the conditions are not met, it returns 0.
+- **Output**: Returns 1 on successful parsing of whitespace, comments, and newlines, or 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_parse_comment`](#fd_toml_parse_comment)
+    - [`fd_toml_advance`](#fd_toml_advance)
 
 
 ---
 ### fd\_toml\_parse\_ws\_comment\_newline<!-- {{#callable:fd_toml_parse_ws_comment_newline}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L806>)
-
-Processes whitespace, comments, and newlines in a TOML file.
+Parses whitespace, comments, and newlines in a TOML file.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the parser state.
-- **Logic and Control Flow**:
-    - Enters a loop that continues as long as [`fd_toml_parse_ws_comment_newline_inner`](<#fd_toml_parse_ws_comment_newline_inner>) returns true.
-    - Calls [`fd_toml_parse_ws_comment_newline_inner`](<#fd_toml_parse_ws_comment_newline_inner>) to handle whitespace, comments, and newlines.
-- **Output**: Returns 1 to indicate successful parsing.
-- **Functions Called**:
-    - [`fd_toml_parse_ws_comment_newline_inner`](<#fd_toml_parse_ws_comment_newline_inner>)
-
-
----
-### fd\_toml\_parse\_array\_values<!-- {{#callable:fd_toml_parse_array_values}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L815>)
-
-Parses array values from a TOML configuration file.
-- **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Stores the current length of the key in `old_len`.
-    - Checks if the suffix for the array index is within bounds; if not, sets an error and returns 0.
-    - Enters an infinite loop to parse array values, incrementing the index `j` for each value.
-    - Constructs a child key by appending the current index to the suffix.
-    - Calls [`fd_toml_parse_ws_comment_newline`](<#fd_toml_parse_ws_comment_newline>) to handle whitespace and comments.
-    - Attempts to parse a value using [`fd_toml_parse_val`](<#fd_toml_parse_val>); if it fails, backtracks to the previous cursor position.
-    - Logs the added key if parsing is successful.
-    - Checks for a comma to continue parsing additional values; if not found, breaks the loop.
-    - Restores the original key length after parsing.
-- **Output**: Returns 1 on successful parsing of array values, or 0 if an error occurs.
-- **Functions Called**:
-    - [`fd_toml_parse_ws_comment_newline`](<#fd_toml_parse_ws_comment_newline>)
-    - [`fd_toml_parse_val`](<#fd_toml_parse_val>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-
-
----
-### fd\_toml\_parse\_array<!-- {{#callable:fd_toml_parse_array}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L866>)
-
-Parses a TOML array structure.
-- **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks for the opening character '['.
-    - Calls [`fd_toml_upsert_empty_pod`](<#fd_toml_upsert_empty_pod>) to ensure the current pod is initialized.
-    - Calls [`fd_toml_parse_array_values`](<#fd_toml_parse_array_values>) to parse the values within the array.
-    - Calls [`fd_toml_parse_ws_comment_newline`](<#fd_toml_parse_ws_comment_newline>) to handle any whitespace or comments after the values.
-    - Checks for the closing character ']' and updates the parser's key length.
-- **Output**: Returns 1 on successful parsing of the array; otherwise, returns 0.
-- **Functions Called**:
-    - [`fd_toml_upsert_empty_pod`](<#fd_toml_upsert_empty_pod>)
-    - [`fd_toml_parse_array_values`](<#fd_toml_parse_array_values>)
-    - [`fd_toml_parse_ws_comment_newline`](<#fd_toml_parse_ws_comment_newline>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - The function enters a loop that continues as long as [`fd_toml_parse_ws_comment_newline_inner`](#fd_toml_parse_ws_comment_newline_inner) returns a truthy value.
+    - Within the loop, it calls [`fd_toml_parse_ws_comment_newline_inner`](#fd_toml_parse_ws_comment_newline_inner), which handles parsing whitespace, comments, and newlines.
+    - If [`fd_toml_parse_ws_comment_newline_inner`](#fd_toml_parse_ws_comment_newline_inner) returns false, the loop terminates.
+- **Output**: Returns 1 on success, indicating that whitespace, comments, and newlines were successfully parsed.
+- **Functions called**:
+    - [`fd_toml_parse_ws_comment_newline_inner`](#fd_toml_parse_ws_comment_newline_inner)
 
 
 ---
 ### fd\_toml\_parse\_inline\_table\_sep<!-- {{#callable:fd_toml_parse_inline_table_sep}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L884>)
-
-Processes inline table separators in TOML syntax.
+Parses an inline table separator in TOML syntax.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) to skip any whitespace before the separator.
-    - Checks if there are available characters to parse; if not, returns 0.
-    - Checks if the current character is a comma; if not, returns 0.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) to skip any whitespace before the separator.
+    - Checks if there are any characters available to parse; if not, returns 0.
+    - Checks if the current character is a comma (','); if not, returns 0.
     - Advances the parser cursor by one character to skip the comma.
-    - Calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) again to skip any whitespace after the separator.
-    - Returns 1 to indicate successful parsing of the separator.
-- **Output**: Returns 1 if the inline table separator is successfully parsed; otherwise, returns 0.
-- **Functions Called**:
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - Calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) again to skip any whitespace after the separator.
+    - Returns 1 to indicate successful parsing of the inline table separator.
+- **Output**: Returns 1 if the inline table separator is successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_ws`](#fd_toml_parse_ws)
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_inline\_table\_keyvals<!-- {{#callable:fd_toml_parse_inline_table_keyvals}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L896>)
-
-Parses key-value pairs in an inline table format.
+Parses key-value pairs in an inline TOML table.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_keyval`](<#fd_toml_parse_keyval>) to parse the first key-value pair.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - Calls [`fd_toml_parse_keyval`](#fd_toml_parse_keyval) to parse the first key-value pair; if it fails, returns 0.
     - Stores the current cursor position in `backtrack` for potential backtracking.
     - Enters an infinite loop to parse additional key-value pairs.
-    - Calls [`fd_toml_parse_inline_table_sep`](<#fd_toml_parse_inline_table_sep>) to check for a separator between key-value pairs.
-    - If a separator is found, calls [`fd_toml_parse_keyval`](<#fd_toml_parse_keyval>) again to parse the next key-value pair.
-    - Updates `backtrack` to the current cursor position after each successful key-value parse.
-    - Breaks the loop if a separator is not found, restoring the cursor to the last valid position.
-- **Output**: Returns 1 on success, indicating that key-value pairs were successfully parsed; returns 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_keyval`](<#fd_toml_parse_keyval>)
-    - [`fd_toml_parse_inline_table_sep`](<#fd_toml_parse_inline_table_sep>)
+    - Calls [`fd_toml_parse_inline_table_sep`](#fd_toml_parse_inline_table_sep) to check for a separator; if it fails, restores the cursor position from `backtrack` and breaks the loop.
+    - Calls [`fd_toml_parse_keyval`](#fd_toml_parse_keyval) again to parse the next key-value pair; if it fails, returns 0.
+    - Updates `backtrack` to the current cursor position for the next iteration.
+- **Output**: Returns 1 on success, indicating that the inline table key-value pairs were successfully parsed.
+- **Functions called**:
+    - [`fd_toml_parse_keyval`](#fd_toml_parse_keyval)
+    - [`fd_toml_parse_inline_table_sep`](#fd_toml_parse_inline_table_sep)
 
 
 ---
 ### fd\_toml\_parse\_inline\_table<!-- {{#callable:fd_toml_parse_inline_table}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L920>)
-
 Parses an inline table in TOML format.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the parser state.
-- **Logic and Control Flow**:
-    - Checks for the opening character '{'.
-    - Parses whitespace after the opening character.
-    - Stores the current length of the key in `old_key_len`.
-    - Validates that the key length does not exceed the maximum size.
-    - Inserts an empty pod into the parser's data structure.
-    - Appends a dot to the key and increments the key length.
-    - Enters a loop to parse key-value pairs until no more can be parsed.
-    - Parses whitespace before the closing character.
-    - Checks for the closing character '}'.
-    - Restores the original key length.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
+- **Control Flow**:
+    - The function starts by expecting a '{' character to indicate the beginning of an inline table.
+    - Whitespace is parsed after the opening brace.
+    - The current key length is stored, and a check is performed to ensure that the key can accommodate additional characters.
+    - An empty pod is inserted into the parser's data structure.
+    - A dot is appended to the key to signify the start of key-value pairs in the inline table.
+    - A loop is initiated to parse key-value pairs using the [`fd_toml_parse_inline_table_keyvals`](#fd_toml_parse_inline_table_keyvals) function until no more pairs can be parsed.
+    - Whitespace is parsed before expecting a '}' character to close the inline table.
+    - The key length is restored to its original value, and the function returns success.
 - **Output**: Returns 1 on successful parsing of the inline table, or 0 if an error occurs.
-- **Functions Called**:
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
-    - [`fd_toml_upsert_empty_pod`](<#fd_toml_upsert_empty_pod>)
-    - [`fd_toml_parse_inline_table_keyvals`](<#fd_toml_parse_inline_table_keyvals>)
+- **Functions called**:
+    - [`fd_toml_parse_ws`](#fd_toml_parse_ws)
+    - [`fd_toml_upsert_empty_pod`](#fd_toml_upsert_empty_pod)
+    - [`fd_toml_parse_inline_table_keyvals`](#fd_toml_parse_inline_table_keyvals)
 
 
 ---
 ### fd\_toml\_parse\_zero\_prefixable\_int<!-- {{#callable:fd_toml_parse_zero_prefixable_int}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L964>)
-
-Parses a zero-prefixable integer from the TOML input.
+Parses a zero-prefixable integer from the TOML input, allowing underscores as digit separators.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-    - `dec`: Pointer to the `fd_toml_dec_t` structure where the parsed integer result and its length will be stored.
-- **Logic and Control Flow**:
-    - Initializes `len` to 0 and `digits` to 0, and sets `allow_underscore` to 0.
-    - Enters an infinite loop to read characters from the input.
-    - Checks if the current character is an underscore and if underscores are allowed.
-    - If an underscore is found, advances the parser and checks for the next character.
-    - If the next character is not a digit, returns 0 indicating failure.
-    - If the current character is a digit, updates `digits` using multiplication and addition, checking for overflow.
-    - Advances the parser to the next character and checks if more characters are available.
-    - If the next character is neither a digit nor an underscore, breaks the loop.
-    - Sets `allow_underscore` to 1 after processing a digit.
-    - After exiting the loop, assigns the parsed value to `dec->res` and its length to `dec->len`.
-- **Output**: Returns 1 on success, indicating that a zero-prefixable integer was successfully parsed; returns 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-
-
----
-### fd\_toml\_parse\_dec\_int\_<!-- {{#callable:fd_toml_parse_dec_int_}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L997>)
-
-Parses a decimal integer from a TOML string.
-- **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current parsing state.
-    - `dec`: Pointer to the `fd_toml_dec_t` structure where the parsed integer result will be stored.
-- **Logic and Control Flow**:
-    - Check if there are available characters to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - Read the first character to determine if it is a sign ('-' or '+').
-    - Advance the parser cursor if a sign is found.
-    - Check the next character to see if it is a digit or '0'.
-    - If the first digit is '0', set the result to 0 and advance the cursor.
-    - If the first digit is not valid, return 0 to indicate failure.
-    - Set the negative flag based on the sign and call [`fd_toml_parse_zero_prefixable_int`](<#fd_toml_parse_zero_prefixable_int>) to parse the remaining digits.
-- **Output**: Returns 1 on success, 0 on failure, and updates the `dec` structure with the parsed integer and its sign.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_zero_prefixable_int`](<#fd_toml_parse_zero_prefixable_int>)
-
-
----
-### fd\_toml\_parse\_dec\_int<!-- {{#callable:fd_toml_parse_dec_int}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1028>)
-
-Parses a decimal integer from a TOML string and inserts it into a provided data structure.
-- **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current parsing state.
-- **Logic and Control Flow**:
-    - Initializes a `fd_toml_dec_t` structure to hold the parsed decimal value.
-    - Calls [`fd_toml_parse_dec_int_`](<#fd_toml_parse_dec_int_>) to parse the decimal integer; if it fails, returns 0.
-    - Converts the parsed value to a `long` type and adjusts its sign if necessary.
-    - Attempts to insert the value into the provided data structure using `fd_pod_insert_long`; if it fails, sets an error code and returns 0.
-    - Returns 1 to indicate successful parsing and insertion.
-- **Output**: Returns 1 on success, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_dec_int_`](<#fd_toml_parse_dec_int_>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the TOML parser.
+    - `dec`: A pointer to the `fd_toml_dec_t` structure where the parsed integer result and its length will be stored.
+- **Control Flow**:
+    - The function initializes a loop to read characters from the parser's current data.
+    - It checks if the current character is an underscore and if underscores are allowed; if so, it advances the parser and checks the next character.
+    - If the character is a digit, it updates the `digits` variable by multiplying the current value by 10 and adding the new digit, while checking for overflow.
+    - The loop continues until a non-digit and non-underscore character is encountered, at which point it breaks out of the loop.
+    - Finally, it assigns the parsed value to `dec->res` and the length to `dec->len`, returning 1 to indicate success.
+- **Output**: Returns 1 on successful parsing of a zero-prefixable integer, or 0 if an error occurs, such as overflow or invalid input.
+- **Functions called**:
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_avail`](#fd_toml_avail)
 
 
 ---
 ### fd\_toml\_parse\_hex\_int<!-- {{#callable:fd_toml_parse_hex_int}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1043>)
-
 Parses a hexadecimal integer from a TOML string.
 - **Inputs**:
     - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if at least three characters are available for parsing.
-    - Validates that the first two characters are '0' and 'x'.
+- **Control Flow**:
+    - Checks if there are at least 3 characters available in the input for a valid hex integer.
+    - Validates that the first two characters are '0' and 'x', indicating the start of a hex integer.
     - Ensures that the third character is a valid hexadecimal digit.
     - Advances the parser cursor past the '0x' prefix.
-    - Initializes a result variable to accumulate the parsed integer.
-    - Processes each character in the hexadecimal string until a non-hexadecimal character is encountered.
-    - Handles underscores as valid separators between digits.
-    - Checks for integer overflow during parsing.
-    - Inserts the parsed integer into the output pod.
-    - Returns success or failure based on the parsing and insertion results.
-- **Output**: Returns 1 on successful parsing and insertion, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_xdigit`](<#fd_toml_xdigit>)
+    - Enters a loop to read hexadecimal digits, allowing underscores as separators.
+    - Shifts the accumulated result left by 4 bits and adds the value of the current hex digit.
+    - Checks for overflow conditions during the accumulation of the result.
+    - Inserts the parsed long value into the provided POD structure.
+    - Returns 1 on successful parsing or 0 on failure.
+- **Output**: Returns 1 if a valid hexadecimal integer was parsed and inserted into the POD, or 0 if parsing failed.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_xdigit`](#fd_toml_xdigit)
 
 
 ---
 ### fd\_toml\_is\_odigit<!-- {{#callable:fd_toml_is_odigit}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1084>)
-
-Checks if the character `c` is an octal digit (0-7).
+The `fd_toml_is_odigit` function checks if a given character represents an octal digit (0-7).
 - **Inputs**:
-    - `c`: An integer representing a character to check.
-- **Logic and Control Flow**:
-    - Evaluates if `c` is greater than or equal to '0' and less than '8'.
-    - Returns 1 if true, otherwise returns 0.
-- **Output**: Returns 1 if `c` is an octal digit, otherwise returns 0.
-
-
----
-### fd\_toml\_parse\_oct\_int<!-- {{#callable:fd_toml_parse_oct_int}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1089>)
-
-Parses an octal integer from a TOML string.
-- **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current parsing state.
-- **Logic and Control Flow**:
-    - Checks if at least three characters are available for parsing.
-    - Validates that the first character is '0' and the second is 'o'.
-    - Validates that the third character is a valid octal digit.
-    - Advances the parser cursor past the '0o' prefix.
-    - Enters a loop to parse octal digits, allowing underscores as separators.
-    - Checks for overflow during the conversion of octal digits to a long integer.
-    - Inserts the parsed long integer into the output pod.
-    - Returns success or failure based on the parsing and insertion results.
-- **Output**: Returns 1 on successful parsing and insertion, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_is_odigit`](<#fd_toml_is_odigit>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `c`: An integer representing a character to be checked.
+- **Control Flow**:
+    - The function evaluates whether the input character `c` is greater than or equal to '0' and less than '8'.
+    - It returns 1 (true) if the condition is satisfied, indicating that `c` is an octal digit; otherwise, it returns 0 (false).
+- **Output**: Returns 1 if `c` is an octal digit (0-7), otherwise returns 0.
 
 
 ---
 ### fd\_toml\_is\_bdigit<!-- {{#callable:fd_toml_is_bdigit}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1130>)
-
-Checks if the character `c` is a binary digit (0 or 1).
+The `fd_toml_is_bdigit` function checks if a given character is a binary digit (either '0' or '1').
 - **Inputs**:
-    - `c`: An integer representing a character to check.
-- **Logic and Control Flow**:
-    - Returns 1 if `c` is '0' or '1'.
-    - Returns 0 otherwise.
-- **Output**: Returns 1 if `c` is a binary digit, otherwise returns 0.
+    - `c`: An integer representing a character to be checked.
+- **Control Flow**:
+    - The function evaluates if the input character `c` is equal to '0' or '1'.
+    - It returns 1 (true) if `c` is a binary digit, otherwise it returns 0 (false).
+- **Output**: The function returns an integer: 1 if the character is a binary digit ('0' or '1'), and 0 otherwise.
 
 
 ---
 ### fd\_toml\_parse\_bin\_int<!-- {{#callable:fd_toml_parse_bin_int}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1135>)
-
 Parses a binary integer from a TOML string.
 - **Inputs**:
     - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
+- **Control Flow**:
     - Checks if there are at least 3 characters available for parsing.
-    - Validates that the first character is '0' and the second character is 'b'.
-    - Checks that the third character is a valid binary digit (either '0' or '1').
-    - Advances the parser cursor past the prefix '0b'.
-    - Initializes a result variable to accumulate the parsed binary integer.
-    - Enters a loop to read binary digits, allowing underscores as separators.
-    - If an underscore is encountered, it checks the next character must be a binary digit.
-    - If a valid binary digit is found, it updates the result by shifting left and adding the digit.
-    - Detects overflow conditions and sets an error if the result exceeds the maximum allowed value.
-    - Inserts the parsed integer into the output pod and checks for insertion errors.
-- **Output**: Returns 1 on successful parsing and insertion, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_is_bdigit`](<#fd_toml_is_bdigit>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-
-
----
-### fd\_toml\_parse\_integer<!-- {{#callable:fd_toml_parse_integer}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1178>)
-
-Parses an integer from the TOML input using various formats.
-- **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Attempts to parse a hexadecimal integer using [`fd_toml_parse_hex_int`](<#fd_toml_parse_hex_int>).
-    - If parsing fails, it attempts to parse an octal integer using [`fd_toml_parse_oct_int`](<#fd_toml_parse_oct_int>).
-    - If that fails, it tries to parse a binary integer using [`fd_toml_parse_bin_int`](<#fd_toml_parse_bin_int>).
-    - Finally, it attempts to parse a decimal integer using [`fd_toml_parse_dec_int`](<#fd_toml_parse_dec_int>).
-    - Returns 1 if any parsing succeeds, otherwise returns 0.
-- **Output**: Returns 1 on successful parsing of an integer, or 0 if all parsing attempts fail.
-- **Functions Called**:
-    - [`fd_toml_parse_hex_int`](<#fd_toml_parse_hex_int>)
-    - [`fd_toml_parse_oct_int`](<#fd_toml_parse_oct_int>)
-    - [`fd_toml_parse_bin_int`](<#fd_toml_parse_bin_int>)
-    - [`fd_toml_parse_dec_int`](<#fd_toml_parse_dec_int>)
+    - Validates that the first character is '0' and the second is 'b'.
+    - Ensures that the third character is a valid binary digit (either '0' or '1').
+    - Advances the parser cursor past the '0b' prefix.
+    - Enters a loop to parse binary digits, allowing underscores as separators.
+    - Detects overflow conditions during the parsing of binary digits.
+    - Inserts the parsed binary integer into the provided pod structure.
+    - Returns 1 on successful parsing or 0 on failure.
+- **Output**: Returns 1 if the binary integer is successfully parsed and inserted into the pod; otherwise, returns 0.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_is_bdigit`](#fd_toml_is_bdigit)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_exp<!-- {{#callable:fd_toml_parse_exp}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1190>)
-
 Parses an exponential notation in TOML format.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-    - `exp`: Pointer to a `fd_toml_dec_t` structure where the parsed exponential value will be stored.
-- **Logic and Control Flow**:
-    - Checks if there are at least two characters available for parsing.
-    - Validates that the first character is 'e' or 'E'.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
+    - `exp`: A pointer to the `fd_toml_dec_t` structure where the parsed exponential value will be stored.
+- **Control Flow**:
+    - Checks if there are at least 2 characters available for parsing; if not, returns 0.
+    - Validates that the first character is 'e' or 'E'; if not, returns 0.
     - Advances the parser cursor by one character.
-    - Checks for an optional sign ('-' or '+') and advances the cursor.
-    - Validates that the next character is a digit (0-9).
-    - Calls [`fd_toml_parse_zero_prefixable_int`](<#fd_toml_parse_zero_prefixable_int>) to parse the integer part of the exponent.
-- **Output**: Returns 1 on successful parsing of the exponential notation, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_zero_prefixable_int`](<#fd_toml_parse_zero_prefixable_int>)
+    - Checks for an optional sign ('-' or '+') for the exponent and sets the `neg` field in `exp` accordingly.
+    - Advances the cursor again and checks if there is at least one digit available for the exponent; if not, returns 0.
+    - Validates that the first digit of the exponent is between '0' and '9'; if not, returns 0.
+    - Calls [`fd_toml_parse_zero_prefixable_int`](#fd_toml_parse_zero_prefixable_int) to parse the rest of the exponent and store it in `exp`.
+- **Output**: Returns 1 on successful parsing of the exponential notation, or 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_parse_zero_prefixable_int`](#fd_toml_parse_zero_prefixable_int)
 
 
 ---
 ### fd\_toml\_parse\_frac<!-- {{#callable:fd_toml_parse_frac}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1219>)
-
-Parses a fractional number from a TOML string.
+Parses a fractional part of a TOML number.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current parsing state.
-    - `frac`: Pointer to the `fd_toml_dec_t` structure where the parsed fractional value will be stored.
-- **Logic and Control Flow**:
-    - Checks if at least two characters are available for parsing.
-    - Validates that the first character is a decimal point ('.').
-    - Advances the parser cursor past the decimal point.
-    - Checks if the next character is a digit (0-9).
-    - Calls [`fd_toml_parse_zero_prefixable_int`](<#fd_toml_parse_zero_prefixable_int>) to parse the integer part after the decimal point.
-    - Returns 1 if parsing is successful, otherwise returns 0.
-- **Output**: Returns 1 on successful parsing of a fractional number, otherwise returns 0.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_zero_prefixable_int`](<#fd_toml_parse_zero_prefixable_int>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
+    - `frac`: A pointer to the `fd_toml_dec_t` structure where the parsed fractional value will be stored.
+- **Control Flow**:
+    - Checks if there are at least two characters available for parsing; if not, returns 0.
+    - Validates that the first character is a decimal point ('.'); if not, returns 0.
+    - Advances the parser cursor by one character to skip the decimal point.
+    - Checks if the next character is a digit (0-9); if not, returns 0.
+    - Calls [`fd_toml_parse_zero_prefixable_int`](#fd_toml_parse_zero_prefixable_int) to parse the digits following the decimal point; if it fails, returns 0.
+    - If all checks pass, returns 1 indicating successful parsing.
+- **Output**: Returns 1 on successful parsing of the fractional part, or 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_parse_zero_prefixable_int`](#fd_toml_parse_zero_prefixable_int)
 
 
 ---
 ### fd\_toml\_parse\_float\_normal<!-- {{#callable:fd_toml_parse_float_normal}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1235>)
-
-Parses a normal floating-point number from a TOML string.
+Parses a normal floating-point number from a TOML string and inserts it into a provided data structure.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current parsing state.
-- **Logic and Control Flow**:
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the current state of the TOML parser, including the input data and the output data structure.
+- **Control Flow**:
     - Initializes a `fd_toml_dec_t` structure to hold the integer part of the float.
-    - Calls [`fd_toml_parse_dec_int_`](<#fd_toml_parse_dec_int_>) to parse the integer part; returns 0 if parsing fails.
-    - Checks if more data is available; returns 0 if not.
-    - Converts the integer part to a float and initializes a flag `ok` to track if a fractional part is parsed.
-    - Attempts to parse the fractional part using [`fd_toml_parse_frac`](<#fd_toml_parse_frac>); if successful, adjusts the float value accordingly.
-    - Attempts to parse the exponent part using [`fd_toml_parse_exp`](<#fd_toml_parse_exp>); if not successful and a fractional part was parsed, proceeds to insert the float value.
-    - Calculates the final float value by applying the exponent if parsed.
-    - Inserts the final float value into the `pod` using `fd_pod_insert_float`; sets an error if insertion fails.
-- **Output**: Returns 1 on successful parsing and insertion of the float, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_dec_int_`](<#fd_toml_parse_dec_int_>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_parse_frac`](<#fd_toml_parse_frac>)
-    - [`fd_toml_parse_exp`](<#fd_toml_parse_exp>)
-
-
----
-### fd\_float\_parse\_float\_special<!-- {{#callable:fd_float_parse_float_special}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1273>)
-
-Parses special float values such as 'inf' and 'nan' from a TOML parser.
-- **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the TOML parser.
-- **Logic and Control Flow**:
-    - Checks if there are at least 3 characters available for parsing.
-    - Advances the parser if the first character is a '+' or '-'.
-    - Checks if the next three characters match 'inf' or 'nan'.
-    - Logs a warning and sets an error if 'inf' is encountered.
-    - Logs a warning and sets an error if 'nan' is encountered.
-    - Returns 0 if neither 'inf' nor 'nan' is matched.
-- **Output**: Returns 0 if the special float is not recognized, 1 if 'nan' is recognized, and 0 if 'inf' is recognized.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - Calls [`fd_toml_parse_dec_int_`](#fd_toml_parse_dec_int_) to parse the integer part; if it fails, returns 0.
+    - Checks if there are more characters available to parse; if not, returns 0.
+    - Converts the parsed integer to a float and initializes a flag `ok` to track if a fractional part was parsed.
+    - Attempts to parse a fractional part using [`fd_toml_parse_frac`](#fd_toml_parse_frac); if successful, adjusts the float value accordingly.
+    - Attempts to parse an exponent part using [`fd_toml_parse_exp`](#fd_toml_parse_exp); if successful, adjusts the float value based on the exponent.
+    - Inserts the final float value into the output data structure using `fd_pod_insert_float`; if this fails, sets an error and returns 0.
+    - Returns 1 to indicate successful parsing and insertion.
+- **Output**: Returns 1 on successful parsing and insertion of the float, or 0 if an error occurs during parsing or insertion.
+- **Functions called**:
+    - [`fd_toml_parse_dec_int_`](#fd_toml_parse_dec_int_)
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_parse_frac`](#fd_toml_parse_frac)
+    - [`fd_toml_parse_exp`](#fd_toml_parse_exp)
 
 
 ---
 ### fd\_toml\_parse\_float<!-- {{#callable:fd_toml_parse_float}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1306>)
-
-Parses a floating-point number from a TOML input.
+Parses a floating-point number from a TOML file using a parser.
 - **Inputs**:
-    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_float_normal`](<#fd_toml_parse_float_normal>) to attempt to parse a normal float.
-    - If the first parsing attempt fails, it calls [`fd_float_parse_float_special`](<#fd_float_parse_float_special>) to check for special float values.
-    - Returns 1 if either parsing attempt succeeds, otherwise returns 0.
-- **Output**: Returns 0 on success or 1 on failure, indicating whether a valid float was parsed.
-- **Functions Called**:
-    - [`fd_toml_parse_float_normal`](<#fd_toml_parse_float_normal>)
-    - [`fd_float_parse_float_special`](<#fd_float_parse_float_special>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+- **Control Flow**:
+    - First, it attempts to parse a normal float using the [`fd_toml_parse_float_normal`](#fd_toml_parse_float_normal) function.
+    - If the normal float parsing fails, it then attempts to parse special float values (like 'inf' or 'nan') using [`fd_float_parse_float_special`](#fd_float_parse_float_special).
+    - If both parsing attempts fail, the function returns 0, indicating failure; otherwise, it returns 1 for success.
+- **Output**: Returns 1 if a float is successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_float_normal`](#fd_toml_parse_float_normal)
+    - [`fd_float_parse_float_special`](#fd_float_parse_float_special)
 
 
 ---
 ### fd\_toml\_parse\_full\_date<!-- {{#callable:fd_toml_parse_full_date}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1318>)
-
-Parses a full date in the format YYYY-MM-DD and stores it in a `struct tm`.
+Parses a full date in the format YYYY-MM-DD from a TOML string.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current parsing state.
-    - `time`: Pointer to a `struct tm` where the parsed date will be stored.
-- **Logic and Control Flow**:
-    - Checks if there are at least 10 characters available for parsing.
-    - Validates that the first four characters are digits, followed by a hyphen, then two digits, another hyphen, and finally two more digits.
-    - Copies the date string into a temporary character array.
-    - Advances the parser cursor by 10 characters.
-    - Attempts to parse the date string using `strptime`.
-    - Logs a warning if the date format is invalid.
-- **Output**: Returns 1 on successful parsing, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that contains the current parsing state and data.
+    - `time`: A pointer to a `struct tm` where the parsed date will be stored.
+- **Control Flow**:
+    - Checks if there are at least 10 characters available for parsing; if not, returns 0.
+    - Validates that the first four characters are digits, followed by a hyphen, then two more digits, another hyphen, and finally two more digits.
+    - Copies the first 10 characters into a temporary string and advances the parser cursor by 10 characters.
+    - Attempts to parse the date string using `strptime`; if it fails, logs a warning and returns 0.
+    - If successful, returns 1.
+- **Output**: Returns 1 on successful parsing of the date, or 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_time\_delim<!-- {{#callable:fd_toml_parse_time_delim}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1350>)
-
-Parses a time delimiter from the TOML input.
+Parses a time delimiter character from the TOML input.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Checks if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If no bytes are available, returns 0.
-    - Checks the first character of the input data for 'T', 't', or a space.
-    - If the character does not match, returns 0.
-    - Advances the parser cursor by one character using [`fd_toml_advance_inline`](<#fd_toml_advance_inline>).
-    - Returns 1 to indicate successful parsing.
-- **Output**: Returns 1 on success, indicating a valid time delimiter was found, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the TOML parser.
+- **Control Flow**:
+    - Checks if there are available characters to parse using [`fd_toml_avail`](#fd_toml_avail).
+    - If no characters are available, returns 0 indicating failure.
+    - Checks the first character of the input data in the parser's cursor.
+    - If the character is 'T', 't', or a space, it proceeds; otherwise, it returns 0.
+    - Advances the parser's cursor by one character using [`fd_toml_advance_inline`](#fd_toml_advance_inline).
+    - Returns 1 indicating success.
+- **Output**: Returns 1 if a valid time delimiter is found ('T', 't', or space), otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_time\_secfrac<!-- {{#callable:fd_toml_parse_time_secfrac}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1363>)
-
 Parses the fractional part of a time value in TOML format and stores it in nanoseconds.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the current parsing state.
-    - `pnanos`: Pointer to an `ulong` where the parsed fractional seconds in nanoseconds will be stored.
-- **Logic and Control Flow**:
-    - Checks if at least two characters are available for parsing.
-    - Validates that the first character is a '.' indicating the start of the fractional part.
-    - Checks that the next character is a digit.
-    - Advances the parser cursor to the next character.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+    - `pnanos`: A pointer to an unsigned long variable where the parsed fractional seconds in nanoseconds will be stored.
+- **Control Flow**:
+    - Checks if at least two characters are available for parsing; if not, returns 0.
+    - Validates that the first character is a dot ('.'); if not, returns 0.
+    - Checks if the next character is a digit; if not, returns 0.
+    - Advances the parser cursor by one character.
     - Initializes `secfrac` to 0 and `len` to 0 for accumulating the parsed digits.
-    - Enters a loop to read digits, updating `secfrac` and incrementing `len` until a non-digit is encountered.
-    - Checks if the length of the parsed digits exceeds 9, logging a warning if it does.
-    - Pads `secfrac` with zeros to ensure it represents nanoseconds.
-    - Stores the final value in `pnanos` and returns success.
-- **Output**: Returns 1 on successful parsing and 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
+    - Enters a loop to read digits while they are available and valid, updating `secfrac` and incrementing `len`.
+    - If `len` exceeds 9, logs a warning and returns 0.
+    - Pads `secfrac` with zeros to ensure it represents nanoseconds (9 digits).
+    - Stores the final value in `*pnanos` and returns 1.
+- **Output**: Returns 1 on successful parsing of the fractional part, or 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_partial\_time<!-- {{#callable:fd_toml_parse_partial_time}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1394>)
-
-Parses a partial time string in the format HH:MM:SS and optionally a fractional second component, returning the total time in nanoseconds.
+Parses a partial time string in the format HH:MM:SS and optionally a fractional second, returning the total time in nanoseconds.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current parsing state.
-    - `pnanos`: Pointer to an `ulong` where the parsed time in nanoseconds will be stored.
-- **Logic and Control Flow**:
-    - Checks if there are at least 8 characters available for parsing.
-    - Validates the format of the time string, ensuring it matches HH:MM:SS.
-    - Copies the time string into a temporary character array.
-    - Advances the parser cursor by 8 characters.
-    - Parses the time string into a `struct tm` using `strptime`.
-    - Calculates the total time in nanoseconds from hours, minutes, and seconds.
-    - Checks for an optional fractional second component and adds it to the total time.
-    - Stores the result in the location pointed to by `pnanos`.
-- **Output**: Returns 1 on success, indicating that the time was successfully parsed, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_time_secfrac`](<#fd_toml_parse_time_secfrac>)
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current parsing state.
+    - `pnanos`: A pointer to an unsigned long variable where the parsed time in nanoseconds will be stored.
+- **Control Flow**:
+    - Checks if there are at least 8 characters available for parsing; if not, returns 0.
+    - Validates the format of the time string, ensuring it matches HH:MM:SS; if not, returns 0.
+    - Copies the time string into a temporary character array and advances the parser cursor.
+    - Attempts to parse the time string into a `struct tm` using `strptime`; if it fails, logs a warning and returns 0.
+    - Calculates the total time in seconds and converts it to nanoseconds.
+    - Checks for an optional fractional second component and adds it to the total if present.
+    - Stores the final result in the variable pointed to by `pnanos` and returns 1.
+- **Output**: Returns 1 on successful parsing of the time, or 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_parse_time_secfrac`](#fd_toml_parse_time_secfrac)
 
 
 ---
 ### fd\_toml\_parse\_time\_numoffset<!-- {{#callable:fd_toml_parse_time_numoffset}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1436>)
-
-Parses a time zone offset from a `fd_toml_parser_t` and returns the offset in seconds.
+Parses a time zone offset in the format of either '+HH:MM' or '-HH:MM' and returns the corresponding offset in seconds.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that contains the current parsing state.
-    - `psec`: Pointer to a `long` variable where the parsed time offset in seconds will be stored.
-- **Logic and Control Flow**:
-    - Checks if there are available characters to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - Determines if the offset is positive or negative based on the first character ('+' or '-') and advances the parser.
-    - Validates the format of the time offset, ensuring it contains two digits, a colon, and two more digits.
-    - Copies the relevant characters into a string and advances the parser.
-    - Parses the time using `strptime` to convert the string into a `struct tm`.
-    - Calculates the total seconds from the parsed hours and minutes, applying the sign based on the earlier determination.
-- **Output**: Returns 1 on success, indicating the time offset was parsed correctly, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-
-
----
-### fd\_toml\_parse\_time\_offset<!-- {{#callable:fd_toml_parse_time_offset}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1476>)
-
-Parses a time offset from a TOML string.
-- **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current parsing state.
-    - `psec`: Pointer to a `long` variable where the parsed time offset in seconds will be stored.
-- **Logic and Control Flow**:
-    - Checks if there are available bytes to parse using [`fd_toml_avail`](<#fd_toml_avail>).
-    - If the first character is 'Z' or 'z', sets `*psec` to 0 and advances the parser cursor by 1.
-    - If the first character is not 'Z' or 'z', calls [`fd_toml_parse_time_numoffset`](<#fd_toml_parse_time_numoffset>) to parse a numeric time offset.
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the current state of the TOML parser, including the current position in the input data.
+    - `psec`: A pointer to a long integer where the parsed time offset in seconds will be stored.
+- **Control Flow**:
+    - Checks if there are available characters to parse; if not, returns 0.
+    - Determines if the offset is positive or negative based on the first character ('+' or '-') and advances the parser cursor.
+    - Validates that there are enough characters remaining for a valid time offset format.
+    - Checks that the next characters conform to the expected format of two digits, a colon, and two more digits.
+    - Copies the relevant characters into a temporary string and advances the parser cursor.
+    - Attempts to parse the time string into a `struct tm` using `strptime`; if it fails, logs a warning and returns 0.
+    - Calculates the absolute offset in seconds and assigns it to the location pointed to by `psec`, applying the sign determined earlier.
 - **Output**: Returns 1 on successful parsing of the time offset, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_time_numoffset`](<#fd_toml_parse_time_numoffset>)
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
 
 
 ---
 ### fd\_toml\_parse\_full\_time<!-- {{#callable:fd_toml_parse_full_time}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1493>)
-
-Parses a full time value from a TOML string, including an optional time offset.
+Parses a full time representation from a TOML parser and updates the provided nanoseconds value.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current parsing state.
-    - `pnanos`: Pointer to an `ulong` where the parsed time in nanoseconds will be stored.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_partial_time`](<#fd_toml_parse_partial_time>) to parse the time component and store it in `pnanos`. If this fails, returns 0.
-    - Calls [`fd_toml_parse_time_offset`](<#fd_toml_parse_time_offset>) to parse the time offset and store it in `off_sec`. If this fails, returns 0.
-    - Adds the parsed offset in seconds (converted to nanoseconds) to the value in `pnanos`.
-    - Returns 1 to indicate successful parsing.
-- **Output**: Returns 1 on success, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_parse_partial_time`](<#fd_toml_parse_partial_time>)
-    - [`fd_toml_parse_time_offset`](<#fd_toml_parse_time_offset>)
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the state of the TOML parser.
+    - `pnanos`: A pointer to an unsigned long variable where the parsed time in nanoseconds will be stored.
+- **Control Flow**:
+    - The function first attempts to parse a partial time using [`fd_toml_parse_partial_time`](#fd_toml_parse_partial_time), storing the result in `pnanos`. If this fails, it returns 0.
+    - Next, it attempts to parse a time offset using [`fd_toml_parse_time_offset`](#fd_toml_parse_time_offset), storing the result in `off_sec`. If this fails, it returns 0.
+    - If both parsing steps succeed, it adds the offset (in seconds) to the previously parsed nanoseconds value.
+- **Output**: Returns 1 on successful parsing of the full time, or 0 if any parsing step fails.
+- **Functions called**:
+    - [`fd_toml_parse_partial_time`](#fd_toml_parse_partial_time)
+    - [`fd_toml_parse_time_offset`](#fd_toml_parse_time_offset)
 
 
 ---
 ### fd\_toml\_parse\_offset\_date\_time<!-- {{#callable:fd_toml_parse_offset_date_time}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1505>)
-
-Parses a TOML offset date-time string into a timestamp in nanoseconds.
+Parses an offset date-time from a TOML string and converts it to nanoseconds since the epoch.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-    - `pnanos`: Pointer to an `ulong` where the parsed timestamp in nanoseconds will be stored.
-- **Logic and Control Flow**:
-    - Initializes a `struct tm` variable named `date` to hold the parsed date.
-    - Calls [`fd_toml_parse_full_date`](<#fd_toml_parse_full_date>) to parse the date part; if it fails, returns 0.
-    - Calls [`fd_toml_parse_time_delim`](<#fd_toml_parse_time_delim>) to parse the time delimiter; if it fails, returns 0.
-    - Calls [`fd_toml_parse_full_time`](<#fd_toml_parse_full_time>) to parse the time part; if it fails, returns 0.
-    - Calculates the total nanoseconds by converting the parsed date to a timestamp using `timegm` and adds it to `pnanos`.
-- **Output**: Returns 1 on success, indicating that the parsing was successful.
-- **Functions Called**:
-    - [`fd_toml_parse_full_date`](<#fd_toml_parse_full_date>)
-    - [`fd_toml_parse_time_delim`](<#fd_toml_parse_time_delim>)
-    - [`fd_toml_parse_full_time`](<#fd_toml_parse_full_time>)
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the state of the TOML parser.
+    - `pnanos`: A pointer to an `ulong` where the resulting nanoseconds since the epoch will be stored.
+- **Control Flow**:
+    - Initializes a `struct tm` variable to hold the parsed date.
+    - Calls [`fd_toml_parse_full_date`](#fd_toml_parse_full_date) to parse the date part; if it fails, returns 0.
+    - Calls [`fd_toml_parse_time_delim`](#fd_toml_parse_time_delim) to parse the time delimiter; if it fails, returns 0.
+    - Calls [`fd_toml_parse_full_time`](#fd_toml_parse_full_time) to parse the time part; if it fails, returns 0.
+    - Calculates the total nanoseconds by converting the parsed date to UTC seconds using `timegm` and adds the nanoseconds from the time part.
+    - Returns 1 to indicate successful parsing.
+- **Output**: Returns 1 on success, indicating that the offset date-time was successfully parsed and stored in `pnanos`; returns 0 on failure.
+- **Functions called**:
+    - [`fd_toml_parse_full_date`](#fd_toml_parse_full_date)
+    - [`fd_toml_parse_time_delim`](#fd_toml_parse_time_delim)
+    - [`fd_toml_parse_full_time`](#fd_toml_parse_full_time)
 
 
 ---
 ### fd\_toml\_parse\_local\_date\_time<!-- {{#callable:fd_toml_parse_local_date_time}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1520>)
-
-Parses a local date and time from a TOML format string.
+Parses a local date and time from a TOML format string and returns the corresponding nanoseconds since the epoch.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-    - `pnanos`: Pointer to an `ulong` where the parsed date and time in nanoseconds will be stored.
-- **Logic and Control Flow**:
-    - Initializes a `struct tm` variable named `date` to zero.
-    - Calls [`fd_toml_parse_full_date`](<#fd_toml_parse_full_date>) to parse the date part; if it fails, returns 0.
-    - Calls [`fd_toml_parse_time_delim`](<#fd_toml_parse_time_delim>) to parse the time delimiter; if it fails, returns 0.
-    - Calls [`fd_toml_parse_partial_time`](<#fd_toml_parse_partial_time>) to parse the time part; if it fails, returns 0.
-    - Converts the `date` to a time_t value using `mktime`, multiplies it by 1e9 to convert to nanoseconds, and stores it in `*pnanos`.
-    - Returns 1 to indicate success.
-- **Output**: Returns 1 on success, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_parse_full_date`](<#fd_toml_parse_full_date>)
-    - [`fd_toml_parse_time_delim`](<#fd_toml_parse_time_delim>)
-    - [`fd_toml_parse_partial_time`](<#fd_toml_parse_partial_time>)
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that maintains the state of the TOML parser.
+    - `pnanos`: A pointer to an `ulong` variable where the parsed local date and time in nanoseconds will be stored.
+- **Control Flow**:
+    - Initializes a `struct tm` variable to hold the parsed date.
+    - Calls [`fd_toml_parse_full_date`](#fd_toml_parse_full_date) to parse the full date; if it fails, returns 0.
+    - Calls [`fd_toml_parse_time_delim`](#fd_toml_parse_time_delim) to parse the time delimiter; if it fails, returns 0.
+    - Calls [`fd_toml_parse_partial_time`](#fd_toml_parse_partial_time) to parse the partial time; if it fails, returns 0.
+    - Calculates the total nanoseconds by converting the `struct tm` date to time using `mktime` and multiplying by 1e9.
+    - Stores the result in the variable pointed to by `pnanos` and returns 1 to indicate success.
+- **Output**: Returns 1 on successful parsing of the local date and time, or 0 if any parsing step fails.
+- **Functions called**:
+    - [`fd_toml_parse_full_date`](#fd_toml_parse_full_date)
+    - [`fd_toml_parse_time_delim`](#fd_toml_parse_time_delim)
+    - [`fd_toml_parse_partial_time`](#fd_toml_parse_partial_time)
 
 
 ---
 ### fd\_toml\_parse\_local\_date<!-- {{#callable:fd_toml_parse_local_date}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1535>)
-
 Parses a local date from a TOML format and converts it to nanoseconds since the epoch.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the TOML parser.
-    - `pnanos`: Pointer to an `ulong` where the resulting nanoseconds will be stored.
-- **Logic and Control Flow**:
-    - Initializes a `struct tm` variable named `date` to zero.
-    - Calls [`fd_toml_parse_full_date`](<#fd_toml_parse_full_date>) to parse the date from the TOML input.
-    - If the parsing fails, returns 0.
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the state of the TOML parser.
+    - `pnanos`: A pointer to an `ulong` where the resulting nanoseconds since the epoch will be stored.
+- **Control Flow**:
+    - Initializes a `struct tm` variable to hold the parsed date.
+    - Calls [`fd_toml_parse_full_date`](#fd_toml_parse_full_date) to parse the full date from the TOML input.
+    - If the date parsing fails, returns 0.
     - Converts the parsed date to seconds since the epoch using `mktime`.
     - Multiplies the result by 1e9 to convert seconds to nanoseconds.
-    - Stores the result in the location pointed to by `pnanos`.
-    - Returns 1 to indicate success.
-- **Output**: Returns 1 on success, or 0 if parsing fails.
-- **Functions Called**:
-    - [`fd_toml_parse_full_date`](<#fd_toml_parse_full_date>)
+    - Stores the result in the location pointed to by `pnanos` and returns 1.
+- **Output**: Returns 1 on successful parsing and conversion, or 0 if an error occurs.
+- **Functions called**:
+    - [`fd_toml_parse_full_date`](#fd_toml_parse_full_date)
 
 
 ---
 ### fd\_toml\_parse\_local\_time<!-- {{#callable:fd_toml_parse_local_time}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1546>)
-
-Parses local time from a TOML string.
+Parses a local time from a TOML string.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-    - `pnanos`: Pointer to an `ulong` where the parsed nanoseconds will be stored.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_partial_time`](<#fd_toml_parse_partial_time>) to parse the local time.
-    - Returns the result of the [`fd_toml_parse_partial_time`](<#fd_toml_parse_partial_time>) function.
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the state of the TOML parser.
+    - `pnanos`: A pointer to an unsigned long variable where the parsed local time in nanoseconds will be stored.
+- **Control Flow**:
+    - Calls the [`fd_toml_parse_partial_time`](#fd_toml_parse_partial_time) function to parse the local time.
+    - The function returns the result of the parsing operation directly.
 - **Output**: Returns an integer indicating success (1) or failure (0) of the parsing operation.
-- **Functions Called**:
-    - [`fd_toml_parse_partial_time`](<#fd_toml_parse_partial_time>)
+- **Functions called**:
+    - [`fd_toml_parse_partial_time`](#fd_toml_parse_partial_time)
 
 
 ---
 ### fd\_toml\_parse\_date\_time<!-- {{#callable:fd_toml_parse_date_time}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1554>)
-
-Parses date and time values from TOML format.
+Parses various date-time formats from a TOML file and inserts the resulting timestamp in nanoseconds into a provided data structure.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Attempts to parse a date-time value by calling several parsing functions in sequence.
-    - If any parsing function fails, it jumps to the 'add' label.
-    - If a date-time value is successfully parsed, it is inserted into the parser's pod.
-- **Output**: Returns 1 on success, 0 on failure. If successful, the parsed date-time is stored in nanoseconds.
-- **Functions Called**:
-    - [`fd_toml_parse_offset_date_time`](<#fd_toml_parse_offset_date_time>)
-    - [`fd_toml_parse_local_date_time`](<#fd_toml_parse_local_date_time>)
-    - [`fd_toml_parse_local_date`](<#fd_toml_parse_local_date>)
-    - [`fd_toml_parse_local_time`](<#fd_toml_parse_local_time>)
+    - `parser`: A pointer to a `fd_toml_parser_t` structure that holds the current state of the parser, including the input data and the output storage.
+- **Control Flow**:
+    - The function attempts to parse a date-time value by calling several parsing functions in sequence: [`fd_toml_parse_offset_date_time`](#fd_toml_parse_offset_date_time), [`fd_toml_parse_local_date_time`](#fd_toml_parse_local_date_time), [`fd_toml_parse_local_date`](#fd_toml_parse_local_date), and [`fd_toml_parse_local_time`](#fd_toml_parse_local_time).
+    - If any of these parsing functions succeed, the resulting timestamp in nanoseconds is stored in the `unix_nanos` variable.
+    - If all parsing attempts fail, the function returns 0, indicating no valid date-time was found.
+    - If a valid date-time is parsed, it attempts to insert the timestamp into the `pod` structure using `fd_pod_insert_ulong`.
+    - If the insertion fails, it sets an error code in the parser and returns 0; otherwise, it returns 1 to indicate success.
+- **Output**: Returns 1 if a valid date-time was parsed and inserted successfully, or 0 if parsing failed or if there was an error during insertion.
+- **Functions called**:
+    - [`fd_toml_parse_offset_date_time`](#fd_toml_parse_offset_date_time)
+    - [`fd_toml_parse_local_date_time`](#fd_toml_parse_local_date_time)
+    - [`fd_toml_parse_local_date`](#fd_toml_parse_local_date)
+    - [`fd_toml_parse_local_time`](#fd_toml_parse_local_time)
 
 
 ---
 ### fd\_toml\_parse\_val<!-- {{#callable:fd_toml_parse_val}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1572>)
-
-Parses a TOML value from the input data.
+Parses a TOML value from the input data using a recursive descent parser.
 - **Inputs**:
-    - `parser`: Pointer to an `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Attempts to parse a string using [`fd_toml_parse_string`](<#fd_toml_parse_string>) and checks for success.
-    - If the string parsing fails, it tries to parse a boolean using [`fd_toml_parse_boolean`](<#fd_toml_parse_boolean>).
-    - If boolean parsing fails, it attempts to parse an array using [`fd_toml_parse_array`](<#fd_toml_parse_array>).
-    - If array parsing fails, it tries to parse an inline table using [`fd_toml_parse_inline_table`](<#fd_toml_parse_inline_table>).
-    - If inline table parsing fails, it attempts to parse a date-time using [`fd_toml_parse_date_time`](<#fd_toml_parse_date_time>).
-    - If date-time parsing fails, it tries to parse a float using [`fd_toml_parse_float`](<#fd_toml_parse_float>).
-    - If float parsing fails, it finally attempts to parse an integer using [`fd_toml_parse_integer`](<#fd_toml_parse_integer>).
-    - Returns 1 if any parsing succeeds, otherwise returns 0.
-- **Output**: Returns 1 if a value is successfully parsed; otherwise, returns 0.
-- **Functions Called**:
-    - [`fd_toml_parse_string`](<#fd_toml_parse_string>)
-    - [`fd_toml_parse_boolean`](<#fd_toml_parse_boolean>)
-    - [`fd_toml_parse_array`](<#fd_toml_parse_array>)
-    - [`fd_toml_parse_inline_table`](<#fd_toml_parse_inline_table>)
-    - [`fd_toml_parse_date_time`](<#fd_toml_parse_date_time>)
-    - [`fd_toml_parse_float`](<#fd_toml_parse_float>)
-    - [`fd_toml_parse_integer`](<#fd_toml_parse_integer>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser, including the cursor position and the data to be parsed.
+- **Control Flow**:
+    - The function attempts to parse various types of TOML values in a specific order: string, boolean, array, inline table, date-time, float, and integer.
+    - For each type, it calls the corresponding parsing function and checks the return value.
+    - If a parsing function returns success (1), the function immediately returns 1, indicating a successful parse.
+    - If all parsing attempts fail, the function returns 0, indicating that no valid TOML value was found.
+- **Output**: Returns 1 if a valid TOML value is successfully parsed, otherwise returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_string`](#fd_toml_parse_string)
+    - [`fd_toml_parse_boolean`](#fd_toml_parse_boolean)
+    - [`fd_toml_parse_array`](#fd_toml_parse_array)
+    - [`fd_toml_parse_inline_table`](#fd_toml_parse_inline_table)
+    - [`fd_toml_parse_date_time`](#fd_toml_parse_date_time)
+    - [`fd_toml_parse_float`](#fd_toml_parse_float)
+    - [`fd_toml_parse_integer`](#fd_toml_parse_integer)
 
 
 ---
 ### fd\_toml\_parse\_keyval<!-- {{#callable:fd_toml_parse_keyval}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1588>)
-
-Parses a key-value pair from TOML data.
+Parses a key-value pair from a TOML configuration file.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
-    - Stores the current length of the key in `old_key_len`.
-    - Calls [`fd_toml_parse_key`](<#fd_toml_parse_key>) to parse the key; if it fails, returns 0.
-    - Checks for duplicate keys using `fd_pod_query`; if found, logs a warning and sets an error code, then returns 0.
-    - Calls [`fd_toml_parse_keyval_sep`](<#fd_toml_parse_keyval_sep>) to parse the key-value separator; if it fails, returns 0.
-    - Calls [`fd_toml_parse_val`](<#fd_toml_parse_val>) to parse the value; if it fails, returns 0.
-    - Logs the successful addition of the key, resets the key length to `old_key_len`, and returns 1.
-- **Output**: Returns 1 on success, 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_key`](<#fd_toml_parse_key>)
-    - [`fd_toml_parse_keyval_sep`](<#fd_toml_parse_keyval_sep>)
-    - [`fd_toml_parse_val`](<#fd_toml_parse_val>)
-
-
----
-### fd\_toml\_parse\_std\_table<!-- {{#callable:fd_toml_parse_std_table}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1613>)
-
-Parses a standard TOML table from the input data.
-- **Inputs**:
-    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Checks for the opening character '['.
-    - Parses whitespace after the opening character.
-    - Initializes the key buffer and checks for a valid key.
-    - Logs a debug message indicating the added table.
-    - Parses whitespace before the closing character ']' and checks for it.
-- **Output**: Returns 1 on success, 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
-    - [`fd_toml_parse_key`](<#fd_toml_parse_key>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the parser.
+- **Control Flow**:
+    - The function first saves the current length of the key in `old_key_len`.
+    - It attempts to parse the key using [`fd_toml_parse_key`](#fd_toml_parse_key), returning 0 on failure.
+    - It checks for duplicate keys in the provided pod using `fd_pod_query`, logging a warning and setting an error if a duplicate is found.
+    - It then parses the key-value separator using [`fd_toml_parse_keyval_sep`](#fd_toml_parse_keyval_sep), returning 0 on failure.
+    - Finally, it parses the value using [`fd_toml_parse_val`](#fd_toml_parse_val), returning 0 on failure.
+    - If all parsing steps succeed, it logs the added key and resets the key length to its original value before returning 1.
+- **Output**: Returns 1 on successful parsing of a key-value pair, or 0 if any parsing step fails.
+- **Functions called**:
+    - [`fd_toml_parse_key`](#fd_toml_parse_key)
+    - [`fd_toml_parse_keyval_sep`](#fd_toml_parse_keyval_sep)
+    - [`fd_toml_parse_val`](#fd_toml_parse_val)
 
 
 ---
 ### fd\_toml\_parse\_array\_table<!-- {{#callable:fd_toml_parse_array_table}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1638>)
-
-Parses an array table in TOML format.
+Parses a TOML array table and updates the parser's key.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the current state of the parser.
-- **Logic and Control Flow**:
+    - `parser`: A pointer to the `fd_toml_parser_t` structure that holds the current state of the parser.
+- **Control Flow**:
     - Checks if there are at least two characters available for parsing.
-    - Validates that the first two characters are '[['.
-    - Advances the parser cursor by two characters.
+    - Validates that the first two characters are the opening brackets for an array table ('[[').
+    - Advances the parser cursor past the opening brackets.
     - Parses whitespace after the opening brackets.
-    - Initializes the `key` in the parser to store the path to the array.
-    - Calls [`fd_toml_parse_key`](<#fd_toml_parse_key>) to parse the key and checks for success.
-    - Queries the number of existing elements in the subpod associated with the key.
+    - Initializes the parser's key to an empty string.
+    - Calls [`fd_toml_parse_key`](#fd_toml_parse_key) to parse the key for the array table.
+    - Queries the number of existing entries in the subpod associated with the parsed key.
     - Appends the array index to the key path.
     - Checks for potential out-of-bounds access when appending the index.
-    - Logs the addition of the array table.
+    - Logs the addition of the array table with the constructed key.
     - Parses whitespace after the key.
-    - Validates that the next two characters are ']]'.
-    - Advances the parser cursor by two characters.
-- **Output**: Returns 1 on successful parsing of the array table, or 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance_inline`](<#fd_toml_advance_inline>)
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
-    - [`fd_toml_parse_key`](<#fd_toml_parse_key>)
+    - Validates that the next two characters are the closing brackets for the array table (']]').
+    - Advances the parser cursor past the closing brackets.
+- **Output**: Returns 1 on successful parsing of the array table, or 0 if any validation fails.
+- **Functions called**:
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance_inline`](#fd_toml_advance_inline)
+    - [`fd_toml_parse_ws`](#fd_toml_parse_ws)
+    - [`fd_toml_parse_key`](#fd_toml_parse_key)
 
 
 ---
 ### fd\_toml\_parse\_table<!-- {{#callable:fd_toml_parse_table}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1688>)
-
-Parses a TOML table from the input data.
+Parses a TOML table structure and updates the parser state.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Attempts to parse an array table using [`fd_toml_parse_array_table`](<#fd_toml_parse_array_table>).
-    - If the array table parsing fails, attempts to parse a standard table using [`fd_toml_parse_std_table`](<#fd_toml_parse_std_table>).
-    - If both parsing attempts fail, returns 0.
-    - If either parsing succeeds, calls [`fd_toml_upsert_empty_pod`](<#fd_toml_upsert_empty_pod>) to ensure the pod is updated.
-    - Checks if the key length exceeds the maximum size, sets an error if it does, and returns 0.
-    - Adds a trailing dot to the key and returns 1.
-- **Output**: Returns 1 on success, 0 on failure.
-- **Functions Called**:
-    - [`fd_toml_parse_array_table`](<#fd_toml_parse_array_table>)
-    - [`fd_toml_parse_std_table`](<#fd_toml_parse_std_table>)
-    - [`fd_toml_upsert_empty_pod`](<#fd_toml_upsert_empty_pod>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the TOML parser.
+- **Control Flow**:
+    - Attempts to parse an array table using [`fd_toml_parse_array_table`](#fd_toml_parse_array_table) and checks for success.
+    - If the array table parsing fails, it attempts to parse a standard table using [`fd_toml_parse_std_table`](#fd_toml_parse_std_table).
+    - If both parsing attempts fail, the function returns 0 indicating failure.
+    - If either parsing succeeds, it calls [`fd_toml_upsert_empty_pod`](#fd_toml_upsert_empty_pod) to ensure the parser's pod is updated.
+    - It checks if the key length exceeds the maximum allowed size, setting an error if it does.
+    - If the key length is valid, it appends a trailing dot to the key and returns 1 indicating success.
+- **Output**: Returns 1 on successful parsing of a table, or 0 if parsing fails.
+- **Functions called**:
+    - [`fd_toml_parse_array_table`](#fd_toml_parse_array_table)
+    - [`fd_toml_parse_std_table`](#fd_toml_parse_std_table)
+    - [`fd_toml_upsert_empty_pod`](#fd_toml_upsert_empty_pod)
 
 
 ---
 ### fd\_toml\_parse\_expression<!-- {{#callable:fd_toml_parse_expression}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1709>)
-
-Parses a TOML expression from the input data.
+Parses a TOML expression, which can be a key-value pair, a table, or a comment.
 - **Inputs**:
-    - `parser`: Pointer to the `fd_toml_parser_t` structure that holds the parser state and input data.
-- **Logic and Control Flow**:
-    - Calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) to skip any whitespace at the beginning.
-    - Attempts to parse a key-value pair using [`fd_toml_parse_keyval`](<#fd_toml_parse_keyval>). If successful, it calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) again.
-    - If parsing a key-value pair fails, it attempts to parse a table using [`fd_toml_parse_table`](<#fd_toml_parse_table>). If successful, it calls [`fd_toml_parse_ws`](<#fd_toml_parse_ws>) again.
-    - Finally, it attempts to parse a comment using [`fd_toml_parse_comment`](<#fd_toml_parse_comment>).
-- **Output**: Returns 1 on success, indicating that an expression was successfully parsed.
-- **Functions Called**:
-    - [`fd_toml_parse_ws`](<#fd_toml_parse_ws>)
-    - [`fd_toml_parse_keyval`](<#fd_toml_parse_keyval>)
-    - [`fd_toml_parse_table`](<#fd_toml_parse_table>)
-    - [`fd_toml_parse_comment`](<#fd_toml_parse_comment>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the current state of the parser, including the cursor position and the data to be parsed.
+- **Control Flow**:
+    - The function begins by calling [`fd_toml_parse_ws`](#fd_toml_parse_ws) to skip any whitespace.
+    - It attempts to parse a key-value pair using [`fd_toml_parse_keyval`](#fd_toml_parse_keyval), and if successful, it calls [`fd_toml_parse_ws`](#fd_toml_parse_ws) again to skip any whitespace following the key-value pair.
+    - If parsing a key-value pair fails, it attempts to parse a table using [`fd_toml_parse_table`](#fd_toml_parse_table) and again skips whitespace if successful.
+    - Regardless of whether a key-value pair or table was parsed, it attempts to parse a comment using [`fd_toml_parse_comment`](#fd_toml_parse_comment) at the end.
+    - The function returns 1 to indicate successful parsing of an expression.
+- **Output**: Returns 1 if an expression is successfully parsed; otherwise, it returns 0.
+- **Functions called**:
+    - [`fd_toml_parse_ws`](#fd_toml_parse_ws)
+    - [`fd_toml_parse_keyval`](#fd_toml_parse_keyval)
+    - [`fd_toml_parse_table`](#fd_toml_parse_table)
+    - [`fd_toml_parse_comment`](#fd_toml_parse_comment)
 
 
 ---
 ### fd\_toml\_parse\_toml<!-- {{#callable:fd_toml_parse_toml}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1727>)
-
-Parses a TOML document using the provided parser.
+Parses a TOML document using a given parser.
 - **Inputs**:
-    - `parser`: Pointer to a `fd_toml_parser_t` structure that holds the state of the parser.
-- **Logic and Control Flow**:
-    - Checks if the initial expression can be parsed using [`fd_toml_parse_expression`](<#fd_toml_parse_expression>).
-    - Enters an infinite loop to process subsequent lines.
-    - Breaks the loop if an error is detected, if no more data is available, or if the current character is not a newline.
-    - Advances the parser cursor by one character when a newline is found.
-    - Attempts to parse another expression after each newline.
-- **Output**: Returns 1 on successful parsing of the TOML document, or 0 if an error occurs.
-- **Functions Called**:
-    - [`fd_toml_parse_expression`](<#fd_toml_parse_expression>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
-    - [`fd_toml_advance`](<#fd_toml_advance>)
+    - `parser`: A pointer to an `fd_toml_parser_t` structure that holds the state of the parser, including the current position in the input data and any errors encountered.
+- **Control Flow**:
+    - The function first attempts to parse an expression using [`fd_toml_parse_expression`](#fd_toml_parse_expression). If this fails, it returns 0.
+    - It enters an infinite loop where it checks for errors, availability of data, and whether the current character is a newline.
+    - If a newline is found, it advances the parser cursor and attempts to parse another expression.
+    - The loop continues until an error occurs, there is no more data to parse, or a non-newline character is encountered.
+- **Output**: Returns 1 if the parsing is successful, otherwise returns 0 if an error occurs or parsing fails.
+- **Functions called**:
+    - [`fd_toml_parse_expression`](#fd_toml_parse_expression)
+    - [`fd_toml_avail`](#fd_toml_avail)
+    - [`fd_toml_advance`](#fd_toml_advance)
 
 
 ---
 ### fd\_toml\_parse<!-- {{#callable:fd_toml_parse}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1743>)
-
-Parses TOML data into a structured format.
+Parses a TOML formatted string into a structured format.
 - **Inputs**:
-    - `toml`: Pointer to the TOML data to be parsed.
-    - `toml_sz`: Size of the TOML data in bytes.
-    - `pod`: Pointer to the output structure where parsed data is stored.
-    - `scratch`: Pointer to a scratch buffer used during parsing.
-    - `scratch_sz`: Size of the scratch buffer in bytes.
-    - `opt_err`: Pointer to an optional error information structure.
-- **Logic and Control Flow**:
-    - Checks if `opt_err` is NULL and assigns a dummy error structure if it is.
-    - Returns success if `toml_sz` is zero.
-    - Logs a warning and returns an error if `scratch_sz` is zero.
-    - Initializes a `fd_toml_parser_t` structure with the provided TOML data and sizes.
-    - Calls [`fd_toml_parse_toml`](<#fd_toml_parse_toml>) to perform the actual parsing.
-    - Updates the error line information from the parser.
-    - Checks for parsing errors and returns appropriate error codes.
-- **Output**: Returns `FD_TOML_SUCCESS` on successful parsing or an error code indicating the type of failure.
-- **Functions Called**:
-    - [`fd_toml_parse_toml`](<#fd_toml_parse_toml>)
-    - [`fd_toml_avail`](<#fd_toml_avail>)
+    - `toml`: A pointer to the TOML data to be parsed.
+    - `toml_sz`: The size of the TOML data in bytes.
+    - `pod`: A pointer to a buffer where parsed data will be stored.
+    - `scratch`: A scratch buffer used during parsing.
+    - `scratch_sz`: The size of the scratch buffer.
+    - `opt_err`: An optional pointer to an error information structure.
+- **Control Flow**:
+    - If `opt_err` is NULL, a dummy error structure is used.
+    - If `toml_sz` is zero, the function returns success immediately.
+    - If `scratch_sz` is zero, a warning is logged and an error is returned.
+    - A `fd_toml_parser_t` structure is initialized with the provided TOML data and buffers.
+    - The [`fd_toml_parse_toml`](#fd_toml_parse_toml) function is called to perform the actual parsing.
+    - The line number of the last parsed line is stored in `opt_err`.
+    - If parsing fails or there are unparsed bytes left, an appropriate error is returned.
+- **Output**: Returns `FD_TOML_SUCCESS` on successful parsing, or an error code indicating the type of failure.
+- **Functions called**:
+    - [`fd_toml_parse_toml`](#fd_toml_parse_toml)
+    - [`fd_toml_avail`](#fd_toml_avail)
 
 
 ---
 ### fd\_toml\_strerror<!-- {{#callable:fd_toml_strerror}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L1783>)
-
-Returns a string describing the error associated with a given error code.
+The `fd_toml_strerror` function returns a string description of a TOML parsing error based on the provided error code.
 - **Inputs**:
-    - `err`: An integer error code representing a specific error condition.
-- **Logic and Control Flow**:
-    - Evaluates the input error code using a switch statement.
-    - Returns a corresponding error message string for each recognized error code.
-    - If the error code does not match any known cases, returns a default message indicating an unknown error.
-- **Output**: A constant string that describes the error associated with the input error code.
+    - `err`: An integer error code representing the type of error encountered during TOML parsing.
+- **Control Flow**:
+    - The function uses a `switch` statement to evaluate the value of the `err` input.
+    - For each case, it returns a corresponding error message string.
+    - If the error code does not match any predefined cases, it defaults to returning 'unknown error'.
+- **Output**: A constant string that describes the error associated with the provided error code.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_toml\_parse\_keyval<!-- {{#callable_declaration:fd_toml_parse_keyval}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L188>)
-
 Parses a key-value pair from a TOML parser.
-- **Description**: Use this function to parse a key-value pair from a TOML parser. It checks for duplicate keys and logs a warning if a duplicate is found, setting an error code. The function expects the parser to be initialized and positioned correctly within the TOML data. It returns a success or failure status based on the parsing outcome.
+- **Description**: Use this function to parse a key-value pair from a TOML parser, ensuring that the key is unique within the current context. It should be called when a key-value pair is expected in the TOML data. The function will handle parsing errors and duplicate keys by setting an error code in the parser. It is important to ensure that the parser is properly initialized and that the input data is correctly formatted before calling this function.
 - **Inputs**:
-    - `parser`: A pointer to an `fd_toml_parser_t` structure. This must be initialized and must not be null. The function modifies the parser state and checks for duplicate keys in the associated pod.
-- **Output**: Returns 1 on successful parsing of a key-value pair, or 0 if parsing fails or a duplicate key is detected.
-- **See Also**: [`fd_toml_parse_keyval`](<#fd_toml_parse_keyval>)  (Implementation)
+    - `parser`: A pointer to an fd_toml_parser_t structure representing the current state of the TOML parser. This parameter must not be null, and the parser should be properly initialized before calling this function. The function will modify the parser's state and may set an error code if parsing fails or a duplicate key is encountered.
+- **Output**: Returns 1 on successful parsing of a key-value pair, or 0 if parsing fails or a duplicate key is detected. The parser's error field will be set in case of an error.
+- **See also**: [`fd_toml_parse_keyval`](#fd_toml_parse_keyval)  (Implementation)
 
 
 ---
 ### fd\_toml\_parse\_val<!-- {{#callable_declaration:fd_toml_parse_val}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.c#L189>)
-
-Parses a TOML value from the input data.
-- **Description**: Use this function to parse a TOML value from the input data using the provided parser. It attempts to match various TOML data types such as strings, booleans, arrays, inline tables, date-times, floats, and integers. The function returns 1 if a value is successfully parsed and 0 if no value is matched. Ensure that the parser is correctly initialized and that the input data is valid TOML format before calling this function.
+Parses a TOML value from the parser state.
+- **Description**: Use this function to parse a single TOML value from the current state of the parser. It attempts to match and parse various TOML data types such as strings, booleans, arrays, inline tables, date-times, floats, and integers. The function should be called when a value is expected in the TOML input. It returns an integer indicating success or failure, and the parser's state is updated accordingly. Ensure that the parser is properly initialized before calling this function.
 - **Inputs**:
-    - `parser`: A pointer to an `fd_toml_parser_t` structure that maintains the state of the parser. The parser must be initialized and must not be null. The function will update the parser's state as it processes the input data.
-- **Output**: Returns 1 if a TOML value is successfully parsed, otherwise returns 0. The parser's state is updated to reflect the parsing progress.
-- **See Also**: [`fd_toml_parse_val`](<#fd_toml_parse_val>)  (Implementation)
+    - `parser`: A pointer to an fd_toml_parser_t structure representing the current state of the TOML parser. The parser must be initialized and must not be null. The function will update the parser's state as it parses the value.
+- **Output**: Returns 1 if a value was successfully parsed, or 0 if no value could be parsed. The parser's state is updated to reflect the parsing result.
+- **See also**: [`fd_toml_parse_val`](#fd_toml_parse_val)  (Implementation)
 
 
 
