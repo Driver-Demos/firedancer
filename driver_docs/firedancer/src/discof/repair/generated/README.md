@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated seccomp filter allowing read, write, lseek, ftruncate, and fsync on specific file descriptors.
+Defines a seccomp filter policy for syscall access control in a generated header file.
 
 
 ## Files
-- **[fd_repair_tile_seccomp.h](fd_repair_tile_seccomp.h.md)**: Generated seccomp filter allowing read, write, lseek, ftruncate, and fsync on specific file descriptors.
+- **[fd_repair_tile_seccomp.h](fd_repair_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall access control in the Firedancer project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

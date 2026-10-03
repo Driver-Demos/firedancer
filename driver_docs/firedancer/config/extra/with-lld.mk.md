@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-lld.mk` file in the `firedancer` codebase adds a linker flag to use the LLVM linker (`lld`) by appending `-fuse-ld=lld` to `LDFLAGS`.
+Adds the linker flag to use the LLVM linker (lld).
 
 # Purpose
-The file content is a configuration directive for a build system, likely a Makefile. It appends the flag `-fuse-ld=lld` to the `LDFLAGS` variable, instructing the linker to use the LLVM linker (`lld`) instead of the default system linker during the linking stage of the build process.
+The `LDFLAGS` variable in a Makefile is used to specify options for the linker. The line `LDFLAGS+=-fuse-ld=lld` appends the option `-fuse-ld=lld` to the existing linker flags, instructing the build system to use the LLVM linker (`lld`) instead of the default linker.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

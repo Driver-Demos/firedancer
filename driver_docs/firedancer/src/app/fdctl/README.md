@@ -3,23 +3,23 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration, versioning, topology, and command setup for validator execution.
+Functions for Agave component, benchmarking, configuration, versioning, and network topology for fdctl.
 
 ## Folders
-- **[commands](commands/README.md)**: Starts Agave validator boot, argument setup, CPU affinity, and sandboxed clone execution.
-- **[config](config/README.md)**: TOML files for benchmarking, development, and Solana testnet configuration.
+- **[commands](commands/README.md)**: Starts and declares functions for the Agave component of a Firedancer validator.
+- **[config](config/README.md)**: Benchmarking and configuration files for various CPUs, Firedancer instances, and Solana testnets.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: The `.gitignore` file in the `firedancer/src/app/fdctl/` directory specifies that `version.h` and `version2.h` should be ignored by Git.
-- **[config.c](config.c.md)**: The `config.c` file in the `firedancer` codebase imports a default configuration from a TOML file using the `FD_IMPORT_BINARY` macro.
-- **[config.h](config.h.md)**: The `config.h` file in the `firedancer` codebase declares external constants for the default configuration and its size for the `fdctl` application.
-- **[Local.mk](Local.mk.md)**: Makefile rules for version files and Rust builds of fdctl, solana, and agave-ledger-tool.
-- **[main.c](main.c.md)**: Main entry point wiring actions, tiles, callbacks, stages, and default config for fdctl.
-- **[topology.c](topology.c.md)**: Builds and configures the Firedancer tile topology, links, CPU affinity, and tile settings.
-- **[topology.h](topology.h.md)**: The `topology.h` file in the `firedancer` codebase declares a function for initializing topology configurations.
-- **[version.c](version.c.md)**: The `version.c` file in the `firedancer` codebase defines versioning information for the `fdctl` application, including major, minor, and patch versions, as well as commit reference details.
-- **[version.mk](version.mk.md)**: The `version.mk` file in the `firedancer` codebase specifies the major, minor, and patch version numbers for the `fdctl` application.
-- **[with-version.mk](with-version.mk.md)**: The `with-version.mk` file in the `firedancer` codebase defines and exports versioning information for the Firedancer application, including major, minor, and patch versions, as well as the current commit hash.
+- **[.gitignore](.gitignore.md)**: Specifies files to ignore in version control, including version.h and version2.h.
+- **[config.c](config.c.md)**: Imports a default configuration from a TOML file for the fdctl application.
+- **[config.h](config.h.md)**: Defines external default configuration data and its size for the fdctl application.
+- **[Local.mk](Local.mk.md)**: Makefile for managing versioning, building, and dependencies of the fdctl application in Firedancer.
+- **[main.c](main.c.md)**: Main function for the `fdctl` application, initializing configurations, callbacks, stages, tiles, and actions.
+- **[topology.c](topology.c.md)**: Configures and initializes network topology and tile settings for the Firedancer application.
+- **[topology.h](topology.h.md)**: Header file for initializing topology with a given configuration in the Firedancer application.
+- **[version.c](version.c.md)**: Defines version information and commit references for the fdctl application.
+- **[version.mk](version.mk.md)**: Makefile variables for major, minor, and patch version numbers.
+- **[with-version.mk](with-version.mk.md)**: Defines versioning rules and exports version variables for the Firedancer project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
