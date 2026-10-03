@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_reasm and its unit test when FD_HAS_INT128 and FD_HAS_HOSTED are set.
+Makefile for building and testing the `fd_reasm` component with conditional compilation flags.
 
 # Purpose
-Build rules for `fd_reasm` are enabled only when `FD_HAS_INT128` is defined. When `FD_HAS_HOSTED` is also defined, the file adds the `test_reasm` unit test, links it with `fd_discof`, `fd_flamenco`, `fd_ballet`, and `fd_util`, and schedules the test to run.
+The `Makefile` content defines conditional compilation and testing rules for a software project. If the macro `FD_HAS_INT128` is defined, it adds the object `fd_discof` to the `fd_reasm` target. If both `FD_HAS_INT128` and `FD_HAS_HOSTED` are defined, it creates and runs a unit test named `test_reasm` with dependencies on `fd_discof`, `fd_flamenco`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

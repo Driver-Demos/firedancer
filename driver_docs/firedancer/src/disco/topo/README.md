@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CPU topology, workspace, tile execution, and topology builder helpers with conditional build rules.
+Functions and data structures for CPU and Firedancer topology management, including initialization, logging, and resource management.
 
 
 ## Files
-- **[fd_cpu_topo.c](fd_cpu_topo.c.md)**: The `fd_cpu_topo.c` file in the `firedancer` codebase provides functions for initializing and printing CPU topology information, including CPU count, online status, NUMA node association, and hyperthreading sibling relationships.
-- **[fd_cpu_topo.h](fd_cpu_topo.h.md)**: The `fd_cpu_topo.h` file defines structures and functions for managing and initializing CPU topology information in the Firedancer project.
-- **[fd_topo.c](fd_topo.c.md)**: Workspace join/create, fill, memory sizing, and topology summary logging utilities.
-- **[fd_topo.h](fd_topo.h.md)**: Topology data structures and helpers for workspaces, links, tiles, and process setup.
-- **[fd_topo_run.c](fd_topo_run.c.md)**: Topology tile execution, sandboxing, stack setup, and XDP install helpers.
-- **[fd_topob.c](fd_topob.c.md)**: Builds topology objects, links, tiles, layout, NUMA assignment, and validation.
-- **[fd_topob.h](fd_topob.h.md)**: Topology builder helpers for workspaces, objects, links, tiles, layout, and validation.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and object files related to topology and disco components based on the presence of hosted, threads, and Linux configurations.
+- **[fd_cpu_topo.c](fd_cpu_topo.c.md)**: Functions for initializing and printing CPU topology information, including sibling and NUMA node details.
+- **[fd_cpu_topo.h](fd_cpu_topo.h.md)**: Defines data structures and functions for initializing and printing CPU topology information.
+- **[fd_topo.c](fd_topo.c.md)**: Functions for managing and interacting with topological workspaces and objects in shared memory.
+- **[fd_topo.h](fd_topo.h.md)**: Defines data structures and functions for managing Firedancer topologies, including workspaces, tiles, and links.
+- **[fd_topo_run.c](fd_topo_run.c.md)**: Manages the execution of tiles in a topology, including logging, sandboxing, and thread management.
+- **[fd_topob.c](fd_topob.c.md)**: Functions for creating and managing a topology of workspaces, objects, links, and tiles with validation and automatic layout.
+- **[fd_topob.h](fd_topob.h.md)**: Builder for `fd_topo` with functions to create and manage topology components like tiles and links.
+- **[Local.mk](Local.mk.md)**: Makefile logic for adding headers and objects based on platform and threading conditions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the AVX512 implementation of the Ed25519 algorithm, conditional on the presence of AVX512 support.
+Makefile for adding headers, objects, and unit tests for AVX512 in the ed25519 module.
 
 # Purpose
-This file is a Makefile snippet used for building and testing components of a software project. It conditionally adds header files and object files to the build process if the `FD_HAS_AVX512` flag is set, indicating support for AVX-512 instructions. It also defines and runs a unit test for the `test_r43x6` component, while two other unit test definitions are commented out.
+The Makefile script defines build and test instructions for a software project. It uses the `add-hdrs` function to include header files `fd_r43x6.h`, `fd_r43x6_inl.h`, and `fd_r43x6_ge.h`. If the `FD_HAS_AVX512` flag is set, it adds object files `fd_r43x6`, `fd_r43x6_ge`, and `fd_ballet` using the `add-objs` function. It also creates and runs a unit test named `test_r43x6` with dependencies on `fd_ballet` and `fd_util`. Two additional unit tests, `fd_r43x6_ge_smul_table` and `fd_r43x6_ge_dmul_table`, are commented out and not executed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
