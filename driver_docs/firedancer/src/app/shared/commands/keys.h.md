@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Function prototypes and an external action for handling key command arguments and execution.
+The `keys.h` file in the `firedancer` codebase declares functions and an external action related to command handling for keys, including argument parsing and command execution.
 
 # Purpose
-This C header file defines the interface for handling command-line arguments and executing a command related to keys. It includes the necessary configuration header `fd_config.h` and declares two functions: [`keys_cmd_args`](<#keys_cmd_args>), which processes command-line arguments, and [`keys_cmd_fn`](<#keys_cmd_fn>), which executes the command using the provided arguments and configuration. The file also declares an external variable `fd_action_keys` of type `action_t`, which likely represents an action or operation related to keys. The use of include guards prevents multiple inclusions of this header file.
+This code is a C header file that defines the interface for handling command-related operations in an application. It includes function prototypes for [`keys_cmd_args`](#keys_cmd_args) and [`keys_cmd_fn`](#keys_cmd_fn), which are likely responsible for processing command-line arguments and executing command functions, respectively. The file also declares an external variable `fd_action_keys` of type `action_t`, which suggests it is used to represent a specific action or command within the application. The inclusion of `fd_config.h` indicates that the file relies on configuration settings defined elsewhere. Overall, this header file is part of a modular system, providing declarations necessary for managing command actions in a shared application context.
 # Imports and Dependencies
 
 ---
@@ -17,38 +17,34 @@ This C header file defines the interface for handling command-line arguments and
 
 ---
 ### fd\_action\_keys
-- **Type**: ``action_t``
-- **Description**: `fd_action_keys` is a global variable of type `action_t` declared in the header file. It is defined as an external variable, indicating that its definition is located in another source file.
-- **Use**: Used to represent or store an action related to the command keys functionality.
+- **Type**: `action_t`
+- **Description**: The `fd_action_keys` is a global variable of type `action_t`, which is likely a custom data type defined elsewhere in the codebase. It is declared as an external variable, indicating that it is defined in another source file and is accessible from this header file.
+- **Use**: This variable is used to represent or store an action related to keys, and it is accessible across different source files that include this header.
 
 
 # Function Declarations (Public API)
 
 ---
 ### keys\_cmd\_args<!-- {{#callable_declaration:keys_cmd_args}} -->
-[View Source →](<../../../../../../src/app/shared/commands/keys.h#L6>)
-
 Parses command-line arguments for key-related operations.
-- **Description**: Use this function to process command-line arguments related to key operations, specifically for the 'new' and 'pubkey' subcommands. It modifies the argument count and vector to reflect the processed command and updates the `args` structure with the appropriate command and file path. Ensure that the argument count is at least 2 before calling this function. If the arguments do not match the expected format, the function logs an error and terminates the process.
+- **Description**: This function processes command-line arguments to determine the specific key-related operation to perform, such as creating a new key or retrieving a public key. It expects the arguments to include a subcommand ('new' or 'pubkey') followed by a file path. The function updates the provided `args` structure with the parsed command and file path. It must be called with at least two arguments, and the first argument should be a valid subcommand. If the arguments are invalid or the subcommand is unrecognized, an error is logged, and the function does not modify the `args` structure.
 - **Inputs**:
-    - `pargc`: Pointer to the argument count. Must be at least 2. The function decrements this count as it processes arguments.
-    - `pargv`: Pointer to the argument vector. The function advances this pointer as it processes arguments. Must not be null and must contain valid strings.
-    - `args`: Pointer to an `args_t` structure where the function stores the parsed command and file path. Must not be null.
+    - `pargc`: A pointer to an integer representing the count of command-line arguments. Must be at least 2. The value is decremented as arguments are processed.
+    - `pargv`: A pointer to an array of strings representing the command-line arguments. The array is modified to point to the next unprocessed argument.
+    - `args`: A pointer to an `args_t` structure where the parsed command and file path will be stored. Must not be null.
 - **Output**: None
-- **See Also**: [`keys_cmd_args`](<keys.c.md#keys_cmd_args>)  (Implementation)
+- **See also**: [`keys_cmd_args`](keys.c.md#keys_cmd_args)  (Implementation)
 
 
 ---
 ### keys\_cmd\_fn<!-- {{#callable_declaration:keys_cmd_fn}} -->
-[View Source →](<../../../../../../src/app/shared/commands/keys.h#L9>)
-
-Executes a key-related command based on the provided arguments.
-- **Description**: Use this function to execute a command related to key management, such as generating a new key pair or retrieving a public key. The function requires a valid `args_t` structure with a specified command and a `config_t` structure for configuration details. It must be called with a valid command in `args->keys.cmd`, either `CMD_NEW_KEY` or `CMD_PUBKEY`. If the command is not recognized, the function logs an error. Ensure that the `args` and `config` parameters are correctly initialized before calling this function.
+Execute a key-related command based on the provided arguments.
+- **Description**: This function processes a key-related command specified in the `args` parameter and performs the corresponding action. It must be called with valid `args` and `config` structures. The function supports generating a new key pair or retrieving a public key, depending on the command specified. If an unrecognized command is provided, the function logs an error. Ensure that the `args` structure is properly initialized with a valid command before calling this function.
 - **Inputs**:
-    - `args`: A pointer to an `args_t` structure containing the command and file path for key operations. The `args->keys.cmd` must be a valid command, either `CMD_NEW_KEY` or `CMD_PUBKEY`. The caller must ensure this structure is properly initialized and not null.
-    - `config`: A pointer to a `config_t` structure containing configuration details such as user ID and group ID. The caller must ensure this structure is properly initialized and not null.
+    - `args`: A pointer to an `args_t` structure containing the command and associated data. The `keys.cmd` field must be set to a valid command, such as `CMD_NEW_KEY` or `CMD_PUBKEY`. The structure must be properly initialized before use.
+    - `config`: A pointer to a `config_t` structure containing configuration data such as user and group IDs. This structure must be properly initialized before use.
 - **Output**: None
-- **See Also**: [`keys_cmd_fn`](<keys.c.md#keys_cmd_fn>)  (Implementation)
+- **See also**: [`keys_cmd_fn`](keys.c.md#keys_cmd_fn)  (Implementation)
 
 
 
