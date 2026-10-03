@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for generating and managing transaction metadata and payloads in a blockchain context.
+The `fd_txn_generate.c` file in the `firedancer` codebase provides functions for generating and managing transaction metadata and payloads, including adding and resetting transaction instructions.
 
 # Purpose
-The code defines a set of functions and structures for generating and managing transaction metadata and payloads in a financial or blockchain-related application. It includes the definition of a packed structure `fd_txn_message_hdr` to represent a message header with fields for the number of signatures and readonly signatures. The function [`fd_txn_base_generate`](<#fd_txn_base_generate>) initializes transaction metadata and payload, setting up the message header, account information, and optionally a recent blockhash. It ensures constraints such as the maximum number of signatures and account addresses are not exceeded.
+This C source code file is designed to handle the generation and manipulation of transaction metadata and payloads, likely for a blockchain or distributed ledger system. The file includes functions that construct transaction metadata, generate transaction instructions, and manage the transaction payload. The primary components include a packed structure `fd_txn_message_hdr` for message headers, and several functions such as [`fd_txn_base_generate`](#fd_txn_base_generate), [`fd_txn_add_instr`](#fd_txn_add_instr), and [`fd_txn_reset_instrs`](#fd_txn_reset_instrs). These functions collectively manage the creation of transaction metadata, the addition of instructions to a transaction, and the resetting of instructions within a transaction payload.
 
-The code also provides functions to add instructions to a transaction ([`fd_txn_add_instr`](<#fd_txn_add_instr>)) and to reset instructions ([`fd_txn_reset_instrs`](<#fd_txn_reset_instrs>)). The [`fd_txn_add_instr`](<#fd_txn_add_instr>) function appends a new instruction to the transaction payload, updating the metadata with the program ID, account information, and instruction data. The [`fd_txn_reset_instrs`](<#fd_txn_reset_instrs>) function clears the instructions from the transaction metadata and payload. These functions work together to construct and manage transaction data, ensuring that the transaction structure adheres to predefined limits and formats.
+The code provides a focused functionality related to transaction processing, specifically dealing with the encoding and organization of transaction data. It defines internal functions and structures that are likely intended for use within a larger system, as indicated by the use of static functions and the absence of public APIs or external interfaces. The file is not a standalone executable but rather a component that would be integrated into a larger application, possibly as part of a library or module that handles transaction processing in a blockchain environment. The use of specific data types and constants suggests that the code is tailored to a particular transaction format or protocol, emphasizing efficiency and compact data representation.
 # Imports and Dependencies
 
 ---
@@ -19,119 +19,112 @@ The code also provides functions to add instructions to a transaction ([`fd_txn_
 
 ---
 ### fd\_txn\_message\_hdr
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `num_signatures`: Stores the number of signatures in the transaction.
-    - `num_readonly_signatures`: Stores the number of readonly signatures in the transaction.
-    - `num_readonly_unsigned`: Stores the number of readonly unsigned accounts in the transaction.
-- **Description**: Defines a packed structure that represents the header of a transaction message, containing fields for the number of signatures, readonly signatures, and readonly unsigned accounts.
+    - `num_signatures`: Stores the number of signatures required for the transaction.
+    - `num_readonly_signatures`: Indicates the number of signatures that are read-only.
+    - `num_readonly_unsigned`: Represents the number of unsigned read-only accounts.
+- **Description**: The `fd_txn_message_hdr` structure is a packed data structure used to define the header of a transaction message. It contains three fields: `num_signatures`, which specifies the total number of signatures required for the transaction; `num_readonly_signatures`, which indicates how many of those signatures are read-only; and `num_readonly_unsigned`, which represents the number of accounts that are read-only and do not require a signature. This structure is crucial for managing transaction metadata, ensuring that the transaction adheres to the required signature and account constraints.
 
 
 ---
 ### fd\_txn\_message\_hdr\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``num_signatures``: Stores the number of signatures in the transaction.
-    - ``num_readonly_signatures``: Stores the number of readonly signatures in the transaction.
-    - ``num_readonly_unsigned``: Stores the number of readonly unsigned accounts in the transaction.
-- **Description**: Defines a packed structure that represents the header of a transaction message, containing fields for the number of signatures, readonly signatures, and readonly unsigned accounts.
+    - `num_signatures`: Stores the number of signatures in the transaction.
+    - `num_readonly_signatures`: Indicates the number of signatures that are readonly.
+    - `num_readonly_unsigned`: Represents the number of unsigned readonly accounts.
+- **Description**: The `fd_txn_message_hdr_t` structure is a packed data structure used to represent the header of a transaction message. It contains three fields: `num_signatures`, which specifies the total number of signatures required for the transaction; `num_readonly_signatures`, which indicates how many of those signatures are readonly; and `num_readonly_unsigned`, which denotes the number of accounts that are readonly and unsigned. This structure is crucial for managing transaction metadata, ensuring that the transaction adheres to the required signature and account constraints.
 
 
 # Functions
 
 ---
 ### fd\_txn\_instr\_meta\_generate<!-- {{#callable:fd_txn_instr_meta_generate}} -->
-[View Source →](<../../../../../src/flamenco/txn/fd_txn_generate.c#L12>)
-
-Initializes a `fd_txn_instr_t` structure with given transaction instruction metadata and returns a pointer to it.
+The `fd_txn_instr_meta_generate` function initializes a transaction instruction structure with specified metadata and returns a pointer to it.
 - **Inputs**:
-    - `out_buf`: A pointer to a buffer where the `fd_txn_instr_t` structure will be stored.
-    - `program_id`: The program identifier for the transaction instruction.
-    - `acct_cnt`: The number of accounts involved in the transaction instruction.
-    - `data_sz`: The size of the data associated with the transaction instruction.
-    - `acct_off`: The offset for the accounts in the transaction instruction.
-    - `data_off`: The offset for the data in the transaction instruction.
-- **Logic and Control Flow**:
-    - Cast `out_buf` to a `fd_txn_instr_t` pointer and assign it to `out_instr`.
-    - Set the `program_id` field of `out_instr` to the input `program_id`.
-    - Set the `acct_cnt` field of `out_instr` to the input `acct_cnt`.
-    - Set the `data_sz` field of `out_instr` to the input `data_sz`.
-    - Set the `acct_off` field of `out_instr` to the input `acct_off`.
-    - Set the `data_off` field of `out_instr` to the input `data_off`.
+    - `out_buf`: A pointer to a buffer where the transaction instruction metadata will be stored.
+    - `program_id`: An unsigned character representing the program ID associated with the transaction instruction.
+    - `acct_cnt`: An unsigned short representing the number of accounts involved in the transaction instruction.
+    - `data_sz`: An unsigned short representing the size of the data associated with the transaction instruction.
+    - `acct_off`: An unsigned short representing the offset to the accounts in the transaction instruction.
+    - `data_off`: An unsigned short representing the offset to the data in the transaction instruction.
+- **Control Flow**:
+    - Cast the `out_buf` pointer to a `fd_txn_instr_t` pointer and assign it to `out_instr`.
+    - Set the `program_id` field of `out_instr` to the provided `program_id`.
+    - Set the `acct_cnt` field of `out_instr` to the provided `acct_cnt`.
+    - Set the `data_sz` field of `out_instr` to the provided `data_sz`.
+    - Set the `acct_off` field of `out_instr` to the provided `acct_off`.
+    - Set the `data_off` field of `out_instr` to the provided `data_off`.
     - Return the pointer `out_instr`.
-- **Output**: A pointer to the initialized `fd_txn_instr_t` structure.
+- **Output**: A pointer to the initialized `fd_txn_instr_t` structure, which is stored in the provided buffer.
 
 
 ---
 ### fd\_txn\_base\_generate<!-- {{#callable:fd_txn_base_generate}} -->
-[View Source →](<../../../../../src/flamenco/txn/fd_txn_generate.c#L28>)
-
-Generates a transaction metadata and payload based on the given number of signatures, account details, and an optional recent blockhash.
+The `fd_txn_base_generate` function constructs a transaction payload and metadata based on the provided account information, number of signatures, and an optional recent blockhash.
 - **Inputs**:
-    - `out_txn_meta`: A buffer to store the generated transaction metadata, with a size of at least `FD_TXN_MAX_SZ`.
-    - `out_txn_payload`: A buffer to store the generated transaction payload, with a size of at least `FD_TXN_MTU`.
-    - `num_signatures`: The number of signatures for the transaction, which must not exceed 127.
-    - `accounts`: A pointer to an `fd_txn_accounts_t` structure containing account details such as account count and signature counts.
-    - `opt_recent_blockhash`: An optional pointer to a recent blockhash, which can be `NULL`.
-- **Logic and Control Flow**:
-    - Check that `num_signatures` does not exceed `FD_TXN_SIG_MAX` and store it in the first byte of `out_txn_payload`.
-    - Initialize the transaction metadata structure `txn_meta` using `out_txn_meta` and populate it with account and signature information from `accounts`.
-    - Calculate offsets for message, signature, account addresses, and recent blockhash within the transaction metadata.
-    - Write the message header to the transaction payload at the calculated message offset.
+    - `out_txn_meta`: A buffer to store the transaction metadata, with a size defined by `FD_TXN_MAX_SZ`.
+    - `out_txn_payload`: A buffer to store the transaction payload, with a size defined by `FD_TXN_MTU`.
+    - `num_signatures`: The number of signatures required for the transaction, which must not exceed 127.
+    - `accounts`: A pointer to an `fd_txn_accounts_t` structure containing account information such as account count, signature count, and readonly counts.
+    - `opt_recent_blockhash`: An optional pointer to a recent blockhash, which can be `NULL` if not provided.
+- **Control Flow**:
+    - Check that the number of signatures does not exceed the maximum allowed (`FD_TXN_SIG_MAX`).
+    - Initialize the first byte of the transaction payload with the number of signatures.
+    - Populate the transaction metadata structure with account counts and offsets for message, signature, account addresses, and recent blockhash.
+    - Verify that the account address count does not exceed the maximum allowed (`FD_TXN_ACCT_ADDR_MAX`).
+    - Fill the transaction payload with a message header containing signature and readonly counts.
     - Write the number of accounts to the transaction payload.
-    - Copy account addresses for signers and non-signers into the transaction payload, updating the write pointer accordingly.
-    - Verify that the write pointer matches the expected offset for the recent blockhash.
-    - Write the recent blockhash to the transaction payload, using `opt_recent_blockhash` if provided, or zeroing the space if not.
-    - Return the total size of the generated transaction payload.
-- **Output**: Returns the size of the generated transaction payload as an `ulong`.
+    - Copy the account addresses into the transaction payload, separating signers and non-signers, and readonly and writable accounts.
+    - Ensure the write pointer is correctly positioned at the recent blockhash offset.
+    - Write the recent blockhash to the transaction payload, using zeros if no blockhash is provided.
+    - Return the total size of the transaction payload written.
+- **Output**: The function returns the total number of bytes written to the `out_txn_payload` buffer as an unsigned long integer.
 
 
 ---
 ### fd\_txn\_add\_instr<!-- {{#callable:fd_txn_add_instr}} -->
-[View Source →](<../../../../../src/flamenco/txn/fd_txn_generate.c#L93>)
-
-Adds an instruction to a transaction payload and updates transaction metadata.
+The `fd_txn_add_instr` function adds an instruction to a transaction payload, updating the transaction metadata accordingly.
 - **Inputs**:
     - `txn_meta_ptr`: A pointer to the transaction metadata structure.
-    - `out_txn_payload`: An array to store the transaction payload, with a minimum size defined by `FD_TXN_MTU`.
+    - `out_txn_payload`: An array representing the transaction payload where the instruction will be added.
     - `program_id`: The identifier of the program to which the instruction belongs.
-    - `accounts`: A pointer to an array of account identifiers used by the instruction.
-    - `accounts_sz`: The size of the `accounts` array.
+    - `accounts`: A pointer to an array of account identifiers involved in the instruction.
+    - `accounts_sz`: The size of the accounts array.
     - `instr_buf`: A pointer to the buffer containing the instruction data.
-    - `instr_buf_sz`: The size of the `instr_buf` buffer.
-- **Logic and Control Flow**:
-    - Cast `txn_meta_ptr` to a `fd_txn_t` pointer and store it in `txn_meta`.
-    - Check that the instruction count in `txn_meta` is less than `FD_TXN_INSTR_MAX` and that `recent_blockhash_off` is not zero.
-    - Calculate the starting point for the new instruction in `out_txn_payload` using `recent_blockhash_off` and `FD_TXN_BLOCKHASH_SZ`.
-    - Increment the instruction count in `txn_meta`.
-    - Encode the new instruction count as a compact unsigned 16-bit integer and store it in `out_txn_payload`.
-    - If there is more than one instruction, calculate the offset for the new instruction based on the previous instruction's data offset and size.
-    - Store the `program_id` in `out_txn_payload`.
-    - Encode the size of the `accounts` array as a compact unsigned 16-bit integer and store it in `out_txn_payload`.
-    - Copy the `accounts` array into `out_txn_payload` and update the write pointer.
-    - Encode the size of the `instr_buf` as a compact unsigned 16-bit integer and store it in `out_txn_payload`.
-    - Copy the `instr_buf` into `out_txn_payload` and update the write pointer.
-    - Generate instruction metadata using [`fd_txn_instr_meta_generate`](<#fd_txn_instr_meta_generate>) and update the instruction metadata in `txn_meta`.
-- **Output**: Returns the total number of bytes written to `out_txn_payload` as an unsigned long integer.
-- **Functions Called**:
-    - [`fd_txn_instr_meta_generate`](<#fd_txn_instr_meta_generate>)
+    - `instr_buf_sz`: The size of the instruction data buffer.
+- **Control Flow**:
+    - Cast the transaction metadata pointer to `fd_txn_t` type.
+    - Check if the current instruction count is less than the maximum allowed and if the recent blockhash offset is set.
+    - Calculate the starting point for the new instruction in the transaction payload.
+    - Increment the instruction count in the transaction metadata.
+    - Encode the new instruction count as a compact unsigned 16-bit integer and write it to the payload.
+    - If there are previous instructions, calculate the offset for the new instruction based on the previous instruction's data offset and size.
+    - Write the program ID to the payload.
+    - Encode the accounts size as a compact unsigned 16-bit integer and write it to the payload.
+    - Copy the accounts data to the payload and update the write pointer.
+    - Encode the instruction buffer size as a compact unsigned 16-bit integer and write it to the payload.
+    - Copy the instruction buffer data to the payload and update the write pointer.
+    - Generate and store the instruction metadata using [`fd_txn_instr_meta_generate`](#fd_txn_instr_meta_generate).
+- **Output**: Returns the total number of bytes written to the transaction payload as an unsigned long integer.
+- **Functions called**:
+    - [`fd_txn_instr_meta_generate`](#fd_txn_instr_meta_generate)
 
 
 ---
 ### fd\_txn\_reset\_instrs<!-- {{#callable:fd_txn_reset_instrs}} -->
-[View Source →](<../../../../../src/flamenco/txn/fd_txn_generate.c#L148>)
-
-Resets the instruction count and clears the instruction data in the transaction payload.
+The `fd_txn_reset_instrs` function resets the instruction count and clears the instruction data in a transaction payload.
 - **Inputs**:
-    - `txn_meta_ptr`: A pointer to the transaction metadata structure (`fd_txn_t`).
-    - `out_txn_payload`: An array representing the transaction payload with a static size defined by `FD_TXN_MTU`.
-- **Logic and Control Flow**:
-    - Cast `txn_meta_ptr` to a `fd_txn_t` pointer named `txn_meta`.
-    - Check if `txn_meta->instr_cnt` is zero; if true, return immediately.
-    - Calculate `instr_start` as the sum of `txn_meta->recent_blockhash_off` and `FD_TXN_BLOCKHASH_SZ`.
-    - Set the byte at `out_txn_payload + instr_start` to zero.
-    - Set `txn_meta->instr_cnt` to zero.
-- **Output**: No return value; the function modifies the transaction metadata and payload in place.
+    - `txn_meta_ptr`: A pointer to the transaction metadata structure, which contains information about the transaction including the instruction count.
+    - `out_txn_payload`: An array representing the transaction payload where the instructions are stored, with a size defined by `FD_TXN_MTU`.
+- **Control Flow**:
+    - Cast the `txn_meta_ptr` to a `fd_txn_t` pointer to access transaction metadata.
+    - Check if the instruction count (`instr_cnt`) in the transaction metadata is zero; if so, return immediately as there are no instructions to reset.
+    - Calculate the starting position of the instructions in the transaction payload using the offset of the recent blockhash and the size of the blockhash.
+    - Set the first byte of the instruction data in the transaction payload to zero, effectively clearing the instructions.
+    - Reset the instruction count (`instr_cnt`) in the transaction metadata to zero.
+- **Output**: The function does not return any value; it modifies the transaction metadata and payload in place.
 
 
 

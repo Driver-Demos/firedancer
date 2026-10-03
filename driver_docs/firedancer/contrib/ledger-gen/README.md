@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and utilities for Solana management, package configuration, and test cluster scripts.
+The `ledger-gen` folder in the `firedancer` codebase contains Rust source files for Solana program management and a Python script for generating Solana test clusters, with its configuration and dependencies specified in the `Cargo.toml` file.
 
 ## Folders
-- **[src](src/README.md)**: Functions and utilities for managing Solana programs, transactions, nonce and stake accounts using RPC clients.
+- **[src](src/README.md)**: The `src` folder in the `firedancer` codebase contains Rust files that provide comprehensive functionality for deploying, managing, and interacting with Solana programs, ledgers, nonce accounts, and stakes, utilizing various Solana SDK and client utilities.
 
 ## Files
-- **[Cargo.toml](Cargo.toml.md)**: Configuration for the `ledger-gen` package with dependencies on various Solana components.
-- **[run_cluster.py](run_cluster.py.md)**: Script to generate and manage a test Solana cluster with options for multi-node configurations.
+- **[Cargo.toml](Cargo.toml.md)**: The `Cargo.toml` file in the `firedancer/contrib/ledger-gen` directory specifies the package configuration and dependencies for the `ledger-gen` project, including various Solana-related libraries.
+- **[run_cluster.py](run_cluster.py.md)**: The `run_cluster.py` file in the `firedancer` codebase is a script designed to generate and manage a test Solana cluster, allowing for the creation of both single-node and multi-node clusters using Solana binaries built from a specified source directory.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

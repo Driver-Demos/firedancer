@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+Generated seccomp filter allowing write and fsync only on fd 2 or logfile_fd.
 
 
 ## Files
-- **[fd_poh_tile_seccomp.h](fd_poh_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+- **[fd_poh_tile_seccomp.h](fd_poh_tile_seccomp.h.md)**: Generated seccomp filter allowing write and fsync only on fd 2 or logfile_fd.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

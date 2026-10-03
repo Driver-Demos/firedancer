@@ -3,42 +3,54 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Software-based implementation of the Proof-of-History hashchain with functions for appending and mixing.
+The `fd_poh.h` file provides a software-based implementation of the Proof-of-History hashchain, including functions for appending recursive hash operations and mixing in a 32-byte value.
 
 # Purpose
-This C header file defines the interface for a software-based implementation of a Proof-of-History (PoH) hash chain. It includes the necessary header for SHA-256 operations, indicating that the PoH implementation relies on SHA-256 hashing. The file declares two functions: [`fd_poh_append`](<#fd_poh_append>), which performs a specified number of recursive hash operations on a given PoH state, and [`fd_poh_mixin`](<#fd_poh_mixin>), which integrates a 32-byte value into the PoH state. The header uses include guards to prevent multiple inclusions and ensure that the function prototypes are only defined once.
+This C header file defines the interface for a software-based implementation of a Proof-of-History (PoH) hash chain, a concept used in blockchain technologies to provide a verifiable sequence of events. The file includes function prototypes for two primary operations: [`fd_poh_append`](#fd_poh_append), which performs a specified number of recursive hash operations on a given PoH state, and [`fd_poh_mixin`](#fd_poh_mixin), which integrates a 32-byte value into the current PoH state. The header file relies on an external SHA-256 implementation, as indicated by the inclusion of `fd_sha256.h`, to perform the cryptographic hashing operations. The file is structured with include guards to prevent multiple inclusions and uses macros to manage function prototypes, ensuring compatibility and modularity within larger projects.
 # Imports and Dependencies
 
 ---
 - `../sha256/fd_sha256.h`
 
 
+# Global Variables
+
+---
+### fd\_poh\_append
+- **Type**: `function pointer`
+- **Description**: `fd_poh_append` is a function that performs a specified number of recursive hash operations on a Proof-of-History (PoH) state. It takes a pointer to a 32-byte memory region representing the current PoH state and an unsigned long integer indicating the number of hash operations to perform.
+- **Use**: This function is used to update the PoH state by performing multiple hash operations recursively.
+
+
+---
+### fd\_poh\_mixin
+- **Type**: `function pointer`
+- **Description**: The `fd_poh_mixin` is a function that takes a pointer to a 32-byte memory region representing the current state of a Proof-of-History (PoH) hashchain and a pointer to a 32-byte value to be mixed into this state. It is part of a software-based implementation of the PoH hashchain, which is a cryptographic structure used to verify the passage of time between events.
+- **Use**: This function is used to incorporate a new 32-byte value into the existing PoH state, effectively updating the hashchain with additional data.
+
+
 # Function Declarations (Public API)
 
 ---
 ### fd\_poh\_append<!-- {{#callable_declaration:fd_poh_append}} -->
-[View Source →](<../../../../../src/ballet/poh/fd_poh.h#L8>)
-
-Performs recursive hash operations on a Proof-of-History state.
-- **Description**: Use this function to perform a specified number of recursive hash operations on a Proof-of-History (PoH) state. The function updates the PoH state by applying the SHA-256 hash function `n` times. This function is useful in contexts where a PoH hashchain is required. Ensure that the `poh` parameter points to a valid 32-byte memory region before calling this function.
+Perform recursive hash operations on a Proof-of-History state.
+- **Description**: This function performs a specified number of recursive hash operations on a Proof-of-History (PoH) state. It is used to advance the PoH state by applying the SHA-256 hash function iteratively. The function should be called when you need to update the PoH state by a given number of hash iterations. The memory region pointed to by the poh parameter must be at least 32 bytes in size and contain the current PoH state. The function returns a pointer to the updated PoH state.
 - **Inputs**:
-    - `poh`: A pointer to a 32-byte memory region that stores the current PoH state. The caller must ensure this pointer is valid and points to a writable memory region.
-    - `n`: The number of recursive hash operations to perform. Must be a non-negative integer. If `n` is zero, the function returns immediately without modifying the PoH state.
-- **Output**: Returns a pointer to the updated PoH state, which is the same as the input `poh` pointer.
-- **See Also**: [`fd_poh_append`](<fd_poh.c.md#fd_poh_append>)  (Implementation)
+    - `poh`: A pointer to a 32-byte memory region that stores the current PoH state. The caller must ensure this pointer is valid and points to a writable memory region of at least 32 bytes. The function will update this memory region with the new PoH state.
+    - `n`: The number of recursive hash operations to perform. It must be a non-negative integer. If n is zero, the function will return immediately without modifying the PoH state.
+- **Output**: Returns a pointer to the updated PoH state, which is the same as the input poh pointer.
+- **See also**: [`fd_poh_append`](fd_poh.c.md#fd_poh_append)  (Implementation)
 
 
 ---
 ### fd\_poh\_mixin<!-- {{#callable_declaration:fd_poh_mixin}} -->
-[View Source →](<../../../../../src/ballet/poh/fd_poh.h#L28>)
-
 Mixes a 32-byte value into the current Proof-of-History state.
-- **Description**: Use this function to incorporate a 32-byte mixin value into the existing Proof-of-History (PoH) state. This function is useful when you need to update the PoH state with additional data. Ensure that `poh` points to a valid 32-byte memory region representing the current PoH state before calling this function. The function modifies the PoH state in place and returns a pointer to the updated state.
+- **Description**: This function is used to incorporate an additional 32-byte value into the existing Proof-of-History (PoH) state, which is stored in a 32-byte memory region pointed to by `poh`. It is typically called when there is a need to update the PoH state with new data. The function must be called with valid pointers to ensure correct operation. The `poh` parameter is both an input and output, as it is updated in place with the new state after mixing in the `mixin` value.
 - **Inputs**:
-    - `poh`: A pointer to a 32-byte memory region that stores the current PoH state. Must not be null. The function updates this memory region with the new state.
-    - `mixin`: A pointer to a 32-byte value to mix into the PoH state. Must not be null. The function reads this value to update the PoH state.
-- **Output**: Returns a pointer to the updated PoH state.
-- **See Also**: [`fd_poh_mixin`](<fd_poh.c.md#fd_poh_mixin>)  (Implementation)
+    - `poh`: A pointer to a 32-byte memory region that holds the current PoH state. This must not be null and must point to a valid memory region of at least 32 bytes. The caller retains ownership, and the content is updated in place.
+    - `mixin`: A pointer to a 32-byte value to be mixed into the PoH state. This must not be null and must point to a valid memory region of at least 32 bytes. The caller retains ownership, and the content is read-only.
+- **Output**: Returns the updated `poh` pointer, which now contains the new PoH state after mixing in the `mixin` value.
+- **See also**: [`fd_poh_mixin`](fd_poh.c.md#fd_poh_mixin)  (Implementation)
 
 
 
