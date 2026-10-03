@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing workspace components and utilities in the Firedancer project.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, binaries, and unit tests related to the workspace utilities, with conditional compilation and testing for hosted environments.
 
 # Purpose
-The provided content is a Makefile script used to manage the build process of a software project. It defines several operations using the `call` function to add header files and object files, create binaries, and manage unit tests. The script includes conditional logic with `ifdef FD_HAS_HOSTED` to determine if certain unit tests should be compiled and executed, based on the availability of the `fd_shmem` API support. The script specifies the creation of a binary named `fd_wksp_ctl` and includes unit tests for various components such as `test_wksp_used_treap`, `test_wksp_free_treap`, and others. Additionally, it includes a commented-out line indicating a potential issue with the `test_wksp_helper` unit test, marked with `FIXME`.
+The provided content is from a Makefile, which is a build automation tool used to manage the build process of software projects. This specific Makefile snippet is responsible for organizing the compilation and testing of various components related to a workspace module, indicated by the prefix `fd_wksp`. It uses custom macros like `add-hdrs`, `add-objs`, `make-bin`, `make-unit-test`, and `run-unit-test` to add headers, compile object files, create binaries, and define and execute unit tests, respectively. The conditional block `ifdef FD_HAS_HOSTED` ensures that certain tests are only executed if the `FD_HAS_HOSTED` flag is set, indicating that the tests require specific API support available on hosted targets. The commented line suggests a known issue or pending task related to enabling a particular unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

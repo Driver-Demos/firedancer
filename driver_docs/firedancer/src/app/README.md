@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, configurations, build files, and tools for Firedancer applications, debugging, development, and RPC server.
+Configuration, debugging, development, ledger, platform, shared, and data capture tools.
 
 ## Folders
-- **[fdctl](fdctl/README.md)**: Functions for Agave component, benchmarking, configuration, versioning, and network topology for fdctl.
-- **[fddbg](fddbg/README.md)**: Makefile for building `fddbg` and a wrapper for debugging in VS Code.
-- **[fddev](fddev/README.md)**: Blockstore configuration, TPS benchmark commands, development validator, tests, and build files for `fddev`.
-- **[firedancer](firedancer/README.md)**: Configuration settings, callback functions, main function, network topology, versioning, and build files for the Firedancer application.
-- **[firedancer-dev](firedancer-dev/README.md)**: Commands for testing and development, configuration settings, a Makefile, and the main function.
-- **[ledger](ledger/README.md)**: Makefile logic and main function for building and executing the `firedancer` ledger application.
-- **[platform](platform/README.md)**: Capability checks, configuration validation, file and network utilities, system functions, and build scripts.
-- **[shared](shared/README.md)**: Bootstrapping, command-line tools, configuration management, callback functions, fuzz testing, and build scripts.
-- **[shared_dev](shared_dev/README.md)**: Bootstrapping, process execution, benchmarking, configuration, packet generation, QUIC tracing, network command utilities, RPC client programs, and a Makefile for building shared development components.
+- **[fdctl](fdctl/README.md)**: Configuration, versioning, topology, and command setup for validator execution.
+- **[fddbg](fddbg/README.md)**: The `fddbg` folder in the `firedancer` codebase contains files for building and implementing a debugging tool with elevated capabilities, specifically a makefile (`Local.mk`) and a C source file (`main.c`) for managing process capabilities and executing GDB.
+- **[fddev](fddev/README.md)**: Commands, tests, and build rules for blockstore configuration, TPS benchmarks, and development validator threads.
+- **[firedancer](firedancer/README.md)**: Topology, callbacks, config, version, and build files for app startup and tile setup.
+- **[firedancer-dev](firedancer-dev/README.md)**: Commands, config, build rules, and main application setup for Firedancer dev.
+- **[ledger](ledger/README.md)**: Build conditions and command-line ledger workspace management with RocksDB minify logic.
+- **[platform](platform/README.md)**: Capability, config, file, network, and system utility functions with build rules.
+- **[shared](shared/README.md)**: Boot, commands, config, callbacks, and tile unit tests.
+- **[shared_dev](shared_dev/README.md)**: Development command tools, RPC client, and makefile rules for shared objects and configure stages.
 
 
 ---
