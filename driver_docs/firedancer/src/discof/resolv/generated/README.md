@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall restrictions based on architecture and specific conditions.
+Generated seccomp filter allowing write and fsync only on stdout and logfile_fd.
 
 
 ## Files
-- **[fd_resolv_tile_seccomp.h](fd_resolv_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific conditions.
+- **[fd_resolv_tile_seccomp.h](fd_resolv_tile_seccomp.h.md)**: Generated seccomp filter allowing write and fsync only on stdout and logfile_fd.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

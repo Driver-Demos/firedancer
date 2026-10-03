@@ -3,38 +3,38 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines constants and precomputed tables for cryptographic operations using the Ristretto255 group.
+The `fd_rangeproofs_table_ref.c` file in the Firedancer codebase is an auto-generated C header file that defines static constant arrays of precomputed points on the Ristretto255 curve, including base points and generators, which are used internally in cryptographic operations for range proofs to enhance performance and efficiency.
 
 # Purpose
-The header file defines constants and precomputed tables for cryptographic operations related to the Ristretto255 group, which is based on the Edwards25519 curve. It includes arrays such as `fd_rangeproofs_basepoint_G`, `fd_rangeproofs_basepoint_H`, and `fd_rangeproofs_generators_G`, which are used in Pedersen commitments to encode messages and commitment openings. Additionally, the file contains a static array `fd_rangeproofs_generators_H`, which consists of precomputed elliptic curve points represented as nested arrays of hexadecimal values. These points are used for cryptographic protocols like range proofs. The file is auto-generated and intended for internal use within a cryptographic library, as indicated by the use of static and const keywords, ensuring the data is read-only and confined to the file. The file should be included through `fd_rangeproofs.h` and not directly, as enforced by a preprocessor directive.
+The provided C code is a header file that defines a set of static constant arrays used in cryptographic operations, specifically for range proofs using the Ristretto255 curve. This file is auto-generated and not intended for manual modification, serving as a part of a larger cryptographic library. It contains precomputed constants, such as Pedersen base points and generators, which are crucial for encoding messages and generating commitments securely and efficiently. The code does not define any public APIs or external interfaces directly; instead, it provides essential constants that other parts of the library or application might use internally to optimize cryptographic operations. The presence of "compressed" comments and the structured format of hexadecimal values suggest that these constants are used in contexts requiring compressed representations, common in elliptic curve cryptography, to enhance performance and efficiency.
 # Global Variables
 
 ---
 ### fd\_rangeproofs\_basepoint\_G
-- **Type**: ``fd_ristretto255_point_t` array`
-- **Description**: A static constant array of type `fd_ristretto255_point_t` with a single element. It represents a base point used in range proofs, initialized with specific compressed coordinates.
-- **Use**: Used as a base point in cryptographic range proof operations.
+- **Type**: `fd_ristretto255_point_t[1]`
+- **Description**: The variable `fd_rangeproofs_basepoint_G` is a static constant array of type `fd_ristretto255_point_t` with a single element. It represents a base point used in cryptographic operations, specifically for range proofs, and is initialized with a specific compressed point value.
+- **Use**: This variable is used as a constant base point in cryptographic computations related to range proofs.
 
 
 ---
 ### fd\_rangeproofs\_basepoint\_H
-- **Type**: ``fd_ristretto255_point_t` array`
-- **Description**: A static constant array of type `fd_ristretto255_point_t` that contains a single element representing a point on the Ristretto255 curve. The point is defined using four sets of five 64-bit integers, which are likely used to store the coordinates and other related data of the point in a compressed form.
-- **Use**: Used as a base point in cryptographic operations involving range proofs.
+- **Type**: `static const fd_ristretto255_point_t[1]`
+- **Description**: The variable `fd_rangeproofs_basepoint_H` is a static constant array of type `fd_ristretto255_point_t` with a single element. It represents a point on the Ristretto255 curve, which is used in cryptographic operations, specifically for range proofs. The point is defined by a set of coordinates, each represented by a series of hexadecimal values, and is compressed for efficient storage and computation.
+- **Use**: This variable is used as a base point in cryptographic range proof operations, providing a fixed reference point on the Ristretto255 curve.
 
 
 ---
 ### fd\_rangeproofs\_generators\_G
-- **Type**: ``fd_ristretto255_point_t[256]``
-- **Description**: An array of 256 constant `fd_ristretto255_point_t` elements, each representing a point on the Ristretto255 curve. Each element in the array is a structure containing four nested arrays of five 64-bit unsigned integers, which represent the coordinates of the point in a compressed form.
-- **Use**: Used to store precomputed generator points for range proofs in cryptographic operations.
+- **Type**: `fd_ristretto255_point_t[256]`
+- **Description**: The `fd_rangeproofs_generators_G` is a static constant array of 256 elements, each of type `fd_ristretto255_point_t`. This data structure is used to store a series of precomputed points on the Ristretto255 curve, which is a prime-order group based on Curve25519. Each element in the array represents a point on the curve, defined by a set of coordinates in a specific format.
+- **Use**: This array is used in cryptographic operations, particularly in range proofs, where these precomputed points can be used to efficiently perform operations on the Ristretto255 curve.
 
 
 ---
 ### fd\_rangeproofs\_generators\_H
 - **Type**: ``fd_ristretto255_point_t[256]``
-- **Description**: An array of 256 constant `fd_ristretto255_point_t` structures. Each element in the array represents a point on the Ristretto255 curve, which is a prime-order group used in cryptographic operations. The points are stored in a compressed format, and each point consists of four 64-bit integers and one 64-bit integer set to 1, representing the identity element in the group.
-- **Use**: Used to store precomputed points on the Ristretto255 curve for cryptographic operations.
+- **Description**: The `fd_rangeproofs_generators_H` is a static constant array of 256 elements, each of type `fd_ristretto255_point_t`. This data structure is used to store precomputed points on the Ristretto255 curve, which are likely used in cryptographic operations such as range proofs.
+- **Use**: This array is used to provide a set of precomputed points for efficient cryptographic computations in range proofs.
 
 
 

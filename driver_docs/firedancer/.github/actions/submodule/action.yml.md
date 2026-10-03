@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a GitHub Action for caching the agave submodule with configurable machine and compiler options.
+The `action.yml` file in the `firedancer` codebase defines a GitHub Action for caching the agave submodule, with configurable inputs for machine type, C compiler, compiler version, and action type.
 
 # Purpose
-The metadata file defines a configuration for a build process involving a submodule named `agave`. It specifies several input parameters, such as `machine`, `compiler`, and `compiler-version`, each with descriptions, requirements, and default values. The `compiler` and `action` inputs are of type `choice`, providing specific options for selection. The configuration uses a composite action with steps to manage the submodule's state. The first step captures the current commit of the `agave` submodule and stores it in the GitHub environment. The second step utilizes a caching action to store or restore the submodule's build artifacts, using a cache key that incorporates the input parameters and the submodule commit.
+The provided content is a configuration file for a GitHub Action workflow, specifically designed to manage caching for a submodule named "agave." This file defines several inputs, such as the machine type, C compiler, and compiler version, which are required for the build process, with default values and options specified for each. The workflow is set to run using a composite action, consisting of steps that first determine the commit hash of the "agave" submodule and then utilize a caching action to store or restore the build artifacts. The caching mechanism is configured to use a key that incorporates the machine type, compiler, compiler version, and submodule commit hash, ensuring that the cache is uniquely identified and can be efficiently managed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
