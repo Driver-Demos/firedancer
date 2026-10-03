@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for building and testing components with optional SECP256K1 and INT128 support.
+Build rules for fd_tower headers, objects, and unit tests when int128 and secp256k1 are enabled.
 
 # Purpose
-This Makefile script conditionally includes headers and object files for a project based on the presence of certain features. If `FD_HAS_INT128` and `FD_HAS_SECP256K1` are defined, it adds the header `fd_tower.h` and the object files `fd_tower` and `fd_choreo`. If `FD_HAS_HOSTED` is also defined, it creates and runs a unit test named `test_tower` using the specified dependencies and libraries, including `fd_choreo`, `fd_flamenco`, `fd_tango`, `fd_ballet`, `fd_util`, and `SECP256K1_LIBS`.
+This build file adds `fd_tower.h` to the header list and `fd_tower` to the object list for `fd_choreo` when `FD_HAS_INT128` and `FD_HAS_SECP256K1` are set. It also defines and runs the `test_tower` unit test when `FD_HAS_HOSTED` is set, with links to `fd_choreo`, `fd_flamenco`, `fd_tango`, `fd_ballet`, `fd_util`, and `$(SECP256K1_LIBS)`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

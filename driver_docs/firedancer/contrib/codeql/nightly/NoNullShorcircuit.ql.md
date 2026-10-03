@@ -3,17 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Detects potential null pointer access without short-circuiting in C++ code, issuing a warning.
+CodeQL query for potential null pointer checks followed by non-short-circuit access.
 
 # Purpose
-This code defines a rule for identifying a specific problem pattern in C++ code, where a potential null pointer is checked and then accessed without using short-circuit logic. It is part of a static analysis tool or a code quality checker, as indicated by the metadata annotations such as `@kind problem` and `@problem.severity warning`. The code uses pattern matching to detect instances where a binary bitwise operation involves a left-hand side expression and a right-hand side pointer field access, ensuring that the types match and the operation is included in the analysis scope. The rule generates a warning when this pattern is detected, highlighting the potential risk of null pointer dereference.
-# Imports and Dependencies
-
----
-- `cpp`
-- `filter`
-
-
+This query defines a CodeQL problem check named `Null no short-circuit` that detects cases where a value is checked and then used in a pointer field access without short-circuit evaluation. It imports `cpp` and `filter`, then matches a `BinaryBitwiseOperation` with a left operand `lhs` and a right operand `rhs` of type `PointerFieldAccess`. The `where` clause links the operands, verifies that the target type of `rhs` matches the type of `lhs`, and limits results to included locations. The `select` statement reports the left operand with a warning message that identifies a potential null pointer access.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
