@@ -3,25 +3,25 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CI, fuzz, integration, unit, test vector, cluster setup, and TPS scripts.
+Scripts and helpers for CI, integration, unit, fuzz, ledger, and cluster tests.
 
 
 ## Files
-- **[ci_tests.sh](ci_tests.sh.md)**: Builds and runs CI tests, optionally exporting coverage data, and warns about build directory destruction.
-- **[fetch_clusterfuzz_corpus.sh](fetch_clusterfuzz_corpus.sh.md)**: Downloads and extracts the latest ClusterFuzz corpus from Google Cloud Storage.
-- **[find_uncovered_fuzz_canaries.py](find_uncovered_fuzz_canaries.py.md)**: Script to identify uncovered fuzz canaries in source code using lcov coverage data.
-- **[ledger_common.sh](ledger_common.sh.md)**: Shell script functions for managing ledger checksums, including creation, verification, and redownload.
-- **[run_fd_shred_cap.sh](run_fd_shred_cap.sh.md)**: A Bash script to set up, configure, and run a Firedancer simulation with specific parameters and cleanup.
-- **[run_integration_tests.sh](run_integration_tests.sh.md)**: A Bash script to sequentially run integration tests with logging and error handling.
-- **[run_script_tests.sh](run_script_tests.sh.md)**: A shell script to run and log results of various unit tests for the Firedancer project.
-- **[run_solcap_tests.sh](run_solcap_tests.sh.md)**: Shell script to download, configure, and test a Solana ledger for the Firedancer project.
-- **[run_test_vectors.sh](run_test_vectors.sh.md)**: A shell script to run test vectors with parallelism and manage repository setup for the Firedancer project.
-- **[run_unit_tests.sh](run_unit_tests.sh.md)**: A NUMA-aware test scheduler script for running unit tests with configurable job parallelism and memory settings.
-- **[setup_fd_cluster.sh](setup_fd_cluster.sh.md)**: Shell script to set up a Solana test cluster with key generation, program fetching, and validator start.
-- **[setup_fd_cluster_stakes.sh](setup_fd_cluster_stakes.sh.md)**: Shell script to set up Solana cluster stakes and vote accounts using keypairs.
-- **[single_test_cov.sh](single_test_cov.sh.md)**: Generates a coverage report for a single test using Clang, LLVM, and Lcov.
-- **[test_firedancer_leader.sh](test_firedancer_leader.sh.md)**: A shell script to configure and run the Firedancer development environment with specific network settings.
-- **[tps.py](tps.py.md)**: A script to measure and display transaction and compute unit statistics from an RPC endpoint.
+- **[ci_tests.sh](ci_tests.sh.md)**: Builds and runs CI tests, with optional coverage export.
+- **[fetch_clusterfuzz_corpus.sh](fetch_clusterfuzz_corpus.sh.md)**: The `fetch_clusterfuzz_corpus.sh` file is a Bash script that downloads and extracts the latest ClusterFuzz corpus from Google Cloud Storage into a local directory, while warning that it is destructive.
+- **[find_uncovered_fuzz_canaries.py](find_uncovered_fuzz_canaries.py.md)**: The `find_uncovered_fuzz_canaries.py` file in the `firedancer` codebase identifies and reports source code lines marked as "canaries" that have not been covered by fuzz testing, using lcov coverage data to filter out covered lines.
+- **[ledger_common.sh](ledger_common.sh.md)**: Shell helpers for ledger checksum checks, error messages, and redownload handling.
+- **[run_fd_shred_cap.sh](run_fd_shred_cap.sh.md)**: Runs a Firedancer shred-cap testnet simulation with downloaded ledger data and cleanup.
+- **[run_integration_tests.sh](run_integration_tests.sh.md)**: The `run_integration_tests.sh` file in the `firedancer` codebase is a Bash script designed to sequentially execute integration tests, with options for verbosity and specific test selection, while ensuring system configuration changes are managed and logging results for each test.
+- **[run_script_tests.sh](run_script_tests.sh.md)**: Runs unit tests and writes each test log to LOG_PATH.
+- **[run_solcap_tests.sh](run_solcap_tests.sh.md)**: Downloads a ledger, runs firedancer backtest and solcap diff, and checks ledger checksum.
+- **[run_test_vectors.sh](run_test_vectors.sh.md)**: Runs test vectors from a local Git checkout with configurable processes and logging.
+- **[run_unit_tests.sh](run_unit_tests.sh.md)**: The `run_unit_tests.sh` file is a bash script that functions as a NUMA-aware greedy test scheduler, managing the execution of unit tests across multiple NUMA nodes and CPUs while handling memory allocation and job distribution.
+- **[setup_fd_cluster.sh](setup_fd_cluster.sh.md)**: The `setup_fd_cluster.sh` file is a shell script for setting up a Solana test cluster, including generating keypairs, fetching necessary programs, running the genesis process, and starting a bootstrap validator.
+- **[setup_fd_cluster_stakes.sh](setup_fd_cluster_stakes.sh.md)**: The `setup_fd_cluster_stakes.sh` file is a Bash script used to set up keypairs, create vote and stake accounts, and delegate stakes for a Solana cluster in the Firedancer project.
+- **[single_test_cov.sh](single_test_cov.sh.md)**: Generates an lcov coverage report for a single test using llvm-cov and genhtml.
+- **[test_firedancer_leader.sh](test_firedancer_leader.sh.md)**: Shell script that configures and starts firedancer-dev under gdb for a local test ledger.
+- **[tps.py](tps.py.md)**: The `tps.py` file in the `firedancer` codebase is a script that monitors and displays transaction processing statistics such as transaction count, transactions per second, and compute units per second from a specified RPC endpoint and metrics URL.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

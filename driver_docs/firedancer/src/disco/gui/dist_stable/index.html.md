@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-HTML document for the Firedancer GUI with preloaded assets and a root div for content rendering.
+HTML entry page that preloads assets and loads the Firedancer app.
 
 # Purpose
-The HTML document defines the structure and resources for a web page titled "Firedancer." It specifies the document type and language, and includes metadata such as character encoding and viewport settings for responsive design. The document preloads several assets, including fonts and SVG images, to optimize loading performance. It links to a JavaScript module and a CSS stylesheet, both of which are essential for the page's functionality and styling. The `body` contains a `div` with the ID `root`, which serves as a container for dynamically injected content, typically managed by JavaScript.
+This HTML file defines the entry page for the web application and sets the document metadata used by the browser. It declares the page language, character set, viewport settings, title, favicon, and preload links for the font and SVG assets so the browser can load them early. The file also loads the main JavaScript module and stylesheet from the `assets` directory, then provides the `root` element where the application renders its user interface.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
