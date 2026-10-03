@@ -3,38 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Maps error codes to their corresponding string messages in the Firedancer codebase.
+Maps vinyl error codes to string messages.
 
 # Purpose
-The code defines a function [`fd_vinyl_strerror`](<#fd_vinyl_strerror>) that converts error codes into human-readable error messages. It includes the header file `fd_vinyl_base.h`, which likely contains the definitions of the error codes used in the switch statement. The function takes an integer `err` as input, which represents an error code, and returns a string that describes the error. The function handles specific error codes such as `FD_VINYL_SUCCESS`, `FD_VINYL_ERR_INVAL`, and others, returning corresponding strings like "success", "inval", etc. If the error code does not match any predefined cases, the function returns "unknown".
-# Imports and Dependencies
-
----
-- `fd_vinyl_base.h`
-
-
-# Functions
-
----
-### fd\_vinyl\_strerror<!-- {{#callable:fd_vinyl_strerror}} -->
-[View Source →](<../../../../src/vinyl/fd_vinyl_base.c#L3>)
-
-Maps error codes to their corresponding error message strings.
-- **Inputs**:
-    - `err`: An integer representing the error code to be translated into a string message.
-- **Logic and Control Flow**:
-    - Use a `switch` statement to check the value of `err`.
-    - If `err` matches `FD_VINYL_SUCCESS`, return the string "success".
-    - If `err` matches `FD_VINYL_ERR_INVAL`, return the string "inval".
-    - If `err` matches `FD_VINYL_ERR_AGAIN`, return the string "again".
-    - If `err` matches `FD_VINYL_ERR_CORRUPT`, return the string "corrupt".
-    - If `err` matches `FD_VINYL_ERR_EMPTY`, return the string "empty".
-    - If `err` matches `FD_VINYL_ERR_FULL`, return the string "full".
-    - If `err` matches `FD_VINYL_ERR_KEY`, return the string "key".
-    - If `err` does not match any known error code, return the string "unknown".
-- **Output**: A constant character pointer to the string that describes the error.
-
-
+This file defines [`fd_vinyl_strerror`](<#fd_vinyl_strerror>), a small helper function that converts `fd_vinyl` error codes into short text strings. The function uses a `switch` statement to map each known code, such as `FD_VINYL_SUCCESS`, `FD_VINYL_ERR_INVAL`, and `FD_VINYL_ERR_FULL`, to a fixed string name. If the input value does not match any known error code, the function returns `"unknown"`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
