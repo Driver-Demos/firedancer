@@ -3,39 +3,39 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Gossip protocol implementation and management with data structures, message handling, and build configuration.
+Gossip protocol state, message handling, peer tracking, tests, and build rules.
 
 ## Folders
-- **[crds](crds/README.md)**: Implements and tests CRDS structures, peer samplers, and contact info with a Makefile for build management.
+- **[crds](crds/README.md)**: CRDS gossip table APIs, peer samplers, contact info pool, build rules, and tests
 
 ## Files
-- **[fd_active_set.c](fd_active_set.c.md)**: Implements functions for managing an active set with bloom filters and peer rotation in a gossip protocol.
-- **[fd_active_set.h](fd_active_set.h.md)**: APIs for managing an active set of nodes in a Solana gossip network, with peer selection and pruning.
-- **[fd_active_set_private.h](fd_active_set_private.h.md)**: Defines a function to calculate a stake bucket for an active set in the Firedancer project.
-- **[fd_bloom.c](fd_bloom.c.md)**: Implements a Bloom filter with functions for initialization, insertion, and membership testing.
-- **[fd_bloom.h](fd_bloom.h.md)**: Bloom filter implementation with functions for initialization, insertion, and membership testing.
-- **[fd_gossip.c](fd_gossip.c.md)**: Implements a gossip protocol for node communication, including message handling, stake management, and network metrics.
-- **[fd_gossip.h](fd_gossip.h.md)**: Header file for implementing the Solana gossip protocol, including functions for node communication and metrics tracking.
-- **[fd_gossip_msg_parse.c](fd_gossip_msg_parse.c.md)**: Parses various types of gossip messages, including CRDS values, pull requests, and ping/pong messages.
-- **[fd_gossip_msg_ser.c](fd_gossip_msg_ser.c.md)**: Implements serialization and encoding functions for gossip messages in the Firedancer codebase.
-- **[fd_gossip_out.c](fd_gossip_out.c.md)**: Functions for managing and publishing gossip chunks in a network context.
-- **[fd_gossip_out.h](fd_gossip_out.h.md)**: Defines structures and functions for managing and publishing data chunks in a gossip protocol.
-- **[fd_gossip_private.h](fd_gossip_private.h.md)**: Defines data structures, constants, and functions for handling gossip protocol messages in the Firedancer codebase.
-- **[fd_gossip_txbuild.c](fd_gossip_txbuild.c.md)**: Functions and structures for building and managing gossip transaction messages.
-- **[fd_gossip_txbuild.h](fd_gossip_txbuild.h.md)**: APIs for incrementally building and managing Gossip protocol push or pull response messages.
-- **[fd_gossip_types.h](fd_gossip_types.h.md)**: Defines data structures and constants for gossip update messages in a distributed network.
-- **[fd_ping_tracker.c](fd_ping_tracker.c.md)**: Implements a ping tracker for managing peer connections and states in a network, including functions for tracking, registering, and requesting pings.
-- **[fd_ping_tracker.h](fd_ping_tracker.h.md)**: Manages peer metadata for ping tracking to prevent DDoS attacks in a gossip network.
-- **[fd_prune_finder.c](fd_prune_finder.c.md)**: Implements a system for managing and recording prune origins using pools, doubly linked lists, and maps.
-- **[fd_prune_finder.h](fd_prune_finder.h.md)**: API for tracking gossip messages and determining which peers to prune based on message duplication.
-- **[fd_push_set_private.c](fd_push_set_private.c.md)**: Implements a push set data structure using custom pool and doubly linked list templates for managing entries.
-- **[fuzz_gossip_msg_parse.c](fuzz_gossip_msg_parse.c.md)**: Fuzz testing for gossip message parsing with initialization and input handling functions.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for the gossip module in the Firedancer project.
-- **[test_active_set.c](test_active_set.c.md)**: Tests for the active set functionality in the Firedancer codebase, including stake bucket and active set operations.
-- **[test_bloom.c](test_bloom.c.md)**: Tests for Bloom filter functionality, including initialization, insertion, and containment checks.
-- **[test_crds_utils.c](test_crds_utils.c.md)**: Tests for CRDS utilities, including functions to create and free test CRDS instances.
-- **[test_gossip.c](test_gossip.c.md)**: Tests basic functionality of the gossip protocol implementation in the Firedancer codebase.
-- **[test_ping_tracker.c](test_ping_tracker.c.md)**: Unit tests for the ping tracker functionality in the Firedancer codebase, including tests for basic operations, registration, address changes, invalid transitions, and random scenarios.
+- **[fd_active_set.c](fd_active_set.c.md)**: Active-set management with bloom-filter pruning, node lookup, and peer rotation.
+- **[fd_active_set.h](fd_active_set.h.md)**: APIs for tracking and rotating gossip peers with stake buckets and prune bloom filters.
+- **[fd_active_set_private.h](fd_active_set_private.h.md)**: Stake bucket calculation from a stake value.
+- **[fd_bloom.c](fd_bloom.c.md)**: Bloom filter allocation, initialization, insert, and membership test functions.
+- **[fd_bloom.h](fd_bloom.h.md)**: Bloom filter API and sizing helpers for insert and membership tests.
+- **[fd_gossip.c](fd_gossip.c.md)**: Gossip protocol state, message handling, and peer tracking logic.
+- **[fd_gossip.h](fd_gossip.h.md)**: Gossip protocol API, metrics, and packet handling functions.
+- **[fd_gossip_msg_parse.c](fd_gossip_msg_parse.c.md)**: Parses gossip messages, CRDS values, pull requests, prune, ping, and pong payloads.
+- **[fd_gossip_msg_ser.c](fd_gossip_msg_ser.c.md)**: Gossip message serialization for pull requests, contact info, and CRDS votes.
+- **[fd_gossip_out.c](fd_gossip_out.c.md)**: Publishes gossip chunks and advances the chunk pointer after range checks.
+- **[fd_gossip_out.h](fd_gossip_out.h.md)**: Gossip output chunk allocation and publish functions.
+- **[fd_gossip_private.h](fd_gossip_private.h.md)**: Gossip message layouts, size bounds, and encode and parse helpers.
+- **[fd_gossip_txbuild.c](fd_gossip_txbuild.c.md)**: Builds gossip transaction bytes and tracks appended CRDS values.
+- **[fd_gossip_txbuild.h](fd_gossip_txbuild.h.md)**: APIs for incrementally building gossip push or pull response messages from CRDS values.
+- **[fd_gossip_types.h](fd_gossip_types.h.md)**: Gossip update message types, tags, and payload structures.
+- **[fd_ping_tracker.c](fd_ping_tracker.c.md)**: Ping tracker for peers with state, ping tokens, pong validation, and metrics.
+- **[fd_ping_tracker.h](fd_ping_tracker.h.md)**: Ping tracking for gossip peers with ping, pong, and validation state.
+- **[fd_prune_finder.c](fd_prune_finder.c.md)**: LRU-based origin tracking and pruning record logic for gossip duplicates.
+- **[fd_prune_finder.h](fd_prune_finder.h.md)**: API for tracking gossip duplicates and selecting peers to prune.
+- **[fd_push_set_private.c](fd_push_set_private.c.md)**: Push-set pool and LRU list management for gossip transaction build entries.
+- **[fuzz_gossip_msg_parse.c](fuzz_gossip_msg_parse.c.md)**: Fuzzes fd_gossip_msg_parse with libFuzzer initialization and input size limit.
+- **[Local.mk](Local.mk.md)**: Build rules for gossip headers, objects, unit tests, and a fuzz test.
+- **[test_active_set.c](test_active_set.c.md)**: Unit tests for stake bucket mapping and active set rotation and node selection.
+- **[test_bloom.c](test_bloom.c.md)**: Tests bloom filter sizing, insert/contains, and key bounds behavior.
+- **[test_crds_utils.c](test_crds_utils.c.md)**: Test helpers to create and free a CRDS with mock gossip contact info entries.
+- **[test_gossip.c](test_gossip.c.md)**: Tests basic gossip initialization with stub send, sign, and ping-change callbacks.
+- **[test_ping_tracker.c](test_ping_tracker.c.md)**: Unit tests for ping tracking, pong registration, state transitions, and request timing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

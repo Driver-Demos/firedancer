@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and running the `fddev` application with integration tests and conditional dependencies.
+Make rules for fddev build, run, monitor, and integration tests.
 
 # Purpose
-The `Makefile` content defines build and execution rules for a software project. It uses conditional directives to check for specific features such as `FD_HAS_HOSTED`, `FD_HAS_LINUX`, `FD_HAS_ALLOCA`, `FD_HAS_DOUBLE`, and `FD_HAS_INT128`, ensuring that the build process only proceeds if these conditions are met. The `.PHONY` targets `fddev`, `run`, and `monitor` are declared to prevent conflicts with files of the same name. The `add-objs` function is called to add object files for various components, and the `make-bin-rust` function is used to compile a binary named `fddev` with specified dependencies. The `run` and `monitor` targets are defined to execute the `fddev` binary with optional arguments, and integration tests are set up and executed using `make-integration-test` and `run-integration-test` functions.
+This Makefile fragment defines build rules for the `fddev` tool and its related test target under a set of platform and feature guards. It adds object files for the `fd_fddev` module, command sources, and the Rust binary target `fddev`, and it links the binary with the listed internal libraries and components. The `run` and `monitor` targets start `fddev` with default or user-supplied arguments, while the `$(eval ...)` rules allow extra command-line words to pass through as target arguments. It also defines and runs the integration test `test_fddev`, which validates the `fddev` executable with the same dependency set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
