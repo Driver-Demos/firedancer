@@ -3,349 +3,311 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for vector operations on 64-bit unsigned integers using SSE intrinsics.
+The `fd_sse_vv.h` file in the `firedancer` codebase provides a set of macros and inline functions for operations on 128-bit SIMD vectors, specifically handling pairs of 64-bit unsigned integers, including arithmetic, logical, and conversion operations, as well as memory and element manipulation.
 
 # Purpose
-The code defines a set of macros and inline functions for operations on 128-bit SIMD vectors using Intel's SSE (Streaming SIMD Extensions) intrinsics. It focuses on handling vectors of unsigned 64-bit integers, referred to as `vv_t`. The code provides a comprehensive API for constructing, manipulating, and performing arithmetic, logical, and conversion operations on these vectors. It includes constructors for creating vectors, memory operations for loading and storing vectors, and a variety of arithmetic operations such as addition, subtraction, and multiplication. Logical operations include bitwise AND, OR, XOR, and shifts, while conversion operations allow for transforming vectors into different data types.
+This C source code file provides a specialized API for handling vector operations on unsigned 64-bit integers (ulongs) using SIMD (Single Instruction, Multiple Data) instructions, specifically targeting the SSE (Streaming SIMD Extensions) instruction set. The file defines a set of macros and inline functions to perform various operations on vectors of two 64-bit unsigned integers, encapsulated in the `__m128i` data type. The operations include vector construction, memory loading and storing, arithmetic operations (such as addition and subtraction), bitwise operations (such as AND, OR, XOR), logical operations, conditional operations, and conversions between different vector types. The code is designed to be used as part of a larger SIMD utility library, as indicated by the inclusion guard that requires the file to be included through a specific header (`fd_sse.h`).
 
-The code is intended to be included indirectly through a header file `fd_sse.h`, as indicated by the initial preprocessor directive. It provides a broad range of functionality for vector operations, which can be used in performance-critical applications that benefit from parallel processing capabilities of SIMD. The use of macros and inline functions aims to optimize performance by reducing function call overhead and allowing the compiler to better optimize the code. The code also includes conditional operations and reduction operations, which are useful for decision-making and aggregating results across vector elements.
+The file is structured to provide efficient and robust vector operations by leveraging the capabilities of the SSE instruction set, with some operations conditionally optimized for AVX-512 if available. The use of macros allows for compile-time optimizations, while inline functions provide flexibility for operations that require more complex logic or type handling. The code also includes workarounds for limitations in the pre-AVX-512 instruction set, such as emulating certain operations that are not natively supported. This file is intended to be included in other C source files to provide SIMD functionality, and it does not define a standalone executable or public API. Instead, it serves as a utility for developers working with low-level vectorized operations in performance-critical applications.
 # Functions
 
 ---
 ### vv\_ld<!-- {{#callable:vv_ld}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L45>)
-
-Loads two unsigned long integers from a 16-byte aligned memory location into a vector register.
+The `vv_ld` function loads a 128-bit vector of two unsigned long integers from a 16-byte aligned memory location into a SIMD register.
 - **Inputs**:
-    - `p`: A pointer to a 16-byte aligned memory location containing two unsigned long integers.
-- **Logic and Control Flow**:
-    - Casts the input pointer `p` to a pointer of type `__m128i const *`.
-    - Uses the `_mm_load_si128` intrinsic to load the data from the memory location into a `__m128i` vector register.
-- **Output**: Returns a `vv_t` type, which is a `__m128i` vector containing the loaded unsigned long integers.
+    - `p`: A pointer to a memory location containing two unsigned long integers, which must be 16-byte aligned.
+- **Control Flow**:
+    - The function casts the input pointer `p` to a pointer of type `__m128i const *`, which is suitable for SIMD operations.
+    - It then uses the `_mm_load_si128` intrinsic to load the 128-bit data from the memory location pointed to by `p` into a SIMD register.
+- **Output**: A `vv_t` type, which is a 128-bit SIMD register containing the loaded vector of two unsigned long integers.
 
 
 ---
 ### vv\_st<!-- {{#callable:vv_st}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L46>)
-
-Stores a vector of two unsigned 64-bit integers into a 16-byte aligned memory location.
+The `vv_st` function stores a vector of two unsigned 64-bit integers into a 16-byte aligned memory location.
 - **Inputs**:
-    - ``p``: A pointer to a 16-byte aligned memory location where the vector will be stored.
-    - ``i``: A `vv_t` type vector containing two unsigned 64-bit integers to store.
-- **Logic and Control Flow**:
-    - Uses the `_mm_store_si128` intrinsic to store the vector `i` into the memory location pointed to by `p`.
-- **Output**: No return value; the function performs a memory store operation.
+    - `p`: A pointer to a 16-byte aligned memory location where the vector will be stored.
+    - `i`: A vector of type `vv_t` (which is an alias for `__m128i`) containing two unsigned 64-bit integers to be stored.
+- **Control Flow**:
+    - The function uses the intrinsic `_mm_store_si128` to store the vector `i` into the memory location pointed to by `p`.
+- **Output**: The function does not return any value; it performs a side effect by writing to the memory location pointed to by `p`.
 
 
 ---
 ### vv\_ldu<!-- {{#callable:vv_ldu}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L48>)
-
-Loads a vector of two unsigned 64-bit integers from an unaligned memory address.
+The `vv_ldu` function loads a vector of two unsigned 64-bit integers from an unaligned memory address into a `vv_t` type using SIMD instructions.
 - **Inputs**:
-    - `p`: A pointer to the memory location from which to load the vector; the memory does not need to be aligned.
-- **Logic and Control Flow**:
-    - Casts the input pointer `p` to a pointer of type `__m128i const *`.
-    - Uses the `_mm_loadu_si128` intrinsic to load a 128-bit vector from the unaligned memory location pointed to by `p`.
-- **Output**: Returns a `vv_t` type, which is a 128-bit vector containing two unsigned 64-bit integers loaded from the specified memory location.
+    - `p`: A pointer to a memory location from which the vector of unsigned 64-bit integers will be loaded; the memory does not need to be aligned.
+- **Control Flow**:
+    - The function casts the input pointer `p` to a pointer of type `__m128i const *`, which is suitable for SIMD operations.
+    - It then uses the `_mm_loadu_si128` intrinsic to load the data from the unaligned memory location pointed to by `p` into a `__m128i` type, which is equivalent to `vv_t`.
+- **Output**: The function returns a `vv_t` type, which is a vector containing two unsigned 64-bit integers loaded from the specified memory location.
 
 
 ---
 ### vv\_stu<!-- {{#callable:vv_stu}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L49>)
-
-Stores a vector of two 64-bit unsigned integers to a memory location without alignment requirements.
+The `vv_stu` function stores a vector of two unsigned 64-bit integers into a memory location that does not need to be aligned.
 - **Inputs**:
-    - ``p``: A pointer to the memory location where the vector will be stored. The location does not need to be aligned.
-    - ``i``: A vector of type `vv_t` containing two 64-bit unsigned integers to store.
-- **Logic and Control Flow**:
-    - Uses the `_mm_storeu_si128` intrinsic to store the vector `i` at the memory location pointed to by `p`.
-- **Output**: No return value; the function performs a memory store operation.
+    - `p`: A pointer to the memory location where the vector will be stored; it does not need to be aligned.
+    - `i`: A vector of type `vv_t` (which is an alias for `__m128i`) containing two unsigned 64-bit integers to be stored.
+- **Control Flow**:
+    - The function uses the intrinsic `_mm_storeu_si128` to store the vector `i` into the memory location pointed to by `p`.
+- **Output**: The function does not return any value; it performs a side effect by storing data at the specified memory location.
 
 
 ---
 ### vv\_extract\_variable<!-- {{#callable:vv_extract_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L75>)
-
-Extracts a 64-bit unsigned integer from a specified lane of a vector of two 64-bit unsigned integers.
+The `vv_extract_variable` function extracts a 64-bit unsigned integer from a specified lane of a 128-bit SIMD vector.
 - **Inputs**:
-    - ``a``: A vector of type `vv_t` containing two 64-bit unsigned integers.
-    - ``n``: An integer specifying the lane (0 or 1) from which to extract the 64-bit unsigned integer.
-- **Logic and Control Flow**:
-    - Declare a union `t` that can store a `__m128i` vector and an array of two `ulong` values.
-    - Store the vector `a` into the `__m128i` part of the union `t` using `_mm_store_si128`.
-    - Return the `ulong` value from the `n`-th position of the `ulong` array in the union `t`.
-- **Output**: A 64-bit unsigned integer extracted from the specified lane of the input vector.
+    - `a`: A 128-bit SIMD vector (`vv_t`) containing two 64-bit unsigned integers.
+    - `n`: An integer specifying the lane (0 or 1) from which to extract the 64-bit unsigned integer.
+- **Control Flow**:
+    - A union is defined to allow type punning between a 128-bit SIMD vector and an array of two 64-bit unsigned integers.
+    - The SIMD vector `a` is stored into the union's `__m128i` member using `_mm_store_si128`.
+    - The function returns the `n`-th element from the union's `ulong` array, effectively extracting the 64-bit unsigned integer from the specified lane.
+- **Output**: A 64-bit unsigned integer extracted from the specified lane of the input SIMD vector.
 
 
 ---
 ### vv\_insert\_variable<!-- {{#callable:vv_insert_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L82>)
-
-Replaces the `n`-th 64-bit unsigned integer in a vector with a new value and returns the modified vector.
+The `vv_insert_variable` function inserts a 64-bit unsigned integer into a specified lane of a 128-bit vector and returns the modified vector.
 - **Inputs**:
-    - `a`: A vector of type `vv_t` containing two 64-bit unsigned integers.
-    - `n`: An integer index (0 or 1) indicating which element in the vector to replace.
-    - `v`: A 64-bit unsigned integer value to insert into the vector at the specified index.
-- **Logic and Control Flow**:
-    - Store the vector `a` into a temporary union `t` that can be accessed as either a vector or an array of two unsigned long integers.
-    - Replace the `n`-th element of the array `t->u` with the value `v`.
-    - Load the modified vector from the union `t` and return it.
-- **Output**: A vector of type `vv_t` with the `n`-th element replaced by `v`.
+    - `a`: A 128-bit vector of type `vv_t` (which is an alias for `__m128i`) containing two 64-bit unsigned integers.
+    - `n`: An integer specifying the lane (0 or 1) in the vector `a` where the value `v` should be inserted.
+    - `v`: A 64-bit unsigned integer (`ulong`) to be inserted into the vector `a` at the specified lane `n`.
+- **Control Flow**:
+    - A union is defined to allow type punning between `__m128i` and an array of two `ulong` values.
+    - The input vector `a` is stored into the union's `__m128i` member using `_mm_store_si128`.
+    - The `ulong` value `v` is inserted into the `n`-th position of the union's `ulong` array.
+    - The modified vector is loaded back from the union's `__m128i` member using `_mm_load_si128` and returned.
+- **Output**: A 128-bit vector of type `vv_t` with the specified lane `n` replaced by the value `v`.
 
 
 ---
 ### vv\_rol<!-- {{#callable:vv_rol}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L141>)
-
-Performs a bitwise left rotation on a vector of two 64-bit unsigned integers by a specified number of bits.
+The `vv_rol` function performs a bitwise left rotation on a vector of two 64-bit unsigned integers by a specified number of bits.
 - **Inputs**:
-    - ``a``: A vector of two 64-bit unsigned integers (`vv_t`) to rotate.
-    - ``imm``: An integer specifying the number of bits to rotate the vector to the left.
-- **Logic and Control Flow**:
-    - Calculates the left shift of `a` by `imm & 63` bits using `vv_shl`.
-    - Calculates the right shift of `a` by `(-imm) & 63` bits using `vv_shr`.
-    - Combines the results of the left and right shifts using a bitwise OR operation with `vv_or`.
-- **Output**: Returns a vector of two 64-bit unsigned integers (`vv_t`) that is the result of the left rotation.
+    - `a`: A vector of two 64-bit unsigned integers (type `vv_t`) to be rotated.
+    - `imm`: An integer specifying the number of bits to rotate the vector to the left.
+- **Control Flow**:
+    - The function calculates the effective number of bits to rotate by taking `imm & 63`, ensuring the shift amount is within the range of 0 to 63 bits.
+    - It performs a left shift on the vector `a` by the calculated number of bits using `vv_shl`.
+    - It performs a right shift on the vector `a` by the negative of the calculated number of bits using `vv_shr`.
+    - The results of the left and right shifts are combined using a bitwise OR operation (`vv_or`) to produce the final rotated vector.
+- **Output**: The function returns a vector of two 64-bit unsigned integers (`vv_t`) that is the result of the left rotation operation.
 
 
 ---
 ### vv\_ror<!-- {{#callable:vv_ror}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L142>)
-
-Performs a bitwise right rotation on a vector of two 64-bit unsigned integers by a specified number of bits.
+The `vv_ror` function performs a bitwise right rotation on a vector of two 64-bit unsigned integers by a specified number of bits.
 - **Inputs**:
-    - ``a``: A vector of two 64-bit unsigned integers (`vv_t`) to rotate.
-    - ``imm``: An integer specifying the number of bits to rotate the vector to the right.
-- **Logic and Control Flow**:
-    - Compute the effective number of bits to rotate right by taking `imm & 63`, ensuring the shift amount is within the range of 0 to 63.
-    - Perform a right logical shift on the vector `a` by the computed number of bits.
-    - Compute the effective number of bits to rotate left by taking `(-imm) & 63`, ensuring the shift amount is within the range of 0 to 63.
-    - Perform a left logical shift on the vector `a` by the computed number of bits.
-    - Combine the results of the right and left shifts using a bitwise OR operation to complete the rotation.
-- **Output**: Returns a `vv_t` vector representing the result of the right rotation.
+    - `a`: A vector of two 64-bit unsigned integers (type `vv_t`) to be rotated.
+    - `imm`: An integer specifying the number of bits to rotate the vector to the right.
+- **Control Flow**:
+    - The function calculates the effective number of bits to rotate by taking `imm & 63`, ensuring the shift amount is within the range of 0 to 63.
+    - It performs a right shift on the vector `a` by the calculated number of bits using `vv_shr`.
+    - It performs a left shift on the vector `a` by the complement of the calculated number of bits using `vv_shl`.
+    - The results of the right and left shifts are combined using a bitwise OR operation with `vv_or` to produce the final rotated vector.
+- **Output**: The function returns a vector of two 64-bit unsigned integers (`vv_t`) that is the result of the right rotation operation.
 
 
 ---
 ### vv\_rol\_variable<!-- {{#callable:vv_rol_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L145>)
-
-Performs a variable bitwise left rotation on a vector of unsigned 64-bit integers.
+The `vv_rol_variable` function performs a variable bitwise left rotation on a vector of two 64-bit unsigned integers.
 - **Inputs**:
-    - ``a``: A vector of unsigned 64-bit integers (`vv_t`) to rotate.
-    - ``n``: An integer specifying the number of positions to rotate the bits to the left.
-- **Logic and Control Flow**:
-    - Compute `n & 63` to ensure the shift amount is within the range of 0 to 63 bits.
-    - Perform a left shift on vector `a` by `n & 63` bits using `vv_shl_variable`.
-    - Compute `(-n) & 63` to determine the equivalent right shift amount.
-    - Perform a right shift on vector `a` by `(-n) & 63` bits using `vv_shr_variable`.
-    - Combine the results of the left and right shifts using a bitwise OR operation with `vv_or`.
-- **Output**: Returns a vector of unsigned 64-bit integers (`vv_t`) with the bits rotated left by `n` positions.
+    - `a`: A vector of two 64-bit unsigned integers (type `vv_t`) to be rotated.
+    - `n`: An integer specifying the number of bits to rotate the vector `a` to the left.
+- **Control Flow**:
+    - The function calculates `n & 63` to ensure the rotation amount is within the range of 0 to 63 bits.
+    - It performs a left shift on the vector `a` by `n & 63` bits using `vv_shl_variable`.
+    - It performs a right shift on the vector `a` by `(-n) & 63` bits using `vv_shr_variable`.
+    - The results of the left and right shifts are combined using a bitwise OR operation with `vv_or`.
+    - The combined result is returned as the output of the function.
+- **Output**: A vector of two 64-bit unsigned integers (type `vv_t`) that is the result of rotating the input vector `a` to the left by `n` bits.
 
 
 ---
 ### vv\_ror\_variable<!-- {{#callable:vv_ror_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L146>)
-
-Performs a variable right rotation on a vector of two 64-bit unsigned integers.
+The `vv_ror_variable` function performs a variable bitwise right rotation on a vector of two 64-bit unsigned integers.
 - **Inputs**:
-    - ``a``: A vector of two 64-bit unsigned integers (`vv_t`).
-    - ``n``: An integer specifying the number of bits to rotate right.
-- **Logic and Control Flow**:
-    - Compute `n & 63` to ensure the shift amount is within the range of 0 to 63 bits.
-    - Perform a right logical shift on vector `a` by `n & 63` bits using `vv_shr_variable`.
-    - Perform a left logical shift on vector `a` by `(-n) & 63` bits using `vv_shl_variable`.
-    - Combine the results of the two shifts using a bitwise OR operation with `vv_or`.
-- **Output**: Returns a vector of two 64-bit unsigned integers (`vv_t`) that is the result of the right rotation.
+    - `a`: A vector of two 64-bit unsigned integers (type `vv_t`) to be rotated.
+    - `n`: An integer specifying the number of positions to rotate the vector to the right.
+- **Control Flow**:
+    - The function first calculates `n & 63` to ensure the rotation amount is within the range of 0 to 63 bits.
+    - It then performs a right shift on the vector `a` by `n & 63` bits using `vv_shr_variable`.
+    - Simultaneously, it performs a left shift on the vector `a` by `(-n) & 63` bits using `vv_shl_variable`.
+    - The results of the two shifts are combined using a bitwise OR operation via `vv_or`.
+    - The combined result is returned as the output of the function.
+- **Output**: A vector of two 64-bit unsigned integers (type `vv_t`) that is the result of rotating the input vector `a` to the right by `n` positions.
 
 
 ---
 ### vv\_rol\_vector<!-- {{#callable:vv_rol_vector}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L148>)
-
-Performs a vectorized bitwise rotate left operation on a vector of unsigned 64-bit integers.
+The `vv_rol_vector` function performs a bitwise left rotation on each 64-bit integer in a vector by a specified number of bits, using another vector to determine the rotation amount for each integer.
 - **Inputs**:
-    - ``a``: A vector of unsigned 64-bit integers (`vv_t`) to rotate.
-    - ``b``: A vector of long integers (`vl_t`) specifying the number of positions to rotate each corresponding element in `a`.
-- **Logic and Control Flow**:
-    - Broadcasts the constant value `63L` into a vector `m` using `vl_bcast` to mask the shift amounts.
-    - Performs a bitwise AND operation between `b` and `m` to ensure the shift amount is within the range of 0 to 63, then left shifts each element of `a` by the masked amount using `vv_shl_vector`.
-    - Performs a bitwise AND operation between the negation of `b` and `m`, then right shifts each element of `a` by the masked amount using `vv_shr_vector`.
-    - Combines the results of the left and right shifts using a bitwise OR operation with `vv_or` to complete the rotate left operation.
-- **Output**: Returns a vector of unsigned 64-bit integers (`vv_t`) where each element is the result of rotating the corresponding element in `a` left by the number of positions specified in `b`.
+    - `a`: A vector of 64-bit unsigned integers (`vv_t`) to be rotated.
+    - `b`: A vector of 64-bit integers (`vl_t`) specifying the number of bits to rotate each corresponding integer in `a`.
+- **Control Flow**:
+    - A constant vector `m` is created with all elements set to 63, which is used to mask the rotation amount to ensure it is within the range of 0 to 63 bits.
+    - The function calculates the left rotation by shifting the elements of `a` left by the masked values of `b` using `vv_shl_vector`.
+    - It calculates the right rotation by shifting the elements of `a` right by the masked negated values of `b` using `vv_shr_vector`.
+    - The results of the left and right shifts are combined using a bitwise OR operation (`vv_or`) to produce the final rotated vector.
+- **Output**: A vector of 64-bit unsigned integers (`vv_t`) where each integer has been rotated left by the specified number of bits.
 
 
 ---
 ### vv\_ror\_vector<!-- {{#callable:vv_ror_vector}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L153>)
-
-Performs a bitwise right rotation on each 64-bit integer in a vector by a specified number of bits.
+The `vv_ror_vector` function performs a bitwise right rotation on each 64-bit lane of a vector `a` by a variable amount specified in vector `b`.
 - **Inputs**:
-    - ``a``: A vector of 64-bit unsigned integers (`vv_t`) to rotate.
-    - ``b``: A vector of 64-bit integers (`vl_t`) specifying the number of bits to rotate each corresponding element in `a`.
-- **Logic and Control Flow**:
-    - Broadcasts the constant value `63L` into a vector `m` using `vl_bcast` to ensure the shift amount is within the valid range of 0 to 63 bits.
-    - Performs a bitwise AND operation between `b` and `m` to limit the shift amount to 63 bits, then right shifts each element in `a` by the resulting value using `vv_shr_vector`.
-    - Negates `b` and performs a bitwise AND with `m`, then left shifts each element in `a` by the resulting value using `vv_shl_vector`.
-    - Combines the results of the right and left shifts using a bitwise OR operation with `vv_or` to complete the rotation.
-- **Output**: A vector of 64-bit unsigned integers (`vv_t`) with each element rotated right by the specified number of bits.
+    - `a`: A vector of type `vv_t` containing two 64-bit unsigned integers to be rotated.
+    - `b`: A vector of type `vl_t` specifying the number of positions to rotate each corresponding 64-bit lane in `a` to the right.
+- **Control Flow**:
+    - Broadcast the constant value 63 into a vector `m` using `vl_bcast` to ensure the shift amount is within the valid range of 0 to 63 bits.
+    - Perform a bitwise AND operation between `b` and `m` to get the effective right shift amount for each lane.
+    - Perform a right shift on vector `a` using the effective shift amount obtained from the previous step using `vv_shr_vector`.
+    - Negate the vector `b` and perform a bitwise AND with `m` to get the effective left shift amount for each lane.
+    - Perform a left shift on vector `a` using the effective shift amount obtained from the previous step using `vv_shl_vector`.
+    - Combine the results of the right and left shifts using a bitwise OR operation with `vv_or` to achieve the rotation effect.
+- **Output**: The function returns a vector of type `vv_t` where each 64-bit lane has been right-rotated by the specified amount in `b`.
 
 
 ---
 ### vv\_min<!-- {{#callable:vv_min}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L189>)
-
-Selects the minimum value between two vector ulong inputs.
+The `vv_min` function returns a vector containing the minimum values from two input vectors, element-wise.
 - **Inputs**:
-    - `a`: A vector ulong (`vv_t`) input.
-    - `b`: Another vector ulong (`vv_t`) input.
-- **Logic and Control Flow**:
-    - Calls `vv_lt` to compare `a` and `b` and determine which is smaller.
-    - Uses `vv_if` to return `a` if it is less than `b`, otherwise returns `b`.
-- **Output**: Returns a vector ulong (`vv_t`) that contains the minimum values from the corresponding lanes of `a` and `b`.
+    - `a`: A vector of type `vv_t` containing two 64-bit unsigned integers.
+    - `b`: A vector of type `vv_t` containing two 64-bit unsigned integers.
+- **Control Flow**:
+    - The function compares each element of vector `a` with the corresponding element of vector `b` using the `vv_lt` function to determine if elements in `a` are less than those in `b`.
+    - It uses the `vv_if` function to select elements from `a` where `a` is less than `b`, otherwise it selects elements from `b`.
+    - The result is a new vector containing the minimum values from each pair of elements in `a` and `b`.
+- **Output**: A vector of type `vv_t` containing the minimum values from the corresponding elements of vectors `a` and `b`.
 
 
 ---
 ### vv\_max<!-- {{#callable:vv_max}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L190>)
-
-Selects the maximum value between two vector ulong values.
+The `vv_max` function returns a vector containing the maximum values from corresponding lanes of two input vectors.
 - **Inputs**:
-    - `a`: A vector ulong value of type `vv_t`.
-    - `b`: Another vector ulong value of type `vv_t`.
-- **Logic and Control Flow**:
-    - Compares the two vector ulong values `a` and `b` using the `vv_gt` function to determine which is greater.
-    - Uses the `vv_if` function to select `a` if it is greater than `b`, otherwise selects `b`.
-- **Output**: Returns a vector ulong value of type `vv_t` that contains the maximum values from the input vectors.
+    - `a`: A vector of type `vv_t` containing two 64-bit unsigned integers.
+    - `b`: A vector of type `vv_t` containing two 64-bit unsigned integers.
+- **Control Flow**:
+    - The function compares the two input vectors `a` and `b` using the `vv_gt` macro, which checks if elements in `a` are greater than those in `b`.
+    - It then uses the `vv_if` macro to select elements from `a` where `a` is greater than `b`, and from `b` otherwise.
+    - The result is a new vector where each lane contains the maximum value from the corresponding lanes of `a` and `b`.
+- **Output**: A vector of type `vv_t` containing the maximum values from each corresponding lane of the input vectors `a` and `b`.
 
 
 ---
 ### vv\_to\_vf<!-- {{#callable:vv_to_vf}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L220>)
-
-Converts a vector of unsigned 64-bit integers to a vector of floats, inserting the converted values into specified positions based on a control flag.
+The `vv_to_vf` function converts a vector of unsigned 64-bit integers to a vector of floats, inserting the converted values into specified positions of an existing float vector based on a control flag.
 - **Inputs**:
-    - ``v``: A vector of type `vv_t` containing two unsigned 64-bit integers.
-    - ``f``: A vector of type `vf_t` where the converted float values will be inserted.
-    - ``imm_hi``: An integer flag that determines the positions in `f` where the converted float values will be inserted.
-- **Logic and Control Flow**:
-    - Extracts the first element from `v` and converts it to a float, storing it in `f0`.
-    - Extracts the second element from `v` and converts it to a float, storing it in `f1`.
-    - Checks the value of `imm_hi`.
-    - If `imm_hi` is true, inserts `f0` and `f1` into positions 2 and 3 of `f`, respectively.
-    - If `imm_hi` is false, inserts `f0` and `f1` into positions 0 and 1 of `f`, respectively.
-- **Output**: Returns a vector of type `vf_t` with the converted float values inserted at the specified positions.
+    - `v`: A vector of unsigned 64-bit integers (`vv_t`) from which two elements will be extracted and converted to floats.
+    - `f`: A vector of floats (`vf_t`) into which the converted float values will be inserted.
+    - `imm_hi`: An integer flag that determines the positions in the float vector `f` where the converted values will be inserted.
+- **Control Flow**:
+    - Extract the first element from the vector `v` and convert it to a float, storing it in `f0`.
+    - Extract the second element from the vector `v` and convert it to a float, storing it in `f1`.
+    - Check the value of `imm_hi`. If it is non-zero, insert `f0` and `f1` into positions 2 and 3 of the float vector `f`, respectively.
+    - If `imm_hi` is zero, insert `f0` and `f1` into positions 0 and 1 of the float vector `f`, respectively.
+    - Return the modified float vector `f`.
+- **Output**: A vector of floats (`vf_t`) with the converted values from the vector `v` inserted into specified positions.
 
 
 ---
 ### vv\_to\_vi<!-- {{#callable:vv_to_vi}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L226>)
-
-Converts a vector of unsigned 64-bit integers to a vector of signed 32-bit integers, optionally interleaving with another vector based on a flag.
+The `vv_to_vi` function converts a vector of unsigned 64-bit integers to a vector of signed 32-bit integers, optionally interleaving with another vector based on a control flag.
 - **Inputs**:
-    - ``v``: A vector of unsigned 64-bit integers (`vv_t`).
-    - ``i``: A vector of signed 32-bit integers (`vi_t`).
-    - ``imm_hi``: An integer flag that determines the interleaving pattern.
-- **Logic and Control Flow**:
-    - Casts the vector `v` to a vector of single-precision floats (`vf_t`).
-    - Casts the vector `i` to a vector of single-precision floats (`vf_t`).
-    - Checks the `imm_hi` flag to determine the shuffle pattern.
-    - If `imm_hi` is true, shuffles the vectors using the pattern `_MM_SHUFFLE(2,0,1,0)`.
-    - If `imm_hi` is false, shuffles the vectors using the pattern `_MM_SHUFFLE(3,2,2,0)`.
-    - Casts the shuffled vector back to a vector of signed 32-bit integers (`vv_t`).
-- **Output**: Returns a vector of signed 32-bit integers (`vv_t`) after shuffling and interleaving based on the `imm_hi` flag.
+    - `v`: A vector of unsigned 64-bit integers (vv_t) to be converted.
+    - `i`: A vector of signed 32-bit integers (vi_t) to be interleaved with the converted vector.
+    - `imm_hi`: An integer flag that determines the interleaving pattern of the vectors.
+- **Control Flow**:
+    - Cast the input vector `v` to a vector of single-precision floats (`vf_t`).
+    - Cast the input vector `i` to a vector of single-precision floats (`vf_t`).
+    - Check the `imm_hi` flag to determine the interleaving pattern.
+    - If `imm_hi` is true, shuffle the vectors using the pattern `_MM_SHUFFLE(2,0,1,0)`.
+    - If `imm_hi` is false, shuffle the vectors using the pattern `_MM_SHUFFLE(3,2,2,0)`.
+    - Cast the shuffled vector back to a vector of signed 32-bit integers (`vv_t`).
+- **Output**: A vector of signed 32-bit integers (vv_t) resulting from the conversion and optional interleaving of the input vectors.
 
 
 ---
 ### vv\_to\_vu<!-- {{#callable:vv_to_vu}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L234>)
-
-Converts a vector of unsigned 64-bit integers to another format using a shuffle operation based on a condition.
+The `vv_to_vu` function converts a vector of unsigned 64-bit integers to another vector of unsigned 64-bit integers, optionally shuffling the elements based on a compile-time constant.
 - **Inputs**:
-    - `v`: A vector of unsigned 64-bit integers (`vv_t`).
-    - `u`: A vector of unsigned 64-bit integers (`vu_t`).
-    - `imm_hi`: An integer that determines the shuffle operation to perform.
-- **Logic and Control Flow**:
-    - Casts the input vector `v` to a vector of floats (`vf_t`).
-    - Casts the input vector `u` to a vector of floats (`vf_t`).
-    - Checks the value of `imm_hi`.
-    - If `imm_hi` is non-zero, shuffles the vectors using `_MM_SHUFFLE(2,0,1,0)`.
-    - If `imm_hi` is zero, shuffles the vectors using `_MM_SHUFFLE(3,2,2,0)`.
-    - Casts the shuffled vector back to a vector of unsigned 64-bit integers (`vv_t`).
-- **Output**: Returns a vector of unsigned 64-bit integers (`vv_t`) after performing the shuffle operation.
+    - `v`: A vector of unsigned 64-bit integers (`vv_t`) to be converted.
+    - `u`: A vector of unsigned 64-bit integers (`vu_t`) used in the shuffle operation.
+    - `imm_hi`: An integer flag that determines the shuffle pattern to be applied.
+- **Control Flow**:
+    - The function casts the input vectors `v` and `u` from integer to floating-point representations using `_mm_castsi128_ps`.
+    - It checks the value of `imm_hi` to decide which shuffle pattern to apply using `_mm_shuffle_ps`.
+    - If `imm_hi` is non-zero, it shuffles the vectors using the pattern `_MM_SHUFFLE(2,0,1,0)`.
+    - If `imm_hi` is zero, it shuffles the vectors using the pattern `_MM_SHUFFLE(3,2,2,0)`.
+    - Finally, it casts the shuffled floating-point vector back to an integer vector using `_mm_castps_si128` and returns it.
+- **Output**: The function returns a vector of unsigned 64-bit integers (`vv_t`) that is a shuffled combination of the input vectors `v` and `u`.
 
 
 ---
 ### vv\_to\_vd<!-- {{#callable:vv_to_vd}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L242>)
-
-Converts a vector of two unsigned 64-bit integers (`vv_t`) to a vector of two double-precision floating-point numbers (`vd_t`).
+The `vv_to_vd` function converts a vector of two unsigned 64-bit integers into a vector of two double-precision floating-point numbers.
 - **Inputs**:
     - `v`: A vector of type `vv_t` containing two unsigned 64-bit integers.
-- **Logic and Control Flow**:
-    - Extracts the first 64-bit integer from the vector `v` using `_mm_extract_epi64` and casts it to `ulong`, then to `double`.
-    - Extracts the second 64-bit integer from the vector `v` using `_mm_extract_epi64` and casts it to `ulong`, then to `double`.
-    - Uses `_mm_setr_pd` to create a `vd_t` vector from the two double values obtained from the previous steps.
-- **Output**: Returns a `vd_t` vector containing two double-precision floating-point numbers converted from the input vector's unsigned 64-bit integers.
+- **Control Flow**:
+    - Extracts the first 64-bit integer from the input vector `v` using `_mm_extract_epi64` and casts it to a `double`.
+    - Extracts the second 64-bit integer from the input vector `v` using `_mm_extract_epi64` and casts it to a `double`.
+    - Creates a new vector of type `vd_t` with the two double values using `_mm_setr_pd`.
+- **Output**: A vector of type `vd_t` containing two double-precision floating-point numbers corresponding to the two unsigned 64-bit integers from the input vector.
 
 
 ---
 ### vv\_sum\_all<!-- {{#callable:vv_sum_all}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L257>)
-
-Calculates the sum of two 64-bit unsigned integers in a vector and returns a vector with the sum broadcasted to both lanes.
+The `vv_sum_all` function computes the sum of two 64-bit unsigned integers stored in a vector and returns a vector with both lanes containing this sum.
 - **Inputs**:
-    - ``x``: A vector of type `vv_t` containing two 64-bit unsigned integers.
-- **Logic and Control Flow**:
-    - Permutes the input vector `x` to swap its two lanes using `vv_permute(x, 1, 0)`.
-    - Adds the original vector `x` and the permuted vector using `vv_add` to compute the sum of the two lanes.
-    - Returns the resulting vector with the sum of the two lanes in both positions.
+    - `x`: A vector of type `vv_t` containing two 64-bit unsigned integers.
+- **Control Flow**:
+    - The function takes a vector `x` as input, which contains two 64-bit unsigned integers.
+    - It uses `vv_permute` to swap the two lanes of the vector `x`, effectively creating a new vector with the lanes reversed.
+    - The function then adds the original vector `x` and the permuted vector using `vv_add`, resulting in a vector where each lane contains the sum of the two original integers.
 - **Output**: A vector of type `vv_t` where both lanes contain the sum of the two 64-bit unsigned integers from the input vector.
 
 
 ---
 ### vv\_min\_all<!-- {{#callable:vv_min_all}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L262>)
-
-Computes the minimum of two adjacent 64-bit unsigned integers in a vector and broadcasts the result.
+The `vv_min_all` function computes the minimum value of a vector of two unsigned 64-bit integers and broadcasts this minimum value across both lanes of the vector.
 - **Inputs**:
-    - ``x``: A vector of two adjacent 64-bit unsigned integers (`vv_t`).
-- **Logic and Control Flow**:
-    - Permutes the input vector `x` to swap its two elements using `vv_permute(x, 1, 0)`.
-    - Computes the minimum of the original vector `x` and the permuted vector using `vv_min(x, vv_permute(x, 1, 0))`.
-- **Output**: A vector where both elements are the minimum of the two original elements in `x`.
-- **Functions Called**:
-    - [`vv_min`](<#vv_min>)
+    - `x`: A vector of type `vv_t` containing two unsigned 64-bit integers.
+- **Control Flow**:
+    - The function calls `vv_permute` on the input vector `x` with parameters `1` and `0`, which swaps the two lanes of the vector.
+    - It then calls [`vv_min`](#vv_min) with the original vector `x` and the permuted vector to compute the minimum of the two lanes.
+    - The result of [`vv_min`](#vv_min) is returned, which is a vector with the minimum value broadcasted to both lanes.
+- **Output**: A vector of type `vv_t` where both lanes contain the minimum value of the input vector's lanes.
+- **Functions called**:
+    - [`vv_min`](#vv_min)
 
 
 ---
 ### vv\_max\_all<!-- {{#callable:vv_max_all}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L267>)
-
-Computes the maximum value of a vector and broadcasts it across all lanes.
+The `vv_max_all` function returns a vector where each lane contains the maximum value from the input vector `x`.
 - **Inputs**:
-    - ``x``: A vector of type `vv_t` containing two 64-bit unsigned integers.
-- **Logic and Control Flow**:
-    - Calls `vv_permute` on `x` with parameters `1` and `0` to swap the two lanes of the vector.
-    - Calls [`vv_max`](<#vv_max>) with the original vector `x` and the permuted vector to compute the maximum value between the two lanes.
-    - Returns the result of [`vv_max`](<#vv_max>), which is a vector with the maximum value broadcasted to both lanes.
+    - `x`: A vector of type `vv_t` containing two 64-bit unsigned integers.
+- **Control Flow**:
+    - The function calls `vv_permute` on the input vector `x` with parameters 1 and 0, effectively swapping the two lanes of the vector.
+    - It then calls [`vv_max`](#vv_max) with the original vector `x` and the permuted vector to compute the maximum of the two lanes.
+    - The result of [`vv_max`](#vv_max) is returned, which is a vector where both lanes contain the maximum value from the original vector `x`.
 - **Output**: A vector of type `vv_t` where both lanes contain the maximum value from the input vector `x`.
-- **Functions Called**:
-    - [`vv_max`](<#vv_max>)
+- **Functions called**:
+    - [`vv_max`](#vv_max)
 
 
 ---
 ### \_vv\_gather<!-- {{#callable:_vv_gather}} -->
-[View Source →](<../../../../../src/util/simd/fd_sse_vv.h#L282>)
-
-Performs a gather operation to load 64-bit integers from a base address using 32-bit indices.
+The function `_vv_gather` gathers 64-bit integers from a base array using 32-bit indices specified in a vector.
 - **Inputs**:
-    - `b`: A pointer to an array of unsigned long integers, serving as the base address for the gather operation.
-    - `i`: A `vi_t` type vector containing 32-bit indices used to gather elements from the base address `b`.
-- **Logic and Control Flow**:
-    - Calls the `_mm_i32gather_epi64` intrinsic function to gather 64-bit integers from the base address `b` using the indices specified in `i`.
-    - Uses a scale factor of 8 to calculate the byte offset for each index in `i`.
-- **Output**: Returns a `vv_t` type vector containing the gathered 64-bit integers.
+    - `b`: A pointer to an array of unsigned long integers, serving as the base address for gathering elements.
+    - `i`: A vector of 32-bit integers (`vi_t`) used as indices to gather elements from the base array `b`.
+- **Control Flow**:
+    - The function uses the intrinsic `_mm_i32gather_epi64` to gather 64-bit integers from the base array `b` using the indices specified in the vector `i`.
+    - The gathered elements are returned as a vector of type `vv_t`, which is an alias for `__m128i`.
+- **Output**: A vector of type `vv_t` containing the gathered 64-bit integers from the base array `b`.
 
 
 

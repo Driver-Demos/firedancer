@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for monitoring system calls with architecture-specific checks.
+Generated seccomp BPF filter for allowed syscalls and argument checks.
 
 
 ## Files
-- **[monitor_seccomp.h](monitor_seccomp.h.md)**: Defines a seccomp filter policy for monitoring system calls with architecture-specific checks.
+- **[monitor_seccomp.h](monitor_seccomp.h.md)**: Generated seccomp BPF filter for allowed syscalls and argument checks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

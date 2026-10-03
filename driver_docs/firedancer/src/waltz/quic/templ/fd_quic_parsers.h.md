@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Macros for parsing QUIC protocol data structures with support for various data types and error handling.
+The `fd_quic_parsers.h` file in the `firedancer` codebase provides macros for parsing QUIC protocol data structures, including handling various data types and ensuring proper alignment and size checks.
 
 # Purpose
-The code defines a set of macros for parsing QUIC (Quick UDP Internet Connections) protocol data. These macros are designed to extract and decode various data types from a byte buffer, such as `uchar`, `ushort`, `uint`, and `ulong`. The macros perform bitwise operations to shift and combine bytes into the desired data type. The code also includes macros for parsing more complex structures, such as packet numbers and variable-length integers, which are specific to the QUIC protocol.
+This C source code file provides a set of macros designed to facilitate the parsing of QUIC (Quick UDP Internet Connections) protocol data. The code defines a series of macros that parse various data types from a byte buffer, such as `uchar`, `ushort`, `uint`, and `ulong`, by reading bytes from the buffer and assembling them into the appropriate data type. These macros are intended to be used in the context of decoding QUIC protocol structures, as indicated by the naming conventions and the inclusion of a header file `fd_quic_dft.h`, which likely contains definitions and declarations related to QUIC.
 
-The code provides a framework for defining functions that decode QUIC protocol structures. It uses macros like `FD_TEMPL_DEF_STRUCT_BEGIN` and `FD_TEMPL_DEF_STRUCT_END` to encapsulate the decoding logic within a function. The macros handle different types of data elements, including fixed-size elements, variable-length integers, and raw byte arrays. The code checks for buffer overflows and returns a failure code if the input data is insufficient. The inclusion of `fd_quic_dft.h` suggests that additional definitions or implementations related to QUIC parsing are provided in that header file.
+The file is structured around a template-based approach to parsing, where macros like `FD_TEMPL_PARSE`, `FD_TEMPL_DEF_STRUCT_BEGIN`, and `FD_TEMPL_DEF_STRUCT_END` are used to define the parsing logic for different QUIC structures. The macros handle various parsing scenarios, such as fixed-size elements, variable-length integers, and raw byte sequences, ensuring that the parsing process is both efficient and robust against buffer overflows. The code also includes error handling for cases where the buffer does not contain enough data to complete the parsing operation, returning a failure code in such scenarios. This file is not an executable on its own but rather a utility intended to be included in other C source files that implement QUIC protocol handling.
 # Imports and Dependencies
 
 ---

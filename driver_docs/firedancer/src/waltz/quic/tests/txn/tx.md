@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Encodes binary data in Base64 for text-based transmission or storage, requiring decoding for use.
+The `tx` file in the `firedancer` codebase contains a large block of base64-encoded data intended for storage or transmission in text-only environments, serving as a data payload that requires decoding to reveal its original binary form for use by a specific application or system.
 
 # Purpose
-The code is a binary data block encoded in Base64 format, which is used to convert binary data into a text format suitable for transmission or storage in text-based systems. This encoding is often applied to binary files such as images, documents, or serialized objects, allowing them to be embedded within text-based formats like JSON, XML, or HTML. The code does not define public APIs, external interfaces, or executable logic, and it is not intended to be a script or library file. Instead, it serves as a data representation that requires decoding to retrieve the original binary content for use within an application or system. To utilize the data, a Base64 decoding process must be applied, which is supported by many programming languages and libraries.
+The provided code is a large block of base64-encoded data, typically used to represent binary data in a text format for storage or transmission in environments that only support text, such as JSON, XML, or over text-based protocols like HTTP. This encoded data does not function as traditional source code with executable logic, functions, or classes, but rather serves as a data payload that requires decoding to reveal its original binary form. The purpose of this data could vary widely, potentially representing anything from an image or document to a serialized object or configuration file, depending on the context in which it is used. It does not define public APIs or external interfaces and is not directly executable; instead, it is intended to be processed by a specific application or system that understands its format, which would decode and utilize the data accordingly. Understanding its exact purpose requires decoding the data and analyzing it within the context of the software that employs it.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
