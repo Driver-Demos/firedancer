@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_crypto_suites.h` file in the `firedancer` codebase defines the cryptographic suites and related functions for handling encryption and decryption in QUIC protocol, including key generation, key updates, and packet protection mechanisms.
+Defines QUIC v1 crypto suites, structures, and functions for key generation, encryption, and decryption.
 
 # Purpose
-This C header file defines the cryptographic components and operations necessary for implementing QUIC (Quick UDP Internet Connections) protocol version 1, focusing on the cryptographic suites and key management. The file specifies the supported cryptographic suites, such as TLS_AES_128_GCM_SHA256 and TLS_AES_256_GCM_SHA384, which are used for secure communication in QUIC. It provides structures and functions for managing cryptographic keys and secrets, including the generation of initial secrets and keys, key updates, and encryption and decryption of QUIC packets. The file also defines constants and macros related to encryption levels and cryptographic labels, which are essential for the QUIC protocol's security operations.
+The code defines cryptographic functionalities for QUIC (Quick UDP Internet Connections) version 1, focusing on the implementation of cryptographic suites and key management. It includes definitions for various cryptographic suites used in QUIC, such as `TLS_AES_128_GCM_SHA256` and `TLS_CHACHA20_POLY1305_SHA256`, and excludes certain suites that are not applicable according to the RFC 9001 specifications. The code provides structures and functions to manage cryptographic keys and secrets, including the generation of initial secrets and keys, key updates, and encryption and decryption of QUIC packets.
 
-The header file is a crucial part of a larger QUIC implementation, providing the necessary cryptographic functionality to ensure secure data transmission. It includes functions for generating initial secrets based on connection IDs, deriving keys for packet protection, and handling key updates. Additionally, it offers functions for encrypting and decrypting QUIC packets and headers, adhering to the specifications outlined in RFC 9001. The file is designed to be included in other C source files, allowing them to utilize the defined cryptographic operations and structures, making it a foundational component for secure QUIC communication.
+Key components include the `fd_quic_crypto_keys_t` and `fd_quic_crypto_secrets_t` structures, which store cryptographic keys and secrets, respectively. Functions such as [`fd_quic_gen_initial_secrets`](<#fd_quic_gen_initial_secrets>), [`fd_quic_gen_keys`](<#fd_quic_gen_keys>), and [`fd_quic_key_update_derive`](<#fd_quic_key_update_derive>) handle the derivation and update of cryptographic keys and secrets. The code also includes functions for encrypting and decrypting QUIC packets and headers, ensuring secure communication. The header file is intended to be included in other C files, providing a public API for cryptographic operations in a QUIC implementation.
 # Imports and Dependencies
 
 ---
@@ -20,143 +20,157 @@ The header file is a crucial part of a larger QUIC implementation, providing the
 
 ---
 ### fd\_quic\_crypto\_keys\_t
-- **Type**: `struct`
-- **Members**:
-    - `pkt_key`: An array of unsigned characters used as the packet protection key.
-    - `iv`: An array of unsigned characters used as the initialization vector for AES-GCM encryption.
-    - `hp_key`: An array of unsigned characters used as the header protection key.
-- **Description**: The `fd_quic_crypto_keys_t` structure is designed to hold cryptographic keys necessary for securing QUIC packets. It includes keys for packet protection, header protection, and an initialization vector, all of which are essential for encrypting and decrypting data in compliance with the QUIC protocol's security requirements.
-
-
----
-### fd\_quic\_crypto\_secrets\_t
-- **Type**: `struct`
-- **Members**:
-    - `initial_secret`: An array storing the initial secret used for QUIC encryption.
-    - `secret`: A 3D array storing secrets for each encryption level and direction (incoming or outgoing).
-    - `new_secret`: A 2D array storing new secrets for key updates during encryption.
-- **Description**: The `fd_quic_crypto_secrets_t` structure is designed to manage cryptographic secrets used in the QUIC protocol for secure communication. It includes an initial secret for establishing the initial encryption context, a set of secrets for different encryption levels and directions (incoming and outgoing), and new secrets for handling key updates. This structure is crucial for maintaining the confidentiality and integrity of data transmitted over a QUIC connection by facilitating the generation and management of cryptographic keys.
-
-
----
-### fd\_quic\_crypto\_keys
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
     - `pkt_key`: An array of unsigned characters used as the packet protection key.
     - `iv`: An array of unsigned characters used as the initialization vector for encryption.
     - `hp_key`: An array of unsigned characters used as the header protection key.
-- **Description**: The `fd_quic_crypto_keys` structure is designed to hold cryptographic keys necessary for packet protection in the QUIC protocol. It includes a packet protection key (`pkt_key`), an initialization vector (`iv`), and a header protection key (`hp_key`), all of which are essential for ensuring the confidentiality and integrity of QUIC packets during transmission.
+- **Description**: Defines the cryptographic keys used for packet protection in the QUIC protocol, including keys for packet encryption, initialization vector, and header protection.
+
+
+---
+### fd\_quic\_crypto\_secrets\_t
+- **Type**: ``struct``
+- **Members**:
+    - ``initial_secret``: An array of unsigned characters that stores the initial secret for QUIC encryption.
+    - ``secret``: A 3D array of unsigned characters that stores secrets for each encryption level and direction.
+    - ``new_secret``: A 2D array of unsigned characters that stores new secrets for key updates.
+- **Description**: Manages cryptographic secrets for QUIC encryption, including initial secrets, secrets for different encryption levels and directions, and new secrets for key updates.
+
+
+---
+### fd\_quic\_crypto\_keys
+- **Type**: ``struct``
+- **Members**:
+    - ``pkt_key``: An array of unsigned characters used as the packet protection key.
+    - ``iv``: An array of unsigned characters used as the initialization vector for encryption.
+    - ``hp_key``: An array of unsigned characters used as the header protection key.
+- **Description**: Defines the cryptographic keys used for packet protection in QUIC, including keys for packet encryption, initialization vector, and header protection.
 
 
 ---
 ### fd\_quic\_crypto\_secrets
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `initial_secret`: An array storing the initial secret used for QUIC encryption.
-    - `secret`: A 3D array storing secrets for each encryption level and direction (incoming or outgoing).
-    - `new_secret`: An array storing new secrets for key updates during encryption.
-- **Description**: The `fd_quic_crypto_secrets` structure is designed to manage cryptographic secrets used in the QUIC protocol for secure communication. It includes an initial secret for establishing the initial encryption context, a multi-dimensional array to hold secrets for different encryption levels and directions (incoming and outgoing), and a provision for new secrets to facilitate key updates. This structure is crucial for maintaining the confidentiality and integrity of data transmitted over a QUIC connection by managing the cryptographic keys and secrets necessary for encryption and decryption processes.
+    - ``initial_secret``: An array to store the initial secret used in QUIC encryption.
+    - ``secret``: A 3D array to store secrets for each encryption level and direction (incoming or outgoing).
+    - ``new_secret``: A 2D array to store new secrets for key updates.
+- **Description**: Manages cryptographic secrets for QUIC protocol, including initial secrets, secrets for different encryption levels and directions, and new secrets for key updates.
 
 
 # Functions
 
 ---
 ### fd\_quic\_get\_nonce<!-- {{#callable:fd_quic_get_nonce}} -->
-The `fd_quic_get_nonce` function generates a nonce by XORing a given initialization vector (IV) with a 62-bit packet number, after swapping its byte order.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.h#L239>)
+
+Generates a nonce by XORing the QUIC IV with the lower 62 bits of the packet number.
 - **Inputs**:
-    - `nonce`: A pointer to a buffer where the resulting nonce will be stored.
-    - `iv`: A constant pointer to the initialization vector (IV) used in the nonce generation.
-    - `pkt_number`: An unsigned long integer representing the packet number to be used in the nonce generation.
-- **Control Flow**:
-    - Define a mask constant `MASK_LOWER_62` to isolate the lower 62 bits of the packet number.
-    - Copy the first 4 bytes of the IV into the nonce buffer using `memcpy`.
-    - Load an unsigned long integer from the IV starting at the 5th byte using `FD_LOAD`.
-    - Swap the byte order of the packet number masked with `MASK_LOWER_62` using `fd_ulong_bswap`.
-    - XOR the loaded IV value with the byte-swapped packet number and store the result in the nonce buffer starting at the 5th byte using `FD_STORE`.
-    - Undefine the `MASK_LOWER_62` constant.
-- **Output**: The function does not return a value; it modifies the `nonce` buffer in place to contain the generated nonce.
+    - `nonce`: A pointer to a buffer where the generated nonce will be stored.
+    - `iv`: A pointer to the initialization vector (IV) used in the nonce generation.
+    - `pkt_number`: The packet number used in the nonce generation, which will be masked to 62 bits.
+- **Logic and Control Flow**:
+    - Copy the first 4 bytes of the `iv` to the `nonce` buffer.
+    - Load the next 8 bytes from the `iv` starting at the 5th byte.
+    - Mask the `pkt_number` to retain only the lower 62 bits.
+    - Byte-swap the masked `pkt_number` to match the endianness.
+    - XOR the byte-swapped `pkt_number` with the loaded 8 bytes from the `iv`.
+    - Store the result in the `nonce` buffer starting at the 5th byte.
+- **Output**: The function does not return a value; it modifies the `nonce` buffer in place.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_quic\_gen\_initial\_secrets<!-- {{#callable_declaration:fd_quic_gen_initial_secrets}} -->
-Generate initial cryptographic secrets for a QUIC connection.
-- **Description**: This function is used to generate the initial cryptographic secrets required for a QUIC connection based on the provided connection ID. It must be called to set up the initial secrets before any secure communication can occur. The function differentiates between client and server roles, setting the appropriate secrets for each. It does not generate keys but prepares the secrets necessary for further cryptographic operations. This function should be called during the initial setup phase of a QUIC connection.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.h#L101>)
+
+Generates initial cryptographic secrets for a QUIC connection.
+- **Description**: Use this function to initialize the cryptographic secrets for a QUIC connection based on a given connection ID. This function must be called before any cryptographic operations are performed on the connection. It sets the initial secret and the initial incoming and outgoing secrets in the `fd_quic_crypto_secrets_t` structure. The function distinguishes between client and server roles using the `is_server` parameter, which affects the assignment of read and write secrets. Ensure that the `secrets` parameter is a valid pointer to a `fd_quic_crypto_secrets_t` structure, and that `conn_id` is a valid pointer to a connection ID of size `conn_id_sz`.
 - **Inputs**:
-    - `secrets`: A pointer to an fd_quic_crypto_secrets_t structure where the generated secrets will be stored. The caller must ensure this pointer is valid and points to a properly allocated structure.
-    - `conn_id`: A pointer to a buffer containing the connection ID. This buffer must not be null and should contain the connection ID data used to derive the initial secrets.
-    - `conn_id_sz`: The size of the connection ID buffer. It must accurately reflect the length of the data pointed to by conn_id.
-    - `is_server`: An integer indicating the role of the current QUIC instance. A value of 1 indicates the server role, while 0 indicates the client role. This affects which secrets are set as incoming or outgoing.
+    - `secrets`: A pointer to an `fd_quic_crypto_secrets_t` structure where the generated secrets will be stored. Must not be null.
+    - `conn_id`: A pointer to a buffer containing the connection ID. Must not be null.
+    - `conn_id_sz`: The size of the connection ID in bytes. Must be a valid size for the connection ID.
+    - `is_server`: An integer indicating the role of the QUIC instance. Use 1 for server and 0 for client.
 - **Output**: None
-- **See also**: [`fd_quic_gen_initial_secrets`](fd_quic_crypto_suites.c.md#fd_quic_gen_initial_secrets)  (Implementation)
+- **See Also**: [`fd_quic_gen_initial_secrets`](<fd_quic_crypto_suites.c.md#fd_quic_gen_initial_secrets>)  (Implementation)
 
 
 ---
 ### fd\_quic\_gen\_keys<!-- {{#callable_declaration:fd_quic_gen_keys}} -->
-Derives cryptographic keys for QUIC packet protection from a given secret.
-- **Description**: This function is used to derive a set of cryptographic keys necessary for QUIC packet protection, including a packet protection key, a header protection key, and an initialization vector (IV). It must be called with a valid secret of 32 bytes, and the keys structure must be provided to store the derived keys. This function is typically called twice per encryption level, once for incoming keys and once for outgoing keys, ensuring that the keys structure is fully initialized for secure communication.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.h#L121>)
+
+Derives cryptographic keys from a given secret.
+- **Description**: Use this function to derive a packet protection key, a header protection key, and an initialization vector (IV) from a 32-byte secret. This function fully initializes the `fd_quic_crypto_keys_t` structure with the derived keys. It is typically called twice per encryption level, once for incoming keys and once for outgoing keys. Ensure that the `keys` parameter points to a valid `fd_quic_crypto_keys_t` structure and that the `secret` array contains exactly 32 bytes.
 - **Inputs**:
-    - `keys`: A pointer to an fd_quic_crypto_keys_t structure where the derived keys will be stored. The caller must ensure this pointer is valid and points to a properly allocated structure.
-    - `secret`: A constant array of 32 unsigned characters representing the secret from which the keys will be derived. This array must be exactly 32 bytes long, and the caller retains ownership of the data.
+    - `keys`: A pointer to an `fd_quic_crypto_keys_t` structure where the derived keys will be stored. Must not be null.
+    - `secret`: A constant array of 32 bytes used as the input secret for key derivation. Must contain exactly 32 bytes.
 - **Output**: None
-- **See also**: [`fd_quic_gen_keys`](fd_quic_crypto_suites.c.md#fd_quic_gen_keys)  (Implementation)
+- **See Also**: [`fd_quic_gen_keys`](<fd_quic_crypto_suites.c.md#fd_quic_gen_keys>)  (Implementation)
 
 
 ---
 ### fd\_quic\_key\_update\_derive<!-- {{#callable_declaration:fd_quic_key_update_derive}} -->
-Derives new IVs and packet protection keys for the next QUIC key update.
-- **Description**: This function is used to derive the next set of IVs and packet protection keys for QUIC key updates, which are periodic key rotations performed for security reasons. It should be called when a key update is required, using the current secrets to generate new keys. The function does not update header protection keys, only the IVs and packet protection keys. It is important to ensure that the `secrets` parameter is properly initialized with the current encryption secrets before calling this function.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.h#L142>)
+
+Derives new IVs and packet protection keys for key updates.
+- **Description**: Use this function to derive the next set of IVs and packet protection keys during a key update in a QUIC connection. This function does not update header protection keys. It is important for maintaining secure communication by periodically rotating keys. Ensure that the `secrets` parameter contains valid current secrets before calling this function. The function updates the `new_keys` array with the derived keys for both incoming and outgoing directions.
 - **Inputs**:
-    - `secrets`: A pointer to an `fd_quic_crypto_secrets_t` structure containing the current encryption secrets. Must not be null and should be properly initialized with the current secrets.
-    - `new_keys`: An array of two `fd_quic_crypto_keys_t` structures where the derived new keys will be stored. The caller must ensure this array is allocated and has space for two key structures.
+    - `secrets`: A pointer to `fd_quic_crypto_secrets_t` containing the current secrets. Must not be null and must have valid data for the function to derive new keys.
+    - `new_keys`: An array of two `fd_quic_crypto_keys_t` structures where the function will store the derived keys. The caller must allocate this array before calling the function.
 - **Output**: None
-- **See also**: [`fd_quic_key_update_derive`](fd_quic_crypto_suites.c.md#fd_quic_key_update_derive)  (Implementation)
+- **See Also**: [`fd_quic_key_update_derive`](<fd_quic_crypto_suites.c.md#fd_quic_key_update_derive>)  (Implementation)
 
 
 ---
 ### fd\_quic\_crypto\_encrypt<!-- {{#callable_declaration:fd_quic_crypto_encrypt}} -->
-Encrypts a QUIC packet with header and packet protection.
-- **Description**: This function encrypts a QUIC packet according to RFC 9001, applying both packet protection and header protection. It should be used when preparing a packet for secure transmission over a QUIC connection. The function requires pre-allocated output buffer space, which must be large enough to accommodate the encrypted data and authentication tag. The function will fail if the output buffer is too small or if the header size is out of bounds. It is essential to provide valid encryption keys for both packet and header protection.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.h#L166>)
+
+Encrypts a QUIC packet with header and payload protection.
+- **Description**: Use this function to encrypt a QUIC packet according to RFC 9001 standards, which includes both packet and header protection. Ensure that the output buffer is large enough to accommodate the encrypted data, which includes the header, payload, and a tag. The function requires valid encryption keys for both packet and header protection. It returns a success or failure status based on the operation's outcome.
 - **Inputs**:
-    - `out`: A pointer to the buffer where the encrypted packet will be stored. The buffer must be pre-allocated and large enough to hold the encrypted data and authentication tag.
-    - `out_sz`: A pointer to a variable that initially contains the size of the output buffer. On successful encryption, it will be updated to reflect the size of the encrypted data. The initial size must be at least hdr_sz + pkt_sz + FD_QUIC_CRYPTO_TAG_SZ.
-    - `hdr`: A pointer to the plaintext header of the packet. This must not be null and should contain at least 4 bytes.
-    - `hdr_sz`: The size of the header in bytes. It must be at least 4 and no more than INT_MAX.
-    - `pkt`: A pointer to the plaintext payload of the packet. This must not be null.
-    - `pkt_sz`: The size of the payload in bytes. It must not exceed INT_MAX.
-    - `pkt_keys`: A pointer to the fd_quic_crypto_keys_t structure containing the keys for packet protection. This must not be null.
-    - `hp_keys`: A pointer to the fd_quic_crypto_keys_t structure containing the keys for header protection. This must not be null.
-    - `pkt_number`: The packet number, which is used in nonce generation for encryption.
-- **Output**: Returns FD_QUIC_SUCCESS on successful encryption, or FD_QUIC_FAILED if an error occurs, such as insufficient output buffer size or invalid header size.
-- **See also**: [`fd_quic_crypto_encrypt`](fd_quic_crypto_suites.c.md#fd_quic_crypto_encrypt)  (Implementation)
+    - `out`: A pointer to the buffer where the encrypted packet will be stored. The buffer must be large enough to hold the header, payload, and tag. The caller retains ownership.
+    - `out_sz`: A pointer to a variable that initially contains the size of the output buffer. On return, it will contain the size of the written encrypted data. The caller retains ownership.
+    - `hdr`: A pointer to the plain text header of the packet. Must not be null. The caller retains ownership.
+    - `hdr_sz`: The size of the input header in bytes. Must be at least 4 and not exceed INT_MAX.
+    - `pkt`: A pointer to the plain text payload of the packet. Must not be null. The caller retains ownership.
+    - `pkt_sz`: The size of the input payload in bytes. Must not exceed INT_MAX.
+    - `pkt_keys`: A pointer to the `fd_quic_crypto_keys_t` structure containing the packet protection keys. Must not be null. The caller retains ownership.
+    - `hp_keys`: A pointer to the `fd_quic_crypto_keys_t` structure containing the header protection keys. Must not be null. The caller retains ownership.
+    - `pkt_number`: The packet number used in the encryption process. Must be a valid unsigned long value.
+- **Output**: Returns `FD_QUIC_SUCCESS` if encryption succeeds, otherwise returns `FD_QUIC_FAILED`. The `out_sz` is updated with the size of the encrypted data.
+- **See Also**: [`fd_quic_crypto_encrypt`](<fd_quic_crypto_suites.c.md#fd_quic_crypto_encrypt>)  (Implementation)
 
 
 ---
 ### fd\_quic\_crypto\_decrypt<!-- {{#callable_declaration:fd_quic_crypto_decrypt}} -->
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.h#L200>)
+
 Decrypts a QUIC protected packet.
-- **Description**: This function is used to decrypt a QUIC packet that contains a decrypted header, an encrypted payload, and an authentication tag. It should be called when you need to access the plaintext payload of a QUIC packet. The function requires a buffer containing the packet, the size of the packet, the offset of the packet number, the packet number itself, and the decryption keys. It returns a success or failure status based on whether the decryption was successful. Ensure that the buffer is large enough to contain the packet and that the packet number offset is correctly determined from the unprotected header data.
+- **Description**: Use this function to decrypt a QUIC packet that contains a decrypted header, an encrypted payload, and an authentication tag. Ensure the buffer is large enough to hold the packet, including the authentication tag of size `FD_QUIC_CRYPTO_TAG_SZ`. The function requires the offset of the packet number within the ciphertext, which must be determined from unprotected header data. It returns a success or failure status based on the decryption outcome.
 - **Inputs**:
-    - `buf`: A buffer containing the QUIC packet with a decrypted header, encrypted payload, and authentication tag. The buffer must be large enough to hold the entire packet, including the authentication tag.
-    - `buf_sz`: The size of the QUIC packet in the buffer. It must be at least the size of the shortest possible QUIC packet.
-    - `pkt_number_off`: The offset of the packet number within the ciphertext. This must be determined from the unprotected header data.
-    - `pkt_number`: The packet number used in the decryption process. It is used to derive the nonce for decryption.
-    - `keys`: A pointer to the fd_quic_crypto_keys_t structure containing the keys needed for decryption. The caller retains ownership of this structure.
-- **Output**: Returns FD_QUIC_SUCCESS if the decryption is successful, or FD_QUIC_FAILED if it fails due to issues like buffer size being too small or decryption errors.
-- **See also**: [`fd_quic_crypto_decrypt`](fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt)  (Implementation)
+    - `buf`: A buffer containing a QUIC packet with a decrypted header, encrypted payload, and an authentication tag. The buffer must be large enough to hold the entire packet, including the authentication tag. On return, the payload will be decrypted.
+    - `buf_sz`: The size of the QUIC packet in the buffer. It must be at least `FD_QUIC_SHORTEST_PKT`.
+    - `pkt_number_off`: The offset of the packet number within the ciphertext. This must be determined from unprotected header data.
+    - `pkt_number`: The packet number used in the decryption process. It is used to calculate the nonce.
+    - `keys`: A pointer to `fd_quic_crypto_keys_t` containing the keys needed for decryption. The caller retains ownership of this pointer.
+- **Output**: Returns `FD_QUIC_SUCCESS` if decryption succeeds, otherwise returns `FD_QUIC_FAILED`.
+- **See Also**: [`fd_quic_crypto_decrypt`](<fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt>)  (Implementation)
 
 
 ---
 ### fd\_quic\_crypto\_decrypt\_hdr<!-- {{#callable_declaration:fd_quic_crypto_decrypt_hdr}} -->
-Decrypts the header of a QUIC packet by removing header protection.
-- **Description**: Use this function to decrypt the header of a QUIC packet, which involves removing the header protection. This function should be called when you have a buffer containing an encrypted QUIC packet and you need to access the unprotected header information. Ensure that the buffer size is sufficient and that the packet number offset is correctly determined from the unprotected header data. The function requires a set of cryptographic keys to perform the decryption. It returns a success or failure status, indicating whether the header was successfully decrypted.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.h#L231>)
+
+Decrypts a QUIC packet header by removing header protection.
+- **Description**: Use this function to decrypt the header of a QUIC packet by removing the header protection. This function should be called when you need to access the unprotected header of a QUIC packet while keeping the payload encrypted. Ensure that the buffer size is sufficient and that the packet number offset is correctly determined from unprotected header data. The function requires valid decryption keys and will return an error if the buffer is too small or if decryption fails.
 - **Inputs**:
-    - `buf`: A pointer to a buffer containing an encrypted QUIC packet. The buffer must be large enough to hold the packet, and on return, the header will be decrypted while the rest remains encrypted. The caller retains ownership and the buffer must not be null.
-    - `buf_sz`: The size of the buffer in bytes. It must be at least as large as the QUIC packet, including the header and any encrypted payload.
-    - `pkt_number_off`: The offset within the buffer where the packet number is located. This offset must be determined from the unprotected header data and must be within the bounds of the buffer.
-    - `keys`: A pointer to a constant fd_quic_crypto_keys_t structure containing the cryptographic keys needed for decryption. The caller retains ownership and the pointer must not be null.
-- **Output**: Returns FD_QUIC_SUCCESS if the header was successfully decrypted, or FD_QUIC_FAILED if an error occurred, such as insufficient buffer size or invalid input parameters.
-- **See also**: [`fd_quic_crypto_decrypt_hdr`](fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt_hdr)  (Implementation)
+    - `buf`: A pointer to a buffer containing an encrypted QUIC packet. The buffer must not be null and must have enough space to hold the packet. On return, the header is decrypted, but the rest of the packet remains encrypted.
+    - `buf_sz`: The size of the buffer in bytes. It must be at least `FD_QUIC_CRYPTO_TAG_SZ` and larger than the packet number offset plus the sample size.
+    - `pkt_number_off`: The offset of the packet number within the cipher text. This must be determined from unprotected header data and must be less than `buf_sz`.
+    - `keys`: A pointer to `fd_quic_crypto_keys_t` containing the keys needed for decryption. This must not be null and must be properly initialized before calling the function.
+- **Output**: Returns `FD_QUIC_SUCCESS` if the header is successfully decrypted, or `FD_QUIC_FAILED` if an error occurs, such as insufficient buffer size or decryption failure.
+- **See Also**: [`fd_quic_crypto_decrypt_hdr`](<fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt_hdr>)  (Implementation)
 
 
 

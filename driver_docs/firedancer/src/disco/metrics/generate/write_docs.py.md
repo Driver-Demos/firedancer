@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `write_docs.py` file in the `firedancer` codebase generates documentation for metrics by writing them to a Markdown file, formatting them with HTML spans for styling, and categorizing them by type and description.
+Generates Markdown documentation for metrics, converting metric names to snake_case and formatting them.
 
 # Purpose
-This Python code is designed to generate documentation for a set of metrics, outputting the results to a Markdown file. The primary function, [`write_docs`](#write_docs), takes a `Metrics` object as input and writes formatted documentation to a file located at `../../../book/api/metrics-generated.md`. The code processes different categories of metrics, such as `link_out`, `link_in`, and `common`, as well as metrics associated with specific tiles. It uses helper functions like [`_write_metric`](#_write_metric) to format each metric's name, type, and description into a Markdown table format, ensuring that the output is both human-readable and structured for easy inclusion in documentation.
+The code is a script that generates documentation for metrics in Markdown format. It processes a collection of metrics, which are categorized into links, tiles, and specific tile types, and writes them to a file named `metrics-generated.md` located in the `book/api` directory. The script uses a helper function [`_write_metric`](<#_write_metric>) to format each metric's name, type, and description into a table row, applying specific formatting rules such as converting camel case to snake case and adding HTML spans for styling.
 
-The code leverages regular expressions to convert metric names from camelCase to snake_case, enhancing readability and consistency in the documentation. It also includes HTML elements to style the metric names and tags, which are embedded within the Markdown content. This script is not a standalone application but rather a utility intended to be part of a larger documentation generation process, likely integrated into a build or deployment pipeline. The use of specific imports and the structure of the code suggest that it is part of a broader system for managing and documenting metrics, with a focus on clarity and organization in the generated documentation.
+The script imports types from a local module and uses the `TextIO` type from the `typing` module to handle file operations. It iterates over different categories of metrics, writing each category to the Markdown file with appropriate headers and formatting. The script also includes preamble content from external Markdown files for links and tiles. The final output is a structured Markdown document that lists all metrics with their details, facilitating easy reference and documentation.
 # Imports and Dependencies
 
 ---
@@ -21,59 +21,63 @@ The code leverages regular expressions to convert metric names from camelCase to
 
 ---
 ### camel2snake<!-- {{#callable:firedancer/src/disco/metrics/generate/write_docs.camel2snake}} -->
-The `camel2snake` function converts a camelCase string to a snake_case string.
+[View Source →](<../../../../../../src/disco/metrics/generate/write_docs.py#L5>)
+
+Converts a camel case string to a snake case string.
 - **Inputs**:
-    - `str`: A string in camelCase format that needs to be converted to snake_case.
-- **Control Flow**:
-    - Uses a regular expression to identify positions in the string where a lowercase letter is followed by an uppercase letter.
-    - Inserts an underscore ('_') before each identified uppercase letter, except if it is the first character of the string.
+    - `str`: A string in camel case format.
+- **Logic and Control Flow**:
+    - Uses a regular expression to find positions in the string where a lowercase letter is followed by an uppercase letter.
+    - Inserts an underscore ('_') before each uppercase letter found, except if it is the first character of the string.
     - Converts the entire string to lowercase.
-- **Output**: A string converted from camelCase to snake_case format.
+- **Output**: A string converted from camel case to snake case.
 
 
 ---
 ### \_write\_metric<!-- {{#callable:firedancer/src/disco/metrics/generate/write_docs._write_metric}} -->
-The `_write_metric` function formats and writes metric information to a file in a specific markdown table format, handling both enum and non-enum metrics.
+[View Source →](<../../../../../../src/disco/metrics/generate/write_docs.py#L8>)
+
+Writes metric data to a file in a formatted table.
 - **Inputs**:
-    - `f`: A file-like object (TextIO) where the metric information will be written.
-    - `metric`: An instance of the Metric class, which contains information about the metric to be written.
-    - `prefix`: A string prefix to be prepended to the metric name for formatting purposes.
-- **Control Flow**:
-    - Check if the metric is an instance of CounterEnumMetric or GaugeEnumMetric.
-    - If it is an enum metric, iterate over each value in the metric's enum values.
-    - For each enum value, convert the metric name and value name from camel case to snake case.
-    - Format the metric name and value name with HTML span tags for styling.
-    - Construct a full tag string with the formatted value name and replace underscores with a zero-width space for better display.
-    - Write a formatted line to the file with the metric name, type, description, and value label.
-    - If the metric is not an enum metric, convert the metric name from camel case to snake case.
-    - Format the metric name with an HTML span tag for styling.
-    - Write a formatted line to the file with the metric name, type, and description.
-- **Output**: The function writes formatted metric information to the provided file-like object, with different formats for enum and non-enum metrics.
-- **Functions called**:
-    - [`firedancer/src/disco/metrics/generate/write_docs.camel2snake`](#camel2snake)
+    - `f`: A file-like object where the metric data will be written.
+    - `metric`: An instance of the `Metric` class, which contains the metric data to write.
+    - `prefix`: A string to prepend to the metric name for formatting purposes.
+- **Logic and Control Flow**:
+    - Check if `metric` is an instance of `CounterEnumMetric` or `GaugeEnumMetric`.
+    - If true, iterate over `metric.enum.values` to process each value.
+    - For each value, convert `metric.name` and `value.name` from camel case to snake case using [`camel2snake`](<#camel2snake>).
+    - Format the `full_name` and `full_tag` with HTML span elements and zero-width spaces for display purposes.
+    - Write the formatted metric data to the file `f` with the type and description, including the value label.
+    - If `metric` is not an instance of `CounterEnumMetric` or `GaugeEnumMetric`, format `full_name` similarly without processing enum values.
+    - Write the formatted metric data to the file `f` with the type and description.
+- **Output**: Writes formatted metric data to the provided file-like object `f`.
+- **Functions Called**:
+    - [`firedancer/src/disco/metrics/generate/write_docs.camel2snake`](<#camel2snake>)
 
 
 ---
 ### write\_docs<!-- {{#callable:firedancer/src/disco/metrics/generate/write_docs.write_docs}} -->
-The `write_docs` function generates a markdown file documenting various metrics by writing formatted metric data into a specified file.
+[View Source →](<../../../../../../src/disco/metrics/generate/write_docs.py#L23>)
+
+Generates a Markdown document with metrics information and writes it to a file.
 - **Inputs**:
-    - `metrics`: An instance of the `Metrics` class containing collections of metrics to be documented, including `link_out`, `link_in`, `common`, and `tiles`.
-- **Control Flow**:
-    - Open a file located at '../../../book/api/metrics-generated.md' in write mode.
-    - Write a section header and preamble for 'All Links' metrics.
-    - Iterate over `metrics.link_out` and `metrics.link_in`, writing each metric using the [`_write_metric`](#_write_metric) helper function with the prefix 'link'.
-    - Write a closing div tag for the 'All Links' section.
-    - Write a section header and preamble for 'All Tiles' metrics.
-    - Iterate over `metrics.common`, writing each metric using the [`_write_metric`](#_write_metric) helper function with the prefix 'tile'.
-    - Write a closing div tag for the 'All Tiles' section.
-    - Iterate over each `Tile` enumeration value, checking if it exists in `metrics.tiles`.
-    - For each existing tile, write a section header for the tile, iterate over its metrics, and write each using the [`_write_metric`](#_write_metric) helper function with the tile's name as the prefix.
-    - Write a closing div tag for each tile section.
-    - Print a message indicating the number of metrics written to the file.
-- **Output**: The function outputs a markdown file at the specified path, containing formatted documentation of the metrics, and prints a message to the console indicating the number of metrics written.
-- **Functions called**:
-    - [`firedancer/src/disco/metrics/generate/write_docs._write_metric`](#_write_metric)
-    - [`firedancer/src/disco/metrics/generate/types.Metrics.count`](types.py.md#metricscount)
+    - `metrics`: An instance of the `Metrics` class containing metric data to document.
+- **Logic and Control Flow**:
+    - Opens a file at the path '../../../book/api/metrics-generated.md' for writing.
+    - Writes a section header and preamble for 'All Links' to the file.
+    - Iterates over `metrics.link_out` and `metrics.link_in`, writing each metric using the [`_write_metric`](<#_write_metric>) function with the prefix 'link'.
+    - Writes a closing div tag for the 'All Links' section.
+    - Writes a section header and preamble for 'All Tiles' to the file.
+    - Iterates over `metrics.common`, writing each metric using the [`_write_metric`](<#_write_metric>) function with the prefix 'tile'.
+    - Writes a closing div tag for the 'All Tiles' section.
+    - Iterates over each `Tile` in the `Tile` enumeration.
+    - For each `Tile` present in `metrics.tiles`, writes a section header for the tile, iterates over the metrics for that tile, and writes each metric using the [`_write_metric`](<#_write_metric>) function with the tile name as the prefix.
+    - Writes a closing div tag for each tile section.
+    - Prints a message indicating the number of metrics written to the file.
+- **Output**: A Markdown file containing formatted metrics information is written to the specified path.
+- **Functions Called**:
+    - [`firedancer/src/disco/metrics/generate/write_docs._write_metric`](<#_write_metric>)
+    - [`firedancer/src/disco/metrics/generate/types.Metrics.count`](<types.py.md#metricscount>)
 
 
 
