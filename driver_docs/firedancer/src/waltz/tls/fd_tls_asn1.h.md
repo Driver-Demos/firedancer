@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_tls_asn1.h` file provides minimal APIs for handling ASN.1 DER encoded data, specifically for extracting Ed25519 public keys as per RFC 8410.
+Minimal APIs for handling ASN.1 DER encoded data, focusing on Ed25519 keys per RFC 8410.
 
 # Purpose
-This C header file, `fd_tls_asn1.h`, is part of a library that provides minimal APIs for handling ASN.1 DER encoded data, specifically focusing on Ed25519 keys as outlined in RFC 8410. It includes a declaration for a function, [`fd_ed25519_public_key_from_asn1`](#fd_ed25519_public_key_from_asn1), which attempts to extract an Ed25519 public key from a given ASN.1 DER encoded data buffer. The function returns a pointer to the public key if successful, or NULL if it fails, but it does not verify the validity of the extracted key. Additionally, the file defines a constant array, `fd_asn1_ed25519_pubkey_prefix`, which likely serves as a prefix for identifying Ed25519 public keys. The header notes limitations in handling only trivial DER encodings, which may affect compatibility with various TLS libraries.
+The `fd_tls_asn1.h` header file provides minimal APIs for handling ASN.1 DER encoded data, specifically for Ed25519 keys as defined in RFC 8410. It includes a declaration for the `fd_asn1_ed25519_pubkey_prefix` array, which is a constant prefix used in the context of Ed25519 public keys. The file also declares the function [`fd_ed25519_public_key_from_asn1`](<#fd_ed25519_public_key_from_asn1>), which attempts to extract an Ed25519 public key from a given ASN.1 DER encoded buffer. This function returns a pointer to the public key if successful, or `NULL` if it fails. The function does not verify the validity of the extracted public key and only handles trivial DER encodings, which may limit compatibility with some TLS libraries.
 # Imports and Dependencies
 
 ---
@@ -17,29 +17,24 @@ This C header file, `fd_tls_asn1.h`, is part of a library that provides minimal 
 
 ---
 ### fd\_asn1\_ed25519\_pubkey\_prefix
-- **Type**: `const uchar[12]`
-- **Description**: The `fd_asn1_ed25519_pubkey_prefix` is a constant array of unsigned characters with a fixed size of 12 bytes. It is used as a prefix for Ed25519 public keys in ASN.1 DER encoding, as specified in RFC 8410.
-- **Use**: This variable is used to identify or verify the beginning of an Ed25519 public key within an ASN.1 DER encoded data structure.
-
-
----
-### fd\_ed25519\_public\_key\_from\_asn1
-- **Type**: `function pointer`
-- **Description**: The `fd_ed25519_public_key_from_asn1` is a function that attempts to extract an Ed25519 public key from an ASN.1 DER encoded data buffer. It takes a pointer to a buffer and its size as arguments and returns a pointer to the first byte of the 32-byte subregion containing the public key on success, or NULL on failure.
-- **Use**: This function is used to parse ASN.1 DER encoded data to retrieve an Ed25519 public key, without verifying its validity.
+- **Type**: ``uchar[12]``
+- **Description**: A constant array of unsigned characters that represents the prefix for Ed25519 public keys in ASN.1 DER encoding.
+- **Use**: Used to identify and handle Ed25519 public keys within ASN.1 DER encoded data.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_ed25519\_public\_key\_from\_asn1<!-- {{#callable_declaration:fd_ed25519_public_key_from_asn1}} -->
-Extracts an Ed25519 public key from an ASN.1 DER encoded buffer.
-- **Description**: This function attempts to extract a 32-byte Ed25519 public key from a given ASN.1 DER encoded buffer. It should be used when you have a buffer containing an ASN.1 DER encoded Ed25519 public key and you need to access the raw public key bytes. The function expects the buffer to contain a specific prefix followed by the public key. If the buffer does not match the expected format or size, the function returns NULL. Note that the function does not verify the validity of the extracted public key, and it only handles a specific encoding format, which may not be compatible with all TLS libraries.
+[View Source →](<../../../../../src/waltz/tls/fd_tls_asn1.h#L26>)
+
+Extracts an Ed25519 public key from an ASN.1 DER container.
+- **Description**: Use this function to obtain an Ed25519 public key from a given ASN.1 DER encoded buffer. The function expects the buffer to contain a specific prefix followed by a 32-byte public key. It returns a pointer to the start of the public key if the buffer is correctly formatted. The function does not validate the public key itself, so treat the output as untrusted. It only handles the simplest form of DER encoding and may not be compatible with all TLS libraries.
 - **Inputs**:
-    - `buf`: A pointer to the buffer containing the ASN.1 DER encoded data. The buffer must not be null and should contain the expected prefix followed by the 32-byte public key.
-    - `sz`: The size of the buffer in bytes. It must be exactly the size of the expected prefix plus 32 bytes for the public key. If the size does not match, the function returns NULL.
-- **Output**: Returns a pointer to the first byte of the 32-byte public key if successful, or NULL if the buffer does not match the expected format or size.
-- **See also**: [`fd_ed25519_public_key_from_asn1`](fd_tls_asn1.c.md#fd_ed25519_public_key_from_asn1)  (Implementation)
+    - `buf`: A pointer to the buffer containing the ASN.1 DER encoded data. Must not be null and must point to a valid memory region of at least 'sz' bytes.
+    - `sz`: The size of the buffer in bytes. Must be equal to the size of the prefix plus 32 bytes for the public key. If not, the function returns NULL.
+- **Output**: Returns a pointer to the first byte of the 32-byte public key on success, or NULL if the input is invalid or the format is incorrect.
+- **See Also**: [`fd_ed25519_public_key_from_asn1`](<fd_tls_asn1.c.md#fd_ed25519_public_key_from_asn1>)  (Implementation)
 
 
 
