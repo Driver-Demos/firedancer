@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_dns_parse.c` file contains a function that parses DNS response messages and processes them using a callback function.
+Parses DNS messages and invokes a callback function for each answer section.
 
 # Purpose
-The provided C code defines a function [`fd_dns_parse`](#fd_dns_parse), which is part of a DNS parsing utility. This function is designed to parse DNS response messages, extracting and processing the question and answer sections of the DNS packet. The function takes a raw DNS response (`uchar const * r`) and its length (`int rlen`) as input, along with a callback function and a context pointer. The callback function is invoked for each DNS answer record, allowing the caller to handle the parsed data as needed. The function returns `-1` if an error occurs during parsing, `0` if the DNS response indicates an error, or continues processing otherwise.
+The code defines a function [`fd_dns_parse`](<#fd_dns_parse>) that processes DNS response messages. It takes a pointer to a buffer `r` containing the DNS message, the length of the message `rlen`, a callback function `callback`, and a context pointer `ctx`. The function first checks if the message length is valid and if the response code in the DNS header indicates no error. It then parses the question and answer sections of the DNS message. For each question, it advances the pointer `p` through the message, ensuring it does not exceed the buffer length. For each answer, it extracts the data length and calls the provided `callback` function with the context, type, data, and lengths. The function returns `-1` if it encounters an error or `0` if it successfully processes the message.
 
-The code is focused on DNS message parsing, specifically handling the question and answer sections of a DNS response. It checks for the validity of the response length and the DNS header's response code before proceeding to parse the question and answer records. The function uses pointer arithmetic to navigate through the DNS message, ensuring that it does not exceed the message's bounds. The callback mechanism provides flexibility, allowing the function to be used in various contexts where different processing of DNS records is required. This code is likely part of a larger library or application dealing with network communications, particularly DNS operations, and is intended to be integrated with other components that handle DNS queries and responses.
+The function is part of a DNS parsing utility, likely intended to be used in a larger application that requires DNS message handling. It does not define a public API or external interface but provides a specific functionality to parse DNS messages and invoke a callback for each answer section. The inclusion of `fd_lookup.h` suggests that this header file may contain related declarations or dependencies required by the function.
 # Imports and Dependencies
 
 ---
@@ -19,23 +19,25 @@ The code is focused on DNS message parsing, specifically handling the question a
 
 ---
 ### fd\_dns\_parse<!-- {{#callable:fd_dns_parse}} -->
-The `fd_dns_parse` function parses a DNS message from a byte array and invokes a callback function for each answer record.
+[View Source →](<../../../../../src/waltz/resolv/fd_dns_parse.c#L3>)
+
+Parses a DNS response and invokes a callback function for each answer record.
 - **Inputs**:
-    - `r`: A pointer to the byte array containing the DNS message to be parsed.
-    - `rlen`: The length of the byte array `r`.
-    - `callback`: A pointer to a callback function that is called for each answer record in the DNS message.
-    - `ctx`: A context pointer that is passed to the callback function.
-- **Control Flow**:
-    - Check if the length of the DNS message is less than 12 bytes; if so, return -1 indicating an error.
-    - Check if the response code in the DNS header is non-zero; if so, return 0 indicating no further processing is needed.
-    - Initialize a pointer `p` to the start of the question section of the DNS message.
-    - Extract the number of questions (`qdcount`) and answers (`ancount`) from the DNS header.
-    - Iterate over each question in the DNS message, advancing the pointer `p` past each question section.
-    - For each answer, advance the pointer `p` past the name and type fields, then extract the data length.
-    - Check if the remaining length is sufficient for the answer data; if not, return -1 indicating an error.
-    - Invoke the callback function with the context, type, data, data length, and the original message.
-    - Advance the pointer `p` past the current answer record.
-- **Output**: Returns 0 on successful parsing and processing of the DNS message, or -1 if an error occurs during parsing.
+    - `r`: A pointer to the DNS response data.
+    - `rlen`: The length of the DNS response data.
+    - `callback`: A function pointer to a callback function that processes each answer record.
+    - `ctx`: A context pointer passed to the callback function.
+- **Logic and Control Flow**:
+    - Check if `rlen` is less than 12; if true, return -1.
+    - Check if the fourth byte of `r` has any of the lower 4 bits set; if true, return 0.
+    - Initialize pointer `p` to point to the start of the question section in `r`.
+    - Calculate `qdcount` and `ancount` from the DNS header.
+    - Iterate over each question record, adjusting `p` to skip over the question section.
+    - For each answer record, adjust `p` to skip over the name and type fields.
+    - Calculate the length of the data in the answer record and check if it fits within the remaining buffer; if not, return -1.
+    - Invoke the `callback` function with the context, type, data, data length, and the entire response; if the callback returns a negative value, return -1.
+    - Adjust `p` to skip over the current answer record.
+- **Output**: Returns 0 on successful parsing and processing of all answer records, or -1 on error.
 
 
 

@@ -3,25 +3,25 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Repair request, message, metrics, tile, policy, test, and build files with seccomp rules.
+FEC chainer and repair management, seccomp filter policy, repair protocol, security policies, and tests.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing read, write, lseek, ftruncate, and fsync on specific file descriptors.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall access control in a generated header file.
 
 ## Files
-- **[fd_inflight.c](fd_inflight.c.md)**: Inflight request table management with insert, remove, query, and workspace-backed init.
-- **[fd_inflight.h](fd_inflight.h.md)**: Inflight repair request tracking with pool, map, and eviction list helpers.
-- **[fd_policy.c](fd_policy.c.md)**: Repair request policy with peer selection, deduplication, and latency bucket management.
-- **[fd_policy.h](fd_policy.h.md)**: Repair request policy, peer selection, dedup cache, and latency-based peer tracking.
-- **[fd_repair.c](fd_repair.c.md)**: Repair message creation and workspace lifecycle functions for ping, shred, highest shred, and orphan messages.
-- **[fd_repair.h](fd_repair.h.md)**: Solana Repair protocol message types, constructors, and signing helpers.
-- **[fd_repair_metrics.c](fd_repair_metrics.c.md)**: Catchup repair metrics storage, update, and print functions.
-- **[fd_repair_metrics.h](fd_repair_metrics.h.md)**: Circular buffer metrics for the 256 most recent slots and repair progress printing.
-- **[fd_repair_tile.c](fd_repair_tile.c.md)**: Repair tile logic for signing, ping-pong, shred handling, and slot repair metrics.
-- **[fd_repair_tile.seccomppolicy](fd_repair_tile.seccomppolicy.md)**: The `fd_repair_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for file operations related to logging and managing a cache of good repair peers, including rules for writing, seeking, truncating, syncing, and reading specific file descriptors.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_discof repair objects and headers when FD_HAS_INT128 is set.
-- **[test_policy.c](test_policy.c.md)**: Test entry point that calls fd_boot and fd_halt.
-- **[test_repair.c](test_repair.c.md)**: Tests repair message creation and serialization for pong, shred, highest shred, and orphan cases.
+- **[fd_inflight.c](fd_inflight.c.md)**: Manages inflight request tables with functions to insert, remove, and query requests.
+- **[fd_inflight.h](fd_inflight.h.md)**: Tracks inflight repair requests to validators for metrics and reporting, using unique nonces for identification.
+- **[fd_policy.c](fd_policy.c.md)**: Implements functions for managing and manipulating deduplication and peer policies in a repair system.
+- **[fd_policy.h](fd_policy.h.md)**: Implements the policy for a Repair agent, including deduplication, peer management, and request strategies.
+- **[fd_repair.c](fd_repair.c.md)**: Functions for creating, joining, leaving, and deleting repair objects, and generating repair messages.
+- **[fd_repair.h](fd_repair.h.md)**: Implements the Solana Repair protocol for recovering missing shreds with message types like Pong, Shred, HighestShred, and Orphan.
+- **[fd_repair_metrics.c](fd_repair_metrics.c.md)**: Functions for managing and printing repair metrics, including slot tracking and performance analysis.
+- **[fd_repair_metrics.h](fd_repair_metrics.h.md)**: Tracks and prints metadata for the last 256 slots in a circular buffer for repair metrics.
+- **[fd_repair_tile.c](fd_repair_tile.c.md)**: Implements a repair tile for handling synchronous and asynchronous requests, including credit tracking and request signing, within a distributed system.
+- **[fd_repair_tile.seccomppolicy](fd_repair_tile.seccomppolicy.md)**: Defines security policies for file operations related to logging and peer cache management.
+- **[Local.mk](Local.mk.md)**: Makefile rules for adding object files and headers related to repair functionality if FD_HAS_INT128 is defined.
+- **[test_policy.c](test_policy.c.md)**: Tests the initialization and termination of the fd_policy module.
+- **[test_repair.c](test_repair.c.md)**: Tests for the `fd_repair` module, including functions for pong, shred, highest shred, and orphan messages.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
