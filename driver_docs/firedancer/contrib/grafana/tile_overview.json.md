@@ -3,22 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Grafana dashboard configuration for monitoring Firedancer tiles with Prometheus data sources.
+Grafana dashboard for tile busy percentage and backpressure metrics.
 
 # Purpose
-This JSON file configures a Grafana dashboard, which is a tool for visualizing and analyzing data. The file defines various components of the dashboard, including annotations, panels, and data sources. Annotations are used to mark specific events on the dashboard, and the file specifies that these annotations are built-in and linked to the Grafana data source. The panels section contains configurations for visual elements, such as timeseries graphs, which use Prometheus as the data source. Each panel has settings for field configurations, grid positions, and data queries, which determine how data is displayed and interacted with. The file also includes templating options for dynamic data queries and time settings to define the range of data displayed. The dashboard is titled "Firedancer Tile Overview" and is identified by a unique identifier (`uid`).
-# Content Summary
-This JSON configuration file defines a Grafana dashboard titled "Firedancer Tile Overview." The dashboard is identified by the unique ID "3909" and UID "aedayga2qtb7ke." It is editable and set to use the timezone "America/Chicago." The dashboard's time range is configured to display data from the last six hours up to the current time.
-
-The dashboard includes annotations and alerts, with a built-in annotation named "Annotations & Alerts" that is enabled and hidden by default. The annotation uses the Grafana datasource.
-
-There are two panels in the dashboard, both of which are of the "timeseries" type and use Prometheus as the datasource. The first panel, titled "Tile Avg Busy %," displays the average busy percentage of tiles. It uses a Prometheus query to calculate the expression and formats the legend using the kind and kind_id labels. The panel's field configuration includes settings for color, axis, line style, and thresholds, with a unit of "percentunit."
-
-The second panel, titled "Tile Backpressure," visualizes the backpressure count of tiles. It also uses a Prometheus query for data retrieval and shares similar field configuration settings with the first panel, but with a unit of "short."
-
-The dashboard includes templating variables for "datasource" and "instance." The "datasource" variable is a datasource type with a query set to "prometheus." The "instance" variable is a query type that retrieves label values for "tile_regime_duration_nanos" and "instance" from Prometheus.
-
-The dashboard schema version is 39, and it does not have any tags or links. The refresh interval is not specified, and the fiscal year starts in January. The graph tooltip mode is set to 0, indicating a default setting. The dashboard version is 10, and the week start is not defined.
+This Grafana dashboard definition configures a monitoring view named `Firedancer Tile Overview` for Prometheus metrics. It defines two time series panels: `Tile Avg Busy %`, which calculates the share of time tiles are not in `caught_up_*` regimes, and `Tile Backpressure`, which shows the increase in `tile_backpressure_count` over the selected time range. The file also sets dashboard metadata such as the default time range, timezone, refresh behavior, annotations, and template variables for the Prometheus datasource and `instance` selection. In a codebase, this file supports operational monitoring by giving operators a fixed dashboard layout and metric queries for tile activity and backpressure analysis.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
