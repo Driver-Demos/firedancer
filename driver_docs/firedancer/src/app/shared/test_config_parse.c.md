@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_config_parse.c` file in the `firedancer` codebase tests the parsing and validation of configuration strings using the TOML format, ensuring correct handling of recognized and unrecognized keys, as well as the ability to override specific configuration fields.
+Tests for parsing and validating TOML configuration strings in the Firedancer application.
 
 # Purpose
-This C source code file is an executable program designed to test the parsing and validation of configuration data using the TOML (Tom's Obvious, Minimal Language) format. The code includes functionality to parse configuration strings, validate the parsed data, and ensure that the configuration adheres to expected structures and values. The main technical components include the use of a TOML parser (`fd_toml_parse`), a configuration extraction function (`fd_config_extract_pod`), and a validation function (`fd_config_validate`). The code also demonstrates the ability to handle default configurations and selectively override specific configuration fields while maintaining the integrity of other fields.
+This code is an executable C program that tests the functionality of a configuration parsing system using the TOML format. It includes the necessary headers for configuration management and TOML parsing. The program defines two static configuration strings, `cfg_str_1` and `cfg_str_2`, which represent different TOML configurations. The main function initializes the environment and memory structures required for parsing and validating these configurations.
 
-The program is structured to perform a series of tests on configuration data, ensuring that the parsing and validation processes work correctly. It uses static configuration strings and a default configuration to verify that the TOML parser can correctly interpret and extract configuration data into a structured format. The code also checks for the rejection of unrecognized configuration keys and validates that the default configuration can be parsed without errors. Additionally, it tests the ability to override specific configuration fields while preserving others, demonstrating the flexibility and robustness of the configuration handling logic. The program concludes by logging a success message and halting execution, indicating that all tests have passed successfully.
+The program uses a series of tests to verify the parsing and extraction of configuration data. It checks that a basic configuration string can be parsed and that the expected values are extracted correctly. It also tests the rejection of unrecognized configuration keys and ensures that a default configuration can be parsed without errors. Additionally, the program verifies that specific fields in the configuration can be selectively overridden while maintaining other values. The use of `FD_TEST` macros indicates that the program is designed to validate the correctness of the configuration parsing and extraction process, and it logs a notice upon successful completion of all tests.
 # Imports and Dependencies
 
 ---
@@ -21,52 +21,54 @@ The program is structured to perform a series of tests on configuration data, en
 ---
 ### cfg\_str\_1
 - **Type**: ``char const[]``
-- **Description**: The `cfg_str_1` variable is a static constant character array that contains a TOML configuration string. This string specifies a section labeled 'gossip' with a single entry point address '208.91.106.45:8080'.
-- **Use**: This variable is used to provide a basic configuration string for parsing and testing within the main function.
+- **Description**: A constant character array that contains a TOML configuration string for a 'gossip' section with an entry point IP address and port.
+- **Use**: Used to parse and extract configuration data for the 'gossip' section in the application.
 
 
 ---
 ### cfg\_str\_2
 - **Type**: ``char const[]``
-- **Description**: The `cfg_str_2` variable is a static constant character array that contains a TOML configuration string. It defines a single key-value pair where the key is 'wumbo' and the value is the string 'mini'.
-- **Use**: This variable is used to test the parsing and rejection of unrecognized configuration keys in the TOML parsing process.
+- **Description**: A static constant character array that contains a configuration string in TOML format. The string defines a key-value pair where the key is 'wumbo' and the value is 'mini'.
+- **Use**: Used to test the parsing and rejection of unrecognized configuration keys in the TOML parsing process.
 
 
 ---
 ### fdctl\_default\_config
-- **Type**: `uchar const[]`
-- **Description**: The `fdctl_default_config` is an external constant array of unsigned characters that represents the default configuration data for the application. It is used in conjunction with `fdctl_default_config_sz`, which holds the size of this configuration data.
-- **Use**: This variable is used to provide a default configuration that can be parsed and validated within the application.
+- **Type**: ``uchar const[]``
+- **Description**: An array of unsigned characters that represents the default configuration data for the application. The size of this array is defined by the variable `fdctl_default_config_sz`. This configuration data is used to initialize or reset the application's settings to a known state.
+- **Use**: Used to parse and extract configuration settings into a `config_t` structure for application initialization and validation.
 
 
 ---
 ### fdctl\_default\_config\_sz
 - **Type**: `ulong`
-- **Description**: The `fdctl_default_config_sz` is a global constant variable of type `ulong` that represents the size of the default configuration data used in the application. It is declared as an external variable, indicating that its definition is provided elsewhere, likely in a separate source file.
-- **Use**: This variable is used to specify the size of the `fdctl_default_config` array when parsing the default configuration using the `fd_toml_parse` function.
+- **Description**: `fdctl_default_config_sz` is a constant global variable of type `ulong` that represents the size of the default configuration data.
+- **Use**: Used to specify the size of the `fdctl_default_config` array when parsing the default configuration.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the application, parses configuration strings, validates configurations, and tests configuration overrides.
+[View Source →](<../../../../../src/app/shared/test_config_parse.c#L14>)
+
+Initializes the system, parses configuration strings, validates configurations, and tests configuration overrides.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the application with command-line arguments.
-    - Allocate memory for a configuration pod and join it using `fd_pod_join`.
-    - Parse a basic configuration string `cfg_str_1` using `fd_toml_parse` and verify its success with `FD_TEST`.
-    - Extract the configuration from the pod into a `config_t` structure and verify the expected values using `FD_TEST`.
-    - Reset the configuration and parse an unrecognized configuration string `cfg_str_2`, ensuring it fails to extract valid configuration.
-    - Reset the configuration and parse the default configuration, ensuring it parses and validates successfully.
-    - Modify the configuration to test selective field overrides, parse `cfg_str_1` again, and verify that only specific fields are overridden while others remain unchanged.
-    - Log a success message and call `fd_halt` to terminate the application.
-- **Output**: The function does not return a value; it performs configuration parsing and validation, logging success or terminating the process on failure.
-- **Functions called**:
-    - [`fd_config_extract_pod`](fd_config_parse.c.md#fd_config_extract_pod)
-    - [`fd_config_validate`](fd_config.c.md#fd_config_validate)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the system with command-line arguments.
+    - Allocates memory for a configuration pod and joins it using `fd_pod_join`.
+    - Parses a basic configuration string `cfg_str_1` using `fd_toml_parse` and checks the result with `FD_TEST`.
+    - Extracts the configuration from the pod into a `config_t` structure and validates the entrypoints count and value.
+    - Clears the configuration structure and parses an unrecognized configuration string `cfg_str_2`, ensuring it is not extracted.
+    - Clears the configuration structure again and parses the default configuration, validating it with [`fd_config_validate`](<fd_config.c.md#fd_config_validate>).
+    - Modifies the configuration to test selective field overrides, parses `cfg_str_1` again, and checks that only specific fields are overridden.
+    - Logs a notice of success and halts the system with `fd_halt`.
+- **Output**: No return value; the function performs system initialization, configuration parsing, and validation, and exits the process on failure.
+- **Functions Called**:
+    - [`fd_config_extract_pod`](<fd_config_parse.c.md#fd_config_extract_pod>)
+    - [`fd_config_validate`](<fd_config.c.md#fd_config_validate>)
 
 
 

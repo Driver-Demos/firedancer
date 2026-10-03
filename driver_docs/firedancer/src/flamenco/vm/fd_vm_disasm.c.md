@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_vm_disasm.c` file in the `firedancer` codebase provides functions for disassembling virtual machine instructions, including pretty-printing single-word instructions and handling various instruction classes such as ALU, JMP, LDX, and STX.
+Disassembles and formats SBPF virtual machine instructions into human-readable assembly code.
 
 # Purpose
-This C source code file provides functionality for disassembling a virtual machine's instruction set, specifically for a system using the Solana Berkeley Packet Filter (SBPF) instruction set. The file includes functions that convert binary instructions into human-readable assembly-like text, which is useful for debugging and understanding the behavior of compiled programs. The primary function, [`fd_vm_disasm_program`](#fd_vm_disasm_program), processes a sequence of instructions, identifies function and label boundaries, and outputs the disassembled instructions with appropriate labels and function names. It handles various instruction classes such as load, store, arithmetic logic unit (ALU), and jump instructions, each with specific handling logic to ensure accurate disassembly.
+The code is a C source file that provides functionality for disassembling a virtual machine's instruction set, specifically for a system using the SBPF (Solana Berkeley Packet Filter) instruction set. The primary function, [`fd_vm_disasm_program`](<#fd_vm_disasm_program>), takes a sequence of machine code instructions and translates them into a human-readable assembly format. It handles various instruction classes such as load, store, arithmetic logic unit (ALU), and jump instructions, and formats them into a string buffer. The code includes error handling for buffer overflows and invalid instructions, ensuring that the output buffer is properly terminated and that errors are reported with specific error codes.
 
-The file defines several static functions, each responsible for disassembling specific types of instructions, such as [`fd_vm_disasm_instr_alu`](#fd_vm_disasm_instr_alu) for ALU operations and [`fd_vm_disasm_instr_jmp`](#fd_vm_disasm_instr_jmp) for jump operations. These functions utilize a helper function, [`fd_vm_disasm_printf`](#fd_vm_disasm_printf), to format and append the disassembled instruction strings to an output buffer. The code also includes error handling to manage buffer overflows and invalid instructions, returning specific error codes when issues are encountered. The use of macros, such as `OUT_PRINTF`, simplifies repetitive error-checking tasks. Overall, this file is a specialized utility for converting SBPF bytecode into a more understandable format, aiding developers in program analysis and debugging.
+The file defines several static functions, such as [`fd_vm_disasm_instr_alu`](<#fd_vm_disasm_instr_alu>), [`fd_vm_disasm_instr_jmp`](<#fd_vm_disasm_instr_jmp>), [`fd_vm_disasm_instr_ldx`](<#fd_vm_disasm_instr_ldx>), and [`fd_vm_disasm_instr_stx`](<#fd_vm_disasm_instr_stx>), which are responsible for disassembling specific types of instructions. These functions use a macro, `OUT_PRINTF`, to append formatted strings to the output buffer while checking for errors. The code also includes logic to manage program counter (PC) labels and function labels, which are used to annotate the disassembled output with meaningful identifiers. The file does not define a public API but provides internal functions and macros that are likely intended to be used within a larger system for disassembling and analyzing SBPF programs.
 # Imports and Dependencies
 
 ---
@@ -21,160 +21,189 @@ The file defines several static functions, each responsible for disassembling sp
 
 ---
 ### fd\_vm\_disasm\_printf<!-- {{#callable:fd_vm_disasm_printf}} -->
-The `fd_vm_disasm_printf` function appends formatted output to a buffer, ensuring it does not exceed the buffer's maximum size, and returns a status code indicating success or specific errors.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L31>)
+
+Appends formatted output to a buffer, updating the buffer length, and handles errors related to buffer overflow and format parsing.
 - **Inputs**:
-    - `buf`: A character buffer where the formatted output will be appended.
-    - `max`: The maximum size of the buffer `buf`.
-    - `_len`: A pointer to an unsigned long that indicates the current length of the string in `buf` and will be updated with the new length after appending.
-    - `fmt`: A format string similar to those used in `printf` functions, specifying how the subsequent arguments are formatted.
-    - `...`: A variable number of arguments to be formatted according to `fmt`.
-- **Control Flow**:
-    - Initialize `len` with the current length of the string in `buf` and calculate the remaining space `rem` in the buffer.
-    - Start processing the variable arguments using `va_start` and format them into the buffer using `vsnprintf`, starting at the current end of the string and using the remaining space.
-    - Check if `vsnprintf` returned a negative value, indicating a parse error, and if so, terminate the string at the current length and return `FD_VM_ERR_IO`.
-    - Calculate the length of the appended string and check if it exceeds the remaining space, indicating truncation, and if so, terminate the string at the maximum length minus one and return `FD_VM_ERR_FULL`.
-    - If no errors occurred, update the length pointer with the new length of the string and return `FD_VM_SUCCESS`.
-- **Output**: The function returns an integer status code: `FD_VM_SUCCESS` for success, `FD_VM_ERR_FULL` if the buffer was too small to hold the formatted output, or `FD_VM_ERR_IO` if there was a format parse error.
+    - ``buf``: A character buffer where the formatted output will be appended.
+    - ``max``: The maximum size of the buffer `buf`.
+    - ``_len``: A pointer to the current length of the string in `buf`, which will be updated.
+    - ``fmt``: A format string that specifies how to format the output.
+    - ``...``: Additional arguments to be formatted according to `fmt`.
+- **Logic and Control Flow**:
+    - Initialize `len` with the value pointed to by `_len` and calculate `rem` as the remaining space in the buffer.
+    - Start a variable argument list with `va_start` and use `vsnprintf` to format the output into the buffer starting at `buf + len`, with a maximum of `rem` characters.
+    - End the variable argument list with `va_end`.
+    - If `vsnprintf` returns a negative value, indicating a format error, terminate the string at `buf[len]` and return `FD_VM_ERR_IO`.
+    - Calculate `append_len` as the number of characters written by `vsnprintf`.
+    - If `append_len` is greater than or equal to `rem`, indicating truncation, terminate the string at `buf[max-1]`, set `*_len` to `max-1`, and return `FD_VM_ERR_FULL`.
+    - Update `*_len` to `len + append_len` and return `FD_VM_SUCCESS`.
+- **Output**: Returns `FD_VM_SUCCESS` on success, `FD_VM_ERR_FULL` if the buffer is too small, or `FD_VM_ERR_IO` if there is a format parsing error.
 
 
 ---
 ### fd\_vm\_disasm\_instr\_alu<!-- {{#callable:fd_vm_disasm_instr_alu}} -->
-The `fd_vm_disasm_instr_alu` function disassembles an ALU instruction into a human-readable format and appends it to a buffer.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L74>)
+
+Disassembles an ALU instruction and formats it into a human-readable string.
 - **Inputs**:
-    - `instr`: A `fd_sbpf_instr_t` structure representing the instruction to be disassembled.
-    - `suffix`: A constant character string to be appended to the operation name.
-    - `out`: A character buffer where the disassembled instruction will be written.
+    - `instr`: The `fd_sbpf_instr_t` structure representing the instruction to disassemble.
+    - `suffix`: A constant character string to append to the operation name.
+    - `out`: A character buffer to store the formatted output string.
     - `out_max`: The maximum number of characters that can be written to the `out` buffer.
-    - `_out_len`: A pointer to an unsigned long that tracks the current length of the string in the `out` buffer.
-- **Control Flow**:
-    - Determine the operation name based on the `op_mode` field of the instruction's opcode.
-    - If the operation mode is `NEG`, format the output string with the operation name, suffix, and destination register, then return success.
-    - If the source mode is immediate, format the output string with the operation name, suffix, destination register, and immediate value, then return success.
-    - If the source mode is register, format the output string with the operation name, suffix, destination register, and source register, then return success.
-    - If none of the above conditions are met, return an invalid error code.
-- **Output**: Returns an integer status code indicating success or an error, such as `FD_VM_SUCCESS` for success or `FD_VM_ERR_INVAL` for invalid input.
+    - `_out_len`: A pointer to an `ulong` that tracks the current length of the string in `out`.
+- **Logic and Control Flow**:
+    - Determine the operation name based on `instr.opcode.normal.op_mode` using a switch statement.
+    - If the operation mode is `FD_SBPF_OPCODE_ALU_OP_MODE_NEG`, format the output string with the operation name, suffix, and destination register, then return success.
+    - For other operation modes, check the source mode using another switch statement.
+    - If the source mode is `FD_SBPF_OPCODE_SOURCE_MODE_IMM`, format the output string with the operation name, suffix, destination register, and immediate value, then return success.
+    - If the source mode is `FD_SBPF_OPCODE_SOURCE_MODE_REG`, format the output string with the operation name, suffix, destination register, and source register, then return success.
+    - If none of the cases match, return an invalid error code.
+- **Output**: Returns `FD_VM_SUCCESS` on successful formatting, or an error code such as `FD_VM_ERR_INVAL` if the operation mode or source mode is invalid.
 
 
 ---
 ### fd\_vm\_disasm\_instr\_jmp<!-- {{#callable:fd_vm_disasm_instr_jmp}} -->
-The `fd_vm_disasm_instr_jmp` function disassembles a jump instruction from a given instruction set and formats it into a human-readable string representation.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L118>)
+
+Disassembles a jump instruction and formats it into a human-readable string representation.
 - **Inputs**:
-    - `instr`: An `fd_sbpf_instr_t` structure representing the instruction to be disassembled.
-    - `pc`: An unsigned long integer representing the program counter, used to calculate jump offsets.
-    - `suffix`: A constant character pointer to a string suffix to append to the disassembled instruction.
-    - `syscalls`: A constant pointer to an `fd_sbpf_syscalls_t` structure, used to resolve syscall names if applicable.
-    - `out`: A character pointer to the output buffer where the disassembled instruction string will be written.
-    - `out_max`: An unsigned long integer representing the maximum size of the output buffer.
-    - `_out_len`: A pointer to an unsigned long integer that tracks the current length of the output buffer.
-- **Control Flow**:
-    - Determine the operation name based on the instruction's opcode mode using a switch statement.
-    - If the operation mode is 'CALL', handle immediate and register source modes separately, resolving syscall names if applicable, and format the output accordingly.
-    - If the operation mode is 'EXIT', format the output with the operation name and suffix.
-    - If the operation mode is 'JA', calculate the jump target using the program counter and instruction offset, then format the output.
-    - For other jump operations, handle immediate and register source modes separately, formatting the output with the appropriate registers and jump target.
-    - Return an error code if the operation mode or source mode is invalid.
-- **Output**: Returns an integer status code indicating success or a specific error (e.g., `FD_VM_SUCCESS`, `FD_VM_ERR_INVAL`).
+    - `instr`: The instruction to disassemble, represented as a `fd_sbpf_instr_t` structure.
+    - `pc`: The current program counter, represented as an unsigned long integer.
+    - `suffix`: A string suffix to append to the operation name in the output.
+    - `syscalls`: A pointer to a `fd_sbpf_syscalls_t` structure containing syscall information, or NULL if not applicable.
+    - `out`: A character buffer to store the formatted output string.
+    - `out_max`: The maximum size of the output buffer.
+    - `_out_len`: A pointer to an unsigned long integer that tracks the current length of the output string.
+- **Logic and Control Flow**:
+    - Determine the operation name based on the `op_mode` of the instruction's opcode.
+    - If the operation mode is `CALL`, handle the source mode to format the output for syscalls or function calls.
+    - If the operation mode is `EXIT`, format the output with the operation name and suffix.
+    - If the operation mode is `JA`, calculate the target label and format the output accordingly.
+    - For other jump operations, handle the source mode to format the output with registers and immediate values.
+    - Return `FD_VM_ERR_INVAL` if the operation mode or source mode is invalid.
+- **Output**: Returns `FD_VM_SUCCESS` on successful formatting, or an error code such as `FD_VM_ERR_INVAL` if the instruction is invalid.
 
 
 ---
 ### fd\_vm\_disasm\_instr\_ldx<!-- {{#callable:fd_vm_disasm_instr_ldx}} -->
-The `fd_vm_disasm_instr_ldx` function disassembles a load instruction with an index (ldx) from a given instruction and formats it into a human-readable string representation.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L193>)
+
+Disassembles a load instruction with index addressing and formats it into a human-readable string.
 - **Inputs**:
-    - `instr`: A `fd_sbpf_instr_t` structure representing the instruction to be disassembled, which contains opcode and other relevant fields.
-    - `out`: A character buffer where the disassembled instruction string will be written.
+    - `instr`: The instruction to disassemble, of type `fd_sbpf_instr_t`, containing opcode and addressing information.
+    - `out`: A character buffer where the disassembled instruction string will be stored.
     - `out_max`: The maximum number of characters that can be written to the `out` buffer.
-    - `_out_len`: A pointer to an `ulong` that tracks the current length of the string in the `out` buffer.
-- **Control Flow**:
-    - Determine the operation name (`op_name`) based on the `op_size` field of the instruction's opcode, mapping it to one of 'ldxw', 'ldxh', 'ldxb', or 'ldxdw'.
-    - If the `op_size` is not recognized, return `FD_VM_ERR_INVAL` indicating an invalid operation.
-    - Check if the `offset` field of the instruction is negative or non-negative.
-    - Use the `OUT_PRINTF` macro to format and append the disassembled instruction to the `out` buffer, adjusting the format based on whether the offset is negative or positive.
-    - Return `FD_VM_SUCCESS` to indicate successful disassembly.
-- **Output**: Returns an integer status code: `FD_VM_SUCCESS` on success, or `FD_VM_ERR_INVAL` if the operation size is invalid.
+    - `_out_len`: A pointer to a variable that holds the current length of the string in `out` and will be updated with the new length after the operation.
+- **Logic and Control Flow**:
+    - Determine the operation name based on the `op_size` field of the instruction's opcode.
+    - If the `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_WORD`, set `op_name` to "ldxw".
+    - If the `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_HALF`, set `op_name` to "ldxh".
+    - If the `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_BYTE`, set `op_name` to "ldxb".
+    - If the `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_DOUB`, set `op_name` to "ldxdw".
+    - If the `op_size` is not recognized, return `FD_VM_ERR_INVAL`.
+    - Check if the `offset` in the instruction is negative.
+    - If `offset` is negative, format the string as `"%s r%d, [r%d-0x%x]"` using `op_name`, `dst_reg`, `src_reg`, and the absolute value of `offset`.
+    - If `offset` is non-negative, format the string as `"%s r%d, [r%d+0x%x]"` using `op_name`, `dst_reg`, `src_reg`, and `offset`.
+    - Use the `OUT_PRINTF` macro to append the formatted string to the `out` buffer, handling any errors that occur.
+    - Return `FD_VM_SUCCESS` if the operation completes successfully.
+- **Output**: Returns `FD_VM_SUCCESS` on success or `FD_VM_ERR_INVAL` if the opcode size is invalid.
 
 
 ---
 ### fd\_vm\_disasm\_instr\_stx<!-- {{#callable:fd_vm_disasm_instr_stx}} -->
-The `fd_vm_disasm_instr_stx` function disassembles a store instruction with an index (STX) from a given instruction and formats it into a human-readable string representation.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L213>)
+
+Disassembles a store instruction and formats it into a human-readable string representation.
 - **Inputs**:
-    - `instr`: A `fd_sbpf_instr_t` structure representing the instruction to be disassembled.
+    - `instr`: The `fd_sbpf_instr_t` structure representing the instruction to disassemble.
     - `out`: A character buffer where the disassembled instruction string will be written.
     - `out_max`: The maximum number of characters that can be written to the `out` buffer.
     - `_out_len`: A pointer to an `ulong` that tracks the current length of the string in the `out` buffer.
-- **Control Flow**:
-    - Determine the operation name (`op_name`) based on the `op_size` field of the instruction's opcode, mapping it to one of 'stxw', 'stxh', 'stxb', or 'stxdw'.
-    - If the `op_size` does not match any known size, return `FD_VM_ERR_INVAL` indicating an invalid instruction.
-    - Use the `OUT_PRINTF` macro to format the disassembled instruction string into the `out` buffer, handling both positive and negative offsets appropriately.
-    - Return `FD_VM_SUCCESS` if the disassembly and formatting are successful.
-- **Output**: Returns an integer status code: `FD_VM_SUCCESS` on success, or `FD_VM_ERR_INVAL` if the instruction is invalid.
+- **Logic and Control Flow**:
+    - Determine the operation name based on the `op_size` field of the instruction's opcode.
+    - If `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_WORD`, set `op_name` to "stxw".
+    - If `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_HALF`, set `op_name` to "stxh".
+    - If `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_BYTE`, set `op_name` to "stxb".
+    - If `op_size` is `FD_SBPF_OPCODE_SIZE_MODE_DOUB`, set `op_name` to "stxdw".
+    - If `op_size` does not match any known size, return `FD_VM_ERR_INVAL`.
+    - Check if the `offset` field of the instruction is negative.
+    - If `offset` is negative, format the instruction as `"<op_name> [r<dst_reg>-0x<offset>], r<src_reg>"` and append it to the `out` buffer using `OUT_PRINTF`.
+    - If `offset` is non-negative, format the instruction as `"<op_name> [r<dst_reg>+0x<offset>], r<src_reg>"` and append it to the `out` buffer using `OUT_PRINTF`.
+    - Return `FD_VM_SUCCESS` if the operation is successful.
+- **Output**: Returns `FD_VM_SUCCESS` on success or `FD_VM_ERR_INVAL` if the opcode size is invalid.
 
 
 ---
 ### fd\_vm\_disasm\_instr<!-- {{#callable:fd_vm_disasm_instr}} -->
-The `fd_vm_disasm_instr` function disassembles a single instruction from a given text segment of SBPF bytecode and formats it into a human-readable string.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L233>)
+
+Disassembles a single instruction from a given text buffer and writes the result to an output buffer.
 - **Inputs**:
-    - `text`: A pointer to an array of unsigned long integers representing the SBPF bytecode instructions.
+    - `text`: A pointer to an array of unsigned long integers representing the instruction text to disassemble.
     - `text_cnt`: The number of instructions in the text array.
-    - `pc`: The program counter indicating the current instruction's index in the text array.
-    - `syscalls`: A pointer to a structure containing syscall information for resolving syscall names.
-    - `out`: A character buffer where the disassembled instruction will be written.
-    - `out_max`: The maximum number of characters that can be written to the out buffer.
-    - `_out_len`: A pointer to an unsigned long that tracks the current length of the string in the out buffer.
-- **Control Flow**:
-    - Check for invalid input parameters such as null pointers or buffer overflows and return an error if any are found.
-    - Retrieve the first instruction from the text array and determine its opcode class.
-    - For opcode class `FD_SBPF_OPCODE_CLASS_LD`, check if there are at least two instructions available, then disassemble a load double word instruction and append it to the output buffer.
-    - For opcode class `FD_SBPF_OPCODE_CLASS_ST`, append a placeholder message to the output buffer indicating a store instruction.
-    - For other opcode classes, delegate the disassembly to specialized functions ([`fd_vm_disasm_instr_ldx`](#fd_vm_disasm_instr_ldx), [`fd_vm_disasm_instr_stx`](#fd_vm_disasm_instr_stx), [`fd_vm_disasm_instr_alu`](#fd_vm_disasm_instr_alu), [`fd_vm_disasm_instr_jmp`](#fd_vm_disasm_instr_jmp)) based on the opcode class.
-    - Return an error if the opcode class is not recognized.
-- **Output**: Returns an integer status code indicating success or a specific error condition, such as invalid input or buffer overflow.
-- **Functions called**:
-    - [`fd_vm_disasm_instr_ldx`](#fd_vm_disasm_instr_ldx)
-    - [`fd_vm_disasm_instr_stx`](#fd_vm_disasm_instr_stx)
-    - [`fd_vm_disasm_instr_alu`](#fd_vm_disasm_instr_alu)
-    - [`fd_vm_disasm_instr_jmp`](#fd_vm_disasm_instr_jmp)
+    - `pc`: The program counter indicating the current instruction's position in the text.
+    - `syscalls`: A pointer to a structure containing system call information, used for disassembling jump instructions.
+    - `out`: A pointer to a character buffer where the disassembled instruction will be written.
+    - `out_max`: The maximum number of characters that can be written to the output buffer.
+    - `_out_len`: A pointer to an unsigned long that tracks the current length of the output buffer.
+- **Logic and Control Flow**:
+    - Checks if any of the input pointers are null or if the output buffer is already full, returning an error if so.
+    - Retrieves the first instruction from the text and determines its operation class.
+    - For `FD_SBPF_OPCODE_CLASS_LD`, checks if there are at least two instructions, then disassembles a load instruction and writes it to the output buffer.
+    - For `FD_SBPF_OPCODE_CLASS_ST`, writes a placeholder message to the output buffer indicating a store instruction.
+    - For other operation classes, delegates the disassembly to specific helper functions based on the operation class, such as [`fd_vm_disasm_instr_ldx`](<#fd_vm_disasm_instr_ldx>), [`fd_vm_disasm_instr_stx`](<#fd_vm_disasm_instr_stx>), [`fd_vm_disasm_instr_alu`](<#fd_vm_disasm_instr_alu>), and [`fd_vm_disasm_instr_jmp`](<#fd_vm_disasm_instr_jmp>).
+    - Returns an error if the operation class is not recognized.
+- **Output**: Returns an integer status code indicating success or an error, such as `FD_VM_SUCCESS` for success or `FD_VM_ERR_INVAL` for invalid input.
+- **Functions Called**:
+    - [`fd_vm_disasm_instr_ldx`](<#fd_vm_disasm_instr_ldx>)
+    - [`fd_vm_disasm_instr_stx`](<#fd_vm_disasm_instr_stx>)
+    - [`fd_vm_disasm_instr_alu`](<#fd_vm_disasm_instr_alu>)
+    - [`fd_vm_disasm_instr_jmp`](<#fd_vm_disasm_instr_jmp>)
 
 
 ---
 ### fd\_vm\_disasm\_program<!-- {{#callable:fd_vm_disasm_program}} -->
-The `fd_vm_disasm_program` function disassembles a given SBPF program into a human-readable format, mapping program counters to labels and functions, and outputs the disassembled instructions to a buffer.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L273>)
+
+Disassembles a program into a human-readable format by mapping program counters to labels and functions, and printing instructions.
 - **Inputs**:
-    - `text`: A pointer to an array of unsigned long integers representing the SBPF program instructions.
+    - `text`: A pointer to an array of unsigned long integers representing the program instructions.
     - `text_cnt`: The number of instructions in the `text` array.
-    - `syscalls`: A pointer to a structure containing syscall information for resolving syscall names during disassembly.
-    - `out`: A character buffer where the disassembled program will be output.
-    - `out_max`: The maximum size of the `out` buffer.
+    - `syscalls`: A pointer to a structure containing system call information for disassembly.
+    - `out`: A character buffer where the disassembled program will be written.
+    - `out_max`: The maximum number of characters that can be written to the `out` buffer.
     - `_out_len`: A pointer to an unsigned long that tracks the current length of the output in the `out` buffer.
-- **Control Flow**:
-    - Check for invalid input parameters and return `FD_VM_ERR_INVAL` if any are found.
-    - Initialize arrays `func_pc` and `label_pc` to store program counters for functions and labels, respectively.
-    - Iterate over the instructions to count the number of function and label targets, updating `func_cnt` and `label_cnt`.
-    - Check if the counts exceed the maximum allowed and return `FD_VM_ERR_UNSUP` if they do.
-    - Reset `func_cnt` and `label_cnt` and populate `func_pc` and `label_pc` with the actual program counters for functions and labels.
-    - Output the initial function label `function_0:` to the buffer.
-    - Iterate over the instructions again, printing function and label markers as needed, and disassemble each instruction using [`fd_vm_disasm_instr`](#fd_vm_disasm_instr).
-    - Handle multiword instructions by checking for truncated instructions and return `FD_VM_ERR_INVAL` if found.
-    - Continue to the next instruction, adjusting for any extra words in multiword instructions.
-    - Return `FD_VM_SUCCESS` upon successful disassembly.
-- **Output**: Returns an integer status code: `FD_VM_SUCCESS` on success, `FD_VM_ERR_INVAL` for invalid input or truncated instructions, and `FD_VM_ERR_UNSUP` if the number of functions or labels exceeds the limit.
-- **Functions called**:
-    - [`fd_vm_disasm_instr`](#fd_vm_disasm_instr)
+- **Logic and Control Flow**:
+    - Checks for invalid input parameters and returns `FD_VM_ERR_INVAL` if any are found.
+    - Initializes arrays `func_pc` and `label_pc` to store program counters for functions and labels, respectively.
+    - Iterates over the instructions to count the number of function and label targets, updating `func_cnt` and `label_cnt`.
+    - Checks if the number of functions or labels exceeds the maximum allowed and returns `FD_VM_ERR_UNSUP` if so.
+    - Resets `func_cnt` and `label_cnt` and populates `func_pc` and `label_pc` with the actual program counters for functions and labels.
+    - Outputs the initial function label `function_0:` to the `out` buffer.
+    - Iterates over the instructions again, printing labels and functions as they are encountered, and disassembling each instruction using [`fd_vm_disasm_instr`](<#fd_vm_disasm_instr>).
+    - Handles multiword instructions by checking for truncated instructions at the end of the text and returns `FD_VM_ERR_INVAL` if found.
+    - Prints any trailing function labels if necessary.
+- **Output**: Returns `FD_VM_SUCCESS` on successful disassembly, or an error code such as `FD_VM_ERR_INVAL` or `FD_VM_ERR_UNSUP` on failure.
+- **Functions Called**:
+    - [`fd_vm_disasm_instr`](<#fd_vm_disasm_instr>)
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_vm\_disasm\_printf<!-- {{#callable_declaration:fd_vm_disasm_printf}} -->
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_disasm.c#L25>)
+
 Appends formatted output to a buffer with length tracking.
-- **Description**: This function appends formatted output to a buffer, updating the length of the content in the buffer. It is designed to be used when you need to append formatted strings to an existing buffer while keeping track of the buffer's current length. The function ensures that the buffer is null-terminated even in error cases. It should be called with a valid buffer, a maximum size for the buffer, a pointer to the current length of the buffer, and a format string followed by additional arguments as required by the format. The function handles cases where the buffer is too small to hold the formatted output by truncating the output and returning an error code.
+- **Description**: Use this function to append formatted text to a buffer while keeping track of the buffer's current length. It is important to ensure that the initial length of the buffer, as pointed to by `_len`, is within the range [0, `max`). The function guarantees that the buffer is null-terminated even in error cases. It returns specific error codes if the buffer is too small to hold the formatted output or if there is a format parsing error. This function is useful when you need to build a string incrementally and want to handle potential buffer overflows gracefully.
 - **Inputs**:
-    - `buf`: A pointer to the buffer where the formatted output will be appended. Must not be null and should have a size of at least 'max' bytes.
-    - `max`: The maximum number of bytes the buffer can hold. Must be greater than zero.
-    - `_len`: A pointer to the current length of the string in the buffer. Must not be null and should initially be in the range [0, max). The value is updated to reflect the new length after appending.
-    - `fmt`: A format string as in printf, specifying how to format the additional arguments. Must not be null.
-    - `...`: Additional arguments as required by the format string.
-- **Output**: Returns FD_VM_SUCCESS on success, FD_VM_ERR_FULL if the buffer is too small, or FD_VM_ERR_IO if there is a format parsing error. The buffer is always null-terminated.
-- **See also**: [`fd_vm_disasm_printf`](#fd_vm_disasm_printf)  (Implementation)
+    - `buf`: A pointer to the character buffer where the formatted output will be appended. The buffer must have a size of at least `max` bytes. The caller retains ownership and must ensure it is not null.
+    - `max`: The maximum number of bytes that `buf` can hold. Must be greater than the initial value of `_len`.
+    - `_len`: A pointer to an unsigned long that indicates the current length of the string in `buf`. On input, it must be in the range [0, `max`). On output, it is updated to reflect the new length of the string.
+    - `fmt`: A format string that specifies how to format the remaining arguments. It must not be null and should follow the same rules as standard `printf` format strings.
+- **Output**: Returns `FD_VM_SUCCESS` on success, `FD_VM_ERR_FULL` if the buffer is too small, or `FD_VM_ERR_IO` if there is a format parsing error. The buffer is always null-terminated.
+- **See Also**: [`fd_vm_disasm_printf`](<#fd_vm_disasm_printf>)  (Implementation)
 
 
 
