@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp filter policy, utility functions, terminal-based monitoring tool, and security policies for Firedancer.
+Terminal GUI for tile and link metrics, helper output functions, and seccomp policy files.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for monitoring system calls with architecture-specific checks.
+- **[generated](generated/README.md)**: Generated seccomp BPF filter for allowed syscalls and argument checks.
 
 ## Files
-- **[helper.c](helper.c.md)**: Utility functions for formatted printing and input handling in a monitoring application.
-- **[helper.h](helper.h.md)**: Header file for terminal text formatting and diagnostic printing functions with color coding.
-- **[monitor.c](monitor.c.md)**: Implements a terminal-based monitoring tool for a Firedancer instance, including command-line argument parsing and permission checks.
-- **[monitor.h](monitor.h.md)**: Function prototypes and an external action declaration for monitoring commands.
-- **[monitor.seccomppolicy](monitor.seccomppolicy.md)**: Defines security policies for the monitor binary, including logging, process control, and I/O operations.
+- **[helper.c](helper.c.md)**: The `helper.c` file in the `firedancer` codebase provides utility functions for formatting and printing various types of data, such as time durations, error counts, and rates, as well as handling input from the standard input.
+- **[helper.h](helper.h.md)**: The `helper.h` file in the `firedancer` codebase provides a set of utility functions for formatted and color-coded terminal output, including functions for printing ages, heartbeats, signals, error conditions, sequences, rates, and percentages, as well as a non-blocking character read from stdin.
+- **[monitor.c](monitor.c.md)**: Terminal GUI for monitoring Firedancer tile and link metrics, with optional Sankey output.
+- **[monitor.h](monitor.h.md)**: Monitor command argument, permission, and execution prototypes plus action declaration.
+- **[monitor.seccomppolicy](monitor.seccomppolicy.md)**: The `monitor.seccomppolicy` file defines security policies for the monitor binary in the Firedancer codebase, detailing how it handles logging, process supervision, and terminal interactions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

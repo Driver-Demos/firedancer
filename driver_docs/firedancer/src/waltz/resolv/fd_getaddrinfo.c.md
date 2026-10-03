@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements address resolution and error handling functions for network address translation.
+The `fd_getaddrinfo.c` file in the `firedancer` codebase implements a function to resolve hostnames to addresses, similar to `getaddrinfo`, and provides error string conversion for address resolution errors.
 
 # Purpose
-The code provides functionality for network address resolution and error handling related to address information retrieval. It defines two main functions: [`fd_getaddrinfo`](<#fd_getaddrinfo>) and [`fd_gai_strerror`](<#fd_gai_strerror>). The [`fd_getaddrinfo`](<#fd_getaddrinfo>) function is responsible for resolving a host name into a set of address structures. It takes parameters such as the host name, a hint for address type, a pointer to store the result, and a buffer for output. The function checks for valid input, processes the host name using `fd_lookup_name`, and populates the result with address information, including handling both IPv4 and IPv6 addresses. It also manages memory allocation for the address information structures.
+This C source code file provides functionality for network address resolution, specifically implementing a custom version of the `getaddrinfo` function, named [`fd_getaddrinfo`](#fd_getaddrinfo). The primary purpose of this function is to translate a host name into a set of socket addresses, which can be used for network communication. The function takes a host name, optional hints for address family and flags, and outputs a linked list of address information structures. It handles both IPv4 and IPv6 addresses and includes error handling for various conditions such as invalid flags, unsupported address families, and memory allocation issues. The code also includes a helper function, [`fd_gai_strerror`](#fd_gai_strerror), which translates error codes into human-readable error messages, enhancing the usability of the address resolution process.
 
-The [`fd_gai_strerror`](<#fd_gai_strerror>) function provides error message strings corresponding to error codes returned by [`fd_getaddrinfo`](<#fd_getaddrinfo>). It maps specific error codes to human-readable strings, facilitating error diagnosis. The code includes necessary headers for socket programming and uses structures like `fd_addrinfo_t` and `struct sockaddr_in` to manage address information. This code is intended to be part of a larger network utility library, providing a specific API for address resolution and error interpretation.
+The file includes several headers, indicating dependencies on system-level networking libraries and custom utility functions, such as `fd_lookup_name` for name resolution and `fd_io_strerror` for error string conversion. The code is structured to be part of a larger library or application, as it relies on external definitions and utility functions. It does not define a public API or external interface directly but provides essential network-related functionality that can be integrated into broader network communication modules. The use of custom error codes and structures suggests that this code is part of a specialized networking library, possibly designed for environments where standard library functions are insufficient or need to be extended.
 # Imports and Dependencies
 
 ---
@@ -28,43 +28,38 @@ The [`fd_gai_strerror`](<#fd_gai_strerror>) function provides error message stri
 
 ---
 ### fd\_getaddrinfo<!-- {{#callable:fd_getaddrinfo}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_getaddrinfo.c#L12>)
-
-Resolves a host name to a list of address structures, considering optional hints and output constraints.
+The `fd_getaddrinfo` function resolves a hostname into a list of address structures, considering optional hints and memory constraints.
 - **Inputs**:
-    - `host`: A pointer to a string containing the host name to resolve.
-    - `hint`: A pointer to a `fd_addrinfo_t` structure providing hints for the address resolution, such as address family and flags.
-    - `res`: A pointer to a pointer where the function will store the result list of address structures.
-    - `pout`: A pointer to a memory location where the function will store the allocated address information buffer.
-    - `out_max`: The maximum size of the output buffer pointed to by `pout`.
-- **Logic and Control Flow**:
+    - `host`: A constant character pointer to the hostname to be resolved.
+    - `hint`: A constant pointer to a `fd_addrinfo_t` structure providing hints about the type of socket the caller supports.
+    - `res`: A pointer to a pointer to `fd_addrinfo_t` where the result will be stored.
+    - `pout`: A pointer to a void pointer for memory allocation purposes.
+    - `out_max`: An unsigned long indicating the maximum size of the output buffer.
+- **Control Flow**:
     - Initialize `family` to `AF_UNSPEC` and `flags` to 0.
-    - Return `FD_EAI_NONAME` if `host` is null.
-    - If `hint` is provided, set `family` and `flags` from `hint`, validate `flags` against a mask, and check `family` for supported values.
-    - Call [`fd_lookup_name`](<fd_lookup_name.c.md#fd_lookup_name>) to resolve the host name into addresses and canonical name, returning the result if negative.
-    - Calculate the required allocation size for the address information buffer and check if `pout` is null or `out_max` is insufficient, returning `FD_EAI_MEMORY` if so.
-    - Allocate memory for the address information buffer and copy the canonical name if present.
-    - Iterate over resolved addresses, populating the address information buffer with address details and linking them in a list.
-    - Set the reference count in the first address information buffer entry and store the result list in `res`.
-    - Return 0 to indicate success.
-- **Output**: Returns 0 on success, or an error code such as `FD_EAI_NONAME`, `FD_EAI_BADFLAGS`, `FD_EAI_FAMILY`, or `FD_EAI_MEMORY` on failure.
-- **Functions Called**:
-    - [`fd_lookup_name`](<fd_lookup_name.c.md#fd_lookup_name>)
+    - Check if `host` is NULL and return `FD_EAI_NONAME` if true.
+    - If `hint` is provided, set `family` and `flags` from `hint` and validate `flags` against a mask; return `FD_EAI_BADFLAGS` if invalid.
+    - Validate `family` against supported address families; return `FD_EAI_FAMILY` if unsupported.
+    - Call [`fd_lookup_name`](fd_lookup_name.c.md#fd_lookup_name) to resolve the hostname into addresses and canonical name; return error if resolution fails.
+    - Calculate the required allocation size and check if `pout` is NULL or `out_max` is insufficient; return `FD_EAI_MEMORY` if true.
+    - Allocate memory for the canonical name if it exists and copy it to the output buffer.
+    - Iterate over resolved addresses, populate `aibuf` structures, and link them in a list.
+    - Set the reference count in the first `aibuf` and assign the result to `res`.
+- **Output**: Returns 0 on success, or an error code indicating the type of failure.
+- **Functions called**:
+    - [`fd_lookup_name`](fd_lookup_name.c.md#fd_lookup_name)
 
 
 ---
 ### fd\_gai\_strerror<!-- {{#callable:fd_gai_strerror}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_getaddrinfo.c#L92>)
-
-Translates a `gai` error code into a human-readable error message.
+The `fd_gai_strerror` function returns a human-readable string describing the error code provided by the `gai` parameter.
 - **Inputs**:
-    - `gai`: An integer representing the error code to translate.
-- **Logic and Control Flow**:
-    - Check if `gai` is less than or equal to `FD_EAI_SYSTEM`.
-    - If true, calculate `err` as `gai - FD_EAI_SYSTEM` and return the result of `fd_io_strerror(err)`.
-    - If false, use a switch statement to match `gai` to predefined error codes and return the corresponding error message.
-    - If `gai` does not match any predefined error codes, return "unknown error".
-- **Output**: A constant character pointer to a string describing the error.
+    - `gai`: An integer representing the error code for which a descriptive string is needed.
+- **Control Flow**:
+    - Check if `gai` is less than or equal to `FD_EAI_SYSTEM`; if true, calculate `err` as `gai - FD_EAI_SYSTEM` and return the result of `fd_io_strerror(err)`.
+    - Use a switch statement to match `gai` against predefined error codes such as `FD_EAI_BADFLAGS`, `FD_EAI_NONAME`, etc., and return the corresponding error message string.
+    - If `gai` does not match any predefined error codes, return the string "unknown error".
+- **Output**: A constant character pointer to a string that describes the error associated with the given `gai` code.
 
 
 

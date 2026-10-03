@@ -3,28 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Test cases for bitwise OR and AND operations on 32-bit and 64-bit registers with immediate and register operands.
+The `bitwise.instr` file in the `firedancer` codebase contains test cases for bitwise operations such as OR and AND on 32-bit and 64-bit registers, including both immediate and register operands, with validation for invalid sources and destinations.
 
 # Purpose
-The file contains a series of test cases for verifying the behavior of bitwise operations in a processor or emulator. Each line represents a test case for specific operations such as `or32`, `or64`, `and32`, and `and64`, which perform bitwise OR and AND operations on registers and immediate values. The test cases specify operation codes (`op`), destination registers (`dst`), source registers (`src`), offsets (`off`), and initial register values. The expected results are indicated after the colon, with comments explaining the outcome, such as truncation of upper bits or validation failures (`vfy`) for invalid source or destination registers. This file is crucial for ensuring that the bitwise operations execute correctly and handle edge cases as expected.
+The provided content appears to be a test or verification file for a software component that performs bitwise operations, specifically OR and AND operations, on 32-bit and 64-bit registers. This file is likely used to validate the functionality of a processor or an emulator by specifying various test cases with expected outcomes. Each line represents a test case, detailing the operation code (`op`), destination (`dst`), source (`src`), offset (`off`), initial register values, immediate values, and the expected result after the operation. The file includes both valid operations, marked with `: ok`, and invalid operations, marked with `: vfy`, to ensure that the system correctly handles both correct and erroneous inputs. This file is crucial for ensuring the reliability and correctness of the bitwise operation implementations within the codebase.
 # Content Summary
-The provided content is a series of test cases for bitwise operations in a software codebase. These operations include OR and AND operations on 32-bit and 64-bit registers, with both immediate values and register-to-register operations. Each test case is structured with specific fields and outcomes:
+The provided content appears to be a set of test cases or validation scenarios for a series of bitwise operations, specifically `or` and `and` operations, on 32-bit and 64-bit registers. Each line represents a test case with a specific operation code (`op`), destination register (`dst`), source register (`src`), and an optional immediate value (`imm`). The operations are categorized into four main types: `or32 reg, imm`, `or32 reg, reg`, `or64 reg, imm`, `or64 reg, reg`, `and32 reg, imm`, `and32 reg, reg`, `and64 reg, imm`, and `and64 reg, reg`.
 
-1. **Operation Codes**: Each line begins with an operation code (`op`) that specifies the type of operation. For example, `op=44` and `op=4c` represent OR operations with immediate values and registers, respectively, while `op=54` and `op=5c` represent AND operations.
+Key technical details include:
 
-2. **Destination and Source Registers**: The `dst` and `src` fields indicate the destination and source registers involved in the operation. The destination register is where the result of the operation is stored.
+1. **Operation Codes**: Each operation is identified by a unique opcode, such as `44` for `or32 reg, imm`, `4c` for `or32 reg, reg`, `47` for `or64 reg, imm`, and so on. These opcodes are crucial for the execution of the correct bitwise operation.
 
-3. **Offset**: The `off` field represents an offset value, though its specific role in these operations is not detailed in the content.
+2. **Registers and Immediate Values**: The test cases specify destination (`dst`) and source (`src`) registers, with some operations also involving an immediate value (`imm`). The initial values of these registers and the immediate values are provided in hexadecimal or binary format.
 
-4. **Initial Register Values**: The initial values of the registers (`r0`, `r1`, etc.) and immediate values (`imm`) are provided before the operation is executed.
+3. **Expected Results**: Each test case includes an expected result after the operation is performed, indicated by the `ok` status and the resulting value of the destination register. This helps in verifying the correctness of the operation.
 
-5. **Expected Results**: After the operation, the expected result is shown, indicating the new value of the destination register. Comments such as `# truncate upper` and `# sign extend` describe specific behaviors like truncating higher bits or extending the sign bit.
+4. **Validation and Verification**: Some test cases are marked with `vfy`, indicating that they are intended to verify invalid scenarios, such as using an invalid source or destination register. These cases are essential for ensuring robust error handling in the implementation.
 
-6. **Verification Status**: Each test case ends with a status, either `ok` for successful operations or `vfy` for cases that require verification due to invalid source or destination registers.
+5. **Comments and Annotations**: Comments provide additional context, such as "truncate upper" or "sign extend," which describe specific behaviors or edge cases that the operation should handle. These annotations are important for understanding the nuances of each test case.
 
-7. **Invalid Cases**: Lines marked with `vfy` indicate invalid operations, such as using non-existent registers as sources or destinations.
-
-These test cases are essential for verifying the correct implementation of bitwise operations in the software, ensuring that the operations produce the expected results under various conditions.
+Overall, this file serves as a comprehensive suite for testing and validating the implementation of bitwise `or` and `and` operations on both 32-bit and 64-bit registers, ensuring that the operations perform correctly under various conditions and handle invalid inputs gracefully.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
