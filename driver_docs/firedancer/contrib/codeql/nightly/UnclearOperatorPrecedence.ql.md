@@ -3,21 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Identifies unparenthesised binary bitwise operations with comparison operations as operands.
+Lists unparenthesized comparison operands in binary bitwise operations.
 
 # Purpose
-This code defines a query for identifying potential issues in C++ code related to operator precedence. It specifically targets binary bitwise operations that are not parenthesized and have a comparison operation as the other operand. The code is part of a static analysis tool that aims to detect and warn about possible logical errors in code due to operator precedence rules.
-
-The query imports modules `cpp` and `filter`, which are likely used to access C++ code structures and apply filtering criteria, respectively. It uses the `BinaryBitwiseOperation`, `ComparisonOperation`, and `Expr` classes to identify relevant code patterns. The query checks if a binary bitwise operation has operands that include a comparison operation and another expression, ensuring that the comparison operation is not parenthesized. If these conditions are met and the bitwise operation is within the included location, the query selects the comparison operation and issues a warning about potential precedence issues.
-
-The purpose of this code is to improve code quality by highlighting areas where the lack of parentheses might lead to unintended behavior due to the precedence of operators. It is part of a broader static analysis framework that helps developers identify and correct subtle bugs in their code.
-# Imports and Dependencies
-
----
-- `cpp`
-- `filter`
-
-
+This code defines a CodeQL query that finds C++ expressions where a binary bitwise operation uses a comparison expression as one operand and the comparison is not parenthesised. It imports the `cpp` and `filter` libraries, then matches a `BinaryBitwiseOperation` with a `ComparisonOperation` operand and checks that the comparison is included in the analysis scope. The query reports the comparison expression with a warning message because the operator order can indicate a likely precedence error.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for conditional object addition and unit test setup in the deduplication module.
+Build rules for fd_dedup_tile when FD_HAS_ALLOCA is set.
 
 # Purpose
-The `Makefile` snippet conditionally adds object files to the build process if the `FD_HAS_ALLOCA` macro is defined. It uses the `add-objs` function to include `fd_dedup_tile` and `fd_disco` in the build. The commented line suggests a unit test target `test_dedup` that would depend on `fd_disco`, `fd_tango`, and `fd_util`, but it is not active in the current configuration.
+Build logic for `fd_disco` adds `fd_dedup_tile` to the object list only when `FD_HAS_ALLOCA` is defined. The commented `make-unit-test` line shows a unit test target for `test_dedup` that uses `fd_disco`, `fd_tango`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

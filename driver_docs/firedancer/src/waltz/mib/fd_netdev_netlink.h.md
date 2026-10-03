@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-APIs for importing network interfaces from Linux netlink.
+The `fd_netdev_netlink.h` file provides APIs for importing network interfaces from Linux netlink in the `firedancer` codebase.
 
 # Purpose
-The `fd_netdev_netlink.h` file is a C header file that provides an API for importing network interfaces using Linux netlink. It includes necessary dependencies such as `fd_netdev_tbl.h` and `fd_netlink1.h` when compiled on a Linux system. The file declares the function [`fd_netdev_netlink_load_table`](<#fd_netdev_netlink_load_table>), which is used to load network interface data into a table structure defined by `fd_netdev_tbl_join_t` using a netlink connection represented by `fd_netlink_t`. The header guards prevent multiple inclusions of the file, ensuring that the declarations are only processed once during compilation.
+This code is a C header file designed to provide an interface for working with network devices on Linux systems using netlink, a communication protocol between the Linux kernel and user-space processes. The file includes necessary headers for network device table management and netlink operations, specifically `fd_netdev_tbl.h` and `fd_netlink1.h`. It defines a function prototype, [`fd_netdev_netlink_load_table`](#fd_netdev_netlink_load_table), which is intended to load network interface data into a provided table structure using netlink. The use of preprocessor directives ensures that the code is only compiled on Linux systems, highlighting its platform-specific functionality. Overall, this header file is part of a larger system for managing network interfaces in a Linux environment.
 # Imports and Dependencies
 
 ---
@@ -18,15 +18,13 @@ The `fd_netdev_netlink.h` file is a C header file that provides an API for impor
 
 ---
 ### fd\_netdev\_netlink\_load\_table<!-- {{#callable_declaration:fd_netdev_netlink_load_table}} -->
-[View Source →](<../../../../../src/waltz/mib/fd_netdev_netlink.h#L12>)
-
 Loads network interface data into a table using netlink.
-- **Description**: Use this function to populate a network device table with interface data obtained from the Linux netlink interface. This function resets the table before loading new data. It requires a valid netlink connection and a table with sufficient capacity to store the interface data. Call this function when you need to refresh the network interface information in the table. Ensure that the table and netlink parameters are properly initialized before calling.
+- **Description**: This function populates a network device table with interface data obtained from the Linux netlink interface. It should be called when you need to refresh or initialize the network device table with the current state of network interfaces. The function resets the table before loading new data, ensuring that it reflects the latest interface configurations. It handles various interface attributes such as name, MAC address, operational status, MTU, and master-slave relationships for bonded interfaces. The function returns an error code if it encounters issues during the netlink communication or data processing.
 - **Inputs**:
-    - `tbl`: A pointer to a `fd_netdev_tbl_join_t` structure where the network interface data will be loaded. Must not be null and should have sufficient capacity to store the data.
-    - `netlink`: A pointer to a `fd_netlink_t` structure representing an active netlink connection. Must not be null and should be properly initialized before calling.
-- **Output**: Returns 0 on success. On failure, returns a non-zero error code indicating the type of error encountered.
-- **See Also**: [`fd_netdev_netlink_load_table`](<fd_netdev_netlink.c.md#fd_netdev_netlink_load_table>)  (Implementation)
+    - `tbl`: A pointer to an fd_netdev_tbl_join_t structure where the network interface data will be loaded. The table is reset before loading new data. Must not be null.
+    - `netlink`: A pointer to an fd_netlink_t structure used for netlink communication. Must be properly initialized and not null.
+- **Output**: Returns 0 on success or a non-zero error code if an error occurs during the operation.
+- **See also**: [`fd_netdev_netlink_load_table`](fd_netdev_netlink.c.md#fd_netdev_netlink_load_table)  (Implementation)
 
 
 
