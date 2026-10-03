@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for network device components in the Waltz module.
+The `Local.mk` file in the `firedancer` codebase specifies the headers and object files for `fd_dbl_buf` and `fd_netdev_tbl`, and conditionally includes `fd_netdev_netlink` and its unit test if `FD_HAS_LINUX` is defined.
 
 # Purpose
-The Makefile snippet defines build instructions for a software project. It uses the `add-hdrs` and `add-objs` macros to include header files and object files, respectively, for components such as `fd_dbl_buf` and `fd_netdev_tbl`. The conditional block, `ifdef FD_HAS_LINUX`, specifies additional headers and objects for Linux-specific components, such as `fd_netdev_netlink`, and includes a unit test target `test_netdev_netlink` that depends on `fd_waltz` and `fd_util`.
+This file is a Makefile snippet used to manage the build process of a software project. It defines rules for adding header files and object files to the build system, and conditionally includes additional files and unit tests if the `FD_HAS_LINUX` flag is set, indicating compatibility with Linux systems. The use of `$(call ...)` suggests the use of macros or functions to streamline the inclusion of these components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

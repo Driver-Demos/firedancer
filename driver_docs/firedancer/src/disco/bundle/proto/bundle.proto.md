@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines protobuf messages for a bundle with a header, packets, and a UUID.
+The `bundle.proto` file defines protocol buffer messages for a `Bundle` containing a header and repeated packets, and a `BundleUuid` that includes a bundle and a UUID.
 
 # Purpose
-The code defines a Protocol Buffers (`proto3`) schema for a package named `bundle`. It imports definitions from `packet.proto` and `shared.proto` to use in its own message structures. The `Bundle` message includes a `header` field of type `shared.Header` and a `packets` field, which is a repeated list of `packet.Packet` messages. Additionally, the `BundleUuid` message contains a `bundle` field of type `bundle.Bundle` and a `uuid` field of type `bytes`. This code provides a narrow functionality focused on defining data structures for bundling packets with associated metadata and unique identifiers.
+This code is a Protocol Buffers (protobuf) definition file, which is used to define the structure of data for serialization and deserialization across different systems. It provides a narrow functionality focused on defining data structures, specifically for a "Bundle" and a "BundleUuid" message. The file imports two other protobuf files, "packet.proto" and "shared.proto," indicating that it relies on definitions from these files, such as the "Header" from "shared.proto" and "Packet" from "packet.proto." The "Bundle" message includes a header and a list of packets, while the "BundleUuid" message associates a bundle with a unique identifier. This file is intended to be used as part of a larger system where these data structures are serialized for communication between services or components.
 # Imports and Dependencies
 
 ---
@@ -18,20 +18,20 @@ The code defines a Protocol Buffers (`proto3`) schema for a package named `bundl
 
 ---
 ### Bundle
-- **Type**: ``message``
+- **Type**: `message`
 - **Members**:
-    - ``header``: A `shared.Header` object that contains metadata for the `Bundle`.
-    - ``packets``: A list of `packet.Packet` objects that the `Bundle` contains.
-- **Description**: Represents a collection of packets with a header, where `header` provides metadata and `packets` is a list of `packet.Packet` objects. The `Bundle` is part of the `bundle` package and is defined using Protocol Buffers syntax.
+    - `header`: A shared.Header object that contains metadata for the bundle.
+    - `packets`: A repeated field of packet.Packet objects representing the collection of packets in the bundle.
+- **Description**: The `Bundle` message is a protocol buffer message that encapsulates a collection of packets along with a header. It is designed to group multiple `packet.Packet` objects, which are defined in an imported `packet.proto` file, under a single `shared.Header`, which is defined in an imported `shared.proto` file. This structure is useful for transmitting or processing multiple packets as a single unit, with the header providing necessary metadata for the entire bundle.
 
 
 ---
 ### BundleUuid
-- **Type**: ``message``
+- **Type**: `message`
 - **Members**:
-    - ``bundle``: A `Bundle` message that contains a header and repeated packets.
-    - ``uuid``: A byte array that represents a universally unique identifier (UUID).
-- **Description**: The `BundleUuid` message is a data structure that contains a `Bundle` and a `uuid`. The `Bundle` includes a header and a list of packets, while the `uuid` is a byte array that uniquely identifies the `BundleUuid` instance.
+    - `bundle`: A field of type `bundle.Bundle` that represents a collection of packets with a shared header.
+    - `uuid`: A field of type `bytes` that stores a universally unique identifier for the bundle.
+- **Description**: The `BundleUuid` message is a data structure that encapsulates a `Bundle` and associates it with a unique identifier. The `bundle` field contains a `Bundle` object, which includes a header and a list of packets, while the `uuid` field provides a unique identifier in the form of a byte array. This structure is useful for uniquely identifying and managing collections of packets within a system.
 
 
 
