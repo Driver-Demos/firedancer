@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Feature checklist for the rewrite of the "bundle" tile, comparing versions 1.0 and 2.0.
+Rewrite of the bundle tile with feature checklists for versions 1.0 and 2.0.
 
 # Purpose
-The document outlines the features of the "bundle" tile, comparing the capabilities of version 1.0 with the planned features for version 2.0. It lists the features supported by the old bundle tile, such as packet delivery, gRPC over HTTP/2 connections with and without TLS, and seccomp sandboxing. The document also specifies the features intended for the new bundle tile, including TCP performance metrics and SSL key log file support. Additionally, it identifies features that are uncertain for inclusion, such as power saving through yielding to the OS scheduler when I/O is inactive. This checklist helps track the development progress and feature parity between the two versions.
+This file defines the scope of the `bundle` tile 2.0 rewrite and records the feature set for both the older and new versions. It lists the functions already supported by `bundle` tile 1.0, including packet delivery, bundle delivery, gRPC connections with and without TLS, custom SNI, seccomp sandboxing, auth token flow, basic metrics, and connection timeout. It also marks the features planned for `bundle` tile 2.0, such as TCP performance metrics and SSL key log file support, while leaving HTTP/2 and gRPC performance metrics unchecked. The `Unsure` section tracks power saving as an open item that still needs a decision.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

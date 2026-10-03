@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for the `fd_pack_rebate_sum` functionality, including transaction creation and rebate calculations.
+The `test_pack_rebate_sum.c` file in the `firedancer` codebase contains tests for the `fd_pack_rebate_sum` functionality, which involves creating and processing fake transactions to verify rebate calculations and transaction handling.
 
 # Purpose
-The code is an executable C program that tests the functionality of a transaction rebate system. It includes the headers `fd_pack_rebate_sum.h` and `fd_pack.h`, which suggest that it relies on external definitions for handling transaction rebates and packing operations. The program defines several macros for transaction flags, such as `VOTE`, `BUNDLE`, `IB`, `SANITIZE`, and `EXECUTE`, which are used to control the behavior of transactions within the test cases.
+This C source code file is designed to simulate and test a transaction processing system, specifically focusing on the handling of transaction rebates and microblock processing. The code includes functions to create fake transactions ([`fake_transaction`](#fake_transaction)) and to verify the correctness of transaction writer rebates ([`check_writer`](#check_writer)). The main function orchestrates a series of tests that simulate different transaction scenarios, such as normal transactions, votes, and bundled transactions, and evaluates the system's ability to correctly calculate and report transaction rebates. The code utilizes several macros to define transaction flags, which are used to control the behavior of transactions during testing.
 
-The main components of the code include the [`fake_transaction`](<#fake_transaction>) function, which simulates transactions by setting various transaction parameters, and the [`check_writer`](<#check_writer>) function, which verifies the correctness of writer rebates. The [`main`](<#main>) function initializes the system, creates and processes multiple fake transactions, and checks the results using assertions (`FD_TEST`). The program uses a structure `fd_pack_rebate_sum_t` to accumulate and report rebate summaries, and it tests different scenarios by adding transactions to this structure and verifying the expected outcomes. The code is structured to validate the transaction processing logic, including handling of different transaction flags and ensuring correct rebate calculations.
+The file is structured as an executable C program, as indicated by the presence of a [`main`](#main) function. It imports functionality from two header files, `fd_pack_rebate_sum.h` and `fd_pack.h`, which likely provide definitions and functions related to transaction packing and rebate summation. The program makes extensive use of inline functions and macros to streamline the creation and validation of transactions. It does not define public APIs or external interfaces, as its primary purpose is to perform internal testing of transaction processing logic. The code is a focused implementation, providing a narrow functionality aimed at validating the correctness and efficiency of transaction rebate calculations within a specific system context.
 # Imports and Dependencies
 
 ---
@@ -20,73 +20,66 @@ The main components of the code include the [`fake_transaction`](<#fake_transact
 
 ---
 ### fake\_transaction<!-- {{#callable:fake_transaction}} -->
-[View Source →](<../../../../../src/disco/pack/test_pack_rebate_sum.c#L10>)
-
-Initializes a transaction structure with specified parameters and populates payloads based on input strings.
+The `fake_transaction` function initializes a transaction structure with specified parameters and populates its payload and alternate address fields based on input strings.
 - **Inputs**:
-    - `txnp`: Pointer to a `fd_txn_p_t` structure that represents the transaction.
-    - `alt`: Pointer to a `fd_acct_addr_t` structure used for alternative writable data.
-    - `rebate_cus`: Unsigned long integer representing the rebate customer units.
-    - `flags`: Unsigned integer representing transaction flags.
-    - `writable`: Constant character pointer to a string representing writable data.
-    - `alt_writable`: Constant character pointer to a string representing alternative writable data.
-- **Logic and Control Flow**:
-    - Retrieve the transaction object from `txnp` using the `TXN` macro.
-    - Set `acct_addr_cnt` in the transaction to the length of the `writable` string.
-    - Initialize several transaction counters (`signature_cnt`, `readonly_signed_cnt`, `readonly_unsigned_cnt`, `acct_addr_off`) to zero.
-    - Set `addr_table_adtl_cnt`, `addr_table_adtl_writable_cnt`, and `addr_table_lookup_cnt` based on the length of `alt_writable`.
-    - Iterate over each character in `writable`, filling the `payload` with 32 copies of each character, and advance the `payload` pointer.
-    - Iterate over each character in `alt_writable`, filling `alt` with 32 copies of each character, and advance the `alt` pointer.
-    - Set `payload_sz` in `txnp` to 111.
-    - Assign `flags` to `txnp->flags`.
-    - Set `rebated_cus` in `txnp->bank_cu` to `rebate_cus`.
-- **Output**: No return value; modifies the transaction structure pointed to by `txnp` and the alternative writable data pointed to by `alt`.
+    - `txnp`: A pointer to an `fd_txn_p_t` structure where the transaction data will be stored.
+    - `alt`: A pointer to an `fd_acct_addr_t` array where alternate writable data will be stored.
+    - `rebate_cus`: An unsigned long integer representing the rebate customer units.
+    - `flags`: An unsigned integer representing various flags for the transaction.
+    - `writable`: A constant character pointer to a string representing writable data for the transaction.
+    - `alt_writable`: A constant character pointer to a string representing alternate writable data for the transaction.
+- **Control Flow**:
+    - Retrieve the transaction structure from the `txnp` pointer using the `TXN` macro.
+    - Set the `acct_addr_cnt` field of the transaction to the length of the `writable` string.
+    - Initialize several fields of the transaction structure to zero, including `signature_cnt`, `readonly_signed_cnt`, `readonly_unsigned_cnt`, and `acct_addr_off`.
+    - Set the `addr_table_adtl_cnt`, `addr_table_adtl_writable_cnt`, and `addr_table_lookup_cnt` fields based on the length of the `alt_writable` string.
+    - Iterate over each character in the `writable` string, filling the `payload` array with 32 copies of each character.
+    - Iterate over each character in the `alt_writable` string, filling the `alt` array with 32 copies of each character.
+    - Set the `payload_sz` field of the `txnp` structure to 111.
+    - Set the `flags` field of the `txnp` structure to the provided `flags` value.
+    - Set the `rebated_cus` field of the `bank_cu` structure within `txnp` to the `rebate_cus` value.
+- **Output**: The function does not return a value; it modifies the transaction structure pointed to by `txnp` and the alternate address array `alt`.
 
 
 ---
 ### check\_writer<!-- {{#callable:check_writer}} -->
-[View Source →](<../../../../../src/disco/pack/test_pack_rebate_sum.c#L43>)
-
-Validates that each account in the `accts` string has a corresponding writer rebate in `r` with the specified `cus` value.
+The `check_writer` function verifies that each account in a given string is associated with a writer rebate in a rebate structure and that the rebate's customer ID matches a specified value.
 - **Inputs**:
-    - `r`: A pointer to a `fd_pack_rebate_t` structure containing writer rebate information.
-    - `accts`: A pointer to a null-terminated string of account identifiers to check.
-    - `cus`: An unsigned long integer representing the expected rebate customer value for each account.
-- **Logic and Control Flow**:
-    - Iterates over each character in the `accts` string until the null terminator is reached.
-    - For each account character, initializes a `found` flag to 0.
-    - Iterates over the `writer_rebates` array in `r` to find a matching account key.
-    - If a match is found, checks that `found` is 0 using `FD_TEST`, sets `found` to 1, and verifies that the `rebate_cus` matches `cus` using `FD_TEST`.
-    - After checking all writer rebates, uses `FD_TEST` to ensure that `found` is 1, indicating a match was found for the account.
-    - Increments the `accts` pointer to check the next account.
-- **Output**: No return value; uses `FD_TEST` to assert conditions, which may terminate the program if assertions fail.
+    - `r`: A pointer to a constant `fd_pack_rebate_t` structure containing writer rebate information.
+    - `accts`: A pointer to a constant character string representing account identifiers to be checked.
+    - `cus`: An unsigned long integer representing the customer ID to be verified against the writer rebates.
+- **Control Flow**:
+    - Iterate over each character in the `accts` string until a null terminator is encountered.
+    - Initialize a `found` flag to 0 for each account character.
+    - Iterate over the writer rebates in the `r` structure using a loop indexed by `i`.
+    - Check if the first byte of the current writer rebate's key matches the current account character.
+    - If a match is found, assert that `found` is 0 (indicating no previous match for this account character), set `found` to 1, and assert that the rebate's customer ID matches `cus`.
+    - After checking all writer rebates for the current account character, assert that `found` is 1 (indicating a match was found).
+    - Move to the next account character in the `accts` string.
+- **Output**: The function does not return a value; it uses assertions to ensure conditions are met, which may terminate the program if any assertion fails.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/disco/pack/test_pack_rebate_sum.c#L61>)
-
-Initializes and tests a series of fake transactions to verify the functionality of the rebate sum calculation and reporting system.
+The `main` function initializes and tests a rebate calculation system by simulating transactions and verifying the results of rebate calculations.
 - **Inputs**:
     - `argc`: The number of command-line arguments.
     - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the system with command-line arguments.
-    - Initializes a rebate sum structure using [`fd_pack_rebate_sum_new`](<fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_new>) and `fd_pack_rebate_sum_join`.
-    - Defines a union `report` to store rebate data and a `microblock` array to store transaction data.
-    - Initializes an array of account addresses `alt` and a pointer array `_alt` to these addresses.
-    - Creates several fake transactions using [`fake_transaction`](<#fake_transaction>) with different parameters and flags.
-    - Adds transactions to the rebate sum using [`fd_pack_rebate_sum_add_txn`](<fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_add_txn>) and checks the results with `FD_TEST`.
-    - Reports the rebate sum using [`fd_pack_rebate_sum_report`](<fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_report>) and verifies the results with `FD_TEST`.
-    - Checks the writer rebates using [`check_writer`](<#check_writer>) to ensure correct rebate calculations.
-    - Logs a success message with `FD_LOG_NOTICE` and halts the system with `fd_halt`.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_pack_rebate_sum_new`](<fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_new>)
-    - [`fake_transaction`](<#fake_transaction>)
-    - [`fd_pack_rebate_sum_add_txn`](<fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_add_txn>)
-    - [`fd_pack_rebate_sum_report`](<fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_report>)
-    - [`check_writer`](<#check_writer>)
+- **Control Flow**:
+    - Initialize the system with `fd_boot` using command-line arguments.
+    - Create and join a new rebate sum object using [`fd_pack_rebate_sum_new`](fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_new) and `fd_pack_rebate_sum_join`.
+    - Declare and initialize arrays for transactions (`microblock`) and account addresses (`alt`).
+    - Simulate transactions using [`fake_transaction`](#fake_transaction) with various parameters and flags.
+    - Add transactions to the rebate sum and report the results using [`fd_pack_rebate_sum_add_txn`](fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_add_txn) and [`fd_pack_rebate_sum_report`](fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_report).
+    - Verify the results of the rebate calculations using `FD_TEST` and [`check_writer`](#check_writer).
+    - Log a success message and halt the system with `fd_halt`.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`fd_pack_rebate_sum_new`](fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_new)
+    - [`fake_transaction`](#fake_transaction)
+    - [`fd_pack_rebate_sum_add_txn`](fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_add_txn)
+    - [`fd_pack_rebate_sum_report`](fd_pack_rebate_sum.c.md#fd_pack_rebate_sum_report)
+    - [`check_writer`](#check_writer)
 
 
 

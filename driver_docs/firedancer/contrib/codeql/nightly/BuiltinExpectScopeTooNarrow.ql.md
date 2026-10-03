@@ -3,15 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Identifies and warns about the use of `__builtin_expect()` in non-conditional contexts in C++ code.
+The `BuiltinExpectScopeTooNarrow.ql` file identifies and warns about the use of `__builtin_expect()` in non-conditional contexts within the `firedancer` codebase.
 
 # Purpose
-The code is a query script that identifies the use of the `__builtin_expect()` function in non-conditional contexts within C++ code. It is part of a static analysis tool that flags potential misuse of this function, which is typically used to provide the compiler with branch prediction information. The script checks if `__builtin_expect()` is used outside of conditional statements, loops, binary logical operations, or conditional expressions, and issues a warning if such usage is detected. The script includes a note about potential false positives and suggests possible solutions, such as switching from an allow list to a deny list or adding dataflow analysis to improve accuracy. The script is identified by the ID `asymmetric-research/builtin-expect-scope-too-narrow` and is categorized as a problem with a severity level of warning.
+This code is a query script designed to identify improper uses of the `__builtin_expect()` function in C/C++ codebases, specifically when it is used outside of conditional contexts. It is part of a static analysis tool, likely intended to be used within a larger code analysis framework, such as a linter or a code quality checker. The script filters through function calls to `__builtin_expect()` and flags instances where it is not used within conditional statements, loops, binary logical operations, or conditional expressions, which are its intended contexts. The purpose of this script is to enhance code reliability by warning developers about potential misuse of this function, which can lead to performance issues or logical errors. The script is narrowly focused on this specific issue and provides a warning severity level for identified problems.
 # Imports and Dependencies
 
 ---
 - `cpp`
 - `filter`
+- `FunctionCall`
+- `Element`
+- `ConditionalStmt`
+- `Loop`
+- `BinaryLogicalOperation`
+- `ConditionalExpr`
 
 
 
