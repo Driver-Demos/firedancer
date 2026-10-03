@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+Generated seccomp BPF filter for allowed syscalls and argument checks.
 
 
 ## Files
-- **[fd_cswtch_tile_seccomp.h](fd_cswtch_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall access control on different architectures.
+- **[fd_cswtch_tile_seccomp.h](fd_cswtch_tile_seccomp.h.md)**: Generated seccomp BPF filter for allowed syscalls and argument checks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
