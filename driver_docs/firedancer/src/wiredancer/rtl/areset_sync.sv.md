@@ -3,30 +3,27 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements an asynchronous reset synchronizer module using Xilinx Parameterized Macros.
+The `areset_sync.sv` file in the `firedancer` codebase implements an asynchronous reset synchronizer module using Xilinx Parameterized Macros to synchronize an asynchronous reset signal to a destination clock domain.
 
 # Purpose
-The `areset_sync` module is an asynchronous reset synchronizer designed to ensure that an asynchronous reset signal (`areset`) is safely synchronized to a destination clock domain (`dclk`). This module uses the Xilinx Parameterized Macro (XPM) for asynchronous reset synchronization, which is a specialized component for handling clock domain crossing issues. The module outputs a synchronized reset signal (`dreset`) that asserts asynchronously and deasserts synchronously with the destination clock, ensuring reliable reset behavior across different clock domains.
-
-The module instantiates the `xpm_cdc_async_rst` component with specific parameters: `DEST_SYNC_FF`, `INIT_SYNC_FF`, and `RST_ACTIVE_HIGH`. `DEST_SYNC_FF` determines the number of synchronization stages and the minimum width of the reset signal. `INIT_SYNC_FF` controls the initialization of simulation values on synchronization registers, and `RST_ACTIVE_HIGH` sets the polarity of the reset signal. The module is essential for designs requiring robust handling of asynchronous reset signals in multi-clock environments, ensuring that reset signals are properly synchronized to the target clock domain.
+This Verilog source code defines a module named `areset_sync` that implements an asynchronous reset synchronizer using the Xilinx Parameterized Macro (XPM) for clock domain crossing. The module takes an asynchronous reset signal (`areset`) and a destination clock (`dclk`) as inputs and produces a synchronized reset signal (`dreset`) as output. The XPM instantiation, `xpm_cdc_async_rst`, is configured with parameters such as `DEST_SYNC_FF`, which determines the number of synchronization stages, `INIT_SYNC_FF` for simulation initialization, and `RST_ACTIVE_HIGH` to define the reset signal's polarity. This setup ensures that the reset signal is asserted asynchronously and deasserted synchronously with the destination clock, providing a reliable reset mechanism across different clock domains.
 # Modules
 
 ---
 ### areset\_sync
-Synchronizes an asynchronous reset signal to a destination clock domain using the Xilinx Parameterized Macro (XPM) for asynchronous reset synchronization. The module ensures that the reset signal asserts asynchronously and deasserts synchronously to the destination clock.
+The `areset_sync` module is designed to synchronize an asynchronous reset signal to a destination clock domain using the Xilinx Parameterized Macro (XPM) for asynchronous reset synchronization. It ensures that the reset signal is asserted asynchronously and deasserted synchronously, with a minimum width determined by the number of synchronization stages.
 - **Constants**:
-    - ``DEST_SYNC_FF``: Number of register stages used to synchronize the signal in the destination clock domain, with a range of 2 to 10.
-    - ``INIT_SYNC_FF``: Enables or disables behavioral simulation initialization values on synchronization registers, with allowed values of 0 or 1.
-    - ``RST_ACTIVE_HIGH``: Defines the polarity of the asynchronous reset signal, with 0 for active low and 1 for active high.
+    - `DEST_SYNC_FF`: An integer parameter that specifies the number of register stages used to synchronize the signal in the destination clock domain, with a range of 2 to 10 and a default value of 4.
+    - `INIT_SYNC_FF`: An integer parameter that enables (1) or disables (0) behavioral simulation initialization values on synchronization registers, with a default value of 0.
+    - `RST_ACTIVE_HIGH`: An integer parameter that defines the polarity of the asynchronous reset signal, where 0 indicates active low and 1 indicates active high, with a default value of 0.
 - **Ports**:
-    - ``areset``: Input wire for the source asynchronous reset signal.
-    - ``dclk``: Input wire for the destination clock.
-    - ``dreset``: Output wire for the synchronized asynchronous reset signal in the destination clock domain.
-- **Logic and Control Flow**:
-    - Instantiates the `xpm_cdc_async_rst` module with parameters `DEST_SYNC_FF`, `INIT_SYNC_FF`, and `RST_ACTIVE_HIGH`.
-    - Connects the input `areset` to the `src_arst` port of the `xpm_cdc_async_rst` instance.
-    - Connects the input `dclk` to the `dest_clk` port of the `xpm_cdc_async_rst` instance.
-    - Connects the output `dreset` to the `dest_arst` port of the `xpm_cdc_async_rst` instance.
+    - `areset`: Input wire for the source asynchronous reset signal.
+    - `dclk`: Input wire for the destination clock signal.
+    - `dreset`: Output wire for the synchronized asynchronous reset signal in the destination clock domain.
+- **Logic And Control Flow**:
+    - The module instantiates the `xpm_cdc_async_rst` component, which is a Xilinx Parameterized Macro for asynchronous reset synchronization.
+    - The `xpm_cdc_async_rst` instance is configured with parameters `DEST_SYNC_FF`, `INIT_SYNC_FF`, and `RST_ACTIVE_HIGH` to control synchronization stages, initialization behavior, and reset signal polarity, respectively.
+    - The `xpm_cdc_async_rst` component synchronizes the `areset` signal to the `dclk` domain, producing the `dreset` output, which asserts asynchronously and deasserts synchronously.
 
 
 

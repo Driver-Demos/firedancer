@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-References a query and postprocess script for testing non-binary function detection.
+Query reference for NonBinaryIsFunction.ql and InlineExpectationsTestQuery.ql postprocessing.
 
 # Purpose
-The file specifies a query configuration for a software analysis tool. It sets the `query` to `NonBinaryIsFunction.ql`, which likely defines a specific query to be executed. The `postprocess` is set to `InlineExpectationsTestQuery.ql`, indicating that after the main query runs, a post-processing step will occur using the specified script to handle or verify the results.
+This configuration maps the query `NonBinaryIsFunction.ql` to the postprocess step `InlineExpectationsTestQuery.ql`. It defines which query file to run and which postprocessing query to apply to its output.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

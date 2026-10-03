@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile logic to add objects for `fd_resolv_tile` and `fd_discof` if `FD_HAS_ALLOCA` and `FD_HAS_INT128`.
+Build rules for fd_resolv_tile when FD_HAS_ALLOCA and FD_HAS_INT128 are set.
 
 # Purpose
-The `Makefile` snippet uses conditional directives to determine if certain features are available before adding objects to the build process. If `FD_HAS_ALLOCA` and `FD_HAS_INT128` are defined, the `add-objs` function is called to include `fd_resolv_tile` and `fd_discof` in the build. This ensures that these objects are only included when the necessary features are supported.
+Build rules include `fd_discof` in the `fd_resolv_tile` object list only when both `FD_HAS_ALLOCA` and `FD_HAS_INT128` are defined. The nested `ifdef` blocks gate this object addition on the presence of both build-time feature flags.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

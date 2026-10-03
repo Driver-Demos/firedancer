@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a terminal GUI command to monitor Firedancer with security policies and architecture-specific syscall handling.
+Terminal GUI and seccomp policy for monitoring Firedancer metrics, snapshots, gossip, repair, and replay.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+- **[generated](generated/README.md)**: Generated seccomp BPF filter for watch, allowing read/write/fsync only on set file descriptors.
 
 ## Files
-- **[watch.c](watch.c.md)**: Implements a command to monitor a Firedancer instance using a terminal GUI, handling permissions, metrics, and sandboxing.
-- **[watch.h](watch.h.md)**: Header file for watch command functions and action in the Firedancer application.
-- **[watch.seccomppolicy](watch.seccomppolicy.md)**: Defines security policies for logging and diagnostics in the Firedancer watcher application.
+- **[watch.c](watch.c.md)**: Terminal GUI for monitoring Firedancer metrics, snapshots, gossip, repair, and replay.
+- **[watch.h](watch.h.md)**: Watch command prototypes and the fd_action_watch declaration.
+- **[watch.seccomppolicy](watch.seccomppolicy.md)**: Seccomp policy for watcher logging, waiting, exit, and pipe read/write syscalls.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

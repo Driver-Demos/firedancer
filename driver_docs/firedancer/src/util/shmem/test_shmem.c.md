@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for shared memory operations, including name validation, page size conversion, and join/leave functionality.
+The `test_shmem.c` file in the `firedancer` codebase contains unit tests for shared memory operations, including validation of NUMA and CPU indices, name length checks, page size conversions, and join/leave operations.
 
 # Purpose
-The code is a C program designed to perform unit tests on shared memory operations. It includes various static assertions to validate constants related to shared memory, such as page sizes and maximum limits for NUMA nodes and CPUs. The program uses a random number generator to test the validity of shared memory names and their lengths, ensuring they conform to specified constraints. It also tests the conversion between string representations and numeric values for different page sizes.
+This C source code file is a comprehensive unit test for shared memory management functions, specifically focusing on the functionalities provided by the `fd_shmem` library. The code is structured to validate various aspects of shared memory operations, including joining and leaving shared memory segments, querying shared memory information, and handling different page sizes. It uses a series of assertions and tests to ensure that the shared memory operations behave as expected under various conditions. The file includes tests for name validation, page size conversion, and the integrity of join and leave operations, ensuring that shared memory segments are correctly managed and queried.
 
-The main functionality of the program involves testing the joining and leaving of shared memory segments. It verifies the correct behavior of functions that query shared memory by name, join, and address. The program simulates multiple join and leave operations, checking reference counts and ensuring that shared memory is correctly mapped and unmapped. It also includes tests for acquiring and releasing shared memory pages, validating their alignment and NUMA node assignments. The program is structured to run these tests only if the `FD_HAS_HOSTED` capability is available, otherwise, it logs a warning and exits.
+The code is designed to be executed as a standalone program, as indicated by the presence of a [`main`](#main) function. It includes static assertions to verify compile-time constants and runtime tests to validate the behavior of shared memory functions. The tests cover a wide range of scenarios, including edge cases for invalid inputs and stress tests with random data. The file is intended to be run in an environment with hosted capabilities (`FD_HAS_HOSTED`), and it logs detailed information about the test results. This file is crucial for developers to ensure the reliability and correctness of the shared memory management functionalities in the `fd_shmem` library.
 # Imports and Dependencies
 
 ---
@@ -21,17 +21,16 @@ The main functionality of the program involves testing the joining and leaving o
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/shmem/test_shmem.c#L428>)
-
-Initializes the environment and logs a warning if the `FD_HAS_HOSTED` capability is not available, then halts execution.
+The `main` function initializes the environment and logs a warning if the FD_HAS_HOSTED capabilities are not available, then halts the program.
 - **Inputs**:
-    - `argc`: The count of command-line arguments.
-    - `argv`: The array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
-    - Logs a warning message indicating that the unit test requires `FD_HAS_HOSTED` capabilities.
-    - Calls `fd_halt` to stop further execution.
-- **Output**: Returns 0, indicating successful execution.
+    - `argc`: The count of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with the command-line arguments.
+    - Log a warning message indicating that the unit test requires FD_HAS_HOSTED capabilities.
+    - Call `fd_halt` to terminate the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 
