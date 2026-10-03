@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_utf8.h` file in the `firedancer` codebase provides a function to verify whether a byte array contains valid UTF-8 according to the validation rules of Rust's `std::str::from_utf8`.
+Function to verify if a byte array contains valid UTF-8 according to Rust's validation rules.
 
 # Purpose
-This C header file defines a function prototype for [`fd_utf8_verify`](#fd_utf8_verify), which is designed to validate whether a given byte array contains valid UTF-8 encoded data. The function adheres to the UTF-8 validation rules similar to those used in Rust's `std::str::from_utf8`, ensuring that each code point is correctly encoded in one to four bytes, with specific ranges for each byte length. It also handles zero bytes as valid one-byte code points and checks for proper use of control and continuation characters, although it does not verify if the code points are valid Unicode characters. The header file includes necessary preprocessor directives to prevent multiple inclusions and relies on a base header file, `fd_ballet_base.h`, for additional dependencies or definitions.
+This C header file defines the interface for a function named [`fd_utf8_verify`](<#fd_utf8_verify>), which checks if a byte array contains valid UTF-8 encoded data. The function follows the UTF-8 validation rules similar to those used in Rust's `std::str::from_utf8`, ensuring that each code point is between one and four bytes long and adheres to specific byte ranges for each length. The function does not consider zero bytes as code points, nor does it check if code points are valid Unicode characters. The header file includes necessary dependencies and uses preprocessor directives to prevent multiple inclusions. The function is declared with `FD_FN_PURE`, indicating it has no side effects and its return value depends only on its parameters.
 # Imports and Dependencies
 
 ---
@@ -17,13 +17,15 @@ This C header file defines a function prototype for [`fd_utf8_verify`](#fd_utf8_
 
 ---
 ### fd\_utf8\_verify<!-- {{#callable_declaration:fd_utf8_verify}} -->
-Checks if a byte array contains valid UTF-8 encoding.
-- **Description**: Use this function to verify whether a given byte array adheres to UTF-8 encoding rules, as defined by Rust's std::str::from_utf8. It is suitable for validating strings that may contain zero bytes, which are treated as valid one-byte code points. The function does not check for valid Unicode characters beyond encoding rules. It should be called with a pointer to the byte array and the size of the array. The function assumes that the pointer and size do not cause overflow and ignores the pointer if the size is zero.
+[View Source →](<../../../../../src/ballet/utf8/fd_utf8.h#L6>)
+
+Checks if a byte array contains valid UTF-8.
+- **Description**: Use this function to verify if a given byte array adheres to UTF-8 encoding rules. It follows the validation rules similar to Rust's `std::str::from_utf8`, ensuring that each code point is between one to four bytes long and that continuation characters are correctly placed. The function does not check for valid Unicode characters but ensures that zero bytes are treated as valid one-byte code points. Call this function when you need to validate UTF-8 data, especially when handling data that may not be null-terminated or when zero bytes are present. Ensure that the byte array does not overflow beyond the specified size.
 - **Inputs**:
-    - `str`: A pointer to the first byte of the UTF-8 string. It must not be null unless the size is zero. The caller retains ownership of the data.
-    - `sz`: The number of bytes in the string. It must be a non-negative value, and the function assumes that str+sz does not overflow.
+    - `str`: A pointer to the first byte of the UTF-8 string. It must not be null unless `sz` is zero. The caller retains ownership, and the function does not modify the data.
+    - `sz`: The number of bytes in the string. It must be a non-negative value, and the function assumes that `str + sz` does not overflow.
 - **Output**: Returns 1 if the byte array is valid UTF-8, otherwise returns 0.
-- **See also**: [`fd_utf8_verify`](fd_utf8.c.md#fd_utf8_verify)  (Implementation)
+- **See Also**: [`fd_utf8_verify`](<fd_utf8.c.md#fd_utf8_verify>)  (Implementation)
 
 
 

@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Execution tile logic, seccomp policy, and build rules for single-transaction processing.
+Seccomp filter policy, transaction execution logic, security policies, and Makefile logic.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only for stdout and logfile_fd.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
 
 ## Files
-- **[fd_exec_tile.c](fd_exec_tile.c.md)**: Executes single transactions, commits results, and publishes replay and signature messages.
-- **[fd_exec_tile.seccomppolicy](fd_exec_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
-- **[Local.mk](Local.mk.md)**: Build rule that adds fd_exec_tile objects to fd_discof when FD_HAS_INT128 is set.
+- **[fd_exec_tile.c](fd_exec_tile.c.md)**: Executes single transactions by identifying the correct bank and account database, committing results, and updating the bank.
+- **[fd_exec_tile.seccomppolicy](fd_exec_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log synchronization.
+- **[Local.mk](Local.mk.md)**: Makefile logic to add objects for `fd_exec_tile` and `fd_discof` if `FD_HAS_INT128` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

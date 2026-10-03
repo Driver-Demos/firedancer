@@ -3,10 +3,33 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints workspace memory and tile topology information.
+Defines a command to print workspace memory and tile topology information.
 
 # Purpose
-This file defines the `mem` action for a command-line tool. The `mem_cmd_fn` function ignores its argument list and calls `fd_topo_print_log` with the current topology from `config->topo` to print workspace memory and tile topology information. The `fd_action_mem` object registers this action with the name `mem`, marks that it requires a configuration, and sets the description used by the action system.
+This code defines a function `mem_cmd_fn` and an `action_t` structure `fd_action_mem` for a memory-related action in a software system. The function `mem_cmd_fn` takes two parameters, `args` and `config`, and calls `fd_topo_print_log` to print memory and tile topology information from the `config` parameter. The `fd_action_mem` structure specifies the action's name as "mem", associates it with the `mem_cmd_fn` function, and includes a description of the action's purpose. The `require_config` field is set to 1, indicating that a configuration is necessary for this action. The code includes headers `fd_config.h` and `fd_action.h`, which likely define the types and functions used in this file.
+# Imports and Dependencies
+
+---
+- `../fd_config.h`
+- `../fd_action.h`
+
+
+# Global Variables
+
+---
+### mem\_cmd\_fn
+- **Type**: `function`
+- **Description**: Executes a command to print memory and tile topology information using the `fd_topo_print_log` function.
+- **Use**: Used as a function pointer in the `fd_action_mem` structure to perform memory and topology logging.
+
+
+---
+### fd\_action\_mem
+- **Type**: ``action_t``
+- **Description**: Defines an action structure for the 'mem' command, which includes a function pointer to `mem_cmd_fn` and a description of its purpose.
+- **Use**: Used to store and manage the properties and behavior of the 'mem' action in the application.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

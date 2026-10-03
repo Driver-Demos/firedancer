@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_icelake.mk` file in the `firedancer` codebase configures build settings for the GCC compiler targeting Intel Ice Lake architecture, including various optimizations and feature flags.
+Makefile for configuring GCC build settings optimized for Intel Ice Lake architecture in the Firedancer project.
 
 # Purpose
-The provided content is a Makefile, which is used to automate the build process of a software project. This particular Makefile is configured to build a project targeting the Intel Ice Lake architecture using the GCC compiler. It includes several configuration files that add specific build options, such as debugging, security, optimization, and threading capabilities. The `CPPFLAGS` variable is set with compiler flags that enable various CPU features like AVX, SSE, and AES-NI, which are specific to the Ice Lake architecture. Additionally, the Makefile checks the GCC compiler version to conditionally enable AVX-512 support, ensuring compatibility with the compiler's capabilities.
+The Makefile content configures the build environment for a software project targeting the `icelake` architecture using the GCC compiler. It sets the build directory to `linux/gcc/icelake` and includes several configuration files to enable specific features such as debugging, security, optimization, and threading. The `CPPFLAGS` variable is augmented with flags that define architecture-specific capabilities, such as support for AVX, SSE, and AES-NI instructions, and ensures the use of architecture-optimized memory functions. The file also checks the GCC compiler version to conditionally enable AVX-512 support, setting the `FD_HAS_AVX512` flag if the compiler version is 10 or higher. Various feature flags like `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and others are defined to indicate the availability of specific hardware and software capabilities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
