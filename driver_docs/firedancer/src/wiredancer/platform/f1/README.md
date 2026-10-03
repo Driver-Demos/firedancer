@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CL-specific constraints, DDR DRAM DMA module, and TCL script for FPGA design synthesis on Amazon's platform.
+Constraints, DDR DMA and PCIe bridge logic, and FPGA synthesis scripts.
 
 ## Folders
-- **[constraints](constraints/README.md)**: Defines CL-specific constraints for top-level PNR with pblock creation and configuration.
-- **[design](design/README.md)**: Implements a DDR DRAM DMA module for FPGA with address mapping and reset synchronization.
-- **[scripts](scripts/README.md)**: TCL script for synthesizing FPGA designs on Amazon's platform.
+- **[constraints](constraints/README.md)**: The `constraints` folder in the `firedancer` codebase contains a file that specifies constraints for the top-level place and route process, including the configuration of partition blocks for various components.
+- **[design](design/README.md)**: DDR DMA and PCIe bridge logic with reset sync, FIFOs, and top-level wiring.
+- **[scripts](scripts/README.md)**: The `scripts` folder in the `firedancer` codebase contains a script for synthesizing a custom logic design for an AWS FPGA, specifically the `synth_cl_dram_dma.tcl` file.
 
 
 ---

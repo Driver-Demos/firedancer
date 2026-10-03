@@ -3,51 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a structure and function for managing compute budget details in transactions.
+Compute budget fields and initialization prototype for transaction limits and heap size.
 
 # Purpose
-This C header file defines a structure and a function prototype related to compute budget details in a runtime environment. The `fd_compute_budget_details` structure contains fields that track various parameters of a compute budget, such as limits and prices for compute units, heap size, and data size limits for loaded accounts. It also includes fields to count the number of builtin and non-builtin instructions, which are used to calculate default compute unit limits. The function prototype [`fd_compute_budget_details_new`](<#fd_compute_budget_details_new>) is declared to initialize or create a new instance of the `fd_compute_budget_details_t` structure. The file includes necessary headers and uses include guards to prevent multiple inclusions.
-# Imports and Dependencies
-
----
-- `../fd_flamenco_base.h`
-
-
-# Data Structures
-
----
-### fd\_compute\_budget\_details\_t
-- **Type**: ``struct``
-- **Members**:
-    - `has_compute_units_limit_update`: Indicates if the compute units limit is updated.
-    - `has_compute_units_price_update`: Indicates if the compute units price is updated.
-    - `has_requested_heap_size`: Indicates if a heap size is requested.
-    - `has_loaded_accounts_data_size_limit_update`: Indicates if the loaded accounts data size limit is updated.
-    - `compute_unit_limit`: Specifies the compute unit limit for the transaction.
-    - `compute_unit_price`: Specifies the compute unit price for the transaction.
-    - `compute_meter`: Tracks the remaining compute units.
-    - `heap_size`: Specifies the heap size for VMs for the transaction.
-    - `loaded_accounts_data_size_limit`: Specifies the loaded accounts data size limit for the transaction.
-    - `num_builtin_instrs`: Counts the number of builtin instructions in the transaction.
-    - `num_non_builtin_instrs`: Counts the number of non-builtin instructions in the transaction.
-    - `requested_heap_size_instr_index`: Stores the index of the instruction that requested a heap size.
-- **Description**: Defines compute budget details that may be updated by compute budget instructions, including limits and prices for compute units, heap size, and loaded accounts data size. It also tracks the number of builtin and non-builtin instructions to calculate default compute unit limits.
-
-
+Defines the `fd_compute_budget_details_t` data structure used to store compute budget settings for a transaction. The structure keeps flags that record whether compute budget instructions updated values such as the compute unit limit, compute unit price, heap size, and loaded accounts data size limit. It also stores the current values for these settings, plus counters for builtin and non-builtin instructions that are used to derive default compute unit limits. The file also declares [`fd_compute_budget_details_new`](<#fd_compute_budget_details_new>), which initializes an `fd_compute_budget_details_t` object.
 # Function Declarations (Public API)
 
 ---
-### fd\_compute\_budget\_details\_new<!-- {{#callable_declaration:fd_compute_budget_details_new}} -->
-[View Source →](<../../../../../src/flamenco/runtime/fd_compute_budget_details.h#L35>)
-
-Initializes a compute budget details structure with default values.
-- **Description**: Use this function to initialize a `fd_compute_budget_details_t` structure with default values before using it in a transaction. This function sets all update flags to zero and assigns default values to compute unit limits, prices, and other related fields. It must be called before the structure is used to ensure that all fields are set to known initial states.
-- **Inputs**:
-    - `details`: A pointer to a `fd_compute_budget_details_t` structure. Must not be null. The function initializes this structure with default values.
-- **Output**: None
-- **See Also**: [`fd_compute_budget_details_new`](<fd_compute_budget_details.c.md#fd_compute_budget_details_new>)  (Implementation)
-
-
+- `fd_compute_budget_details_new`
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
