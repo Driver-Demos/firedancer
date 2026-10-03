@@ -3,44 +3,49 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Helper functions for buffered line reads from an input stream, including `fd_io_fgets` and `fd_io_fgetc`.
+The `fd_io_readline.h` file provides helper functions for buffered line reading, including `fd_io_fgets` and `fd_io_fgetc`, in the `firedancer` codebase.
 
 # Purpose
-The `fd_io_readline.h` file is a C header file that provides function prototypes for buffered line reading operations. It includes the `fd_io.h` header file from a relative path, indicating a dependency on utility functions for input/output operations. The file declares two functions: [`fd_io_fgets`](<#fd_io_fgets>) and [`fd_io_fgetc`](<#fd_io_fgetc>). The [`fd_io_fgets`](<#fd_io_fgets>) function reads bytes from a buffered input stream into a character array until a specified maximum length is reached, a newline character is encountered, or the end of the file is reached. It returns a pointer to the string or `NULL` if an error occurs, and it updates an error code. The [`fd_io_fgetc`](<#fd_io_fgetc>) function reads a single character from the input stream and also updates an error code. These functions are designed to handle non-blocking input streams with a specified buffer size.
+This code is a C header file designed to facilitate buffered line reading from input streams. It provides function prototypes for [`fd_io_fgets`](#fd_io_fgets) and [`fd_io_fgetc`](#fd_io_fgetc), which are used to read lines and characters, respectively, from a buffered input stream (`fd_io_buffered_istream_t`). The [`fd_io_fgets`](#fd_io_fgets) function reads bytes into a provided character array until a newline, the maximum specified length, or the end of the file is reached, handling errors and end-of-file conditions by setting an error code. The header file includes necessary dependencies and uses include guards to prevent multiple inclusions, ensuring efficient and error-free compilation. This file is part of a larger system, likely dealing with input/output operations, and is intended to provide a robust interface for reading data line-by-line from streams.
 # Imports and Dependencies
 
 ---
 - `../../util/io/fd_io.h`
 
 
+# Global Variables
+
+---
+### fd\_io\_fgets
+- **Type**: `function`
+- **Description**: The `fd_io_fgets` function reads bytes from a buffered input stream (`istream`) into a character array (`str`) until a specified maximum number of bytes (`str_max-1`) is reached, a newline character is encountered, or the end of the file is reached. It returns a pointer to the null-terminated string if successful, or NULL if an error occurs or EOF is reached before reading any bytes.
+- **Use**: This function is used to read lines from a buffered input stream into a string, handling errors and end-of-file conditions.
+
+
 # Function Declarations (Public API)
 
 ---
 ### fd\_io\_fgets<!-- {{#callable_declaration:fd_io_fgets}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_io_readline.h#L8>)
-
 Reads a line from a buffered input stream into a string.
-- **Description**: Use this function to read a line of text from a buffered input stream into a provided character array. It reads up to `str_max-1` characters or until a newline character is encountered, whichever comes first. The function returns a null-terminated string in `str` and sets `*err` to 0 if a newline is found, or -1 if the end of the file is reached before any bytes are read. If an error occurs, it returns NULL and sets `*err` to a positive error number. Ensure the input stream's buffer size is at least `str_max` and that it operates in non-blocking mode.
+- **Description**: This function reads bytes from a buffered input stream into the provided string buffer until a newline character is encountered, the specified maximum number of characters is read, or the end of the stream is reached. It is useful for reading lines from a file or other input source that supports buffered reading. The function must be called with a valid input stream and a sufficiently large buffer to store the line. It handles errors by returning NULL and setting the error code appropriately. The function assumes the input stream is non-blocking and that its buffer size is at least as large as the maximum string size specified.
 - **Inputs**:
-    - `str`: A pointer to a character array where the function will store the read line. The array must have space for at least `str_max` characters. The caller retains ownership and must ensure it is not null.
-    - `str_max`: The maximum number of characters to read, including the null terminator. Must be at least 1.
-    - `istream`: A pointer to a `fd_io_buffered_istream_t` object representing the input stream to read from. Must not be null.
-    - `err`: A pointer to an integer where the function will store the error code. Must not be null.
-- **Output**: Returns a pointer to the null-terminated string in `str` if successful, or NULL if an error occurs or EOF is reached before reading any bytes.
-- **See Also**: [`fd_io_fgets`](<fd_io_readline.c.md#fd_io_fgets>)  (Implementation)
+    - `str`: A pointer to a character array where the read line will be stored. The array must be large enough to hold up to str_max characters, including the null terminator. The caller retains ownership and must ensure it is not null.
+    - `str_max`: The maximum number of characters to read, including the null terminator. Must be at least 1. If less than 1, it is clamped to 1.
+    - `istream`: A pointer to a buffered input stream from which the line will be read. Must not be null. The stream should be non-blocking and have a buffer size at least as large as str_max.
+    - `err`: A pointer to an integer where the error code will be stored. Must not be null. On success, it is set to 0 if a newline is found or -1 if EOF is reached without a newline. On error, it is set to a positive errno value.
+- **Output**: Returns a pointer to the string buffer containing the read line on success, or NULL on error or if EOF is reached before reading any bytes.
+- **See also**: [`fd_io_fgets`](fd_io_readline.c.md#fd_io_fgets)  (Implementation)
 
 
 ---
 ### fd\_io\_fgetc<!-- {{#callable_declaration:fd_io_fgetc}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_io_readline.h#L26>)
-
-Reads a character from a buffered input stream.
-- **Description**: Use this function to read a single character from a buffered input stream. It attempts to read a character from the stream and returns it as an integer. If the stream is empty, it tries to fetch more data. If an error occurs during this process, or if the end of the stream is reached without reading any character, the function returns -1 and sets the error code accordingly. This function is useful when you need to process input character by character. Ensure that the input stream is properly initialized before calling this function.
+Reads a single character from a buffered input stream.
+- **Description**: Use this function to read the next character from a buffered input stream represented by `istream`. It attempts to fetch a character from the stream, returning it as an integer. If the stream is empty, it will attempt to refill the buffer once. The function sets the error code in `perr` to indicate success or the type of error encountered. This function is useful when reading data character by character from a non-blocking input stream.
 - **Inputs**:
-    - `istream`: A pointer to a `fd_io_buffered_istream_t` object representing the buffered input stream. Must not be null. The stream should be initialized and ready for reading.
-    - `err`: A pointer to an integer where the function will store the error code. Must not be null. The error code is set to 0 on success, or a positive error number if an error occurs, or -1 if the end of the stream is reached without reading any character.
-- **Output**: Returns the next character from the input stream as an integer, or -1 if an error occurs or the end of the stream is reached.
-- **See Also**: [`fd_io_fgetc`](<fd_io_readline.c.md#fd_io_fgetc>)  (Implementation)
+    - `istream`: A pointer to a `fd_io_buffered_istream_t` representing the buffered input stream. Must not be null. The stream should be properly initialized and open for reading.
+    - `perr`: A pointer to an integer where the function will store the error code. Must not be null. On success, `*perr` is set to 0. If an error occurs, `*perr` is set to a positive error code, or -1 if EOF is reached.
+- **Output**: Returns the next character from the stream as an integer on success. Returns -1 if an error occurs or EOF is reached, with the error code set in `*perr`.
+- **See also**: [`fd_io_fgetc`](fd_io_readline.c.md#fd_io_fgetc)  (Implementation)
 
 
 
