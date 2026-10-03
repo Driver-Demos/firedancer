@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Ed25519 signature verification, elliptic curve operations, optimizations, and testing utilities.
+The `py` folder in the `firedancer` codebase contains Python files focused on implementing and testing cryptographic operations, particularly using the Ed25519 curve, including signature verification, point decomposition, and multiplication, as well as providing a reference implementation and simulation tools.
 
 
 ## Files
-- **[ed25519_lib.py](ed25519_lib.py.md)**: Implements an expression tracking class for generating machine instructions for the ed25519 verification process, including optimizations like constant propagation and dead code elimination.
-- **[point_decomp.py](point_decomp.py.md)**: Implements a function for decomposing elliptic curve points using the Ed25519 curve.
-- **[point_mul.py](point_mul.py.md)**: Implements elliptic curve point multiplication and addition using the Ed25519 curve.
-- **[ref_ed25519.py](ref_ed25519.py.md)**: Reference implementation of Ed25519 signature scheme with test vectors and verification functions.
-- **[sigverify.py](sigverify.py.md)**: Implements functions for verifying Ed25519 signatures using various mathematical operations and checks.
-- **[wd_cocotil.py](wd_cocotil.py.md)**: Implements various functions and coroutines for testing and verifying Ed25519 signatures using cocotb.
+- **[ed25519_lib.py](ed25519_lib.py.md)**: The `ed25519_lib.py` file in the `firedancer` codebase provides an implementation of the `Expr` class to generate machine instructions for the ed25519 verification procedure, including optimizations like constant propagation and dead code elimination, and various modular arithmetic functions.
+- **[point_decomp.py](point_decomp.py.md)**: The `point_decomp.py` file in the `firedancer` codebase implements a function for decomposing elliptic curve points using the Ed25519 curve, and includes a main section for testing this functionality with random inputs.
+- **[point_mul.py](point_mul.py.md)**: The `point_mul.py` file in the `firedancer` codebase implements elliptic curve point multiplication and addition operations using the Ed25519 curve, and includes a test routine to verify the correctness of these operations.
+- **[ref_ed25519.py](ref_ed25519.py.md)**: The `ref_ed25519.py` file in the `firedancer` codebase provides a reference implementation of the Ed25519 digital signature algorithm, including functions for key generation, signing, verification, and test vectors for validation.
+- **[sigverify.py](sigverify.py.md)**: The `sigverify.py` file in the `firedancer` codebase implements functions for verifying Ed25519 digital signatures, including various methods for point decomposition, multiplication, and addition, as well as signature verification and testing.
+- **[wd_cocotil.py](wd_cocotil.py.md)**: The `wd_cocotil.py` file in the `firedancer` codebase contains a variety of functions and coroutines for simulating and verifying digital signal processing and cryptographic operations, including Ed25519 signature verification and SHA-512 hashing, using the cocotb framework.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

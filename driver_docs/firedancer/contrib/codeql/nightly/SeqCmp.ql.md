@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Identifies sequence number comparisons not using fd_seq_* functions, issuing a low-precision warning.
+The `SeqCmp.ql` file in the `firedancer` codebase identifies relational comparisons of sequence numbers that do not utilize the `fd_seq_*` functions, issuing a warning to use appropriate sequence comparison functions instead.
 
 # Purpose
-The code is a static analysis rule designed to identify improper relational comparisons of sequence numbers in C++ source files. It specifically targets sequence numbers that do not use the designated `fd_seq_*` functions for comparison. The rule is part of a code quality or linting tool, and it issues a warning when it detects such comparisons, suggesting the use of `fd_seq_lt`, `fd_seq_le`, `fd_seq_ge`, `fd_seq_gt`, or equivalent functions instead.
+This code is a static analysis rule written in a domain-specific language, likely for a tool that analyzes C++ code. Its primary purpose is to identify instances where sequence numbers are compared using relational operators other than the provided `fd_seq_*` functions, which are presumably designed for this specific purpose. The rule is categorized as a problem with a warning severity and low precision, indicating that it may generate false positives but is still useful for identifying potential issues in the codebase.
 
-The code defines a predicate `include` that filters locations to only include files within the "src/" directory, excluding those with base names matching "fd_cstr%". It then defines a class `SeqNum` that extends `Variable`, identifying variables with names containing "seq" and located in files that pass the `include` predicate. The main logic of the rule is a query that searches for relational operations between two sequence number variables (`SeqNum` instances) that do not use the appropriate `fd_seq_*` functions. The query ensures that the operations are not simple equality or inequality checks, which are allowed, and it avoids duplicate results by comparing the names of the target variables.
+The code defines a predicate `include` that filters locations to those within the "src/" directory, excluding files with base names starting with "fd_cstr". It also defines a class `SeqNum` that extends `Variable`, identifying variables with names containing "seq" and located in the specified directory. The main logic of the rule uses these definitions to find pairs of sequence number variables that are compared using relational operations other than equality (`==`) or inequality (`!=`). The rule suggests using specific functions (`fd_seq_lt`, `fd_seq_le`, `fd_seq_ge`, `fd_seq_gt`) for these comparisons to ensure correctness and consistency.
 
-The rule is intended to be used as part of a larger static analysis framework, likely integrated into a build or continuous integration process. It helps maintain code quality by enforcing consistent and correct usage of sequence number comparison functions, which may be critical for ensuring the correctness and reliability of the software.
+Overall, this code is a part of a larger static analysis framework, providing a specific check to enforce best practices in handling sequence number comparisons. It does not define public APIs or external interfaces but rather contributes to code quality by flagging potentially incorrect or suboptimal code patterns.
 # Imports and Dependencies
 
 ---
@@ -21,10 +21,10 @@ The rule is intended to be used as part of a larger static analysis framework, l
 
 ---
 ### SeqNum
-- **Type**: ``class``
+- **Type**: `class`
 - **Members**:
-    - ``SeqNum``: Represents a sequence number that extends the `Variable` class.
-- **Description**: Represents a sequence number that extends the `Variable` class. The `SeqNum` class constructor checks if the name of the variable matches a pattern related to sequence numbers and if its location is included in the specified source path. This class is used to identify sequence numbers in code for relational comparisons, ensuring that specific functions are used for comparison instead of direct relational operations.
+    - `SeqNum`: A class that extends the Variable class and is used to identify sequence numbers based on their name and location.
+- **Description**: The SeqNum class is a specialized data structure that extends the Variable class, designed to identify and work with sequence numbers in code. It uses a constructor to match sequence numbers by their name pattern and location, ensuring they are included in specific source files while excluding certain base names. The class is part of a system that checks for relational comparisons of sequence numbers, encouraging the use of specific functions for comparison to maintain consistency and correctness in the codebase.
 
 
 
