@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for VM headers, objects, tool, and unit tests under feature guards.
+Makefile for building and testing components in the Flamenco VM, including unit tests and binaries.
 
 # Purpose
-This build script controls which virtual machine components and tests are built when the required feature flags are enabled. The nested `ifdef` blocks limit the `fd_vm` headers, objects, tool binary, and unit tests to builds that include `FD_HAS_HOSTED`, `FD_HAS_INT128`, and `FD_HAS_SECP256K1`. The `add-hdrs`, `add-objs`, `make-bin`, and `make-unit-test` calls register the source files and link dependencies for `fd_vm_tool`, `test_vm_interp`, `test_vm_base`, and `test_vm_instr`, while the `run-unit-test` calls mark the tests for execution. The final `test_pointer_chase` unit test is built and run when `FD_HAS_HOSTED` is enabled, using only `fd_util` as its dependency.
+The content is a Makefile script used to manage the build process of a software project. It includes conditional compilation directives, such as `ifdef FD_HAS_HOSTED`, `ifdef FD_HAS_INT128`, and `ifdef FD_HAS_SECP256K1`, which determine whether certain sections of the build process should be executed based on the presence of specific features or libraries. The script uses `$(call add-hdrs,...)` and `$(call add-objs,...)` to specify header files and object files that are part of the build, respectively. It also defines targets for building binaries and running unit tests, such as `fd_vm_tool` and various test cases like `test_vm_interp`, `test_vm_base`, and `test_pointer_chase`. The script ensures that dependencies, such as `fd_flamenco`, `fd_funk`, and `fd_ballet`, are included in the build process, and it manages the execution of unit tests to verify the functionality of different components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

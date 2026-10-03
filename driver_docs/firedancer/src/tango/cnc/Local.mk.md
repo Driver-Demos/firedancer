@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_cnc` and `fd_tango` components.
+Makefile for adding headers, objects, and unit tests for `fd_cnc` and `fd_tango`.
 
 # Purpose
-The file is a Makefile snippet used in a build system to manage dependencies and automate the compilation process. It defines rules to add header files (`fd_cnc.h`) and object files (`fd_cnc`, `fd_tango`) to the build, and specifies a unit test target (`test_cnc`) that depends on the `fd_tango` and `fd_util` components.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` function to include the header file `fd_cnc.h`. The `add-objs` function adds object files `fd_cnc` and `fd_tango` to the build process. The `make-unit-test` function creates a unit test named `test_cnc`, which depends on the `fd_tango` and `fd_util` components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
