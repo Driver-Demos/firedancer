@@ -3,18 +3,44 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Static inline APIs for bounded shared-memory object pools with acquire and release operations.
+Header-only library for creating and managing object pools with a bounded maximum size for high-performance IPC.
 
 # Purpose
-This file defines a template for a fixed-size object pool in C. It is meant for non-concurrent use with shared memory or persistent IPC. The code uses macros such as `POOL_NAME`, `POOL_T`, and `POOL_NEXT` to generate a pool API for any shallow-copyable element type. It provides functions to compute alignment and footprint, format and unformat a memory region, join and leave the pool from a caller address space, and acquire or release elements by index or by pointer.
+The code defines a template for creating object pools with a bounded maximum size, suitable for high-performance inter-process communication (IPC) in non-concurrent environments. The template allows users to define custom object pools by specifying the pool name and the type of elements the pool will manage. The code provides a set of static inline functions that operate as a header-only library, enabling the creation, management, and manipulation of these pools within a single compilation unit.
 
-The file also defines pool metadata and helper functions for index and pointer conversion, pool size queries, and special values such as `POOL_IDX_NULL` and, when `POOL_SENTINEL` is enabled, a sentinel element at index `0`. The pool uses a free-list stored in the `POOL_NEXT` field of unused elements, and it tracks state in private metadata that includes `magic`, `max`, `free`, and `free_top`. The implementation is controlled by `POOL_IMPL_STYLE`, so the same file can act as a header-only declaration unit or provide the full implementation in a compilation unit.
-# Function Declarations (Public API)
+The key components of this code include functions for aligning memory, calculating the memory footprint required for a pool, and managing the lifecycle of a pool (creation, joining, leaving, and deletion). It also includes functions for acquiring and releasing elements from the pool, as well as utility functions for testing and converting between element indices and pointers. The code supports optional features such as a sentinel element, which reserves a specific index in the pool, and provides mechanisms for handling special values like null and sentinel indices. The template is designed to be flexible, allowing multiple pools of different types to be defined within the same compilation unit.
+# Imports and Dependencies
 
 ---
-- `POOL_`
-- `POOL_`
-- `POOL_`
+- `../bits/fd_bits.h`
+- `../log/fd_log.h`
+
+
+# Global Variables
+
+---
+### FD\_PROTOTYPES\_BEGIN
+- **Type**: `macro`
+- **Description**: `FD_PROTOTYPES_BEGIN` is a macro used to mark the beginning of a section in the code where function prototypes are declared. It is typically used in conjunction with `FD_PROTOTYPES_END` to encapsulate function prototype declarations.
+- **Use**: Used to demarcate the start of function prototype declarations in the code.
+
+
+# Functions
+
+---
+### POOL\_<!-- {{#callable:POOL_}} -->
+[View Source →](<../../../../../src/util/tmpl/fd_pool.c#L479>)
+
+Releases an element back to the pool by calculating its index and calling the `POOL_(idx_release)` function.
+- **Inputs**:
+    - ``join``: A pointer to the pool from which the element is being released.
+    - ``ele``: A pointer to the element being released back to the pool.
+- **Logic and Control Flow**:
+    - Calculate the index of the element by subtracting the base address of the pool (`join`) from the address of the element (`ele`).
+    - Call the `POOL_(idx_release)` function with the calculated index to release the element back to the pool.
+- **Output**: No return value; the function releases the element back to the pool.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

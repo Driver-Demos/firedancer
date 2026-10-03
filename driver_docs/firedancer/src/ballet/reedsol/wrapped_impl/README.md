@@ -3,26 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `wrapped_impl` folder in the `firedancer` codebase contains auto-generated C files implementing forward and inverse fast Fourier transforms (FFT and IFFT) and Reed-Solomon parity processing functions, along with a makefile for building these implementations.
+Auto-generated C code for Reed-Solomon FFT operations and encoding functions, plus a related Makefile.
 
 
 ## Files
-- **[fd_reedsol_fft_impl_128_0.c](fd_reedsol_fft_impl_128_0.c.md)**: The `fd_reedsol_fft_impl_128_0.c` file in the `firedancer` codebase provides auto-generated implementations for forward and inverse fast Fourier transforms (FFT and IFFT) on 128 elements using Reed-Solomon error correction techniques.
-- **[fd_reedsol_fft_impl_128_128.c](fd_reedsol_fft_impl_128_128.c.md)**: The `fd_reedsol_fft_impl_128_128.c` file in the `firedancer` codebase provides auto-generated implementations for 128-point forward and inverse fast Fourier transforms (FFT and IFFT) using Reed-Solomon error correction.
-- **[fd_reedsol_fft_impl_256_0.c](fd_reedsol_fft_impl_256_0.c.md)**: The `fd_reedsol_fft_impl_256_0.c` file in the `firedancer` codebase provides auto-generated implementations for forward and inverse fast Fourier transforms (FFT and IFFT) on 256 elements using Reed-Solomon error correction techniques.
-- **[fd_reedsol_fft_impl_64_0.c](fd_reedsol_fft_impl_64_0.c.md)**: The `fd_reedsol_fft_impl_64_0.c` file in the `firedancer` codebase provides auto-generated implementations for 64-point forward and inverse fast Fourier transforms (FFT and IFFT) using Reed-Solomon error correction techniques.
-- **[fd_reedsol_fft_impl_64_128.c](fd_reedsol_fft_impl_64_128.c.md)**: The `fd_reedsol_fft_impl_64_128.c` file in the `firedancer` codebase provides auto-generated implementations for forward and inverse fast Fourier transforms (FFT and IFFT) on 64 input elements using Reed-Solomon error correction techniques.
-- **[fd_reedsol_fft_impl_64_64.c](fd_reedsol_fft_impl_64_64.c.md)**: The `fd_reedsol_fft_impl_64_64.c` file in the `firedancer` codebase provides auto-generated implementations of 64-point forward and inverse fast Fourier transforms (FFT and IFFT) for Reed-Solomon error correction.
-- **[fd_reedsol_ppt_impl_17.c](fd_reedsol_ppt_impl_17.c.md)**: The `fd_reedsol_ppt_impl_17.c` file in the `firedancer` codebase contains auto-generated functions for generating Reed-Solomon parity using the `FD_REEDSOL_GENERATE_PPT` macro with varying parameters.
-- **[fd_reedsol_ppt_impl_25.c](fd_reedsol_ppt_impl_25.c.md)**: The `fd_reedsol_ppt_impl_25.c` file in the `firedancer` codebase contains auto-generated functions for generating Reed-Solomon parity using a specific implementation for different configurations of input parameters.
-- **[fd_reedsol_ppt_impl_33.c](fd_reedsol_ppt_impl_33.c.md)**: The `fd_reedsol_ppt_impl_33.c` file in the `firedancer` codebase contains auto-generated functions for generating Reed-Solomon parity using a specific configuration of 64 input elements and varying output elements from 33 to 39.
-- **[fd_reedsol_ppt_impl_40.c](fd_reedsol_ppt_impl_40.c.md)**: The `fd_reedsol_ppt_impl_40.c` file in the `firedancer` codebase contains auto-generated functions for processing Reed-Solomon codes with varying parameters using the `FD_REEDSOL_GENERATE_PPT` macro.
-- **[fd_reedsol_ppt_impl_45.c](fd_reedsol_ppt_impl_45.c.md)**: The `fd_reedsol_ppt_impl_45.c` file in the `firedancer` codebase contains auto-generated functions for processing Reed-Solomon codes with varying parameters, specifically implementing the `FD_REEDSOL_GENERATE_PPT` macro for different configurations.
-- **[fd_reedsol_ppt_impl_50.c](fd_reedsol_ppt_impl_50.c.md)**: The `fd_reedsol_ppt_impl_50.c` file in the `firedancer` codebase contains auto-generated functions for processing Reed-Solomon codes with varying parameters, specifically implementing the `FD_REEDSOL_GENERATE_PPT` macro for different input configurations.
-- **[fd_reedsol_ppt_impl_55.c](fd_reedsol_ppt_impl_55.c.md)**: The `fd_reedsol_ppt_impl_55.c` file in the `firedancer` codebase contains auto-generated functions for processing Reed-Solomon codes with varying parameters, specifically implementing the `FD_REEDSOL_GENERATE_PPT` macro for different input configurations.
-- **[fd_reedsol_ppt_impl_60.c](fd_reedsol_ppt_impl_60.c.md)**: The `fd_reedsol_ppt_impl_60.c` file in the `firedancer` codebase contains auto-generated functions for processing Reed-Solomon codes with varying parameters using the `FD_REEDSOL_GENERATE_PPT` macro.
-- **[fd_reedsol_ppt_impl_65.c](fd_reedsol_ppt_impl_65.c.md)**: The `fd_reedsol_ppt_impl_65.c` file in the `firedancer` codebase contains auto-generated functions for processing Reed-Solomon codes with specific parameters, utilizing a macro to generate parity part tables.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies object files for various Reed-Solomon implementations to be added to the `fd_reedsol` target.
+- **[fd_reedsol_fft_impl_128_0.c](fd_reedsol_fft_impl_128_0.c.md)**: Auto-generated C code for 128-point forward and inverse Reed-Solomon FFT operations.
+- **[fd_reedsol_fft_impl_128_128.c](fd_reedsol_fft_impl_128_128.c.md)**: Auto-generated C code for 128-point forward and inverse Reed-Solomon FFT implementations.
+- **[fd_reedsol_fft_impl_256_0.c](fd_reedsol_fft_impl_256_0.c.md)**: Auto-generated C code for 256-point Reed-Solomon FFT and inverse FFT implementations.
+- **[fd_reedsol_fft_impl_64_0.c](fd_reedsol_fft_impl_64_0.c.md)**: Auto-generated C code for 64-point Reed-Solomon FFT and inverse FFT operations.
+- **[fd_reedsol_fft_impl_64_128.c](fd_reedsol_fft_impl_64_128.c.md)**: Auto-generated C code for 64-point forward and inverse Reed-Solomon FFT implementations.
+- **[fd_reedsol_fft_impl_64_64.c](fd_reedsol_fft_impl_64_64.c.md)**: Auto-generated C code for 64-point forward and inverse Reed-Solomon FFT implementations.
+- **[fd_reedsol_ppt_impl_17.c](fd_reedsol_ppt_impl_17.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters in C.
+- **[fd_reedsol_ppt_impl_25.c](fd_reedsol_ppt_impl_25.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters.
+- **[fd_reedsol_ppt_impl_33.c](fd_reedsol_ppt_impl_33.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters.
+- **[fd_reedsol_ppt_impl_40.c](fd_reedsol_ppt_impl_40.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters.
+- **[fd_reedsol_ppt_impl_45.c](fd_reedsol_ppt_impl_45.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters.
+- **[fd_reedsol_ppt_impl_50.c](fd_reedsol_ppt_impl_50.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters in a C file.
+- **[fd_reedsol_ppt_impl_55.c](fd_reedsol_ppt_impl_55.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters.
+- **[fd_reedsol_ppt_impl_60.c](fd_reedsol_ppt_impl_60.c.md)**: Auto-generated functions for Reed-Solomon encoding with varying parameters.
+- **[fd_reedsol_ppt_impl_65.c](fd_reedsol_ppt_impl_65.c.md)**: Auto-generated functions for Reed-Solomon encoding with different parameters.
+- **[Local.mk](Local.mk.md)**: Makefile for adding object files related to Reed-Solomon implementations in the `fd_reedsol` module.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
