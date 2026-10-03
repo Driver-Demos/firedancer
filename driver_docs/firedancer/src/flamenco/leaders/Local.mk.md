@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for leaders headers, objects, and unit tests when FD_HAS_INT128 is set.
+Makefile configuration for building and testing leader-related components in the Flamenco module.
 
 # Purpose
-Build rules for the `fd_flamenco` target are enabled only when `FD_HAS_INT128` is defined. The file adds the `fd_leaders.h` and `fd_multi_epoch_leaders.h` headers, builds the `fd_leaders` and `fd_multi_epoch_leaders` objects, defines the `test_leaders` and `test_multi_leaders` unit tests, and registers both tests to run.
+The `Makefile` content conditionally includes headers and object files, and defines unit tests for a software project. If the `FD_HAS_INT128` macro is defined, it adds the headers `fd_leaders.h` and `fd_multi_epoch_leaders.h`, and the object files `fd_leaders`, `fd_multi_epoch_leaders`, and `fd_flamenco`. It also sets up unit tests named `test_leaders` and `test_multi_leaders`, which depend on the `fd_flamenco`, `fd_ballet`, and `fd_util` components. Finally, it specifies the execution of these unit tests.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
