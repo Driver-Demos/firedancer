@@ -3,27 +3,27 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflows for builds, tests, coverage, benchmarks, docs, and analysis.
+GitHub Actions workflows for building, testing, deploying, and analyzing Firedancer projects with various configurations.
 
 
 ## Files
-- **[backtest.yml](backtest.yml.md)**: Workflow to replay ledgers in backtest mode.
-- **[benchmark.yml](benchmark.yml.md)**: GitHub Actions workflow for ledger backtest benchmarks, comparison, publishing, and PR comments.
-- **[book.yml](book.yml.md)**: GitHub Actions workflow to build and deploy a VitePress site to GitHub Pages.
-- **[builds.yml](builds.yml.md)**: Build matrix workflow for GCC, Clang, and ARM targets with optional checks and dry runs
-- **[clusterfuzz.yml](clusterfuzz.yml.md)**: GitHub Actions workflow to build fuzz artifacts and dispatch them to AR Fuzz.
-- **[codeql.yml](codeql.yml.md)**: Nightly CodeQL analysis workflow for C/C++ builds and security-event upload.
-- **[coverage_report.yml](coverage_report.yml.md)**: GitHub Actions workflow for coverage generation and upload to Google Cloud Storage and Codecov.
-- **[coverage_report_clusterfuzz.yml](coverage_report_clusterfuzz.yml.md)**: GitHub Actions workflow for ClusterFuzz-based fuzz coverage reporting and Codecov upload.
-- **[doxygen.yml](doxygen.yml.md)**: Scheduled Doxygen build and upload workflow for Google Cloud Storage.
-- **[on_main_push.yml](on_main_push.yml.md)**: The `on_main_push.yml` file in the `firedancer` codebase defines a GitHub Actions workflow that triggers on pushes to the main branch, executing jobs related to book generation, cluster fuzzing, and dispatching a CI event to the `solfuzz` repository.
-- **[on_nightly.yml](on_nightly.yml.md)**: Nightly workflow for coverage, CodeQL, and build jobs.
-- **[on_pull_request.yml](on_pull_request.yml.md)**: Pull request workflow that runs tests, backtests, benchmarks, and build checks.
-- **[test_firedancer_localnet.yml](test_firedancer_localnet.yml.md)**: Workflow for building and testing a local Firedancer cluster with Agave validators.
-- **[test_firedancer_testnet.yml](test_firedancer_testnet.yml.md)**: GitHub Actions workflow for building Firedancer and running testnet tests.
-- **[test_firedancer_testnet_shredcap.yml](test_firedancer_testnet_shredcap.yml.md)**: Workflow for building Firedancer and running the shredcap replay test on testnet.
-- **[tests.yml](tests.yml.md)**: GitHub Actions workflow for unit, script, fuzz, test-vector, solcap, and integration tests.
-- **[trailing_whitespace.yml](trailing_whitespace.yml.md)**: Pull request workflow that checks changed files for trailing whitespace with pre-commit.
+- **[backtest.yml](backtest.yml.md)**: GitHub Actions workflow for replaying ledgers with configurable inputs and environment setup.
+- **[benchmark.yml](benchmark.yml.md)**: GitHub Actions workflow for benchmarking ledger backtests, comparing performance metrics, and posting results.
+- **[book.yml](book.yml.md)**: GitHub Actions workflow for deploying a VitePress book site to GitHub Pages.
+- **[builds.yml](builds.yml.md)**: GitHub Actions workflow for building with GCC and Clang across different architectures and configurations.
+- **[clusterfuzz.yml](clusterfuzz.yml.md)**: GitHub Actions workflow for building, testing, and publishing artifacts with fuzzing and coverage.
+- **[codeql.yml](codeql.yml.md)**: GitHub Actions workflow for nightly CodeQL analysis on C/C++ code using a matrix strategy.
+- **[coverage_report.yml](coverage_report.yml.md)**: GitHub Actions workflow for generating and uploading a coverage report to Google Cloud Storage.
+- **[coverage_report_clusterfuzz.yml](coverage_report_clusterfuzz.yml.md)**: GitHub Actions workflow for generating and uploading a daily coverage report using the ClusterFuzz corpus.
+- **[doxygen.yml](doxygen.yml.md)**: GitHub Actions workflow for running Doxygen documentation generation and uploading artifacts to Google Cloud.
+- **[on_main_push.yml](on_main_push.yml.md)**: GitHub Actions workflow for triggering jobs on main branch push, including book, clusterfuzz, and solfuzz CI.
+- **[on_nightly.yml](on_nightly.yml.md)**: GitHub Actions workflow for nightly builds, coverage reports, and CodeQL analysis.
+- **[on_pull_request.yml](on_pull_request.yml.md)**: GitHub Actions workflow for handling pull request events with jobs for testing, backtesting, benchmarking, and build checks.
+- **[test_firedancer_localnet.yml](test_firedancer_localnet.yml.md)**: GitHub Actions workflow for setting up and testing a Firedancer local network environment.
+- **[test_firedancer_testnet.yml](test_firedancer_testnet.yml.md)**: GitHub Actions workflow for running and testing the Firedancer Testnet with specific environment settings.
+- **[test_firedancer_testnet_shredcap.yml](test_firedancer_testnet_shredcap.yml.md)**: GitHub Actions workflow for testing the Firedancer Testnet Shredcap with specific environment setups.
+- **[tests.yml](tests.yml.md)**: GitHub Actions workflow for running unit, script, fuzz, and integration tests with a matrix strategy.
+- **[trailing_whitespace.yml](trailing_whitespace.yml.md)**: GitHub Actions workflow to check for trailing whitespace in pull request changes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

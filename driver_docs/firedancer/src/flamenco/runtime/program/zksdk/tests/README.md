@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `tests` folder in the `firedancer` codebase contains a bash script for testing ledger creation with ZK SDK transactions using Solana and SPL Token dependencies.
+Bash script to recreate a ledger with ZK SDK transactions using Solana and SPL Token dependencies.
 
 
 ## Files
-- **[test_zksdk_create_ledger.sh](test_zksdk_create_ledger.sh.md)**: The `test_zksdk_create_ledger.sh` file is a bash script that recreates a ledger with ZK SDK transactions using Solana and SPL Token dependencies, including operations like creating token accounts, minting tokens, and performing confidential transfers.
+- **[test_zksdk_create_ledger.sh](test_zksdk_create_ledger.sh.md)**: Bash script to recreate a ledger with ZK SDK transactions using Solana and SPL Token dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

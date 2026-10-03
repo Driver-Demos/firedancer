@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `type.pb.c` file contains automatically generated nanopb constant definitions for the `firedancer` codebase, specifically for the `FD_EXEC_TEST_TYPE_CONTEXT`, `FD_EXEC_TEST_TYPE_EFFECTS`, and `FD_EXEC_TEST_TYPE_FIXTURE` types.
+Automatically generated nanopb constant definitions for FD_EXEC_TEST_TYPE structures.
 
 # Purpose
-This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library, specifically version 0.4.9.1. It includes a header file, "type.pb.h," which likely contains protobuf message definitions. The code checks for compatibility with the nanopb generator by verifying the `PB_PROTO_HEADER_VERSION` and raises an error if the version is not 40, ensuring that the file is regenerated with the correct version if needed. The `PB_BIND` macros are used to bind C structures (`fd_exec_test_type_context_t`, `fd_exec_test_type_effects_t`, and `fd_exec_test_type_fixture_t`) to their corresponding protobuf message types, facilitating serialization and deserialization of these structures. This file is part of a system that uses nanopb to handle protobuf messages in a lightweight manner suitable for embedded systems.
+This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `type.pb.h` and checks if the `PB_PROTO_HEADER_VERSION` is 40, issuing an error if it is not, to ensure compatibility with the nanopb generator version used. The file uses the `PB_BIND` macro to bind protobuf message types to C structures, specifically `FD_EXEC_TEST_TYPE_CONTEXT`, `FD_EXEC_TEST_TYPE_EFFECTS`, and `FD_EXEC_TEST_TYPE_FIXTURE`, with their corresponding C types `fd_exec_test_type_context_t`, `fd_exec_test_type_effects_t`, and `fd_exec_test_type_fixture_t`. The `AUTO` parameter indicates automatic handling of these bindings by nanopb.
 # Imports and Dependencies
 
 ---
