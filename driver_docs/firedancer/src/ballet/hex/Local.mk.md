@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and conditional fuzz test setup for the `fd_hex` and `fd_ballet` components.
+Makefile for adding headers, objects, and conditional fuzz testing in the `firedancer` codebase.
 
 # Purpose
-This file is a Makefile snippet used for building a software project. It defines build rules by adding header files and object files to the build process using the `add-hdrs` and `add-objs` functions. Additionally, it conditionally includes a fuzz test target, `fuzz_hex`, if the `FD_HAS_HOSTED` variable is defined, indicating a hosted environment.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` and `add-objs` functions to include the header file `fd_hex.h` and the object files `fd_hex` and `fd_ballet` in the build process. If the `FD_HAS_HOSTED` variable is defined, it calls the `make-fuzz-test` function to create a fuzz test named `fuzz_hex`, which depends on the `fd_ballet` and `fd_util` components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

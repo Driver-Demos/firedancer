@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `shred.pb.c` file contains automatically generated nanopb constant definitions for various data structures used in the `firedancer` codebase.
+Automatically generated nanopb constant definitions for various FD_EXEC_TEST structures.
 
 # Purpose
-This C source code file is an automatically generated set of constant definitions for use with the nanopb library, a small code-size Protocol Buffers implementation in C. The file includes the header "shred.pb.h" and checks for compatibility with the nanopb generator version by comparing `PB_PROTO_HEADER_VERSION` against the expected value of 40, issuing an error if they do not match. The file uses the `PB_BIND` macro to bind several data structures (e.g., `fd_exec_test_shred_binary_t`, `fd_exec_test_data_header_t`) to their corresponding Protocol Buffers message types, facilitating serialization and deserialization operations. This file is part of a larger system that likely involves data exchange or storage using Protocol Buffers, specifically tailored for the "shred" data structures.
+This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `shred.pb.h` and checks if the `PB_PROTO_HEADER_VERSION` is 40, issuing an error if it is not, to ensure compatibility with the nanopb generator version used. The file uses the `PB_BIND` macro to bind several protobuf message types, such as `FD_EXEC_TEST_SHRED_BINARY`, `FD_EXEC_TEST_DATA_HEADER`, `FD_EXEC_TEST_CODE_HEADER`, `FD_EXEC_TEST_PARSED_SHRED`, and `FD_EXEC_TEST_ACCEPTS_SHRED`, to their corresponding C structures with automatic field handling. This setup facilitates the serialization and deserialization of these protobuf messages in C applications.
 # Imports and Dependencies
 
 ---

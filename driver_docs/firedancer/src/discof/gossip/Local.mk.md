@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules that add gossip tile objects when FD_HAS_INT128 is defined.
+Makefile logic to conditionally add objects for gossip tiles if 128-bit integers are available.
 
 # Purpose
-Build rules add the `fd_discof` object file to the `fd_gossip_tile` and `fd_gossvf_tile` targets when `FD_HAS_INT128` is defined. The `ifdef` guard enables these object additions only for builds that support 128-bit integer types.
+The `Makefile` snippet uses a conditional directive to check if the macro `FD_HAS_INT128` is defined. If it is defined, the `add-objs` function is called to add the object files `fd_discof` to the targets `fd_gossip_tile` and `fd_gossvf_tile`. This configuration ensures that these object files are included in the build process only when the `FD_HAS_INT128` feature is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

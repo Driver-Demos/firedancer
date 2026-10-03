@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, unit tests, and fuzz tests for the SBPF components, conditional on the `FD_HAS_HOSTED` flag.
+Makefile for adding headers, objects, and defining unit and fuzz tests for SBPF components.
 
 # Purpose
-The provided content is from a Makefile, which is a build automation tool used to manage the build process of software projects. This Makefile snippet defines a series of build and test instructions for components related to "sbpf" (likely a software module or library). The `add-hdrs` and `add-objs` functions are used to specify header files and object files, respectively, that are part of the build process. The `ifdef FD_HAS_HOSTED` conditional block indicates that certain unit tests and fuzz tests should only be compiled and executed if the `FD_HAS_HOSTED` variable is defined, suggesting a conditional build environment. The `make-unit-test` and `run-unit-test` functions are used to create and execute unit tests, while `make-fuzz-test` is used to create fuzz tests, ensuring the robustness and reliability of the software components.
+The Makefile content defines build and test instructions for a software project. It uses the `add-hdrs` and `add-objs` functions to specify header files and object files, respectively, for the `fd_sbpf_loader` and `fd_ballet` components. The `ifdef FD_HAS_HOSTED` directive checks if the `FD_HAS_HOSTED` variable is defined, and if so, it includes commands to create and run unit tests for components such as `test_sbpf_load_prog`, `test_sbpf_loader`, and `test_sbpf_elf_peek`. Additionally, it includes a command to create a fuzz test for `fuzz_sbpf_loader`. These instructions help automate the compilation and testing processes, ensuring that the software components are correctly built and verified.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

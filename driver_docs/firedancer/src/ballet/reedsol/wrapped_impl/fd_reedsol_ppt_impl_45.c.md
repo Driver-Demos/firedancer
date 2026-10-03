@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_reedsol_ppt_impl_45.c` file in the `firedancer` codebase contains auto-generated functions for processing Reed-Solomon codes with varying parameters, specifically implementing the `FD_REEDSOL_GENERATE_PPT` macro for different configurations.
+Auto-generated functions for Reed-Solomon encoding with varying parameters.
 
 # Purpose
-This C source code file is an auto-generated implementation of functions related to Reed-Solomon error correction, specifically for generating parity-check matrices. The file includes multiple functions, each named `fd_reedsol_ppt_64_xx`, where `xx` varies from 45 to 49. These functions are designed to work with 64 input elements of type `gf_t`, which likely represents elements in a Galois Field, a common mathematical structure used in error correction algorithms. The functions perform operations on these inputs using a macro `FD_REEDSOL_GENERATE_PPT`, which is presumably defined in the included header file `fd_reedsol_ppt.h`. This macro likely encapsulates the core logic for generating the parity-check matrices necessary for the Reed-Solomon encoding process.
+The code defines a set of functions that are part of an auto-generated module for processing data using Reed-Solomon error correction. Each function, such as [`fd_reedsol_ppt_64_45`](<#fd_reedsol_ppt_64_45>), [`fd_reedsol_ppt_64_46`](<#fd_reedsol_ppt_64_46>), [`fd_reedsol_ppt_64_47`](<#fd_reedsol_ppt_64_47>), [`fd_reedsol_ppt_64_48`](<#fd_reedsol_ppt_64_48>), and [`fd_reedsol_ppt_64_49`](<#fd_reedsol_ppt_64_49>), takes 64 input parameters of type `gf_t`, which are pointers to Galois field elements. These functions perform operations on the input data using the `FD_REEDSOL_GENERATE_PPT` macro, which is likely responsible for generating parity or processing the data according to the Reed-Solomon algorithm.
 
-The primary purpose of this file is to provide specific implementations of Reed-Solomon encoding for different configurations, as indicated by the varying function names. Each function takes 64 pointers to `gf_t` types, processes them, and updates the values in place. The functions are marked with `FD_FN_UNSANITIZED`, suggesting that they are optimized for performance and may not include safety checks, which is typical in high-performance computing scenarios where Reed-Solomon codes are often applied, such as in data storage and transmission systems. This file is part of a larger library and is intended to be used as a backend component, providing specialized functionality for error correction without defining a public API or external interface directly.
+The functions are marked with the `FD_FN_UNSANITIZED` attribute, indicating that they may not perform input validation or error checking. The functions are designed to be part of a larger system, as indicated by the inclusion of the header file `fd_reedsol_ppt.h`. The functions do not define public APIs or external interfaces directly but are likely intended to be used internally within a library or application that implements Reed-Solomon error correction. The common theme of the functions is to handle data processing for different configurations of the Reed-Solomon algorithm, as indicated by the varying parameters in the `FD_REEDSOL_GENERATE_PPT` macro.
 # Imports and Dependencies
 
 ---
@@ -19,7 +19,9 @@ The primary purpose of this file is to provide specific implementations of Reed-
 
 ---
 ### fd\_reedsol\_ppt\_64\_45<!-- {{#callable:fd_reedsol_ppt_64_45}} -->
-The function `fd_reedsol_ppt_64_45` processes 64 input elements using a Reed-Solomon error correction algorithm with a specific configuration of 64 total elements and 45 data elements.
+[View Source →](<../../../../../../src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_45.c#L4>)
+
+Processes 64 input elements using a Reed-Solomon error correction algorithm with parameters 64 and 45.
 - **Inputs**:
     - `_in00`: Pointer to the first input element of type `gf_t`.
     - `_in01`: Pointer to the second input element of type `gf_t`.
@@ -85,16 +87,18 @@ The function `fd_reedsol_ppt_64_45` processes 64 input elements using a Reed-Sol
     - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
     - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
     - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
-- **Control Flow**:
-    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values and assigns them to local variables `in00` to `in63`.
-    - It then calls the macro `FD_REEDSOL_GENERATE_PPT` with the parameters 64, 45, and the 64 local variables, which likely performs the Reed-Solomon error correction algorithm.
-    - After the macro call, the function updates the original input pointers with the potentially modified values from the local variables.
-- **Output**: The function does not return a value; it modifies the input data in place.
+- **Logic and Control Flow**:
+    - Initialize local variables `in00` to `in63` with the values pointed to by `_in00` to `_in63` respectively.
+    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters 64, 45, and the local variables `in00` to `in63`.
+    - Update the values pointed to by `_in00` to `_in63` with the modified local variables `in00` to `in63`.
+- **Output**: No return value; the function modifies the input data in place.
 
 
 ---
 ### fd\_reedsol\_ppt\_64\_46<!-- {{#callable:fd_reedsol_ppt_64_46}} -->
-The function `fd_reedsol_ppt_64_46` performs a Reed-Solomon encoding operation on 64 input elements using a specific configuration and updates the input elements with the result.
+[View Source →](<../../../../../../src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_45.c#L201>)
+
+Processes 64 input elements using a Reed-Solomon error correction algorithm with 46 data elements.
 - **Inputs**:
     - `_in00`: Pointer to the first input element of type `gf_t`.
     - `_in01`: Pointer to the second input element of type `gf_t`.
@@ -160,17 +164,18 @@ The function `fd_reedsol_ppt_64_46` performs a Reed-Solomon encoding operation o
     - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
     - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
     - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
-- **Control Flow**:
-    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values.
-    - It then calls the macro `FD_REEDSOL_GENERATE_PPT` with the parameters 64, 46, and the 64 dereferenced input values.
-    - The macro presumably performs some form of Reed-Solomon encoding or processing on these values.
-    - After the macro call, the function updates each of the original input pointers with the potentially modified `gf_t` values.
-- **Output**: The function does not return a value; it modifies the input data in place.
+- **Logic and Control Flow**:
+    - Initialize local variables `in00` to `in63` with the values pointed to by `_in00` to `_in63` respectively.
+    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters `64`, `46`, and the local variables `in00` to `in63`.
+    - Update the values pointed to by `_in00` to `_in63` with the modified local variables `in00` to `in63`.
+- **Output**: No return value; the function modifies the input data in place.
 
 
 ---
 ### fd\_reedsol\_ppt\_64\_47<!-- {{#callable:fd_reedsol_ppt_64_47}} -->
-The function `fd_reedsol_ppt_64_47` processes 64 input elements using a Reed-Solomon error correction algorithm with specific parameters and updates the input elements with the processed values.
+[View Source →](<../../../../../../src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_45.c#L398>)
+
+Processes 64 input elements using a Reed-Solomon error correction algorithm with 47 data elements.
 - **Inputs**:
     - `_in00`: Pointer to the first input element of type `gf_t`.
     - `_in01`: Pointer to the second input element of type `gf_t`.
@@ -236,16 +241,18 @@ The function `fd_reedsol_ppt_64_47` processes 64 input elements using a Reed-Sol
     - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
     - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
     - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
-- **Control Flow**:
-    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values.
-    - It then calls the macro `FD_REEDSOL_GENERATE_PPT` with parameters 64 and 47, along with the 64 dereferenced input values, to perform the Reed-Solomon error correction processing.
-    - After the processing, the function updates each of the original input pointers with the processed `gf_t` values.
-- **Output**: The function does not return a value; it modifies the input data in place.
+- **Logic and Control Flow**:
+    - Initialize local variables `in00` to `in63` with the values pointed to by `_in00` to `_in63` respectively.
+    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters `64`, `47`, and the local variables `in00` to `in63`.
+    - Update the values pointed to by `_in00` to `_in63` with the modified local variables `in00` to `in63`.
+- **Output**: No return value; the function modifies the input data in place.
 
 
 ---
 ### fd\_reedsol\_ppt\_64\_48<!-- {{#callable:fd_reedsol_ppt_64_48}} -->
-The function `fd_reedsol_ppt_64_48` performs a Reed-Solomon encoding operation on 64 input elements using a specific configuration and updates the input elements with the result.
+[View Source →](<../../../../../../src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_45.c#L595>)
+
+Processes 64 input elements using a Reed-Solomon error correction algorithm with parameters 64 and 48.
 - **Inputs**:
     - `_in00`: Pointer to the first input element of type `gf_t`.
     - `_in01`: Pointer to the second input element of type `gf_t`.
@@ -311,16 +318,18 @@ The function `fd_reedsol_ppt_64_48` performs a Reed-Solomon encoding operation o
     - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
     - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
     - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
-- **Control Flow**:
-    - Initialize local variables `in00` to `in63` by dereferencing the corresponding input pointers `_in00` to `_in63`.
-    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters `64`, `48`, and the local variables `in00` to `in63` to perform the Reed-Solomon encoding operation.
-    - Update the input pointers `_in00` to `_in63` with the values of the local variables `in00` to `in63`.
-- **Output**: The function does not return a value; it modifies the input elements in place.
+- **Logic and Control Flow**:
+    - Initialize local variables `in00` to `in63` with the values pointed to by `_in00` to `_in63` respectively.
+    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters 64, 48, and the local variables `in00` to `in63`.
+    - Update the values pointed to by `_in00` to `_in63` with the modified local variables `in00` to `in63`.
+- **Output**: No return value; the function modifies the input data in place.
 
 
 ---
 ### fd\_reedsol\_ppt\_64\_49<!-- {{#callable:fd_reedsol_ppt_64_49}} -->
-The function `fd_reedsol_ppt_64_49` performs a Reed-Solomon encoding operation on 64 input elements using a specific configuration and updates the input pointers with the results.
+[View Source →](<../../../../../../src/ballet/reedsol/wrapped_impl/fd_reedsol_ppt_impl_45.c#L792>)
+
+Generates a Reed-Solomon parity check for 64 input elements with 49 data elements.
 - **Inputs**:
     - `_in00`: Pointer to the first input element of type `gf_t`.
     - `_in01`: Pointer to the second input element of type `gf_t`.
@@ -386,11 +395,11 @@ The function `fd_reedsol_ppt_64_49` performs a Reed-Solomon encoding operation o
     - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
     - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
     - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
-- **Control Flow**:
-    - Initialize local variables `in00` to `in63` by dereferencing the corresponding input pointers `_in00` to `_in63`.
-    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters `64`, `49`, and the local variables `in00` to `in63` to perform the Reed-Solomon encoding operation.
-    - Update the input pointers `_in00` to `_in63` with the values of the local variables `in00` to `in63`.
-- **Output**: The function does not return a value; it modifies the input pointers in place with the encoded results.
+- **Logic and Control Flow**:
+    - Initialize local variables `in00` to `in63` with the values pointed to by `_in00` to `_in63` respectively.
+    - Call the macro `FD_REEDSOL_GENERATE_PPT` with parameters `64`, `49`, and the local variables `in00` to `in63`.
+    - Update the values pointed to by `_in00` to `_in63` with the modified local variables `in00` to `in63`.
+- **Output**: No return value; the function modifies the input data in place.
 
 
 

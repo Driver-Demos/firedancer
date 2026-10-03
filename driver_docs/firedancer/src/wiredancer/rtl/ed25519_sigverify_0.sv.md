@@ -3,41 +3,43 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ed25519_sigverify_0.sv` file implements a module for dispatching and merging signature verification jobs using a round-robin policy, with reassembly of results and metadata management in the `firedancer` codebase.
+Implements a module for dispatching, processing, and merging ED25519 signature verification tasks using a round-robin policy.
 
 # Purpose
-The provided Verilog code defines a module named `ed25519_sigverify_0`, which is part of a system designed for signature verification using the Ed25519 algorithm. This module is responsible for dispatching and merging signature verification tasks across multiple processors in a round-robin fashion. The architecture includes a series of processors, each paired with a FIFO buffer, to handle the parallel processing of signature verification tasks. The dispatch logic ensures that the inputs for each verification task are serialized and sent to the same processor, while the merge logic uses a multiplexer to collect results from the processors, handling potential backpressure with separate FIFOs for each processor.
+The `ed25519_sigverify_0` module is designed to handle the dispatch and merging of signature verification tasks across multiple processors. It implements a round-robin scheduling policy to distribute incoming jobs to a set of processors, ensuring that each processor receives serialized inputs for each invocation. The module uses a series of FIFOs to manage data flow and backpressure, allowing multiple processors to produce results simultaneously. The results from these processors are then merged using a multiplexer, which also follows a round-robin policy to select outputs. The module includes a reassembly mechanism to consolidate multiple results from a single transaction into a single output cycle, which is then stored in a FIFO to handle backpressure.
 
-Key components of this module include a key storage mechanism to manage metadata efficiently, a round-robin scheduler to distribute tasks among processors, and a reassembly process to consolidate the results of each transaction. The module also includes logic for handling backpressure and synchronization through FIFOs and dual-port RAMs. The design is highly modular, with parameterized components such as the number of schedulers (`N_SCH`) and key dimensions (`KEY_D`), allowing for flexibility in adapting the module to different system requirements. This module serves as a top-level implementation for managing the flow of signature verification tasks, ensuring efficient distribution and collection of results in a high-throughput environment.
+The module also incorporates a key storage system to manage metadata efficiently, avoiding the need to send wide metadata into the processors. The design includes several key components such as the `key_store`, `shcl_cpu`, and `showahead_fifo` instances, which facilitate the processing and storage of data. The module is parameterized to allow flexibility in configuration, such as the number of schedulers (`N_SCH`) and key dimensions (`KEY_D`). The use of `always_ff` blocks and `generate` constructs ensures that the module can handle synchronous operations and instantiate multiple processing paths as needed.
 # Modules
 
 ---
 ### ed25519\_sigverify\_0
-The `ed25519_sigverify_0` module is designed to handle the dispatch and merging of signature verification jobs using a round-robin policy. It manages the serialization of inputs and reassembly of outputs, ensuring efficient processing and backpressure handling.
+Implements a dispatch and merge mechanism for signature verification jobs using a round-robin policy. Serializes inputs to processors and reassembles outputs, supporting backpressure and metadata storage.
 - **Constants**:
-    - `MUL_T`: A constant parameter set to 32'h007F_CCC2, used for multiplication operations.
-    - `MUL_D`: A constant parameter set to 15, used for multiplication operations.
-    - `N_SCH`: A constant parameter set to 2, representing the number of schedulers.
-    - `KEY_D`: A constant parameter set to 512, representing the key depth.
-    - `KEY_D_L`: A constant parameter calculated as $clog2(KEY_D), representing the key depth in logarithmic scale.
+    - ``MUL_T``: A constant parameter with a value of `32'h007F_CCC2` used in the module.
+    - ``MUL_D``: A constant parameter with a value of `15` used in the module.
+    - ``N_SCH``: A constant parameter with a value of `2` representing the number of schedulers.
+    - ``KEY_D``: A constant parameter with a value of `512` representing the key dimension.
+    - ``KEY_D_L``: A constant parameter calculated as `$clog2(KEY_D)` representing the key dimension length.
 - **Ports**:
-    - `i_r`: Output logic signal for backpressure indication.
-    - `i_w`: Input wire signal indicating wait state.
-    - `i_v`: Input wire signal indicating valid input.
-    - `i_m`: Input wire carrying metadata of type sv_meta4_t.
-    - `o_v`: Output logic signal indicating valid output.
-    - `o_m`: Output logic carrying metadata of type sv_meta5_t.
-    - `clk`: Input wire for the clock signal.
-    - `rst`: Input wire for the reset signal.
-- **Logic And Control Flow**:
-    - The module uses a round-robin policy to distribute jobs to processors, incrementing the index `sch_i_rrb` on each valid input cycle.
-    - A `key_store` instance is used to manage metadata storage, interfacing with the main module through input and output signals.
-    - The `always_ff` block updates the round-robin index and handles reset conditions, ensuring proper job distribution.
-    - A `generate` block creates multiple scheduler instances, each handling job serialization and interfacing with a `shcl_cpu` instance for processing.
-    - Each scheduler instance uses an `always_ff` block to manage state transitions and data serialization based on input signals.
-    - A `showahead_fifo` instance is used within each scheduler to buffer output data, supporting backpressure handling.
-    - The module merges scheduler outputs using a round-robin policy, updating output signals based on the current scheduler index.
-    - Reassembly of scheduler outputs is performed using `simple_dual_port_ram` instances, ensuring complete transaction results are available in a single cycle.
+    - ``i_r``: Output logic signal for backpressure.
+    - ``i_w``: Input wire signal indicating wait state.
+    - ``i_v``: Input wire signal indicating valid input.
+    - ``i_m``: Input wire for metadata with a size of `$bits(sv_meta4_t)`.
+    - ``o_v``: Output logic signal indicating valid output.
+    - ``o_m``: Output logic for metadata with a size of `$bits(sv_meta5_t)`.
+    - ``clk``: Input wire for the clock signal.
+    - ``rst``: Input wire for the reset signal.
+- **Logic and Control Flow**:
+    - Uses a round-robin policy to dispatch jobs to processors, incrementing `sch_i_rrb` on each valid input cycle.
+    - Implements a `key_store` instance to manage metadata storage and retrieval.
+    - Contains an `always_ff` block to handle the round-robin index and reset conditions.
+    - Uses a `generate` block to instantiate multiple schedulers (`G_SCH`) with serialized input handling and state management.
+    - Each scheduler (`G_SCH`) uses an `always_ff` block to serialize inputs and manage state transitions based on input validity and readiness.
+    - Instantiates a `piped_wire` to manage reset signal propagation with a depth of 2.
+    - Each scheduler includes a `shcl_cpu` instance to process hash data and a `showahead_fifo` for output buffering.
+    - Implements a `generate` block to reassemble outputs using `simple_dual_port_ram` instances, storing intermediate results.
+    - Uses an `always_ff` block to manage output validity and reset conditions.
+    - Displays debug information using `$display` statements within `always_ff` blocks.
 
 
 
