@@ -3,29 +3,29 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Async I/O, eBPF, HTTP, IP, TLS, QUIC, DNS, UDP, XDP, RTT, and token bucket code.
+Network, protocol, and build components for AIO, eBPF, gRPC, HTTP/2, HTTP, IP, MIB, neighbor, OpenSSL, QUIC, DNS, TLS, UDP, XDP, RTT, and token bucket handling.
 
 ## Folders
-- **[aio](aio/README.md)**: Stubs, abstractions, and tests for asynchronous I/O, including PCAPNG and memory cache operations.
-- **[ebpf](ebpf/README.md)**: Macros for eBPF assembly and BPF syscall wrappers for Linux operations.
-- **[grpc](grpc/README.md)**: gRPC client and codec implementation with HTTP/2, TLS support, and related tests and build configuration.
-- **[h2](h2/README.md)**: HTTP/2 implementation with components for connection management, HPACK compression, fuzz testing, and various tests.
-- **[http](http/README.md)**: HTTP server implementation with WebSocket support, URL parsing, picohttpparser, fuzz testing, and build scripts.
-- **[ip](ip/README.md)**: IPv4 FIB management and Netlink integration with data structures, functions, headers, and tests.
-- **[mib](mib/README.md)**: Double buffer and network device management implementations with related APIs, makefile, and tests.
-- **[neigh](neigh/README.md)**: Functions, data structures, macros, and tests for IPv4 neighbor discovery, ARP, and netlink integration.
-- **[openssl](openssl/README.md)**: Maps OpenSSL SSL error codes to strings and conditionally includes OpenSSL headers and objects.
-- **[quic](quic/README.md)**: QUIC protocol, TLS, crypto, logging, streams, retry, tests, and tools.
-- **[resolv](resolv/README.md)**: DNS resolution and network address translation functions, tests, and configuration files for Linux userland.
-- **[tls](tls/README.md)**: TLS 1.3 handshake, ASN.1 parsing, protocol encoding/decoding, fuzz tests, and unit tests.
-- **[udpsock](udpsock/README.md)**: UDP socket abstraction implementation, unprivileged driver, Makefile, and echo server test.
-- **[xdp](xdp/README.md)**: eBPF XDP programs, XSK management, packet header injection, and unit tests.
+- **[aio](aio/README.md)**: The `aio` folder in the `firedancer` codebase contains source and header files implementing and defining asynchronous I/O operations, including packet handling, PCAPNG file management, and testing, along with a makefile for building these components.
+- **[ebpf](ebpf/README.md)**: eBPF instruction macros and Linux BPF syscall wrappers.
+- **[grpc](grpc/README.md)**: gRPC client, codec, tests, fuzzers, and build rules for HTTP/2, TLS, and header handling.
+- **[h2](h2/README.md)**: HTTP/2 framing, HPACK, ring buffers, callbacks, tests, and fuzzing utilities
+- **[http](http/README.md)**: HTTP and WebSocket server code, URL parsing, patched picohttpparser, fuzz tests, and build rules
+- **[ip](ip/README.md)**: IPv4 FIB and Linux netlink route management code with unit tests.
+- **[mib](mib/README.md)**: Double-buffer and netlink-based network device table APIs, plus a test program and build file.
+- **[neigh](neigh/README.md)**: The `neigh` folder in the `firedancer` codebase contains source files and headers for managing IPv4 neighbor discovery and mapping, including handling ARP requests, netlink message processing, and neighbor probing, with a focus on Linux environments.
+- **[openssl](openssl/README.md)**: The `openssl` folder in the `firedancer` codebase contains source and header files for converting OpenSSL SSL error codes into human-readable strings, along with a makefile for managing OpenSSL-related build configurations.
+- **[quic](quic/README.md)**: QUIC protocol code, crypto, TLS, logging, tests, and packet, stream, and connection handling.
+- **[resolv](resolv/README.md)**: DNS resolution, lookup, parsing, query, and test code for a Linux userland resolver.
+- **[tls](tls/README.md)**: TLS 1.3 handshake, message encode/decode, ASN.1, fuzz, and test support for QUIC.
+- **[udpsock](udpsock/README.md)**: The `udpsock` folder in the `firedancer` codebase contains files for implementing and testing a UDP socket abstraction, including source and header files for socket operations, a makefile for build instructions, and a test file for a UDP echo server.
+- **[xdp](xdp/README.md)**: eBPF packet filters, AF_XDP socket management, GRE header injection, and tests.
 
 ## Files
-- **[fd_rtt_est.h](fd_rtt_est.h.md)**: API for estimating round trip time (RTT) for packet transmissions using RFC 9002 guidelines.
-- **[fd_token_bucket.h](fd_token_bucket.h.md)**: Defines a token bucket structure and a function to consume tokens based on elapsed time and rate.
-- **[fd_waltz_base.h](fd_waltz_base.h.md)**: Header file for including utility functions in the Firedancer Waltz module.
-- **[Local.mk](Local.mk.md)**: Makefile for building the `fd_waltz` library and adding headers `fd_waltz_base.h` and `fd_rtt_est.h`.
+- **[fd_rtt_est.h](fd_rtt_est.h.md)**: RTT estimation API with RFC 9002 sample update logic and variance tracking.
+- **[fd_token_bucket.h](fd_token_bucket.h.md)**: The `fd_token_bucket.h` file defines a structure and function for managing a token bucket, which is used to control the rate of some process by refilling and consuming tokens based on elapsed time.
+- **[fd_waltz_base.h](fd_waltz_base.h.md)**: The `fd_waltz_base.h` file is a header guard for the `firedancer` codebase that includes the `fd_util.h` utility header.
+- **[Local.mk](Local.mk.md)**: Build rules that add the fd_waltz library and its header files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
