@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-256-bit unsigned integer operations, Montgomery multiplication, Makefile, and unit tests.
+256-bit unsigned integer helpers, Montgomery multiplication, and unit tests.
 
 
 ## Files
-- **[fd_uint256.h](fd_uint256.h.md)**: Defines a 256-bit unsigned integer type with functions for byte swapping, comparison, and bit access.
-- **[fd_uint256_mul.h](fd_uint256_mul.h.md)**: Implementation of uint256 Montgomery multiplication and utility functions for field arithmetic.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers and running unit tests for `fd_uint256`.
-- **[test_uint256.c](test_uint256.c.md)**: Tests the `fd_ulong_sub_borrow` function for unsigned long subtraction with borrow handling.
+- **[fd_uint256.h](fd_uint256.h.md)**: 256-bit unsigned integer type with byte swap, compare, equality, and bit access helpers.
+- **[fd_uint256_mul.h](fd_uint256_mul.h.md)**: Montgomery uint256 modular multiplication helpers and an Fp mul macro.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and the setup and execution of a unit test for `fd_uint256` functionality.
+- **[test_uint256.c](test_uint256.c.md)**: The `test_uint256.c` file contains a test suite for verifying the behavior of the `fd_ulong_sub_borrow` function, which performs subtraction with borrow handling for unsigned long integers.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
