@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_io.c` file in the `firedancer` codebase contains a comprehensive suite of tests for file input/output operations, including creating, writing, reading, seeking, and buffered I/O, as well as error handling and memory-mapped I/O.
+Tests for file input/output operations, including buffered and memory-mapped I/O, with error handling.
 
 # Purpose
-This C source code file is an executable program designed to perform comprehensive testing of file input/output (I/O) operations, including both standard and buffered I/O, as well as memory-mapped I/O (MMIO). The program begins by initializing a random number generator and parsing command-line arguments to determine the file path, file mode, and whether to keep the file after execution. It then creates a temporary file or uses a specified path to conduct various I/O tests. These tests include writing and reading data, seeking within the file, and verifying the file size. The program also tests buffered I/O operations using undersized buffers to ensure edge case coverage, and it performs MMIO tests to validate reading and writing patterns directly to memory.
+The code is a C program designed to test various file input/output operations, including basic and buffered read/write operations, file seeking, and memory-mapped I/O (MMIO). It begins by initializing a random number generator and setting up command-line arguments to specify file paths, modes, and whether to keep temporary files. The program creates a temporary file or uses a specified path, writes test data to it, and performs a series of tests to verify the correctness of file operations such as seeking, writing, and reading. It also tests buffered I/O operations using undersized buffers to ensure edge case coverage.
 
-The code is structured to handle errors robustly, logging any issues encountered during file operations. It uses a series of macros and functions to streamline the testing process, such as `FD_TEST` for assertions and `FD_LOG_NOTICE` for logging. The program also includes tests for handling invalid file descriptors and edge cases like empty reads and writes. This file is a standalone executable, as indicated by the presence of a [`main`](#main) function, and it does not define any public APIs or external interfaces. Its primary purpose is to validate the correctness and reliability of various file I/O operations in a controlled environment.
+The program includes tests for both static and dynamic reads, compound writes, and zero-copy buffered operations. It also verifies the behavior of file operations under various conditions, such as after closing a file or using invalid file descriptors. Additionally, the program tests the functionality of truncating files and using MMIO to read and write data. Error handling is implemented to log issues encountered during file operations, and the program concludes by cleaning up resources and logging a success message. The code is structured as an executable C file, with a [`main`](<#main>) function serving as the entry point, and it does not define public APIs or external interfaces.
 # Imports and Dependencies
 
 ---
@@ -24,24 +24,25 @@ The code is structured to handle errors robustly, logging any issues encountered
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, processes command-line arguments, creates a temporary file for I/O testing, performs various file operations including writing, reading, and testing buffered I/O, and finally cleans up resources.
+[View Source →](<../../../../../src/util/io/test_io.c#L8>)
+
+Executes a series of file I/O tests, including creating, writing, reading, and manipulating temporary files, while handling command-line arguments for path, mode, and keep options.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Extract command-line options for `--path`, `--mode`, and `--keep` using `fd_env_strip_cmdline_cstr` and `fd_env_strip_cmdline_int`.
-    - Initialize a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Create a temporary file for I/O testing; if `--path` is specified, use it to create the file with specified mode, otherwise use `mkstemp` to create a temporary file.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Initialize the environment with `fd_boot` and parse command-line arguments for `--path`, `--mode`, and `--keep` options.
+    - Create a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Determine the file path to use: if `--path` is specified, use it; otherwise, create a temporary file with `mkstemp`.
     - If `--keep` is not set, unlink the file to ensure it is deleted upon program termination.
-    - Perform various file operations including seeking, writing, and reading to test file I/O functionality.
-    - Test buffered I/O operations using `fd_io_buffered_ostream` and `fd_io_buffered_istream` with undersized buffers for edge case coverage.
-    - Perform multiple read and write tests to ensure data integrity and correct file operations.
-    - Test memory-mapped I/O (MMIO) operations for reading and writing patterns to the file.
-    - Handle errors and log notices throughout the process.
-    - Close the file descriptor and test operations on closed and invalid file descriptors.
-    - Log the result of the tests and clean up resources before exiting.
-- **Output**: The function returns an integer status code, typically 0 for successful execution.
+    - Write test data to the file and perform various seek and size tests on the file, both when empty and after writing data.
+    - Perform buffered and zero-copy writes using `fd_io_buffered_ostream_t` and test the writes with different buffer sizes.
+    - Read the written data back using various read methods, including simple, compound, incremental, and buffered reads.
+    - Test file truncation and memory-mapped I/O (MMIO) operations, including writing and reading random patterns.
+    - Perform error handling tests for invalid file descriptors, seek types, and empty read/write operations.
+    - Log errors and notices using `FD_LOG_ERR`, `FD_LOG_WARNING`, and `FD_LOG_NOTICE`.
+    - Clean up resources by closing the file descriptor and deleting the random number generator.
+- **Output**: Returns 0 upon successful execution of all tests.
 
 
 

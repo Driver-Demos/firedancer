@@ -3,10 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL query for double-delete paths from _new to _delete functions.
+Detects double delete issues in C++ code, emphasizing non-idempotent delete functions.
 
 # Purpose
-This file defines a CodeQL path-problem query that detects double-delete issues in C++ code. It uses data-flow analysis with `GenericDoubleFree` and `DataFlow::GlobalWithState` to track values created by functions that match the `_new` pattern and released by functions that match the `_delete` pattern. The query reports a warning when a flow path shows a value reaching a delete operation more than once, while it excludes test files and one named delete function that must stay idempotent.
+The code is a static analysis module designed to detect potential double delete issues in C++ codebases. It identifies cases where a `_delete` function is called more than once on the same resource, which can lead to undefined behavior if the function is not idempotent. The module uses pattern matching to identify functions that follow the naming convention of ending with `_delete` and `_new`, excluding specific cases like `fd_aio_delete` that are intended to be idempotent.
+
+The module imports several components, including `cpp`, `GenericDoubleFree`, and `semmle.code.cpp.dataflow.new.DataFlow`, to facilitate data flow analysis. It defines a `Flow` module using `DataFlow::GlobalWithState` with a configuration that specifies the patterns for matching delete and new functions. The analysis focuses on identifying paths in the code where a resource is allocated and then deleted multiple times, ensuring that the source and sink of the data flow are in different lines and not part of test files.
+
+The code uses a query to select and report instances of double delete issues, providing the location of the problematic code. The severity of the problem is marked as a warning, and it is tagged for correctness and maintainability, indicating its importance in preventing potential runtime errors and ensuring code quality.
+# Imports and Dependencies
+
+---
+- `cpp`
+- `GenericDoubleFree`
+- `semmle.code.cpp.dataflow.new.DataFlow`
+- `Flow::PathGraph`
+- `filter`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

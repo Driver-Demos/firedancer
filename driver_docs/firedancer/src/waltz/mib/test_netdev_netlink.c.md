@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_netdev_netlink.c` file in the `firedancer` codebase is a test program that initializes and manages network device tables using netlink, including creating a workspace, loading interfaces, and dumping the interface table.
+Tests the functionality of network device management using netlink in the Firedancer codebase.
 
 # Purpose
-This C source code file is an executable program designed to initialize and manage a network device table using shared memory and netlink interfaces. The program begins by setting up the environment and parsing command-line arguments to configure parameters such as page size, page count, NUMA index, device count, and bond count. It then creates a shared memory workspace and allocates memory for a network device table, which is initialized and joined for further operations. The program uses the `fd_netlink` interface to load network interface data into the table and subsequently dumps the interface table to standard error for inspection.
+This code is an executable C program that initializes and manages a network device table using shared memory. It begins by setting up the environment and parsing command-line arguments to configure parameters such as page size, page count, NUMA index, device count, and bond count. The program uses these parameters to create a shared memory workspace and allocate memory for a network device table. It then initializes the table and a netlink interface to load network device information.
 
-The code leverages several utility functions and structures from included headers, such as `fd_netdev_netlink.h` and `fd_util.h`, indicating its reliance on external libraries for network device management and shared memory operations. The program is structured to handle errors gracefully, logging warnings and errors as needed. It concludes by cleaning up resources, including finalizing the netlink interface, leaving the network device table, and deleting the shared memory workspace. This file is a standalone executable that provides a specific functionality related to network device management, rather than a library or a header file meant for reuse in other programs.
+The program checks for errors at various stages, such as unsupported page sizes or invalid device counts, and logs messages accordingly. After successfully loading the network device information into the table, it outputs the interface table to standard error. Finally, the program cleans up by finalizing the netlink interface, deallocating the network device table, and deleting the shared memory workspace before exiting. This code is intended to be run as a standalone application and does not define public APIs or external interfaces for use by other programs.
 # Imports and Dependencies
 
 ---
@@ -21,33 +21,37 @@ The code leverages several utility functions and structures from included header
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, processes command-line arguments, creates a shared memory workspace, sets up a network device table, loads network interfaces, and then cleans up resources before exiting.
+[View Source →](<../../../../../src/waltz/mib/test_netdev_netlink.c#L5>)
+
+Initializes the environment, processes command-line arguments, creates a workspace, manages network device tables, and cleans up resources before exiting.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
+    - `argc`: The number of command-line arguments.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Determine the CPU index and adjust if it exceeds the shared memory CPU count.
-    - Parse command-line arguments for page size, page count, NUMA index, device count, and bond count with default values.
-    - Convert the page size string to an unsigned long and check for validity.
-    - Log an error and exit if the page size, device count, or bond count is unsupported.
-    - Log the creation of a workspace and create an anonymous shared memory workspace with the specified parameters.
-    - Calculate the footprint of the network device table and allocate memory for it in the workspace.
-    - Initialize the network device table and join it to the allocated memory.
-    - Initialize a netlink structure and load the network device table with it, logging a warning if loading fails.
-    - Dump the interface table to standard error and flush the logs.
-    - Finalize the netlink structure, leave the network device table, free the allocated memory, and delete the workspace.
-    - Log a notice of successful execution and halt the program.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_netdev_tbl_footprint`](fd_netdev_tbl.c.md#fd_netdev_tbl_footprint)
-    - [`fd_netdev_tbl_align`](fd_netdev_tbl.c.md#fd_netdev_tbl_align)
-    - [`fd_netdev_tbl_new`](fd_netdev_tbl.c.md#fd_netdev_tbl_new)
-    - [`fd_netdev_tbl_join`](fd_netdev_tbl.h.md#fd_netdev_tbl_join)
-    - [`fd_netdev_netlink_load_table`](fd_netdev_netlink.c.md#fd_netdev_netlink_load_table)
-    - [`fd_netdev_tbl_fprintf`](fd_netdev_tbl.c.md#fd_netdev_tbl_fprintf)
-    - [`fd_netdev_tbl_leave`](fd_netdev_tbl.c.md#fd_netdev_tbl_leave)
-    - [`fd_netdev_tbl_delete`](fd_netdev_tbl.c.md#fd_netdev_tbl_delete)
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Determines the CPU index using `fd_tile_cpu_id` and `fd_tile_idx`, and adjusts it if necessary.
+    - Extracts command-line arguments for page size, page count, NUMA index, device count, and bond count using `fd_env_strip_cmdline_cstr` and `fd_env_strip_cmdline_ulong`.
+    - Converts the page size string to an unsigned long using `fd_cstr_to_shmem_page_sz` and checks for validity.
+    - Logs an error and exits if the page size, device count, or bond count is unsupported.
+    - Logs the creation of a workspace and creates it using `fd_wksp_new_anonymous`.
+    - Calculates the footprint of the network device table using [`fd_netdev_tbl_footprint`](<fd_netdev_tbl.c.md#fd_netdev_tbl_footprint>) and checks for validity.
+    - Allocates memory for the network device table in the workspace using `fd_wksp_alloc_laddr`.
+    - Creates and joins the network device table using [`fd_netdev_tbl_new`](<fd_netdev_tbl.c.md#fd_netdev_tbl_new>) and [`fd_netdev_tbl_join`](<fd_netdev_tbl.h.md#fd_netdev_tbl_join>).
+    - Initializes a netlink object using `fd_netlink_init`.
+    - Loads the network device table with interfaces using [`fd_netdev_netlink_load_table`](<fd_netdev_netlink.c.md#fd_netdev_netlink_load_table>) and logs a warning if it fails.
+    - Logs the interface table using [`fd_netdev_tbl_fprintf`](<fd_netdev_tbl.c.md#fd_netdev_tbl_fprintf>) and flushes the log.
+    - Finalizes the netlink object, leaves the network device table, frees allocated memory, and deletes the workspace.
+    - Logs a notice of successful execution and calls `fd_halt` before returning 0.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_netdev_tbl_footprint`](<fd_netdev_tbl.c.md#fd_netdev_tbl_footprint>)
+    - [`fd_netdev_tbl_align`](<fd_netdev_tbl.c.md#fd_netdev_tbl_align>)
+    - [`fd_netdev_tbl_new`](<fd_netdev_tbl.c.md#fd_netdev_tbl_new>)
+    - [`fd_netdev_tbl_join`](<fd_netdev_tbl.h.md#fd_netdev_tbl_join>)
+    - [`fd_netdev_netlink_load_table`](<fd_netdev_netlink.c.md#fd_netdev_netlink_load_table>)
+    - [`fd_netdev_tbl_fprintf`](<fd_netdev_tbl.c.md#fd_netdev_tbl_fprintf>)
+    - [`fd_netdev_tbl_leave`](<fd_netdev_tbl.c.md#fd_netdev_tbl_leave>)
+    - [`fd_netdev_tbl_delete`](<fd_netdev_tbl.c.md#fd_netdev_tbl_delete>)
 
 
 
