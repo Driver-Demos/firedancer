@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A stub for future tests with random number generation setup and teardown.
+The `test_disco_base.c` file in the `firedancer` codebase is a stub for future tests, initializing and cleaning up a random number generator.
 
 # Purpose
-This code is a simple C program that initializes and finalizes a random number generator (RNG) environment. It includes the header file `fd_disco.h` and defines a [`main`](<#main>) function that takes command-line arguments. The program begins by calling `fd_boot` to initialize the environment with the provided arguments. It then creates and joins a new RNG instance using `fd_rng_new` and `fd_rng_join`. Although the program currently does not perform any operations with the RNG, it includes a comment indicating that it is a placeholder for future tests. The RNG is properly cleaned up with `fd_rng_leave` and `fd_rng_delete` before the program logs a "pass" message using `FD_LOG_NOTICE` and calls `fd_halt` to terminate the environment. The program returns 0 to indicate successful execution.
+This C source code file is a simple test stub designed to initialize and finalize a random number generator (RNG) environment using the functions provided by the "fd_disco" library. The [`main`](#main) function begins by calling `fd_boot` to set up the environment, then creates and joins a new RNG instance with `fd_rng_new` and `fd_rng_join`. Although the RNG is initialized, the code does not perform any operations with it, as indicated by the comment suggesting future tests. The RNG is then properly cleaned up with `fd_rng_leave` and `fd_rng_delete`, ensuring no resource leaks. Finally, the program logs a "pass" message and calls `fd_halt` before exiting, indicating successful execution.
 # Imports and Dependencies
 
 ---
@@ -17,20 +17,19 @@ This code is a simple C program that initializes and finalizes a random number g
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/disco/test_disco_base.c#L3>)
-
-Initializes the environment, sets up a random number generator, logs a notice, and halts the program.
+The `main` function initializes the environment, sets up a random number generator, and logs a notice before halting the program.
 - **Inputs**:
-    - `argc`: The count of command-line arguments.
-    - `argv`: The array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Creates a random number generator using `fd_rng_new` and joins it with `fd_rng_join`.
-    - Leaves and deletes the random number generator using `fd_rng_leave` and `fd_rng_delete`.
-    - Logs a notice message 'pass' using `FD_LOG_NOTICE`.
-    - Calls `fd_halt` to halt the program.
-    - Returns 0 to indicate successful execution.
-- **Output**: Returns 0 to indicate successful execution.
+    - `argc`: The count of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - The function begins by calling `fd_boot` to initialize the environment with the command-line arguments.
+    - A random number generator is created and joined using `fd_rng_new` and `fd_rng_join`.
+    - The function contains a comment indicating it is a stub for future tests, implying no significant operations are currently performed.
+    - The random number generator is deleted and left using `fd_rng_leave` and `fd_rng_delete`.
+    - A log notice is generated with the message 'pass' using `FD_LOG_NOTICE`.
+    - The function calls `fd_halt` to perform any necessary cleanup and halt the program.
+    - The function returns 0, indicating successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 
