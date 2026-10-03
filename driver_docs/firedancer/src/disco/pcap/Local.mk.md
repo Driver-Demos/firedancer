@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and binary targets for the `fd_pcap_replay` component and its dependencies.
+Makefile for building and testing `fd_pcap_replay` and related components in the `firedancer` codebase.
 
 # Purpose
-This file is a Makefile snippet used for building a software project. It defines build rules by invoking macros to add header files, object files, unit tests, and binary targets related to the `fd_pcap_replay` component and its dependencies, such as `fd_disco`, `fd_flamenco`, `fd_tango`, and `fd_util`.
+The Makefile content defines build instructions for a software project. It uses the `add-hdrs` function to include the header file `fd_pcap_replay.h`. The `add-objs` function adds object files `fd_pcap_replay` and `fd_disco` to the build. The `make-unit-test` function creates a unit test named `test_pcap_replay` with dependencies on `fd_disco`, `fd_flamenco`, `fd_tango`, and `fd_util`. The `make-bin` function compiles an executable named `fd_pcap_replay_tile` with the same dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
