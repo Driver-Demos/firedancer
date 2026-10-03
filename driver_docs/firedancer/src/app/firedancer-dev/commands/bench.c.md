@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `bench.c` file in the `firedancer` codebase defines a command for testing validator TPS benchmarks, including a function that executes the benchmark and a structure describing the command's properties.
+Defines a command for testing validator TPS benchmarks with a function that pauses indefinitely.
 
 # Purpose
-This C source code file defines a command function for a benchmarking tool within a development environment. It includes headers for shared development commands and the standard `unistd.h` for POSIX API access. The function [`firedancer_dev_bench_cmd_fn`](#firedancer_dev_bench_cmd_fn) is designed to execute a benchmark command using `bench_cmd_fn` and then enters an infinite loop to keep the parent thread active, allowing termination via an external interrupt like Ctrl+C. Additionally, the file defines an `action_t` structure, `fd_action_bench`, which encapsulates metadata and function pointers for the "bench" command, including its name, arguments, permissions, and a description indicating its purpose to test validator transactions per second (TPS) benchmarks.
+The code defines a command action for a benchmarking tool in a C program. It includes headers for shared development commands and the `unistd.h` library for POSIX operating system API access. The function [`firedancer_dev_bench_cmd_fn`](<#firedancer_dev_bench_cmd_fn>) is implemented to execute a benchmark command by calling `bench_cmd_fn` with the provided arguments and configuration. After executing the benchmark, the function enters an infinite loop using `pause()` to keep the parent thread active until it is terminated by a signal such as Ctrl+C. The `fd_action_bench` structure defines the action with properties such as its name, arguments, function pointer, permissions, and a description indicating that it tests the validator's transactions per second (TPS) benchmark.
 # Imports and Dependencies
 
 ---
@@ -19,23 +19,25 @@ This C source code file defines a command function for a benchmarking tool withi
 
 ---
 ### fd\_action\_bench
-- **Type**: `action_t`
-- **Description**: The `fd_action_bench` is a global variable of type `action_t` that represents a specific action configuration for a command named 'bench'. It includes various fields such as the name of the action, arguments, a function pointer to execute the action, permissions, a flag indicating if it is for a local cluster, and a description of the action.
-- **Use**: This variable is used to define and configure the 'bench' command action, which is likely part of a command-line interface or application framework.
+- **Type**: ``action_t``
+- **Description**: Defines an action structure for a benchmark command in a development environment. It includes the name of the action, the arguments it takes, the function to execute, the permissions required, a flag indicating if it is for a local cluster, and a description of the action.
+- **Use**: Used to configure and execute a benchmark command to test validator TPS in a development environment.
 
 
 # Functions
 
 ---
 ### firedancer\_dev\_bench\_cmd\_fn<!-- {{#callable:firedancer_dev_bench_cmd_fn}} -->
-The `firedancer_dev_bench_cmd_fn` function executes a benchmark command and then puts the parent thread to sleep indefinitely until interrupted.
+[View Source →](<../../../../../../src/app/firedancer-dev/commands/bench.c#L6>)
+
+Calls `bench_cmd_fn` with given arguments and then pauses indefinitely.
 - **Inputs**:
-    - `args`: A pointer to an `args_t` structure containing command-line arguments for the benchmark command.
-    - `config`: A pointer to a `config_t` structure containing configuration settings for the benchmark command.
-- **Control Flow**:
-    - Call the `bench_cmd_fn` function with `args` and `config` to execute the benchmark command.
-    - Enter an infinite loop where the `pause()` function is called to put the parent thread to sleep indefinitely.
-- **Output**: This function does not return any value; it runs indefinitely until interrupted by an external signal such as Ctrl+C.
+    - `args`: Pointer to `args_t` structure containing command-line arguments.
+    - `config`: Pointer to `config_t` structure containing configuration settings.
+- **Logic and Control Flow**:
+    - Call `bench_cmd_fn` with `args` and `config` as parameters.
+    - Enter an infinite loop that calls `pause()` to suspend execution until a signal is received.
+- **Output**: No output is returned as the function does not terminate under normal conditions.
 
 
 

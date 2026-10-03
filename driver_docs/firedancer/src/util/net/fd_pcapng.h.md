@@ -3,263 +3,266 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_pcapng.h` file in the `firedancer` codebase provides an API for reading and writing pcapng files, including support for handling packet data, metadata, and decryption secrets, with a focus on little-endian files and UTF-8 formatted strings.
+Header file for reading and writing pcapng files, including structures and functions for handling packet capture data.
 
 # Purpose
-The provided C header file, `fd_pcapng.h`, defines an interface for working with the PCAP Next Generation (pcapng) file format, which is used for storing packet capture data. This file is part of a library that facilitates reading from and writing to pcapng files, offering functionality to handle packet data, metadata, and decryption secrets. The library is designed to be robust against malicious inputs but is not optimized for high-performance packet capture, making it unsuitable for capturing packets at line rate. The file includes definitions for structures and functions that manage pcapng iterators, frames, and options for section header blocks (SHB) and interface description blocks (IDB).
+The code defines a C header file for handling the `pcapng` file format, which is used for packet captures. This format is distinct from the classic `pcap` format and includes additional features such as embedded encryption secrets. The code provides a set of APIs for reading and writing `pcapng` files, focusing on parsing and constructing various blocks within the format, such as Section Header Blocks (SHB), Interface Description Blocks (IDB), and Enhanced Packet Blocks (EPB). The code is designed to handle little-endian `pcapng` files and uses UTF-8 formatted strings with a maximum length of 200 characters.
 
-Key components of this header file include the `fd_pcapng_iter_t` structure, which represents an iterator for reading pcapng files, and the `fd_pcapng_frame_t` structure, which encapsulates a generalized frame read from a pcapng file. The file provides a set of functions for creating and managing iterators, reading frames, and writing various blocks to pcapng files, such as SHB, IDB, and Enhanced Packet Blocks (EPB). It also includes macros for defining frame types and link types, as well as functions for handling default options based on the system environment. The API is designed to be used in a hosted environment, with certain functions conditionally compiled based on the availability of hosted features.
+The header file defines several structures and functions to facilitate the manipulation of `pcapng` files. Key structures include `fd_pcapng_iter_t` for iterating over `pcapng` files, `fd_pcapng_frame_t` for representing frames read from the file, and option structures for SHB and IDB. The API provides functions to create and delete iterators, read frames, and write various blocks to a file. The code also includes constants for frame types and link types, and it specifies alignment and footprint requirements for memory regions used by the iterators. The API is not optimized for high-performance packet capture but is designed to be robust against malicious inputs.
 # Imports and Dependencies
 
 ---
 - `../fd_util_base.h`
 
 
-# Global Variables
-
----
-### fd\_pcapng\_iter\_new
-- **Type**: `fd_pcapng_iter_t *`
-- **Description**: The `fd_pcapng_iter_new` is a function that returns a pointer to a `fd_pcapng_iter_t`, which is an opaque handle for iterating over a pcapng file. This function initializes a new iterator using a provided memory region and a file stream that is positioned at the start of a pcapng section header block.
-- **Use**: This function is used to create an iterator for reading pcapng files, allowing sequential access to frames within the file.
-
-
----
-### fd\_pcapng\_iter\_delete
-- **Type**: `function pointer`
-- **Description**: `fd_pcapng_iter_delete` is a function that takes a pointer to an `fd_pcapng_iter_t` structure and returns a void pointer. This function is responsible for destroying an `fd_pcapng_iter_t` iterator, effectively cleaning up resources associated with the iterator and returning the underlying memory region to the caller.
-- **Use**: This function is used to properly dispose of an `fd_pcapng_iter_t` iterator, allowing the caller to regain ownership of the memory and stream handle.
-
-
----
-### fd\_pcapng\_iter\_next
-- **Type**: `fd_pcapng_frame_t *`
-- **Description**: The `fd_pcapng_iter_next` function is a global function that returns a pointer to a `fd_pcapng_frame_t` structure. This structure represents a generalized frame read from a pcapng file, which can be a packet or metadata. The function is used to extract the next frame from a pcapng stream, returning NULL on failure or end of the file.
-- **Use**: This function is used to iterate over frames in a pcapng file, providing access to each frame's data and metadata sequentially.
-
-
 # Data Structures
 
 ---
 ### fd\_pcapng\_iter\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `fd_pcapng_iter_t`: An opaque handle for iterating over pcapng files.
-- **Description**: The `fd_pcapng_iter_t` is an opaque data structure used to iterate over pcapng files, which are packet capture files with additional features like embedded encryption secrets. This iterator is designed to read pcapng files, providing a mechanism to extract frames, which can be packets or metadata, from the file stream. The structure is part of a library that supports little-endian pcapng files and is not optimized for high-performance packet capture, focusing instead on robustness against malicious inputs.
+    - ``fd_pcapng_iter_t``: Opaque handle for iterating over pcapng files.
+- **Description**: `fd_pcapng_iter_t` is an opaque data structure used to iterate over pcapng files, which are packet capture files with additional features like embedded encryption secrets. This iterator is designed to read pcapng files, providing a mechanism to extract frames, which can be packets or metadata, from the file stream. The structure is not directly accessible, emphasizing its role as a handle for iteration operations.
 
 
 ---
 ### fd\_pcapng\_frame
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `ts`: Time in nanoseconds, matching fd_log_wallclock.
-    - `type`: Packet type identifier.
-    - `data_sz`: Size of the data array.
-    - `orig_sz`: Original packet size, which is greater than or equal to data_sz.
-    - `if_idx`: Index of the network interface.
-    - `data`: Array holding the frame data, with a maximum size defined by FD_PCAPNG_FRAME_SZ.
-- **Description**: The `fd_pcapng_frame` structure is used to represent a generalized frame read from a pcapng file, which is typically a packet but can also include metadata. It includes a timestamp (`ts`) for when the frame was captured, a `type` to specify the kind of packet, and size fields (`data_sz` and `orig_sz`) to describe the data's size and the original packet size, respectively. The `if_idx` field indicates the interface index, and the `data` array holds the actual frame data, with a maximum size of 16384 bytes. This structure is part of a library for handling pcapng files, which are used for packet captures and support additional features like embedded encryption secrets.
+    - ``ts``: Time in nanoseconds, matching `fd_log_wallclock`.
+    - ``type``: Packet type identifier.
+    - ``data_sz``: Size of the data array.
+    - ``orig_sz``: Original packet size, which is greater than or equal to `data_sz`.
+    - ``if_idx``: Index of the interface.
+    - ``data``: Array containing the frame data, with a maximum size defined by `FD_PCAPNG_FRAME_SZ`.
+- **Description**: Represents a generalized frame read from a pcapng file, which can be a packet or metadata. It includes a timestamp, packet type, data size, original packet size, interface index, and the frame data itself. The `data` array has a fixed maximum size of 16384 bytes.
 
 
 ---
 ### fd\_pcapng\_frame\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `ts`: Time in nanoseconds, matching fd_log_wallclock.
-    - `type`: Packet type identifier.
-    - `data_sz`: Size of the data array.
-    - `orig_sz`: Original packet size, which is greater than or equal to data_sz.
-    - `if_idx`: Index of the interface from which the packet was captured.
-    - `data`: Array containing the frame data, with a maximum size defined by FD_PCAPNG_FRAME_SZ.
-- **Description**: The `fd_pcapng_frame_t` structure represents a generalized frame read from a pcapng file, which is typically a packet but can also include metadata. It includes a timestamp, packet type, data size, original packet size, interface index, and an array to hold the frame data. This structure is used to encapsulate the details of a packet or metadata extracted from a pcapng stream, facilitating the processing and analysis of network captures.
+    - ``ts``: Time in nanoseconds, matching `fd_log_wallclock`.
+    - ``type``: Packet type identifier.
+    - ``data_sz``: Size of the data array.
+    - ``orig_sz``: Original packet size, which is greater than or equal to `data_sz`.
+    - ``if_idx``: Index of the interface.
+    - ``data``: Array containing the frame data, with a maximum size defined by `FD_PCAPNG_FRAME_SZ`.
+- **Description**: Represents a generalized frame read from a pcapng file, which can be a packet or metadata. It includes timestamp, packet type, data size, original size, interface index, and the actual frame data. The structure is used to handle packet capture data in a pcapng format, supporting additional features like metadata and encryption secrets.
 
 
 ---
 ### fd\_pcapng\_shb\_opts
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `hardware`: Generic name of the machine performing capture, e.g., 'x86_64 Server'.
+    - `hardware`: Generic name of the machine performing capture, such as 'x86_64 Server'.
     - `os`: Operating system or distribution name.
-    - `userappl`: Name of the program performing the capture, e.g., 'Firedancer'.
-- **Description**: The `fd_pcapng_shb_opts` structure is used to store optional metadata for a Section Header Block (SHB) in the pcapng file format, which is a format for packet captures. This structure includes fields for specifying the hardware, operating system, and application name associated with the capture process. These fields are optional and provide context about the environment in which the packet capture was performed, enhancing the interpretability of the capture data.
+    - `userappl`: Name of the program, for example, 'Firedancer'.
+- **Description**: Defines options for a Section Header Block (SHB) in the pcapng file format, which includes metadata about the hardware, operating system, and application used to perform the packet capture.
 
 
 ---
 ### fd\_pcapng\_shb\_opts\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
     - `hardware`: Generic name of the machine performing the capture, such as 'x86_64 Server'.
     - `os`: Name of the operating system or distribution.
-    - `userappl`: Name of the program performing the capture, e.g., 'Firedancer'.
-- **Description**: The `fd_pcapng_shb_opts_t` structure is used to store optional metadata for a Section Header Block (SHB) in the pcapng file format, which is used for packet captures. This structure includes fields for specifying the hardware, operating system, and application name associated with the capture, providing context and additional information about the environment in which the capture was performed. These fields are optional and their absence is implied by zero.
+    - `userappl`: Name of the program performing the capture, such as 'Firedancer'.
+- **Description**: Defines options for the Section Header Block (SHB) in a pcapng file, which includes metadata about the hardware, operating system, and application used to perform the packet capture.
 
 
 ---
 ### fd\_pcapng\_idb\_opts
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `name`: Name of the network interface in the operating system, stored as a character array of length 16.
-    - `ip4_addr`: IPv4 address in big endian order, stored as an unsigned character array of length 4.
-    - `mac_addr`: MAC address, stored as an unsigned character array of length 6.
-    - `tsresol`: Timestamp resolution, represented as an unsigned character.
-    - `hardware`: Name of the network interface hardware, stored as a character array of length 64.
-- **Description**: The `fd_pcapng_idb_opts` structure is used to define options for an Interface Description Block (IDB) in the pcapng file format, which is used for packet captures. It includes fields for storing the name of the network interface, its IPv4 and MAC addresses, the timestamp resolution, and the hardware name. This structure is part of a library that supports reading and writing pcapng files, which are used to capture network traffic with additional features like embedded encryption secrets.
+    - `name`: Name of the network interface in the operating system.
+    - `ip4_addr`: IPv4 address in big endian order.
+    - `mac_addr`: MAC address of the network interface.
+    - `tsresol`: Timestamp resolution indicator.
+    - `hardware`: Name of the network interface hardware.
+- **Description**: Defines options for an Interface Description Block (IDB) in the pcapng file format, including network interface name, IPv4 and MAC addresses, timestamp resolution, and hardware name.
 
 
 ---
 ### fd\_pcapng\_idb\_opts\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `name`: Name of network interface in OS.
-    - `ip4_addr`: IPv4 address in big endian order.
+    - `name`: Name of the network interface in the operating system.
+    - `ip4_addr`: IPv4 address in big-endian order.
     - `mac_addr`: MAC address of the network interface.
-    - `tsresol`: Timestamp resolution setting.
-    - `hardware`: Name of network interface hardware.
-- **Description**: The `fd_pcapng_idb_opts_t` structure is used to define options for the Interface Description Block (IDB) in the pcapng file format. It includes fields for specifying the network interface's name, IPv4 address, MAC address, timestamp resolution, and hardware name. These options provide metadata about the network interface used during packet capture, which can be embedded in pcapng files to describe the capture environment.
+    - `tsresol`: Timestamp resolution indicator.
+    - `hardware`: Name of the network interface hardware.
+- **Description**: Defines options for an Interface Description Block (IDB) in the pcapng file format, which includes details about the network interface such as its name, IP address, MAC address, timestamp resolution, and hardware description.
 
 
 # Functions
 
 ---
 ### fd\_pcapng\_is\_pkt<!-- {{#callable:fd_pcapng_is_pkt}} -->
-The function `fd_pcapng_is_pkt` checks if a given frame is a regular captured packet by evaluating its type.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L124>)
+
+Determines if a given frame is a regular captured packet or metadata.
 - **Inputs**:
-    - `frame`: A pointer to a constant `fd_pcapng_frame_t` structure representing a frame read from a pcapng file.
-- **Control Flow**:
+    - `frame`: A pointer to a `fd_pcapng_frame_t` structure representing the frame to check.
+- **Logic and Control Flow**:
     - Retrieve the `type` field from the `frame` structure.
-    - Check if the `type` is equal to `FD_PCAPNG_FRAME_SIMPLE` or `FD_PCAPNG_FRAME_ENHANCED`.
-    - Return 1 if the type matches either of these values, indicating the frame is a regular packet; otherwise, return 0.
-- **Output**: An integer value, 1 if the frame is a regular packet (either simple or enhanced), and 0 if it is not.
+    - Check if `type` is equal to `FD_PCAPNG_FRAME_SIMPLE` or `FD_PCAPNG_FRAME_ENHANCED`.
+    - Return 1 if either condition is true, otherwise return 0.
+- **Output**: Returns 1 if the frame is a regular captured packet, otherwise returns 0.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_pcapng\_iter\_align<!-- {{#callable_declaration:fd_pcapng_iter_align}} -->
-Return the alignment requirement for a pcapng iterator.
-- **Description**: This function provides the alignment requirement for a memory region that will be used to create a pcapng iterator. It is useful when allocating memory for a pcapng iterator to ensure that the memory is correctly aligned, which is necessary for the iterator to function properly. This function should be called before allocating memory for a pcapng iterator to determine the correct alignment.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L74>)
+
+Returns the alignment requirement for a pcapng iterator.
+- **Description**: Use this function to obtain the alignment requirement for a `fd_pcapng_iter_t` memory region. This is necessary when allocating memory for a pcapng iterator to ensure proper alignment and avoid undefined behavior. The function does not require any parameters and can be called at any time.
 - **Inputs**: None
-- **Output**: Returns the alignment requirement as an unsigned long integer.
-- **See also**: [`fd_pcapng_iter_align`](fd_pcapng.c.md#fd_pcapng_iter_align)  (Implementation)
+- **Output**: The function returns an `ulong` representing the alignment requirement for a `fd_pcapng_iter_t`.
+- **See Also**: [`fd_pcapng_iter_align`](<fd_pcapng.c.md#fd_pcapng_iter_align>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_iter\_footprint<!-- {{#callable_declaration:fd_pcapng_iter_footprint}} -->
-Return the memory footprint of a pcapng iterator.
-- **Description**: Use this function to determine the size of memory required to store an instance of a pcapng iterator. This is useful when allocating memory for creating a new iterator with fd_pcapng_iter_new. The function does not require any parameters and can be called at any time to retrieve the constant size of the iterator structure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L84>)
+
+Returns the memory footprint of a pcapng iterator.
+- **Description**: Use this function to determine the size of memory required to store a `fd_pcapng_iter_t` object. This is useful when allocating memory for a pcapng iterator, ensuring that the allocated memory is sufficient to hold the iterator structure. This function does not perform any operations other than returning the size, and it can be called at any time without any preconditions.
 - **Inputs**: None
-- **Output**: The function returns an unsigned long representing the size in bytes of the fd_pcapng_iter_t structure.
-- **See also**: [`fd_pcapng_iter_footprint`](fd_pcapng.c.md#fd_pcapng_iter_footprint)  (Implementation)
+- **Output**: The function returns an `ulong` representing the size in bytes of a `fd_pcapng_iter_t` object.
+- **See Also**: [`fd_pcapng_iter_footprint`](<fd_pcapng.c.md#fd_pcapng_iter_footprint>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_iter\_new<!-- {{#callable_declaration:fd_pcapng_iter_new}} -->
-Create a new pcapng iterator for reading a pcapng file.
-- **Description**: This function initializes a pcapng iterator using a provided memory region and a file stream. The memory region must be non-null, properly aligned, and meet the footprint requirements for an fd_pcapng_iter_t. The file stream should be non-null and positioned at the start of a pcapng section header block. The function returns a pointer to the initialized iterator on success, or NULL if any preconditions are not met or if the file does not start with a valid section header block. It is important to ensure that the file is in the correct format and version, as unsupported versions will result in a failure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L96>)
+
+Creates an iterator for reading a pcapng file.
+- **Description**: Use this function to initialize an iterator for reading a pcapng file. The function requires a memory region that meets specific alignment and footprint requirements, and a file stream positioned at the start of a pcapng section header block. It returns a pointer to the iterator on success or NULL on failure. Ensure that the memory and file parameters are non-NULL and correctly aligned to avoid failure. The function may consume an indeterminate number of bytes from the stream on failure.
 - **Inputs**:
-    - `mem`: A non-null pointer to a memory region that must be aligned according to fd_pcapng_iter_t's alignment requirements. The caller retains ownership of this memory.
-    - `file`: A non-null pointer to a file stream that should be positioned at the start of a pcapng section header block. The caller retains ownership of the file stream.
-- **Output**: Returns a pointer to an fd_pcapng_iter_t on success, or NULL on failure.
-- **See also**: [`fd_pcapng_iter_new`](fd_pcapng.c.md#fd_pcapng_iter_new)  (Implementation)
+    - `mem`: A non-NULL pointer to a memory region that must be aligned according to `fd_pcapng_iter_align` and meet the footprint requirements of `fd_pcapng_iter_footprint`. The caller retains ownership.
+    - `file`: A non-NULL pointer to a file stream (e.g., a `FILE *` from `fopen`) that should be positioned at the first byte of a pcapng section header block. The caller retains ownership.
+- **Output**: Returns a pointer to an `fd_pcapng_iter_t` on success, or NULL on failure. On failure, the function may consume an indeterminate number of bytes from the stream.
+- **See Also**: [`fd_pcapng_iter_new`](<fd_pcapng.c.md#fd_pcapng_iter_new>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_iter\_delete<!-- {{#callable_declaration:fd_pcapng_iter_delete}} -->
-Destroys a pcapng iterator and returns the underlying memory region.
-- **Description**: Use this function to properly dispose of a pcapng iterator when it is no longer needed. This function should be called to clean up resources associated with the iterator, ensuring that the memory allocated for it is returned to the caller. It is important to call this function to avoid memory leaks. The caller regains ownership of the memory region after the function is called.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L104>)
+
+Destroys a pcapng iterator and returns its memory.
+- **Description**: Use this function to destroy a `fd_pcapng_iter_t` iterator when it is no longer needed. This function clears the memory associated with the iterator and returns the pointer to the underlying memory region. The caller regains ownership of this memory region after the function call. Ensure that the iterator is valid and has been properly initialized before calling this function.
 - **Inputs**:
-    - `iter`: A pointer to the fd_pcapng_iter_t iterator to be destroyed. Must not be null. The function will zero out the memory occupied by the iterator.
-- **Output**: Returns a pointer to the underlying memory region that was used by the iterator, allowing the caller to reuse or free it as needed.
-- **See also**: [`fd_pcapng_iter_delete`](fd_pcapng.c.md#fd_pcapng_iter_delete)  (Implementation)
+    - `iter`: A pointer to a `fd_pcapng_iter_t` iterator. Must not be null. The function assumes the iterator is valid and initialized.
+- **Output**: Returns a pointer to the underlying memory region of the iterator.
+- **See Also**: [`fd_pcapng_iter_delete`](<fd_pcapng.c.md#fd_pcapng_iter_delete>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_iter\_next<!-- {{#callable_declaration:fd_pcapng_iter_next}} -->
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L118>)
+
 Extracts the next frame from a pcapng stream.
-- **Description**: Use this function to retrieve the next frame from a pcapng file stream using an iterator. It should be called repeatedly to iterate over all frames in the stream. The function returns a pointer to a frame descriptor on success, or NULL if the end of the section or file is reached, or if an error occurs. Errors are logged with warnings, and the last error code can be retrieved using fd_pcapng_iter_err. The returned frame and its data are stored in a thread-local memory region, which remains valid until the next call to this function or until the iterator is deleted.
+- **Description**: Use this function to retrieve the next frame from a pcapng file stream using an iterator. It returns a pointer to a frame descriptor on success, or NULL on failure. Failures can occur due to end-of-file, read errors, or file corruption, and are logged with warnings. The returned frame and its data are valid until the next call to this function or until the iterator is deleted. Ensure the iterator is properly initialized before calling this function.
 - **Inputs**:
-    - `iter`: A pointer to an fd_pcapng_iter_t structure, which must be initialized and associated with a valid pcapng file stream. The iterator must not be NULL, and it retains ownership of the stream.
-- **Output**: Returns a pointer to an fd_pcapng_frame_t structure containing the frame data on success, or NULL on failure or end of file.
-- **See also**: [`fd_pcapng_iter_next`](fd_pcapng.c.md#fd_pcapng_iter_next)  (Implementation)
+    - `iter`: A pointer to an `fd_pcapng_iter_t` structure, which must be initialized and point to a valid pcapng stream. The function updates this structure with error information if a failure occurs.
+- **Output**: Returns a pointer to an `fd_pcapng_frame_t` structure containing the frame data on success, or NULL on failure. The frame data is stored in a thread-local memory region.
+- **See Also**: [`fd_pcapng_iter_next`](<fd_pcapng.c.md#fd_pcapng_iter_next>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_iter\_err<!-- {{#callable_declaration:fd_pcapng_iter_err}} -->
-Retrieve the last error encountered by the pcapng iterator.
-- **Description**: Use this function to obtain the last error code encountered by a pcapng iterator during operations such as reading frames. This is useful for diagnosing issues when iterating over a pcapng file, especially after a failure in functions like `fd_pcapng_iter_next`. The function should be called with a valid iterator that has been previously initialized. It does not modify the iterator or any other state.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L133>)
+
+Returns the last encountered error code from the iterator.
+- **Description**: Use this function to obtain the last error code encountered by the pcapng iterator. This is useful for diagnosing issues when iterating over a pcapng file. The function does not modify the iterator or any other state, and it can be called at any time after the iterator is initialized. Ensure that the iterator is not null before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `iter`: A pointer to a constant `fd_pcapng_iter_t` structure representing the pcapng iterator. This must not be null and should be a valid iterator that has been initialized and possibly used in previous operations.
-- **Output**: Returns an integer representing the last error code encountered by the iterator. The error codes are based on `fd_io` error codes.
-- **See also**: [`fd_pcapng_iter_err`](fd_pcapng.c.md#fd_pcapng_iter_err)  (Implementation)
+    - `iter`: A pointer to a constant `fd_pcapng_iter_t` structure. This must not be null, as passing a null pointer will result in undefined behavior. The caller retains ownership of the iterator.
+- **Output**: Returns an integer representing the last error code encountered by the iterator. The error codes are consistent with `fd_io` error codes.
+- **See Also**: [`fd_pcapng_iter_err`](<fd_pcapng.c.md#fd_pcapng_iter_err>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_shb\_defaults<!-- {{#callable_declaration:fd_pcapng_shb_defaults}} -->
-Sets default options for a Section Header Block based on the system environment.
-- **Description**: This function initializes the fields of a `fd_pcapng_shb_opts_t` structure with default values that are determined by the current system environment. It should be called with a pre-initialized `fd_pcapng_shb_opts_t` structure to populate its fields with default hardware, operating system, and application name information. This is useful for setting up a pcapng Section Header Block with system-specific defaults before writing it to a file.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L142>)
+
+Stores default options for a Section Header Block (SHB) based on the system environment.
+- **Description**: Use this function to initialize the `fd_pcapng_shb_opts_t` structure with default values that reflect the current system environment. This function sets default values for hardware, operating system, and user application fields. It must be called with a valid `fd_pcapng_shb_opts_t` structure that has been initialized by the caller. This function does not return a value and does not handle invalid input; the caller must ensure that the input is valid.
 - **Inputs**:
-    - `opt`: A pointer to a `fd_pcapng_shb_opts_t` structure that must be initialized before calling this function. The function will populate this structure with default values. The pointer must not be null.
+    - `opt`: A pointer to an `fd_pcapng_shb_opts_t` structure. The caller must initialize this structure before calling the function. The function will populate this structure with default values for hardware, operating system, and user application fields. The pointer must not be null.
 - **Output**: None
-- **See also**: [`fd_pcapng_shb_defaults`](fd_pcapng.c.md#fd_pcapng_shb_defaults)  (Implementation)
+- **See Also**: [`fd_pcapng_shb_defaults`](<fd_pcapng.c.md#fd_pcapng_shb_defaults>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_fwrite\_shb<!-- {{#callable_declaration:fd_pcapng_fwrite_shb}} -->
-Writes a Section Header Block (SHB) to a pcapng file stream.
-- **Description**: This function writes a little-endian pcapng Section Header Block (SHB) version 1.0 to the specified file stream. It is typically used at the beginning of a pcapng file to define a new section, and multiple SHBs can be included in a single file. The function accepts optional metadata about the hardware, operating system, and application, which can be embedded in the SHB. The caller must ensure that the file stream is aligned to a 4-byte boundary, as the function writes data in multiples of 4 bytes. The function returns the number of SHBs written, which should be 1 on success and 0 on failure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L162>)
+
+Writes a Section Header Block to a file stream.
+- **Description**: Use this function to write a little-endian pcapng Section Header Block (SHB) version 1.0 to a specified file stream. This function is typically called at the beginning of a pcapng file, as the PCAPNG specification requires an SHB at the start. It is permissible to have multiple SHBs in a file, and each SHB resets any side effects from previous blocks. The caller must ensure that the file stream pointer is aligned to a 4-byte boundary, as the function writes data in multiples of 4 bytes. The function returns the number of headers written, which should be 1 on success and 0 on failure. If the SHB is not the first block in the file, the function does not adjust the length field of the preceding SHB.
 - **Inputs**:
-    - `opt`: A pointer to a `fd_pcapng_shb_opts_t` structure containing optional metadata for the SHB. This parameter can be NULL, in which case no additional metadata is included.
-    - `file`: A pointer to a file stream where the SHB will be written. This must be a valid, open file stream, and the caller is responsible for ensuring 4-byte alignment of the stream pointer.
-- **Output**: Returns the number of SHBs written, which is 1 on success and 0 on failure.
-- **See also**: [`fd_pcapng_fwrite_shb`](fd_pcapng.c.md#fd_pcapng_fwrite_shb)  (Implementation)
+    - `opt`: A pointer to an `fd_pcapng_shb_opts_t` structure containing options to embed in the SHB. This parameter is optional and can be NULL. If provided, the structure may include hardware, operating system, and user application information.
+    - `file`: A pointer to a file stream where the SHB will be written. The stream must be aligned to a 4-byte boundary. The caller retains ownership of the file stream.
+- **Output**: Returns the number of headers written, which is 1 on success and 0 on failure.
+- **See Also**: [`fd_pcapng_fwrite_shb`](<fd_pcapng.c.md#fd_pcapng_fwrite_shb>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_idb\_defaults<!-- {{#callable_declaration:fd_pcapng_idb_defaults}} -->
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L174>)
+
 Stores default options for an IDB based on the system environment.
-- **Description**: This function initializes the provided `fd_pcapng_idb_opts_t` structure with default values for an Interface Description Block (IDB) using the system environment. It requires a valid network interface index, `if_idx`, which is specific to the operating system and unrelated to the PCAPNG interface index. The function should be called when you need to populate an IDB with system-specific defaults before writing it to a pcapng file. It returns 0 on success and -1 on failure, with failure reasons logged. On failure, the `opt` structure may be partially written.
+- **Description**: Use this function to populate an `fd_pcapng_idb_opts_t` structure with default values for an Interface Description Block (IDB) based on the current system environment. This function requires a valid network interface index (`if_idx`) and a pre-initialized `opt` structure. It returns 0 on success and -1 on failure, with failure reasons logged. On failure, the `opt` structure may be partially populated.
 - **Inputs**:
-    - `opt`: A pointer to an `fd_pcapng_idb_opts_t` structure where default options will be stored. Must not be null. The structure is partially written on failure.
-    - `if_idx`: An unsigned integer representing the operating system's network interface index. Must be a valid index for the function to succeed.
-- **Output**: Returns 0 on success and -1 on failure. On failure, the `opt` structure may be partially written, and reasons for failure are logged.
-- **See also**: [`fd_pcapng_idb_defaults`](fd_pcapng.c.md#fd_pcapng_idb_defaults)  (Implementation)
+    - `opt`: A pointer to an `fd_pcapng_idb_opts_t` structure that will be populated with default IDB options. Must be pre-initialized and not null.
+    - `if_idx`: An unsigned integer representing the operating system's network interface index. This is unrelated to the PCAPNG interface index. Must be a valid index for the function to succeed.
+- **Output**: Returns 0 on success and -1 on failure. On failure, the `opt` structure may be partially populated.
+- **See Also**: [`fd_pcapng_idb_defaults`](<fd_pcapng.c.md#fd_pcapng_idb_defaults>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_fwrite\_idb<!-- {{#callable_declaration:fd_pcapng_fwrite_idb}} -->
-Writes an Interface Description Block (IDB) to a pcapng file stream.
-- **Description**: This function is used to write an Interface Description Block (IDB) to a pcapng file stream, typically following a Section Header Block (SHB). It is essential for defining the characteristics of the network interface used in the capture. The function requires a valid link type and a file stream pointer. Optional interface description options can be provided, but the timestamp resolution option is ignored as the function always writes a resolution of nanoseconds. The function returns the number of blocks written, which should be 1 on success.
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L192>)
+
+Writes an Interface Description Block (IDB) to a file stream.
+- **Description**: Use this function to write an Interface Description Block (IDB) to a file stream, typically following a Section Header Block (SHB). This function is part of the process of creating a pcapng file, which is used for packet capture. The function requires a valid link type and a file stream pointer. Optional interface description options can be provided through the `opt` parameter. The function writes the IDB with a fixed timestamp resolution of nanoseconds, ignoring any `tsresol` value in `opt`. Ensure the file stream is properly aligned to 4-byte boundaries before calling this function.
 - **Inputs**:
-    - `link_type`: Specifies the type of link layer for the interface. Must be one of the predefined FD_PCAPNG_LINKTYPE_* constants, such as FD_PCAPNG_LINKTYPE_ETHERNET.
-    - `opt`: Pointer to a fd_pcapng_idb_opts_t structure containing optional interface description options. Can be NULL, in which case no additional options are written.
-    - `file`: Pointer to a file stream where the IDB will be written. Must not be NULL and should be properly aligned to 4-byte boundaries.
-- **Output**: Returns the number of IDBs written to the file, which should be 1 on success and 0 on failure.
-- **See also**: [`fd_pcapng_fwrite_idb`](fd_pcapng.c.md#fd_pcapng_fwrite_idb)  (Implementation)
+    - `link_type`: Specifies the type of link layer for the interface. Must be one of the predefined link types such as `FD_PCAPNG_LINKTYPE_ETHERNET`. Invalid values may result in incorrect file output.
+    - `opt`: Pointer to a `fd_pcapng_idb_opts_t` structure containing optional interface description data. Can be NULL if no options are needed. The `tsresol` field is ignored.
+    - `file`: Pointer to a file stream where the IDB will be written. Must not be NULL. The caller is responsible for ensuring the stream is correctly aligned and open for writing.
+- **Output**: Returns the number of IDBs written, which should be 1 on success and 0 on failure.
+- **See Also**: [`fd_pcapng_fwrite_idb`](<fd_pcapng.c.md#fd_pcapng_fwrite_idb>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_fwrite\_pkt<!-- {{#callable_declaration:fd_pcapng_fwrite_pkt}} -->
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L203>)
+
 Writes an Enhanced Packet Block (EPB) to a pcapng file.
-- **Description**: This function is used to write an Enhanced Packet Block (EPB) to a pcapng file, which is a format for storing packet capture data. It should be called when you want to log an Ethernet frame with a specific timestamp into a pcapng file. The function requires the file stream to be aligned to a 4-byte boundary before calling. It returns the number of packets written, which should be 1 on success, and 0 on failure. The function handles alignment and padding of the payload to ensure proper formatting in the pcapng file.
+- **Description**: Use this function to write an Enhanced Packet Block (EPB) to a pcapng file, which includes an Ethernet frame captured at a specified timestamp. This function should be called when you need to log packet data into a pcapng file format. Ensure that the file stream is aligned to a 4-byte boundary before calling this function. The function returns the number of packets written, which should be 1 on success. If the function fails, it returns 0, indicating that the packet was not written.
 - **Inputs**:
-    - `ts`: The timestamp in nanoseconds when the packet was captured. It should be a valid long integer representing the time.
-    - `payload`: A pointer to the payload data of the packet. This must not be null and should point to a valid memory region containing the packet data.
-    - `payload_sz`: The size of the payload in bytes. It should be a non-negative ulong value representing the length of the data pointed to by payload.
-    - `file`: A pointer to a FILE object representing the open pcapng file stream. The stream must be aligned to a 4-byte boundary, and the caller retains ownership of the file pointer.
-- **Output**: Returns 1 on successful writing of the packet, or 0 if an error occurs during the write process.
-- **See also**: [`fd_pcapng_fwrite_pkt`](fd_pcapng.c.md#fd_pcapng_fwrite_pkt)  (Implementation)
+    - `ts`: The timestamp in nanoseconds when the packet was captured. It must be a valid long integer.
+    - `payload`: A pointer to the packet data to be written. It must not be null, and the caller retains ownership of the data.
+    - `payload_sz`: The size of the packet data in bytes. It must be a valid unsigned long integer.
+    - `file`: A pointer to the file stream where the EPB will be written. It must be a valid file pointer and aligned to a 4-byte boundary.
+- **Output**: Returns 1 on success, indicating the packet was written, or 0 on failure.
+- **See Also**: [`fd_pcapng_fwrite_pkt`](<fd_pcapng.c.md#fd_pcapng_fwrite_pkt>)  (Implementation)
 
 
 ---
 ### fd\_pcapng\_fwrite\_tls\_key\_log<!-- {{#callable_declaration:fd_pcapng_fwrite_tls_key_log}} -->
+[View Source →](<../../../../../src/util/net/fd_pcapng.h#L221>)
+
 Writes TLS key log information to a PCAPNG file.
-- **Description**: This function writes TLS key log information to a PCAPNG file using a Decryption Secrets Block (DSB). It should be used when you need to embed TLS decryption secrets into a PCAPNG file for later analysis. The function requires the file stream to be aligned to a 4-byte boundary before calling. It returns 1 on success and 0 on failure, where failure can occur due to issues with writing to the file stream. The function assumes the log data is in ASCII format and handles necessary padding to maintain alignment.
+- **Description**: Use this function to write TLS key log information to a PCAPNG file using a Decryption Secrets Block (DSB). This function is useful when you need to include decryption secrets in a packet capture file for analysis. Ensure that the file stream is aligned to a 4-byte boundary before calling this function. The function returns 1 on success and 0 on failure, where failure can occur due to write errors or misalignment.
 - **Inputs**:
-    - `log`: Pointer to the first byte of the NSS key log in ASCII format. The caller retains ownership and it must not be null.
-    - `log_sz`: The size in bytes of the log data. It must accurately reflect the size of the data pointed to by log.
-    - `file`: A pointer to a file stream (e.g., a FILE* from fopen) where the TLS key log will be written. The stream must be aligned to a 4-byte boundary before calling this function.
-- **Output**: Returns 1 on success and 0 on failure, indicating whether the TLS key log was successfully written to the file.
-- **See also**: [`fd_pcapng_fwrite_tls_key_log`](fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log)  (Implementation)
+    - `log`: Pointer to the first byte of the NSS key log in ASCII format. Must not be null.
+    - `log_sz`: Size in bytes of the key log. Must be a non-zero value.
+    - `file`: Pointer to a file stream where the TLS key log will be written. Must be aligned to a 4-byte boundary and not be null.
+- **Output**: Returns 1 on success and 0 on failure.
+- **See Also**: [`fd_pcapng_fwrite_tls_key_log`](<fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log>)  (Implementation)
 
 
 

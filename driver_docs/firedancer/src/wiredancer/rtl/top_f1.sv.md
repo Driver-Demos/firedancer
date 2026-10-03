@@ -3,72 +3,75 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `top_f1.sv` file in the `firedancer` codebase defines a SystemVerilog module for a top-level hardware design that includes various components for processing and verifying data, such as PCIe interfaces, DMA handling, and signature verification, with extensive parameterization and debugging capabilities.
+Implements the `top_f1` module for handling PCIe, DMA, and DDR interfaces with various signal processing and verification stages.
 
 # Purpose
-The provided Verilog code defines a top-level module named `top_f1`, which appears to be a complex digital design involving multiple subsystems and interfaces. This module is designed to handle a variety of tasks related to data processing and communication, particularly focusing on PCIe (Peripheral Component Interconnect Express) and DMA (Direct Memory Access) operations. The module includes several parameterized components and interfaces, such as `pcie_inorder`, `pcie_tr_ext`, `dma_result`, and various signature verification stages (`ed25519_sigverify_0`, `ed25519_sigverify_1`, `ed25519_sigverify_2`). These components suggest that the module is involved in cryptographic operations, likely related to signature verification using the Ed25519 algorithm, which is a widely used elliptic curve signature scheme.
+The Verilog code defines a module named `top_f1`, which appears to be a top-level implementation for a hardware design involving data processing and verification. The module interfaces with various input and output signals, including those for memory-mapped I/O (`avmm_*`), PCIe (`pcie_*`), and DMA (`dma_*`). It also handles DDR memory operations (`ddr_*`) and includes debugging capabilities through the `dbg_wire` signal. The module is parameterized with several constants that configure its operation, such as `KEY_D`, `MUL_T`, `MUL_D`, and others, which likely relate to cryptographic or data processing tasks.
 
-The module is structured to handle data flow through a series of processing stages, each with its own input and output logic, and includes mechanisms for data throttling and synchronization across different clock domains. The use of pipelined and FIFO (First-In-First-Out) structures indicates a design optimized for high throughput and efficient data handling. The module also includes extensive debug and monitoring capabilities, as evidenced by the `dbg_wire` and various `$display` statements, which are used for logging and tracking the internal state and data flow during simulation or operation. Overall, this Verilog file provides a comprehensive implementation of a high-performance data processing system with a focus on secure data handling and verification.
+The module integrates several submodules and components, such as `piped_pending`, `piped_wire`, `pcie_inorder`, `pcie_tr_ext`, `dma_result`, `rrb_merge`, `sha512_pre`, and `ed25519_sigverify_*`. These components suggest that the module's primary function is to manage data flow and processing through a series of stages, including SHA-512 preprocessing, signature verification, and result handling. The use of pipelining and FIFO structures indicates that the design is optimized for high-throughput data processing. The module also includes logic for handling reset signals and clock domains, ensuring proper synchronization across different parts of the design.
 # Modules
 
 ---
 ### top\_f1
-The `top_f1` module is a complex Verilog module designed for handling various data processing tasks, including PCIe transactions, DMA operations, and signature verification. It integrates multiple submodules and logic blocks to manage data flow and processing across different clock domains.
+Implements a top-level module for a system that handles data processing and communication through various interfaces, including PCIe, DMA, and DDR. Manages data flow and processing through multiple stages, including signature verification and data throttling.
 - **Constants**:
-    - `KEY_D`: Defines the key dimension, set to 512.
-    - `MUL_T`: Specifies the multiplier time constant, set to 32'h07F_CCC2.
-    - `MUL_D`: Defines the multiplier delay, set to 15.
-    - `N_SCH`: Specifies the number of schedules, set to 5.
-    - `DSDP_WS`: Defines the DSDP workspace size, set to 256.
-    - `TH_PRE`: Threshold for pre-processing, set to {12'h0, 12'd10, 12'd10}.
-    - `TH_SHA`: Threshold for SHA processing, set to {12'h0, 12'd200, 12'd200}.
-    - `TH_SV0`: Threshold for SV0 processing, set to {12'h0, 12'd200, 12'd200}.
-    - `TH_SV1`: Threshold for SV1 processing, set to {12'h0, 12'd200, 12'd200}.
-    - `TH_SV2`: Threshold for SV2 processing, set to {12'h0, 12'd200, 12'd200}.
-    - `DBG_WIDTH`: Defines the debug wire width, set to 1024.
-    - `NO_DDR`: Specifies the number of DDR interfaces, set to 4.
-    - `DMA_N`: Defines the number of DMA channels, set to 2.
-    - `DDR_BUFF_W`: Specifies the DDR buffer width, set to 20.
+    - ``KEY_D``: Defines the key depth, set to 512.
+    - ``MUL_T``: Specifies the multiplier time constant, set to `32'h07F_CCC2`.
+    - ``MUL_D``: Defines the multiplier depth, set to 15.
+    - ``N_SCH``: Specifies the number of schedules, set to 5.
+    - ``DSDP_WS``: Defines the DSDP workspace size, set to 256.
+    - ``TH_PRE``: Specifies the threshold for pre-processing, set to `{12'h0, 12'd10, 12'd10}`.
+    - ``TH_SHA``: Specifies the threshold for SHA processing, set to `{12'h0, 12'd200, 12'd200}`.
+    - ``TH_SV0``: Specifies the threshold for SV0 processing, set to `{12'h0, 12'd200, 12'd200}`.
+    - ``TH_SV1``: Specifies the threshold for SV1 processing, set to `{12'h0, 12'd200, 12'd200}`.
+    - ``TH_SV2``: Specifies the threshold for SV2 processing, set to `{12'h0, 12'd200, 12'd200}`.
+    - ``DBG_WIDTH``: Defines the debug wire width, set to 1024.
+    - ``NO_DDR``: Specifies the number of DDR interfaces, set to 4.
+    - ``DMA_N``: Defines the number of DMA channels, set to 2.
+    - ``DDR_BUFF_W``: Specifies the DDR buffer width, set to 20.
 - **Ports**:
-    - `avmm_read`: Input signal for AVMM read operation.
-    - `avmm_write`: Input signal for AVMM write operation.
-    - `avmm_address`: Input address for AVMM operations.
-    - `avmm_writedata`: Input data for AVMM write operations.
-    - `avmm_readdata`: Output data for AVMM read operations.
-    - `avmm_readdatavalid`: Output signal indicating valid AVMM read data.
-    - `avmm_waitrequest`: Output signal indicating AVMM wait request.
-    - `priv_bytes`: Input array of private bytes.
-    - `pcie_v`: Input signal for PCIe valid operation.
-    - `pcie_a`: Input address for PCIe operations.
-    - `pcie_d`: Input data for PCIe operations.
-    - `dma_r`: Input signal for DMA read operation.
-    - `dma_v`: Output signal for DMA valid operation.
-    - `dma_a`: Output address for DMA operations.
-    - `dma_b`: Output secondary address for DMA operations.
-    - `dma_f`: Input signal for DMA full operation.
-    - `dma_d`: Output data for DMA operations.
-    - `ddr_rd_en`: Output enable signal for DDR read operations.
-    - `ddr_rd_pop`: Input pop signal for DDR read operations.
-    - `ddr_rd_addr`: Output address for DDR read operations.
-    - `ddr_rd_sz`: Output size for DDR read operations.
-    - `ddr_rd_v`: Input valid signal for DDR read operations.
-    - `ddr_rd_data`: Input data for DDR read operations.
-    - `ddr_wr_en`: Output enable signal for DDR write operations.
-    - `ddr_wr_pop`: Input pop signal for DDR write operations.
-    - `ddr_wr_res`: Input reset signal for DDR write operations.
-    - `ddr_wr_addr`: Output address for DDR write operations.
-    - `ddr_wr_data`: Output data for DDR write operations.
-    - `dbg_wire`: Output debug wire.
-    - `clk_f`: Input fast clock signal.
-    - `rst_f`: Input fast reset signal.
-    - `clk`: Input clock signal.
-    - `rst`: Input reset signal.
-- **Logic And Control Flow**:
-    - The module uses an `always_ff` block to handle clocked operations, updating the `timestamp` and managing AVMM read and write operations based on the `avmm_address` and `avmm_writedata` inputs.
-    - A `generate` block is used to instantiate PCIe input and transaction extension modules for each PCIe channel, handling data flow and processing.
-    - The module includes several `piped_wire` and `throttle` instances to manage data flow and synchronization across different processing stages and clock domains.
-    - Multiple `showahead_fifo` and `dual_clock_showahead_fifo` instances are used to buffer and manage data between different stages of processing, ensuring data integrity and flow control.
-    - The module integrates several signature verification and processing submodules, such as `sha512_pre`, `sha512_modq_meta`, and `ed25519_sigverify`, to perform cryptographic operations on the data.
+    - ``avmm_read``: Input signal for AVMM read operation.
+    - ``avmm_write``: Input signal for AVMM write operation.
+    - ``avmm_address``: Input address for AVMM operations.
+    - ``avmm_writedata``: Input data for AVMM write operations.
+    - ``avmm_readdata``: Output data for AVMM read operations.
+    - ``avmm_readdatavalid``: Output signal indicating valid AVMM read data.
+    - ``avmm_waitrequest``: Output signal indicating AVMM wait request.
+    - ``priv_bytes``: Input private bytes for configuration.
+    - ``pcie_v``: Input PCIe valid signal.
+    - ``pcie_a``: Input PCIe address.
+    - ``pcie_d``: Input PCIe data.
+    - ``dma_r``: Input DMA read request.
+    - ``dma_v``: Output DMA valid signal.
+    - ``dma_a``: Output DMA address.
+    - ``dma_b``: Output DMA base address.
+    - ``dma_f``: Input DMA full signal.
+    - ``dma_d``: Output DMA data.
+    - ``ddr_rd_en``: Output DDR read enable signals.
+    - ``ddr_rd_pop``: Input DDR read pop signals.
+    - ``ddr_rd_addr``: Output DDR read address.
+    - ``ddr_rd_sz``: Output DDR read size.
+    - ``ddr_rd_v``: Input DDR read valid signals.
+    - ``ddr_rd_data``: Input DDR read data.
+    - ``ddr_wr_en``: Output DDR write enable signals.
+    - ``ddr_wr_pop``: Input DDR write pop signals.
+    - ``ddr_wr_res``: Input DDR write response signals.
+    - ``ddr_wr_addr``: Output DDR write address.
+    - ``ddr_wr_data``: Output DDR write data.
+    - ``dbg_wire``: Output debug wire for monitoring.
+    - ``clk_f``: Input fast clock signal.
+    - ``rst_f``: Input fast reset signal.
+    - ``clk``: Input clock signal.
+    - ``rst``: Input reset signal.
+- **Logic and Control Flow**:
+    - Initializes `timestamp` to 0 and increments it on each clock cycle.
+    - Handles AVMM read and write operations using a case statement based on `avmm_address`.
+    - Implements counters and monitors using macros `CNT`, `CNM`, and `MON` for various signals.
+    - Generates PCIe input and transaction extension logic using a `generate` block for each PCIe channel.
+    - Processes DMA results and merges external data using `dma_result` and `rrb_merge` modules.
+    - Implements SHA-512 preprocessing and signature verification using `sha512_pre` and `ed25519_sigverify` modules.
+    - Uses `piped_wire` and `showahead_fifo` for data pipelining and buffering.
+    - Displays debug information using `$display` statements for various signals.
 
 
 
