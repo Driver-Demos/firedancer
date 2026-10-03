@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_cswtch_tile to fd_disco when FD_HAS_ALLOCA is set.
+Makefile logic to conditionally add objects `fd_cswtch_tile` and `fd_disco` if `FD_HAS_ALLOCA` is defined.
 
 # Purpose
-Build logic includes `fd_cswtch_tile` in the `fd_disco` object list only when `FD_HAS_ALLOCA` is defined. The `ifdef` and `endif` directives make this object addition conditional on the build environment.
+The `Makefile` snippet uses a conditional directive to check if the `FD_HAS_ALLOCA` macro is defined. If it is defined, the `add-objs` function is called with the arguments `fd_cswtch_tile` and `fd_disco`, which adds these object files to the build process. This conditional inclusion allows for flexibility in the build configuration based on the presence of the `FD_HAS_ALLOCA` feature.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
