@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Lock-free atomic operations for managing superblocks in a memory allocation system, including functions for setting active superblocks, pushing and popping inactive superblocks, and verifying superblock integrity.
+The `fd_groove_data.c` file in the `firedancer` codebase implements lock-free atomic operations for managing superblocks in a memory allocation system, including functions for setting active superblocks, pushing and popping inactive superblocks, and verifying the integrity of superblocks and volumes.
 
 # Purpose
-The code is a C source file that provides functions for managing memory allocation and deallocation using a lock-free, atomic approach. It is part of a memory management system that operates on the concept of superblocks, which are blocks of memory that can be subdivided into smaller objects for allocation. The file includes functions to displace active superblocks, push and pop inactive superblocks, and allocate and free objects within these superblocks. The functions use atomic operations to ensure thread safety without the need for locks, making them suitable for concurrent environments.
+The provided C source code file is part of a memory management system, specifically designed to handle dynamic memory allocation and deallocation using a lock-free, concurrent approach. The code defines several static inline functions and public APIs that manage superblocks and objects within a memory volume, which is a contiguous block of memory. The primary functions include [`fd_groove_data_private_active_displace`](#fd_groove_data_private_active_displace), [`fd_groove_data_private_inactive_push`](#fd_groove_data_private_inactive_push), and [`fd_groove_data_private_inactive_pop`](#fd_groove_data_private_inactive_pop), which manage the active and inactive states of superblocks. These functions ensure that memory blocks are efficiently allocated and deallocated without the need for locks, thus improving performance in multi-threaded environments.
 
-The file defines several key functions, such as [`fd_groove_data_private_active_displace`](<#fd_groove_data_private_active_displace>), [`fd_groove_data_private_inactive_push`](<#fd_groove_data_private_inactive_push>), and [`fd_groove_data_private_inactive_pop`](<#fd_groove_data_private_inactive_pop>), which manage the state of superblocks in a lock-free manner. It also includes functions like [`fd_groove_data_new`](<#fd_groove_data_new>), [`fd_groove_data_join`](<#fd_groove_data_join>), [`fd_groove_data_leave`](<#fd_groove_data_leave>), and [`fd_groove_data_delete`](<#fd_groove_data_delete>) to handle the lifecycle of the memory management system. The code uses compiler fences (`FD_COMPILER_MFENCE`) to ensure memory ordering and atomic operations (`FD_ATOMIC_XCHG`, `FD_ATOMIC_CAS`) to manipulate shared data safely. Additionally, the file contains verification functions to ensure the integrity of the memory structures, such as [`fd_groove_data_verify`](<#fd_groove_data_verify>) and [`fd_groove_data_volume_verify`](<#fd_groove_data_volume_verify>).
+The file also includes functions for creating, joining, leaving, and deleting memory data structures ([`fd_groove_data_new`](#fd_groove_data_new), [`fd_groove_data_join`](#fd_groove_data_join), [`fd_groove_data_leave`](#fd_groove_data_leave), and [`fd_groove_data_delete`](#fd_groove_data_delete)). These functions are responsible for initializing and managing the lifecycle of memory data structures, ensuring that they are correctly aligned and configured. Additionally, the code provides mechanisms for verifying the integrity of the memory structures ([`fd_groove_data_verify`](#fd_groove_data_verify) and [`fd_groove_data_volume_verify`](#fd_groove_data_volume_verify)), which are crucial for maintaining the correctness and reliability of the memory management system. Overall, this file is a comprehensive implementation of a lock-free memory management library, providing both internal mechanisms and public interfaces for efficient memory handling in concurrent applications.
 # Imports and Dependencies
 
 ---
@@ -19,327 +19,294 @@ The file defines several key functions, such as [`fd_groove_data_private_active_
 
 ---
 ### fd\_groove\_data\_private\_active\_displace<!-- {{#callable:fd_groove_data_private_active_displace}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L31>)
-
-Atomically sets the active superblock offset and returns the previous offset.
+The function `fd_groove_data_private_active_displace` atomically sets the active superblock offset for a given sizeclass and concurrency group, returning the previous offset.
 - **Inputs**:
-    - `_active_slot`: A pointer to a volatile unsigned long representing the active superblock offset.
-    - `volume0`: A pointer to `fd_groove_volume_t`, which is not used in the function.
-    - `superblock_off`: An unsigned long representing the new superblock offset to set.
-- **Logic and Control Flow**:
-    - Ignore `volume0` as it is not used in the function.
-    - Execute a memory fence using `FD_COMPILER_MFENCE()` to ensure memory ordering before the atomic operation.
-    - If `FD_HAS_ATOMIC` is defined, use `FD_ATOMIC_XCHG` to atomically exchange the value of `_active_slot` with `superblock_off`.
-    - If `FD_HAS_ATOMIC` is not defined, manually swap the value of `_active_slot` with `superblock_off` using a temporary variable `old`.
-    - Execute another memory fence using `FD_COMPILER_MFENCE()` to ensure memory ordering after the atomic operation.
-    - Return the previous value of `_active_slot`, which is now stored in `superblock_off`.
-- **Output**: Returns the previous offset of the active superblock as an unsigned long.
+    - `_active_slot`: A pointer to a volatile unsigned long representing the active superblock offset for a specific sizeclass and concurrency group.
+    - `volume0`: A pointer to a `fd_groove_volume_t` structure, which is not used in the function.
+    - `superblock_off`: An unsigned long representing the offset of the new superblock to be set as active.
+- **Control Flow**:
+    - The function begins by casting `volume0` to void to indicate it is unused.
+    - A memory fence is applied to ensure memory operations are completed before proceeding.
+    - If atomic operations are supported (`FD_HAS_ATOMIC`), the function uses an atomic exchange to set the new superblock offset and retrieve the old one.
+    - If atomic operations are not supported, it manually swaps the values of `_active_slot` and `superblock_off`.
+    - Another memory fence is applied to ensure the atomic operation is completed before returning.
+    - The function returns the previous value of the active superblock offset.
+- **Output**: The function returns the offset of the previously active superblock as an unsigned long.
 
 
 ---
 ### fd\_groove\_data\_private\_inactive\_push<!-- {{#callable:fd_groove_data_private_inactive_push}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L56>)
-
-Performs a lock-free atomic push of a superblock onto an inactive stack.
+The `fd_groove_data_private_inactive_push` function performs a lock-free atomic push of a superblock onto an inactive stack, ensuring the superblock is the top of the stack upon completion.
 - **Inputs**:
-    - `_inactive_stack`: A pointer to a volatile unsigned long representing the inactive stack.
+    - `_inactive_stack`: A pointer to a volatile unsigned long representing the inactive stack where the superblock will be pushed.
     - `volume0`: A pointer to the base of the volume, used to calculate the address of the superblock.
     - `superblock_off`: An unsigned long representing the offset of the superblock from the base of the volume.
-- **Logic and Control Flow**:
-    - Executes a memory fence to ensure memory ordering before proceeding.
-    - Calculates the address of the superblock using the base volume pointer and the superblock offset.
-    - Enters an infinite loop to attempt the atomic push operation.
-    - Reads the current value of the inactive stack to determine the version and next offset.
-    - Updates the `info` field of the superblock with the next offset.
-    - Calculates the next version number by incrementing the current version and wrapping it within the footprint limit.
-    - Attempts an atomic compare-and-swap (CAS) operation to update the inactive stack with the new version and superblock offset.
-    - If the CAS operation is successful, breaks out of the loop; otherwise, pauses briefly and retries.
-    - Executes another memory fence to ensure memory ordering after the operation.
-- **Output**: None (void function).
+- **Control Flow**:
+    - The function begins with a compiler memory fence to ensure memory operations are not reordered.
+    - It calculates the address of the superblock by adding the offset to the base volume pointer.
+    - A loop is initiated to attempt the atomic push operation until it succeeds.
+    - Within the loop, the current version and next offset are extracted from the inactive stack.
+    - The superblock's info field is updated with the next offset.
+    - A new version is calculated by incrementing the current version.
+    - An atomic compare-and-swap (CAS) operation is attempted to update the inactive stack with the new version and superblock offset.
+    - If the CAS operation is successful, the loop breaks; otherwise, it pauses briefly and retries.
+    - The function ends with another compiler memory fence to ensure memory operations are completed.
+- **Output**: The function does not return a value; it modifies the inactive stack in place to push the superblock onto it.
 
 
 ---
 ### fd\_groove\_data\_private\_inactive\_pop<!-- {{#callable:fd_groove_data_private_inactive_pop}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L96>)
-
-Performs a lock-free atomic pop operation on an inactive stack to retrieve a superblock offset.
+The function `fd_groove_data_private_inactive_pop` performs a lock-free atomic pop operation on an inactive stack, returning the offset of a superblock relative to a given volume, or zero if the stack is empty.
 - **Inputs**:
-    - `_inactive_stack`: A pointer to a volatile unsigned long representing the inactive stack.
-    - `volume0`: A pointer to the base of the volume from which offsets are calculated.
-- **Logic and Control Flow**:
-    - Initialize `off` to store the offset of the superblock.
-    - Use `FD_COMPILER_MFENCE` to ensure memory ordering before entering the loop.
-    - Enter an infinite loop to attempt to pop the stack.
-    - Read the current version and offset from `_inactive_stack`.
-    - Extract the version and offset from `ver_off`.
-    - If `off` is zero, break the loop as the stack is empty.
-    - Calculate the address of the superblock using `volume0` and `off`.
-    - Compute the next version and next offset from the superblock's `info`.
-    - Use atomic compare-and-swap (`FD_ATOMIC_CAS`) to update `_inactive_stack` with the new version and offset, or use a conditional assignment if atomic operations are not available.
-    - If the compare-and-swap was successful, break the loop.
-    - Use `FD_SPIN_PAUSE` to yield the processor if the compare-and-swap failed.
-    - Use `FD_COMPILER_MFENCE` to ensure memory ordering after the loop.
-    - Return the offset `off`.
-- **Output**: Returns the offset of the superblock relative to `volume0`, or 0 if the stack was empty.
+    - `_inactive_stack`: A pointer to a volatile unsigned long representing the inactive stack from which a superblock is to be popped.
+    - `volume0`: A pointer to the base of the volume, used to calculate the address of the superblock.
+- **Control Flow**:
+    - The function begins with a compiler memory fence to ensure memory operations are not reordered.
+    - It enters an infinite loop to attempt the pop operation until successful.
+    - Within the loop, it reads the current version and offset from the inactive stack.
+    - It checks if the offset is zero, indicating the stack is empty, and breaks the loop if so.
+    - If the stack is not empty, it calculates the address of the superblock using the offset and volume0.
+    - It prepares the next version and offset for the stack update.
+    - It attempts to atomically compare and swap the stack's value with the new version and offset using `FD_ATOMIC_CAS` if atomic operations are supported, otherwise it uses a conditional assignment.
+    - If the compare-and-swap is successful, it breaks the loop; otherwise, it pauses briefly and retries.
+    - The function ends with another compiler memory fence before returning the offset.
+- **Output**: The function returns an unsigned long representing the offset of the superblock relative to volume0, or zero if the stack was empty.
 
 
 ---
 ### fd\_groove\_data\_new<!-- {{#callable:fd_groove_data_new}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L134>)
-
-Initializes a shared memory region for groove data, ensuring alignment and configuration validity, and sets up a volume pool.
+The `fd_groove_data_new` function initializes a shared memory region for groove data, ensuring proper alignment and configuration, and returns a pointer to the initialized memory.
 - **Inputs**:
-    - `shmem`: A pointer to the shared memory region to initialize.
-- **Logic and Control Flow**:
-    - Cast `shmem` to a `fd_groove_data_shmem_t` pointer `shdata`.
+    - `shmem`: A pointer to the shared memory region to be initialized as groove data.
+- **Control Flow**:
+    - Cast the input `shmem` to a `fd_groove_data_shmem_t` pointer named `shdata`.
     - Check if `shdata` is NULL; if so, log a warning and return NULL.
-    - Check if `shdata` is aligned according to `fd_groove_data_align()`; if not, log a warning and return NULL.
-    - Retrieve the footprint size using `fd_groove_data_footprint()` and check if it is zero; if so, log a warning and return NULL.
-    - Clear the memory region pointed to by `shdata` using `memset` with the footprint size.
-    - Initialize the volume pool in `shdata->volume_pool` using `fd_groove_volume_pool_new()`; if it fails, return NULL.
-    - Use `FD_COMPILER_MFENCE()` to ensure memory ordering, then set `shdata->magic` to `FD_GROOVE_DATA_MAGIC`.
+    - Check if `shdata` is properly aligned using `fd_ulong_is_aligned`; if not, log a warning and return NULL.
+    - Retrieve the footprint size using [`fd_groove_data_footprint`](fd_groove_data.h.md#fd_groove_data_footprint) and check if it is zero; if so, log a warning and return NULL.
+    - Initialize the memory region pointed to by `shdata` to zero using `memset`.
+    - Attempt to initialize the volume pool within `shdata` using `fd_groove_volume_pool_new`; if it fails, return NULL.
+    - Use compiler memory fences (`FD_COMPILER_MFENCE`) to ensure memory ordering, then set the `magic` field of `shdata` to `FD_GROOVE_DATA_MAGIC`.
     - Return the original `shmem` pointer.
-- **Output**: Returns the initialized shared memory pointer if successful, or NULL if any checks fail.
-- **Functions Called**:
-    - [`fd_groove_data_align`](<fd_groove_data.h.md#fd_groove_data_align>)
-    - [`fd_groove_data_footprint`](<fd_groove_data.h.md#fd_groove_data_footprint>)
+- **Output**: A pointer to the initialized shared memory region, or NULL if initialization fails due to invalid input or configuration.
+- **Functions called**:
+    - [`fd_groove_data_align`](fd_groove_data.h.md#fd_groove_data_align)
+    - [`fd_groove_data_footprint`](fd_groove_data.h.md#fd_groove_data_footprint)
 
 
 ---
 ### fd\_groove\_data\_join<!-- {{#callable:fd_groove_data_join}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L166>)
-
-Joins a local groove data structure with shared memory data, initializing volume pools and setting configuration hints.
+The `fd_groove_data_join` function initializes and joins a local groove data structure with shared memory data, setting up volume pools and aligning necessary components.
 - **Inputs**:
-    - `ljoin`: Pointer to the local groove data structure to join.
-    - `shdata`: Pointer to the shared memory groove data structure.
-    - `volume0`: Pointer to the initial volume for the volume pool.
-    - `volume_max`: Maximum volume size for the volume pool.
-    - `cgroup_hint`: Concurrency group hint for the groove data.
-- **Logic and Control Flow**:
-    - Set `volume_max` to the provided value or the maximum possible if zero.
-    - Cast `ljoin` and `shdata` to `fd_groove_data_t` and `fd_groove_data_shmem_t` respectively.
-    - Check if `join` is NULL or misaligned, log a warning, and return NULL if true.
-    - Check if `data` is NULL or misaligned, log a warning, and return NULL if true.
-    - Verify `data->magic` matches `FD_GROOVE_DATA_MAGIC`, log a warning, and return NULL if not.
-    - Check if `volume0` is NULL or misaligned, log a warning, and return NULL if true.
-    - Attempt to join the volume pool using `fd_groove_volume_pool_join`, return NULL if it fails.
-    - Copy `active_slot`, `inactive_stack`, and `cgroup_hint` from `data` to `join`.
-- **Output**: Returns a pointer to the joined `fd_groove_data_t` structure or NULL if any checks fail.
-- **Functions Called**:
-    - [`fd_groove_data_align`](<fd_groove_data.h.md#fd_groove_data_align>)
+    - `ljoin`: A pointer to the local groove data structure to be initialized and joined.
+    - `shdata`: A pointer to the shared memory groove data structure.
+    - `volume0`: A pointer to the initial volume for the groove data.
+    - `volume_max`: The maximum volume size, which defaults to a predefined maximum if zero.
+    - `cgroup_hint`: A hint for the concurrency group to be used.
+- **Control Flow**:
+    - The function first ensures `volume_max` is set to a valid maximum by using a helper function if it is zero.
+    - It casts the `ljoin` and `shdata` pointers to their respective types, `fd_groove_data_t` and `fd_groove_data_shmem_t`.
+    - The function checks if `join` (from `ljoin`) is NULL or misaligned, logging a warning and returning NULL if so.
+    - It checks if `data` (from `shdata`) is NULL, misaligned, or has an incorrect magic number, logging a warning and returning NULL if any check fails.
+    - It checks if `volume0` is NULL or misaligned, logging a warning and returning NULL if so.
+    - The function attempts to join the volume pool using `fd_groove_volume_pool_join`, logging details and returning NULL if it fails.
+    - If all checks pass, it copies the `active_slot` and `inactive_stack` from `data` to `join`, and sets `join->cgroup_hint` to `cgroup_hint`.
+    - Finally, it returns the `join` pointer.
+- **Output**: Returns a pointer to the initialized and joined `fd_groove_data_t` structure, or NULL if any error occurs during the process.
+- **Functions called**:
+    - [`fd_groove_data_align`](fd_groove_data.h.md#fd_groove_data_align)
 
 
 ---
 ### fd\_groove\_data\_leave<!-- {{#callable:fd_groove_data_leave}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L222>)
-
-Validates and leaves a `fd_groove_data_t` join structure, ensuring proper cleanup of resources.
+The `fd_groove_data_leave` function safely detaches a `fd_groove_data_t` structure from its associated volume pool, ensuring proper cleanup and logging warnings if any issues occur.
 - **Inputs**:
-    - `join`: A pointer to a `fd_groove_data_t` structure that represents the join to be left.
-- **Logic and Control Flow**:
-    - Checks if the `join` pointer is NULL and logs a warning if it is, then returns NULL.
-    - Attempts to leave the volume pool associated with the `join` using `fd_groove_volume_pool_leave`.
-    - Logs a warning and returns NULL if leaving the volume pool fails, although this is currently not possible.
-    - Returns the `join` pointer if all operations succeed.
+    - `join`: A pointer to a `fd_groove_data_t` structure that represents the data to be detached from the volume pool.
+- **Control Flow**:
+    - Check if the `join` pointer is NULL; if so, log a warning and return NULL.
+    - Attempt to leave the volume pool associated with `join->volume_pool`; if this fails, log a warning and return NULL.
+    - If all checks pass, return the `join` pointer.
 - **Output**: Returns the `join` pointer if successful, or NULL if an error occurs.
 
 
 ---
 ### fd\_groove\_data\_delete<!-- {{#callable:fd_groove_data_delete}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L237>)
-
-Validates and deletes a shared memory data structure if it meets specific alignment and magic number criteria.
+The `fd_groove_data_delete` function validates and deletes a shared memory data structure by resetting its magic number to zero.
 - **Inputs**:
-    - ``shdata``: A pointer to the shared memory data structure to be deleted.
-- **Logic and Control Flow**:
-    - Cast `shdata` to a `fd_groove_data_shmem_t` pointer named `data`.
+    - `shdata`: A pointer to the shared memory data structure (`fd_groove_data_shmem_t`) to be deleted.
+- **Control Flow**:
+    - Cast the input `shdata` to a `fd_groove_data_shmem_t` pointer named `data`.
     - Check if `data` is NULL; if so, log a warning and return NULL.
-    - Check if `data` is aligned according to `fd_groove_data_align()`; if not, log a warning and return NULL.
-    - Check if `data->magic` equals `FD_GROOVE_DATA_MAGIC`; if not, log a warning and return NULL.
-    - Use `FD_COMPILER_MFENCE()` to ensure memory operations are completed before and after setting `data->magic` to 0.
+    - Check if `data` is misaligned according to [`fd_groove_data_align`](fd_groove_data.h.md#fd_groove_data_align); if so, log a warning and return NULL.
+    - Check if `data->magic` is not equal to `FD_GROOVE_DATA_MAGIC`; if so, log a warning and return NULL.
+    - Use a compiler memory fence (`FD_COMPILER_MFENCE`) to ensure memory operations are completed before and after setting `data->magic` to 0.
     - Return the original `shdata` pointer.
-- **Output**: Returns the original `shdata` pointer if the deletion is successful, otherwise returns NULL.
-- **Functions Called**:
-    - [`fd_groove_data_align`](<fd_groove_data.h.md#fd_groove_data_align>)
+- **Output**: Returns the original `shdata` pointer if the deletion is successful, otherwise returns NULL if any validation checks fail.
+- **Functions called**:
+    - [`fd_groove_data_align`](fd_groove_data.h.md#fd_groove_data_align)
 
 
 ---
 ### fd\_groove\_data\_private\_alloc\_obj<!-- {{#callable:fd_groove_data_private_alloc_obj}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L268>)
-
-Allocates an object from a specified size class superblock, handling concurrency and memory management.
+The `fd_groove_data_private_alloc_obj` function allocates an object from a specified size class superblock within a groove data structure, managing concurrency and superblock states.
 - **Inputs**:
-    - ``data``: A pointer to `fd_groove_data_t`, which contains the data structure for groove data management.
-    - ``obj_szc``: An unsigned long representing the size class of the object to allocate.
-    - ``_obj_off``: A pointer to an unsigned long where the function will store the offset of the allocated object.
-    - ``_obj_idx``: A pointer to an unsigned long where the function will store the index of the allocated object.
-- **Logic and Control Flow**:
-    - Retrieve the volume pointer `_volume0` from the data structure.
-    - Determine the object count, footprint, concurrency group mask, and parent size class from the configuration for the given size class `obj_szc`.
-    - Calculate the concurrency group using the `cgroup_hint` and `cgroup_mask`.
-    - Attempt to access the active superblock for the concurrency group and size class, using a test-and-test-and-set approach to avoid unnecessary atomic operations.
+    - `data`: A pointer to the `fd_groove_data_t` structure, which contains the groove data context and state.
+    - `obj_szc`: An unsigned long integer representing the size class of the object to be allocated.
+    - `_obj_off`: A pointer to an unsigned long where the function will store the offset of the allocated object.
+    - `_obj_idx`: A pointer to an unsigned long where the function will store the index of the allocated object within the superblock.
+- **Control Flow**:
+    - Retrieve the volume base address from the data structure.
+    - Determine the object count, footprint, concurrency group mask, and parent size class from the configuration for the given size class.
+    - Calculate the concurrency group and locate the active slot and inactive stack for the size class and concurrency group.
+    - Attempt to acquire exclusive access to the active superblock for the concurrency group using a test-and-test-and-set approach.
     - If no active superblock is available, attempt to pop an inactive superblock from the stack.
-    - If no inactive superblock is available, create a new superblock by acquiring a volume or a parent size class object, depending on the configuration.
-    - Initialize the superblock header and mark all objects in the superblock as free.
+    - If no inactive superblock is available, attempt to create a new superblock by acquiring a volume or a parent size class object.
+    - Initialize the new superblock header and mark all objects as free if a new superblock is created.
     - Allocate a free object from the superblock, updating the free object bit field atomically.
-    - If the superblock still has free objects, return it to circulation as the active superblock; otherwise, it will be returned to circulation when a block is freed.
-    - Calculate the object index and store the offset and index in the provided pointers.
+    - If the superblock still has free objects, return it to circulation as the active superblock; otherwise, it will be returned to circulation upon freeing.
+    - Calculate the object offset and index, storing them in the provided pointers.
     - Return success status.
-- **Output**: Returns an integer status code, `FD_GROOVE_SUCCESS` on success, or an error code if an error occurs during allocation.
-- **Functions Called**:
-    - [`fd_groove_data_volume0`](<fd_groove_data.h.md#fd_groove_data_volume0>)
-    - [`fd_groove_data_volume1`](<fd_groove_data.h.md#fd_groove_data_volume1>)
-    - [`fd_groove_data_private_active_displace`](<#fd_groove_data_private_active_displace>)
-    - [`fd_groove_data_private_inactive_pop`](<#fd_groove_data_private_inactive_pop>)
-    - [`fd_groove_data_hdr_t::fd_groove_data_hdr`](<fd_groove_data.h.md#fd_groove_data_hdr_tfd_groove_data_hdr>)
-    - [`fd_groove_data_hdr_type`](<fd_groove_data.h.md#fd_groove_data_hdr_type>)
-    - [`fd_groove_data_hdr_szc`](<fd_groove_data.h.md#fd_groove_data_hdr_szc>)
-    - [`fd_groove_data_private_inactive_push`](<#fd_groove_data_private_inactive_push>)
+- **Output**: Returns an integer status code, `FD_GROOVE_SUCCESS` on success, or an error code if allocation fails.
+- **Functions called**:
+    - [`fd_groove_data_volume0`](fd_groove_data.h.md#fd_groove_data_volume0)
+    - [`fd_groove_data_volume1`](fd_groove_data.h.md#fd_groove_data_volume1)
+    - [`fd_groove_data_private_active_displace`](#fd_groove_data_private_active_displace)
+    - [`fd_groove_data_private_inactive_pop`](#fd_groove_data_private_inactive_pop)
+    - [`fd_groove_data_hdr_t::fd_groove_data_hdr`](fd_groove_data.h.md#fd_groove_data_hdr_tfd_groove_data_hdr)
+    - [`fd_groove_data_hdr_type`](fd_groove_data.h.md#fd_groove_data_hdr_type)
+    - [`fd_groove_data_hdr_szc`](fd_groove_data.h.md#fd_groove_data_hdr_szc)
+    - [`fd_groove_data_private_inactive_push`](#fd_groove_data_private_inactive_push)
 
 
 ---
 ### fd\_groove\_data\_alloc<!-- {{#callable:fd_groove_data_alloc}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L461>)
-
-Allocates memory from a specified data structure with alignment and size constraints, returning a pointer to the allocated memory or NULL on error.
+The `fd_groove_data_alloc` function allocates a memory block from a specified data structure with given alignment, size, and tag, and returns a pointer to the allocated memory or NULL on failure.
 - **Inputs**:
-    - ``data``: A pointer to an `fd_groove_data_t` structure from which memory is allocated.
-    - ``align``: The desired alignment for the allocated memory, defaulting to `FD_GROOVE_DATA_ALLOC_ALIGN_DEFAULT` if zero.
-    - ``sz``: The size of the memory to allocate.
-    - ``tag``: A tag value associated with the allocation.
-    - ``_err``: A pointer to an integer where the function stores the error code, or uses a local variable if NULL.
-- **Logic and Control Flow**:
+    - `data`: A pointer to an `fd_groove_data_t` structure, which represents the data structure from which memory is to be allocated.
+    - `align`: An unsigned long specifying the desired alignment for the allocated memory block; if zero, a default alignment is used.
+    - `sz`: An unsigned long specifying the size of the memory block to allocate.
+    - `tag`: An unsigned long used to tag the allocation for identification or debugging purposes.
+    - `_err`: A pointer to an integer where the function will store an error code; if NULL, a local variable is used.
+- **Control Flow**:
     - Initialize a local error variable if `_err` is NULL.
-    - Check if `data` is NULL; if so, log a warning, set the error code to `FD_GROOVE_ERR_INVAL`, and return NULL.
-    - Set `align` to `FD_GROOVE_DATA_ALLOC_ALIGN_DEFAULT` if it is zero, and validate that it is a power of two and within the maximum allowed alignment.
-    - Calculate `off_obj` and `footprint` based on alignment and size, and validate that `footprint` is within the maximum allowed footprint.
-    - Determine the size class `obj_szc` for the allocation footprint.
-    - Attempt to allocate an object from the data structure using [`fd_groove_data_private_alloc_obj`](<#fd_groove_data_private_alloc_obj>); if it fails, set the error code and return NULL.
-    - Calculate the header address for the allocated object and initialize it with allocation details.
-    - Set the error code to `FD_GROOVE_SUCCESS` and return a pointer to the allocated memory.
-- **Output**: Returns a pointer to the allocated memory if successful, or NULL if an error occurs.
-- **Functions Called**:
-    - [`fd_groove_data_szc`](<fd_groove_data.h.md#fd_groove_data_szc>)
-    - [`fd_groove_data_private_alloc_obj`](<#fd_groove_data_private_alloc_obj>)
-    - [`fd_groove_data_hdr_t::fd_groove_data_hdr`](<fd_groove_data.h.md#fd_groove_data_hdr_tfd_groove_data_hdr>)
+    - Check if `data` is NULL and return an error if so.
+    - Set `align` to a default value if it is zero, and validate the alignment value.
+    - Calculate the offset and footprint for the allocation based on alignment and size, and validate them.
+    - Determine the size class for the allocation footprint.
+    - Attempt to allocate an object from the data structure using the determined size class.
+    - If allocation fails, return the error code and NULL.
+    - If successful, set up the allocation header with the provided tag and other details.
+    - Set the error code to success and return a pointer to the allocated memory.
+- **Output**: A pointer to the allocated memory block, or NULL if the allocation fails.
+- **Functions called**:
+    - [`fd_groove_data_szc`](fd_groove_data.h.md#fd_groove_data_szc)
+    - [`fd_groove_data_private_alloc_obj`](#fd_groove_data_private_alloc_obj)
+    - [`fd_groove_data_hdr_t::fd_groove_data_hdr`](fd_groove_data.h.md#fd_groove_data_hdr_tfd_groove_data_hdr)
 
 
 ---
 ### fd\_groove\_data\_private\_free<!-- {{#callable:fd_groove_data_private_free}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L517>)
-
-Frees a previously allocated object in the groove data structure, ensuring it is marked as invalid and potentially returning its superblock to circulation.
+The [`fd_groove_data_private_free`](#fd_groove_data_private_free) function is responsible for freeing a previously allocated object in a groove data structure, ensuring its validity and managing the circulation of superblocks.
 - **Inputs**:
-    - `data`: A pointer to the `fd_groove_data_t` structure, representing the groove data context.
+    - `data`: A pointer to the `fd_groove_data_t` structure representing the groove data context.
     - `_obj`: A pointer to the object to be freed.
-    - `exp_type`: The expected type of the object, used for validation in paranoid mode.
-- **Logic and Control Flow**:
-    - Check if `data` or `_obj` is NULL and return `FD_GROOVE_ERR_INVAL` if true.
-    - Retrieve the object header using `fd_groove_data_object_hdr` and the volume base using [`fd_groove_data_volume0`](<fd_groove_data.h.md#fd_groove_data_volume0>).
-    - In paranoid mode, validate the object's address and alignment, and check if the object type and size class are as expected.
-    - Determine the object's size class and count of objects in the size class.
-    - In paranoid mode, validate the object's alignment, size, and footprint against the expected values.
-    - Mark the object as invalid by setting its type to an invalid value and update the free objects bit field.
-    - If the superblock was full before freeing, return it to circulation by updating the active slot or pushing it onto the inactive stack.
-    - If the superblock becomes completely empty after freeing, attempt to free it or its parent volume, depending on its size class.
-- **Output**: Returns `FD_GROOVE_SUCCESS` on successful free, or an error code such as `FD_GROOVE_ERR_INVAL` or `FD_GROOVE_ERR_CORRUPT` if validation fails.
-- **Functions Called**:
-    - [`fd_groove_data_volume0`](<fd_groove_data.h.md#fd_groove_data_volume0>)
-    - [`fd_groove_data_volume1`](<fd_groove_data.h.md#fd_groove_data_volume1>)
-    - [`fd_groove_data_hdr_type`](<fd_groove_data.h.md#fd_groove_data_hdr_type>)
-    - [`fd_groove_data_hdr_idx`](<fd_groove_data.h.md#fd_groove_data_hdr_idx>)
-    - [`fd_groove_data_hdr_szc`](<fd_groove_data.h.md#fd_groove_data_hdr_szc>)
-    - [`fd_groove_data_hdr_align`](<fd_groove_data.h.md#fd_groove_data_hdr_align>)
-    - [`fd_groove_data_hdr_sz`](<fd_groove_data.h.md#fd_groove_data_hdr_sz>)
-    - [`fd_groove_data_cgroup_hint`](<fd_groove_data.h.md#fd_groove_data_cgroup_hint>)
-    - [`fd_groove_data_private_active_displace`](<#fd_groove_data_private_active_displace>)
-    - [`fd_groove_data_private_inactive_push`](<#fd_groove_data_private_inactive_push>)
-    - [`fd_groove_data_private_inactive_pop`](<#fd_groove_data_private_inactive_pop>)
-    - [`fd_groove_data_private_free`](<#fd_groove_data_private_free>)
-    - [`fd_groove_strerror`](<fd_groove_base.c.md#fd_groove_strerror>)
+    - `exp_type`: An expected type of the object, used for validation purposes.
+- **Control Flow**:
+    - Check if `data` or `_obj` is NULL and return an error if so.
+    - Retrieve the object header and validate its alignment and address range.
+    - In paranoid mode, validate the object type and size class against expected values.
+    - Determine the object's size class and count of objects in the superblock.
+    - In paranoid mode, validate the object's alignment, size, and footprint against expected values.
+    - Mark the object as invalid and update the free objects bit field to include the object.
+    - If the superblock was full before freeing, return it to circulation; if it becomes completely empty, manage its release or circulation appropriately.
+    - Handle the release of completely empty superblocks or volumes, ensuring they are marked and released correctly.
+- **Output**: Returns `FD_GROOVE_SUCCESS` on successful freeing of the object, or an error code if any validation or operation fails.
+- **Functions called**:
+    - [`fd_groove_data_volume0`](fd_groove_data.h.md#fd_groove_data_volume0)
+    - [`fd_groove_data_volume1`](fd_groove_data.h.md#fd_groove_data_volume1)
+    - [`fd_groove_data_hdr_type`](fd_groove_data.h.md#fd_groove_data_hdr_type)
+    - [`fd_groove_data_hdr_idx`](fd_groove_data.h.md#fd_groove_data_hdr_idx)
+    - [`fd_groove_data_hdr_szc`](fd_groove_data.h.md#fd_groove_data_hdr_szc)
+    - [`fd_groove_data_hdr_align`](fd_groove_data.h.md#fd_groove_data_hdr_align)
+    - [`fd_groove_data_hdr_sz`](fd_groove_data.h.md#fd_groove_data_hdr_sz)
+    - [`fd_groove_data_cgroup_hint`](fd_groove_data.h.md#fd_groove_data_cgroup_hint)
+    - [`fd_groove_data_private_active_displace`](#fd_groove_data_private_active_displace)
+    - [`fd_groove_data_private_inactive_push`](#fd_groove_data_private_inactive_push)
+    - [`fd_groove_data_private_inactive_pop`](#fd_groove_data_private_inactive_pop)
+    - [`fd_groove_data_private_free`](#fd_groove_data_private_free)
+    - [`fd_groove_strerror`](fd_groove_base.c.md#fd_groove_strerror)
 
 
 ---
 ### fd\_groove\_data\_private\_verify\_superblock<!-- {{#callable:fd_groove_data_private_verify_superblock}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L789>)
-
-Verifies that a specified memory location contains a valid superblock with correct headers and object configurations.
+The function `fd_groove_data_private_verify_superblock` verifies that a specified superblock within a memory volume is valid and optionally checks its descendant superblocks.
 - **Inputs**:
-    - `superblock_off`: The offset of the superblock relative to `_volume0`.
+    - `superblock_off`: The offset of the superblock within the volume, relative to `_volume0`.
     - `exp_szc`: The expected size class of the superblock.
-    - `in_circulation`: A flag indicating if the superblock is in circulation, meaning it contains at least one free object.
-    - `verify_descendents`: A flag indicating whether to verify the descendents of the superblock.
-    - `_volume0`: A pointer to the start of the volume in memory.
-    - `_volume1`: A pointer to the end of the volume in memory.
-- **Logic and Control Flow**:
+    - `in_circulation`: A flag indicating if the superblock is in circulation, meaning it should have at least one free object.
+    - `verify_descendents`: A flag indicating whether to recursively verify the descendant superblocks.
+    - `_volume0`: A pointer to the start of the memory volume.
+    - `_volume1`: A pointer to the end of the memory volume.
+- **Control Flow**:
     - Calculate the address of the superblock header using `superblock_off` and `_volume0`.
     - Verify that the superblock header is within the bounds of `_volume0` and `_volume1` and is properly aligned.
     - Check that the superblock header type is `FD_GROOVE_DATA_HDR_TYPE_SUPERBLOCK` and its size class matches `exp_szc`.
-    - Retrieve object count, footprint, and parent size class from the size class configuration.
-    - Verify that the parent object index is within the valid range and that the header alignment and size are correct.
+    - Retrieve and verify the object count, footprint, and parent size class from the size class configuration.
+    - Ensure the parent object index is within valid bounds.
+    - Verify the alignment and size of the superblock header.
     - Check the validity of the free object bit field and ensure there is at least one free object if `in_circulation` is true.
-    - Iterate over remaining objects, verifying each object's header type, index, size class, alignment, and footprint.
-    - If `verify_descendents` is true and the object type is a superblock, recursively verify its descendents.
+    - Iterate over the remaining objects in the superblock, verifying each object's header type, index, size class, alignment, and footprint.
+    - If `verify_descendents` is true and an object is a superblock, recursively verify its descendants.
     - Return `FD_GROOVE_SUCCESS` if all checks pass.
-- **Output**: Returns `FD_GROOVE_SUCCESS` if the superblock is valid, otherwise returns `FD_GROOVE_ERR_CORRUPT` if any verification fails.
-- **Functions Called**:
-    - [`fd_groove_data_hdr_type`](<fd_groove_data.h.md#fd_groove_data_hdr_type>)
-    - [`fd_groove_data_hdr_szc`](<fd_groove_data.h.md#fd_groove_data_hdr_szc>)
-    - [`fd_groove_data_hdr_idx`](<fd_groove_data.h.md#fd_groove_data_hdr_idx>)
-    - [`fd_groove_data_hdr_align`](<fd_groove_data.h.md#fd_groove_data_hdr_align>)
-    - [`fd_groove_data_hdr_sz`](<fd_groove_data.h.md#fd_groove_data_hdr_sz>)
+- **Output**: Returns `FD_GROOVE_SUCCESS` if the superblock and its objects are valid, otherwise returns an error code indicating corruption.
+- **Functions called**:
+    - [`fd_groove_data_hdr_type`](fd_groove_data.h.md#fd_groove_data_hdr_type)
+    - [`fd_groove_data_hdr_szc`](fd_groove_data.h.md#fd_groove_data_hdr_szc)
+    - [`fd_groove_data_hdr_idx`](fd_groove_data.h.md#fd_groove_data_hdr_idx)
+    - [`fd_groove_data_hdr_align`](fd_groove_data.h.md#fd_groove_data_hdr_align)
+    - [`fd_groove_data_hdr_sz`](fd_groove_data.h.md#fd_groove_data_hdr_sz)
 
 
 ---
 ### fd\_groove\_data\_verify<!-- {{#callable:fd_groove_data_verify}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L880>)
-
-Verifies the integrity and alignment of `fd_groove_data_t` structure and its associated components.
+The `fd_groove_data_verify` function verifies the integrity and consistency of a `fd_groove_data_t` structure, ensuring that its components and associated memory structures are correctly aligned and configured.
 - **Inputs**:
-    - `data`: A pointer to a constant `fd_groove_data_t` structure to verify.
-- **Logic and Control Flow**:
-    - Check if `data` is non-null and properly aligned.
-    - Retrieve and verify the `volume_pool`, `active_slot`, and `inactive_stack` from `data`.
-    - Verify the `volume_pool` using `fd_groove_volume_pool_verify`.
-    - Retrieve shared memory pool and volume information from `volume_pool`.
-    - Check alignment and range of volumes in the pool.
-    - Iterate over volumes to verify their magic number and index.
-    - Verify shared memory data alignment and consistency with `data`.
-    - Iterate over sizeclass configurations to verify object count, footprint, and alignment.
-    - Verify all active superblocks for each sizeclass and concurrency group.
-    - Verify all inactive superblocks for each sizeclass, ensuring no cycles.
-- **Output**: Returns `FD_GROOVE_SUCCESS` if all verifications pass, otherwise returns `FD_GROOVE_ERR_CORRUPT` on failure.
-- **Functions Called**:
-    - [`fd_groove_data_shdata_const`](<fd_groove_data.h.md#fd_groove_data_shdata_const>)
-    - [`fd_groove_data_align`](<fd_groove_data.h.md#fd_groove_data_align>)
-    - [`fd_groove_data_private_verify_superblock`](<#fd_groove_data_private_verify_superblock>)
-    - [`fd_groove_data_hdr_szc`](<fd_groove_data.h.md#fd_groove_data_hdr_szc>)
-    - [`fd_groove_data_hdr_info`](<fd_groove_data.h.md#fd_groove_data_hdr_info>)
+    - `data`: A pointer to a `fd_groove_data_t` structure that needs to be verified.
+- **Control Flow**:
+    - Check if the `data` pointer is non-null and properly aligned.
+    - Retrieve and verify the associated volume pool using `fd_groove_volume_pool_verify`.
+    - Ensure the volume pool's shared memory and elements are correctly aligned and within bounds.
+    - Iterate over the volume pool to verify each volume's magic number and index.
+    - Verify the shared memory (`shdata`) associated with `data` for correct alignment and magic number.
+    - Check the sizeclass configuration for valid object counts, footprints, and alignment constraints.
+    - Iterate over all active superblocks, verifying their offsets and headers using [`fd_groove_data_private_verify_superblock`](#fd_groove_data_private_verify_superblock).
+    - Iterate over all inactive superblocks, ensuring they are in circulation and verifying their headers.
+    - Return `FD_GROOVE_SUCCESS` if all checks pass.
+- **Output**: Returns `FD_GROOVE_SUCCESS` if the verification is successful, otherwise returns `FD_GROOVE_ERR_CORRUPT` if any check fails.
+- **Functions called**:
+    - [`fd_groove_data_shdata_const`](fd_groove_data.h.md#fd_groove_data_shdata_const)
+    - [`fd_groove_data_align`](fd_groove_data.h.md#fd_groove_data_align)
+    - [`fd_groove_data_private_verify_superblock`](#fd_groove_data_private_verify_superblock)
+    - [`fd_groove_data_hdr_szc`](fd_groove_data.h.md#fd_groove_data_hdr_szc)
+    - [`fd_groove_data_hdr_info`](fd_groove_data.h.md#fd_groove_data_hdr_info)
 
 
 ---
 ### fd\_groove\_data\_volume\_verify<!-- {{#callable:fd_groove_data_volume_verify}} -->
-[View Source →](<../../../../src/groove/fd_groove_data.c#L982>)
-
-Verifies the integrity and validity of a specified volume within a groove data structure.
+The `fd_groove_data_volume_verify` function verifies the integrity and validity of a specified volume within a groove data structure.
 - **Inputs**:
-    - `data`: A pointer to a constant `fd_groove_data_t` structure representing the groove data.
-    - `_volume`: A pointer to a constant `fd_groove_volume_t` structure representing the volume to verify.
-- **Logic and Control Flow**:
-    - Check if `data` is not NULL using the `TEST` macro.
-    - Retrieve the base and end pointers of the volume range using [`fd_groove_data_volume0_const`](<fd_groove_data.h.md#fd_groove_data_volume0_const>) and [`fd_groove_data_volume1_const`](<fd_groove_data.h.md#fd_groove_data_volume1_const>).
-    - Calculate the offset of `_volume` from `_volume0`.
-    - Verify that `_volume` is within the valid range and aligned to `FD_GROOVE_VOLUME_FOOTPRINT`.
-    - Check if the `magic` field of `_volume` is either `FD_GROOVE_VOLUME_MAGIC` or its bitwise complement.
-    - Ensure the `idx` field of `_volume` corresponds to its offset.
-    - Verify that `info_sz` does not exceed `FD_GROOVE_VOLUME_INFO_MAX`.
-    - If `magic` equals `FD_GROOVE_VOLUME_MAGIC`, verify the superblock at the calculated offset using [`fd_groove_data_private_verify_superblock`](<#fd_groove_data_private_verify_superblock>).
-- **Output**: Returns `FD_GROOVE_SUCCESS` if the volume is valid, otherwise returns `FD_GROOVE_ERR_CORRUPT` if any test fails.
-- **Functions Called**:
-    - [`fd_groove_data_volume0_const`](<fd_groove_data.h.md#fd_groove_data_volume0_const>)
-    - [`fd_groove_data_volume1_const`](<fd_groove_data.h.md#fd_groove_data_volume1_const>)
-    - [`fd_groove_data_private_verify_superblock`](<#fd_groove_data_private_verify_superblock>)
+    - `data`: A pointer to a constant `fd_groove_data_t` structure representing the groove data context.
+    - `_volume`: A pointer to a constant `fd_groove_volume_t` structure representing the volume to be verified.
+- **Control Flow**:
+    - The function begins by asserting that the `data` pointer is valid using the `TEST` macro.
+    - It retrieves the start and end pointers of the volume range (`_volume0` and `_volume1`) from the `data` structure.
+    - Calculates the offset of `_volume` from `_volume0` and checks if `_volume` is within the valid range and properly aligned.
+    - Extracts the `magic`, `idx`, and `info_sz` fields from `_volume` and verifies their correctness using the `TEST` macro.
+    - If the `magic` field indicates the volume is active (`FD_GROOVE_VOLUME_MAGIC`), it calculates the offset for the superblock and verifies it using [`fd_groove_data_private_verify_superblock`](#fd_groove_data_private_verify_superblock).
+- **Output**: The function returns `FD_GROOVE_SUCCESS` if all checks pass, indicating the volume is valid; otherwise, it returns `FD_GROOVE_ERR_CORRUPT` if any check fails.
+- **Functions called**:
+    - [`fd_groove_data_volume0_const`](fd_groove_data.h.md#fd_groove_data_volume0_const)
+    - [`fd_groove_data_volume1_const`](fd_groove_data.h.md#fd_groove_data_volume1_const)
+    - [`fd_groove_data_private_verify_superblock`](#fd_groove_data_private_verify_superblock)
 
 
 
