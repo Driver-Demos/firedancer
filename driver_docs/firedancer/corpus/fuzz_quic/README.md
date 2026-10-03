@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fuzz testing corpus for QUIC protocol implementations.
+Binary or incomplete fuzzing corpus files for QUIC.
 
 
 ## Files
-- **[27d5482eebd075de44389774fce28c69f45c8a75](27d5482eebd075de44389774fce28c69f45c8a75.md)**: A file in the `firedancer` codebase with unspecified content.
-- **[be36a591864699103edb1934db9f098cb8c29c9a](be36a591864699103edb1934db9f098cb8c29c9a.md)**: Fuzz testing for QUIC protocol in the Firedancer codebase.
-- **[c78ebd3c85a39a596d9f5cfd2b8d240bc1b9c125](c78ebd3c85a39a596d9f5cfd2b8d240bc1b9c125.md)**: Fuzz testing for QUIC protocol implementations.
-- **[daa16758c0f9c63d3cfbf1ab04d3174d744d6345](daa16758c0f9c63d3cfbf1ab04d3174d744d6345.md)**: No technical content available to summarize.
-- **[e76eff2a9ce23ea6660984cade2582a0cc80ae67](e76eff2a9ce23ea6660984cade2582a0cc80ae67.md)**: Fuzzing test case for QUIC protocol in the Firedancer codebase.
+- **[27d5482eebd075de44389774fce28c69f45c8a75](27d5482eebd075de44389774fce28c69f45c8a75.md)**: The `27d5482eebd075de44389774fce28c69f45c8a75` file in the `firedancer` codebase appears to be incomplete or lacks sufficient information for a detailed description.
+- **[be36a591864699103edb1934db9f098cb8c29c9a](be36a591864699103edb1934db9f098cb8c29c9a.md)**: The `be36a591864699103edb1934db9f098cb8c29c9a` file in the `firedancer` codebase appears to be a binary or non-text file located in the `firedancer/corpus/fuzz_quic` directory.
+- **[c78ebd3c85a39a596d9f5cfd2b8d240bc1b9c125](c78ebd3c85a39a596d9f5cfd2b8d240bc1b9c125.md)**: The `c78ebd3c85a39a596d9f5cfd2b8d240bc1b9c125` file in the `firedancer` codebase appears to be a binary or non-text file, possibly related to fuzz testing for QUIC, given its location in the `fuzz_quic` directory.
+- **[daa16758c0f9c63d3cfbf1ab04d3174d744d6345](daa16758c0f9c63d3cfbf1ab04d3174d744d6345.md)**: The `daa16758c0f9c63d3cfbf1ab04d3174d744d6345` file in the `firedancer` codebase appears to be a binary or non-text file, possibly related to fuzz testing for QUIC, given its path.
+- **[e76eff2a9ce23ea6660984cade2582a0cc80ae67](e76eff2a9ce23ea6660984cade2582a0cc80ae67.md)**: The `e76eff2a9ce23ea6660984cade2582a0cc80ae67` file in the `firedancer` codebase appears to contain non-standard or corrupted content, as indicated by the presence of the character "h€".
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

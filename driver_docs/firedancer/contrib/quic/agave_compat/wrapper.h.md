@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file with macro definitions and includes for network and QUIC functionalities.
+The `wrapper.h` file in the `firedancer` codebase defines several feature flags and includes headers related to network utilities, QUIC protocol, and UDP socket functionalities.
 
 # Purpose
-This code is a C source file that sets up preprocessor directives and includes necessary headers for a network-related application. The `#define` statements configure the environment by indicating the presence of hosted capabilities, threading support, double precision floating-point support, and stack allocation with `alloca`. The included headers provide functionalities for handling network packet capture (`fd_pcapng.h`), QUIC protocol operations (`fd_quic.h`), QUIC testing utilities (`fd_quic_test_helpers.h`), and UDP socket operations (`fd_udpsock.h`). This setup suggests that the file is part of a larger system dealing with network communication and testing, specifically using the Firedancer library.
+This code is a simple C header file that sets up preprocessor directives and includes necessary headers for a project, likely related to network programming or testing. The `#define` statements indicate the presence of certain features or capabilities, such as hosted environments, threading, double precision, and stack allocation with `alloca`. The included headers suggest that the file is part of a larger project involving network protocols, specifically QUIC (Quick UDP Internet Connections), and possibly packet capture (PCAPNG) and UDP socket operations. This setup is likely used to configure and prepare the environment for compiling and running network-related tests or applications within the Firedancer project.
 # Imports and Dependencies
 
 ---

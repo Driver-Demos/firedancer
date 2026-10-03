@@ -3,42 +3,28 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Command-line tool for managing and querying pods with various operations like insert, delete, and query.
+The `fd_pod_ctl_help` file provides detailed usage instructions for the `fd_pod_ctl` command-line tool, which manages operations on pods such as creation, deletion, insertion, querying, and compaction within the `firedancer` codebase.
 
 # Purpose
-The `fd_pod_ctl` command-line tool provides a set of operations for managing and interacting with data structures called "pods" within a workspace (`wksp`). The tool supports various commands to create, delete, reset, and list pods, as well as to insert, remove, update, and set values within these pods. Each command operates on a specific pod identified by its workspace address and can manipulate data types such as strings, integers, and floating-point numbers. The tool also includes query commands to retrieve information about the pod's structure and contents, such as the number of keys or the amount of used and available space. The operations may affect the internal organization of the pod, and the tool assumes that there are no concurrent users accessing the same pod.
+The provided content appears to be a command-line interface (CLI) usage guide for a tool named `fd_pod_ctl`. This tool is designed to manage and manipulate data structures referred to as "pods" within a workspace (`wksp`). The functionality is relatively broad, covering operations such as creating, deleting, resetting, and listing pods, as well as inserting, removing, updating, and querying data within these pods. The commands allow for detailed manipulation of data types and structures, including handling of various data types like integers, floats, and strings, and even file contents. The relevance of this file to a codebase lies in its role as a user guide for developers or system administrators who need to interact with the pod data structures, providing them with the necessary commands and options to effectively manage and query the data within the application environment.
 # Content Summary
-The provided content describes the usage and commands of a command-line tool named `fd_pod_ctl`. This tool is used to manage and manipulate data structures referred to as "pods" within a workspace (`wksp`). Below is a summary of the functional details of the commands available in this tool:
+The provided content is a command-line interface (CLI) usage guide for a tool named `fd_pod_ctl`. This tool is designed to manage and manipulate data structures referred to as "pods" within a workspace (wksp). The document outlines various commands available to users, detailing their functionality and expected behavior.
 
-1. **help**: Displays a help message with information about the available commands.
+Key commands include:
 
-2. **tag val**: Sets a tag for workspace allocations, with a default value of 1.
+- **help**: Displays the help message, listing available commands and their descriptions.
+- **tag val**: Sets a tag for subsequent workspace allocations, with a default value of 1.
+- **new wksp max**: Creates a new pod in the specified workspace with a maximum size, defaulting to 4KiB if not specified. It outputs the workspace constructor address of the empty pod upon success.
+- **delete pod** and **reset pod**: These commands delete or reset a pod at a given workspace constructor address.
+- **list pod**: Recursively lists the contents of a pod, outputting to standard output.
+- **insert pod type path val**: Inserts a specified type and value into a pod at a given path, with various data types supported, such as integers, floats, and strings. It fails if the path already exists.
+- **insert-file pod path file**: Inserts the contents of a file into a pod as a buffer, with the path failing if it already exists.
+- **remove pod path**: Removes a specified path from a pod, failing if the path does not exist.
+- **update pod type path val** and **set pod type path val**: These commands update or set a value at a specified path, with conditions on type matching and path existence.
+- **compact pod full**: Compacts the pod, potentially altering the locations of existing values.
+- **query-root what pod** and **query what pod path**: These commands query the pod or a specific path within the pod for various metrics, such as existence, type, value, and usage statistics.
 
-3. **new wksp max**: Creates a new pod in the specified workspace with a maximum size. If the size is set to 0, a default size of 4KiB is used. The command outputs the workspace address of the new pod.
-
-4. **delete pod**: Deletes the pod located at the specified workspace address.
-
-5. **reset pod**: Resets the pod at the given workspace address.
-
-6. **list pod**: Recursively lists the contents of the pod at the specified workspace address.
-
-7. **insert pod type path val**: Inserts a value of a specified type into the pod at a given path. The command fails if the path already exists. Supported types include various integer types, characters, and floating-point numbers.
-
-8. **insert-file pod path file**: Inserts the contents of a file as a buffer into the pod at the specified path. The command fails if the path already exists.
-
-9. **remove pod path**: Removes a specified path and its subpaths from the pod. The command fails if the path does not exist.
-
-10. **update pod type path val**: Updates the value at a specified path in the pod. The command fails if the path does not exist or if the type does not match.
-
-11. **set pod type path val**: Sets a value at a specified path, inserting the path if it does not exist. The command does not change the type of an existing path.
-
-12. **compact pod full**: Compacts the pod, with an option for full compaction if specified.
-
-13. **query-root what pod**: Queries the pod for specific information, such as existence, maximum size, used size, available space, number of keys, and number of subpods.
-
-14. **query what pod path**: Queries a specific path within the pod for information similar to the `query-root` command.
-
-The tool assumes no concurrent users of the pods, meaning it is designed for single-user access at any given time.
+The document emphasizes that the current implementation does not support concurrent users, implying that operations on pods are expected to be performed sequentially. This guide is crucial for developers working with the `fd_pod_ctl` tool, as it provides detailed instructions on managing pod data structures effectively.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
