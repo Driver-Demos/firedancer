@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_sha1.c` file in the `firedancer` codebase provides an implementation of the SHA-1 hashing algorithm, adapted from the teeny sha1 library.
+SHA-1 hash function implementation with data pre-processing and main loop logic.
 
 # Purpose
-This C source code file implements a function for computing the SHA-1 hash of a given data input. The function [`fd_sha1_hash`](#fd_sha1_hash) takes three parameters: a pointer to the data to be hashed, the length of the data, and a pointer to a buffer where the resulting hash will be stored. The code is a modified version of the teeny SHA-1 library, as noted in the comments, and it follows the standard SHA-1 algorithm, which involves processing the input data in 512-bit chunks, padding the data as necessary, and performing a series of bitwise operations and rotations to produce a 160-bit hash value. The function is designed to be used as part of a larger application or library, as indicated by the inclusion of a header file (`fd_sha1.h`), suggesting that it is intended to be imported and used elsewhere.
+The code implements the SHA-1 hashing algorithm, which is a cryptographic hash function. The function [`fd_sha1_hash`](<#fd_sha1_hash>) takes an input data buffer and its length, processes the data according to the SHA-1 specification, and produces a 160-bit hash value. The function uses a series of bitwise operations and logical functions to transform the input data into a fixed-size hash. The algorithm involves initializing a set of hash values, processing the data in 512-bit chunks, and performing a series of operations to update the hash values. The final hash is stored in the provided `hash` buffer.
 
-The code is focused on the specific task of computing SHA-1 hashes, which is a cryptographic function used for data integrity verification. It includes key technical components such as the initialization of hash values, the processing of data in chunks, and the use of bitwise operations to transform the data into a fixed-size hash. The function does not define a public API or external interface beyond the [`fd_sha1_hash`](#fd_sha1_hash) function itself, which serves as the primary entry point for users of this code. The implementation is efficient, utilizing pre-processing steps and loop unrolling techniques to optimize the performance of the hash computation.
+The code includes pre-processing steps such as padding the input data to ensure it is a multiple of 512 bits and appending the original message length. It defines a main loop that processes each 512-bit chunk, extending it into 80 32-bit words, and iteratively updating the hash values using bitwise operations and constants. The function returns the computed hash, which is useful for verifying data integrity and authenticity. The code is a modified version of the teeny SHA-1 library, as noted in the comments, and is intended to be used as part of a larger application or library that requires SHA-1 hashing functionality.
 # Imports and Dependencies
 
 ---
@@ -19,20 +19,23 @@ The code is focused on the specific task of computing SHA-1 hashes, which is a c
 
 ---
 ### fd\_sha1\_hash<!-- {{#callable:fd_sha1_hash}} -->
-The `fd_sha1_hash` function computes the SHA-1 hash of a given data buffer and stores the result in the provided hash buffer.
+[View Source →](<../../../../../src/ballet/sha1/fd_sha1.c#L6>)
+
+Computes the SHA-1 hash of the input data.
 - **Inputs**:
-    - `data`: A pointer to the input data buffer that needs to be hashed.
-    - `data_len`: The length of the input data buffer in bytes.
+    - `data`: A pointer to the input data to hash.
+    - `data_len`: The length of the input data in bytes.
     - `hash`: A pointer to a buffer where the resulting SHA-1 hash will be stored.
-- **Control Flow**:
-    - Initialize the SHA-1 state variables and prepare the data tail for padding.
-    - Calculate the number of 512-bit chunks needed to process the data, including padding.
-    - For each 512-bit chunk, initialize the message schedule array W and fill it with the data and padding.
-    - Extend the sixteen 32-bit words in W into eighty 32-bit words using bitwise operations and rotations.
-    - Initialize the five working variables with the current hash value and perform the main SHA-1 loop for 80 iterations, updating the working variables.
-    - After processing each chunk, update the hash value with the results from the working variables.
-    - Store the final hash value in the provided hash buffer in big-endian format.
-    - Return the pointer to the hash buffer.
+- **Logic and Control Flow**:
+    - Initialize the `W` array and the `H` array with predefined constants.
+    - Calculate the number of bits in the input data and determine the number of 512-bit chunks needed.
+    - Prepare the data tail with padding and the length of the message in bits.
+    - Iterate over each 512-bit chunk, processing it into 80 32-bit words in `W`.
+    - Extend the first 16 words in `W` to 80 words using bitwise operations and rotations.
+    - Initialize working variables `a`, `b`, `c`, `d`, and `e` with the values from `H`.
+    - Perform the main loop of 80 iterations, updating the working variables using SHA-1 specific functions and constants.
+    - Update the `H` array with the results from the working variables.
+    - Convert the final `H` values into the output hash in big-endian format.
 - **Output**: A pointer to the buffer containing the computed SHA-1 hash.
 
 

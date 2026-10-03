@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_zen4.mk` file in the `firedancer` codebase configures the build environment for GCC on Zen 4 architecture, specifying compiler flags and feature definitions for various optimizations and security enhancements.
+Makefile for configuring GCC build settings for Zen 4 architecture with various optimizations.
 
 # Purpose
-The provided content is a Makefile, which is used to automate the build process of a software project. The `BUILDDIR` variable specifies the directory structure for the build, targeting a Linux environment with GCC for the Zen 4 architecture. The file includes several configuration files that add specific build options, such as debugging, security, optimization, and threading capabilities. It checks the version of GCC being used and adjusts the compiler flags accordingly, ensuring compatibility with the minimum supported version (GCC 8) by setting architecture-specific flags. Additionally, it defines several preprocessor flags (`CPPFLAGS`) that enable various hardware and software features, such as support for advanced instruction sets like SSE, AVX, and AVX512, which are crucial for optimizing performance on modern processors.
+This Makefile is used to configure the build environment for a software project. It sets the default build directory to `linux/gcc/zen4` and includes several configuration files that define additional build options, such as support for GCC, x86-64 architecture, debugging, security, optimization, and threading. The file checks the version of GCC being used; if it is version 8, it sets the `CPPFLAGS` to use the `znver1` architecture, otherwise, it uses `znver4`. The `CPPFLAGS` are further extended with preprocessor definitions that enable various hardware and software features, such as 128-bit integers, double precision, stack allocation, and several x86 instruction set extensions like SSE, AVX, and AVX512. These flags ensure that the compiled code can utilize specific processor capabilities for performance optimization.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
