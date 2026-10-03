@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines protobuf messages and services for generating and refreshing authentication tokens.
+The `auth.proto` file defines the protocol buffer messages and service for generating and refreshing authentication tokens in the `firedancer` codebase.
 
 # Purpose
-The `proto3` syntax file defines the `AuthService`, which is responsible for issuing authentication tokens to clients for API access. It includes an enumeration `Role` that specifies different client roles such as `RELAYER`, `SEARCHER`, `VALIDATOR`, and `SHREDSTREAM_SUBSCRIBER`. The file defines several messages, including `GenerateAuthChallengeRequest` and `GenerateAuthChallengeResponse`, which handle the initial challenge-response mechanism for token generation. The `GenerateAuthTokensRequest` and `GenerateAuthTokensResponse` messages manage the issuance of access and refresh tokens, while the `RefreshAccessTokenRequest` and `RefreshAccessTokenResponse` messages facilitate the renewal of access tokens using a valid refresh token. The `AuthService` provides three remote procedure calls (RPCs): `GenerateAuthChallenge`, `GenerateAuthTokens`, and `RefreshAccessToken`, each corresponding to the defined messages to manage the authentication process.
+The provided content is a Protocol Buffers (proto3) file that defines the structure and services for an authentication system within a software application. It specifies a package named "auth" and imports a "timestamp.proto" file, likely for handling timestamp data. The file defines an enumeration `Role` to categorize different user roles such as RELAYER, SEARCHER, VALIDATOR, and SHREDSTREAM_SUBSCRIBER. It includes several message types, such as `GenerateAuthChallengeRequest`, `GenerateAuthChallengeResponse`, `GenerateAuthTokensRequest`, `Token`, `GenerateAuthTokensResponse`, `RefreshAccessTokenRequest`, and `RefreshAccessTokenResponse`, which outline the data structures for requests and responses involved in generating and refreshing authentication tokens. The `AuthService` service is defined with RPC methods like `GenerateAuthChallenge`, `GenerateAuthTokens`, and `RefreshAccessToken`, which facilitate the process of issuing and managing authentication tokens for clients to access APIs securely.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

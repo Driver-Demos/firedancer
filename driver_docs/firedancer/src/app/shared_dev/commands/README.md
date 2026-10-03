@@ -3,29 +3,29 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Benchmarking, configuration, packet generation, QUIC tracing, and network command utilities with related source and header files.
+Benchmark, configuration, packet generation, QUIC trace, UDP echo, and development command tools.
 
 ## Folders
-- **[bench](bench/README.md)**: Benchmarking commands, topology configuration, transaction generation, RPC client interactions, and QUIC protocol performance.
-- **[configure](configure/README.md)**: Functions for genesis file management, key pair generation, process termination, and network namespace configuration.
-- **[pktgen](pktgen/README.md)**: Packet generation and testing tools for network tiles, including Ethernet frame generation and topology setup.
-- **[quic_trace](quic_trace/README.md)**: Header and source files for QUIC tracing, parsing, logging, and passive decryption in Firedancer.
-- **[udpecho](udpecho/README.md)**: UDP echo server implementation with packet mirroring and configuration functions.
+- **[bench](bench/README.md)**: Benchmark topology, transaction generation, RPC, and QUIC/UDP performance tools.
+- **[configure](configure/README.md)**: Genesis, key file, process kill, and network namespace configuration tools.
+- **[pktgen](pktgen/README.md)**: Interactive packet generation, topology setup, tile execution, and live network stats.
+- **[quic_trace](quic_trace/README.md)**: QUIC trace context, frame parsing, log output, packet decryption, and build rules.
+- **[udpecho](udpecho/README.md)**: UDP echo server command and tile for packet mirroring and connectivity testing
 
 ## Files
-- **[bundle_client.c](bundle_client.c.md)**: Configures and runs a bundle client tile in a network topology, including setup and execution functions.
-- **[dev.c](dev.c.md)**: Development and debugging utilities for running Firedancer in a single process with signal handling and configuration updates.
-- **[dev.h](dev.h.md)**: Header file for command functions related to argument parsing, permission checking, and execution.
-- **[dump.c](dump.c.md)**: Implements functionality to dump network link data to a packet capture file, with options for configuration and metrics logging.
-- **[dump.h](dump.h.md)**: Header file for defining the external action `fd_action_dump`.
-- **[flame.c](flame.c.md)**: Implements a command to capture and report performance flamegraphs using `/usr/bin/perf`.
-- **[flame.h](flame.h.md)**: Header file for declaring the external action `fd_action_flame`.
-- **[load.c](load.c.md)**: Defines a load testing command for an external validator, including argument parsing and execution logic.
-- **[load.h](load.h.md)**: Header file for declaring the external action `fd_action_load`.
-- **[txn.c](txn.c.md)**: Implements functions to send QUIC transactions with command-line argument parsing and permission checks.
-- **[txn.h](txn.h.md)**: Header file defining an external transaction action `fd_action_txn`.
-- **[wksp.c](wksp.c.md)**: Defines functions to initialize workspaces and manage memory locking limits in the Firedancer application.
-- **[wksp.h](wksp.h.md)**: Header file for workspace command functions and an external action in the Firedancer codebase.
+- **[bundle_client.c](bundle_client.c.md)**: Sets up and runs bundle, sign, and metric tiles in isolation.
+- **[dev.c](dev.c.md)**: Development command logic for configuring, running, watching, and debugging Firedancer.
+- **[dev.h](dev.h.md)**: The `dev.h` file in the `firedancer` codebase declares functions for handling command arguments, permissions, and execution related to device commands.
+- **[dump.c](dump.c.md)**: Dumps selected links to a PCAP file, with one-shot or live capture modes.
+- **[dump.h](dump.h.md)**: The `dump.h` file in the `firedancer` codebase declares an external action, `fd_action_dump`, and includes a configuration header.
+- **[flame.c](flame.c.md)**: Captures a perf flamegraph for selected tiles or the Agave process.
+- **[flame.h](flame.h.md)**: The `flame.h` file in the `firedancer` codebase declares an external action, `fd_action_flame`, and includes a configuration header.
+- **[load.c](load.c.md)**: Load-test command parsing, topology setup, and single-process execution for an external validator.
+- **[load.h](load.h.md)**: The `load.h` file in the `firedancer` codebase declares an external action, `fd_action_load`, and includes a configuration header.
+- **[txn.c](txn.c.md)**: QUIC client code to send one or more transaction payloads to a target address and port.
+- **[txn.h](txn.h.md)**: The `txn.h` file in the `firedancer` codebase declares an external action, `fd_action_txn`, and includes a configuration header.
+- **[wksp.c](wksp.c.md)**: The `wksp.c` file in the `firedancer` codebase defines functions to initialize workspaces and manage memory locking limits, and it sets up an action for workspace initialization.
+- **[wksp.h](wksp.h.md)**: The `wksp.h` file declares functions and an external action related to workspace commands in the Firedancer application.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

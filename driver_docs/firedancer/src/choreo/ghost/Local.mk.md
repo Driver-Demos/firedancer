@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the `fd_ghost` component with optional unit tests.
+Build rules for fd_ghost headers, objects, and unit tests when int128 and hosted support are enabled.
 
 # Purpose
-The `Makefile` content defines conditional compilation and testing rules for a software project. If the macro `FD_HAS_INT128` is defined, it adds headers and object files related to `fd_ghost` and `fd_choreo`. If `FD_HAS_HOSTED` is also defined, it creates and runs a unit test named `test_ghost` that depends on several components: `fd_choreo`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.
+Build rules add the `fd_ghost.h` header and the `fd_ghost` object file when `FD_HAS_INT128` is defined. When `FD_HAS_HOSTED` is also defined, the file adds the `test_ghost` unit test, links it with `fd_choreo`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`, and runs that test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,24 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-TLS 1.3 handshake, ASN.1 parsing, protocol encoding/decoding, fuzz tests, and unit tests.
+TLS 1.3 handshake, message encode/decode, ASN.1, fuzz, and test support for QUIC.
 
 
 ## Files
-- **[fd_tls.c](fd_tls.c.md)**: Implements TLS 1.3 handshake and cryptographic operations, including client and server state management.
-- **[fd_tls.h](fd_tls.h.md)**: Implements a subset of the TLS v1.3 handshake protocol for securing peer-to-peer QUIC connections in Solana.
-- **[fd_tls_asn1.c](fd_tls_asn1.c.md)**: Parses Ed25519 public keys from ASN.1 encoded data with a specific prefix.
-- **[fd_tls_asn1.h](fd_tls_asn1.h.md)**: Minimal APIs for handling ASN.1 DER encoded data, focusing on Ed25519 keys per RFC 8410.
-- **[fd_tls_estate.h](fd_tls_estate.h.md)**: Defines structures and functions for managing TLS handshake state for both server and client sides.
-- **[fd_tls_proto.c](fd_tls_proto.c.md)**: Implements functions for encoding and decoding TLS protocol messages, including client and server hello messages, extensions, and certificate handling.
-- **[fd_tls_proto.h](fd_tls_proto.h.md)**: Declares TLS v1.3 data structures and APIs for encoding/decoding them to/from wire format.
-- **[fd_tls_serde.h](fd_tls_serde.h.md)**: Branch-minimizing (de-)serializer macros for internal use in `fd_tls_proto.c`.
-- **[fuzz_tls.c](fuzz_tls.c.md)**: Fuzz testing implementation for TLS handshaking in the Firedancer codebase.
-- **[fuzz_tls_msg_parser.c](fuzz_tls_msg_parser.c.md)**: Fuzz testing for TLS message parsers using LLVM's libFuzzer framework.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing TLS components, including unit and fuzz tests, with optional OpenSSL support.
-- **[test_tls.c](test_tls.c.md)**: Tests for TLS protocol functionality, including client-server handshake and cipher suite validation.
-- **[test_tls_helper.h](test_tls_helper.h.md)**: Common routines and structures for unit testing fd_tls, including deterministic RNG and test record transport.
-- **[test_tls_openssl.c](test_tls_openssl.c.md)**: Tests the handshake between an OpenSSL client and an fd_tls server using various cryptographic operations and callbacks.
+- **[fd_tls.c](fd_tls.c.md)**: TLS 1.3 client and server handshake logic with X25519, Ed25519, HKDF, and alert handling.
+- **[fd_tls.h](fd_tls.h.md)**: TLS 1.3 handshake API for QUIC with Ed25519, X25519, and AES-128-GCM support.
+- **[fd_tls_asn1.c](fd_tls_asn1.c.md)**: The `fd_tls_asn1.c` file in the `firedancer` codebase provides functionality for extracting an Ed25519 public key from ASN.1 encoded data by verifying a specific prefix.
+- **[fd_tls_asn1.h](fd_tls_asn1.h.md)**: The `fd_tls_asn1.h` file provides minimal APIs for handling ASN.1 DER encoded data, specifically for extracting Ed25519 public keys as per RFC 8410.
+- **[fd_tls_estate.h](fd_tls_estate.h.md)**: The `fd_tls_estate.h` file in the `firedancer` codebase defines structures and functions for managing TLS handshake states for both server and client, optimizing memory usage and handling security concerns.
+- **[fd_tls_proto.c](fd_tls_proto.c.md)**: The `fd_tls_proto.c` file in the `firedancer` codebase provides functions for encoding and decoding various TLS protocol messages, including client and server hello messages, certificate handling, and extension processing, as part of the TLS handshake process.
+- **[fd_tls_proto.h](fd_tls_proto.h.md)**: TLS v1.3 data structures, constants, and encode/decode APIs for wire format.
+- **[fd_tls_serde.h](fd_tls_serde.h.md)**: Branch-minimizing TLS serialize and deserialize macros with bounds checks and list helpers.
+- **[fuzz_tls.c](fuzz_tls.c.md)**: The `fuzz_tls.c` file in the `firedancer` codebase implements a fuzzing test for the `fd_tls` handshaking process, using input data to simulate various TLS handshake states and configurations.
+- **[fuzz_tls_msg_parser.c](fuzz_tls_msg_parser.c.md)**: The `fuzz_tls_msg_parser.c` file in the `firedancer` codebase implements a fuzzing test for parsing various TLS message types, including client hello, server hello, encrypted extensions, certificate verification, and finished messages.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_tls, unit tests, fuzz tests, and OpenSSL tests.
+- **[test_tls.c](test_tls.c.md)**: The `test_tls.c` file in the `firedancer` codebase contains tests for TLS protocol operations, including encoding and decoding of TLS messages, client-server handshake integration, and handling of incorrect cipher suites.
+- **[test_tls_helper.h](test_tls_helper.h.md)**: The `test_tls_helper.h` file in the `firedancer` codebase provides common routines and utilities for unit testing TLS functionalities, including deterministic random number generation, signing operations, and test record transport and logging.
+- **[test_tls_openssl.c](test_tls_openssl.c.md)**: OpenSSL and fd_tls QUIC handshake tests for client and server paths.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

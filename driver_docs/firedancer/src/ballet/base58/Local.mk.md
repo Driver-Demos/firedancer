@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the fd_base58 module with unit and fuzz tests.
+The `Local.mk` file in the `firedancer` codebase specifies the build configuration for the `base58` module, including headers, object files, unit tests, and conditional fuzz tests.
 
 # Purpose
-The Makefile content defines build instructions for a software project. It adds the header file `fd_base58.h` and object files `fd_base58` and `fd_ballet` to the build process. It specifies a unit test `test_base58` that depends on `fd_ballet` and `fd_util`. If the `FD_HAS_HOSTED` condition is true, it includes fuzz tests `fuzz_base58_roundtrip` and `fuzz_base58_garbage`, both of which also depend on `fd_ballet` and `fd_util`.
+This file is a Makefile snippet used to define build rules for a software project. It specifies the inclusion of header files, object files, and unit tests related to Base58 functionality, and conditionally includes fuzz tests if the `FD_HAS_HOSTED` environment variable is set. The `call` function is used to modularize the addition of these components into the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
