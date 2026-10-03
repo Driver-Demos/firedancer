@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A script for producing block schedules in Solana using RPC, public keys, and slot information.
+The `block_production.py` file in the `firedancer` codebase is a script that connects to a Solana RPC client to retrieve and display upcoming leader slots for a given public key.
 
 # Purpose
-The code is a script designed to interact with the Solana blockchain network. It retrieves and processes information about block production schedules for a given public key. The script requires three command-line arguments: an RPC URL, a public key, and a number `n`. It uses these inputs to connect to the Solana network, fetch epoch information, and determine the leader schedule for block production. The script calculates and prints details about upcoming slots where the specified public key is scheduled to produce blocks, including the relative and absolute distances between slots in terms of time.
+This Python script is designed to interact with the Solana blockchain to analyze and display information about block production schedules. It primarily focuses on retrieving and processing leader schedules for a given public key, which represents a validator or node in the Solana network. The script uses the Solana RPC API to fetch epoch information and leader schedules, then calculates and prints the relative and absolute distances between upcoming slots and the current slot. This information is useful for validators to understand their upcoming responsibilities in block production.
 
-The script imports several modules and classes from the `solders` and `solana` libraries to facilitate blockchain interactions, such as `Client`, `Pubkey`, and `TransferParams`. It also uses standard Python libraries like `datetime`, `sys`, and `multiprocessing` to handle time calculations, command-line arguments, and parallel processing. The [`usage`](<#usage>) function provides guidance on how to run the script, and the [`main`](<#main>) function contains the core logic for fetching and displaying the block production schedule. The script is intended to be executed directly and does not define any public APIs or external interfaces for use in other modules.
+The script is structured as a command-line tool, requiring three arguments: an RPC URL, a public key, and a number of slots to consider. It uses several external libraries, such as `solders` for handling Solana-specific data structures and `pqdm` for potential parallel processing, although the latter is not utilized in the current implementation. The script is intended to be executed directly and does not define any public APIs or external interfaces for use in other programs. Its primary function is to provide insights into the timing and scheduling of block production for a specific validator on the Solana network.
 # Imports and Dependencies
 
 ---
@@ -36,34 +36,33 @@ The script imports several modules and classes from the `solders` and `solana` l
 
 ---
 ### usage<!-- {{#callable:firedancer/contrib/tool/block_production.usage}} -->
-[View Source →](<../../../../contrib/tool/block_production.py#L22>)
-
-Prints usage instructions and exits the program.
+The `usage` function prints a usage message for the script and exits the program with a status code of 1.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Prints a usage message to the standard output.
-    - Calls the `exit` function with status code 1 to terminate the program.
-- **Output**: No return value; the function exits the program.
+- **Control Flow**:
+    - Prints a usage message indicating the expected command-line arguments for the script.
+    - Exits the program with a status code of 1.
+- **Output**: The function does not return any value; it exits the program with a status code of 1.
 
 
 ---
 ### main<!-- {{#callable:firedancer/contrib/tool/block_production.main}} -->
-[View Source →](<../../../../contrib/tool/block_production.py#L26>)
-
-Calculates and prints the relative and absolute distances of upcoming leader slots for a given public key in a Solana network.
+The `main` function retrieves and processes Solana blockchain leader schedule information for a given public key and number of slots, then prints the timing details of upcoming slots.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Check if the number of command-line arguments is less than 4; if true, call the [`usage`](<#usage>) function and exit.
+- **Control Flow**:
+    - Check if the number of command-line arguments is less than 4; if so, call the [`usage`](#usage) function and exit.
     - Create a `Client` object using the first command-line argument as the RPC URL.
     - Convert the second command-line argument to a `Pubkey` object.
-    - Convert the third command-line argument to an integer `slot_cnt`.
-    - Retrieve epoch information and leader schedule from the Solana client.
-    - Filter leader slots for the given public key that are greater than the current slot index and limit the list to four times `slot_cnt`.
-    - Calculate the starting slot of the current epoch.
-    - Iterate over the upcoming leader slots, calculate relative and absolute distances, and print the formatted results.
-- **Output**: Prints the slot number, relative distance, absolute distance, and time in seconds for each upcoming leader slot.
-- **Functions Called**:
-    - [`firedancer/contrib/tool/block_production.usage`](<#usage>)
+    - Convert the third command-line argument to an integer representing the number of slots (`slot_cnt`).
+    - Retrieve epoch information using the `client.get_epoch_info()` method.
+    - Retrieve the leader schedule for the current epoch using the `client.get_leader_schedule()` method.
+    - Extract the leader slot indices for the given public key from the leader schedule.
+    - Filter the leader slot indices to find upcoming slots that are greater than the current slot index, limiting the result to four times the number of slots specified (`4*slot_cnt`).
+    - Calculate the starting slot of the epoch by subtracting the current slot index from the absolute slot.
+    - Iterate over the upcoming slot indices, calculating the slot number, relative slot difference, and distance from the current absolute slot.
+    - For each slot, calculate the relative and distance time deltas in milliseconds and print the slot information.
+- **Output**: The function outputs formatted information about upcoming slots, including the slot number, relative slot difference, distance from the current slot, and corresponding time deltas.
+- **Functions called**:
+    - [`firedancer/contrib/tool/block_production.usage`](#usage)
 
 
 
