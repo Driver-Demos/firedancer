@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a mechanism to trigger ARP requests using UDP packets with minimal privileges.
+The `fd_neigh4_probe.h` file in the `firedancer` codebase implements a mechanism for triggering ARP requests in Linux using empty UDP packets to facilitate neighbor discovery with minimal privileges.
 
 # Purpose
-The `fd_neigh4_probe.h` file provides functionality to indirectly trigger ARP (Address Resolution Protocol) requests in Linux using the Firedancer network stack. This is achieved by sending empty UDP packets to a specified IP address, which prompts the kernel to perform ARP requests without requiring elevated privileges. The file defines a structure, `fd_neigh4_prober_t`, which includes a UDP socket, a delay for successive ARP requests, a token bucket rate limiter, and counters for rate-limited probes. The primary purpose of this code is to manage neighbor probing with minimal privileges, using solution 3 from the documented possible solutions.
+The `fd_neigh4_probe.h` file is a C header file that provides functionality for triggering ARP (Address Resolution Protocol) requests in a Linux environment using a method that requires minimal privileges. This file is part of the Firedancer network stack and is specifically designed to handle situations where an IP packet is sent, but no corresponding entry exists in the neighbor table to resolve the destination MAC address. The header defines a mechanism to send empty UDP packets to indirectly prompt the Linux kernel to issue ARP requests, thereby updating the neighbor table with the necessary MAC address information. This approach is chosen because it does not require elevated privileges, unlike other potential solutions that involve direct manipulation of the neighbor table or sending raw packets.
 
-The file includes functions to initialize and finalize the `fd_neigh4_prober_t` structure, as well as to send probes. The [`fd_neigh4_prober_init`](<#fd_neigh4_prober_init>) function sets up a UDP socket with a TTL of zero and configures rate limiting parameters. The [`fd_neigh4_probe`](<#fd_neigh4_probe>) function sends an empty UDP packet to initiate the neighbor discovery process. Additionally, the [`fd_neigh4_probe_rate_limited`](<#fd_neigh4_probe_rate_limited>) function ensures that probes adhere to local and global rate limits, incrementing counters when limits are reached. This header file is intended to be included in other C files, providing a public API for neighbor probing in network applications.
+The file defines the `fd_neigh4_prober_t` structure, which encapsulates the state and configuration for the neighbor probing process, including a UDP socket, a delay for successive ARP requests, and a token bucket rate limiter to control the frequency of outgoing probes. The header also declares several functions: [`fd_neigh4_prober_init`](#fd_neigh4_prober_init) for initializing the prober, [`fd_neigh4_prober_fini`](#fd_neigh4_prober_fini) for cleaning up resources, and [`fd_neigh4_probe`](#fd_neigh4_probe) for sending the UDP packets. Additionally, it provides a rate-limited version of the probe function, [`fd_neigh4_probe_rate_limited`](#fd_neigh4_probe_rate_limited), which ensures that probes do not exceed specified rate limits. This file is intended to be included in other C source files that require neighbor probing functionality, and it defines a public API for managing and executing these probes within the constraints of the Firedancer network stack.
 # Imports and Dependencies
 
 ---
@@ -20,92 +20,84 @@ The file includes functions to initialize and finalize the `fd_neigh4_prober_t` 
 
 ---
 ### fd\_neigh4\_prober
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
     - `sock_fd`: UDP socket with IP_TTL 0.
     - `probe_delay`: Specifies the delay in ticks for successive ARP requests to the same IP address.
     - `rate_limit`: Token bucket rate limiter on any outgoing ARP probes.
     - `local_rate_limited_cnt`: Metric counter for probes suppressed by local rate limit.
     - `global_rate_limited_cnt`: Metric counter for probes suppressed by global rate limit.
-- **Description**: Provides a structure for managing ARP probe operations using UDP sockets with rate limiting and delay mechanisms. It includes fields for socket file descriptor, probe delay, rate limiting, and counters for rate-limited probes.
+- **Description**: The `fd_neigh4_prober` structure is designed to facilitate ARP requests in a Linux environment by sending empty UDP packets to trigger the kernel's ARP mechanism. It includes a UDP socket (`sock_fd`) with a time-to-live of zero, a delay mechanism (`probe_delay`) to control the frequency of ARP requests to the same IP, and a token bucket rate limiter (`rate_limit`) to manage the rate of outgoing ARP probes. Additionally, it maintains counters (`local_rate_limited_cnt` and `global_rate_limited_cnt`) to track the number of probes suppressed due to local and global rate limits, respectively. This structure is part of a solution to perform neighbor probing with minimal privileges.
 
 
 ---
 ### fd\_neigh4\_prober\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
     - `sock_fd`: UDP socket with IP_TTL 0.
     - `probe_delay`: Specifies the delay in ticks for successive ARP requests to the same IP address.
     - `rate_limit`: Token bucket rate limiter on any outgoing ARP probes.
     - `local_rate_limited_cnt`: Metric counter for probes suppressed by local rate limit.
     - `global_rate_limited_cnt`: Metric counter for probes suppressed by global rate limit.
-- **Description**: Provides neighbor probing functionality using empty UDP/IP packets to indirectly trigger ARP requests in Linux, implementing a solution that requires minimal privileges.
+- **Description**: The `fd_neigh4_prober_t` structure is designed to facilitate neighbor probing in a network by sending empty UDP/IP packets to trigger ARP requests indirectly. It contains a UDP socket descriptor, a delay parameter for controlling the frequency of ARP requests to the same IP, a token bucket for rate limiting outgoing probes, and counters for tracking the number of probes suppressed by local and global rate limits. This structure is part of a solution that minimizes required privileges by using UDP packets to prompt the kernel to perform ARP requests.
 
 
 # Functions
 
 ---
 ### fd\_neigh4\_probe\_rate\_limited<!-- {{#callable:fd_neigh4_probe_rate_limited}} -->
-[View Source →](<../../../../../src/waltz/neigh/fd_neigh4_probe.h#L110>)
-
-Calls [`fd_neigh4_probe`](<fd_neigh4_probe.c.md#fd_neigh4_probe>) to send a probe unless local or global rate limits are exceeded.
+The `fd_neigh4_probe_rate_limited` function attempts to send a network probe while adhering to local and global rate limits.
 - **Inputs**:
-    - `prober`: A pointer to an `fd_neigh4_prober_t` structure that manages probe operations and rate limits.
-    - `entry`: A pointer to an `fd_neigh4_entry_t` structure that contains information about the neighbor entry, including the next allowed probe time.
-    - `ip4_addr`: An unsigned integer representing the IPv4 address of the target neighbor in big-endian format.
-    - `now`: A long integer representing the current time in ticks, used to check rate limits.
-- **Logic and Control Flow**:
-    - Check if the current time `now` is less than `entry->probe_suppress_until`; if true, increment `prober->local_rate_limited_cnt` and return -1.
-    - Update `entry->probe_suppress_until` to `now + prober->probe_delay`.
-    - Attempt to consume a token from `prober->rate_limit` using `fd_token_bucket_consume`; if unsuccessful, increment `prober->global_rate_limited_cnt` and return -1.
-    - Call [`fd_neigh4_probe`](<fd_neigh4_probe.c.md#fd_neigh4_probe>) with the provided arguments to send a probe.
-- **Output**: Returns 0 if a probe is sent successfully, -1 if a rate limit is hit, or a positive errno value if [`fd_neigh4_probe`](<fd_neigh4_probe.c.md#fd_neigh4_probe>) fails.
-- **Functions Called**:
-    - [`fd_neigh4_probe`](<fd_neigh4_probe.c.md#fd_neigh4_probe>)
+    - `prober`: A pointer to an `fd_neigh4_prober_t` structure, which contains the state and configuration for probing, including rate limits and counters.
+    - `entry`: A pointer to an `fd_neigh4_entry_t` structure, which represents an entry in the neighbor table and includes the timestamp for when probing is next allowed.
+    - `ip4_addr`: An unsigned integer representing the IPv4 address to probe, in big-endian format.
+    - `now`: A long integer representing the current time, typically obtained from `fd_tickcount()`, used to check against rate limits.
+- **Control Flow**:
+    - Check if the current time `now` is less than `entry->probe_suppress_until`; if true, increment the local rate limit counter and return -1 to indicate rate limiting.
+    - Update `entry->probe_suppress_until` to the current time plus the probe delay to set the next allowable probe time.
+    - Attempt to consume a token from the global rate limiter using `fd_token_bucket_consume`; if unsuccessful, increment the global rate limit counter and return -1 to indicate rate limiting.
+    - If both rate limits are not exceeded, call [`fd_neigh4_probe`](fd_neigh4_probe.c.md#fd_neigh4_probe) to send the probe and return its result.
+- **Output**: Returns 0 if the probe is successfully sent, -1 if either local or global rate limits are hit, or a positive errno value if [`fd_neigh4_probe`](fd_neigh4_probe.c.md#fd_neigh4_probe) fails.
+- **Functions called**:
+    - [`fd_neigh4_probe`](fd_neigh4_probe.c.md#fd_neigh4_probe)
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_neigh4\_prober\_init<!-- {{#callable_declaration:fd_neigh4_prober_init}} -->
-[View Source →](<../../../../../src/waltz/neigh/fd_neigh4_probe.h#L74>)
-
-Initializes a neighbor prober for ARP requests.
-- **Description**: Use this function to set up a `fd_neigh4_prober_t` object for sending ARP requests via UDP packets. This function creates a new unbound UDP socket with specific configurations, including an IPv4 TTL of zero. It configures rate limiting for outgoing probe packets using a token bucket algorithm, and sets a minimum delay between successive probes to the same IP address. Call this function before using the prober to ensure it is properly initialized.
+Initialize a neighbor prober for sending UDP packets.
+- **Description**: This function initializes a `fd_neigh4_prober_t` object, setting up a UDP socket with specific options to facilitate neighbor probing via ARP requests. It configures the prober with rate limiting parameters for outgoing probe packets and a delay between successive probes to the same IP address. This function should be called before using the prober to send any probe packets, ensuring that the prober is properly configured and ready for operation.
 - **Inputs**:
-    - `prober`: A pointer to a `fd_neigh4_prober_t` structure. Must not be null. The function initializes this structure with the necessary socket and rate limiting configurations.
-    - `max_probes_per_second`: A float specifying the maximum number of probes allowed per second. Must be a positive value. Used to configure the rate limiter.
-    - `max_probe_burst`: An unsigned long specifying the maximum burst size for probe packets. Must be a positive value. Used to configure the rate limiter.
+    - `prober`: A pointer to a `fd_neigh4_prober_t` structure that will be initialized. Must not be null. The caller retains ownership.
+    - `max_probes_per_second`: A float specifying the maximum number of probes that can be sent per second. Must be a non-negative value.
+    - `max_probe_burst`: An unsigned long specifying the maximum burst size of probes that can be sent at once. Must be a non-negative value.
     - `probe_delay_seconds`: A float specifying the minimum delay in seconds between successive probes to the same IP address. Must be a non-negative value.
 - **Output**: None
-- **See Also**: [`fd_neigh4_prober_init`](<fd_neigh4_probe.c.md#fd_neigh4_prober_init>)  (Implementation)
+- **See also**: [`fd_neigh4_prober_init`](fd_neigh4_probe.c.md#fd_neigh4_prober_init)  (Implementation)
 
 
 ---
 ### fd\_neigh4\_prober\_fini<!-- {{#callable_declaration:fd_neigh4_prober_fini}} -->
-[View Source →](<../../../../../src/waltz/neigh/fd_neigh4_probe.h#L91>)
-
 Closes the socket associated with a neighbor prober.
-- **Description**: Use this function to close the socket of a `fd_neigh4_prober_t` instance when it is no longer needed. This function should be called to release the resources associated with the prober, specifically the UDP socket. It is important to ensure that the prober is properly initialized before calling this function. After execution, the socket file descriptor within the prober is set to -1, indicating that it is closed. This function does not handle invalid input and assumes that the provided prober is valid and initialized.
+- **Description**: Use this function to properly close and clean up a `fd_neigh4_prober_t` instance when it is no longer needed. This function should be called to release the resources associated with the prober, specifically the UDP socket used for neighbor probing. It is important to ensure that the prober is not used after this function is called, as the socket file descriptor will be set to an invalid state.
 - **Inputs**:
-    - `prober`: A pointer to a `fd_neigh4_prober_t` instance. The prober must be initialized and must not be null. The function does not perform any checks on the validity of the pointer, so passing a null or uninitialized pointer can lead to undefined behavior.
+    - `prober`: A pointer to a `fd_neigh4_prober_t` instance. This must not be null, and it should point to a valid prober that was previously initialized. The function will close the socket associated with this prober and set its `sock_fd` to -1.
 - **Output**: None
-- **See Also**: [`fd_neigh4_prober_fini`](<fd_neigh4_probe.c.md#fd_neigh4_prober_fini>)  (Implementation)
+- **See also**: [`fd_neigh4_prober_fini`](fd_neigh4_probe.c.md#fd_neigh4_prober_fini)  (Implementation)
 
 
 ---
 ### fd\_neigh4\_probe<!-- {{#callable_declaration:fd_neigh4_probe}} -->
-[View Source →](<../../../../../src/waltz/neigh/fd_neigh4_probe.h#L100>)
-
 Sends an empty UDP packet to trigger ARP requests.
-- **Description**: Use this function to initiate the neighbor discovery process by sending an empty UDP packet to a specified IP address on a neighboring subnet. This action indirectly triggers the kernel to send an ARP request. The function requires a valid `fd_neigh4_prober_t` object, which must be initialized before calling this function. The `ip4_addr` parameter must be in big-endian format. The `now` parameter should be a recent tick count value. The function updates the `probe_suppress_until` field in the `entry` to prevent immediate successive probes to the same IP address. It returns 0 on success or an error code if the `sendto` operation fails.
+- **Description**: This function is used to initiate the neighbor discovery process by sending an empty UDP packet to a specified IP address on a neighboring subnet. It is particularly useful in environments where minimal privileges are available, as it does not require elevated permissions. The function should be called with a valid prober and entry, and the IP address must be in big-endian format. The 'now' parameter should be a recent tick count. The function updates the entry to suppress further probes for a specified delay period.
 - **Inputs**:
-    - `prober`: A pointer to an `fd_neigh4_prober_t` object. Must be initialized and not null. The function uses this object to send the UDP packet.
-    - `entry`: A pointer to an `fd_neigh4_entry_t` object. Must not be null. The function updates the `probe_suppress_until` field in this object.
-    - `ip4_addr`: An unsigned integer representing the IP address in big-endian format. Must be a valid IP address on a neighboring subnet.
-    - `now`: A long integer representing the current tick count. Used to calculate the next allowable probe time.
-- **Output**: Returns 0 on success. If `sendto` fails, returns the corresponding errno value.
-- **See Also**: [`fd_neigh4_probe`](<fd_neigh4_probe.c.md#fd_neigh4_probe>)  (Implementation)
+    - `prober`: A pointer to an initialized fd_neigh4_prober_t structure. Must not be null. The prober should have a valid UDP socket and configured probe delay.
+    - `entry`: A pointer to an fd_neigh4_entry_t structure. Must not be null. This entry will be updated to suppress further probes for a delay period.
+    - `ip4_addr`: The IP address of the target neighbor in big-endian format. Must be a valid IPv4 address.
+    - `now`: A long integer representing the current tick count. Used to calculate the suppression period for further probes.
+- **Output**: Returns 0 on success, or an errno value if the send operation fails.
+- **See also**: [`fd_neigh4_probe`](fd_neigh4_probe.c.md#fd_neigh4_probe)  (Implementation)
 
 
 
