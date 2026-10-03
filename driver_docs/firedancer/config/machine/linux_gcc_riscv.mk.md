@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_riscv.mk` file in the `firedancer` codebase is a makefile configuration for building with GCC targeting RISC-V architecture, including various flags and settings for cross-compilation, optimization, debugging, and security.
+Makefile for configuring RISC-V cross-compilation with GCC, including flags and feature definitions.
 
 # Purpose
-The provided content is from a Makefile, which is used to automate the build process of a software project. This Makefile is configured to build a project targeting the RISC-V architecture using the GNU Compiler Collection (GCC). It sets up the build directory and includes several configuration files to extend its functionality, such as enabling optimizations, debugging, security features, and threading. The file also conditionally sets up cross-compilation tools if the host machine is not a PowerPC 64-bit Little Endian (ppc64le) architecture, specifying the use of RISC-V specific compilers and linkers. Additionally, it defines and appends preprocessor flags to enable certain features like 128-bit integers, double precision, and dynamic memory allocation using `alloca`.
+This Makefile is used to configure the build environment for a software project targeting the RISC-V architecture. The `BUILDDIR` variable specifies the directory for build outputs, and several configuration files are included to extend the build settings. The file sets compiler flags such as `CPPFLAGS` and `LDFLAGS`, with `LDFLAGS` including the math library `-lm`. It checks the machine architecture and sets the `CROSS` variable to enable cross-compilation if the architecture is not `ppc64le`. When cross-compilation is enabled, it defines the compilers `CC`, `CXX`, and `LD` for the RISC-V target. Additional configuration files are included to enable features like optimization, debugging, security, and threading, and preprocessor flags are set to define specific capabilities such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and `FD_HAS_ALLOCA`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

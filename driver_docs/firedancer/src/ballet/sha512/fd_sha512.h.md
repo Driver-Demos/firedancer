@@ -3,418 +3,378 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_sha512.h` file in the `firedancer` codebase provides APIs for SHA-512 and SHA-384 hashing, including functions for initializing, appending data, finalizing, and clearing hash calculations, as well as support for batch processing with different levels of hardware acceleration.
+APIs and data structures for SHA-512 and SHA-384 hashing, including memory management and batch processing.
 
 # Purpose
-The provided C header file defines a comprehensive API for performing SHA-512 and SHA-384 cryptographic hash operations. It includes definitions for the necessary data structures, constants, and function prototypes required to initialize, update, and finalize hash computations. The file specifies memory alignment and footprint requirements for the hash state structures, ensuring efficient memory usage and performance optimization, particularly in multi-threaded environments where false sharing might be a concern. The API is designed to be flexible, allowing for both single and batched hash computations, with optimizations for different hardware capabilities such as AVX and AVX-512 instruction sets.
+The code is a C header file that provides an API for SHA-512 and SHA-384 hashing operations. It defines constants, data structures, and function prototypes necessary for performing cryptographic hash calculations using the SHA-512 and SHA-384 algorithms. The file includes definitions for memory alignment and footprint requirements, which are crucial for efficient memory management and performance optimization. The `fd_sha512_t` and `fd_sha384_t` types represent the state of a hash calculation, and the file provides functions to initialize, append data to, and finalize hash calculations. Additionally, it includes batch processing capabilities with different implementations based on available hardware acceleration (e.g., AVX, AVX-512).
 
-The header file defines several key components, including the `fd_sha512_t` and `fd_sha384_t` types, which represent the state of an ongoing hash computation. It provides functions to manage the lifecycle of these states, such as [`fd_sha512_new`](#fd_sha512_new), [`fd_sha512_join`](#fd_sha512_join), [`fd_sha512_leave`](#fd_sha512_leave), and [`fd_sha512_delete`](#fd_sha512_delete), which handle memory allocation and deallocation. The core hashing operations are encapsulated in functions like [`fd_sha512_init`](#fd_sha512_init), [`fd_sha512_append`](#fd_sha512_append), and [`fd_sha512_fini`](#fd_sha512_fini), which initialize the hash state, append data to be hashed, and finalize the hash computation, respectively. Additionally, the file includes batch processing capabilities, allowing multiple hash computations to be processed simultaneously, leveraging SIMD instructions for performance gains. This makes the API suitable for high-performance applications requiring secure and efficient hash computations.
+The header file defines several macros and functions to facilitate the use of SHA-512 and SHA-384 hashing in applications. Functions such as [`fd_sha512_new`](<#fd_sha512_new>), [`fd_sha512_join`](<#fd_sha512_join>), [`fd_sha512_leave`](<#fd_sha512_leave>), and [`fd_sha512_delete`](<#fd_sha512_delete>) manage the lifecycle of a hash calculation state. The [`fd_sha512_init`](<#fd_sha512_init>), [`fd_sha512_append`](<#fd_sha512_append>), and [`fd_sha512_fini`](<#fd_sha512_fini>) functions are used to start, update, and complete a hash calculation, respectively. The file also provides batch processing functions that allow multiple hash calculations to be performed simultaneously, leveraging hardware acceleration when available. This header file is intended to be included in other C source files to provide hashing functionality.
 # Imports and Dependencies
 
 ---
 - `../fd_ballet_base.h`
 
 
-# Global Variables
-
----
-### fd\_sha512\_new
-- **Type**: `function pointer`
-- **Description**: The `fd_sha512_new` function is a global function pointer that initializes a memory region to hold a SHA-512 calculation state. It takes a pointer to a memory region (`shmem`) as an argument and returns the same pointer on success or `NULL` on failure.
-- **Use**: This function is used to format a memory region with the necessary alignment and footprint for SHA-512 hashing operations.
-
-
----
-### fd\_sha512\_join
-- **Type**: `fd_sha512_t *`
-- **Description**: The `fd_sha512_join` function is a global function that returns a pointer to a `fd_sha512_t` structure. This function is used to join a caller to a SHA-512 calculation state, which is represented by the `fd_sha512_t` structure.
-- **Use**: This function is used to obtain a local handle to a SHA-512 calculation state by providing a pointer to the memory region holding the state.
-
-
----
-### fd\_sha512\_leave
-- **Type**: `function`
-- **Description**: The `fd_sha512_leave` function is used to leave a current local join to a SHA-512 calculation state. It takes a pointer to a `fd_sha512_t` structure, which represents the SHA-512 calculation state, and returns a pointer to the memory region holding the state on success or NULL on failure.
-- **Use**: This function is used to disassociate a caller from a SHA-512 calculation state, effectively ending the caller's interaction with that state.
-
-
----
-### fd\_sha512\_delete
-- **Type**: `function pointer`
-- **Description**: `fd_sha512_delete` is a function pointer that points to a function designed to unformat a memory region holding a SHA-512 calculation state. It takes a pointer to the memory region as an argument and returns a pointer to the memory region on success or NULL on failure.
-- **Use**: This function is used to release or reset the memory region associated with a SHA-512 calculation state, ensuring that the caller regains ownership of the memory.
-
-
----
-### fd\_sha512\_init
-- **Type**: `fd_sha512_t *`
-- **Description**: The `fd_sha512_init` function initializes a SHA-512 calculation state. It takes a pointer to an `fd_sha512_t` structure, which represents the state of a SHA-512 hash calculation, and prepares it for a new hashing operation.
-- **Use**: This function is used to start a new SHA-512 hashing process by resetting the state of the provided `fd_sha512_t` structure.
-
-
----
-### fd\_sha384\_init
-- **Type**: `fd_sha512_t *`
-- **Description**: The `fd_sha384_init` function is a global function that initializes a SHA-384 hashing calculation state. It takes a pointer to a `fd_sha512_t` structure, which represents the internal state of the SHA-512 calculation, and prepares it for a new SHA-384 hashing operation.
-- **Use**: This function is used to reset or initialize the state of a SHA-384 hashing operation, discarding any previous state and preparing it for a new calculation.
-
-
----
-### fd\_sha512\_append
-- **Type**: `fd_sha512_t *`
-- **Description**: The `fd_sha512_append` function is a global function that appends a specified number of bytes from a data buffer to an in-progress SHA-512 hash calculation. It takes a pointer to a SHA-512 calculation state, a pointer to the data to be appended, and the size of the data in bytes.
-- **Use**: This function is used to update the state of an ongoing SHA-512 hash calculation by adding new data to it.
-
-
----
-### fd\_sha512\_fini
-- **Type**: `function`
-- **Description**: The `fd_sha512_fini` function is used to complete a SHA-512 hashing operation. It takes a pointer to a SHA-512 calculation state (`fd_sha512_t * sha`) and a pointer to a memory region (`void * hash`) where the resulting 64-byte hash will be stored. Upon completion, the function returns the `hash` pointer, and the SHA-512 calculation state is no longer in progress.
-- **Use**: This function is used to finalize a SHA-512 hash calculation and store the result in a specified memory location.
-
-
----
-### fd\_sha384\_fini
-- **Type**: `function`
-- **Description**: The `fd_sha384_fini` function is used to complete a SHA-384 hashing operation. It takes a pointer to a SHA-384 calculation state (`fd_sha384_t *sha`) and a pointer to a memory region (`void *hash`) where the resulting hash will be stored. The function finalizes the hash calculation and populates the provided memory region with the 48-byte hash result.
-- **Use**: This function is used to finalize a SHA-384 hash calculation and store the result in a specified memory location.
-
-
----
-### fd\_sha512\_hash
-- **Type**: `function pointer`
-- **Description**: `fd_sha512_hash` is a function that performs a SHA-512 hash computation on a given data input. It initializes a SHA-512 calculation state, appends the data to it, and finalizes the hash computation, storing the result in the provided hash buffer.
-- **Use**: This function is used to compute the SHA-512 hash of a data block in a streamlined manner, optimizing for small messages by reducing overhead.
-
-
----
-### fd\_sha384\_hash
-- **Type**: `function pointer`
-- **Description**: `fd_sha384_hash` is a function that computes the SHA-384 hash of a given data input. It takes three parameters: a pointer to the data to be hashed, the size of the data, and a pointer to a memory location where the resulting hash will be stored. The function returns a pointer to the hash.
-- **Use**: This function is used to perform a SHA-384 hash operation on a block of data, storing the result in the provided hash memory location.
-
-
 # Data Structures
 
 ---
 ### fd\_sha512\_private
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `buf`: Buffered message bytes that have not been added to the hash yet, indexed [0,buf_used).
-    - `state`: Current state of the hash.
-    - `magic`: A constant value equal to FD_SHA512_MAGIC, used for validation.
-    - `buf_used`: Number of buffered bytes, in the range [0,FD_SHA512_PRIVATE_BUF_MAX).
-    - `bit_cnt_lo`: Lower 64 bits of the total number of bits appended.
-    - `bit_cnt_hi`: Upper 64 bits of the total number of bits appended.
-- **Description**: The `fd_sha512_private` structure is a data structure used to maintain the state of a SHA-512 hashing operation. It includes a buffer for message bytes that have not yet been processed, the current state of the hash, and counters for the number of bits processed. The structure is aligned to 128 bytes to optimize performance and reduce false sharing in multi-threaded environments. It also contains a magic number for validation purposes.
+    - ``buf``: Buffered message bytes that have not been added to the hash yet, indexed from 0 to `buf_used`.
+    - ``state``: Current state of the hash.
+    - ``magic``: A constant value equal to `FD_SHA512_MAGIC`.
+    - ``buf_used``: Number of buffered bytes, ranging from 0 to `FD_SHA512_PRIVATE_BUF_MAX`.
+    - ``bit_cnt_lo``: Lower 64 bits of the total number of bits appended.
+    - ``bit_cnt_hi``: Upper 64 bits of the total number of bits appended.
+- **Description**: The `fd_sha512_private` structure is used to maintain the state of a SHA-512 hashing operation. It includes a buffer for message bytes that have not yet been processed, the current state of the hash, and counters for the number of bits processed. The structure is aligned to 128 bytes to optimize memory access and includes a magic number for validation purposes.
 
 
 ---
 ### fd\_sha512\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `buf`: Buffered message bytes that have not been added to the hash yet.
-    - `state`: Current state of the hash.
-    - `magic`: Magic number to identify the structure, set to FD_SHA512_MAGIC.
-    - `buf_used`: Number of buffered bytes currently in use.
-    - `bit_cnt_lo`: Lower 64 bits of the total number of bits appended.
-    - `bit_cnt_hi`: Upper 64 bits of the total number of bits appended.
-- **Description**: The `fd_sha512_t` structure is an opaque handle representing the state of a SHA-512 hash calculation. It contains a buffer for message bytes that have not yet been processed, the current state of the hash, a magic number for validation, and counters for the number of bits processed. This structure is aligned to 128 bytes to optimize performance and mitigate false sharing in multi-threaded environments.
+    - ``buf``: Buffered message bytes that have not been added to the hash yet.
+    - ``state``: Current state of the hash.
+    - ``magic``: Magic number to identify the SHA512 structure.
+    - ``buf_used``: Number of buffered bytes currently in use.
+    - ``bit_cnt_lo``: Lower 64 bits of the total number of bits appended.
+    - ``bit_cnt_hi``: Upper 64 bits of the total number of bits appended.
+- **Description**: An opaque handle representing the state of a SHA-512 calculation, including buffered message bytes, the current hash state, and counters for the number of bits processed.
 
 
 ---
 ### fd\_sha384\_t
-- **Type**: `typedef struct fd_sha512_private fd_sha384_t;`
+- **Type**: ``struct``
 - **Members**:
-    - `buf`: Buffered message bytes that have not been added to the hash yet.
-    - `state`: Current state of the hash.
-    - `magic`: Magic number to identify the structure.
-    - `buf_used`: Number of buffered bytes currently in use.
-    - `bit_cnt_lo`: Lower 64 bits of the total number of bits appended.
-    - `bit_cnt_hi`: Upper 64 bits of the total number of bits appended.
-- **Description**: The `fd_sha384_t` is a typedef for the `fd_sha512_private` structure, which is used to maintain the state of a SHA-384 hashing operation. It includes a buffer for message bytes, a state array for the hash computation, a magic number for structure identification, and counters for the number of buffered bytes and total bits processed. The structure is aligned to 128 bytes to optimize performance and reduce false sharing.
+    - ``buf``: Buffered message bytes that have not been added to the hash yet.
+    - ``state``: Current state of the hash.
+    - ``magic``: Magic number to identify the structure.
+    - ``buf_used``: Number of buffered bytes.
+    - ``bit_cnt_lo``: Lower 64 bits of the total number of bits appended.
+    - ``bit_cnt_hi``: Upper 64 bits of the total number of bits appended.
+- **Description**: `fd_sha384_t` is a typedef for `fd_sha512_private`, which is a structure used to maintain the state of a SHA-384 hash calculation. It includes a buffer for message bytes, the current hash state, a magic number for identification, and counters for buffered bytes and total bits appended. The structure is aligned to 128 bytes to optimize memory access and mitigate false sharing.
 
 
 ---
 ### fd\_sha512\_private\_batch
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `data`: An array of pointers to the data to be hashed, aligned for AVX-512.
-    - `sz`: An array of sizes corresponding to each data block, aligned for AVX-512.
-    - `hash`: An array of pointers where the resulting hashes will be stored, aligned for AVX-512.
-    - `cnt`: A counter indicating the number of data blocks currently in the batch.
-- **Description**: The `fd_sha512_private_batch` structure is designed to facilitate batch processing of SHA-512 hashes using AVX-512 instructions. It holds arrays of data pointers, sizes, and hash result pointers, all aligned for optimal performance with AVX-512. The `cnt` member keeps track of how many data blocks are currently being processed in the batch, allowing for efficient handling of multiple hash computations in parallel.
+    - ``data``: An array of pointers to constant data, aligned for AVX-512.
+    - ``sz``: An array of unsigned long integers representing sizes, aligned for AVX-512.
+    - ``hash``: An array of pointers to hash results, aligned for AVX-512.
+    - ``cnt``: An unsigned long integer representing the count of elements in the batch.
+- **Description**: Facilitates batch processing of SHA-512 hash calculations using AVX-512 acceleration, storing data pointers, sizes, and hash results for up to `FD_SHA512_BATCH_MAX` elements.
 
 
 ---
 ### fd\_sha512\_batch\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `data`: An array of pointers to the data to be hashed, aligned for AVX or AVX-512.
-    - `sz`: An array of sizes corresponding to each data block, aligned for AVX or AVX-512.
-    - `hash`: An array of pointers where the resulting hashes will be stored, aligned for AVX or AVX-512.
-    - `cnt`: A counter indicating the number of data blocks currently in the batch.
-- **Description**: The `fd_sha512_batch_t` structure is designed to facilitate the batching of SHA-512 hash computations, optimized for different levels of SIMD acceleration (AVX or AVX-512). It contains arrays for storing pointers to data blocks, their sizes, and the resulting hash outputs, along with a counter to track the number of data blocks in the current batch. This structure allows for efficient processing of multiple hash computations in parallel, leveraging hardware acceleration to improve performance.
+    - ``data``: An array of pointers to the data to be hashed, aligned for AVX or AVX-512.
+    - ``sz``: An array of sizes corresponding to each data block, aligned for AVX or AVX-512.
+    - ``hash``: An array of pointers where the hash results will be stored, aligned for AVX or AVX-512.
+    - ``cnt``: A counter indicating the number of data blocks currently in the batch.
+- **Description**: The `fd_sha512_batch_t` structure is used to manage batches of data for SHA-512 hashing, optimized for AVX or AVX-512 instruction sets. It contains arrays for data pointers, sizes, and hash result pointers, along with a counter to track the number of data blocks in the batch. This structure facilitates efficient processing of multiple data blocks in parallel, leveraging SIMD capabilities for performance improvements.
 
 
 # Functions
 
 ---
 ### fd\_sha512\_clear<!-- {{#callable:fd_sha512_clear}} -->
-The `fd_sha512_clear` function resets a SHA-512 calculation state and securely clears its internal buffer.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L200>)
+
+Clears the SHA-512 calculation state and resets the internal buffer to zero.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure representing the SHA-512 calculation state to be cleared.
-- **Control Flow**:
-    - The function begins by calling [`fd_sha512_init`](fd_sha512.c.md#fd_sha512_init) on the `sha` pointer to reset the SHA-512 calculation state.
-    - It then calls `fd_memset_explicit` to fill the `buf` array within the `sha` structure with zeros, ensuring the buffer is securely cleared.
-- **Output**: The function does not return a value; it operates directly on the provided `fd_sha512_t` structure.
-- **Functions called**:
-    - [`fd_sha512_init`](fd_sha512.c.md#fd_sha512_init)
+    - `sha`: A pointer to an `fd_sha512_t` structure representing the SHA-512 calculation state to clear.
+- **Logic and Control Flow**:
+    - Calls [`fd_sha512_init`](<fd_sha512.c.md#fd_sha512_init>) to initialize the SHA-512 calculation state pointed to by `sha`.
+    - Uses `fd_memset_explicit` to set the `buf` field of `sha` to zero, with a size of `FD_SHA512_PRIVATE_BUF_MAX`.
+- **Output**: No return value; the function operates directly on the `sha` pointer to clear and reset its state.
+- **Functions Called**:
+    - [`fd_sha512_init`](<fd_sha512.c.md#fd_sha512_init>)
 
 
 ---
 ### fd\_sha512\_batch\_align<!-- {{#callable:fd_sha512_batch_align}} -->
-The `fd_sha512_batch_align` function returns the alignment requirement for a memory region to hold a `fd_sha512_batch_t` structure.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L375>)
+
+Returns the alignment requirement for a `fd_sha512_batch_t` structure.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined as a static inline function, meaning it is intended to be used within the same translation unit and suggests the compiler to inline it for performance.
-    - It uses the `alignof` operator to determine the alignment requirement of the `fd_sha512_batch_t` type.
-    - The function returns the result of the `alignof` operator, which is the alignment requirement.
+- **Logic and Control Flow**:
+    - Calls `alignof(fd_sha512_batch_t)` to determine the alignment requirement.
+    - Returns the result of the `alignof` operation.
 - **Output**: The function returns an `ulong` representing the alignment requirement for a `fd_sha512_batch_t` structure.
 
 
 ---
 ### fd\_sha512\_batch\_footprint<!-- {{#callable:fd_sha512_batch_footprint}} -->
-The `fd_sha512_batch_footprint` function returns the size in bytes of the `fd_sha512_batch_t` structure.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L376>)
+
+Returns the memory footprint size of a `fd_sha512_batch_t` structure.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined as a static inline function, meaning it is intended to be used within the same translation unit and suggests that the compiler should attempt to embed the function's code at the call site to reduce function call overhead.
-    - The function is marked with `FD_FN_CONST`, indicating that it does not read or write any global memory and its return value depends only on its parameters, which in this case are none.
-    - The function simply returns the result of the `sizeof` operator applied to `fd_sha512_batch_t`, which is a type defined elsewhere in the code.
-- **Output**: The function returns an `ulong` representing the size in bytes of the `fd_sha512_batch_t` structure.
+- **Logic and Control Flow**:
+    - Returns the size of the `fd_sha512_batch_t` structure using the `sizeof` operator.
+- **Output**: The function returns an `ulong` representing the size of the `fd_sha512_batch_t` structure.
 
 
 ---
 ### fd\_sha512\_batch\_init<!-- {{#callable:fd_sha512_batch_init}} -->
-The `fd_sha512_batch_init` function initializes a SHA-512 batch processing structure by setting its count to zero.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L378>)
+
+Initializes a `fd_sha512_batch_t` structure by setting its `cnt` field to zero.
 - **Inputs**:
-    - `mem`: A pointer to a memory region where the SHA-512 batch structure will be initialized.
-- **Control Flow**:
-    - Cast the input memory pointer `mem` to a `fd_sha512_batch_t` pointer and assign it to `batch`.
-    - Set the `cnt` field of the `batch` structure to 0UL, indicating that no data has been added to the batch yet.
-    - Return the initialized `batch` pointer.
-- **Output**: A pointer to the initialized `fd_sha512_batch_t` structure.
+    - `mem`: A pointer to a memory region that will be cast to a `fd_sha512_batch_t` structure.
+- **Logic and Control Flow**:
+    - Cast the `mem` pointer to a `fd_sha512_batch_t` pointer and assign it to `batch`.
+    - Set the `cnt` field of `batch` to 0UL.
+    - Return the `batch` pointer.
+- **Output**: Returns a pointer to the initialized `fd_sha512_batch_t` structure.
 
 
 ---
 ### fd\_sha512\_batch\_add<!-- {{#callable:fd_sha512_batch_add}} -->
-The `fd_sha512_batch_add` function adds a new data item to a SHA-512 batch for hashing, and processes the batch if it reaches its maximum size.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L385>)
+
+Adds a data block to a SHA-512 batch for processing and triggers batch processing if the batch is full.
 - **Inputs**:
-    - `batch`: A pointer to an `fd_sha512_batch_t` structure representing the current batch of data to be hashed.
-    - `data`: A pointer to the data to be added to the batch.
-    - `sz`: The size of the data in bytes.
-    - `hash`: A pointer to the memory location where the resulting hash will be stored.
-- **Control Flow**:
-    - Retrieve the current count of items in the batch from `batch->cnt`.
-    - Store the `data`, `sz`, and `hash` pointers in the respective arrays at the current batch count index.
+    - `batch`: A pointer to a `fd_sha512_batch_t` structure that holds the current batch state.
+    - `data`: A pointer to the data block to add to the batch.
+    - `sz`: The size of the data block in bytes.
+    - `hash`: A pointer to the memory location where the hash result will be stored.
+- **Logic and Control Flow**:
+    - Retrieve the current count of data blocks in the batch from `batch->cnt`.
+    - Store the `data`, `sz`, and `hash` pointers in the `batch` at the current count index.
     - Increment the batch count.
     - Check if the batch count has reached `FD_SHA512_BATCH_MAX`.
-    - If the batch count equals `FD_SHA512_BATCH_MAX`, call [`fd_sha512_private_batch_avx512`](fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512) to process the batch and reset the batch count to 0.
-    - Update the batch's count with the new batch count value.
-    - Return the updated batch pointer.
+    - If the batch is full, call [`fd_sha512_private_batch_avx512`](<fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512>) to process the batch and reset the batch count to 0.
+    - Update the batch count in `batch->cnt`.
 - **Output**: Returns a pointer to the updated `fd_sha512_batch_t` structure.
-- **Functions called**:
-    - [`fd_sha512_private_batch_avx512`](fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512)
+- **Functions Called**:
+    - [`fd_sha512_private_batch_avx512`](<fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512>)
 
 
 ---
 ### fd\_sha512\_batch\_fini<!-- {{#callable:fd_sha512_batch_fini}} -->
-The `fd_sha512_batch_fini` function finalizes a batch of SHA-512 hash computations using AVX-512 acceleration if there are any pending computations in the batch.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L403>)
+
+Finalizes a batch of SHA-512 hash calculations using AVX-512 acceleration if available.
 - **Inputs**:
-    - `batch`: A pointer to an `fd_sha512_batch_t` structure representing the batch of SHA-512 computations to be finalized.
-- **Control Flow**:
-    - Retrieve the current count of pending computations in the batch from `batch->cnt`.
-    - Check if there are any pending computations using `FD_LIKELY(batch_cnt)`.
-    - If there are pending computations, call [`fd_sha512_private_batch_avx512`](fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512) to process them using AVX-512 acceleration.
-    - Return the `batch` pointer cast to a `void *`.
-- **Output**: Returns a `void *` pointer to the `fd_sha512_batch_t` structure, indicating the batch has been finalized.
-- **Functions called**:
-    - [`fd_sha512_private_batch_avx512`](fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512)
+    - ``batch``: A pointer to an `fd_sha512_batch_t` structure that holds the batch data, sizes, and hash results.
+- **Logic and Control Flow**:
+    - Retrieve the current count of items in the batch from `batch->cnt`.
+    - If the count is non-zero, call [`fd_sha512_private_batch_avx512`](<fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512>) to process the batch data, sizes, and hashes.
+    - Return the `batch` pointer cast to `void *`.
+- **Output**: Returns a `void *` pointer to the `batch` structure.
+- **Functions Called**:
+    - [`fd_sha512_private_batch_avx512`](<fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512>)
 
 
 ---
 ### fd\_sha512\_batch\_abort<!-- {{#callable:fd_sha512_batch_abort}} -->
-The `fd_sha512_batch_abort` function returns a pointer to the given SHA-512 batch object, effectively aborting any ongoing batch operation without performing any additional operations.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L410>)
+
+Returns a pointer to the `fd_sha512_batch_t` object passed to it.
 - **Inputs**:
-    - `batch`: A pointer to an `fd_sha512_batch_t` object, representing the SHA-512 batch operation to be aborted.
-- **Control Flow**:
-    - The function takes a single argument, `batch`, which is a pointer to an `fd_sha512_batch_t` object.
-    - It casts the `batch` pointer to a `void *` type and returns it immediately without any further processing.
-- **Output**: A `void *` pointer to the `fd_sha512_batch_t` object passed as input, indicating the batch operation has been aborted.
+    - `batch`: A pointer to a `fd_sha512_batch_t` object, representing the SHA-512 batch processing state.
+- **Logic and Control Flow**:
+    - Casts the `batch` pointer to a `void *` type.
+    - Returns the casted pointer.
+- **Output**: A `void *` pointer to the `fd_sha512_batch_t` object passed as input.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_sha512\_align<!-- {{#callable_declaration:fd_sha512_align}} -->
-Returns the required memory alignment for a SHA-512 calculation state.
-- **Description**: Use this function to determine the alignment requirement for memory regions intended to hold a SHA-512 calculation state. This is useful for ensuring that memory allocations are correctly aligned, which is necessary for optimal performance and to avoid potential issues with memory access. The function is particularly relevant when declaring memory regions or using functions like aligned_alloc or fd_alloca to allocate memory for SHA-512 operations.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L81>)
+
+Returns the required memory alignment for SHA-512 operations.
+- **Description**: Use this function to obtain the alignment requirement for memory regions intended to hold SHA-512 calculation states. This is useful for ensuring that memory allocations are correctly aligned, which is necessary for optimal performance and correctness in SHA-512 operations. The alignment value is a power of 2, facilitating efficient memory access.
 - **Inputs**: None
-- **Output**: The function returns an unsigned long integer representing the alignment requirement, which is a power of 2.
-- **See also**: [`fd_sha512_align`](fd_sha512.c.md#fd_sha512_align)  (Implementation)
+- **Output**: Returns an unsigned long integer representing the alignment requirement for SHA-512 memory regions.
+- **See Also**: [`fd_sha512_align`](<fd_sha512.c.md#fd_sha512_align>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_footprint<!-- {{#callable_declaration:fd_sha512_footprint}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L122>)
+
 Returns the memory footprint required for a SHA-512 calculation state.
-- **Description**: Use this function to determine the size of the memory region needed to hold a SHA-512 calculation state. This is useful for allocating memory with the correct footprint for SHA-512 operations. The function is constant and does not depend on any input parameters, ensuring consistent behavior across calls.
+- **Description**: Use this function to obtain the size of the memory region needed to store a SHA-512 calculation state. This is useful for allocating memory with the correct size and alignment for SHA-512 operations. The function does not require any parameters and can be called at any time to retrieve the footprint size.
 - **Inputs**: None
-- **Output**: The function returns an unsigned long representing the memory footprint in bytes required for a SHA-512 calculation state.
-- **See also**: [`fd_sha512_footprint`](fd_sha512.c.md#fd_sha512_footprint)  (Implementation)
+- **Output**: Returns an unsigned long integer representing the memory footprint size in bytes.
+- **See Also**: [`fd_sha512_footprint`](<fd_sha512.c.md#fd_sha512_footprint>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_new<!-- {{#callable_declaration:fd_sha512_new}} -->
-Initialize a memory region for SHA-512 calculation state.
-- **Description**: This function prepares a memory region to hold the state of a SHA-512 calculation. It should be called with a pointer to a memory region that the caller owns, which must be properly aligned and have sufficient footprint as defined by `fd_sha512_align` and `fd_sha512_footprint`. The function returns a pointer to the initialized memory region on success, or `NULL` if the input is invalid, logging a warning in such cases. The caller retains ownership of the memory region, and it is not joined upon return.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L128>)
+
+Formats a memory region for SHA-512 calculation state.
+- **Description**: Use this function to prepare a memory region for holding a SHA-512 calculation state. The memory region must have the correct alignment and footprint as specified by `fd_sha512_align` and `fd_sha512_footprint`. This function initializes the memory region and sets it up for use in SHA-512 calculations. It returns a pointer to the initialized memory region on success, or `NULL` if the input is invalid or misaligned. Ensure that the memory region is not in use by any other process when calling this function.
 - **Inputs**:
-    - `shmem`: A pointer to the memory region to be initialized. It must not be null, must be aligned according to `fd_sha512_align`, and must have a size of at least `fd_sha512_footprint`. If these conditions are not met, the function returns `NULL` and logs a warning.
-- **Output**: Returns a pointer to the initialized memory region on success, or `NULL` on failure.
-- **See also**: [`fd_sha512_new`](fd_sha512.c.md#fd_sha512_new)  (Implementation)
+    - `shmem`: A pointer to the memory region to format. Must not be null and must be aligned according to `fd_sha512_align()`. The caller retains ownership of the memory.
+- **Output**: Returns a pointer to the formatted memory region on success, or `NULL` if the input is invalid or misaligned.
+- **See Also**: [`fd_sha512_new`](<fd_sha512.c.md#fd_sha512_new>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_join<!-- {{#callable_declaration:fd_sha512_join}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L131>)
+
 Joins a caller to a SHA-512 calculation state.
-- **Description**: This function is used to join a caller to an existing SHA-512 calculation state, allowing the caller to perform operations on the state. It should be called with a pointer to a memory region that holds a valid SHA-512 state. The memory region must be properly aligned and initialized with the correct magic number. If the memory region is null, misaligned, or has an incorrect magic number, the function will return null and log a warning. This function is typically used after initializing or creating a SHA-512 state with the appropriate setup functions.
+- **Description**: Use this function to obtain a local handle to a SHA-512 calculation state. The input must point to a memory region that holds a valid SHA-512 state. This function checks if the memory region is correctly aligned and contains the expected magic number. If these conditions are not met, it logs a warning and returns NULL. This function is typically used after initializing or creating a SHA-512 state to begin operations on it.
 - **Inputs**:
-    - `shsha`: A pointer to the memory region holding the SHA-512 calculation state. It must not be null, must be aligned according to fd_sha512_align(), and must contain the correct magic number (FD_SHA512_MAGIC). If these conditions are not met, the function returns null.
-- **Output**: Returns a pointer to the local handle of the SHA-512 calculation state on success, or null on failure.
-- **See also**: [`fd_sha512_join`](fd_sha512.c.md#fd_sha512_join)  (Implementation)
+    - `shsha`: A pointer to the first byte of the memory region holding the SHA-512 state. Must not be null and must be aligned according to `fd_sha512_align()`. The memory region must contain the correct magic number (`FD_SHA512_MAGIC`). If these conditions are not met, the function returns NULL.
+- **Output**: Returns a pointer to the SHA-512 calculation state on success, or NULL if the input is invalid.
+- **See Also**: [`fd_sha512_join`](<fd_sha512.c.md#fd_sha512_join>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_leave<!-- {{#callable_declaration:fd_sha512_leave}} -->
-Leaves the current local join to a SHA-512 calculation state.
-- **Description**: This function is used to leave a previously joined SHA-512 calculation state, effectively ending the caller's association with that state. It should be called when the caller no longer needs to interact with the SHA-512 state, allowing for cleanup or reuse of resources. The function returns a pointer to the memory region holding the state, which can be used for further operations or deallocation. It is important to ensure that the `sha` parameter is not null before calling this function, as passing a null pointer will result in a warning and a null return value.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L134>)
+
+Leaves a SHA-512 calculation state.
+- **Description**: Use this function to leave a current local join to a SHA-512 calculation state. It returns a pointer to the memory region holding the state on success. If the input is null, it logs a warning and returns null. This function does not modify the state or the memory region.
 - **Inputs**:
-    - `sha`: A pointer to a `fd_sha512_t` structure representing the current local join to a SHA-512 calculation state. Must not be null. If null, the function logs a warning and returns null.
-- **Output**: Returns a pointer to the memory region holding the SHA-512 calculation state on success, or null if the input was invalid.
-- **See also**: [`fd_sha512_leave`](fd_sha512.c.md#fd_sha512_leave)  (Implementation)
+    - `sha`: A pointer to a `fd_sha512_t` structure representing the SHA-512 calculation state. Must not be null. If null, the function logs a warning and returns null.
+- **Output**: Returns a pointer to the memory region holding the SHA-512 calculation state on success, or null if the input is invalid.
+- **See Also**: [`fd_sha512_leave`](<fd_sha512.c.md#fd_sha512_leave>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_delete<!-- {{#callable_declaration:fd_sha512_delete}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L137>)
+
 Unformats a memory region holding a SHA-512 calculation state.
-- **Description**: Use this function to unformat a memory region that was previously formatted to hold a SHA-512 calculation state. It should be called when the memory region is no longer needed for SHA-512 calculations and the caller wishes to reclaim ownership of the memory. The function assumes that the provided pointer is aligned according to the requirements of a SHA-512 state and that no other operations are currently joined to this state. It returns the pointer to the memory region on success, allowing the caller to manage the memory further, or NULL if the input is invalid or the state is corrupted.
+- **Description**: Use this function to unformat a memory region that holds a SHA-512 calculation state. It must be called when no other operations are joined to the state. The function checks if the provided memory region is valid, aligned, and has the correct magic number. If any of these checks fail, it logs a warning and returns NULL. On success, it returns a pointer to the memory region, and the caller regains ownership of the memory.
 - **Inputs**:
-    - `shsha`: A pointer to the first byte of the memory region holding the SHA-512 state. Must not be null, must be properly aligned, and must point to a valid SHA-512 state. If these conditions are not met, the function logs a warning and returns NULL.
+    - `shsha`: A pointer to the first byte of the memory region holding the SHA-512 calculation state. It must not be null, must be aligned according to `fd_sha512_align()`, and must have a valid magic number. If these conditions are not met, the function logs a warning and returns NULL.
 - **Output**: Returns a pointer to the memory region on success, or NULL on failure.
-- **See also**: [`fd_sha512_delete`](fd_sha512.c.md#fd_sha512_delete)  (Implementation)
+- **See Also**: [`fd_sha512_delete`](<fd_sha512.c.md#fd_sha512_delete>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_init<!-- {{#callable_declaration:fd_sha512_init}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L152>)
+
 Initializes a SHA-512 calculation state.
-- **Description**: Use this function to start a new SHA-512 hashing operation. It must be called on a valid `fd_sha512_t` object that represents a current local join to a SHA-512 calculation state. This function resets any existing state, discarding any in-progress or completed calculations, and prepares the object for a new hashing operation. Ensure no concurrent operations modify the state while this function is executing.
+- **Description**: Use this function to start a new SHA-512 calculation. It prepares the given SHA-512 state for a new hashing operation by resetting its internal state. This function must be called before any data is appended to the SHA-512 state. Ensure that no other concurrent operations modify the state while this function executes. Any previous state of an in-progress or completed calculation will be discarded.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` object representing a SHA-512 calculation state. It must be a valid local join with no concurrent modifications. The caller retains ownership and responsibility for ensuring the pointer is not null.
-- **Output**: Returns the same `fd_sha512_t` pointer passed in, now initialized for a new SHA-512 calculation.
-- **See also**: [`fd_sha512_init`](fd_sha512.c.md#fd_sha512_init)  (Implementation)
+    - `sha`: A pointer to an `fd_sha512_t` structure representing the SHA-512 calculation state. Must be a valid local join to a SHA-512 calculation state with no concurrent modifications. The caller retains ownership.
+- **Output**: Returns the pointer to the initialized `fd_sha512_t` structure.
+- **See Also**: [`fd_sha512_init`](<fd_sha512.c.md#fd_sha512_init>)  (Implementation)
 
 
 ---
 ### fd\_sha384\_init<!-- {{#callable_declaration:fd_sha384_init}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L155>)
+
 Initializes a SHA-384 calculation state.
-- **Description**: Use this function to initialize a SHA-384 calculation state before starting a new hash computation. It sets up the internal state of the provided `fd_sha512_t` structure to begin a SHA-384 hash operation. This function must be called before any data is appended to the hash state. It discards any preexisting state, so it should not be used on a state that is currently in use for another calculation.
+- **Description**: Use this function to start a new SHA-384 hash calculation. It prepares the provided `fd_sha512_t` structure for a new hashing operation by setting its internal state to the initial values required for SHA-384. This function must be called before appending data to the hash calculation. Ensure that the `sha` parameter is a valid pointer to a `fd_sha512_t` structure and that no other operations are concurrently modifying the state.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure that will hold the SHA-384 calculation state. Must not be null. The caller retains ownership of the memory, and it should be properly aligned and allocated according to `FD_SHA512_ALIGN` and `FD_SHA512_FOOTPRINT`.
-- **Output**: Returns the same `fd_sha512_t` pointer passed in, now initialized for a new SHA-384 calculation.
-- **See also**: [`fd_sha384_init`](fd_sha512.c.md#fd_sha384_init)  (Implementation)
+    - `sha`: A pointer to a `fd_sha512_t` structure that will hold the SHA-384 calculation state. Must not be null. The caller retains ownership and is responsible for ensuring the structure is properly aligned and has the necessary footprint.
+- **Output**: Returns the same `fd_sha512_t` pointer provided as input, now initialized for a new SHA-384 calculation.
+- **See Also**: [`fd_sha384_init`](<fd_sha512.c.md#fd_sha384_init>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_append<!-- {{#callable_declaration:fd_sha512_append}} -->
-Appends data to an in-progress SHA-512 calculation.
-- **Description**: Use this function to add data to an ongoing SHA-512 hash calculation. It should be called after initializing the SHA-512 state with `fd_sha512_init` and before finalizing the hash with `fd_sha512_fini`. The function updates the internal state of the SHA-512 calculation with the provided data. It is optimized for appending large blocks of data, and performance is best when the size of the data is a multiple of 128 bytes, except for the last append which should ideally be less than 112 bytes. The function handles cases where no data is provided by simply returning the current state without modification.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L174>)
+
+Appends data to an ongoing SHA-512 hash calculation.
+- **Description**: Use this function to add data to an ongoing SHA-512 hash calculation. It is important to ensure that the `sha` parameter is a valid local join to a SHA-512 calculation state, and that no other concurrent operations modify the state during execution. The `data` parameter can be null if `sz` is zero, which means no data is appended. The function updates the state of the SHA-512 calculation with the provided data and returns the updated state. For optimal performance, append as many bytes as possible at once, and ensure that `sz` is a multiple of 128 for all but the last append, which should be less than 112 bytes.
 - **Inputs**:
-    - `sha`: A pointer to a `fd_sha512_t` structure representing the current state of the SHA-512 calculation. Must be a valid, initialized state with no concurrent modifications.
-    - `data`: A pointer to the data to be appended. The data should remain unmodified during the function execution and can be null if `sz` is zero.
-    - `sz`: The size in bytes of the data to append. Must be non-negative. If zero, the function will return immediately without modifying the state.
-- **Output**: Returns the updated `fd_sha512_t` pointer, reflecting the new state of the SHA-512 calculation.
-- **See also**: [`fd_sha512_append`](fd_sha512.c.md#fd_sha512_append)  (Implementation)
+    - `sha`: A pointer to a `fd_sha512_t` structure representing the current state of the SHA-512 calculation. Must be a valid local join with no concurrent modifications.
+    - `data`: A pointer to the data to append. Can be null if `sz` is zero. The data is not modified and no reference is retained after the function returns.
+    - `sz`: The size in bytes of the data to append. Must be a valid size, and can be zero if no data is to be appended.
+- **Output**: Returns a pointer to the updated `fd_sha512_t` structure representing the current state of the SHA-512 calculation.
+- **See Also**: [`fd_sha512_append`](<fd_sha512.c.md#fd_sha512_append>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_fini<!-- {{#callable_declaration:fd_sha512_fini}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L191>)
+
 Completes a SHA-512 hash calculation and stores the result.
-- **Description**: This function finalizes an in-progress SHA-512 hash calculation and writes the resulting hash to the specified memory location. It should be called after all data has been appended to the SHA-512 state using the appropriate append function. The function assumes that the SHA-512 state is valid and that no other concurrent operations are modifying it. The provided hash buffer must be large enough to store the 64-byte hash result. After this function is called, the SHA-512 state will no longer have an in-progress calculation.
+- **Description**: Use this function to finalize a SHA-512 hash calculation after appending all data. It requires a valid SHA-512 calculation state and a memory region to store the 64-byte hash result. Ensure no concurrent operations modify the state during execution. After completion, the calculation state will not have any in-progress calculation.
 - **Inputs**:
-    - `sha`: A pointer to a valid fd_sha512_t structure representing the SHA-512 calculation state. It must be a local join to a SHA-512 state with no concurrent modifications.
-    - `_hash`: A pointer to a memory region where the 64-byte hash result will be stored. The caller must ensure this buffer is large enough to hold the result.
-- **Output**: Returns the pointer to the hash buffer provided by the caller, now containing the 64-byte SHA-512 hash result.
-- **See also**: [`fd_sha512_fini`](fd_sha512.c.md#fd_sha512_fini)  (Implementation)
+    - `sha`: A pointer to a `fd_sha512_t` structure representing the SHA-512 calculation state. Must be a valid local join with no concurrent modifications.
+    - `hash`: A pointer to a 64-byte memory region where the hash result will be stored. Must not be null.
+- **Output**: Returns the `hash` pointer with the 64-byte SHA-512 hash result populated.
+- **See Also**: [`fd_sha512_fini`](<fd_sha512.c.md#fd_sha512_fini>)  (Implementation)
 
 
 ---
 ### fd\_sha384\_fini<!-- {{#callable_declaration:fd_sha384_fini}} -->
-Completes a SHA-384 hash calculation and stores the result.
-- **Description**: This function finalizes an in-progress SHA-384 hash calculation and writes the resulting hash to the specified memory location. It should be called after all data has been appended to the SHA-384 calculation state. The function assumes that the SHA-384 calculation state is valid and that no other concurrent operations are modifying it. The caller must ensure that the provided memory location for the hash is valid and has enough space to store a 48-byte hash.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L206>)
+
+Finalizes a SHA-384 hash calculation.
+- **Description**: Use this function to complete a SHA-384 hash calculation that is in progress. It takes the current state of the SHA-384 calculation and produces the final hash value. This function must be called after initializing and appending data to the SHA-384 calculation state. It is important to ensure that the `sha` parameter is a valid and active SHA-384 calculation state and that `_hash` points to a memory region large enough to store the 48-byte hash result.
 - **Inputs**:
-    - `sha`: A pointer to a valid fd_sha384_t structure representing the SHA-384 calculation state. It must be a local join to an in-progress calculation with no concurrent modifications.
-    - `_hash`: A pointer to a memory location where the 48-byte SHA-384 hash result will be stored. The caller must ensure this memory is valid and writable.
-- **Output**: Returns the pointer to the memory location where the hash result is stored.
-- **See also**: [`fd_sha384_fini`](fd_sha512.c.md#fd_sha384_fini)  (Implementation)
+    - `sha`: A pointer to an `fd_sha384_t` structure representing the current state of a SHA-384 calculation. It must be a valid and active state with no concurrent modifications.
+    - `_hash`: A pointer to a memory region where the 48-byte hash result will be stored. The caller must ensure this memory region is allocated and large enough to hold the result.
+- **Output**: Returns the `_hash` pointer, which now contains the 48-byte SHA-384 hash result.
+- **See Also**: [`fd_sha384_fini`](<fd_sha512.c.md#fd_sha384_fini>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_hash<!-- {{#callable_declaration:fd_sha512_hash}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L220>)
+
 Computes the SHA-512 hash of the given data.
-- **Description**: This function computes the SHA-512 hash of a given data buffer and stores the result in a specified memory location. It is designed for efficiency, particularly for small messages, by minimizing overhead associated with function calls and data handling. The function should be used when a complete SHA-512 hash of a data block is needed in a single operation. It is important to ensure that the output buffer is properly allocated to hold the 64-byte hash result before calling this function.
+- **Description**: Use this function to compute the SHA-512 hash of a data buffer. It is suitable for cases where you need a one-time hash computation without the overhead of incremental hashing. Ensure that the `hash` parameter points to a valid memory region of at least 64 bytes to store the resulting hash. This function does not handle null pointers for the `data` or `hash` parameters, so ensure they are valid before calling.
 - **Inputs**:
-    - `data`: A pointer to the data to be hashed. This must not be null if sz is greater than zero. The caller retains ownership and the data is not modified.
-    - `sz`: The size of the data in bytes. It can be zero, in which case the function will compute the hash of an empty input.
-    - `hash`: A pointer to a memory region where the 64-byte hash result will be stored. This must not be null and must be properly allocated to hold at least 64 bytes.
-- **Output**: Returns a pointer to the hash buffer, which contains the 64-byte SHA-512 hash of the input data.
-- **See also**: [`fd_sha512_hash`](fd_sha512.c.md#fd_sha512_hash)  (Implementation)
+    - `data`: Pointer to the data to hash. Must not be null. The data is read-only and the caller retains ownership.
+    - `sz`: Size of the data in bytes. Must be a valid size for the data buffer.
+    - `hash`: Pointer to a memory region where the 64-byte hash result will be stored. Must not be null and must have at least 64 bytes available.
+- **Output**: Returns the pointer to the `hash` memory region containing the computed SHA-512 hash.
+- **See Also**: [`fd_sha512_hash`](<fd_sha512.c.md#fd_sha512_hash>)  (Implementation)
 
 
 ---
 ### fd\_sha384\_hash<!-- {{#callable_declaration:fd_sha384_hash}} -->
-Computes the SHA-384 hash of the given data.
-- **Description**: This function computes the SHA-384 hash for a given block of data and stores the result in the provided hash buffer. It is designed for efficiency, particularly for small messages, by eliminating overheads associated with incremental hashing. The function should be used when a complete message is available for hashing in one go. It is important to ensure that the hash buffer is large enough to hold the 48-byte SHA-384 hash result.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L225>)
+
+Computes the SHA-384 hash of the input data.
+- **Description**: Use this function to compute the SHA-384 hash of a given data buffer. It processes the entire data in one go and stores the resulting hash in the provided memory location. This function is suitable for hashing small messages efficiently by avoiding the overhead of incremental hashing. Ensure that the output buffer is large enough to hold the 48-byte hash result.
 - **Inputs**:
-    - `_data`: Pointer to the data to be hashed. Must not be null if sz is greater than zero. The caller retains ownership and the data is not modified.
-    - `sz`: The size of the data in bytes. Can be zero, in which case the function will compute the hash of an empty input.
-    - `_hash`: Pointer to a buffer where the 48-byte SHA-384 hash will be stored. Must not be null and must be large enough to hold the hash result. The caller retains ownership.
-- **Output**: Returns a pointer to the hash buffer containing the computed SHA-384 hash.
-- **See also**: [`fd_sha384_hash`](fd_sha512.c.md#fd_sha384_hash)  (Implementation)
+    - `_data`: Pointer to the data to hash. Must not be null. The data is read-only and the caller retains ownership.
+    - `sz`: Size of the data in bytes. Must be a non-negative value.
+    - `_hash`: Pointer to a memory location where the 48-byte hash result will be stored. Must not be null and must have sufficient space to store the hash.
+- **Output**: Returns the pointer to the hash buffer provided by the caller.
+- **See Also**: [`fd_sha384_hash`](<fd_sha512.c.md#fd_sha384_hash>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_private\_batch\_avx<!-- {{#callable_declaration:fd_sha512_private_batch_avx}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L290>)
+
 Processes a batch of messages using SHA-512 with AVX acceleration.
-- **Description**: This function computes SHA-512 hashes for a batch of messages using AVX acceleration, which is suitable for processing multiple messages in parallel for improved performance. It should be used when you have multiple messages to hash and your system supports AVX instructions. The function requires that the number of messages (`batch_cnt`) is between 1 and the maximum batch size defined by `FD_SHA512_BATCH_MAX`. If `batch_cnt` is less than 2, it processes each message individually using a non-batched approach. The function does not return a value but writes the computed hashes to the provided output locations.
+- **Description**: Use this function to compute SHA-512 hashes for a batch of messages when AVX acceleration is available. It is designed to handle multiple messages in parallel, optimizing performance for batch sizes greater than one. The function requires that the number of messages (`batch_cnt`) is at least 1 and does not exceed the maximum batch size defined by `FD_SHA512_BATCH_MAX`. Each message's data, size, and output hash location must be provided in aligned arrays. If `batch_cnt` is less than 2, the function processes each message individually using a non-batch method.
 - **Inputs**:
-    - `batch_cnt`: The number of messages in the batch to be processed. Must be between 1 and FD_SHA512_BATCH_MAX. If less than 2, messages are processed individually.
-    - `_batch_data`: A pointer to an array of pointers, each pointing to the data of a message to be hashed. The array must have at least `batch_cnt` valid entries. The data for each message must be aligned as required by the implementation.
-    - `batch_sz`: A pointer to an array of unsigned long integers, each representing the size in bytes of the corresponding message in `_batch_data`. The array must have at least `batch_cnt` valid entries.
-    - `_batch_hash`: A pointer to an array of pointers, each pointing to a memory location where the hash of the corresponding message should be stored. The array must have at least `batch_cnt` valid entries, and each location must be large enough to store a SHA-512 hash (64 bytes).
+    - `batch_cnt`: The number of messages to process, must be between 1 and `FD_SHA512_BATCH_MAX`. If less than 2, messages are processed individually.
+    - `_batch_data`: Pointer to an array of message data pointers, each aligned to 32 bytes. Only the first `batch_cnt` entries are used.
+    - `batch_sz`: Pointer to an array of message sizes, each aligned to 32 bytes. Only the first `batch_cnt` entries are used.
+    - `_batch_hash`: Pointer to an array of hash output pointers, each aligned to 32 bytes. Only the first `batch_cnt` entries are used.
 - **Output**: None
-- **See also**: [`fd_sha512_private_batch_avx`](fd_sha512_batch_avx.c.md#fd_sha512_private_batch_avx)  (Implementation)
+- **See Also**: [`fd_sha512_private_batch_avx`](<fd_sha512_batch_avx.c.md#fd_sha512_private_batch_avx>)  (Implementation)
 
 
 ---
 ### fd\_sha512\_private\_batch\_avx512<!-- {{#callable_declaration:fd_sha512_private_batch_avx512}} -->
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.h#L362>)
+
 Processes a batch of messages using SHA-512 with AVX-512 acceleration.
-- **Description**: This function is used to compute SHA-512 hashes for a batch of messages using AVX-512 acceleration, which is suitable for high-performance environments. It should be called when you have multiple messages to hash and the batch count is at least 5. If the batch count is less than 5, it delegates the processing to a different function optimized for smaller batches. This function is designed to handle up to 8 messages in a single batch, leveraging AVX-512 instructions for efficient processing.
+- **Description**: Use this function to compute SHA-512 hashes for a batch of messages when AVX-512 support is available. It is optimized for processing batches of messages with a count of 5 or more. For smaller batches, it defaults to a different processing method. Ensure that the input data and hash buffers are properly aligned and sized according to the batch count. This function does not return a value but writes the computed hashes to the provided output buffers.
 - **Inputs**:
-    - `batch_cnt`: The number of messages in the batch to be processed. Must be between 1 and 8 inclusive. If less than 5, a different function is used.
-    - `_batch_data`: A pointer to an array of pointers, each pointing to the data of a message to be hashed. The array must have at least 'batch_cnt' valid entries. The data for each message must be aligned to 64 bytes.
-    - `batch_sz`: A pointer to an array of unsigned long integers, each representing the size in bytes of the corresponding message in '_batch_data'. The array must have at least 'batch_cnt' valid entries.
-    - `_batch_hash`: A pointer to an array of pointers, each pointing to a memory location where the resulting hash of the corresponding message will be stored. The array must have at least 'batch_cnt' valid entries, and each location must be able to hold a 64-byte hash.
+    - `batch_cnt`: The number of messages in the batch. Must be between 1 and FD_SHA512_BATCH_MAX (inclusive). If less than 5, a different processing method is used.
+    - `_batch_data`: Pointer to an array of message data pointers. Each message data pointer must be aligned to 64 bytes. The array must have at least 'batch_cnt' elements.
+    - `batch_sz`: Pointer to an array of message sizes. Each size corresponds to a message in '_batch_data'. The array must have at least 'batch_cnt' elements.
+    - `_batch_hash`: Pointer to an array of hash output buffers. Each buffer must be aligned to 64 bytes and have space for a 64-byte hash. The array must have at least 'batch_cnt' elements.
 - **Output**: None
-- **See also**: [`fd_sha512_private_batch_avx512`](fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512)  (Implementation)
+- **See Also**: [`fd_sha512_private_batch_avx512`](<fd_sha512_batch_avx512.c.md#fd_sha512_private_batch_avx512>)  (Implementation)
 
 
 

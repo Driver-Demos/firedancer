@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_waltz_base.h` file is a header guard for the `firedancer` codebase that includes the `fd_util.h` utility header.
+Header file for including utility functions in the Firedancer Waltz module.
 
 # Purpose
-This code is a simple C header file that serves as a guard to prevent multiple inclusions of the same header, which is a common practice in C programming to avoid redefinition errors. The file uses include guards, defined by `#ifndef`, `#define`, and `#endif` preprocessor directives, to ensure that the contents of the file are only included once during compilation. It includes another header file, `fd_util.h`, from a relative path, suggesting that it relies on utility functions or definitions provided by that file. The naming convention and structure imply that this header is part of a larger project, possibly related to a module or component named "waltz" within the project.
+This code is a simple C header file that uses include guards to prevent multiple inclusions of its contents. The macro `HEADER_fd_src_waltz_fd_waltz_base_h` is defined to ensure that the file's contents are only included once during compilation. The file includes another header file, `fd_util.h`, which is located in the parent directory's `util` folder. This setup is typically used to manage dependencies and organize code in a modular way.
 # Imports and Dependencies
 
 ---

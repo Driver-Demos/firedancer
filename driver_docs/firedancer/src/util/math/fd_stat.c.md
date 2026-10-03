@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_stat.c` file in the `firedancer` codebase provides implementations for statistical functions such as filtering, median calculation, and robust fitting for various data types, along with sorting utilities for both ascending and descending orders.
+Implements statistical functions and sorting algorithms for various data types, including robust fitting.
 
 # Purpose
-This C source code file provides a collection of statistical and sorting functions designed to handle various data types, including both integer and floating-point types. The primary functionality revolves around filtering data, computing medians, and performing robust statistical fits for normal and exponential distributions. The code defines a macro `FD_STAT_IMPL` to generate type-specific implementations of filtering and median calculation functions for different data types, such as `schar`, `short`, `int`, `long`, `float`, and `double`. These functions are used to filter out data points based on a threshold and compute the median, which is a robust estimator of the central tendency in the presence of outliers.
+The code provides statistical and sorting functionalities for various data types in C. It defines a macro `FD_STAT_IMPL` to generate functions for filtering and calculating the median of arrays of different types, such as `schar`, `short`, `int`, `long`, `uchar`, `ushort`, `uint`, `ulong`, `float`, and optionally `int128`, `uint128`, and `double` if supported. The filtering function, `fd_stat_filter_##T`, removes elements from an array that exceed a specified threshold, while the median function, `fd_stat_median_##T`, calculates the median of an array. The code also includes functions for robust statistical fitting, such as [`fd_stat_robust_norm_fit_float`](<#fd_stat_robust_norm_fit_float>) and [`fd_stat_robust_exp_fit_float`](<#fd_stat_robust_exp_fit_float>), which estimate parameters like mean and standard deviation or exponential decay parameters from data, using robust statistical methods.
 
-Additionally, the file includes sorting functionality for ascending and descending order using a template-based approach. It imports a sorting implementation from an external file (`fd_sort.c`) and applies it to various data types by defining macros that specify the sort name, key type, and sorting style. The sorting functions are crucial for the median calculation and other statistical operations that require ordered data. The file also includes robust fitting functions for normal and exponential distributions, which estimate parameters like mean (`mu`), standard deviation (`sigma`), initial value (`x0`), and time constant (`tau`) using median and median absolute deviation. This code is intended to be part of a larger library, providing essential statistical and sorting utilities that can be reused across different applications.
+Additionally, the code includes sorting functionality for ascending and descending order for the same set of data types. It uses a template-based approach to include sorting implementations from an external file, `fd_sort.c`, by defining macros such as `SORT_NAME`, `SORT_KEY_T`, and `SORT_IMPL_STYLE`. The sorting functions are generated for both ascending (`fd_sort_up_##T`) and descending (`fd_sort_dn_##T`) orders. This modular approach allows the code to handle a wide range of data types and operations, making it suitable for statistical analysis and data processing tasks.
 # Imports and Dependencies
 
 ---
@@ -20,91 +20,101 @@ Additionally, the file includes sorting functionality for ascending and descendi
 
 ---
 ### j
-- **Type**: `ulong`
-- **Description**: The variable `j` is a local variable of type `ulong` initialized to zero within the `fd_stat_filter_##T` function. It is used to keep track of the number of elements in the array `y` that meet a certain condition based on the threshold value.
-- **Use**: `j` is incremented each time an element in the input array `x` satisfies the condition, effectively counting the number of elements that pass the filter.
+- **Type**: ``ulong``
+- **Description**: `j` is a variable of type `ulong` that is initialized to 0. It is used to count the number of elements in the array `x` that meet a certain condition.
+- **Use**: `j` increments when an element in `x` has an absolute value less than or equal to `thresh`, and it is returned as the result of the function.
 
 
 # Functions
 
 ---
 ### fd\_stat\_robust\_norm\_fit\_float<!-- {{#callable:fd_stat_robust_norm_fit_float}} -->
-The function `fd_stat_robust_norm_fit_float` computes robust estimates of the mean and standard deviation of a dataset, filtering out extreme values to prevent overflow.
+[View Source →](<../../../../../src/util/math/fd_stat.c#L49>)
+
+Estimates the robust mean and standard deviation of a dataset after filtering out extreme values.
 - **Inputs**:
-    - `opt_mu`: A pointer to a float where the computed robust mean (mu) will be stored, if not NULL.
-    - `opt_sigma`: A pointer to a float where the computed robust standard deviation (sigma) will be stored, if not NULL.
-    - `x`: A pointer to an array of floats representing the input data.
-    - `cnt`: An unsigned long integer representing the number of elements in the input data array.
-    - `scratch`: A pointer to a memory area used for temporary storage during computation.
-- **Control Flow**:
-    - The function begins by casting the scratch pointer to a float pointer for temporary storage.
-    - It filters the input data array `x` to remove extreme values using `fd_stat_filter_float`, storing the result in `y` and updating `cnt` to the number of valid elements.
-    - If either `opt_mu` or `opt_sigma` is not NULL, it proceeds to compute the median of the filtered data using `fd_stat_median_float`.
-    - If `opt_mu` is not NULL, it stores the computed median in `*opt_mu`.
-    - If `opt_sigma` is not NULL, it calculates the absolute deviations from the median, updates `y`, and computes the median of these deviations, scaling it by a constant to estimate the standard deviation, storing the result in `*opt_sigma`.
-    - The function returns the count of valid elements after filtering.
-- **Output**: The function returns an unsigned long integer representing the number of elements remaining after filtering the input data.
+    - `opt_mu`: Pointer to store the estimated mean; can be NULL if not needed.
+    - `opt_sigma`: Pointer to store the estimated standard deviation; can be NULL if not needed.
+    - `x`: Pointer to the input array of float data.
+    - `cnt`: Number of elements in the input array.
+    - `scratch`: Pointer to a scratch space used for intermediate calculations.
+- **Logic and Control Flow**:
+    - Cast the `scratch` pointer to a float pointer `y`.
+    - Filter the input data `x` using `fd_stat_filter_float` with a threshold of `FLT_MAX/5.f` to remove extreme values, updating `cnt`.
+    - Check if either `opt_mu` or `opt_sigma` is not NULL.
+    - Calculate the median of the filtered data `y` using `fd_stat_median_float`.
+    - If `opt_mu` is not NULL, store the median in `*opt_mu`.
+    - If `opt_sigma` is not NULL, compute the absolute deviations from the median, calculate the median of these deviations, and store the scaled result in `*opt_sigma`.
+    - Return the count of filtered data points `cnt`.
+- **Output**: Returns the number of data points remaining after filtering.
 
 
 ---
 ### fd\_stat\_robust\_exp\_fit\_float<!-- {{#callable:fd_stat_robust_exp_fit_float}} -->
-The function `fd_stat_robust_exp_fit_float` estimates the parameters of an exponential distribution robustly from a given dataset of floats by filtering out extreme values and calculating the median and median absolute deviation.
+[View Source →](<../../../../../src/util/math/fd_stat.c#L87>)
+
+Estimates the parameters of a robust exponential distribution fit for a given set of float data points.
 - **Inputs**:
-    - `opt_x0`: A pointer to a float where the estimated x0 parameter will be stored, or NULL if not needed.
-    - `opt_tau`: A pointer to a float where the estimated tau parameter will be stored, or NULL if not needed.
-    - `x`: A pointer to an array of floats representing the input data.
-    - `cnt`: The number of elements in the input data array.
-    - `scratch`: A pointer to a memory area used for temporary storage during computation.
-- **Control Flow**:
-    - Allocate a float pointer `y` to use the provided `scratch` memory for temporary storage.
-    - Filter the input data `x` to remove extreme values using `fd_stat_filter_float`, updating `cnt` to the number of valid data points.
-    - Check if either `opt_x0` or `opt_tau` is non-NULL to determine if parameter estimation is needed.
-    - Compute the median of the filtered data stored in `y`.
-    - Calculate the median absolute deviation (MAD) from the median for the data in `y`.
-    - If `opt_x0` is non-NULL, estimate `x0` using the formula `med - mad*1.44042009041256f`.
-    - If `opt_tau` is non-NULL, estimate `tau` using the formula `mad*2.07808692123503f`.
-    - Return the count of valid data points after filtering.
-- **Output**: The function returns the number of valid data points after filtering the input data.
+    - `opt_x0`: Pointer to store the estimated x0 parameter of the distribution, or NULL if not needed.
+    - `opt_tau`: Pointer to store the estimated tau parameter of the distribution, or NULL if not needed.
+    - `x`: Pointer to the array of float data points to fit.
+    - `cnt`: Number of elements in the array `x`.
+    - `scratch`: Pointer to a scratch space used for intermediate calculations.
+- **Logic and Control Flow**:
+    - Cast `scratch` to a float pointer `y`.
+    - Filter the input data `x` using `fd_stat_filter_float` with a threshold of `FLT_MAX/5.f`, storing the result in `y` and updating `cnt`.
+    - Check if either `opt_x0` or `opt_tau` is not NULL.
+    - Compute the median of the filtered data `y` using `fd_stat_median_float`.
+    - Calculate the absolute deviation of each element in `y` from the median and store it back in `y`.
+    - Compute the median absolute deviation (MAD) of the updated `y`.
+    - If `opt_x0` is not NULL, calculate and store the estimated x0 parameter using the formula `med - mad*1.44042009041256f`.
+    - If `opt_tau` is not NULL, calculate and store the estimated tau parameter using the formula `mad*2.07808692123503f`.
+- **Output**: Returns the number of data points after filtering.
 
 
 ---
 ### fd\_stat\_robust\_norm\_fit\_double<!-- {{#callable:fd_stat_robust_norm_fit_double}} -->
-The function `fd_stat_robust_norm_fit_double` calculates robust estimates of the mean and standard deviation of a dataset using the median and median absolute deviation.
+[View Source →](<../../../../../src/util/math/fd_stat.c#L121>)
+
+Estimates the robust mean and standard deviation of a dataset using median and median absolute deviation.
 - **Inputs**:
-    - `opt_mu`: A pointer to a double where the estimated mean will be stored, or NULL if the mean is not needed.
-    - `opt_sigma`: A pointer to a double where the estimated standard deviation will be stored, or NULL if the standard deviation is not needed.
-    - `x`: A pointer to an array of doubles representing the input data.
-    - `cnt`: The number of elements in the input data array.
-    - `scratch`: A pointer to a memory area used for temporary storage during computation.
-- **Control Flow**:
-    - The function begins by casting the `scratch` pointer to a double pointer `y`.
-    - It filters the input data `x` using `fd_stat_filter_double`, storing the result in `y` and updating `cnt` to the number of valid data points.
-    - If either `opt_mu` or `opt_sigma` is non-NULL, it proceeds to calculate the median of the filtered data `y`.
-    - If `opt_mu` is non-NULL, it stores the median in `*opt_mu`.
-    - If `opt_sigma` is non-NULL, it calculates the absolute deviations from the median, updates `y` with these deviations, and computes the median of these deviations.
-    - It then scales this median absolute deviation by a constant factor (1.48260221850560) to estimate the standard deviation, storing the result in `*opt_sigma`.
-- **Output**: The function returns the number of valid data points after filtering, which is stored in `cnt`.
+    - `opt_mu`: Pointer to store the estimated mean; can be NULL if not needed.
+    - `opt_sigma`: Pointer to store the estimated standard deviation; can be NULL if not needed.
+    - `x`: Pointer to the input array of double values.
+    - `cnt`: Number of elements in the input array.
+    - `scratch`: Pointer to a scratch space used for intermediate calculations.
+- **Logic and Control Flow**:
+    - Cast `scratch` to a `double` pointer and store it in `y`.
+    - Filter the input array `x` into `y` using `fd_stat_filter_double`, reducing `cnt` based on a threshold of `DBL_MAX/5`.
+    - Check if either `opt_mu` or `opt_sigma` is not NULL.
+    - Calculate the median of `y` using `fd_stat_median_double` and store it in `mu`.
+    - If `opt_mu` is not NULL, store `mu` in `*opt_mu`.
+    - If `opt_sigma` is not NULL, compute the absolute deviation of each element in `y` from `mu`, then calculate the median of these deviations, multiply by 1.48260221850560, and store the result in `*opt_sigma`.
+- **Output**: Returns the number of elements remaining after filtering.
 
 
 ---
 ### fd\_stat\_robust\_exp\_fit\_double<!-- {{#callable:fd_stat_robust_exp_fit_double}} -->
-The `fd_stat_robust_exp_fit_double` function estimates the parameters of a robust exponential fit for a given dataset of doubles, filtering out extreme values and calculating the median and median absolute deviation to determine the fit parameters.
+[View Source →](<../../../../../src/util/math/fd_stat.c#L141>)
+
+Estimates the parameters of a robust exponential distribution fit for a given dataset.
 - **Inputs**:
-    - `opt_x0`: A pointer to a double where the estimated x0 parameter will be stored, or NULL if not needed.
-    - `opt_tau`: A pointer to a double where the estimated tau parameter will be stored, or NULL if not needed.
-    - `x`: A pointer to an array of doubles representing the input data.
-    - `cnt`: The number of elements in the input data array.
-    - `scratch`: A pointer to a memory area used for temporary storage during computation.
-- **Control Flow**:
-    - The function begins by casting the scratch pointer to a double pointer and storing it in `y`.
-    - It calls `fd_stat_filter_double` to filter the input data `x`, storing the filtered data in `y` and updating `cnt` to the number of valid data points.
-    - If either `opt_x0` or `opt_tau` is not NULL, the function proceeds to calculate the median of the filtered data `y`.
-    - The function then computes the absolute deviation of each element in `y` from the median and updates `y` with these deviations.
-    - It calculates the median of these absolute deviations (MAD).
-    - If `opt_x0` is not NULL, it calculates `*opt_x0` as the median minus MAD multiplied by a constant factor.
-    - If `opt_tau` is not NULL, it calculates `*opt_tau` as MAD multiplied by another constant factor.
-    - Finally, the function returns the count of valid data points after filtering.
-- **Output**: The function returns the number of valid data points after filtering, which is an unsigned long integer.
+    - `opt_x0`: Pointer to store the estimated x0 parameter; can be NULL if not needed.
+    - `opt_tau`: Pointer to store the estimated tau parameter; can be NULL if not needed.
+    - `x`: Pointer to the input data array of doubles.
+    - `cnt`: Number of elements in the input data array.
+    - `scratch`: Pointer to a scratch space used for intermediate calculations.
+- **Logic and Control Flow**:
+    - Cast the `scratch` pointer to a `double` pointer `y`.
+    - Filter the input data `x` into `y` using `fd_stat_filter_double`, with a threshold of `DBL_MAX/5.0`, updating `cnt` to the number of valid elements.
+    - Check if either `opt_x0` or `opt_tau` is not NULL.
+    - Calculate the median of the filtered data `y` using `fd_stat_median_double`.
+    - For each element in `y`, replace it with its absolute deviation from the median.
+    - Calculate the median absolute deviation (MAD) of `y`.
+    - If `opt_x0` is not NULL, compute `*opt_x0` as `med - mad*1.44042009041256`.
+    - If `opt_tau` is not NULL, compute `*opt_tau` as `mad*2.07808692123503`.
+    - Return the updated `cnt`.
+- **Output**: Returns the number of elements in the filtered dataset.
 
 
 
