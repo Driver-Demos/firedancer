@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for configuring a build environment with Clang on a 128-bit architecture with various features.
+The `linux_clang_noarch128.mk` file in the `firedancer` codebase configures the build environment for a Linux system using Clang with specific features such as 128-bit integers, double precision, and stack allocation.
 
 # Purpose
-The Makefile sets the build directory to `linux/clang/noarch128` and includes several configuration files to extend the build process with additional features such as Clang support, debugging, security, optimization, and threading. It defines preprocessor flags `CPPFLAGS` to enable specific features like 128-bit integers, double precision, and stack allocation with `alloca`. The variables `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and `FD_HAS_ALLOCA` are set to `1` to indicate the presence of these features in the build environment.
+This Makefile snippet is used to configure the build environment for a software project. It sets the build directory to `linux/clang/noarch128` and includes several configuration files to enable specific build features such as Clang support, debugging, security, optimization, and threading. Additionally, it defines preprocessor flags and variables to indicate the presence of certain features like 128-bit integers, double precision, and stack allocation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
