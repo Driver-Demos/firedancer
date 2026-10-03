@@ -3,12 +3,46 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Executes ZK ElGamal proof instructions with feature gating and proof verification.
+Executes the ZK ElGamal proof program with various verification instructions and error handling.
 
 # Purpose
-[`fd_executor_zk_elgamal_proof_program_execute`](<#fd_executor_zk_elgamal_proof_program_execute>) implements the executor entry point for the `zk-elgamal-proof` program. It first checks feature gates to confirm that the program is enabled for the current slot, and it also enforces a temporary disable state controlled by runtime features. If the program is not active, it returns `FD_EXECUTOR_INSTR_ERR_UNSUPPORTED_PROGRAM_ID` or `FD_EXECUTOR_INSTR_ERR_INVALID_INSTR_DATA` as required by the feature state.
+The code defines a function [`fd_executor_zk_elgamal_proof_program_execute`](<#fd_executor_zk_elgamal_proof_program_execute>) that is part of a Zero-Knowledge (ZK) ElGamal proof program. This function is responsible for executing various cryptographic proof instructions related to the ElGamal encryption scheme. It checks if the ZK ElGamal proof program is active and not temporarily disabled. The function processes different instructions based on the first byte of the instruction data, which includes operations like closing context state, verifying zero ciphertext, verifying ciphertext equality, and verifying public key validity, among others. Each instruction updates compute units and logs a message indicating the operation being performed.
 
-The function then reads the first byte of the instruction data and uses it to select one `FD_ZKSDK` instruction type. For each supported instruction, it updates the compute-unit budget and writes a log message with the instruction name. The `FD_ZKSDK_INSTR_CLOSE_CONTEXT_STATE` case calls `fd_zksdk_process_close_context_state`, while the other cases route to `fd_zksdk_process_verify_proof` after the switch. If the instruction data is empty or the opcode is not supported, the function returns `FD_EXECUTOR_INSTR_ERR_INVALID_INSTR_DATA`.
+The function is part of a larger system that uses feature flags to control the activation of specific functionalities. It uses several external functions and macros, such as `FD_FEATURE_ACTIVE`, `FD_EXEC_CU_UPDATE`, and `fd_log_collector_msg_literal`, to manage execution flow and logging. The function returns specific error codes if the program is unsupported or if the instruction data is invalid. The code is intended to be part of an executor that processes cryptographic proofs, and it interfaces with other components through the `fd_exec_instr_ctx_t` context structure.
+# Imports and Dependencies
+
+---
+- `fd_zk_elgamal_proof_program.h`
+- `zksdk/fd_zksdk.h`
+- `../fd_executor.h`
+- `../fd_runtime.h`
+
+
+# Functions
+
+---
+### fd\_executor\_zk\_elgamal\_proof\_program\_execute<!-- {{#callable:fd_executor_zk_elgamal_proof_program_execute}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/program/fd_zk_elgamal_proof_program.c#L10>)
+
+Executes a ZK ElGamal proof program based on the instruction data and context provided.
+- **Inputs**:
+    - `ctx`: A pointer to `fd_exec_instr_ctx_t` which contains the transaction context and instruction data.
+- **Logic and Control Flow**:
+    - Check if the ZK ElGamal proof program is enabled using `FD_FEATURE_ACTIVE`; if not, return `FD_EXECUTOR_INSTR_ERR_UNSUPPORTED_PROGRAM_ID`.
+    - Check if the program is temporarily disabled using `FD_FEATURE_ACTIVE`; if so, log a message and return `FD_EXECUTOR_INSTR_ERR_INVALID_INSTR_DATA`.
+    - Retrieve the instruction data and its size from `ctx`.
+    - If the instruction data size is zero, return `FD_EXECUTOR_INSTR_ERR_INVALID_INSTR_DATA`.
+    - Use a switch statement on the first byte of `instr_data` to determine the operation to execute.
+    - For each case, update compute units using `FD_EXEC_CU_UPDATE`, log a message, and either break or call a specific processing function.
+    - If the instruction is `FD_ZKSDK_INSTR_CLOSE_CONTEXT_STATE`, call [`fd_zksdk_process_close_context_state`](<zksdk/fd_zksdk.c.md#fd_zksdk_process_close_context_state>) and return its result.
+    - For unrecognized instructions, return `FD_EXECUTOR_INSTR_ERR_INVALID_INSTR_DATA`.
+    - If no specific case returns, call [`fd_zksdk_process_verify_proof`](<zksdk/fd_zksdk.c.md#fd_zksdk_process_verify_proof>) and return its result.
+- **Output**: Returns an integer status code indicating success or the type of error encountered.
+- **Functions Called**:
+    - [`fd_zksdk_process_close_context_state`](<zksdk/fd_zksdk.c.md#fd_zksdk_process_close_context_state>)
+    - [`fd_zksdk_process_verify_proof`](<zksdk/fd_zksdk.c.md#fd_zksdk_process_verify_proof>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

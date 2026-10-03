@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_tango.h` file in the `firedancer` codebase serves as a header file that includes various other headers related to tempo, CNC, fseq, fctl, mcache, dcache, and tcache functionalities.
+Header file for including various modules like tempo, cnc, fseq, fctl, mcache, dcache, and tcache.
 
 # Purpose
-This code is a C header file that serves as an inclusion guard and organizes the inclusion of several other header files related to a project or module named "tango." The file uses preprocessor directives to prevent multiple inclusions, ensuring that the contents are only included once during compilation. It includes a series of headers from different submodules such as "tempo," "cnc," "fseq," "fctl," "mcache," "dcache," and "tcache," each of which indirectly includes a common base header file, "fd_tango_base.h." This structure suggests that the file is part of a larger system where these components are interdependent, and it helps manage dependencies and modularize the codebase.
+This code is a C header file that serves as an inclusion guard and manages the inclusion of several other header files related to the `fd_tango` module. The inclusion guard, defined by `#ifndef`, `#define`, and `#endif`, prevents multiple inclusions of the same header file, which can cause compilation errors. The file includes headers from various submodules such as `fd_tempo`, `fd_cnc`, `fd_fseq`, `fd_fctl`, `fd_mcache`, `fd_dcache`, and `fd_tcache`, each of which indirectly includes `fd_tango_base.h`. This structure helps organize dependencies and ensures that the necessary components of the `fd_tango` module are available for use in other parts of the program.
 # Imports and Dependencies
 
 ---
