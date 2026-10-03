@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components in the Flamenco runtime with SECP256K1 support.
+Build rules for runtime tests, Solana compatibility, and backtest execution.
 
 # Purpose
-The content is a Makefile script used to manage the build process for a software project. It includes conditional compilation directives `ifdef FD_HAS_INT128` and `ifdef FD_HAS_SECP256K1` to check for specific features or dependencies before executing the build commands. The script uses `$(call add-hdrs,...)` and `$(call add-objs,...)` to add header files and object files to the build process, respectively. It defines `SOL_COMPAT_FLAGS` to specify linker flags for compatibility with the Solana ecosystem. The script also includes commands to create unit tests and shared libraries using `$(call make-unit-test,...)` and `$(call make-shared,...)`. Finally, it defines a target `run-runtime-backtest` to execute a backtest script, which is part of the project's testing suite.
+This build file section defines test and support targets for the `fd_flamenco` runtime when `FD_HAS_INT128` and `FD_HAS_SECP256K1` are enabled. It adds header files and object files for Solana compatibility code, harness code, and generated protocol buffer sources, and it links them into the `fd_flamenco_test` and `fd_flamenco` build targets. The `SOL_COMPAT_FLAGS` setting exports `fd_types_vt_by_name` and applies a version script when building `libfd_exec_sol_compat.so`, which controls the shared library interface. It also defines unit test targets such as `test_sol_compat`, `test_sol_compat_so`, and `test_dump_block`, and it adds the `run-runtime-backtest` target, which runs the backtest script after building `fd_ledger` and `firedancer-dev`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

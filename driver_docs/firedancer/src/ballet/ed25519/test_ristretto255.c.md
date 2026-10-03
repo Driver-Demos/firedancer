@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for Ristretto255 point operations, including decompression, compression, addition, subtraction, and scalar multiplication.
+The `test_ristretto255.c` file in the `firedancer` codebase contains tests for Ristretto255 point operations, including decompression, compression, addition, subtraction, scalar multiplication, and multi-scalar multiplication, as well as validation and benchmarking of these operations.
 
 # Purpose
-The code is a C source file that implements and tests various operations related to the Ristretto255 elliptic curve, which is used in cryptographic applications. The file includes functions for point decompression and compression, hashing to the curve, point addition and subtraction, scalar validation, scalar multiplication, and multi-scalar multiplication. These operations are essential for cryptographic protocols that rely on elliptic curve arithmetic.
+This C source code file is designed to test and benchmark various operations related to the Ristretto255 elliptic curve, which is a prime-order group based on Curve25519. The file includes functions for point decompression and compression, hashing to the curve, point addition and subtraction, scalar validation, scalar multiplication, and multi-scalar multiplication. It utilizes predefined base point multiples and bad encodings, which are imported from a draft specification, to validate the correctness of these operations. The file also includes benchmarking code to measure the performance of these operations, providing insights into their efficiency.
 
-The file defines several static arrays, such as `base_point_multiples` and `bad_encodings`, which are used to test the correctness of the implemented functions. The functions [`test_point_decompress`](<#test_point_decompress>), [`test_point_compress`](<#test_point_compress>), [`test_hash_to_curve`](<#test_hash_to_curve>), [`test_point_add_sub`](<#test_point_add_sub>), [`test_scalar_validate`](<#test_scalar_validate>), [`test_point_scalarmult`](<#test_point_scalarmult>), and [`test_multiscalar_mul`](<#fd_fn_no_asantest_multiscalar_mul>) are designed to verify the correctness and performance of the Ristretto255 operations. The code also includes benchmarking functionality to measure the performance of these operations. The [`main`](<#main>) function initializes a random number generator and executes the test functions, logging the results and performance metrics.
+The code is structured as a test suite, with each function focusing on a specific aspect of the Ristretto255 operations. It uses logging to report errors and performance metrics, ensuring that the operations are both correct and efficient. The file is intended to be compiled and executed as a standalone program, as indicated by the presence of a [`main`](#main) function, which orchestrates the execution of the various test functions. The inclusion of external headers and the use of specific macros suggest that this file is part of a larger project, likely involving cryptographic operations or secure communications.
 # Imports and Dependencies
 
 ---
@@ -23,260 +23,233 @@ The file defines several static arrays, such as `base_point_multiples` and `bad_
 
 ---
 ### base\_point\_multiples
-- **Type**: ``uchar const``
-- **Description**: An array of constant unsigned characters that stores precomputed multiples of a base point in the Ristretto255 group. Each element in the array is a 32-byte string representing a point on the curve.
-- **Use**: Used for operations involving point decompression and compression in the Ristretto255 group.
+- **Type**: `uchar const`
+- **Description**: The `base_point_multiples` is a static constant array of unsigned characters, where each element is a 32-byte array. It represents precomputed multiples of a base point used in elliptic curve cryptography, specifically for the Ristretto255 curve. This array is imported from the draft-irtf-cfrg-ristretto255-decaf448-08 Appendix A.1, which is a specification for the Ristretto255 group.
+- **Use**: This variable is used to store precomputed values of base point multiples for efficient elliptic curve operations, such as point decompression and scalar multiplication.
 
 
 ---
 ### bad\_encodings
-- **Type**: ``static uchar const``
-- **Description**: An array of 32-byte arrays that contains invalid or non-canonical encodings for field elements in the Ristretto255 group. These encodings include non-canonical field encodings, negative field elements, non-square x^2 values, negative xy values, and a special case where s = -1 causing y = 0.
-- **Use**: Used to test the rejection of invalid encodings in the `fd_ristretto255_point_decompress` function.
+- **Type**: `2D array of `uchar``
+- **Description**: The `bad_encodings` variable is a static constant two-dimensional array of unsigned characters (`uchar`) with each sub-array containing 32 elements. It stores a collection of byte sequences that represent invalid or non-canonical encodings for field elements in the context of the Ristretto255 elliptic curve operations.
+- **Use**: This variable is used to test and ensure that invalid encodings are correctly rejected by the Ristretto255 point decompression function.
 
 
 # Functions
 
 ---
 ### log\_bench<!-- {{#callable:log_bench}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L74>)
-
-Calculates and logs the performance metrics of a benchmark test, specifically the speed in kilohertz per core and the time per call in nanoseconds.
+The `log_bench` function logs the performance metrics of a benchmark, specifically the rate of iterations per second per core and the average time per call.
 - **Inputs**:
-    - ``descr``: A constant character pointer that describes the benchmark being logged.
-    - ``iter``: An unsigned long integer representing the number of iterations performed in the benchmark.
-    - ``dt``: A long integer representing the time duration in microseconds for the benchmark to complete.
-- **Logic and Control Flow**:
-    - Calculate `khz` as the number of iterations per second per core by multiplying 1,000,000 by the number of iterations and dividing by the time duration.
-    - Calculate `tau` as the average time per call in nanoseconds by dividing the time duration by the number of iterations.
-    - Log the description, speed in kilohertz per core, and time per call in nanoseconds using the `FD_LOG_NOTICE` macro.
-- **Output**: No return value; the function logs the performance metrics.
+    - `descr`: A constant character pointer representing the description of the benchmark.
+    - `iter`: An unsigned long integer representing the number of iterations performed in the benchmark.
+    - `dt`: A long integer representing the total time taken for the benchmark in some time unit (e.g., microseconds).
+- **Control Flow**:
+    - Calculate the rate of iterations per second per core (`khz`) by multiplying 1e6 with the ratio of `iter` to `dt`.
+    - Calculate the average time per call (`tau`) by dividing `dt` by `iter`.
+    - Log the description, rate of iterations per second per core, and average time per call using the `FD_LOG_NOTICE` macro.
+- **Output**: The function does not return any value; it logs the benchmark results using a logging macro.
 
 
 ---
 ### fd\_f25519\_print<!-- {{#callable:fd_f25519_print}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L83>)
-
-Converts a `fd_f25519_t` object to a byte array and prints it in hexadecimal format.
+The `fd_f25519_print` function converts a `fd_f25519_t` type field element to a byte array and prints it in hexadecimal format.
 - **Inputs**:
-    - `f`: A pointer to a `fd_f25519_t` object that represents the field element to be printed.
-- **Logic and Control Flow**:
-    - Declare a 32-byte array `s` to store the byte representation of the field element.
-    - Call `fd_f25519_tobytes` to convert the field element `f` into a byte array `s`.
-    - Iterate over each byte in the array `s` and print it in hexadecimal format using `printf`.
+    - `f`: A pointer to a `fd_f25519_t` type, representing a field element to be printed.
+- **Control Flow**:
+    - Declare a 32-byte array `s` to hold the byte representation of the field element.
+    - Call `fd_f25519_tobytes` to convert the field element `f` into its byte representation stored in `s`.
+    - Iterate over each byte in the array `s`, printing each byte in hexadecimal format using `printf`.
     - Print a newline character after printing all bytes.
-- **Output**: No return value; the function outputs the hexadecimal representation of the field element to the standard output.
+- **Output**: The function does not return any value; it outputs the hexadecimal representation of the field element to the standard output.
 
 
 ---
 ### fd\_ed25519\_ge\_print<!-- {{#callable:fd_ed25519_ge_print}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L90>)
-
-Prints the coordinates of an `fd_ed25519_point_t` point in the extended twisted Edwards coordinates (X, Y, Z, T).
+The `fd_ed25519_ge_print` function prints the coordinates of an Ed25519 point in a human-readable format.
 - **Inputs**:
-    - `p`: A pointer to an `fd_ed25519_point_t` structure representing the point to print.
-- **Logic and Control Flow**:
+    - `p`: A pointer to an `fd_ed25519_point_t` structure representing the Ed25519 point to be printed.
+- **Control Flow**:
     - Declare four `fd_f25519_t` variables `x`, `y`, `z`, and `t` to hold the coordinates of the point.
-    - Call [`fd_ed25519_point_to`](<ref/fd_curve25519.h.md#fd_ed25519_point_to>) to convert the point `p` into its coordinates `x`, `y`, `z`, and `t`.
-    - Print the label 'X = ' and the value of `x` using [`fd_f25519_print`](<#fd_f25519_print>).
-    - Print the label 'Y = ' and the value of `y` using [`fd_f25519_print`](<#fd_f25519_print>).
-    - Print the label 'Z = ' and the value of `z` using [`fd_f25519_print`](<#fd_f25519_print>).
-    - Print the label 'T = ' and the value of `t` using [`fd_f25519_print`](<#fd_f25519_print>).
-- **Output**: No return value; the function outputs the coordinates to the standard output.
-- **Functions Called**:
-    - [`fd_ed25519_point_to`](<ref/fd_curve25519.h.md#fd_ed25519_point_to>)
-    - [`fd_f25519_print`](<#fd_f25519_print>)
+    - Call [`fd_ed25519_point_to`](avx512/fd_curve25519.h.md#fd_ed25519_point_to) to convert the point `p` into its coordinates `x`, `y`, `z`, and `t`.
+    - Print the label 'X = ' and the value of `x` using [`fd_f25519_print`](#fd_f25519_print).
+    - Print the label 'Y = ' and the value of `y` using [`fd_f25519_print`](#fd_f25519_print).
+    - Print the label 'Z = ' and the value of `z` using [`fd_f25519_print`](#fd_f25519_print).
+    - Print the label 'T = ' and the value of `t` using [`fd_f25519_print`](#fd_f25519_print).
+- **Output**: This function does not return a value; it outputs the coordinates of the point to the standard output.
+- **Functions called**:
+    - [`fd_ed25519_point_to`](avx512/fd_curve25519.h.md#fd_ed25519_point_to)
+    - [`fd_f25519_print`](#fd_f25519_print)
 
 
 ---
 ### test\_point\_decompress<!-- {{#callable:test_point_decompress}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L101>)
-
-Tests the decompression of Ristretto255 points from encoded byte arrays, verifies the rejection of invalid encodings, and benchmarks the decompression process.
+The `test_point_decompress` function tests the decompression of Ristretto255 points from encoded byte arrays, verifies the rejection of invalid encodings, and benchmarks the decompression process.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator object, marked as unused in this function.
-- **Logic and Control Flow**:
-    - Initialize a 32-byte array `_s` and a Ristretto255 point `_h`.
-    - Iterate over `base_point_multiples`, decompress each 32-byte segment into a Ristretto255 point, and log an error if decompression fails.
-    - Iterate over `bad_encodings`, attempt to decompress each 32-byte segment, and log an error if decompression succeeds (indicating a failure to reject bad encoding).
-    - Copy the 6th element of `base_point_multiples` into `_s` for benchmarking.
-    - Perform 100,000 decompression operations on `_s` and measure the time taken.
-    - Log the benchmark results for the decompression operation.
-- **Output**: No return value; outputs are logged to the console.
-- **Functions Called**:
-    - [`log_bench`](<#log_bench>)
+    - `rng`: An unused random number generator pointer, marked with FD_FN_UNUSED to indicate it is not used in the function.
+- **Control Flow**:
+    - Initialize local variables for storing byte arrays and Ristretto255 points.
+    - Iterate over the `base_point_multiples` array, decompressing each 32-byte segment into a Ristretto255 point and logging an error if decompression fails.
+    - Iterate over the `bad_encodings` array, attempting to decompress each 32-byte segment and logging an error if decompression succeeds (indicating a failure to reject a bad encoding).
+    - Copy a specific 32-byte segment from `base_point_multiples` to a local buffer for benchmarking.
+    - Perform a benchmark by repeatedly decompressing the selected byte array segment and measuring the time taken, then log the benchmark results.
+- **Output**: The function does not return a value; it logs errors and benchmark results to the console.
+- **Functions called**:
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_point\_compress<!-- {{#callable:test_point_compress}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L141>)
-
-Tests the compression and decompression of Ristretto255 points and benchmarks the compression operation.
+The `test_point_compress` function tests the correctness and performance of point compression and decompression operations on Ristretto255 points.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t`.
-- **Logic and Control Flow**:
+    - `rng`: A pointer to a random number generator object (`fd_rng_t`) used for generating random values during the test.
+- **Control Flow**:
     - Initialize local variables for storing points and scalars.
-    - Iterate over `base_point_multiples`, decompress each point, and check for decompression errors.
-    - Compress the decompressed point and compare it with the original to verify correctness.
-    - Generate a random scalar `c` and multiply all coordinates of the point by `c`.
-    - Compress the modified point and verify the result against the original.
-    - Decompress a specific base point multiple for benchmarking.
-    - Measure the time taken to compress the point multiple times and log the benchmark results.
-- **Output**: No return value; the function logs errors and benchmark results.
-- **Functions Called**:
-    - [`fd_ed25519_point_to`](<ref/fd_curve25519.h.md#fd_ed25519_point_to>)
-    - [`log_bench`](<#log_bench>)
+    - Iterate over the `base_point_multiples` array, decompressing each point and then compressing it back to verify correctness.
+    - Log an error if decompression or compression results do not match the expected values.
+    - Multiply all coordinates of the decompressed point by a random scalar and compress the result to verify correctness again.
+    - Log an error if the compressed result after multiplication does not match the expected value.
+    - Perform a benchmark test by repeatedly compressing a point and logging the performance metrics.
+- **Output**: The function does not return a value; it logs errors if any test fails and outputs performance metrics for the compression operation.
+- **Functions called**:
+    - [`fd_ed25519_point_to`](avx512/fd_curve25519.h.md#fd_ed25519_point_to)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_hash\_to\_curve<!-- {{#callable:test_hash_to_curve}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L199>)
-
-Tests the [`fd_ristretto255_hash_to_curve`](<fd_ristretto255.c.md#fd_ristretto255_hash_to_curve>) function by comparing its output to a known expected result and benchmarks its performance.
+The `test_hash_to_curve` function tests the correctness and performance of the [`fd_ristretto255_hash_to_curve`](fd_ristretto255.c.md#fd_ristretto255_hash_to_curve) function by comparing its output to expected results and benchmarking its execution time.
 - **Inputs**:
     - `rng`: A pointer to a random number generator object, marked as unused in this function.
-- **Logic and Control Flow**:
-    - Initialize arrays `_s` and `_e` to hold 64 and 32 bytes respectively, and pointers `s` and `e` to point to these arrays.
-    - Initialize `fd_ristretto255_point_t` structures `_h` and `_g` to hold points, and pointers `h` and `g` to point to these structures.
-    - Decode a 64-byte hexadecimal string into `s` and a 32-byte hexadecimal string into `e`.
-    - Decompress the point `g` from the encoded point `e`.
-    - Hash the data in `s` to a curve point `h` using [`fd_ristretto255_hash_to_curve`](<fd_ristretto255.c.md#fd_ristretto255_hash_to_curve>).
-    - Check if the point `h` is equal to `g` using [`fd_ristretto255_point_eq`](<fd_ristretto255.h.md#fd_ristretto255_point_eq>) and ensure it is not equal to `g` using [`fd_ed25519_point_eq`](<ref/fd_curve25519.h.md#fd_ed25519_point_eq>).
-    - Compress the point `h` into a 32-byte array `t` and compare it with `e` to verify correctness.
-    - Log an error if the compressed point `t` does not match `e`.
-    - Benchmark the [`fd_ristretto255_hash_to_curve`](<fd_ristretto255.c.md#fd_ristretto255_hash_to_curve>) function by running it 10,000 times and logging the performance.
-    - Benchmark the [`fd_ristretto255_map_to_curve`](<fd_ristretto255.c.md#fd_ristretto255_map_to_curve>) function similarly.
-- **Output**: No return value; outputs are logged or errors are reported if the test fails.
-- **Functions Called**:
-    - [`fd_ristretto255_hash_to_curve`](<fd_ristretto255.c.md#fd_ristretto255_hash_to_curve>)
-    - [`fd_ristretto255_point_eq`](<fd_ristretto255.h.md#fd_ristretto255_point_eq>)
-    - [`fd_ed25519_point_eq`](<ref/fd_curve25519.h.md#fd_ed25519_point_eq>)
-    - [`log_bench`](<#log_bench>)
-    - [`fd_ristretto255_map_to_curve`](<fd_ristretto255.c.md#fd_ristretto255_map_to_curve>)
+- **Control Flow**:
+    - Initialize byte arrays `_s` and `_e` for input and expected output, and point structures `_h` and `_g` for hash and expected point.
+    - Decode a predefined SHA-512 hash into `s` and a predefined point into `e`, then decompress `e` into point `g`.
+    - Call [`fd_ristretto255_hash_to_curve`](fd_ristretto255.c.md#fd_ristretto255_hash_to_curve) to hash `s` into point `h`.
+    - Verify that `h` equals `g` using [`fd_ristretto255_point_eq`](fd_ristretto255.h.md#fd_ristretto255_point_eq) and that `h` does not equal `g` using [`fd_ed25519_point_eq`](avx512/fd_curve25519.h.md#fd_ed25519_point_eq).
+    - Compress `h` into a byte array `t` and compare it with `e`; log an error if they do not match.
+    - Benchmark the [`fd_ristretto255_hash_to_curve`](fd_ristretto255.c.md#fd_ristretto255_hash_to_curve) function by running it 10,000 times and logging the performance.
+    - Benchmark the [`fd_ristretto255_map_to_curve`](fd_ristretto255.c.md#fd_ristretto255_map_to_curve) function similarly.
+- **Output**: The function does not return a value; it logs errors if the hash-to-curve operation fails and logs performance metrics for benchmarking.
+- **Functions called**:
+    - [`fd_ristretto255_hash_to_curve`](fd_ristretto255.c.md#fd_ristretto255_hash_to_curve)
+    - [`fd_ristretto255_point_eq`](fd_ristretto255.h.md#fd_ristretto255_point_eq)
+    - [`fd_ed25519_point_eq`](avx512/fd_curve25519.h.md#fd_ed25519_point_eq)
+    - [`log_bench`](#log_bench)
+    - [`fd_ristretto255_map_to_curve`](fd_ristretto255.c.md#fd_ristretto255_map_to_curve)
 
 
 ---
 ### test\_point\_add\_sub<!-- {{#callable:test_point_add_sub}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L244>)
-
-Tests the correctness and performance of point addition and subtraction operations on Ristretto255 points.
+The `test_point_add_sub` function tests the correctness and performance of point addition and subtraction operations on Ristretto255 points.
 - **Inputs**:
-    - ``rng``: A pointer to a random number generator, marked as unused in this function.
-- **Logic and Control Flow**:
-    - Initialize three Ristretto255 point variables `f`, `g`, and `h` for testing.
+    - `rng`: A pointer to a random number generator object, marked as unused in this function.
+- **Control Flow**:
+    - Initialize three Ristretto255 point variables `f`, `g`, and `h` for testing purposes.
     - Decompress base point multiples into temporary point `t` and point `f`.
-    - Perform addition and subtraction operations on points `f`, `g`, `h`, and `t` to verify correctness of operations such as `P + 0`, `0 + P`, `P - 0`, `0 - P`, and `P + (-P)`.
-    - Use nested loops to test addition and subtraction for combinations of base point multiples, ensuring `(i+j)P = iP + jP` and `iP = (i+j)P - jP`.
-    - Benchmark the performance of `fd_ristretto255_point_add` and `fd_ristretto255_point_sub` functions by executing them a million times and logging the results.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fd_ristretto255_point_eq`](<fd_ristretto255.h.md#fd_ristretto255_point_eq>)
-    - [`log_bench`](<#log_bench>)
+    - Perform addition and subtraction operations on points `f`, `g`, `h`, and `t` to verify correctness of operations such as `P + 0 = P`, `0 + P = P`, `P - 0 = P`, `P + (-P) = 0`, and `(-P) + P = 0`.
+    - Use nested loops to iterate over combinations of base point multiples, decompress them into `f`, `g`, and `t`, and verify that `iP + jP = (i+j)P` and `iP = (i+j)P - jP`.
+    - Benchmark the performance of `fd_ristretto255_point_add` and `fd_ristretto255_point_sub` functions by running them a million times and logging the results.
+- **Output**: The function does not return any value; it performs tests and logs results to verify the correctness and performance of point addition and subtraction operations.
+- **Functions called**:
+    - [`fd_ristretto255_point_eq`](fd_ristretto255.h.md#fd_ristretto255_point_eq)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_scalar\_validate<!-- {{#callable:test_scalar_validate}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L307>)
-
-Validates Curve25519 scalars by checking specific hexadecimal values for validity and benchmarking the validation function.
+The `test_scalar_validate` function tests the validity of scalar values for the Curve25519 elliptic curve by checking both invalid and valid cases and benchmarks the validation process.
 - **Inputs**:
     - `rng`: A pointer to a random number generator object, marked as unused in this function.
-- **Logic and Control Flow**:
-    - Declare a 32-byte array `_a` and a pointer `a` pointing to it.
-    - Decode a hexadecimal string representing an invalid scalar into `a` and check if `fd_curve25519_scalar_validate(a)` returns `NULL`.
-    - Repeat the above step for another invalid scalar value.
-    - Decode a hexadecimal string representing a valid scalar into `a` and check if `fd_curve25519_scalar_validate(a)` returns `a`.
-    - Repeat the above step for another valid scalar value and a specific valid scalar value `r-1`.
-    - Set `iter` to 1,000,000 for benchmarking.
-    - Record the current wall clock time, run `fd_ristretto255_scalar_validate(a)` in a loop `iter` times, and calculate the elapsed time.
-    - Log the benchmark results using [`log_bench`](<#log_bench>).
-- **Output**: No output is returned; the function performs validation checks and logs benchmark results.
-- **Functions Called**:
-    - [`log_bench`](<#log_bench>)
+- **Control Flow**:
+    - Initialize a 32-byte array `a` to hold scalar values.
+    - Decode a known invalid scalar value into `a` and assert that `fd_curve25519_scalar_validate(a)` returns NULL, indicating invalidity.
+    - Decode another known invalid scalar value into `a` and assert the same invalidity check.
+    - Decode a known valid scalar value into `a` and assert that `fd_curve25519_scalar_validate(a)` returns `a`, indicating validity.
+    - Decode another known valid scalar value into `a` and assert the same validity check.
+    - Decode a scalar value representing `r-1` into `a` and assert that it is valid.
+    - Perform a benchmark by running `fd_ristretto255_scalar_validate(a)` one million times, measuring the time taken, and logging the performance.
+- **Output**: The function does not return any value; it uses assertions to validate scalar values and logs benchmark results.
+- **Functions called**:
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_point\_scalarmult<!-- {{#callable:test_point_scalarmult}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L346>)
-
-Tests the correctness and performance of scalar multiplication on Ristretto255 points.
-- **Inputs**:
-    - ``rng``: A pointer to a random number generator of type `fd_rng_t`.
-- **Logic and Control Flow**:
+The `test_point_scalarmult` function tests the correctness and performance of scalar multiplication on Ristretto255 points.
+- **Inputs**: None
+- **Control Flow**:
     - Initialize Ristretto255 point variables `f`, `h`, and `t`, and a 32-byte array `a`.
-    - Decompress the base point multiples for indices 1 and 13 into `f` and `t`, respectively.
-    - Set the first byte of `a` to 13 and the rest to 0, then perform scalar multiplication of `f` by `a` and store the result in `h`.
-    - Verify that the result of the scalar multiplication `h` is equal to `t`.
-    - Decode a hexadecimal string into `a`, decompress the base point multiple for index 0 into `t`, and subtract `f` from `t`.
-    - Perform scalar multiplication of `f` by `a` again and verify that the result `h` is equal to `t`.
-    - Benchmark the scalar multiplication function by running it 10,000 times and logging the performance.
-- **Output**: No output is returned; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fd_ristretto255_point_eq`](<fd_ristretto255.h.md#fd_ristretto255_point_eq>)
-    - [`log_bench`](<#log_bench>)
+    - Decompress a base point multiple into `f` and another into `t`.
+    - Set `a` to represent the scalar value 13 and perform scalar multiplication of `f` by `a`, storing the result in `h`.
+    - Verify that the result `h` is equal to `t` using [`fd_ristretto255_point_eq`](fd_ristretto255.h.md#fd_ristretto255_point_eq).
+    - Decode a hexadecimal string into `a` and perform scalar multiplication again, verifying the result against a decompressed base point multiple subtracted by `f`.
+    - Run a benchmark loop to measure the performance of the scalar multiplication operation over 10,000 iterations, logging the results.
+- **Output**: The function does not return any value; it performs tests and logs results to verify correctness and performance.
+- **Functions called**:
+    - [`fd_ristretto255_point_eq`](fd_ristretto255.h.md#fd_ristretto255_point_eq)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### fd\_rng\_b256<!-- {{#callable:fd_rng_b256}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L381>)
-
-Generates 256 bits of random data using a random number generator.
+The `fd_rng_b256` function generates 256 bits of random data using a given random number generator and stores it in a provided buffer.
 - **Inputs**:
-    - `rng`: A pointer to an `fd_rng_t` structure, which represents the random number generator state.
-    - `r`: A pointer to an `uchar` array where the function will store the generated random data.
-- **Logic and Control Flow**:
-    - Casts the `uchar` pointer `r` to a `ulong` pointer `u`.
-    - Calls `fd_rng_ulong` four times to fill the `ulong` array `u` with random values.
-    - Returns the pointer `r` after filling it with random data.
-- **Output**: A pointer to the `uchar` array `r` containing 256 bits of random data.
+    - `rng`: A pointer to an `fd_rng_t` structure, which represents the random number generator to be used.
+    - `r`: A pointer to an `uchar` array where the generated random data will be stored.
+- **Control Flow**:
+    - Cast the `uchar` pointer `r` to a `ulong` pointer `u`.
+    - Call `fd_rng_ulong` four times with `rng` to generate four random `ulong` values.
+    - Store each generated `ulong` value in the corresponding position of the `ulong` array `u`.
+    - Return the original `uchar` pointer `r`.
+- **Output**: The function returns the `uchar` pointer `r`, which now contains 256 bits of random data.
 
 
 ---
 ### test\_multiscalar\_mul<!-- {{#callable:FD_FN_NO_ASAN::test_multiscalar_mul}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L389>)
-
-Tests the correctness and performance of multi-scalar multiplication operations on Ristretto255 points.
+The `test_multiscalar_mul` function tests the correctness and performance of multi-scalar multiplication operations on Ristretto255 points.
 - **Inputs**:
-    - ``rng``: A pointer to a random number generator of type `fd_rng_t` used for generating random scalars.
-- **Logic and Control Flow**:
-    - Defines a constant `MSM_N` for the number of points and scalars used in the test.
-    - Initializes arrays for points and scalars, and sets specific values for testing multi-scalar multiplication.
-    - Performs decompression of base point multiples and sets up expected results for comparison.
-    - Executes multi-scalar multiplication using `fd_ristretto255_multi_scalar_mul` and verifies the result against expected values using `FD_TEST`.
-    - Conducts additional tests with different scalar and point values to ensure correctness of multi-scalar multiplication.
-    - Benchmarks the performance of multi-scalar multiplication by varying the number of points and scalars, and logs the results.
-    - Frees allocated memory for points after benchmarking.
-- **Output**: No direct output; the function performs tests and logs results for correctness and performance of multi-scalar multiplication.
-- **Functions Called**:
-    - [`fd_ristretto255_point_eq`](<fd_ristretto255.h.md#fd_ristretto255_point_eq>)
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator object used for generating random scalars.
+- **Control Flow**:
+    - Initialize a Ristretto255 point `h` for storing results.
+    - Define a constant `MSM_N` for the number of points and scalars used in the test.
+    - In the first correctness test block, initialize arrays for points and scalars, set specific scalar values, decompress points, and perform multi-scalar multiplication, verifying the result against an expected value.
+    - In the second correctness test block, use predefined scalars and points, validate them, perform multi-scalar multiplication, and verify the result against scalar multiplication and point addition results.
+    - For benchmarking, allocate memory for points, generate random scalars, decompress points, and measure the performance of multi-scalar multiplication for varying sizes of input data.
+    - Free the allocated memory for points after benchmarking.
+- **Output**: The function does not return a value but performs tests and logs results to verify the correctness and performance of multi-scalar multiplication operations.
+- **Functions called**:
+    - [`fd_ristretto255_point_eq`](fd_ristretto255.h.md#fd_ristretto255_point_eq)
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ristretto255.c#L504>)
-
-Initializes the environment, runs a series of cryptographic tests, logs the results, and then halts the program.
+The `main` function initializes the environment and random number generator, executes a series of cryptographic tests, and logs the results before terminating.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Executes a series of test functions: [`test_point_decompress`](<#test_point_decompress>), [`test_point_compress`](<#test_point_compress>), [`test_hash_to_curve`](<#test_hash_to_curve>), [`test_point_add_sub`](<#test_point_add_sub>), [`test_scalar_validate`](<#test_scalar_validate>), [`test_point_scalarmult`](<#test_point_scalarmult>), and [`test_multiscalar_mul`](<#fd_fn_no_asantest_multiscalar_mul>), each with `rng` as an argument.
-    - Logs a notice message 'pass' using `FD_LOG_NOTICE`.
-    - Calls `fd_halt` to terminate the program.
-    - Returns 0 to indicate successful execution.
+    - `argc`: An integer representing the number of command-line arguments.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - Create and join a new random number generator `rng`.
+    - Execute [`test_point_decompress`](#test_point_decompress) with `rng` to test point decompression functionality.
+    - Execute [`test_point_compress`](#test_point_compress) with `rng` to test point compression functionality.
+    - Execute [`test_hash_to_curve`](#test_hash_to_curve) with `rng` to test hashing to curve functionality.
+    - Execute [`test_point_add_sub`](#test_point_add_sub) with `rng` to test point addition and subtraction.
+    - Execute [`test_scalar_validate`](#test_scalar_validate) with `rng` to test scalar validation.
+    - Execute [`test_point_scalarmult`](#test_point_scalarmult) with `rng` to test point scalar multiplication.
+    - Execute [`test_multiscalar_mul`](#fd_fn_no_asantest_multiscalar_mul) with `rng` to test multi-scalar multiplication.
+    - Log a notice message indicating the tests passed.
+    - Call `fd_halt` to terminate the program.
 - **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`test_point_decompress`](<#test_point_decompress>)
-    - [`test_point_compress`](<#test_point_compress>)
-    - [`test_hash_to_curve`](<#test_hash_to_curve>)
-    - [`test_point_add_sub`](<#test_point_add_sub>)
-    - [`test_scalar_validate`](<#test_scalar_validate>)
-    - [`test_point_scalarmult`](<#test_point_scalarmult>)
-    - [`FD_FN_NO_ASAN::test_multiscalar_mul`](<#fd_fn_no_asantest_multiscalar_mul>)
+- **Functions called**:
+    - [`test_point_decompress`](#test_point_decompress)
+    - [`test_point_compress`](#test_point_compress)
+    - [`test_hash_to_curve`](#test_hash_to_curve)
+    - [`test_point_add_sub`](#test_point_add_sub)
+    - [`test_scalar_validate`](#test_scalar_validate)
+    - [`test_point_scalarmult`](#test_point_scalarmult)
+    - [`FD_FN_NO_ASAN::test_multiscalar_mul`](#fd_fn_no_asantest_multiscalar_mul)
 
 
 
