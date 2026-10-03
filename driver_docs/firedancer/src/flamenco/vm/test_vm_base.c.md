@@ -3,12 +3,86 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Unit tests for VM constants, disassembly, and trace creation, use, and deletion.
+Tests for virtual machine static assertions, error codes, limits, disassembly, and tracing functionality.
 
 # Purpose
-This file is a self-test program for the `fd_vm` virtual machine support code. It first uses many `FD_STATIC_ASSERT` checks to verify that `fd_vm_t` layout, error codes, register and stack limits, heap sizes, log sizes, compute-unit costs, and trace event values match the expected constants from `fd_vm_private.h`. These checks confirm that the VM interface and internal data layout stay consistent at compile time.
+The code is a C source file that serves as a test suite for a virtual machine (VM) implementation. It includes static assertions to verify the integrity of various VM parameters, such as structure sizes, alignments, error codes, and operational limits. These assertions ensure that the VM's configuration and error handling are consistent with expected values. The file also contains a [`main`](<#main>) function that initializes the environment, sets up random number generation, and performs a series of tests on VM functionalities, including error string retrieval, instruction disassembly, and event tracing.
 
-The [`main`](<#main>) function then runs runtime tests for VM helper APIs. It checks `fd_vm_strerror`, `fd_vm_disasm_instr`, and `fd_vm_disasm_program` with invalid arguments and with many random instruction values. It also creates a VM trace object with `fd_vm_trace_new`, verifies trace accessors and event-info helpers, records execution and memory events with `fd_vm_trace_event_exe` and `fd_vm_trace_event_mem`, prints the trace with `fd_vm_trace_printf`, and tests the trace destructor and join/leave functions. The file is therefore a test executable for VM disassembly and trace handling, not a library file that defines a public API.
+The [`main`](<#main>) function tests several components of the VM, such as error handling through `fd_vm_strerror`, instruction disassembly with `fd_vm_disasm_instr`, and program disassembly with `fd_vm_disasm_program`. It also tests the VM's tracing capabilities by creating and manipulating trace events using functions like `fd_vm_trace_event_exe` and `fd_vm_trace_event_mem`. The code includes various test cases to validate the behavior of these functions under different conditions, ensuring that the VM operates correctly and efficiently. Additionally, the code handles memory management for the trace events and includes cleanup operations to ensure proper resource deallocation.
+# Imports and Dependencies
+
+---
+- `fd_vm_private.h`
+- `stddef.h`
+- `assert.h`
+
+
+# Global Variables
+
+---
+### lc
+- **Type**: ``fd_vm_log_collector_t` array`
+- **Description**: The `lc` variable is a static array of type `fd_vm_log_collector_t` with a size of 1. It is used to collect log data in the virtual machine environment.
+- **Use**: Used to store and manage log data for the virtual machine.
+
+
+---
+### lc\_mirror
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters with a size defined by `FD_VM_LOG_MAX`. It is declared as a static variable, indicating it is limited to the file scope and retains its value between function calls.
+- **Use**: Used to store a mirrored copy of log data for the virtual machine.
+
+
+# Functions
+
+---
+### main<!-- {{#callable:main}} -->
+[View Source →](<../../../../../src/flamenco/vm/test_vm_base.c#L105>)
+
+Initializes the environment, tests various virtual machine functions, and performs trace operations.
+- **Inputs**:
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Retrieves `--event-max` and `--event-data-max` values from the command line, defaulting to 1024 and 64, respectively.
+    - Initializes a random number generator `rng`.
+    - Tests error codes using [`fd_vm_strerror`](<fd_vm.c.md#fd_vm_strerror>) and logs the results.
+    - Tests the [`fd_vm_disasm_instr`](<fd_vm_disasm.c.md#fd_vm_disasm_instr>) function with various invalid inputs and logs the results.
+    - Performs a loop to test [`fd_vm_disasm_instr`](<fd_vm_disasm.c.md#fd_vm_disasm_instr>) with random instructions, checking for errors and validating output.
+    - Tests the [`fd_vm_disasm_program`](<fd_vm_disasm.c.md#fd_vm_disasm_program>) function with various invalid inputs and logs the results.
+    - Logs the start of `fd_vm_trace` testing with the specified event parameters.
+    - Tests trace constructors, including alignment and footprint calculations, and validates trace creation.
+    - Tests trace accessors to verify event and data maximums.
+    - Tests trace info functions for different event types and validity states.
+    - Performs tracing operations in an infinite loop, alternating between execution and memory events, and checks for errors.
+    - Handles the `FD_VM_ERR_FULL` error by breaking out of the loop.
+    - Tests trace printing functions and logs synthetic trace results.
+    - Tests trace destructors to ensure proper cleanup.
+    - Deletes the random number generator and halts the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_vm_disasm_instr`](<fd_vm_disasm.c.md#fd_vm_disasm_instr>)
+    - [`fd_vm_strerror`](<fd_vm.c.md#fd_vm_strerror>)
+    - [`fd_vm_disasm_program`](<fd_vm_disasm.c.md#fd_vm_disasm_program>)
+    - [`fd_vm_trace_align`](<fd_vm_trace.c.md#fd_vm_trace_align>)
+    - [`fd_vm_trace_footprint`](<fd_vm_trace.c.md#fd_vm_trace_footprint>)
+    - [`fd_vm_trace_new`](<fd_vm_trace.c.md#fd_vm_trace_new>)
+    - [`fd_vm_trace_join`](<fd_vm_trace.c.md#fd_vm_trace_join>)
+    - [`fd_vm_trace_event`](<fd_vm_base.h.md#fd_vm_trace_event>)
+    - [`fd_vm_trace_event_sz`](<fd_vm_base.h.md#fd_vm_trace_event_sz>)
+    - [`fd_vm_trace_event_max`](<fd_vm_base.h.md#fd_vm_trace_event_max>)
+    - [`fd_vm_trace_event_data_max`](<fd_vm_base.h.md#fd_vm_trace_event_data_max>)
+    - [`fd_vm_trace_event_info`](<fd_vm_base.h.md#fd_vm_trace_event_info>)
+    - [`fd_vm_trace_event_info_type`](<fd_vm_base.h.md#fd_vm_trace_event_info_type>)
+    - [`fd_vm_trace_event_info_valid`](<fd_vm_base.h.md#fd_vm_trace_event_info_valid>)
+    - [`fd_vm_trace_event_exe`](<fd_vm_base.h.md#fd_vm_trace_event_exe>)
+    - [`fd_vm_trace_event_mem`](<fd_vm_base.h.md#fd_vm_trace_event_mem>)
+    - [`fd_vm_trace_printf`](<fd_vm_trace.c.md#fd_vm_trace_printf>)
+    - [`fd_vm_trace_leave`](<fd_vm_trace.c.md#fd_vm_trace_leave>)
+    - [`fd_vm_trace_delete`](<fd_vm_trace.c.md#fd_vm_trace_delete>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

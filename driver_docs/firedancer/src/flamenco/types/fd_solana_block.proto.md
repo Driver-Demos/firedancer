@@ -3,18 +3,40 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_solana_block.proto` file defines Protobuf messages for Solana's "ConfirmedBlock" data, which is used for transaction status RPC APIs and integrated with Firedancer using nanopb for efficient C/C++ code generation.
+Protobuf definitions for Solana's ConfirmedBlock transaction status, integrated with Firedancer using nanopb.
 
 # Purpose
-This file is a Protocol Buffers (Protobuf) definition file, specifically designed for the Solana blockchain's transaction status RPC APIs. It provides a structured format for representing data related to confirmed blocks and transactions, which is crucial for debugging and analyzing the side effects of transaction execution. The file is tailored to work with nanopb, a lightweight C/C++ Protobuf code generator, making it suitable for environments with limited resources. The file contains several message definitions, such as `MessageHeader`, `Instruction`, `Transaction`, and `TransactionStatusMeta`, each detailing various aspects of a transaction, including signatures, instructions, errors, token balances, and rewards. This Protobuf schema is integral to the Solana codebase as it facilitates the storage and retrieval of transaction metadata, enabling tools like test_runtime to verify the accuracy of transaction replay results.
+The file defines Protobuf messages for the Solana blockchain's transaction status RPC APIs, specifically for the `ConfirmedBlock` package. These definitions are used to store and retrieve transaction metadata, which is not essential for consensus but is valuable for debugging and analyzing transaction execution side effects. The file uses nanopb, a lightweight C/C++ Protobuf code generator, to create efficient bindings suitable for embedded systems. The Protobuf messages include structures for transactions, instructions, token balances, rewards, and transaction status metadata, providing a comprehensive schema for capturing detailed transaction information. This metadata is stored in a blockstore column family by the Solana Labs validator and can be used by the test_runtime program to verify the accuracy of Firedancer's replay results.
 # Content Summary
-This file is a Protobuf definition file for the Solana blockchain, specifically for the "ConfirmedBlock" package. It is used to define the structure of transaction-related data that is part of the transaction status RPC APIs. This data format is not used for consensus but is crucial for debugging as it provides insights into the side effects of transaction execution. The file has been modified to integrate with Firedancer using nanopb, a lightweight C/C++ Protobuf code generator that is suitable for embedded systems due to its small footprint and lack of external dependencies.
+This file contains Protobuf definitions for the "ConfirmedBlock" data structure, which is part of the transaction status RPC APIs used by Solana Labs. The data format is not used for consensus but is useful for debugging as it provides information about the side effects of transaction execution. The file has been modified to integrate with Firedancer using nanopb, a lightweight C/C++ Protobuf code generator.
 
-The file defines several Protobuf messages that describe various components of a transaction. Key messages include `MessageHeader`, which details the number of required signatures and readonly accounts; `Instruction`, which specifies program IDs and associated data; and `Message`, which encapsulates the transaction's header, account keys, blockhash, instructions, and address table lookups. The `Transaction` message includes signatures and the message itself, while `ConfirmedTransaction` combines a transaction with its status metadata.
+The file defines several Protobuf messages related to transactions and their statuses. Key messages include:
 
-The `TransactionStatusMeta` message is particularly detailed, capturing errors, fees, balance changes, inner instructions, log messages, token balances, rewards, and compute units consumed. It also includes optional fields to handle data that may not be present, such as inner instructions or log messages, which are marked as `None` for transactions executed on earlier versions of Solana.
+1. **MessageHeader**: Contains fields for the number of required signatures and the number of readonly signed and unsigned accounts.
 
-The file also includes metadata for nanopb, specifying custom options for the generated code, such as package names and include paths. Developers working with this file should be aware of the nanopb-specific annotations, which define array size bounds and memory allocation strategies, making the generated code efficient for embedded applications. To regenerate the code after modifying the Protobuf definitions, developers should refer to the Makefile in the directory. The nanopb API reference is available online for further guidance.
+2. **Instruction**: Represents a transaction instruction with fields for the program ID index, accounts, and data.
+
+3. **MessageAddressTableLookup**: Contains fields for account keys and indexes for writable and readonly accounts.
+
+4. **Message**: Includes a header, account keys, recent blockhash, instructions, versioning information, and address table lookups.
+
+5. **Transaction**: Comprises signatures and a message.
+
+6. **ConfirmedTransaction**: Contains a transaction and its status metadata.
+
+7. **InnerInstruction** and **InnerInstructions**: Represent inner instructions within a transaction, including stack height information.
+
+8. **TransactionError**: Captures any errors associated with a transaction.
+
+9. **UiTokenAmount** and **TokenBalance**: Provide details on token amounts and balances, including account index, mint, owner, and program ID.
+
+10. **Reward**: Describes rewards with fields for public key, lamports, post-balance, reward type, and commission.
+
+11. **ReturnData**: Contains program ID and data for return values.
+
+12. **TransactionStatusMeta**: Provides comprehensive metadata about a transaction, including errors, fees, balances, inner instructions, log messages, token balances, rewards, loaded addresses, return data, and compute units consumed.
+
+The file uses nanopb annotations to optimize for embedded systems, specifying array size bounds and custom memory allocators. The Protobuf definitions are used to store transaction metadata in a blockstore column family, which can be accessed by the test_runtime program to verify Firedancer's replay results. The file also includes instructions for building and regenerating the code using a Makefile.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Filters locations to include only files under src/ for CodeQL analysis.
+Excludes specific code from analysis based on file path prefixes.
 
 # Purpose
-This file defines a CodeQL query helper that limits analysis to source files under the `src/` directory. The `included` predicate checks the relative path of a `Location` value and returns true only when the path starts with `src/`. The `import cpp` statement shows that the file is part of a C/C++ analysis setup and uses CodeQL C++ libraries. This code provides narrow filtering logic for analysis scope rather than application runtime behavior.
+The code defines a predicate function `included` that determines if a given file location should be included for analysis. It imports a module named `cpp`, which suggests that the code is related to C++ source files. The predicate checks if the relative path of a file location starts with the prefix "src/", indicating that only files within the "src" directory are included for further processing. This code is likely part of a larger system that filters files for analysis, excluding those that do not meet the specified criteria.
+# Imports and Dependencies
+
+---
+- `cpp`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

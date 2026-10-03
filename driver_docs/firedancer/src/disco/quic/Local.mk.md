@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for QUIC headers, objects, and unit tests, gated by FD_HAS_DOUBLE and FD_HAS_ALLOCA.
+Makefile for adding headers, objects, and unit tests for QUIC-related components in the Firedancer project.
 
 # Purpose
-This Makefile fragment defines build inputs and unit test targets for the `fd_disco` area. It adds the `fd_tpu.h` header and the `fd_tpu_reasm` object, then creates and runs the `test_tpu_reasm` unit test with the `fd_disco`, `fd_tango`, `fd_ballet`, and `fd_util` dependencies. When `FD_HAS_DOUBLE` is enabled, it also builds and runs the `test_quic_metrics` unit test and declares `src/disco/quic/test_quic_metrics.txt` as an input for the `test_quic_metrics.o` object. When `FD_HAS_ALLOCA` is enabled, it adds the `fd_quic_tile.h` header and the `fd_quic_tile` object to the `fd_disco` build.
+The Makefile content defines build and test instructions for a software project. It uses the `add-hdrs` and `add-objs` functions to include header files and object files, such as `fd_tpu.h` and `fd_tpu_reasm`, into the build process. The `make-unit-test` and `run-unit-test` functions are used to create and execute unit tests, specifically `test_tpu_reasm` and `test_quic_metrics`, with dependencies on various modules like `fd_disco` and `fd_util`. Conditional directives, such as `ifdef FD_HAS_DOUBLE` and `ifdef FD_HAS_ALLOCA`, control the inclusion of additional tests and files based on the presence of specific features or configurations. The file also specifies a dependency rule for the object file `test_quic_metrics.o`, indicating it depends on the source file `test_quic_metrics.txt`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

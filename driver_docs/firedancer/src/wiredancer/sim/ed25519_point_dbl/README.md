@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ed25519_point_dbl` folder in the `firedancer` codebase contains configuration and testing files for simulating and verifying the ED25519 point doubling operation in a hardware design using Verilog and cocotb.
+Makefile and test script for simulating and testing ED25519 point doubling with Verilog and Cocotb.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/ed25519_point_dbl` directory is used to configure and run simulations for the `ed25519_point_dbl` module using Verilog sources and the Questa simulator.
-- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase contains a cocotb-based test for verifying the functionality of an ED25519 point doubling operation in a hardware design.
+- **[Makefile](Makefile.md)**: Makefile for simulating the `ed25519_point_dbl` module using Verilog sources and Cocotb.
+- **[test.py](test.py.md)**: Tests the ED25519 point doubling operation using the Cocotb framework.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

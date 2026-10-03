@@ -3,12 +3,84 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Loads netlink link data into the device table and bond slave mapping.
+Implements functions to initialize and load network device tables using Linux netlink.
 
 # Purpose
-This C file loads the Linux network interface table through netlink and stores the result in `fd_netdev_tbl_join_t`. The main entry point, [`fd_netdev_netlink_load_table`](<#fd_netdev_netlink_load_table>), sends an `RTM_GETLINK` request, reads the reply stream, and parses each `RTM_NEWLINK` message. For each interface, it fills a `fd_netdev_t` record with fields such as `name`, `mac_addr`, `mtu`, `oper_status`, `master_idx`, `dev_type`, and GRE tunnel addresses. It also maps Linux interface operating states to the internal `FD_OPER_STATUS_*` values with [`ifoper_to_oper_status`](<#ifoper_to_oper_status>).
+The code is a C source file that interacts with the Linux kernel's netlink interface to manage network device information. It is designed to operate on Linux systems, as indicated by the preprocessor directive that checks for a Linux environment. The primary function, [`fd_netdev_netlink_load_table`](<#fd_netdev_netlink_load_table>), retrieves and processes network interface data using netlink messages. It sends a request to the kernel to get information about network links and processes the responses to populate a network device table (`fd_netdev_tbl_join_t`). This table includes details such as interface names, MAC addresses, operational status, MTU, and GRE tunnel endpoints.
 
-The file also builds bond and slave relationships after the first pass over the interface list. It scans the device table again, finds interfaces that are `UP` and attached to a master, and creates or updates the matching `fd_netdev_bond_t` entry for the master device. The code is Linux-specific and depends on kernel netlink and rtnetlink headers, so it acts as a platform interface layer for importing live network device state into the internal device table.
+The code includes several static functions and macros to handle specific tasks, such as initializing network device structures ([`fd_netdev_init`](<#fd_netdev_init>)) and converting operational status codes ([`ifoper_to_oper_status`](<#ifoper_to_oper_status>)). It uses various Linux-specific headers to access constants and structures necessary for netlink communication. The code also manages bond devices by mapping master-slave relationships among network interfaces. This functionality is crucial for applications that need to monitor or configure network interfaces programmatically on Linux systems.
+# Imports and Dependencies
+
+---
+- `fd_netdev_netlink.h`
+- `../../util/fd_util.h`
+- `../../util/net/fd_ip4.h`
+- `fd_netdev_tbl.h`
+- `linux/if_link.h`
+- `errno.h`
+- `linux/if.h`
+- `linux/if_arp.h`
+- `linux/rtnetlink.h`
+- `linux/if_tunnel.h`
+
+
+# Functions
+
+---
+### fd\_netdev\_init<!-- {{#callable:fd_netdev_init}} -->
+[View Source →](<../../../../../src/waltz/mib/fd_netdev_netlink.c#L17>)
+
+Initializes a `fd_netdev_t` structure with default values.
+- **Inputs**:
+    - `netdev`: A pointer to a `fd_netdev_t` structure that will be initialized.
+- **Logic and Control Flow**:
+    - Assigns default values to the fields of the `fd_netdev_t` structure pointed to by `netdev`.
+    - Sets `mtu` to 1500, `if_idx` to 0, `slave_tbl_idx` to -1, `master_idx` to -1, `oper_status` to `FD_OPER_STATUS_INVALID`, `dev_type` to `ARPHRD_NONE`, `gre_dst_ip` to 0, and `gre_src_ip` to 0.
+    - Returns the pointer to the initialized `fd_netdev_t` structure.
+- **Output**: Returns a pointer to the initialized `fd_netdev_t` structure.
+
+
+---
+### ifoper\_to\_oper\_status<!-- {{#callable:ifoper_to_oper_status}} -->
+[View Source →](<../../../../../src/waltz/mib/fd_netdev_netlink.c#L32>)
+
+Maps Linux interface operational status codes to corresponding RFC 2863 operational status codes.
+- **Inputs**:
+    - ``if_oper``: An unsigned integer representing the Linux interface operational status code.
+- **Logic and Control Flow**:
+    - Use a `switch` statement to evaluate the value of `if_oper`.
+    - For each case, return the corresponding RFC 2863 operational status code: `FD_OPER_STATUS_UNKNOWN`, `FD_OPER_STATUS_NOT_PRESENT`, `FD_OPER_STATUS_DOWN`, `FD_OPER_STATUS_LOWER_LAYER_DOWN`, `FD_OPER_STATUS_TESTING`, `FD_OPER_STATUS_DORMANT`, or `FD_OPER_STATUS_UP`.
+    - If `if_oper` does not match any known case, return `FD_OPER_STATUS_INVALID`.
+- **Output**: Returns an unsigned character representing the RFC 2863 operational status code.
+
+
+---
+### fd\_netdev\_netlink\_load\_table<!-- {{#callable:fd_netdev_netlink_load_table}} -->
+[View Source →](<../../../../../src/waltz/mib/fd_netdev_netlink.c#L55>)
+
+Loads network device information into a table using netlink communication.
+- **Inputs**:
+    - ``tbl``: A pointer to `fd_netdev_tbl_join_t`, which is the table to load network device information into.
+    - ``netlink``: A pointer to `fd_netlink_t`, which is used for netlink communication to retrieve network device information.
+- **Logic and Control Flow**:
+    - Reset the network device table `tbl` using [`fd_netdev_tbl_reset`](<fd_netdev_tbl.c.md#fd_netdev_tbl_reset>).
+    - Increment the sequence number in `netlink` and prepare a netlink request message to get link information.
+    - Send the request using `sendto` and check for errors in sending.
+    - Initialize a buffer and an iterator for receiving netlink messages.
+    - Iterate over received netlink messages using `fd_netlink_iter_init`, `fd_netlink_iter_done`, and `fd_netlink_iter_next`.
+    - For each message, check for errors and process only `RTM_NEWLINK` messages.
+    - For each valid message, check the interface index and type, and initialize a `fd_netdev_t` structure.
+    - Iterate over the attributes of the message and populate the `fd_netdev_t` structure based on attribute types like `IFLA_IFNAME`, `IFLA_ADDRESS`, `IFLA_OPERSTATE`, `IFLA_MTU`, `IFLA_MASTER`, and `IFLA_LINKINFO`.
+    - Update the network device table `tbl` with the populated `fd_netdev_t` structure.
+    - After processing all messages, iterate over the table to index bond master-slave relationships.
+    - Return 0 on success or an error code on failure.
+- **Output**: Returns 0 on success or an error code on failure.
+- **Functions Called**:
+    - [`fd_netdev_tbl_reset`](<fd_netdev_tbl.c.md#fd_netdev_tbl_reset>)
+    - [`fd_netdev_init`](<#fd_netdev_init>)
+    - [`ifoper_to_oper_status`](<#ifoper_to_oper_status>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
