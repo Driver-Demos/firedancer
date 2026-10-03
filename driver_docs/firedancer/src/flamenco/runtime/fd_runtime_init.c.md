@@ -3,71 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Restores feature activation states in a bank from an accounts database using feature account data.
+Restores feature activation state from account data into the bank.
 
 # Purpose
-The code is a C source file that provides functionality for restoring feature states in a banking system. It interacts with a feature account database to update the activation state of features within a bank. The primary function, [`fd_feature_restore`](<#fd_feature_restore>), is responsible for loading a feature from the accounts database and updating the bank's feature activation state based on a given feature account address. It performs several checks to ensure the feature is valid, such as verifying the account ownership, checking the data size, and deserializing the feature account data.
+This C file restores feature activation state into a `fd_bank_t` from the accounts database. The main entry point, [`fd_features_restore`](<#fd_features_restore>), iterates over all known feature IDs with `fd_feature_iter_init`, `fd_feature_iter_done`, and `fd_feature_iter_next`, then calls [`fd_feature_restore`](<#fd_feature_restore>) for each feature account address. The restore logic reads each account from `fd_funk_t`, checks that the feature is not marked as reverted, verifies that the account owner matches `fd_solana_feature_program_id`, and checks that the account data length is at least `FD_FEATURE_SIZEOF`.
 
-The file includes several header files, indicating dependencies on other components such as `fd_runtime_init.h`, `fd_acc_mgr.h`, and `fd_bank.h`. The function [`fd_features_restore`](<#fd_features_restore>) iterates over all feature IDs and calls [`fd_feature_restore`](<#fd_feature_restore>) for each, ensuring that all features are processed. The code is designed to be part of a larger system, likely a banking or financial application, where feature management is necessary. It does not define public APIs or external interfaces but rather provides internal functionality for managing feature states within the system.
-# Imports and Dependencies
-
----
-- `fd_runtime_init.h`
-- `fd_acc_mgr.h`
-- `fd_bank.h`
-- `../types/fd_types.h`
-- `fd_system_ids.h`
-
-
-# Functions
-
----
-### fd\_feature\_restore<!-- {{#callable:fd_feature_restore}} -->
-[View Source →](<../../../../../src/flamenco/runtime/fd_runtime_init.c#L11>)
-
-Restores a feature from the accounts database and updates the bank's feature activation state based on a feature account address.
-- **Inputs**:
-    - ``bank``: A pointer to `fd_bank_t`, representing the bank whose feature activation state will be updated.
-    - ``funk``: A pointer to `fd_funk_t`, representing the transaction context used to read account data.
-    - ``xid``: A constant pointer to `fd_funk_txn_xid_t`, representing the transaction ID for the context.
-    - ``id``: A constant pointer to `fd_feature_id_t`, representing the feature ID to be restored.
-    - ``addr``: A constant pointer to `fd_pubkey_t`, representing the address of the feature account.
-- **Logic and Control Flow**:
-    - Modify the bank's features using `fd_bank_features_modify`.
-    - Check if the feature ID is marked as reverted; if so, exit the function.
-    - Initialize a transaction account record from the `funk` context using [`fd_txn_account_init_from_funk_readonly`](<fd_txn_account.c.md#fd_txn_account_init_from_funk_readonly>); if it fails, exit the function.
-    - Compare the account owner with the feature program ID; if they do not match, exit the function.
-    - Check if the account data length is less than `FD_FEATURE_SIZEOF`; if so, exit the function.
-    - Deserialize the feature account data using `fd_bincode_decode_static`; if it fails, exit the function.
-    - Encode the address to a base58 string using `FD_BASE58_ENCODE_32_BYTES`.
-    - If the feature has an activation timestamp, log the activation and update the bank's features with `fd_features_set`; otherwise, log that the feature is not activated.
-- **Output**: No return value; updates the bank's feature activation state and logs the feature activation status.
-- **Functions Called**:
-    - [`fd_txn_account_init_from_funk_readonly`](<fd_txn_account.c.md#fd_txn_account_init_from_funk_readonly>)
-    - [`fd_txn_account_get_owner`](<fd_txn_account.c.md#fd_txn_account_get_owner>)
-    - [`fd_txn_account_get_data_len`](<fd_txn_account.c.md#fd_txn_account_get_data_len>)
-    - [`fd_txn_account_get_data`](<fd_txn_account.c.md#fd_txn_account_get_data>)
-
-
----
-### fd\_features\_restore<!-- {{#callable:fd_features_restore}} -->
-[View Source →](<../../../../../src/flamenco/runtime/fd_runtime_init.c#L64>)
-
-Restores feature activation states in a bank by iterating over feature IDs and invoking the [`fd_feature_restore`](<#fd_feature_restore>) function for each.
-- **Inputs**:
-    - ``bank``: A pointer to an `fd_bank_t` structure where feature activation states will be updated.
-    - ``funk``: A pointer to an `fd_funk_t` structure used for reading account data.
-    - ``xid``: A constant pointer to an `fd_funk_txn_xid_t` structure representing the transaction ID context for the restoration process.
-- **Logic and Control Flow**:
-    - Initialize a feature ID iterator using `fd_feature_iter_init()`.
-    - Check if the iterator has completed using `fd_feature_iter_done()`; if not, continue the loop.
-    - For each feature ID, call `fd_feature_restore()` with the current feature ID and its address to restore the feature's state.
-    - Repeat the process for the next feature ID using `fd_feature_iter_next()`.
-- **Output**: No direct output; the function updates the feature activation states in the provided `bank` structure.
-- **Functions Called**:
-    - [`fd_feature_restore`](<#fd_feature_restore>)
-
-
+If the account data passes these checks, the code decodes the feature account with `fd_bincode_decode_static` into `fd_feature_t`. When the decoded feature has `has_activated_at` set, the code writes the activation slot into the bank feature state with `fd_features_set`. If the feature is not activated, the code only writes a debug log. This file does not define a public API for general use; it implements internal bank initialization logic for feature gate restoration from stored account data.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

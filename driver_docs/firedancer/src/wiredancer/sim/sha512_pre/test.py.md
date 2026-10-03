@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A test for SHA-512 pre-processing using the cocotb framework with random message lengths and conditions.
+The `test.py` file in the `firedancer` codebase is a cocotb-based test script for simulating and verifying the SHA-512 preprocessing logic in a hardware design.
 
 # Purpose
-The code is a test suite for a digital design verification environment using the Cocotb framework. It defines an asynchronous test function [`test`](<#test>) that interacts with a device under test (DUT) to verify its behavior. The test initializes input signals `i_w` and `i_v` to zero and sets up a clock signal on the DUT's `clk` line. It also uses the `wd_cocotil` module to manage reset toggling and to monitor signal activity.
+This Python file is a test script designed to be executed within the Cocotb framework, which is a coroutine-based co-simulation library for verifying digital designs. The script is specifically tailored to test a digital design unit, referred to as `dut` (Device Under Test), by simulating clock signals and reset conditions, and by generating and applying a series of randomized input transactions to the DUT. The script utilizes several components from the `wd_cocotil` module, such as `toggle_reset` and `mon_sha_pre`, to manage reset toggling and to monitor the state of the DUT during the test. The test function, decorated with `@cocotb.test()`, orchestrates the simulation by initializing input signals, starting clock and reset processes, and then iteratively generating and applying input data to the DUT while monitoring its output.
 
-The test generates random transactions with varying message lengths and sends them to the DUT. It uses the `wd_cocotil.random_tr` function to create these transactions, which are then appended to the `q_o_sha_pre` list. The test simulates backpressure and random gaps in the input signal flow to test the DUT's handling of such conditions. The transactions are encoded into a `BinaryValue` object, which is then assigned to the DUT's input signals. The test continues until all generated transactions are processed, ensuring that the DUT's output is monitored throughout the process.
+The core functionality of this script revolves around generating random transactions with varying message lengths and attributes, which are then encoded into a binary format suitable for the DUT's input interface. The script uses the `BinaryValue` class to construct these input messages, ensuring they conform to the expected bit-width and format. The test also includes mechanisms to handle backpressure and random gaps in the input stream, simulating real-world conditions where data may not be continuously available. This script is a focused test case, not a general-purpose library, and is intended to be run as part of a larger suite of tests to validate the behavior and robustness of the digital design under test.
 # Imports and Dependencies
 
 ---
@@ -26,24 +26,25 @@ The test generates random transactions with varying message lengths and sends th
 
 ---
 ### test<!-- {{#callable:firedancer/src/wiredancer/sim/sha512_pre/test.test}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/sha512_pre/test.py#L11>)
-
-Simulates a testbench for a digital design by generating random transactions and managing signal values.
+The `test` function is a cocotb test that simulates a digital circuit by generating random transactions, applying them to the device under test (DUT), and monitoring the output.
 - **Decorators**: `@cocotb.test`
 - **Inputs**:
-    - `dut`: The device under test, which is a digital design component that the testbench interacts with.
-- **Logic and Control Flow**:
-    - Initialize the input signals `i_w` and `i_v` to 0.
-    - Create an empty list `q_o_sha_pre` to store transaction data.
-    - Start the clock and reset processes using `cocotb.start` and custom utility functions from `wd_cocotil`.
-    - Wait for 1024 clock cycles to allow the system to stabilize post-reset.
-    - Calculate parameters `W` and `M` based on the device under test's attributes and external metadata.
-    - Generate random message lengths and transactions, storing them in `q_o_sha_pre`.
-    - For each transaction, manage the message transmission by checking and setting signal values, handling backpressure, and inserting random gaps.
-    - Construct a `BinaryValue` object to represent the message and control signals, updating the device under test's input signals accordingly.
-    - Continue the process until all messages are sent, then set `i_v` to 0.
-    - Wait until all transactions in `q_o_sha_pre` are processed.
-- **Output**: No explicit return value; the function operates asynchronously to simulate a testbench environment.
+    - `dut`: The device under test (DUT) which is a simulation object representing the digital circuit to be tested.
+- **Control Flow**:
+    - Initialize the DUT's input signals `i_w` and `i_v` to 0.
+    - Start the clock and reset processes using cocotb's `start` function and custom utility functions from `wd_cocotil`.
+    - Wait for 1024 clock cycles to allow the DUT to stabilize post-reset.
+    - Calculate the width `W` and total bit length `M` from the DUT's parameters and metadata.
+    - Iterate over a loop to generate random message lengths and transactions, ensuring each length is used once before repeating.
+    - For each transaction, extract the message and initialize control signals like `sop` (start of packet) and `size`.
+    - While there are message bits remaining, handle backpressure by waiting for the DUT to be ready to accept new data.
+    - Introduce random gaps by occasionally setting `i_v` to 0 and waiting for a clock edge.
+    - Determine the end of packet (`eop`) and calculate the number of padding bytes needed (`e`).
+    - Construct a binary message `b_m` with metadata and message content, adjusting for padding and packet boundaries.
+    - Set the DUT's input signals `i_v`, `i_e`, and `i_m` to apply the transaction to the DUT.
+    - Reset `sop` to 0 after the first packet segment and wait for a clock edge.
+    - After all transactions are applied, set `i_v` to 0 and wait for the output queue `q_o_sha_pre` to empty.
+- **Output**: The function does not return a value; it performs a simulation and applies transactions to the DUT, monitoring the output through side effects.
 
 
 
