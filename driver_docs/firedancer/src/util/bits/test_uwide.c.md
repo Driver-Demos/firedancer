@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for 128-bit integer operations including addition, subtraction, multiplication, division, and bit shifts.
+The `test_uwide.c` file in the `firedancer` codebase is a unit test for various operations on 128-bit unsigned integers, including addition, subtraction, multiplication, division, and bit shifts, using the `fd_uwide` functions.
 
 # Purpose
-The code is a C program designed to perform unit tests on a set of operations involving 128-bit unsigned integers (`uint128`). It includes a main function that initializes a random number generator and iteratively tests various arithmetic and bitwise operations on randomly generated 128-bit numbers. The operations tested include addition, subtraction, multiplication, division, and bit shifts, as well as finding the most significant bit. The program uses helper functions such as `fd_uwide_add`, `fd_uwide_sub`, `fd_uwide_mul`, `fd_uwide_div`, `fd_uwide_divrem`, `fd_uwide_find_msb`, and `fd_uwide_find_msb_def` to perform these operations and verify their correctness by comparing the results with expected values.
+This C source code file is a comprehensive test suite designed to validate the functionality of operations on 128-bit unsigned integers, specifically when the `FD_HAS_INT128` capability is available. The code is structured to perform a series of arithmetic operations such as addition, subtraction, multiplication, division, and bitwise shifts on randomly generated 128-bit integers. It utilizes a custom utility library (`fd_util.h`) and a wide integer library (`fd_uwide.h`) to handle these operations. The main function initializes a random number generator and iterates through a large number of test cases, each time generating random test vectors and verifying the correctness of the operations by comparing the results of the custom wide integer functions against expected outcomes. If any discrepancies are found, detailed error logs are generated to aid in debugging.
 
-The program is structured to run a large number of iterations, logging progress and errors. It uses inline functions [`split_hi`](<#split_hi>), [`split_lo`](<#split_lo>), and [`join`](<#join>) to manipulate the high and low parts of the 128-bit integers. The code is conditional on the presence of the `FD_HAS_INT128` capability, which indicates support for 128-bit integers. If this capability is not available, the program logs a warning and exits without performing the tests. The program is intended to be executed as a standalone application, as indicated by the presence of the [`main`](<#main>) function, and it does not define any public APIs or external interfaces.
+The file is intended to be an executable test program, as indicated by the presence of a [`main`](#main) function. It does not define public APIs or external interfaces but rather serves as an internal validation tool to ensure the reliability and accuracy of the wide integer operations provided by the `fd_uwide` library. The code is structured to skip execution if the `FD_HAS_INT128` capability is not present, logging a warning instead. This ensures that the test suite is only run in environments where 128-bit integer support is available, maintaining the integrity and relevance of the tests.
 # Imports and Dependencies
 
 ---
@@ -20,58 +20,52 @@ The program is structured to run a large number of iterations, logging progress 
 
 ---
 ### split\_hi<!-- {{#callable:split_hi}} -->
-[View Source →](<../../../../../src/util/bits/test_uwide.c#L6>)
-
-Extracts the higher 64 bits from a 128-bit unsigned integer.
+The `split_hi` function extracts the higher 64 bits from a 128-bit unsigned integer.
 - **Inputs**:
-    - `x`: A 128-bit unsigned integer (`uint128`) from which the higher 64 bits are extracted.
-- **Logic and Control Flow**:
-    - Shift the input `x` right by 64 bits to move the higher 64 bits to the lower 64-bit position.
-    - Cast the result to a 64-bit unsigned long integer (`ulong`).
-- **Output**: Returns the higher 64 bits of the input `x` as a 64-bit unsigned long integer (`ulong`).
+    - `x`: A 128-bit unsigned integer (uint128) from which the higher 64 bits are to be extracted.
+- **Control Flow**:
+    - The function takes a 128-bit unsigned integer `x` as input.
+    - It performs a right bitwise shift of 64 positions on `x`, effectively moving the higher 64 bits to the lower 64-bit position.
+    - The result of the shift is then cast to a 64-bit unsigned long integer (ulong).
+- **Output**: The function returns the higher 64 bits of the input 128-bit unsigned integer as a 64-bit unsigned long integer.
 
 
 ---
 ### split\_lo<!-- {{#callable:split_lo}} -->
-[View Source →](<../../../../../src/util/bits/test_uwide.c#L7>)
-
-Extracts the lower 64 bits from a 128-bit unsigned integer.
+The `split_lo` function extracts the lower 64 bits from a 128-bit unsigned integer.
 - **Inputs**:
-    - `x`: A 128-bit unsigned integer (`uint128`) from which the lower 64 bits will be extracted.
-- **Logic and Control Flow**:
-    - Casts the 128-bit unsigned integer `x` to a 64-bit unsigned integer (`ulong`).
-- **Output**: Returns the lower 64 bits of the input `x` as a 64-bit unsigned integer (`ulong`).
+    - `x`: A 128-bit unsigned integer (`uint128`) from which the lower 64 bits are to be extracted.
+- **Control Flow**:
+    - The function takes a 128-bit unsigned integer `x` as input.
+    - It casts `x` to a 64-bit unsigned integer (`ulong`), effectively extracting the lower 64 bits of `x`.
+- **Output**: The function returns the lower 64 bits of the input 128-bit unsigned integer as a 64-bit unsigned integer (`ulong`).
 
 
 ---
 ### join<!-- {{#callable:join}} -->
-[View Source →](<../../../../../src/util/bits/test_uwide.c#L9>)
-
-Combines two 64-bit unsigned long integers into a single 128-bit unsigned integer.
+The `join` function combines two 64-bit unsigned long integers into a single 128-bit unsigned integer.
 - **Inputs**:
-    - `xh`: The high 64 bits of the 128-bit integer.
-    - `xl`: The low 64 bits of the 128-bit integer.
-- **Logic and Control Flow**:
-    - Cast `xh` to a 128-bit integer and shift it left by 64 bits to form the high part of the result.
-    - Cast `xl` to a 128-bit integer to form the low part of the result.
-    - Combine the high and low parts using a bitwise OR operation to form the final 128-bit integer.
-- **Output**: A 128-bit unsigned integer that combines the high and low 64-bit parts.
+    - `xh`: The high 64 bits of the 128-bit integer, represented as an unsigned long integer.
+    - `xl`: The low 64 bits of the 128-bit integer, represented as an unsigned long integer.
+- **Control Flow**:
+    - The function casts the high 64-bit integer `xh` to a 128-bit integer and shifts it left by 64 bits.
+    - It then casts the low 64-bit integer `xl` to a 128-bit integer.
+    - The function performs a bitwise OR operation between the shifted high 128-bit integer and the low 128-bit integer to combine them into a single 128-bit integer.
+- **Output**: A 128-bit unsigned integer that is the result of combining the high and low 64-bit integers.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/bits/test_uwide.c#L193>)
-
-Initializes the environment and logs a warning if the `FD_HAS_INT128` capability is not available, then halts execution.
+The `main` function initializes the environment and logs a warning if the `FD_HAS_INT128` capability is not available, then halts the program.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
-    - Logs a warning message indicating that the unit test requires `FD_HAS_INT128` capability.
-    - Calls `fd_halt` to stop the program execution.
-    - Returns 0 to indicate successful execution.
-- **Output**: Returns 0, indicating successful execution.
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with the command-line arguments.
+    - Log a warning message indicating that the unit test requires `FD_HAS_INT128` capability.
+    - Call `fd_halt` to terminate the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

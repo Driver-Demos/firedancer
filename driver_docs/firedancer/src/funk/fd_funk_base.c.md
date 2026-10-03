@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Maps error codes to their corresponding error message strings.
+The `fd_funk_base.c` file provides a function to convert error codes into human-readable error messages for the Firedancer project.
 
 # Purpose
-The code defines a function [`fd_funk_strerror`](<#fd_funk_strerror>) that converts error codes into human-readable error messages. It includes the header file `fd_funk_base.h`, which likely contains the definitions of the error codes used in the switch statement. The function takes an integer `err` as input, representing an error code, and returns a string that describes the error. The function handles specific error codes such as `FD_FUNK_SUCCESS`, `FD_FUNK_ERR_INVAL`, and others, returning corresponding strings like "success", "inval", etc. If the error code does not match any predefined cases, the function returns "unknown".
+This C source code file defines a function [`fd_funk_strerror`](#fd_funk_strerror) that translates error codes into human-readable string messages. It is a utility function that takes an integer error code as input and returns a corresponding string that describes the error. The function uses a `switch` statement to map predefined error codes, such as `FD_FUNK_SUCCESS` and `FD_FUNK_ERR_INVAL`, to their respective string representations like "success" and "inval". If the error code does not match any predefined cases, it returns "unknown". This function is useful for debugging and logging purposes, providing clear and understandable error messages based on the error codes defined in the included header file `fd_funk_base.h`.
 # Imports and Dependencies
 
 ---
@@ -17,24 +17,14 @@ The code defines a function [`fd_funk_strerror`](<#fd_funk_strerror>) that conve
 
 ---
 ### fd\_funk\_strerror<!-- {{#callable:fd_funk_strerror}} -->
-[View Source →](<../../../../src/funk/fd_funk_base.c#L3>)
-
-Maps error codes to their corresponding error message strings.
+The `fd_funk_strerror` function returns a string description of an error code related to the FD Funk system.
 - **Inputs**:
-    - `err`: An integer representing the error code to be translated into a string message.
-- **Logic and Control Flow**:
-    - Use a switch statement to check the value of `err`.
-    - If `err` matches `FD_FUNK_SUCCESS`, return the string "success".
-    - If `err` matches `FD_FUNK_ERR_INVAL`, return the string "inval".
-    - If `err` matches `FD_FUNK_ERR_XID`, return the string "xid".
-    - If `err` matches `FD_FUNK_ERR_KEY`, return the string "key".
-    - If `err` matches `FD_FUNK_ERR_FROZEN`, return the string "frozen".
-    - If `err` matches `FD_FUNK_ERR_TXN`, return the string "txn".
-    - If `err` matches `FD_FUNK_ERR_REC`, return the string "rec".
-    - If `err` matches `FD_FUNK_ERR_MEM`, return the string "mem".
-    - If `err` matches `FD_FUNK_ERR_SYS`, return the string "sys".
-    - If `err` does not match any known error code, return the string "unknown".
-- **Output**: A constant character pointer to the string that describes the error.
+    - `err`: An integer representing the error code for which a string description is needed.
+- **Control Flow**:
+    - The function uses a switch statement to match the input error code `err` against predefined error constants.
+    - For each case in the switch statement, if the error code matches a predefined constant, the function returns a corresponding string description of the error.
+    - If the error code does not match any predefined constants, the function returns the string "unknown".
+- **Output**: A constant character pointer to a string that describes the error code, or "unknown" if the error code is not recognized.
 
 
 
