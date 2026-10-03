@@ -3,11 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Version script that exports sol_compat_* symbols and hides all others.
-
+Defines versioning and symbol visibility for `sol_compat_*` functions in the Firedancer runtime.
 
 # Purpose
-This version script defines the exported symbols for `VER_1`. It makes all symbols that match `sol_compat_*` global and hides all other symbols by setting them to local.
+The file defines versioning and symbol visibility rules for a shared library. Under `VER_1`, it specifies that symbols matching the pattern `sol_compat_*` are globally visible, meaning they can be accessed by other programs or libraries. All other symbols are marked as `local`, restricting their visibility to within the library itself.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CRDS gossip table APIs, peer samplers, contact info pool, build rules, and tests
+Implements and tests CRDS structures, peer samplers, and contact info with a Makefile for build management.
 
 
 ## Files
-- **[fd_crds.c](fd_crds.c.md)**: CRDS table management with upsert, expiry, eviction, peer sampling, and gossip updates.
-- **[fd_crds.h](fd_crds.h.md)**: CRDS gossip table APIs for insert, expire, sample, and masked iteration.
-- **[fd_crds_contact_info.c](fd_crds_contact_info.c.md)**: Pool template for CRDS contact info entries.
-- **[fd_crds_peer_samplers.c](fd_crds_peer_samplers.c.md)**: Weighted peer samplers and add, remove, update logic for CRDS contact info entries.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_crds and its unit test.
-- **[test_crds.c](test_crds.c.md)**: Tests basic creation and join of a CRDS object.
+- **[fd_crds.c](fd_crds.c.md)**: Implements a CRDS (Conflict-free Replicated Data Store) for managing and updating gossip messages with structures for handling message expiration, eviction, and sampling.
+- **[fd_crds.h](fd_crds.h.md)**: Defines data structures and functions for managing and manipulating CRDS entries in a gossip protocol.
+- **[fd_crds_contact_info.c](fd_crds_contact_info.c.md)**: Defines a contact information entry structure and integrates it with a pool management system.
+- **[fd_crds_peer_samplers.c](fd_crds_peer_samplers.c.md)**: Implements stake-weighted peer samplers for CRDS tables with functions for managing sampler entries.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for CRDS in the Firedancer project.
+- **[test_crds.c](test_crds.c.md)**: Tests the basic creation and initialization of CRDS structures in the Firedancer codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

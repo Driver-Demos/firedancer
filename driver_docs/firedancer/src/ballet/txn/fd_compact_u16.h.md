@@ -3,12 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_compact_u16.h` file declares utility methods for encoding and decoding the compact-u16 format used in Solana transactions, providing functions for reading, validating, and encoding 16-bit unsigned integers in a variable-length format.
+Utility methods for encoding and decoding Solana's compact-u16 format for unsigned 16-bit numbers.
 
 # Purpose
-This C header file provides utility functions for encoding and decoding 16-bit unsigned integers using the compact-u16 format, which is a variable-length encoding scheme used in Solana transactions. The file is intended for internal use within the `fd_txn` module and is not meant to be widely exported, as indicated by the comments. The compact-u16 format is designed to minimize the number of bytes used to represent a number, with different encoding rules based on the value of the number. The file includes functions for decoding a compact-u16 when the size is known ([`fd_cu16_dec_fixed`](#fd_cu16_dec_fixed)), determining the size of a compact-u16 ([`fd_cu16_dec_sz`](#fd_cu16_dec_sz)), decoding a compact-u16 with validation ([`fd_cu16_dec`](#fd_cu16_dec)), and encoding a 16-bit unsigned integer into the compact-u16 format ([`fd_cu16_enc`](#fd_cu16_enc)).
-
-The technical components of this file include inline functions that are optimized for performance, with some functions performing minimal error checking to enhance speed. The [`fd_cu16_dec_fixed`](#fd_cu16_dec_fixed) function, for example, is designed to be used in conjunction with [`fd_cu16_dec_sz`](#fd_cu16_dec_sz), which performs necessary validation. The file also uses macros like `FD_LIKELY` and `FD_UNLIKELY` to optimize branch prediction, and it includes a mechanism to store bytes conditionally with `fd_uchar_store_if`. The encoding and decoding functions are crucial for handling Solana transaction data efficiently, ensuring that numbers are encoded with the minimal number of bytes possible, which is essential for optimizing storage and transmission in blockchain applications.
+This C header file declares utility functions for decoding and encoding the `compact-u16` format, which is a variable-length encoding scheme for unsigned 16-bit numbers used in Solana transactions. The file includes functions such as [`fd_cu16_dec_fixed`](<#fd_cu16_dec_fixed>), [`fd_cu16_dec_sz`](<#fd_cu16_dec_sz>), [`fd_cu16_dec`](<#fd_cu16_dec>), and [`fd_cu16_enc`](<#fd_cu16_enc>), which handle the decoding and encoding processes. The [`fd_cu16_dec_fixed`](<#fd_cu16_dec_fixed>) function reads a `compact-u16` with a known width, while [`fd_cu16_dec_sz`](<#fd_cu16_dec_sz>) determines the number of bytes in the encoded value and validates its legality. The [`fd_cu16_dec`](<#fd_cu16_dec>) function combines these operations to decode a `compact-u16` and store the result. The [`fd_cu16_enc`](<#fd_cu16_enc>) function encodes a 16-bit unsigned integer into the `compact-u16` format. This header is intended for internal use within the `fd_txn` module and is not meant for wider distribution.
 # Imports and Dependencies
 
 ---
@@ -19,62 +17,74 @@ The technical components of this file include inline functions that are optimize
 
 ---
 ### fd\_cu16\_dec\_fixed<!-- {{#callable:fd_cu16_dec_fixed}} -->
-The `fd_cu16_dec_fixed` function decodes a compact-u16 encoded value from a buffer when the size of the encoded value is already known.
+[View Source →](<../../../../../src/ballet/txn/fd_compact_u16.h#L23>)
+
+Decodes a compact-u16 encoded value from a buffer with a known width of 1, 2, or 3 bytes.
 - **Inputs**:
     - `buf`: A pointer to the first byte of the encoded compact-u16 value.
-    - `sz`: The size of the encoded value, which can be 1, 2, or 3 bytes.
-- **Control Flow**:
-    - The function checks if the size `sz` is 1, 2, or 3 using conditional statements.
-    - If `sz` is 1, it directly returns the first byte as the decoded value.
-    - If `sz` is 2, it combines the first byte (masked with 0x7F) and the second byte shifted left by 7 bits to form the decoded value.
-    - If `sz` is 3, it combines the first byte (masked with 0x7F), the second byte (masked with 0x7F) shifted left by 7 bits, and the third byte shifted left by 14 bits to form the decoded value.
-- **Output**: The function returns the decoded unsigned short (ushort) value from the compact-u16 encoded data.
+    - `sz`: The number of bytes to read from the buffer, which must be 1, 2, or 3.
+- **Logic and Control Flow**:
+    - If `sz` is 1, return the first byte of `buf` as an unsigned short.
+    - If `sz` is 2, combine the first byte of `buf` masked with 0x7F and the second byte shifted left by 7 bits, then return the result as an unsigned short.
+    - If `sz` is 3, combine the first byte of `buf` masked with 0x7F, the second byte masked with 0x7F and shifted left by 7 bits, and the third byte shifted left by 14 bits, then return the result as an unsigned short.
+- **Output**: Returns the decoded unsigned short value from the buffer.
 
 
 ---
 ### fd\_cu16\_dec\_sz<!-- {{#callable:fd_cu16_dec_sz}} -->
-The `fd_cu16_dec_sz` function determines the number of bytes used in a compact-u16 encoding and validates its legality based on the available bytes.
+[View Source →](<../../../../../src/ballet/txn/fd_compact_u16.h#L60>)
+
+Determines the number of bytes in a compact-u16 encoding and validates its legality.
 - **Inputs**:
-    - `buf`: A pointer to the first byte of the encoded compact-u16 value.
-    - `bytes_avail`: The number of bytes available in the buffer for reading the encoded value.
-- **Control Flow**:
-    - Check if at least 1 byte is available and the first byte does not have its highest bit set; if true, return 1.
-    - Check if at least 2 bytes are available and the second byte does not have its highest bit set; if true, check for non-minimal encoding and return 2 if valid.
-    - Check if at least 3 bytes are available and the third byte does not have its two highest bits set; if true, check for non-minimal encoding and return 3 if valid.
-    - If none of the above conditions are met, return 0 indicating an invalid or insufficient encoding.
-- **Output**: Returns the number of bytes in the compact-u16 encoding (1, 2, or 3) or 0 if the encoding is invalid or insufficient.
+    - ``buf``: A pointer to the first byte of the encoded compact-u16 value.
+    - ``bytes_avail``: The number of bytes available in the buffer for reading.
+- **Logic and Control Flow**:
+    - Check if at least 1 byte is available and the first byte does not have its most significant bit set; if true, return 1.
+    - Check if at least 2 bytes are available and the second byte does not have its most significant bit set; if true, check for non-minimal encoding and return 2 if valid.
+    - Check if at least 3 bytes are available and the third byte does not have its two most significant bits set; if true, check for non-minimal encoding and return 3 if valid.
+    - Return 0 if none of the conditions for valid encoding are met.
+- **Output**: Returns the number of bytes in the compact-u16 encoding, which can be 0, 1, 2, or 3, where 0 indicates a validation failure.
 
 
 ---
 ### fd\_cu16\_dec<!-- {{#callable:fd_cu16_dec}} -->
-The `fd_cu16_dec` function decodes a compact-u16 encoded unsigned 16-bit integer from a buffer, validates its encoding, and returns the number of bytes used in the encoding.
+[View Source →](<../../../../../src/ballet/txn/fd_compact_u16.h#L82>)
+
+Decodes a compact-u16 encoded value from a buffer and validates its encoding.
 - **Inputs**:
-    - `buf`: A pointer to the first byte of the encoded compact-u16 value.
-    - `bytes_avail`: The number of bytes available in the buffer for reading.
-    - `result_out`: A pointer to a ushort where the decoded value will be stored if the encoding is valid.
-- **Control Flow**:
-    - Call [`fd_cu16_dec_sz`](#fd_cu16_dec_sz) to determine the size of the encoded compact-u16 and validate its encoding.
-    - If the size is non-zero (indicating a valid encoding), decode the value using [`fd_cu16_dec_fixed`](#fd_cu16_dec_fixed) and store it in `result_out`.
-    - Return the size of the encoded compact-u16.
-- **Output**: Returns the size of the encoded compact-u16 in bytes, or 0 if the encoding is invalid.
-- **Functions called**:
-    - [`fd_cu16_dec_sz`](#fd_cu16_dec_sz)
-    - [`fd_cu16_dec_fixed`](#fd_cu16_dec_fixed)
+    - ``buf``: A pointer to the first byte of the encoded compact-u16 value.
+    - ``bytes_avail``: The number of bytes available in the buffer for reading.
+    - ``result_out``: A pointer to where the decoded ushort value will be stored if decoding is successful.
+- **Logic and Control Flow**:
+    - Call [`fd_cu16_dec_sz`](<#fd_cu16_dec_sz>) to determine the size of the encoded compact-u16 and validate its encoding.
+    - If the size `sz` is non-zero, indicating successful validation, call [`fd_cu16_dec_fixed`](<#fd_cu16_dec_fixed>) to decode the value and store it in `result_out`.
+    - Return the size `sz` of the encoded compact-u16.
+- **Output**: Returns the size of the encoded compact-u16 in bytes, or 0 if validation fails.
+- **Functions Called**:
+    - [`fd_cu16_dec_sz`](<#fd_cu16_dec_sz>)
+    - [`fd_cu16_dec_fixed`](<#fd_cu16_dec_fixed>)
 
 
 ---
 ### fd\_cu16\_enc<!-- {{#callable:fd_cu16_enc}} -->
-The `fd_cu16_enc` function encodes a 16-bit unsigned integer into a compact variable-length format and stores it in a byte array.
+[View Source →](<../../../../../src/ballet/txn/fd_compact_u16.h#L91>)
+
+Encodes a 16-bit unsigned integer into a compact variable-length format and stores it in the provided output buffer.
 - **Inputs**:
-    - `val`: A 16-bit unsigned integer (ushort) to be encoded.
-    - `out`: A pointer to an array of unsigned characters (uchar) where the encoded bytes will be stored.
-- **Control Flow**:
-    - Convert the input value `val` to a 64-bit unsigned integer `v`.
-    - Calculate `byte0`, `byte1`, and `byte2` by masking and shifting `v` to extract 7-bit segments.
-    - Determine if additional bytes are needed by checking if `v` exceeds certain thresholds (`0x007F` and `0x3FFF`).
-    - Use `fd_uchar_store_if` to conditionally store `byte0`, `byte1`, and `byte2` in the `out` array based on the need for additional bytes.
-    - Return the total number of bytes used in the encoding, which is 1 plus the number of additional bytes needed.
-- **Output**: The function returns the number of bytes used to encode the input value, which can be 1, 2, or 3.
+    - `val`: The 16-bit unsigned integer to encode.
+    - `out`: A pointer to the buffer where the encoded bytes will be stored.
+- **Logic and Control Flow**:
+    - Convert `val` to a 64-bit unsigned integer `v`.
+    - Calculate `byte0` as the least significant 7 bits of `v`.
+    - Calculate `byte1` as the next 7 bits of `v` shifted right by 7 bits.
+    - Calculate `byte2` as the remaining bits of `v` shifted right by 14 bits.
+    - Determine if `byte1` is needed by checking if `v` is greater than 0x007F.
+    - Determine if `byte2` is needed by checking if `v` is greater than 0x3FFF.
+    - Store `byte0` in `out[0]` with the most significant bit set if `byte1` is needed.
+    - Store `byte1` in `out[1]` with the most significant bit set if `byte2` is needed, only if `byte1` is needed.
+    - Store `byte2` in `out[2]` only if `byte2` is needed.
+    - Return the total number of bytes used in the encoding.
+- **Output**: Returns the number of bytes used to encode the integer, which can be 1, 2, or 3.
 
 
 

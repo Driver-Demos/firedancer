@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp policy for tower file logging, checkpoint, restore, and fsync file descriptors.
+Defines security policies for file descriptor operations in the Firedancer tower component.
 
 # Purpose
-This file defines file descriptor variables and access rules for logging, checkpoint, and restore operations. It states that `logfile_fd`, `checkpt_fd`, and `restore_fd` identify the log file, the tower checkpoint file, and the restore file, and it documents how each descriptor is used during runtime. The policy entries for `write`, `read`, `fstat`, and `fsync` restrict each operation to the correct descriptor, including the special case that descriptor `2` is `STDERR` for warning messages and above. It also defines when log data and tower data must be flushed to disk with `fsync`, so the runtime can keep file handling and persistence behavior consistent.
+The configuration file defines file descriptor management and logging behavior for a software system. It specifies that log messages are written to a file and/or pipe, with messages of 'WARNING' level and above also directed to the `STDERR` pipe. The file descriptors `logfile_fd`, `checkpt_fd`, and `restore_fd` are used to manage logging, checkpointing, and restoration processes. The `write` operation is permitted for `STDERR`, `logfile_fd`, and `checkpt_fd`, while the `read` and `fstat` operations are restricted to `restore_fd`. Additionally, the `fsync` operation is configured to ensure that changes to the log and checkpoint files are immediately written to disk, enhancing data integrity.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
