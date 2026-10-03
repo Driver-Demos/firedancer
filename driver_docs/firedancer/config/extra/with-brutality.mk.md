@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-brutality.mk` file in the `firedancer` codebase configures compiler flags for strict code warnings and error handling, with specific adjustments for Clang and GCC compilers.
+Makefile configuration for compiler warning flags with specific settings for Clang and GCC.
 
 # Purpose
-The provided content is a segment from a Makefile, which is used in software development to automate the build process. This particular section defines compiler flags for C/C++ compilation, specifically for enhancing code quality and safety by enabling various warning options. The `CPPFLAGS` variable is augmented with flags such as `-Werror`, `-Wall`, and `-Wextra`, which treat warnings as errors and enable a comprehensive set of warnings. Conditional blocks are used to append additional flags depending on whether the Clang or GCC compiler is being used, allowing for compiler-specific optimizations and warnings, such as `-Wimplicit-fallthrough` for Clang and `-Wstrict-prototypes` for GCC. This configuration ensures that the code adheres to strict coding standards and helps in identifying potential issues early in the development process.
+The content configures compiler flags for building a C or C++ project. The `CPPFLAGS` variable is used to specify preprocessor options that enforce strict code quality checks. These include flags such as `-Werror`, which treats all warnings as errors, and `-Wall`, `-Wextra`, and `-Wpedantic`, which enable various levels of warning messages. The configuration also includes conditional sections for different compilers. If `FD_USING_CLANG` is defined, additional flags specific to the Clang compiler are added, such as `-Wimplicit-fallthrough` and several flags to suppress specific warnings. Similarly, if `FD_USING_GCC` is defined, flags specific to the GCC compiler are appended, including `-Wimplicit-fallthrough=2` and `-Wstrict-prototypes`. These conditional flags ensure that the code is compiled with appropriate warnings and error checks depending on the compiler used.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

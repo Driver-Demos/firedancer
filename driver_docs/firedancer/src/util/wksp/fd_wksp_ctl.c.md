@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_wksp_ctl.c` file in the `firedancer` codebase implements a command-line utility for managing and querying workspace allocations, including operations such as creating, deleting, allocating, and querying workspaces, as well as handling various workspace-related commands.
+A command-line utility for managing and querying workspace states, including allocation, deletion, and metadata integrity checks.
 
 # Purpose
-This C source code file implements a command-line utility for managing and interacting with workspaces, which are likely memory management structures used in a larger system. The file includes functions for creating, deleting, querying, and modifying these workspaces, as well as for handling memory allocation and deallocation within them. The code is structured around a main function that processes command-line arguments to execute various commands, such as "new" to create a workspace, "delete" to remove one, "alloc" to allocate memory, and "free" to deallocate memory. Each command is associated with specific operations on the workspace, and the code includes error handling and logging to ensure robust operation.
+The code is a C program that provides a command-line interface for managing and interacting with a workspace system. It includes functionality for creating, deleting, and querying workspaces, as well as managing memory allocations within these workspaces. The program defines a [`main`](<#main>) function that processes command-line arguments to execute various commands such as `new`, `delete`, `alloc`, `info`, `free`, `check`, `verify`, `rebuild`, `reset`, `usage`, `query`, `checkpt`, `checkpt-query`, and `restore`. Each command corresponds to a specific operation on the workspace, such as creating a new workspace, allocating memory, or querying workspace information.
 
-The file is designed to be compiled into an executable, as indicated by the presence of a [`main`](#main) function. It includes several utility functions, such as [`fprintf_wksp`](#fprintf_wksp), which prints detailed information about a workspace's state, including metadata integrity checks. The code also supports various commands for workspace management, such as "check", "verify", "rebuild", and "reset", which perform integrity checks, verify workspace states, rebuild workspace structures, and reset workspaces, respectively. The file imports several external functions and constants, suggesting it is part of a larger codebase. The use of macros like `FD_UNLIKELY` and `FD_LOG_ERR` indicates a focus on performance optimization and error logging. Overall, this file provides a comprehensive interface for workspace management, offering both high-level commands and detailed operational control.
+The program uses several helper functions and macros, such as `FD_LOG_ERR`, `FD_LOG_NOTICE`, and `TRAP`, to handle errors and log messages. It also includes a static function [`fprintf_wksp`](<#fprintf_wksp>) that prints detailed information about a workspace's state to a file, including metadata integrity checks. The code is structured to handle errors robustly, with checks for invalid inputs and conditions that could lead to incorrect operations. The program is designed to be executed in a hosted environment, as indicated by the `#if FD_HAS_HOSTED` preprocessor directive, and it includes a fallback [`main`](<#main>) function for unsupported platforms.
 # Imports and Dependencies
 
 ---
@@ -25,44 +25,50 @@ The file is designed to be compiled into an executable, as indicated by the pres
 
 ---
 ### fprintf\_wksp<!-- {{#callable:fprintf_wksp}} -->
-The `fprintf_wksp` function prints detailed information about a workspace's state to a specified file, including metadata integrity checks and error reporting.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_ctl.c#L20>)
+
+Prints detailed information about a workspace to a file, including metadata integrity checks.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the workspace information will be printed.
-    - `wksp`: A pointer to an fd_wksp_t structure representing the workspace whose information is to be printed.
-- **Control Flow**:
-    - Check if the 'file' or 'wksp' pointers are NULL and log a warning if so, returning -1.
-    - Initialize a return value 'ret' to 0 and define a macro 'TRAP' to handle errors during fprintf calls.
-    - Retrieve and store workspace metadata such as part_max, gaddr_lo, and gaddr_hi.
-    - Print basic workspace information using fprintf and the TRAP macro to handle errors.
-    - Attempt to lock the workspace; if locking fails, log an error and increment the error count.
-    - Iterate over the workspace partitions, checking for errors such as index errors, cycle errors, and metadata inconsistencies, while accumulating statistics on used and free space.
-    - Print detailed partition information and error messages for any detected issues using the TRAP macro.
-    - After iterating through partitions, check for tail and completeness errors, and print summary statistics of used and free space.
-    - Unlock the workspace and print the total number of errors detected.
-    - Return the accumulated return value 'ret' from the fprintf calls.
-- **Output**: The function returns an integer representing the total number of characters printed to the file, or a negative value if an error occurred during the process.
-- **Functions called**:
-    - [`fd_wksp_private_pinfo`](fd_wksp_private.h.md#fd_wksp_private_pinfo)
-    - [`fd_wksp_private_lock`](fd_wksp_admin.c.md#fd_wksp_private_lock)
-    - [`fd_wksp_private_pinfo_idx`](fd_wksp_private.h.md#fd_wksp_private_pinfo_idx)
-    - [`fd_wksp_private_pinfo_idx_is_null`](fd_wksp_private.h.md#fd_wksp_private_pinfo_idx_is_null)
-    - [`fd_wksp_private_unlock`](fd_wksp_private.h.md#fd_wksp_private_unlock)
+    - `file`: A pointer to a `FILE` object where the workspace information will be printed.
+    - `wksp`: A pointer to an `fd_wksp_t` structure representing the workspace to be printed.
+- **Logic and Control Flow**:
+    - Check if `file` is NULL; if so, log a warning and return -1.
+    - Check if `wksp` is NULL; if so, log a warning and return -1.
+    - Initialize a return value `ret` to 0 and define a macro `TRAP` to handle errors during printing.
+    - Retrieve and store workspace parameters such as `part_max`, `gaddr_lo`, and `gaddr_hi`.
+    - Print basic workspace information including name, magic number, seed, part_max, data_max, and address range.
+    - Attempt to lock the workspace; if locking fails, increment error count and print a lock error message.
+    - Initialize counters for used and free partitions and sizes, and a cycle tag for iteration.
+    - Iterate over workspace partitions, checking for errors such as index out of bounds, cycle errors, and metadata inconsistencies.
+    - For each partition, update counters for used and free sizes and counts, and print partition details.
+    - After iteration, check for errors in the tail index and address range completion.
+    - Print summary of used and free space, including the number of blocks and the largest block size.
+    - Unlock the workspace after processing.
+    - Print the total number of errors detected during processing.
+- **Output**: Returns the total number of characters printed, or a negative value if an error occurs during printing.
+- **Functions Called**:
+    - [`fd_wksp_private_pinfo`](<fd_wksp_private.h.md#fd_wksp_private_pinfo>)
+    - [`fd_wksp_private_lock`](<fd_wksp_admin.c.md#fd_wksp_private_lock>)
+    - [`fd_wksp_private_pinfo_idx`](<fd_wksp_private.h.md#fd_wksp_private_pinfo_idx>)
+    - [`fd_wksp_private_pinfo_idx_is_null`](<fd_wksp_private.h.md#fd_wksp_private_pinfo_idx_is_null>)
+    - [`fd_wksp_private_unlock`](<fd_wksp_private.h.md#fd_wksp_private_unlock>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the program, checks for valid command-line arguments, and logs a message before terminating.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_ctl.c#L487>)
+
+Initializes the environment, checks the number of command-line arguments, logs a notice, and halts the program.
 - **Inputs**:
     - `argc`: The number of command-line arguments passed to the program.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - The function begins by calling `fd_boot` to initialize the program with the command-line arguments.
-    - It checks if `argc` is less than 1, logging an error and terminating if true.
-    - It checks if `argc` is greater than 1, logging an error and terminating if true, indicating the platform does not support `fd_wksp_ctl`.
-    - Logs a notice that 0 commands were processed.
-    - Calls `fd_halt` to perform any necessary cleanup before exiting.
-    - Returns 0 to indicate successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Checks if `argc` is less than 1 and logs an error if true.
+    - Checks if `argc` is greater than 1 and logs an error if true, indicating that `fd_wksp_ctl` is not supported on this platform.
+    - Logs a notice indicating that 0 commands were processed.
+    - Calls `fd_halt` to halt the program.
+- **Output**: Returns 0, indicating successful execution.
 
 
 

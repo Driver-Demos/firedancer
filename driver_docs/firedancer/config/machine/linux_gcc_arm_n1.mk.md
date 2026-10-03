@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_arm_n1.mk` file in the `firedancer` codebase is a makefile configuration for building the project on ARMv8.4-A server CPUs, such as Neoverse V1 or AWS Graviton3, with various compilation flags and experimental support.
+Makefile for building Firedancer on ARMv8.4-A CPUs with GCC, including experimental support and optimizations.
 
 # Purpose
-The provided content is from a Makefile, which is used to automate the build process of a software project. This particular Makefile is configured for building software on ARM architecture, specifically targeting ARMv8.4-A server CPUs like Neoverse V1 or AWS Graviton3. It includes several configuration files that add specific build options, such as GCC compiler settings, ARM architecture support, and various build optimizations like security, debugging, and threading. The file also sets preprocessor flags (`CPPFLAGS`) to specify the target CPU and enable certain features like 128-bit integers, double precision floating-point support, and dynamic memory allocation with `alloca`. The comments indicate that the ARM CPU support is experimental, suggesting that users should anticipate potential issues.
+The Makefile configuration sets up the build environment for compiling software targeting ARMv8.4-A server CPUs, such as Neoverse V1 or AWS Graviton3. It specifies the build directory as `linux/gcc/arm_n1` and includes several configuration files to extend the build process with additional features like GCC support, ARM architecture compatibility, optimization, debugging, security, and threading. The file defines preprocessor flags `CPPFLAGS` to specify the target CPU as `neoverse-n1` and enables certain features by defining macros such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and `FD_HAS_ALLOCA`. These macros indicate the availability of 128-bit integers, double-precision floating-point support, and stack allocation functions, respectively. The configuration is marked as experimental, indicating potential issues with ARM CPU support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
