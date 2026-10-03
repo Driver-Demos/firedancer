@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally includes headers, objects, and unit tests for `secp256r1` based on the presence of `FD_HAS_S2NBIGNUM`, otherwise issuing a warning if `s2n-bignum` is not available.
+Makefile logic for building and testing secp256r1 with s2n-bignum dependency.
 
 # Purpose
-This is a Makefile snippet that conditionally includes and tests the secp256r1 elliptic curve functionality based on the presence of the `FD_HAS_S2NBIGNUM` flag. If the flag is set, it adds the header and object files for `fd_secp256r1`, sets up a unit test for `test_secp256r1`, and runs the test. If the flag is not set, it issues a warning indicating that secp256r1 is disabled due to the absence of the s2n-bignum library.
+The `Makefile` content conditionally includes headers, object files, and unit tests for the `fd_secp256r1` module if the `FD_HAS_S2NBIGNUM` flag is defined. It uses `add-hdrs` to add the `fd_secp256r1.h` header and `add-objs` to add the `fd_secp256r1` and `fd_ballet` object files. It also defines and runs a unit test named `test_secp256r1` with dependencies on `fd_ballet` and `fd_util`. If the `FD_HAS_S2NBIGNUM` flag is not defined, it issues a warning that `secp256r1` is disabled due to the absence of `s2n-bignum`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
