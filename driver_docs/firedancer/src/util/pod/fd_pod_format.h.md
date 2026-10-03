@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for inserting, replacing, and querying typed values in a pod using formatted paths.
+The `fd_pod_format.h` file in the `firedancer` codebase provides macros and inline functions for inserting, replacing, and querying various data types in a pod structure using formatted paths.
 
 # Purpose
-The code defines a C header file that provides a set of inline functions for manipulating a data structure referred to as a "pod." These functions allow for inserting, replacing, and querying various data types within the pod using formatted strings to specify paths. The functions are implemented using macros to handle different data types, such as `ushort`, `uint`, `ulong`, `short`, `int`, `long`, `char`, `schar`, `uchar`, `float`, and conditionally `double`. The operations are designed to be invalidating, meaning they may alter the state of the pod in a way that affects its future use.
+The provided C header file, `fd_pod_format.h`, is designed to facilitate formatted operations on a data structure referred to as a "pod." This file defines a set of inline functions that allow for inserting, replacing, and querying various data types within a pod using formatted string paths. The operations are implemented for a variety of data types, including integers, floating-point numbers, and character types, and are extended to support double precision if available. The functions utilize variadic arguments and the `vsnprintf` function to construct paths from format strings, which are then used to interact with the pod.
 
-The functions use variadic arguments to construct paths from format strings, which are then used to perform operations on the pod. The `fd_pod_insertf_[type]` functions insert values, `fd_pod_replacef_[type]` functions replace values, and `fd_pod_queryf_[type]` functions query values. Additionally, there are specialized functions for handling C strings and subpods. The code relies on the `fd_pod.h` header for underlying pod operations and uses standard C libraries for formatted string handling. The use of `__attribute__ ((format (printf, ...)))` ensures that the format strings are checked for correctness at compile time.
+The file is structured to provide a consistent interface for manipulating pod data, with macros used to generate type-specific functions for each operation. These operations are marked as "invalidating," indicating that they may alter the state of the pod in a way that affects its integrity or the validity of previously obtained references. The header file does not define a main function or executable code; instead, it is intended to be included in other C source files where these pod operations are needed. The use of `__attribute__ ((format (printf, ...)))` ensures that the format strings are checked for correctness, similar to standard `printf` functions, enhancing the robustness of the code.
 # Imports and Dependencies
 
 ---
@@ -22,47 +22,45 @@ The functions use variadic arguments to construct paths from format strings, whi
 ---
 ### fd\_pod\_insertf\_cstr
 - **Type**: `static inline ulong`
-- **Description**: Inserts a C-style string (`str`) into a pod data structure at a location specified by a formatted path (`fmt`). The function uses a variable argument list to format the path and returns the offset where the string was inserted, or 0 if the operation fails.
-- **Use**: Used to insert a C-style string into a pod at a dynamically constructed path.
+- **Description**: The `fd_pod_insertf_cstr` function is a static inline function that inserts a C-style string (`str`) into a pod data structure at a path specified by a formatted string (`fmt`). It uses variadic arguments to construct the path and returns the offset where the string was inserted, or 0 on failure.
+- **Use**: This function is used to insert a C-style string into a pod at a dynamically constructed path, with the path being specified using a format string and additional arguments.
 
 
 # Functions
 
 ---
 ### fd\_pod\_queryf\_subpod<!-- {{#callable:fd_pod_queryf_subpod}} -->
-[View Source →](<../../../../../src/util/pod/fd_pod_format.h#L146>)
-
-Queries a subpod from a pod using a formatted path string.
+The `fd_pod_queryf_subpod` function queries a subpod from a given pod using a formatted path string.
 - **Inputs**:
-    - `pod`: A pointer to the pod from which to query the subpod.
-    - `fmt`: A format string that specifies the path to the subpod within the pod.
-- **Logic and Control Flow**:
-    - Initialize a variable argument list `ap` with `va_start` using `fmt` as the last fixed argument.
-    - Use `vsnprintf` to format the path string into a buffer `buf` of size 128, using the variable argument list `ap`.
-    - Calculate the length of the formatted string, ensuring it does not exceed the buffer size, and null-terminate the string.
+    - `pod`: A pointer to the constant unsigned character array representing the pod to be queried.
+    - `fmt`: A constant character pointer representing the format string used to construct the path for querying the subpod.
+- **Control Flow**:
+    - Initialize a variable argument list `ap` and start it with `va_start` using the format string `fmt`.
+    - Declare a buffer `buf` of size 128 to store the formatted path string.
+    - Use `vsnprintf` to format the path string into `buf` using the variable argument list `ap`.
+    - Calculate the length of the formatted string using `fd_ulong_if` to ensure it is within bounds and null-terminate `buf`.
     - End the variable argument list with `va_end`.
     - Check if the formatted string length is invalid (negative or exceeds buffer size), and return `0UL` if so.
-    - Call `fd_pod_query_subpod` with the pod and the formatted path string to query the subpod.
-- **Output**: A pointer to the queried subpod, or `0UL` if the query fails.
+    - Call `fd_pod_query_subpod` with the pod and formatted path string `buf` to perform the query and return the result.
+- **Output**: A constant unsigned character pointer to the queried subpod, or `0UL` if the query fails due to formatting errors.
 
 
 ---
 ### fd\_pod\_queryf\_cstr<!-- {{#callable:fd_pod_queryf_cstr}} -->
-[View Source →](<../../../../../src/util/pod/fd_pod_format.h#L163>)
-
-Queries a string from a POD using a formatted path, returning a default if the query fails.
+The `fd_pod_queryf_cstr` function queries a POD (Plain Old Data) structure for a C-string value at a path specified by a formatted string, returning a default value if the query fails.
 - **Inputs**:
-    - `pod`: A pointer to the POD (Plain Old Data) structure to query.
-    - `def`: A default string to return if the query fails.
-    - `fmt`: A format string that specifies the path within the POD.
-- **Logic and Control Flow**:
-    - Initialize a variable argument list with `va_start` using `fmt` as the last fixed argument.
-    - Use `vsnprintf` to format the variable arguments into a buffer `buf` of size 128 bytes.
+    - `pod`: A pointer to the POD structure from which the C-string is queried.
+    - `def`: A default C-string value to return if the query fails.
+    - `fmt`: A format string that specifies the path within the POD structure.
+    - `...`: Additional arguments for the format string.
+- **Control Flow**:
+    - Initialize a variable argument list with `va_start` using the format string `fmt`.
+    - Use `vsnprintf` to format the path into a buffer `buf` of size 128, using the variable argument list.
     - Calculate the length of the formatted string, ensuring it does not exceed the buffer size, and null-terminate the string.
     - End the variable argument list with `va_end`.
-    - Check if the formatted string length is invalid (negative or exceeds buffer size), returning `0UL` if so.
-    - Call `fd_pod_query_cstr` with the formatted path to retrieve the string from the POD, returning the result.
-- **Output**: Returns a pointer to the queried string from the POD, or the default string if the query fails.
+    - Check if the formatted string length is invalid (negative or exceeds buffer size), returning 0 if so.
+    - Call `fd_pod_query_cstr` with the formatted path to retrieve the C-string from the POD, returning the default value `def` if the query fails.
+- **Output**: Returns a pointer to the queried C-string from the POD, or the default value `def` if the query fails.
 
 
 

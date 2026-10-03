@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the `fd_clock` component if `FD_HAS_DOUBLE` is defined.
+Build rules for fd_clock and its unit test when FD_HAS_DOUBLE is set.
 
 # Purpose
-This Makefile snippet conditionally includes headers and object files, and defines a unit test for the `fd_clock` component if the `FD_HAS_DOUBLE` flag is set. It adds the header `fd_clock.h` and object files `fd_clock` and `fd_util` to the build process. It also sets up and runs a unit test named `test_clock` that depends on `fd_util`.
+Build rules for `fd_clock` are enabled only when `FD_HAS_DOUBLE` is defined. The file adds `fd_clock.h` to the header list, adds `fd_clock` to the object list with `fd_util`, defines the `test_clock` unit test, and runs that test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
