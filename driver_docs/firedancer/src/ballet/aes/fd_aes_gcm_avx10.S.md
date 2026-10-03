@@ -3,59 +3,56 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_aes_gcm_avx10.S` file in the `firedancer` codebase provides an optimized implementation of AES-GCM (Galois/Counter Mode) for x86_64 CPUs using VAES and VPCLMULQDQ instructions, adapted to compile outside of the Linux codebase, with support for both 256-bit and 512-bit vector operations.
+Optimized AES-GCM implementation for x86_64 using VAES and VPCLMULQDQ with AVX512 or AVX10 support.
 
 # Purpose
-This assembly source code file implements an optimized version of the AES-GCM (Galois/Counter Mode) cryptographic algorithm for x86_64 CPUs that support VAES (vector AES), VPCLMULQDQ (vector carryless multiplication), and either AVX512 or AVX10 instruction sets. The code is designed to leverage these advanced vector instructions to enhance the performance of AES-GCM operations, which are critical for secure data encryption and decryption. The file includes functions for precomputing necessary cryptographic keys, updating encryption and decryption processes, and finalizing the authentication tag, all while utilizing vectorized operations to maximize throughput on compatible hardware.
+This assembly source code file implements an optimized version of the AES-GCM (Galois/Counter Mode) cryptographic algorithm for x86_64 CPUs that support VAES (Vector AES), VPCLMULQDQ (Vector Carry-Less Multiplication), and either AVX512 or AVX10 instruction sets. The file is designed to leverage the advanced vector processing capabilities of modern CPUs to enhance the performance of AES-GCM operations, which are critical for secure data encryption and decryption. The code includes functions for precomputing key powers, updating encryption and decryption states, processing additional authenticated data (AAD), and finalizing the encryption or decryption process by computing or verifying authentication tags.
 
-The code is structured to provide both 256-bit and 512-bit vector implementations, allowing it to adapt to different CPU capabilities. The 512-bit vector functions are intended for CPUs that can handle such operations without significant performance penalties, requiring specific CPU features like AVX512BW, AVX512VL, or AVX10/512. The 256-bit vector functions are more broadly applicable, requiring a slightly different set of CPU features. The implementation uses the "System V" ABI and is not compatible with the Windows ABI, focusing on Unix-like systems.
+The file contains several macros and functions that are organized to handle different vector lengths, specifically 256-bit and 512-bit vectors, to accommodate varying CPU capabilities. The macros are used to define complex operations such as GHASH multiplication and reduction, which are essential for the GCM mode of operation. The code also includes detailed handling of byte and bit order transformations required by the GCM specification, ensuring that the cryptographic operations are performed correctly. The use of macros allows for efficient code reuse and modularity, enabling the same logic to be applied across different vector lengths and operations.
 
-Key technical components include macros for setting vector lengths, performing GHASH multiplication steps, and handling AES encryption rounds. The file also contains detailed comments explaining the mathematical operations involved in GHASH, a critical part of the GCM mode that ensures data integrity. The code is dual-licensed under the Apache License 2.0 and BSD-2-Clause, allowing for flexible use and distribution. This implementation is particularly suited for high-performance applications where cryptographic operations are a bottleneck, such as secure communications and data storage systems.
+Overall, this assembly file provides a highly specialized and performance-optimized implementation of AES-GCM for specific x86_64 architectures. It is designed to be used in environments where high-speed cryptographic operations are necessary, such as secure communications and data protection applications. The code is dual-licensed under the Apache License 2.0 and BSD-2-Clause, allowing for flexible use and integration into various software projects.
 # Subroutines
 
 ---
 ### aes\_gcm\_precompute\_vaes\_avx10\_256
 The `aes_gcm_precompute_vaes_avx10_256` function precomputes the GHASH subkey and initializes the powers of the hash key for AES-GCM encryption using 256-bit vectors on x86_64 CPUs with VAES and VPCLMULQDQ support.
 - **Inputs**:
-    - `key`: A pointer to the `aes_gcm_key_avx10` structure containing the expanded AES key and space for storing GHASH key powers.
-- **Control Flow**:
-    - The function begins by setting up the vector length to 32 bytes (256 bits) and defining register aliases for the YMM registers.
+    - `key`: A pointer to the `aes_gcm_key_avx10` structure containing the expanded AES key.
+- **Logic and Control Flow**:
+    - The function begins by setting up the vector length to 32 bytes, which corresponds to using 256-bit vectors.
     - It calculates the pointer to the lowest set of key powers in the key structure.
     - An all-zero block is encrypted using the AES key to derive the raw GHASH subkey.
     - The bytes of the raw hash subkey are reflected using a shuffle mask.
+    - The padding blocks in the key structure are zeroized.
     - The first key power, H^1, is preprocessed by reflecting its bytes and multiplying it by x^-1 mod the GHASH polynomial, which involves a left shift and conditional XOR operation.
-    - The GHASH polynomial constant is loaded into a register for use in subsequent multiplications.
-    - The first key power is squared to obtain H^2, and both H^1 and H^2 are stored in YMM registers for further processing.
-    - If the vector length is 64 bytes (512 bits), additional key powers are computed and stored in ZMM registers.
-    - The lowest set of key powers is stored in the key structure, and the remaining key powers are computed and stored in a loop, multiplying the current powers by precomputed increments.
-    - The function ends by zeroing the upper parts of the YMM or ZMM registers to avoid performance penalties.
-- **Output**: The function does not return a value but initializes the `ghash_key_powers` array in the `aes_gcm_key_avx10` structure with precomputed powers of the GHASH subkey.
+    - The GHASH polynomial constant is loaded into a register for further calculations.
+    - The function squares H^1 to compute H^2 and prepares the vectors for storing the key powers.
+    - Depending on the vector length, it computes and stores the remaining key powers by repeatedly multiplying the current powers by H^2 or H^4.
+    - The function concludes by zeroing the upper parts of the YMM or ZMM registers to prevent data leakage.
+- **Output**: The function outputs the precomputed GHASH subkey and its powers stored in the `ghash_key_powers` field of the `aes_gcm_key_avx10` structure.
 
 
 ---
 ### aes\_gcm\_enc\_update\_vaes\_avx10\_256
-The `aes_gcm_enc_update_vaes_avx10_256` function performs AES-GCM encryption on a data segment using VAES and VPCLMULQDQ instructions optimized for AVX10 with 256-bit vectors, updating the GHASH accumulator and producing encrypted output.
+The `aes_gcm_enc_update_vaes_avx10_256` function performs AES-GCM encryption on a data segment using VAES and VPCLMULQDQ instructions optimized for AVX10/256-bit vectors, updating the GHASH accumulator with the encrypted data.
 - **Inputs**:
-    - `key`: A pointer to the `aes_gcm_key_avx10` structure containing the expanded AES key and precomputed GHASH key powers.
-    - `le_ctr`: A pointer to a 4-element array of 32-bit unsigned integers representing the current counter in little-endian format.
-    - `ghash_acc`: A pointer to a 16-byte buffer that holds the current GHASH accumulator state.
+    - `key`: A pointer to the AES-GCM key structure containing the expanded AES key and precomputed GHASH key powers.
+    - `le_ctr`: A pointer to a 4-element array of 32-bit integers representing the current counter in little-endian format.
+    - `ghash_acc`: A pointer to a 16-byte buffer holding the current GHASH accumulator state.
     - `src`: A pointer to the source data buffer to be encrypted.
     - `dst`: A pointer to the destination buffer where the encrypted data will be written.
     - `datalen`: An integer representing the length of the data to be encrypted, which must be a multiple of 16 except on the last call.
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Load constants and initialize registers for AES and GHASH operations.
     - Load the GHASH accumulator and the starting counter from memory.
-    - Load the AES key length and determine the last round key pointer based on the key length.
-    - Initialize the counter increment vector and adjust the counter for the first set of blocks.
-    - Check if the data length is sufficient for processing in 4*VL byte chunks; if not, skip to processing smaller chunks.
-    - Load powers of the hash key for GHASH operations.
-    - Enter the main loop to process 4*VL bytes of data at a time, interleaving AES encryption of counter blocks with GHASH updates of ciphertext blocks.
-    - For encryption, encrypt the first set of plaintext blocks and store the resulting ciphertext for GHASH.
-    - Cache additional AES round keys for performance optimization.
-    - In the main loop, perform AES encryption on counter blocks and update GHASH with ciphertext blocks, interleaving operations for performance.
-    - If the data length is not a multiple of 4*VL, process the remaining data in smaller chunks, handling masking for the last partial vector if necessary.
-    - Perform a final GHASH reduction and store the updated GHASH accumulator back to memory.
-- **Output**: The function outputs the encrypted data to the `dst` buffer and updates the `ghash_acc` buffer with the new GHASH state.
+    - Load the AES key length and determine the last round key based on the key length.
+    - Initialize the counter increment vector and adjust the counter for processing multiple blocks.
+    - Enter a loop to process data in chunks of 4*VL bytes, where VL is the vector length (32 bytes for this function).
+    - For each chunk, perform AES encryption on the counter blocks to generate the keystream, XOR the keystream with the source data to produce ciphertext, and update the GHASH accumulator with the ciphertext.
+    - If the data length is not a multiple of 4*VL, process the remaining data in smaller chunks, handling any partial blocks with masking.
+    - Perform a final GHASH reduction on any remaining intermediate values and store the updated GHASH accumulator back to memory.
+    - Use the `vzeroupper` instruction to clear the upper halves of the YMM registers before returning.
+- **Output**: The function outputs the encrypted data in the `dst` buffer and updates the `ghash_acc` buffer with the new GHASH state.
 
 
 ---
@@ -64,130 +61,127 @@ The `aes_gcm_dec_update_vaes_avx10_256` function performs AES-GCM decryption and
 - **Inputs**:
     - `key`: A pointer to the AES-GCM key structure containing the expanded AES key and precomputed GHASH key powers.
     - `le_ctr`: A pointer to a 4-element array of 32-bit unsigned integers representing the current counter in little-endian format.
-    - `ghash_acc`: A pointer to a 16-byte buffer that holds the current GHASH accumulator value.
-    - `src`: A pointer to the source data buffer containing the ciphertext to be decrypted.
-    - `dst`: A pointer to the destination buffer where the decrypted data will be written.
-    - `datalen`: An integer representing the length of the data to be processed, which must be a multiple of 16 except on the last call.
-- **Control Flow**:
-    - Load constants and initialize registers for byte swapping and GHASH polynomial.
-    - Load the GHASH accumulator and the starting counter from memory.
-    - Load the AES key length and calculate the pointer to the last AES round key.
-    - Initialize the counter increment vector and adjust the data length for loop processing.
-    - Enter a loop to process data in chunks of 4*VL bytes, interleaving AES encryption of counter blocks with GHASH updates of ciphertext blocks.
-    - For each chunk, perform AES encryption on counter blocks, XOR with source data, and update GHASH with ciphertext blocks.
-    - If the remaining data is less than 4*VL bytes, process it one vector at a time, handling any partial vectors with masking.
-    - Perform a final GHASH reduction and store the updated GHASH accumulator back to memory.
-- **Output**: The function outputs the decrypted data to the destination buffer and updates the GHASH accumulator in place.
-
-
----
-### aes\_gcm\_precompute\_vaes\_avx10\_512
-The `aes_gcm_precompute_vaes_avx10_512` function precomputes and initializes the GHASH key powers for AES-GCM encryption using 512-bit vectors on x86_64 CPUs with VAES and VPCLMULQDQ support.
-- **Inputs**:
-    - `key`: A pointer to the `aes_gcm_key_avx10` structure containing the expanded AES key.
-- **Control Flow**:
-    - The function begins by setting up the vector length to 64 bytes (512 bits) using the `_set_veclen` macro.
-    - It calculates the pointer to the lowest set of key powers in the key structure.
-    - An all-zero block is encrypted using the AES key to derive the raw GHASH subkey.
-    - The bytes of the raw hash subkey are reflected using a shuffle mask.
-    - The first key power, H^1, is preprocessed by reflecting its bytes and multiplying it by x^-1 mod the GHASH polynomial.
-    - The GHASH polynomial constant is loaded into a register for further calculations.
-    - The function squares H^1 to compute H^2 and constructs vectors for H_CUR and H_INC.
-    - For VL=64, it further computes H^4 and constructs vectors for H_CUR and H_INC with four elements each.
-    - The lowest set of key powers is stored in memory.
-    - A loop computes and stores the remaining key powers by repeatedly multiplying the current powers by H^2 or H^4, depending on the vector length.
-    - The function ends by zeroing the upper parts of the YMM or ZMM registers to avoid performance penalties.
-- **Output**: The function outputs the initialized GHASH key powers stored in the `ghash_key_powers` field of the `aes_gcm_key_avx10` structure.
-
-
----
-### aes\_gcm\_enc\_update\_vaes\_avx10\_512
-The `aes_gcm_enc_update_vaes_avx10_512` function performs AES-GCM encryption and updates the GHASH accumulator using 512-bit vector operations on x86_64 CPUs with VAES and VPCLMULQDQ support.
-- **Inputs**:
-    - `key`: A pointer to the AES-GCM key structure containing the expanded AES key and precomputed GHASH key powers.
-    - `le_ctr`: A pointer to a 4-element array of 32-bit integers representing the current counter in little-endian format.
     - `ghash_acc`: A pointer to a 16-byte buffer holding the current GHASH accumulator value.
-    - `src`: A pointer to the source data buffer to be encrypted.
-    - `dst`: A pointer to the destination buffer where the encrypted data will be written.
-    - `datalen`: An integer representing the length of the data to be encrypted, which must be a multiple of 16 except on the last call.
-- **Control Flow**:
+    - `src`: A pointer to the source buffer containing the ciphertext data to be decrypted.
+    - `dst`: A pointer to the destination buffer where the decrypted data will be stored.
+    - `datalen`: An integer representing the length of the data to be processed, which must be a multiple of 16 except on the last call.
+- **Logic and Control Flow**:
     - Load constants and initialize registers for byte swapping and GHASH polynomial.
     - Load the GHASH accumulator and the starting counter from memory.
     - Load the AES key length and calculate the pointer to the last AES round key.
     - Initialize the counter increment vector based on the vector length (VL).
-    - Check if the data length is sufficient for processing in 4*VL byte chunks and enter the main loop if so.
-    - In the main loop, interleave AES encryption of counter blocks with GHASH update of ciphertext blocks for performance optimization.
-    - For encryption, process the first set of plaintext blocks, encrypt them, and store the ciphertext for GHASH processing.
-    - Cache additional AES round keys for use in the main loop.
-    - Process 4 vectors of data at a time, updating the GHASH accumulator and storing the encrypted data to the destination buffer.
-    - If the data length is not a multiple of 4*VL, process the remaining data one vector at a time, using masking for the last iteration if necessary.
+    - Check if the data length is sufficient for processing in blocks of 4*VL bytes; if not, skip to processing smaller blocks.
+    - Load powers of the hash key for GHASH processing.
+    - Enter the main loop to process 4*VL bytes of data at a time, interleaving AES decryption and GHASH update operations.
+    - For decryption, load ciphertext blocks into GHASHDATA registers and start AES decryption of counter blocks.
+    - Perform AES rounds and GHASH steps, interleaving operations to optimize performance.
+    - Store decrypted data to the destination buffer and update pointers and counters.
+    - If data remains after the main loop, process the remaining data in smaller blocks, handling masking for partial blocks.
     - Perform a final GHASH reduction and store the updated GHASH accumulator back to memory.
-- **Output**: The function outputs the encrypted data to the destination buffer and updates the GHASH accumulator in place.
+    - Ensure proper cleanup of vector registers with vzeroupper before returning.
+- **Output**: The function outputs the decrypted data in the destination buffer and updates the GHASH accumulator with the processed data.
+
+
+---
+### aes\_gcm\_precompute\_vaes\_avx10\_512
+The `aes_gcm_precompute_vaes_avx10_512` function precomputes the GHASH subkey powers for AES-GCM encryption using 512-bit vectors on x86_64 CPUs with VAES and VPCLMULQDQ support.
+- **Inputs**:
+    - `key`: A pointer to the `aes_gcm_key_avx10` structure containing the expanded AES key.
+- **Logic and Control Flow**:
+    - The function begins by setting up the vector length to 64 bytes, indicating the use of 512-bit vectors.
+    - It calculates the pointer to the lowest set of key powers in the key structure.
+    - An all-zero block is encrypted using the AES key to derive the raw GHASH subkey.
+    - The bytes of the raw hash subkey are reflected, and the padding blocks are zeroized.
+    - The first key power, H^1, is preprocessed by reflecting its bytes and multiplying it by x^-1 mod the GHASH polynomial.
+    - The GHASH polynomial constant is loaded into a register for further calculations.
+    - The function squares H^1 to obtain H^2 and constructs vectors for H_CUR and H_INC, which are used to compute higher powers of the hash key.
+    - For VL=64, the function computes H^4 and constructs vectors for H_CUR and H_INC with four elements each.
+    - The lowest set of key powers is stored, and the remaining key powers are computed and stored in a loop.
+    - The function ends by clearing the upper bits of the YMM/ZMM registers to avoid performance penalties.
+- **Output**: The function outputs the precomputed GHASH key powers stored in the `ghash_key_powers` field of the `aes_gcm_key_avx10` structure.
+
+
+---
+### aes\_gcm\_enc\_update\_vaes\_avx10\_512
+The `aes_gcm_enc_update_vaes_avx10_512` function performs AES-GCM encryption using VAES and VPCLMULQDQ instructions optimized for 512-bit vectors on x86_64 CPUs.
+- **Inputs**:
+    - `key`: A pointer to the AES-GCM key structure containing the expanded AES key and precomputed GHASH key powers.
+    - `le_ctr`: A pointer to a 4-element array of 32-bit integers representing the current counter in little-endian format.
+    - `ghash_acc`: A pointer to a 16-byte buffer holding the current GHASH accumulator state.
+    - `src`: A pointer to the source data buffer to be encrypted.
+    - `dst`: A pointer to the destination buffer where the encrypted data will be written.
+    - `datalen`: An integer representing the length of the data to be encrypted, which must be a multiple of 16 except on the last call.
+- **Logic and Control Flow**:
+    - The function begins by loading constants and initializing registers for AES and GHASH operations.
+    - It checks if the data length is sufficient to process in blocks of 4*VL bytes, where VL is the vector length (64 bytes for 512-bit vectors).
+    - If enough data is available, it enters a loop to process 4*VL bytes at a time, interleaving AES encryption of counter blocks with GHASH updates of ciphertext blocks.
+    - For encryption, it first encrypts the plaintext blocks, stores the resulting ciphertext, and updates the GHASH accumulator with the ciphertext blocks.
+    - If the data length is not a multiple of 4*VL, it processes the remaining data in blocks of VL bytes, using masking to handle any partial blocks.
+    - The function updates the GHASH accumulator with the remaining ciphertext blocks, performs a final GHASH reduction, and stores the updated GHASH state back to memory.
+    - It uses VAES instructions for AES encryption and VPCLMULQDQ instructions for GHASH multiplication, taking advantage of the wide vector registers and interleaving operations to optimize performance.
+- **Output**: The function outputs the encrypted data in the destination buffer and updates the GHASH accumulator with the processed ciphertext.
 
 
 ---
 ### aes\_gcm\_dec\_update\_vaes\_avx10\_512
 The `aes_gcm_dec_update_vaes_avx10_512` function performs AES-GCM decryption and updates the GHASH accumulator using 512-bit vector operations on x86_64 CPUs with VAES and VPCLMULQDQ support.
 - **Inputs**:
-    - `key`: A pointer to the AES-GCM key structure containing the expanded AES key and precomputed GHASH key powers.
+    - `key`: A pointer to the `aes_gcm_key_avx10` structure containing the expanded AES key and precomputed GHASH key powers.
     - `le_ctr`: A pointer to a 4-element array of 32-bit unsigned integers representing the current counter in little-endian format.
     - `ghash_acc`: A pointer to a 16-byte buffer holding the current GHASH accumulator state.
-    - `src`: A pointer to the source buffer containing the ciphertext data to be decrypted.
-    - `dst`: A pointer to the destination buffer where the decrypted data will be written.
+    - `src`: A pointer to the source data buffer containing the ciphertext to be decrypted.
+    - `dst`: A pointer to the destination buffer where the decrypted data will be stored.
     - `datalen`: An integer representing the length of the data to be processed, which must be a multiple of 16 except on the last call.
-- **Control Flow**:
-    - Load constants and initialize registers for AES and GHASH operations.
-    - Load the GHASH accumulator and the starting counter from memory.
-    - Load the AES key length and calculate the pointer to the last AES round key.
-    - Initialize the counter increment vector and adjust the counter for processing.
-    - Check if the data length is sufficient for processing in 4*VL byte chunks and enter the main loop if so.
-    - In the main loop, interleave AES encryption of counter blocks with GHASH updates of ciphertext blocks for performance optimization.
-    - For decryption, load ciphertext blocks into GHASH data registers and start AES encryption of counter blocks.
-    - Perform AES encryption rounds and update GHASH with ciphertext blocks, interleaving operations to optimize CPU resource usage.
-    - Store decrypted data to the destination buffer and update pointers and counters.
-    - If data length is not a multiple of 4*VL, process remaining data in VL byte chunks, using masking for the last partial vector if necessary.
-    - Perform final GHASH reduction and store the updated GHASH accumulator back to memory.
-    - Return from the function.
-- **Output**: The function outputs the decrypted data in the destination buffer and updates the GHASH accumulator with the processed ciphertext.
+- **Logic and Control Flow**:
+    - The function begins by loading constants and initializing registers for AES and GHASH operations.
+    - It checks if the data length is sufficient to process in blocks of 4*VL bytes, where VL is 64 for 512-bit operations.
+    - If enough data is available, it enters a loop to process 4 vectors (4*VL bytes) at a time, interleaving AES decryption of counter blocks with GHASH updates of ciphertext blocks.
+    - For each block, it performs AES decryption using the counter, XORs the result with the ciphertext to get plaintext, and updates the GHASH accumulator with the plaintext.
+    - If the remaining data is less than 4*VL bytes, it processes the remaining data one vector (VL bytes) at a time, using masking to handle partial vectors.
+    - Finally, it performs a GHASH reduction on the accumulated intermediate values and stores the updated GHASH accumulator back to memory.
+- **Output**: The function outputs the decrypted data in the `dst` buffer and updates the `ghash_acc` buffer with the new GHASH accumulator state.
 
 
 ---
 ### aes\_gcm\_aad\_update\_vaes\_avx10
-The `aes_gcm_aad_update_vaes_avx10` function updates the GHASH accumulator with additional authenticated data (AAD) using AES-GCM with VAES and VPCLMULQDQ optimizations on x86_64 architecture.
+The `aes_gcm_aad_update_vaes_avx10` function processes Additional Authenticated Data (AAD) in AES-GCM mode, updating the GHASH accumulator with the provided AAD data.
 - **Inputs**:
-    - `key`: A pointer to the `aes_gcm_key_avx10` structure containing the precomputed GHASH key powers.
+    - `key`: A pointer to the AES-GCM key structure, which must have its GHASH key powers initialized.
     - `ghash_acc`: A pointer to a 16-byte buffer that holds the current GHASH accumulator state, which should be all zeroes on the first call.
-    - `aad`: A pointer to the additional authenticated data (AAD) to be processed.
-    - `aadlen`: An integer representing the length of the AAD in bytes, which must be a multiple of 16 except on the last call.
-- **Control Flow**:
-    - Load the GHASH accumulator from the provided pointer.
-    - Subtract 32 from `aadlen` to prepare for processing in 32-byte chunks.
-    - Check if `aadlen` is less than 32; if so, skip the main loop.
+    - `aad`: A pointer to the AAD data to be processed.
+    - `aadlen`: The length of the AAD data in bytes, which must be a multiple of 16 except on the last call.
+- **Logic and Control Flow**:
+    - Load constants for byte-swapping and the GHASH polynomial.
+    - Load the current GHASH accumulator state from memory.
+    - Subtract 32 from the AAD length to prepare for processing in 32-byte chunks.
+    - If the AAD length is less than 32, skip the main loop.
     - Load the first two powers of the GHASH key from the key structure.
-    - Enter a loop to process 32 bytes of AAD at a time, updating the GHASH accumulator using GHASH multiplication.
-    - If there are remaining bytes (1 <= `aadlen` < 32), prepare a mask for the remaining bytes and process them, updating the GHASH accumulator.
-    - Store the updated GHASH accumulator back to the provided memory location.
-- **Output**: The function updates the GHASH accumulator with the processed AAD, modifying the state in the provided `ghash_acc` buffer.
+    - In a loop, process 32 bytes of AAD at a time: load, byte-swap, XOR with the GHASH accumulator, perform GHASH multiplication, and update the accumulator.
+    - If any AAD remains after the loop, process the remaining bytes using a mask to handle partial blocks.
+    - Store the updated GHASH accumulator back to memory.
+    - Use `vzeroupper` to clear the upper parts of the YMM registers.
+- **Output**: The function updates the GHASH accumulator with the processed AAD data, storing the result back in the provided `ghash_acc` buffer.
 
 
 ---
 ### aes\_gcm\_enc\_final\_vaes\_avx10
-The `aes_gcm_enc_final_vaes_avx10` function finalizes the AES-GCM encryption process by computing the authentication tag using the GHASH accumulator and encrypting it with the AES key.
+The `aes_gcm_enc_final_vaes_avx10` function finalizes the AES-GCM encryption process by computing the authentication tag using the GHASH accumulator and the total lengths of additional authenticated data and encrypted data.
 - **Inputs**:
     - `key`: A pointer to the AES-GCM key structure containing the expanded AES key and precomputed GHASH key powers.
-    - `le_ctr`: A pointer to a 4-element array representing the counter in little-endian format.
+    - `le_ctr`: A pointer to a 4-element array of 32-bit unsigned integers representing the counter in little-endian format.
     - `ghash_acc`: A pointer to a 16-byte buffer holding the current GHASH accumulator state.
-    - `total_aadlen`: The total length of the additional authenticated data in bytes.
-    - `total_datalen`: The total length of the encrypted data in bytes.
-- **Control Flow**:
-    - Load constants for GF(2^128) polynomial and byte swap mask.
-    - Load AES key length and set up the counter block for tag encryption.
-    - Build the lengths block from total AAD and data lengths, convert to bits, and XOR with GHASH accumulator.
-    - Load the first hash key power (H^1) for GHASH multiplication.
-    - Perform AES encryption on the counter block, interleaving with GHASH multiplication to improve performance.
-    - Undo byte reflection on the GHASH accumulator and perform the final AES round to compute the authentication tag.
+    - `total_aadlen`: A 64-bit unsigned integer representing the total length of the additional authenticated data in bytes.
+    - `total_datalen`: A 64-bit unsigned integer representing the total length of the encrypted data in bytes.
+- **Logic and Control Flow**:
+    - Load constants for the GHASH polynomial and byte swap mask.
+    - Load the AES key length and set up a counter block with a low 32-bit word of 1 for tag encryption.
+    - Build the lengths block using the total AAD and data lengths, convert to bits, and XOR with the GHASH accumulator.
+    - Load the first hash key power (H^1) from the key structure.
+    - Start AES encryption of the counter block, interleaving with GHASH multiplication to improve performance.
+    - Complete the AES encryption and multiply the GHASH accumulator by H^1, interleaving operations for efficiency.
+    - Undo byte reflection of the GHASH accumulator and perform the last AES round to produce the authentication tag.
     - Store the computed authentication tag in the GHASH accumulator buffer.
-- **Output**: The function outputs the computed 16-byte authentication tag by storing it in the `ghash_acc` buffer.
+- **Output**: The function outputs the computed 16-byte authentication tag, stored in the `ghash_acc` buffer.
 
 
 ---
@@ -201,14 +195,15 @@ The `aes_gcm_dec_final_vaes_avx10` function finalizes the AES-GCM decryption pro
     - `total_datalen`: A 64-bit integer representing the total length of the decrypted data in bytes.
     - `tag`: A pointer to a 16-byte buffer containing the expected authentication tag.
     - `taglen`: An integer specifying the length of the tag to compare, between 4 and 16 bytes.
-- **Control Flow**:
-    - Load constants and initialize local variables for AES key length, GHASH accumulator, and counter block.
-    - Build the lengths block from total AAD and data lengths, convert to bits, and XOR with the GHASH accumulator.
+- **Logic and Control Flow**:
+    - Load constants and initialize local variables, including the AES key length and the counter block for tag encryption.
+    - Build the lengths block from `total_aadlen` and `total_datalen`, convert to bits, and XOR with the GHASH accumulator.
     - Load the first hash key power (H^1) and prepare a mask for the tag length.
-    - Set up the counter block for encrypting the authentication tag and perform AES encryption on it.
-    - Interleave AES encryption with GHASH multiplication to improve performance.
+    - Set up the counter block with a value of 1 in the low 32-bit word for tag encryption.
+    - Perform AES encryption on the counter block, interleaving with GHASH multiplication to improve performance.
     - Undo byte reflection on the GHASH accumulator and perform the last AES round to compute the authentication tag.
-    - Compare the computed tag with the expected tag using constant-time operations and return the result.
+    - For decryption, XOR the computed tag with the expected tag and use `vptest` to check if the result is zero, indicating a match.
+    - Return true if the tags match, otherwise return false.
 - **Output**: Returns a boolean value indicating whether the computed authentication tag matches the expected tag.
 
 
@@ -219,59 +214,57 @@ The `aes_gcm_dec_final_vaes_avx10` function finalizes the AES-GCM decryption pro
 The `_set_veclen` macro sets the vector length in bytes and defines register aliases for the appropriate vector registers based on the specified vector length.
 - **Inputs**:
     - `vl`: The desired vector length in bytes, which can be either 32 or 64.
-- **Control Flow**:
+- **Logic and Control Flow**:
     - The macro begins by setting the `VL` variable to the specified vector length `vl`.
-    - It iterates over a range of indices from 0 to 31 using the `.irp` directive.
-    - For each index `i`, it checks if `VL` is equal to 32 or 64.
-    - If `VL` is 32, it sets the alias `V\i` to the corresponding YMM register `%ymm\i`.
-    - If `VL` is 64, it sets the alias `V\i` to the corresponding ZMM register `%zmm\i`.
+    - It iterates over the indices 0 to 31 using the `.irp` directive to define register aliases.
+    - For each index `i`, it checks if `VL` is 32, in which case it sets `V\i` to `%ymm\i`.
+    - If `VL` is 64, it sets `V\i` to `%zmm\i`.
     - If `VL` is neither 32 nor 64, it triggers an error with the message "Unsupported vector length".
 - **Output**: The macro does not produce a direct output but sets up the environment by defining register aliases for vector operations based on the specified vector length.
 
 
 ---
 ### \_ghash\_mul\_step
-The `_ghash_mul_step` macro performs one step of GHASH multiplication of 128-bit lanes of two inputs, `\a` and `\b`, storing the reduced products in `\dst` using temporary registers `\t0`, `\t1`, and `\t2`.
+The `_ghash_mul_step` macro performs one step of GHASH multiplication of 128-bit lanes of two inputs, `a` and `b`, storing the reduced products in `dst` using temporary registers `t0`, `t1`, and `t2`.
 - **Inputs**:
     - `i`: Specifies the step number (0 through 9) of the GHASH multiplication process.
     - `a`: The first 128-bit input operand for the GHASH multiplication.
     - `b`: The second 128-bit input operand for the GHASH multiplication.
-    - `dst`: The destination register where the reduced product is stored.
-    - `gfpoly`: The reducing polynomial used in the GHASH multiplication.
-    - `t0`: A temporary register used during the multiplication process.
-    - `t1`: A temporary register used during the multiplication process.
-    - `t2`: A temporary register used during the multiplication process.
-- **Control Flow**:
-    - If `\i` is 0, perform carryless multiplication of the low 64 bits of `\a` and `\b`, storing the result in `\t0`, and multiply the low 64 bits of `\a` with the high 64 bits of `\b`, storing in `\t1`.
-    - If `\i` is 1, multiply the high 64 bits of `\a` with the low 64 bits of `\b`, storing in `\t2`.
-    - If `\i` is 2, XOR `\t2` with `\t1` to consolidate the middle product.
-    - If `\i` is 3, multiply the low half of `\t0` with `\gfpoly`, storing in `\t2`.
-    - If `\i` is 4, swap the halves of `\t0`.
-    - If `\i` is 5, use `vpternlogd` to fold `\t0` into `\t1`.
-    - If `\i` is 6, multiply the high 64 bits of `\a` and `\b`, storing in `\dst`.
-    - If `\i` is 7, multiply the low half of `\t1` with `\gfpoly`, storing in `\t0`.
-    - If `\i` is 8, swap the halves of `\t1`.
-    - If `\i` is 9, use `vpternlogd` to fold `\t1` into `\dst`.
-- **Output**: The macro outputs the reduced product of the GHASH multiplication in the `\dst` register.
+    - `dst`: The destination register where the reduced product of the multiplication is stored.
+    - `gfpoly`: The reducing polynomial used in the GHASH multiplication process.
+    - `t0`: A temporary register used during the multiplication and reduction process.
+    - `t1`: A temporary register used during the multiplication and reduction process.
+    - `t2`: A temporary register used during the multiplication and reduction process.
+- **Logic and Control Flow**:
+    - If `i` is 0, perform the carryless multiplication of the low 64 bits of `a` and `b` and store the result in `t0`; also multiply the low 64 bits of `a` with the high 64 bits of `b` and store in `t1`.
+    - If `i` is 1, multiply the high 64 bits of `a` with the low 64 bits of `b` and store in `t2`.
+    - If `i` is 2, XOR `t2` with `t1` to consolidate the middle product into `t1`.
+    - If `i` is 3, multiply the low half of `t0` with the reducing polynomial `gfpoly` and store in `t2`.
+    - If `i` is 4, swap the halves of `t0`.
+    - If `i` is 5, use `vpternlogd` to fold `t0` into `t1` and store the result in `t1`.
+    - If `i` is 6, perform the carryless multiplication of the high 64 bits of `a` and `b` and store in `dst`.
+    - If `i` is 7, multiply the low half of `t1` with `gfpoly` and store in `t0`.
+    - If `i` is 8, swap the halves of `t1`.
+    - If `i` is 9, use `vpternlogd` to fold `t1` into `dst`.
+- **Output**: The macro outputs the reduced product of the GHASH multiplication in the `dst` register.
 
 
 ---
 ### \_ghash\_mul
-The `_ghash_mul` macro performs GHASH multiplication of 128-bit lanes of two inputs, `a` and `b`, and stores the reduced products in `dst` using a series of steps that involve carryless multiplication and reduction in the finite field GF(2^128).
+The `_ghash_mul` macro performs GHASH multiplication of 128-bit lanes of two inputs, `a` and `b`, and stores the reduced products in `dst` using a series of steps defined in `_ghash_mul_step`.
 - **Inputs**:
     - `a`: The first 128-bit input operand for the GHASH multiplication.
     - `b`: The second 128-bit input operand for the GHASH multiplication.
     - `dst`: The destination register where the reduced product of the GHASH multiplication is stored.
-    - `gfpoly`: The polynomial used for reduction in the finite field GF(2^128).
-    - `t0`: A temporary register used during the multiplication and reduction process.
-    - `t1`: A temporary register used during the multiplication and reduction process.
-    - `t2`: A temporary register used during the multiplication and reduction process.
-- **Control Flow**:
-    - The macro iterates over a sequence of 10 steps using the `_ghash_mul_step` macro to perform the GHASH multiplication and reduction.
-    - In steps 0 to 2, it calculates the low (LO), middle (MI), and high (HI) parts of the carryless multiplication of `a` and `b`.
-    - In steps 3 to 5, it performs the first reduction by folding the LO part into the MI part using the polynomial `gfpoly`.
-    - In steps 6 to 9, it performs the second reduction by folding the MI part into the HI part, resulting in the final reduced product stored in `dst`.
-- **Output**: The macro outputs the reduced product of the GHASH multiplication in the `dst` register.
+    - `gfpoly`: The polynomial used for reduction in the GHASH multiplication.
+    - `t0`: A temporary register used during the GHASH multiplication process.
+    - `t1`: A temporary register used during the GHASH multiplication process.
+    - `t2`: A temporary register used during the GHASH multiplication process.
+- **Logic and Control Flow**:
+    - The macro iterates over a sequence of steps (0 to 9) using the `_ghash_mul_step` macro to perform the GHASH multiplication and reduction.
+    - Each step involves specific operations such as carryless multiplication, XOR operations, and polynomial reduction using the `vpclmulqdq`, `vpxord`, `vpternlogd`, and `vpshufd` instructions.
+    - The macro ensures that the intermediate results are reduced to 128 bits by adding multiples of the polynomial `gfpoly` to cancel out terms in the intermediate product.
+- **Output**: The output is the reduced product of the GHASH multiplication stored in the `dst` register.
 
 
 ---
@@ -287,34 +280,32 @@ The `_ghash_mul_noreduce` macro performs GHASH multiplication of 128-bit lanes o
     - `t1`: Temporary register used during the computation.
     - `t2`: Temporary register used during the computation.
     - `t3`: Temporary register used during the computation.
-- **Control Flow**:
-    - Perform carryless multiplication of the low 64 bits of `a` and `b`, storing the result in `t0`.
-    - Perform carryless multiplication of the low 64 bits of `a` and the high 64 bits of `b`, storing the result in `t1`.
-    - Perform carryless multiplication of the high 64 bits of `a` and the low 64 bits of `b`, storing the result in `t2`.
-    - Perform carryless multiplication of the high 64 bits of `a` and `b`, storing the result in `t3`.
-    - XOR the result in `t0` with `lo` and store it back in `lo`.
-    - XOR the results in `t1` and `t2` using a three-argument XOR operation and store the result in `mi`.
-    - XOR the result in `t3` with `hi` and store it back in `hi`.
+- **Logic and Control Flow**:
+    - The macro begins by performing four carryless multiplications using the `vpclmulqdq` instruction to compute the low, middle, and high parts of the product of `a` and `b`.
+    - The low part (`lo`) is computed as `a_L * b_L` and stored in `t0`.
+    - The middle part (`mi`) is computed as the XOR of `a_L * b_H` and `a_H * b_L`, using `t1` and `t2` for intermediate results.
+    - The high part (`hi`) is computed as `a_H * b_H` and stored in `t3`.
+    - The results are then XORed into the `lo`, `mi`, and `hi` registers to accumulate the intermediate products.
 - **Output**: The macro outputs the intermediate products of the GHASH multiplication in the `lo`, `mi`, and `hi` registers, which are not reduced to 128 bits.
 
 
 ---
 ### \_ghash\_reduce
-The `_ghash_reduce` macro reduces unreduced GHASH products from 256-bit to 128-bit using a specific polynomial.
+The `_ghash_reduce` macro reduces unreduced GHASH products from three 128-bit lanes into a single 128-bit result using a specific polynomial.
 - **Inputs**:
-    - `lo`: The lower 128 bits of the unreduced product.
-    - `mi`: The middle 128 bits of the unreduced product.
-    - `hi`: The higher 128 bits of the unreduced product.
-    - `gfpoly`: The polynomial used for reduction.
+    - `lo`: The lower 128-bit lane of the unreduced GHASH product.
+    - `mi`: The middle 128-bit lane of the unreduced GHASH product.
+    - `hi`: The higher 128-bit lane of the unreduced GHASH product.
+    - `gfpoly`: The polynomial used for reduction, represented in a specific format.
     - `t0`: A temporary register used during the reduction process.
-- **Control Flow**:
-    - Perform a carryless multiplication of the lower 128 bits (`lo`) with the polynomial (`gfpoly`) and store the result in `t0`.
-    - Shuffle the `lo` register to swap its halves.
-    - XOR the result of the previous step with `mi` to fold `lo` into `mi`.
-    - Perform a carryless multiplication of the updated `mi` with the polynomial (`gfpoly`) and store the result in `t0`.
-    - Shuffle the `mi` register to swap its halves.
-    - XOR the result of the previous step with `hi` to fold `mi` into `hi`.
-- **Output**: The `hi` register contains the 128-bit reduced product.
+- **Logic and Control Flow**:
+    - The macro begins by performing a carryless multiplication of the lower lane (`lo`) with the polynomial (`gfpoly`) and stores the result in the temporary register `t0`.
+    - It then swaps the halves of the `lo` register using a shuffle operation.
+    - The macro uses a ternary logic operation to fold the result from `t0` into the middle lane (`mi`).
+    - A similar carryless multiplication is performed on the updated `mi` with the polynomial, storing the result again in `t0`.
+    - The halves of the `mi` register are swapped.
+    - Finally, another ternary logic operation folds the result from `t0` into the higher lane (`hi`), completing the reduction.
+- **Output**: The output is the reduced 128-bit GHASH product stored in the `hi` register.
 
 
 ---
@@ -322,20 +313,18 @@ The `_ghash_reduce` macro reduces unreduced GHASH products from 256-bit to 128-b
 The `_aes_gcm_precompute` macro initializes the GHASH subkey and precomputes powers of it for AES-GCM encryption using VAES and VPCLMULQDQ instructions on x86_64 CPUs.
 - **Inputs**:
     - `KEY`: A pointer to the AES-GCM key structure, which contains the expanded AES key and will be used to store the precomputed GHASH key powers.
-- **Control Flow**:
-    - Set up local variables and register aliases for temporary storage and operations.
+- **Logic and Control Flow**:
     - Load the pointer to the lowest set of key powers in the key structure.
     - Encrypt an all-zeroes block using the AES key to derive the raw GHASH subkey.
-    - Reflect the bytes of the raw hash subkey and zeroize padding blocks in the key structure.
-    - Preprocess the first key power (H^1) by reflecting its bytes and multiplying by x^-1 mod the GHASH polynomial.
-    - Load the GHASH polynomial constant into a register for use in multiplication.
-    - Square the first key power to compute the second key power (H^2).
-    - Create vectors for the current and incremented key powers, filling them with H^2 and H^1.
+    - Reflect the bytes of the raw hash subkey and zeroize the padding blocks in the key structure.
+    - Preprocess the first key power (H^1) by reflecting its bytes and multiplying it by x^-1 mod the GHASH polynomial.
+    - Load the GHASH polynomial constant and square H^1 to get H^2.
+    - Create vectors for H_CUR and H_INC to store multiple key powers.
+    - For VL=64, compute additional key powers by multiplying H_INC and H_CUR.
     - Store the lowest set of key powers in the key structure.
-    - Compute and store the remaining key powers by repeatedly multiplying the current powers by the incremented powers.
-    - Use a loop to handle different vector lengths (VL=32 or VL=64) and store the computed powers in the key structure.
-    - Zero upper bits of registers to clean up after using YMM or ZMM registers.
-- **Output**: The macro outputs the precomputed GHASH key powers stored in the AES-GCM key structure, ready for use in AES-GCM encryption operations.
+    - Compute and store the remaining key powers by iteratively multiplying the current powers by H_INC.
+    - Zero upper bits of YMM/ZMM registers to avoid performance penalties.
+- **Output**: The macro outputs the precomputed GHASH key powers stored in the AES-GCM key structure, which are used for efficient GHASH computation during AES-GCM encryption.
 
 
 ---
@@ -346,13 +335,14 @@ The `_horizontal_xor` macro performs a horizontal XOR operation on the 128-bit l
     - `src_xmm`: The lower 128-bit lane of the source vector.
     - `dst_xmm`: The destination register where the result of the XOR operation will be stored.
     - `t0_xmm`: A temporary register used for intermediate calculations.
-    - `t1_xmm`: A temporary register used for intermediate calculations, only used if VL is 64.
-    - `t2_xmm`: A temporary register used for intermediate calculations, only used if VL is 64.
-- **Control Flow**:
-    - Extract the second 128-bit lane from the source vector into `t0_xmm`.
-    - If the vector length (VL) is 32, XOR `t0_xmm` with `src_xmm` and store the result in `dst_xmm`.
-    - If the vector length (VL) is 64, extract the third and fourth 128-bit lanes into `t1_xmm` and `t2_xmm`, respectively.
-    - Perform a three-way XOR using `vpternlogd` on `t1_xmm`, `t2_xmm`, and the result of the XOR between `t0_xmm` and `src_xmm`, storing the final result in `dst_xmm`.
+    - `t1_xmm`: A temporary register used for intermediate calculations (only used if VL == 64).
+    - `t2_xmm`: A temporary register used for intermediate calculations (only used if VL == 64).
+- **Logic and Control Flow**:
+    - Extracts the second 128-bit lane from the source vector into `t0_xmm`.
+    - If the vector length (VL) is 32 (256-bit), it performs an XOR between `t0_xmm` and `src_xmm`, storing the result in `dst_xmm`.
+    - If the vector length (VL) is 64 (512-bit), it extracts the third and fourth 128-bit lanes into `t1_xmm` and `t2_xmm`, respectively.
+    - Performs an XOR between `t0_xmm` and `src_xmm`, storing the result in `dst_xmm`.
+    - Uses the `vpternlogd` instruction to perform a three-argument XOR between `t1_xmm`, `t2_xmm`, and `dst_xmm`, storing the final result in `dst_xmm`.
 - **Output**: The result of the horizontal XOR operation is stored in the `dst_xmm` register, with all other lanes zeroized.
 
 
@@ -361,18 +351,18 @@ The `_horizontal_xor` macro performs a horizontal XOR operation on the 128-bit l
 The `_ghash_step_4x` macro performs one step of the GHASH update for data blocks using vectorized operations on 128-bit lanes, interleaving computation to optimize performance.
 - **Inputs**:
     - `i`: Specifies the step to perform, ranging from 0 to 9.
-- **Control Flow**:
-    - If `i == 0`, byte-reflects GHASHDATA0, XORs it with GHASH_ACC, and byte-reflects GHASHDATA1 and GHASHDATA2.
-    - If `i == 1`, byte-reflects GHASHDATA3 and performs carryless multiplication to compute LO parts for GHASHDATA0 to GHASHDATA2.
-    - If `i == 2`, XORs GHASHTMP0 with GHASH_ACC, computes LO_3, and sums LO parts using vpternlogd.
-    - If `i == 3`, performs carryless multiplication to compute MI parts for GHASHDATA0 to GHASHDATA2 and sums MI parts using vpternlogd.
-    - If `i == 4`, continues MI computation and sums MI parts, then computes MI_7.
-    - If `i == 5`, sums MI parts, performs carryless multiplication for LO_L, and computes MI_7.
-    - If `i == 6`, swaps halves of LO, performs carryless multiplication for HI parts for GHASHDATA0 to GHASHDATA2.
-    - If `i == 7`, folds LO into MI, performs carryless multiplication for HI_3, and sums HI parts using vpternlogd.
-    - If `i == 8`, XORs GHASHDATA3 with GHASHDATA0, swaps halves of MI, and folds MI into HI.
-    - If `i == 9`, performs a horizontal XOR to finalize the GHASH_ACC_XMM.
-- **Output**: The macro updates the GHASH_ACC_XMM with the result of the GHASH operation for the current step.
+- **Logic and Control Flow**:
+    - If `i` is 0, byte-reflects GHASHDATA0 and XORs it with GHASH_ACC, then byte-reflects GHASHDATA1 and GHASHDATA2.
+    - If `i` is 1, byte-reflects GHASHDATA3 and performs carryless multiplication for LO parts of GHASHDATA0, GHASHDATA1, and GHASHDATA2.
+    - If `i` is 2, XORs LO parts and performs carryless multiplication for LO part of GHASHDATA3, then sums all LO parts.
+    - If `i` is 3, performs carryless multiplication for MI parts of GHASHDATA0, GHASHDATA1, and GHASHDATA2, then sums MI parts.
+    - If `i` is 4, performs carryless multiplication for MI part of GHASHDATA3 and MI part of GHASHDATA0, then sums all MI parts.
+    - If `i` is 5, performs carryless multiplication for MI part of GHASHDATA1 and MI part of GHASHDATA2, then sums all MI parts.
+    - If `i` is 6, swaps halves of LO, performs carryless multiplication for HI parts of GHASHDATA0, GHASHDATA1, and GHASHDATA2.
+    - If `i` is 7, folds LO into MI, performs carryless multiplication for HI part of GHASHDATA3, and sums HI parts.
+    - If `i` is 8, XORs HI parts, swaps halves of MI, and folds MI into HI.
+    - If `i` is 9, performs a horizontal XOR of the 128-bit lanes of GHASH_ACC and stores the result in GHASH_ACC_XMM.
+- **Output**: The macro updates the GHASH_ACC_XMM with the result of the GHASH operation for the specified step.
 
 
 ---
@@ -380,66 +370,66 @@ The `_ghash_step_4x` macro performs one step of the GHASH update for data blocks
 The `_vaesenc_4x` macro performs one non-final round of AES encryption on four vectors of counter blocks using a specified round key.
 - **Inputs**:
     - `round_key`: The AES round key that has been broadcast to all 128-bit lanes, used for the encryption of the counter blocks.
-- **Control Flow**:
-    - The macro applies the `vaesenc` instruction to each of the four vectors (V0, V1, V2, V3) using the provided `round_key`.
-    - Each vector undergoes the AES encryption operation, which is a single round of the AES algorithm, excluding the final round.
-- **Output**: The output is the four vectors (V0, V1, V2, V3) that have been encrypted with the specified round key, ready for further AES rounds or finalization.
+- **Logic and Control Flow**:
+    - The macro takes a single input, `round_key`, which is the AES round key used for encryption.
+    - It performs the AES encryption operation `vaesenc` on each of the four vectors V0, V1, V2, and V3 using the provided `round_key`.
+    - The macro does not include any branching or looping; it simply applies the `vaesenc` instruction to each vector in sequence.
+- **Output**: The output is the encrypted state of the four vectors V0, V1, V2, and V3 after applying the AES encryption round with the specified `round_key`.
 
 
 ---
 ### \_ctr\_begin\_4x
-The `_ctr_begin_4x` macro initializes and prepares four vectors of counter blocks for AES encryption by incrementing a little-endian counter, converting it to big-endian, and XORing with the zero-th round key.
+The `_ctr_begin_4x` macro initializes four vectors of counter blocks for AES encryption by incrementing a little-endian counter, converting it to big-endian, and XORing with the zero-th round key.
 - **Inputs**:
-    - `LE_CTR`: A vector register containing the current little-endian counter blocks.
-    - `LE_CTR_INC`: A vector register containing the increment value for the counter blocks.
+    - `LE_CTR`: A vector register containing the current little-endian counter value.
+    - `LE_CTR_INC`: A vector register containing the increment value for the counter.
     - `BSWAP_MASK`: A shuffle mask used to convert little-endian to big-endian format.
-    - `RNDKEY0`: The zero-th AES round key used for the initial XOR operation.
-- **Control Flow**:
-    - Increment the little-endian counter in `LE_CTR` four times, storing each incremented value back into `LE_CTR`.
-    - Convert each incremented counter block from little-endian to big-endian using `BSWAP_MASK` and store the results in vector registers V0 to V3.
-    - XOR each of the big-endian counter blocks in V0 to V3 with the zero-th round key `RNDKEY0`.
-- **Output**: Four vectors of counter blocks prepared for AES encryption, stored in vector registers V0 to V3.
+    - `RNDKEY0`: The zero-th round key used for the initial XOR operation.
+- **Logic and Control Flow**:
+    - Increment the little-endian counter in `LE_CTR` by `LE_CTR_INC` four times, storing each result back in `LE_CTR`.
+    - Convert each incremented counter value to big-endian format using `vpshufb` with `BSWAP_MASK`, storing the results in vector registers V0 to V3.
+    - XOR each big-endian counter block with the zero-th round key `RNDKEY0` using `vpxord`, storing the results back in V0 to V3.
+- **Output**: Four vectors of big-endian counter blocks, each XORed with the zero-th round key, stored in vector registers V0 to V3.
 
 
 ---
 ### \_aes\_gcm\_update
-The `_aes_gcm_update` macro performs AES-GCM encryption or decryption update by processing data blocks, updating the GHASH accumulator, and handling counter increments using vectorized operations.
+The `_aes_gcm_update` macro performs AES-GCM encryption or decryption update by processing data blocks, updating the GHASH accumulator, and managing the counter for the AES-CTR mode.
 - **Inputs**:
     - `enc`: A flag indicating whether the operation is encryption (1) or decryption (0).
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Initialize function arguments and local variables, including pointers and registers for AES key length, round keys, and GHASH data.
-    - Load constants such as the byte swap mask and GHASH polynomial into vector registers.
+    - Load constants such as the byte swap mask and GHASH polynomial into registers.
     - Load the GHASH accumulator and starting counter from memory.
     - Determine the AES key length and set the pointer to the last AES round key.
     - Initialize the counter increment vector based on the vector length (VL).
-    - Check if the data length is sufficient for processing in blocks of 4*VL bytes, and if so, enter the main loop for processing these blocks.
-    - In the main loop, interleave AES encryption of counter blocks with GHASH updates of ciphertext blocks to optimize performance.
-    - For encryption, encrypt the first set of plaintext blocks and store the resulting ciphertext for GHASH processing.
+    - Check if the data length is sufficient for processing in blocks of 4*VL bytes, and if so, enter the main loop.
+    - In the main loop, interleave AES encryption of counter blocks with GHASH update of ciphertext blocks to optimize performance.
+    - For encryption, encrypt the first set of plaintext blocks and store the ciphertext for GHASH processing; for decryption, load ciphertext blocks directly.
     - Cache additional AES round keys for use in the main loop.
-    - Process data in blocks of 4*VL bytes, updating the GHASH accumulator and storing encrypted or decrypted data to the destination buffer.
-    - If the data length is not a multiple of 4*VL, process the remaining data in smaller blocks, handling masking for the last iteration if necessary.
+    - Process data in blocks of 4*VL bytes, updating the GHASH accumulator and storing the encrypted or decrypted data.
+    - If the data length is not a multiple of 4*VL, process the remaining data in blocks of up to VL bytes, using masking for the last partial block.
     - Perform a final GHASH reduction and store the updated GHASH accumulator back to memory.
-    - Return from the macro.
-- **Output**: The macro outputs the updated GHASH accumulator and the encrypted or decrypted data written to the destination buffer.
+    - Use `vzeroupper` to clear the upper parts of YMM or ZMM registers before returning.
+- **Output**: The macro updates the GHASH accumulator and produces encrypted or decrypted data blocks, storing them in the destination buffer.
 
 
 ---
 ### \_aes\_gcm\_final
-The `_aes_gcm_final` macro finalizes the AES-GCM encryption or decryption process by updating the GHASH with the lengths block, encrypting the GHASH accumulator, and either storing the computed authentication tag or verifying it against a provided tag.
+The `_aes_gcm_final` macro finalizes the AES-GCM encryption or decryption process by updating the GHASH with the lengths block, encrypting the GHASH accumulator, and optionally verifying the authentication tag.
 - **Inputs**:
     - `enc`: A flag indicating whether the function is for encryption (1) or decryption (0).
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Load constants for GF(2^128) polynomial and byte swap mask.
-    - Load AES key length and set up counter block for authentication tag encryption.
-    - Build lengths block from total AAD and data lengths, convert to bits, and XOR with GHASH accumulator.
-    - Load first hash key power (H^1) for GHASH multiplication.
-    - For decryption, prepare a mask of TAGLEN one bits for constant-time comparison.
-    - Set pointer to last AES round key based on key length.
-    - Start AES encryption of counter block, interleaving with GHASH multiplication for performance.
-    - Complete AES encryption and multiply GHASH_ACC by H^1, interleaving operations.
-    - Undo byte reflection of GHASH accumulator and perform last AES round.
-    - For encryption, store computed authentication tag; for decryption, compare computed and transmitted tags in constant time.
-- **Output**: For encryption, the computed authentication tag is stored in `ghash_acc`; for decryption, a boolean is returned indicating whether the computed tag matches the provided tag.
+    - Load AES key length and set up a counter block with a specific value for encryption of the authentication tag.
+    - Build the lengths block from total AAD and data lengths, convert to bits, and XOR with the GHASH accumulator.
+    - Load the first hash key power (H^1) for GHASH multiplication.
+    - For decryption, prepare a mask for the tag length and load the expected tag for comparison.
+    - Set up the last AES round key pointer and start AES encryption of the counter block.
+    - Interleave AES encryption with GHASH multiplication to improve performance.
+    - Undo byte reflection of the GHASH accumulator and perform the last AES round to produce the authentication tag.
+    - For encryption, store the computed tag; for decryption, compare the computed tag with the expected tag in constant time.
+- **Output**: For encryption, the computed authentication tag is stored in `ghash_acc`; for decryption, a boolean is returned indicating whether the computed tag matches the expected tag.
 
 
 
