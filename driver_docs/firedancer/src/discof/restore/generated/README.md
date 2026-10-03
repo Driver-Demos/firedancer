@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated seccomp BPF filters for syscall and file descriptor checks.
+Seccomp filter policies for syscall restrictions and handling with architecture-specific conditions.
 
 
 ## Files
-- **[fd_snapct_tile_seccomp.h](fd_snapct_tile_seccomp.h.md)**: Generated seccomp BPF filter for allowed syscalls and file descriptor checks.
-- **[fd_snapdc_tile_seccomp.h](fd_snapdc_tile_seccomp.h.md)**: Generated seccomp filter for write, fsync, and exit syscalls.
-- **[fd_snapin_tile_seccomp.h](fd_snapin_tile_seccomp.h.md)**: Generated seccomp filter allowing write, fsync, and exit only for specific arguments.
-- **[fd_snapld_tile_seccomp.h](fd_snapld_tile_seccomp.h.md)**: Generated seccomp filter allowing only specific syscalls and file descriptor checks.
+- **[fd_snapct_tile_seccomp.h](fd_snapct_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific conditions.
+- **[fd_snapdc_tile_seccomp.h](fd_snapdc_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+- **[fd_snapin_tile_seccomp.h](fd_snapin_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific syscalls.
+- **[fd_snapld_tile_seccomp.h](fd_snapld_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
