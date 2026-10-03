@@ -3,62 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines and initializes metrics metadata for various tile kinds and link operations in the Firedancer system.
+Generated metric metadata arrays and tile kind name, size, and metric lookup tables.
 
 # Purpose
-The code defines a set of metrics for monitoring and analyzing various components of a system. It is automatically generated and should not be manually edited. The file includes the header `fd_metrics_all.h` and defines several arrays of type `fd_metrics_meta_t`, which store metadata for different metrics. These metrics are categorized into groups such as `FD_METRICS_ALL`, `FD_METRICS_ALL_LINK_IN`, and `FD_METRICS_ALL_LINK_OUT`, each representing different aspects of system performance, like process identifiers, context switch counts, and link consumption statistics.
+This file defines the global metric metadata tables used by the metrics system. It contains the full `FD_METRICS_ALL` list, plus the `FD_METRICS_ALL_LINK_IN` and `FD_METRICS_ALL_LINK_OUT` subsets for link-related metrics. Each entry uses `DECLARE_METRIC` or `DECLARE_METRIC_ENUM` to describe a metric name and type, such as `GAUGE` or `COUNTER`, and in one case to define enum-based variants for `TILE_REGIME_DURATION_NANOS`.
 
-Additionally, the code defines arrays for tile kinds and their corresponding sizes and metrics. The `FD_METRICS_TILE_KIND_NAMES` array lists the names of different tile kinds, such as "net", "quic", and "bundle", while `FD_METRICS_TILE_KIND_SIZES` and `FD_METRICS_TILE_KIND_METRICS` provide the total number of metrics and the specific metrics associated with each tile kind, respectively. This structure allows for organized access to performance data across various system components, facilitating monitoring and analysis.
-# Imports and Dependencies
-
----
-- `fd_metrics_all.h`
-
-
-# Global Variables
-
----
-### FD\_METRICS\_ALL
-- **Type**: ``const fd_metrics_meta_t` array`
-- **Description**: Contains an array of metric metadata definitions for various tile metrics. Each entry in the array is defined using the `DECLARE_METRIC` or `DECLARE_METRIC_ENUM` macros, specifying the metric type and its characteristics such as `GAUGE` or `COUNTER`. The array is indexed by `FD_METRICS_ALL_TOTAL`, which determines its size.
-- **Use**: Used to store metadata for all defined metrics in the system, allowing for easy access and management of these metrics.
-
-
----
-### FD\_METRICS\_ALL\_LINK\_IN
-- **Type**: ``const fd_metrics_meta_t` array`
-- **Description**: An array of `fd_metrics_meta_t` structures that define various metrics related to link input operations. Each element in the array represents a specific metric, such as the count and size of consumed and filtered links, as well as overrun polling and reading counts.
-- **Use**: Used to store and organize metrics for link input operations in a structured format.
-
-
----
-### FD\_METRICS\_ALL\_LINK\_OUT
-- **Type**: ``fd_metrics_meta_t` array`
-- **Description**: An array of `fd_metrics_meta_t` structures that contains metrics related to outgoing link operations. It is initialized with a single metric, `LINK_SLOW_COUNT`, which is of type `COUNTER`. The size of the array is determined by the `FD_METRICS_ALL_LINK_OUT_TOTAL` constant.
-- **Use**: Used to store and manage metrics for outgoing link operations.
-
-
----
-### FD\_METRICS\_TILE\_KIND\_NAMES
-- **Type**: `const char *`
-- **Description**: An array of strings that contains the names of different tile kinds used in the metrics system. Each string in the array represents a specific type of tile, such as 'net', 'quic', 'bundle', etc.
-- **Use**: Used to map tile kind indices to their corresponding string names for identification and display purposes.
-
-
----
-### FD\_METRICS\_TILE\_KIND\_SIZES
-- **Type**: ``const ulong[]``
-- **Description**: An array of unsigned long integers that holds the total size of each metric tile kind. Each element in the array corresponds to a specific metric tile kind, as defined by the constants like `FD_METRICS_NET_TOTAL`, `FD_METRICS_QUIC_TOTAL`, etc.
-- **Use**: Used to store the size of each metric tile kind for reference in metric calculations or reporting.
-
-
----
-### FD\_METRICS\_TILE\_KIND\_METRICS
-- **Type**: `const fd_metrics_meta_t *`
-- **Description**: An array of pointers to `fd_metrics_meta_t` structures, each representing a specific type of metric for different tile kinds. The array size is defined by `FD_METRICS_TILE_KIND_CNT`, and each element corresponds to a specific tile kind metric.
-- **Use**: Used to store and access metric metadata for different tile kinds in the system.
-
-
+The file also maps tile kind identifiers to their names, metric counts, and metric tables through `FD_METRICS_TILE_KIND_NAMES`, `FD_METRICS_TILE_KIND_SIZES`, and `FD_METRICS_TILE_KIND_METRICS`. These arrays let other code select the correct metric set for each tile kind, such as `net`, `quic`, `bank`, or `exec`. Because the file is generated by `gen_metrics.py`, it serves as a data definition file for the metrics API and is not meant for manual editing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
