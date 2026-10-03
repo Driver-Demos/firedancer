@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_dft.h` file in the `firedancer` codebase provides default macro definitions to simplify the use of templates in the QUIC module.
+Defines macros for simplifying template structures in the Firedancer QUIC implementation.
 
 # Purpose
-This C header file provides default macro definitions intended to simplify the use of templates in C code. It defines a series of preprocessor directives that act as placeholders for various template elements, such as structure beginnings and endings, and different types of member elements (e.g., variable integers, packet numbers, raw data). Each macro is conditionally defined only if it hasn't been previously defined, allowing for customization or overriding in other parts of the codebase. This approach is useful for creating flexible and reusable code templates, particularly in projects that require consistent structuring of data or configuration elements across multiple files or modules.
+This code is a C header file that defines a set of preprocessor macros to simplify the creation of templates. Each macro, such as `FD_TEMPL_DEF_STRUCT_BEGIN` and `FD_TEMPL_DEF_STRUCT_END`, is conditionally defined to ensure that it is only defined if it has not been previously defined. The macros are placeholders that can be used to define elements of a structure, such as `FD_TEMPL_MBR_ELEM`, `FD_TEMPL_MBR_ELEM_VARINT`, and `FD_TEMPL_MBR_ELEM_PKTNUM`, among others. These macros allow for flexible template definitions by providing default implementations that can be overridden as needed. The file is useful for developers who need to create structured data templates with customizable elements.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

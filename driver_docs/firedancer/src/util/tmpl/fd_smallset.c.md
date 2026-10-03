@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_smallset.c` file in the `firedancer` codebase provides a header-only API for efficient manipulation of index sets using a primitive unsigned integer type, supporting operations such as set construction, boolean operations, unary and binary operations, iteration, and range-based operations.
+Header-only API for fast manipulation of index sets using primitive unsigned integer types.
 
 # Purpose
-This C header file provides a header-only API for efficient manipulation of small index sets, where the set is represented using a primitive unsigned integer type. The file is designed to be included in other C source files, allowing developers to define custom set types by specifying a set name and optionally customizing the underlying data type and maximum set size. The API offers a comprehensive suite of operations for set manipulation, including constructors, index operations, boolean checks, unary and binary operations, and iteration over set elements. It also includes range-based operations for efficient manipulation of contiguous subsets of elements.
+The code defines a header-only API for manipulating index sets using a primitive unsigned integer type. It provides a collection of functions and macros to create, modify, and query sets of indices, where the set is represented as a bitmask within an integer type. The API allows for operations such as creating empty or full sets, adding or removing elements, and performing set operations like union, intersection, and difference. It also includes functions for iterating over set elements and handling ranges of indices efficiently.
 
-The API is highly customizable, allowing users to define the underlying data type (`SET_TYPE`), the maximum number of elements (`SET_MAX`), and the integral type used for indexing (`SET_IDX_T`). The file includes default implementations for population count, finding the least significant bit, and popping the least significant bit, which can be overridden for optimization. The API ensures safe usage by providing assertions and error logging for invalid operations when handholding is enabled. This file is intended for use in performance-critical applications where small sets need to be manipulated quickly and efficiently, leveraging bitwise operations for optimal performance.
+The API is designed to be included in a compilation unit by defining a `SET_NAME` and optionally other parameters like `SET_TYPE`, `SET_MAX`, and `SET_IDX_T` to customize the behavior and constraints of the set. The code uses macros to generate type-specific functions and ensures that the operations are efficient by leveraging bitwise operations. The API is safe for multiple inclusions and provides options for fine-tuning through preprocessor directives. It assumes valid inputs for most operations, with some functions providing checks for validity when a specific flag (`FD_TMPL_USE_HANDHOLDING`) is enabled.
 # Imports and Dependencies
 
 ---
@@ -19,34 +19,30 @@ The API is highly customizable, allowing users to define the underlying data typ
 # Global Variables
 
 ---
-### MAX
-- **Type**: `enum constant`
-- **Description**: `MAX` is an enumerated constant defined as part of a set of constants used for managing index sets. It is set to the value of `SET_MAX`, which represents the maximum number of elements that can be held in a set.
-- **Use**: `MAX` is used to define the upper limit of elements in a set, ensuring that operations on the set do not exceed this limit.
-
-
----
 ### SET\_
 - **Type**: `macro`
-- **Description**: The `SET_` macro is used to concatenate the `SET_NAME` with a given suffix, effectively creating a unique identifier for set-related functions and types. This macro is part of a template system that allows for the creation of a set API with a customizable name, making it easier to manage multiple sets with different names in the same codebase.
-- **Use**: The `SET_` macro is used to generate unique function and type names by concatenating `SET_NAME` with a specified suffix, ensuring that the set operations are correctly namespaced.
+- **Description**: The `SET_` macro is used to concatenate the `SET_NAME` with a given suffix, effectively creating a unique identifier for set-related operations. It is defined as `FD_EXPAND_THEN_CONCAT3(SET_NAME,_,x)`, where `x` is the suffix to be appended.
+- **Use**: Used to generate unique identifiers for set operations by appending a suffix to `SET_NAME`.
 
 
 # Functions
 
 ---
 ### SET\_<!-- {{#callable:SET_}} -->
-The `SET_(range_cnt)` function calculates the number of elements in a set that fall within a specified range.
+[View Source →](<../../../../../src/util/tmpl/fd_smallset.c#L250>)
+
+Counts the number of elements in a set within a specified range.
 - **Inputs**:
-    - `x`: A set represented as a primitive unsigned integer type, which contains the elements to be counted.
-    - `l`: The lower bound of the range (inclusive) within which elements are to be counted.
-    - `h`: The upper bound of the range (exclusive) within which elements are to be counted.
-- **Control Flow**:
-    - The function first computes the intersection of the set `x` with a range set created by `SET_(range)(l,h)`, which represents all elements within the range [l, h).
-    - It then calculates the population count (number of set bits) of the resulting intersection using `SET_POPCNT`, which effectively counts the number of elements in `x` that are within the specified range.
-- **Output**: The function returns the count of elements in the set `x` that are within the specified range [l, h) as a value of type `SET_IDX_T`.
-- **Functions called**:
-    - [`SET_`](#set_)
+    - ``x``: The set represented as a primitive unsigned integer type.
+    - ``l``: The lower bound of the range (inclusive).
+    - ``h``: The upper bound of the range (exclusive).
+- **Logic and Control Flow**:
+    - Compute the range mask by calling `SET_(range)(l,h)` to get a set with elements in the range [l, h).
+    - Perform a bitwise AND operation between `x` and the range mask to isolate elements within the specified range.
+    - Use `SET_POPCNT` to count the number of set bits in the result, which represents the number of elements in the range.
+- **Output**: Returns the count of elements in the set `x` that fall within the range [l, h).
+- **Functions Called**:
+    - [`SET_`](<#set_>)
 
 
 
