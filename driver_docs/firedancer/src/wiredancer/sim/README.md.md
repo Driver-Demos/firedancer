@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Simulations for RTL verification and testing using Cocotb v1.7.2 and Questa v2019.4.
+The `README.md` file provides instructions for running simulations for RTL verification and testing using Cocotb and Questa within the `firedancer` codebase.
 
 # Purpose
-The folder contains simulations for the verification and testing of the RTL (Register Transfer Level) design. It uses Cocotb version 1.7.2 as the verification platform, and all tests are executed with Questa version 2019.4. To execute a test, run the `make` command inside the test folder.
+This file provides documentation for a directory containing simulation tests for verifying and testing RTL (Register Transfer Level) designs. It specifies that Cocotb v1.7.2 is the verification platform used, and all tests are executed using Questa v2019.4. It instructs users to run tests by executing the `make` command within the test folder.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

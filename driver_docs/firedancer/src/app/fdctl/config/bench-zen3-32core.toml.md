@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for benchmarking on a Zen3 CPU with specific core and thread settings.
+The `bench-zen3-32core.toml` file provides a suggested configuration for benchmarking on a Zen3 CPU, specifically tailored for systems with 64 logical cores and 32 physical cores, such as the AMD EPYC 7513.
 
 # Purpose
-The configuration file is designed for benchmarking on a Zen3 CPU, such as the AMD EPYC 7513, with specific expectations for core and thread allocation. It defines several sections, including `ledger`, `layout`, `development.genesis`, `development.bench`, `rpc`, and `tiles.shred`. The `ledger` section specifies the path for ledger storage. The `layout` section configures CPU affinity and tile counts for various operations. The `development.genesis` section sets the initial number of funded accounts. The `development.bench` section configures benchmarking parameters, including tile counts and affinity settings, and enables larger cost and shred limits per block. The `rpc` section controls transaction history and metadata storage settings. Finally, the `tiles.shred` section sets the maximum number of pending shred sets.
+The provided configuration file is designed for benchmarking software performance on a Zen3 CPU, specifically targeting systems like the AMD EPYC 7513. It outlines a setup that assumes a CPU architecture with 64 logical cores and 32 physical cores, detailing how threads are mapped to these cores. The configuration includes sections for ledger management, core affinity settings, and development parameters, such as initial account funding and tile counts for various operations. It also specifies settings for RPC (Remote Procedure Call) behavior, such as transaction history and metadata storage, and defines limits for pending shred sets, which are likely related to data processing or transaction handling. This configuration is tailored for testing and benchmarking purposes rather than production use, as it dedicates specific resources to simulate transaction generation and processing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

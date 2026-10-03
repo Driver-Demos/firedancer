@@ -3,46 +3,47 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Test harnesses, protobuf dump APIs, and scripts for fuzzing, block execution, and ledger backtests.
+Runtime fuzz harnesses, Solana compatibility tests, ledger backtests, and Protobuf helpers.
 
 ## Folders
-- **[generated](generated/README.md)**: Nanopb-generated C and header files for defining and initializing test structures in the Firedancer codebase.
+- **[generated](generated/README.md)**: Nanopb-generated protobuf bindings for Flamenco runtime test fixtures and message types.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in version control, including `nanopb_venv/`, `nanopb/`, and `protosol/`.
-- **[fd_block_harness.c](fd_block_harness.c.md)**: Implements functions for testing block execution and leader schedule management in a Solana-like runtime environment.
-- **[fd_dump_pb.c](fd_dump_pb.c.md)**: Tests for dumping various contexts and states to protobuf format, including transactions, blocks, instructions, and virtual machine syscalls.
-- **[fd_dump_pb.h](fd_dump_pb.h.md)**: APIs for dumping syscalls, instructions, transactions, and blocks into Protobuf messages for debugging.
-- **[fd_elf_harness.c](fd_elf_harness.c.md)**: A test harness for loading and executing ELF files using the Solfuzz framework.
-- **[fd_harness_common.c](fd_harness_common.c.md)**: Functions for loading account data and restoring features in a runtime fuzz testing environment.
-- **[fd_instr_harness.c](fd_instr_harness.c.md)**: Implements a fuzz testing harness for instruction execution in the Firedancer runtime environment.
-- **[fd_instr_harness.h](fd_instr_harness.h.md)**: APIs for running instruction processor tests, including context creation and destruction functions.
-- **[fd_sol_compat.c](fd_sol_compat.c.md)**: Implements compatibility tests for Solana fuzzing, including setup, execution, and cleanup functions.
-- **[fd_sol_compat.h](fd_sol_compat.h.md)**: Defines a stable ABI for testing Firedancer SVM components with solfuzz, including initialization and execution functions.
-- **[fd_solfuzz.c](fd_solfuzz.c.md)**: Support routines for creating, managing, and deleting demand-paged workspaces and solfuzz runners.
-- **[fd_solfuzz.h](fd_solfuzz.h.md)**: Internal/unstable APIs for executing solfuzz inputs with object-oriented design and multi-thread support.
-- **[fd_solfuzz_exec.c](fd_solfuzz_exec.c.md)**: Implements internal executors for testing various fixtures in the Firedancer runtime.
-- **[fd_solfuzz_private.h](fd_solfuzz_private.h.md)**: Internal components for the solfuzz Protobuf shim, including account management and feature activation.
-- **[fd_txn_harness.c](fd_txn_harness.c.md)**: A test harness for fuzzing and executing Solana transactions within the Firedancer runtime environment.
-- **[fd_txn_harness.h](fd_txn_harness.h.md)**: Header file for serializing and executing transactions in a runtime test environment.
-- **[fd_types_harness.c](fd_types_harness.c.md)**: Tests type decoding and serialization to binary and YAML formats in the Firedancer runtime.
-- **[fd_vm_harness.c](fd_vm_harness.c.md)**: Test harness for fuzz testing a virtual machine's system calls and execution context.
-- **[fetch_and_generate.sh](fetch_and_generate.sh.md)**: Bash script to set up a virtual environment, install dependencies, and fetch specific versions of nanopb and protosol.
-- **[libfd_exec_sol_compat.map](libfd_exec_sol_compat.map.md)**: Defines versioning and symbol visibility for `sol_compat_*` functions in the Firedancer runtime.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing components in the Flamenco runtime with SECP256K1 support.
-- **[nightly_runner.sh](nightly_runner.sh.md)**: Automates nightly code updates, environment setup, and backtest execution with Slack notifications.
-- **[README.md](README.md.md)**: Documentation for the Firedancer SVM backend integration with solfuzz, detailing its layered architecture.
-- **[rewrite_ledgers.sh](rewrite_ledgers.sh.md)**: A Bash script for rewriting ledger files with options for input/output locations and version control.
-- **[run_backtest_ci.sh](run_backtest_ci.sh.md)**: Shell script to run multiple ledger backtests on different networks and configurations.
-- **[run_backtest_tests_all.sh](run_backtest_tests_all.sh.md)**: A shell script to run multiple ledger backtests with specified parameters on different networks.
-- **[run_conformance_tests.sh](run_conformance_tests.sh.md)**: A script to run Solana conformance tests, setting up dependencies and executing tests with specified inputs.
-- **[run_ledger_backtest.sh](run_ledger_backtest.sh.md)**: A Bash script to configure and run a ledger backtest, including options for downloading, extracting, and verifying ledger data.
-- **[run_ledger_tests_all.py](run_ledger_tests_all.py.md)**: Runs ledger tests in parallel using multiple CPU batches and handles command execution errors.
-- **[run_nightly_backtest.sh](run_nightly_backtest.sh.md)**: A Bash script to run nightly backtests, configure memory pages, and send status updates to Slack.
-- **[test_dump_block.c](test_dump_block.c.md)**: Unit tests for block dumping functionality in `fd_dump_pb.c`, including setup, teardown, and round-trip verification.
-- **[test_sol_compat.c](test_sol_compat.c.md)**: Tests Protobuf fixtures for solfuzz/sol_compat/protosol with support for parallel and tile-based execution.
-- **[test_sol_compat_so.c](test_sol_compat_so.c.md)**: Tests the compatibility of Solana shared objects by executing solfuzz inputs using the public ABI.
-- **[upload_rewritten_ledgers.sh](upload_rewritten_ledgers.sh.md)**: Uploads rewritten ledger files to Google Cloud Storage if they do not already exist.
+- **[.gitignore](.gitignore.md)**: Ignore rules for nanopb_venv, nanopb, and protosol directories.
+- **[fd_block_harness.c](fd_block_harness.c.md)**: Runtime fuzz harness for block execution, vote and stake caches, leader schedule, and effects output.
+- **[fd_dump_pb.c](fd_dump_pb.c.md)**: Protobuf dump helpers for transactions, blocks, syscalls, and ELF loader context.
+- **[fd_dump_pb.h](fd_dump_pb.h.md)**: APIs and context for dumping instructions, transactions, blocks, syscalls, and ELF data to Protobuf.
+- **[fd_elf_harness.c](fd_elf_harness.c.md)**: Fuzz harness for ELF loader tests that peeks, loads, and records rodata, text, entry PC, and call destinations.
+- **[fd_harness_common.c](fd_harness_common.c.md)**: Helpers to load test accounts and restore feature flags for runtime fuzz tests.
+- **[fd_instr_harness.c](fd_instr_harness.c.md)**: Instruction fuzz harness setup and execution with captured account and return-data effects.
+- **[fd_instr_harness.h](fd_instr_harness.h.md)**: APIs for creating and destroying instruction test execution contexts.
+- **[fd_sol_compat.c](fd_sol_compat.c.md)**: Compatibility wrappers for fuzzing Solana execution, decoding inputs and encoding results.
+- **[fd_sol_compat.h](fd_sol_compat.h.md)**: ABI and execution APIs for solfuzz testing of Firedancer SVM components.
+- **[fd_solfuzz.c](fd_solfuzz.c.md)**: Support routines for demand-paged workspaces and solfuzz runner setup, teardown, and leak checks.
+- **[fd_solfuzz.h](fd_solfuzz.h.md)**: Internal APIs for running solfuzz inputs, fixtures, and SVM execution tests.
+- **[fd_solfuzz_exec.c](fd_solfuzz_exec.c.md)**: Fixture runners and result comparison helpers for Solana executor fuzz tests.
+- **[fd_solfuzz_private.h](fd_solfuzz_private.h.md)**: Internal helpers for account loading, feature restore, and Protobuf encode/decode in solfuzz tests.
+- **[fd_txn_harness.c](fd_txn_harness.c.md)**: Transaction fuzz harness, serialization, execution, and result capture for runtime tests.
+- **[fd_txn_harness.h](fd_txn_harness.h.md)**: Fuzz helpers for serializing and executing runtime transactions.
+- **[fd_types_harness.c](fd_types_harness.c.md)**: Fuzzes type decode and emits serialized and YAML output.
+- **[fd_vm_harness.c](fd_vm_harness.c.md)**: VM and syscall fuzz harnesses for execution setup, run, and effect capture.
+- **[fetch_and_generate.sh](fetch_and_generate.sh.md)**: Fetches nanopb and protosol, sets up a Python venv, and runs nanopb_generator on proto files.
+- **[libfd_exec_sol_compat.map](libfd_exec_sol_compat.map.md)**: Version script that exports sol_compat_* symbols and hides all others.
+
+- **[Local.mk](Local.mk.md)**: Build rules for runtime tests, Solana compatibility, and backtest execution.
+- **[nightly_runner.sh](nightly_runner.sh.md)**: Nightly backtest test runner that updates code, builds, runs tests, and sends Slack alerts.
+- **[README.md](README.md.md)**: Solfuzz APIs and Firedancer SVM backend layering.
+- **[rewrite_ledgers.sh](rewrite_ledgers.sh.md)**: Rewrites ledger test data, creates snapshots, and generates updated run commands.
+- **[run_backtest_ci.sh](run_backtest_ci.sh.md)**: Runs a set of ledger backtest CI cases with fixed ledger, epoch, and cluster settings.
+- **[run_backtest_tests_all.sh](run_backtest_tests_all.sh.md)**: Runs a set of ledger backtest tests with fixed ledger, epoch, and config arguments.
+- **[run_conformance_tests.sh](run_conformance_tests.sh.md)**: The `run_conformance_tests.sh` file is a script used to execute the Solana conformance test suite by setting up necessary dependencies and running tests with specified input and output directories.
+- **[run_ledger_backtest.sh](run_ledger_backtest.sh.md)**: Shell script that downloads a ledger, writes a backtest config, and runs firedancer-dev backtest.
+- **[run_ledger_tests_all.py](run_ledger_tests_all.py.md)**: The `run_ledger_tests_all.py` file in the `firedancer` codebase is a Python script that manages the execution of commands from a file using multiprocessing, distributing tasks across CPU batches and handling errors.
+- **[run_nightly_backtest.sh](run_nightly_backtest.sh.md)**: Runs a nightly ledger backtest, sends Slack alerts, and reports mismatch status.
+- **[test_dump_block.c](test_dump_block.c.md)**: Unit tests for block dump protobuf round-trip serialization and field verification.
+- **[test_sol_compat.c](test_sol_compat.c.md)**: Runs solfuzz Protobuf fixtures in single-threaded or tile-based parallel mode.
+- **[test_sol_compat_so.c](test_sol_compat_so.c.md)**: Loads a shared object and runs Solana compatibility tests on input files.
+- **[upload_rewritten_ledgers.sh](upload_rewritten_ledgers.sh.md)**: Uploads ledger tarballs to GCS if the target file does not already exist.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
