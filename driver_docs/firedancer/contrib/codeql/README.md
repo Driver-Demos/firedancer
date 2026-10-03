@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL queries, tests, and workspace config for C++ bug and dead-code checks.
+CodeQL queries and configurations for C++ analysis, error handling, and memory management.
 
 ## Folders
-- **[dev](dev/README.md)**: CodeQL queries and pack config for dead code, errors, enums, joins, and topology visualization.
-- **[nightly](nightly/README.md)**: CodeQL queries for C++ bugs, memory errors, pointer issues, and lock checks.
-- **[test](test/README.md)**: CodeQL test pack, lock file, README, and query tests for C++ queries
+- **[dev](dev/README.md)**: CodeQL queries and configuration files for analyzing C++ code, including error handling, function consistency, and network topology visualization.
+- **[nightly](nightly/README.md)**: CodeQL queries and utilities for detecting various C++ code issues, including dereferencing, mismatches, overflow checks, and memory management.
+- **[test](test/README.md)**: CodeQL test configurations, dependencies, metric tests, and documentation.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: Ignore rules for qltest project files and artifacts.
-- **[codeql-workspace.yml](codeql-workspace.yml.md)**: CodeQL workspace for local test, dev, and nightly qlpacks with a codeql registry URL.
-- **[README.md](README.md.md)**: CodeQL queries and tests split into dev, nightly, and test directories.
+- **[.gitignore](.gitignore.md)**: Specifies ignored files for qltest projects and artifacts, including `.actual` and `.testproj` files.
+- **[codeql-workspace.yml](codeql-workspace.yml.md)**: Configures CodeQL to reference nightly queries from local files instead of the default registry.
+- **[README.md](README.md.md)**: CodeQL queries and tests for the Firedancer codebase, organized into `dev`, `nightly`, and `test` directories.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
