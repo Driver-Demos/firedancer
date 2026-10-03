@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-References the `TrivialMemcpy.ql` query and uses `InlineExpectationsTestQuery.ql` for postprocessing.
+Query reference for TrivialMemcpy test and inline expectations postprocess.
 
 # Purpose
-The file specifies a query configuration for a software analysis tool. It sets the `query` to `TrivialMemcpy.ql`, which likely defines a query to detect trivial memory copy operations. The `postprocess` field is set to `InlineExpectationsTestQuery.ql`, indicating that after the main query runs, the results will be processed using the specified post-processing script.
+Defines a query file named `TrivialMemcpy.ql` and sets `InlineExpectationsTestQuery.ql` as the postprocessing step. This links the query to a specific test query used after the main query runs.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

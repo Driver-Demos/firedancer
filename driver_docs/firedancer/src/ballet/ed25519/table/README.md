@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Precomputed tables and constants for Ed25519 elliptic curve and finite field arithmetic.
+Auto-generated Ed25519 and Curve25519 precomputed tables and constants for AVX-512 and reference code.
 
 
 ## Files
-- **[fd_curve25519_table_avx512.c](fd_curve25519_table_avx512.c.md)**: Contains precomputed tables and constants for efficient Ed25519 elliptic curve cryptographic operations.
-- **[fd_curve25519_table_ref.c](fd_curve25519_table_ref.c.md)**: Defines constants and precomputed tables for efficient and secure Ed25519 elliptic curve operations.
-- **[fd_f25519_table_avx512.c](fd_f25519_table_avx512.c.md)**: Auto-generated constants for finite field arithmetic in the Ed25519 curve using AVX-512.
-- **[fd_f25519_table_ref.c](fd_f25519_table_ref.c.md)**: Auto-generated constants for finite field arithmetic in the Ed25519 elliptic curve.
+- **[fd_curve25519_table_avx512.c](fd_curve25519_table_avx512.c.md)**: The file `fd_curve25519_table_avx512.c` in the firedancer codebase is an auto-generated C library component designed for cryptographic operations on the Ed25519 elliptic curve, featuring static constant arrays of precomputed points to optimize scalar multiplication and enhance performance in tasks like signature verification and signing, without providing a public API as it is intended for internal use within a larger cryptographic system.
+- **[fd_curve25519_table_ref.c](fd_curve25519_table_ref.c.md)**: The `fd_curve25519_table_ref.c` file in the `firedancer` codebase is a specialized, auto-generated C library file that optimizes cryptographic operations involving the Ed25519 elliptic curve by using precomputed tables, including the base point, low-order points, and w-NAF tables, to enhance performance and security in scalar multiplication, and is intended for integration via the `fd_curve25519.h` header file.
+- **[fd_f25519_table_avx512.c](fd_f25519_table_avx512.c.md)**: The `fd_f25519_table_avx512.c` file contains auto-generated constant definitions for various mathematical values used in the Ed25519 elliptic curve operations, specifically optimized for AVX-512.
+- **[fd_f25519_table_ref.c](fd_f25519_table_ref.c.md)**: The `fd_f25519_table_ref.c` file in the `firedancer` codebase contains auto-generated constant definitions for various mathematical values used in the context of the Curve25519 elliptic curve operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

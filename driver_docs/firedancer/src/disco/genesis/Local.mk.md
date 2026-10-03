@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile logic for adding headers and objects if 128-bit integer support is available.
+The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and objects related to `fd_genesis_cluster` and `fd_disco` based on the presence of `FD_HAS_INT128`.
 
 # Purpose
-The `Makefile` snippet uses a conditional directive to check if the macro `FD_HAS_INT128` is defined. If it is defined, the script calls two functions: `add-hdrs` to add the header file `fd_genesis_cluster.h`, and `add-objs` to add the object files `fd_genesis_cluster` and `fd_disco`. This configuration helps manage dependencies and build targets based on the availability of 128-bit integer support.
+This file is a Makefile snippet used in a build system to conditionally include headers and object files. It checks if the macro `FD_HAS_INT128` is defined, and if so, it adds `fd_genesis_cluster.h` to the list of headers and `fd_genesis_cluster` and `fd_disco` to the list of object files to be compiled.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
