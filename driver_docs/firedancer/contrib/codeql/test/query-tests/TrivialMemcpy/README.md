@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL test cases and expectations for trivial memcpy alerts and false positives.
+Tests and expected outputs for trivial `memcpy` operations and strict aliasing violations.
 
 
 ## Files
-- **[TrivialMemcpy.c](TrivialMemcpy.c.md)**: CodeQL test cases for trivial memcpy alerts and false positives.
-- **[TrivialMemcpy.expected](TrivialMemcpy.expected.md)**: CodeQL test expectations for memcpy calls that can be rewritten as assignments.
-- **[TrivialMemcpy.qlref](TrivialMemcpy.qlref.md)**: Query reference for TrivialMemcpy test and inline expectations postprocess.
+- **[TrivialMemcpy.c](TrivialMemcpy.c.md)**: Tests for detecting trivial `memcpy` operations and potential strict aliasing violations.
+- **[TrivialMemcpy.expected](TrivialMemcpy.expected.md)**: Expected output for refactoring calls to memcpy, fd_memcpy, and __builtin_memcpy as assignments.
+- **[TrivialMemcpy.qlref](TrivialMemcpy.qlref.md)**: References the `TrivialMemcpy.ql` query and uses `InlineExpectationsTestQuery.ql` for postprocessing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
