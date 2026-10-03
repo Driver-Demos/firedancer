@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for HTTP/2 components including HPACK, header matching, connection, and protocol handling.
+The `test_h2.c` file in the `firedancer` codebase serves as a test suite for various HTTP/2 components, including HPACK, header matching, connection handling, and protocol operations, with conditional testing for hosted environments.
 
 # Purpose
-This code is a C test suite for validating various components related to HTTP/2 functionality. It includes several test modules such as `test_hpack.c`, `test_h2_hdr_match.c`, `test_h2_conn.c`, and `test_h2_proto.c`, which are used to test different aspects of HTTP/2 processing. The [`main`](<#main>) function initializes the environment by calling `fd_boot`, sets up a random number generator using `fd_rng_new`, and then sequentially executes each test function, logging the progress with `FD_LOG_NOTICE`. If the `FD_HAS_HOSTED` macro is defined, it also includes and tests `test_h2_rbuf.c`. After all tests are executed, the random number generator is cleaned up, and the program logs a "pass" message before halting with `fd_halt`.
+This C source code file is a test suite for various components of an HTTP/2 implementation, specifically focusing on HPACK (header compression) and other HTTP/2 functionalities. It includes several test modules, such as `test_hpack.c`, `test_h2_hdr_match.c`, `test_h2_conn.c`, and `test_h2_proto.c`, which are executed sequentially to verify the correctness of these components. The code conditionally includes and tests `test_h2_rbuf.c` if the `FD_HAS_HOSTED` macro is defined, indicating that some tests are only applicable in certain environments. The program initializes a random number generator for use in the tests, logs the progress of each test, and concludes by logging a "pass" message if all tests are successful. This file serves as a comprehensive testing framework to ensure the reliability and functionality of the HTTP/2 features being developed or maintained.
 # Imports and Dependencies
 
 ---
@@ -22,30 +22,29 @@ This code is a C test suite for validating various components related to HTTP/2 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/waltz/h2/test_h2.c#L11>)
-
-Initializes the environment, runs a series of tests, and then terminates the program.
+The `main` function initializes the environment, runs a series of tests on HTTP/2 components, and then cleans up before exiting.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
+    - `argc`: The count of command-line arguments passed to the program.
     - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Creates a random number generator `rng` using `fd_rng_new`, `fd_rng_join`, and initializes it with `_rng`.
-    - Logs a notice and calls [`test_hpack`](<test_hpack.c.md#test_hpack>) to test HPACK functionality.
-    - If `FD_HAS_HOSTED` is defined, logs a notice and calls [`test_h2_rbuf`](<test_h2_rbuf.c.md#test_h2_rbuf>) with `rng` to test H2 buffer functionality.
-    - Logs a notice and calls [`test_h2_hdr_match`](<test_h2_hdr_match.c.md#test_h2_hdr_match>) to test H2 header matching functionality.
-    - Logs a notice and calls [`test_h2_conn`](<test_h2_conn.c.md#test_h2_conn>) to test H2 connection functionality.
-    - Logs a notice and calls [`test_h2_proto`](<test_h2_proto.c.md#test_h2_proto>) to test H2 protocol functionality.
-    - Deletes the random number generator using `fd_rng_leave` and `fd_rng_delete`.
-    - Logs a notice indicating all tests passed.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`test_hpack`](<test_hpack.c.md#test_hpack>)
-    - [`test_h2_rbuf`](<test_h2_rbuf.c.md#test_h2_rbuf>)
-    - [`test_h2_hdr_match`](<test_h2_hdr_match.c.md#test_h2_hdr_match>)
-    - [`test_h2_conn`](<test_h2_conn.c.md#test_h2_conn>)
-    - [`test_h2_proto`](<test_h2_proto.c.md#test_h2_proto>)
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - Create a random number generator instance using `fd_rng_new` and join it with `fd_rng_join`.
+    - Log a notice and call [`test_hpack`](test_hpack.c.md#test_hpack) to test HPACK functionality.
+    - If `FD_HAS_HOSTED` is defined, log a notice and call [`test_h2_rbuf`](test_h2_rbuf.c.md#test_h2_rbuf) to test HTTP/2 buffer functionality with the random number generator.
+    - Log a notice and call [`test_h2_hdr_match`](test_h2_hdr_match.c.md#test_h2_hdr_match) to test HTTP/2 header matching functionality.
+    - Log a notice and call [`test_h2_conn`](test_h2_conn.c.md#test_h2_conn) to test HTTP/2 connection functionality.
+    - Log a notice and call [`test_h2_proto`](test_h2_proto.c.md#test_h2_proto) to test HTTP/2 protocol functionality.
+    - Delete the random number generator instance using `fd_rng_delete` after leaving it with `fd_rng_leave`.
+    - Log a notice indicating all tests passed.
+    - Call `fd_halt` to perform any necessary cleanup before exiting.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`test_hpack`](test_hpack.c.md#test_hpack)
+    - [`test_h2_rbuf`](test_h2_rbuf.c.md#test_h2_rbuf)
+    - [`test_h2_hdr_match`](test_h2_hdr_match.c.md#test_h2_hdr_match)
+    - [`test_h2_conn`](test_h2_conn.c.md#test_h2_conn)
+    - [`test_h2_proto`](test_h2_proto.c.md#test_h2_proto)
 
 
 

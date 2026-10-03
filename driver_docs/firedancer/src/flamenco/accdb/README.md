@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, structures, and tests for account database management, user access, and transaction integrity.
+Account database admin, user, sync, and reference APIs with transaction tests
 
 
 ## Files
-- **[fd_accdb_admin.c](fd_accdb_admin.c.md)**: Functions for managing and manipulating transactions and records in a database administration context.
-- **[fd_accdb_admin.h](fd_accdb_admin.h.md)**: Defines structures and functions for managing account database transactions and integrity checks.
-- **[fd_accdb_ref.h](fd_accdb_ref.h.md)**: Defines account database handle classes and related structures for read-only, read-write, and speculative access.
-- **[fd_accdb_sync.h](fd_accdb_sync.h.md)**: Synchronous blocking APIs for speculative zero-copy reads and in-place transactional writes in an account database.
-- **[fd_accdb_user.c](fd_accdb_user.c.md)**: Functions for managing user accounts in a database, including joining, leaving, and modifying accounts.
-- **[fd_accdb_user.h](fd_accdb_user.h.md)**: Defines the `fd_accdb_user` structure and functions for managing user access to an accdb funk instance.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers and objects for admin and user APIs, and conditionally running unit tests.
-- **[test_accdb.c](test_accdb.c.md)**: Tests for the functionality and integrity of the `accdb` component, including initialization, verification, and random operations.
+- **[fd_accdb_admin.c](fd_accdb_admin.c.md)**: Transaction cancel, publish, root advance, clear, and verify operations for accdb.
+- **[fd_accdb_admin.h](fd_accdb_admin.h.md)**: Account database admin join/leave and transaction fork, commit, cancel, clear, and verify APIs.
+- **[fd_accdb_ref.h](fd_accdb_ref.h.md)**: Opaque account database handles, accessors, setters, lock guards, and speculative access checks.
+- **[fd_accdb_sync.h](fd_accdb_sync.h.md)**: Synchronous blocking APIs for speculative reads and transactional writes to the account database.
+- **[fd_accdb_user.c](fd_accdb_user.c.md)**: Transaction-aware account lookup and modification helpers with fork tracking and record publishing.
+- **[fd_accdb_user.h](fd_accdb_user.h.md)**: User cache for accdb funk state, fork depth, tip txn index, and ref counting.
+- **[Local.mk](Local.mk.md)**: Build rules for admin and user API headers, objects, and an atomic unit test.
+- **[test_accdb.c](test_accdb.c.md)**: Randomized accdb transaction and record operation tests with invariant checks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
