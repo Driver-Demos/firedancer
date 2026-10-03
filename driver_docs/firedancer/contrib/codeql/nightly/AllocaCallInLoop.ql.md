@@ -3,27 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Detects and warns about calls to alloca within loops to prevent stack overflows.
+CodeQL query that flags alloca calls inside loops to avoid stack overflows.
 
 # Purpose
-This code defines a rule for identifying problematic patterns in C++ code, specifically focusing on the use of `alloca` within loops. It is a part of a static analysis tool that flags the use of dynamic stack allocation functions like `alloca`, `fd_alloca`, `fd_alloca_check`, and `__builtin_alloca` when they are called inside loops. The code extends the `FunctionCall` class to create an `AllocaCall` class that checks if the target function matches any of the specified names. It then uses a query to find instances where these functions are called within loops and issues a warning to prevent potential stack overflows. The severity of the problem is set to "warning," and the precision of detection is high.
-# Imports and Dependencies
-
----
-- `cpp`
-- `filter`
-
-
-# Data Structures
-
----
-### AllocaCall
-- **Type**: ``class``
-- **Members**:
-    - ``AllocaCall``: Extends the `FunctionCall` class to represent a call to specific allocation functions.
-- **Description**: Represents a call to allocation functions like `fd_alloca`, `alloca`, `fd_alloca_check`, or `__builtin_alloca` within a loop, which is identified as a problem due to the risk of stack overflow.
-
-
+This CodeQL query file detects calls to `alloca`-style functions that occur inside loops. It imports `cpp` and `filter`, defines an `AllocaCall` class that matches calls to `fd_alloca`, `alloca`, `fd_alloca_check`, and `__builtin_alloca`, then searches for any such call that has a loop as a predecessor in the control flow graph. When it finds a match, it reports the call with the message `Call to alloca in loop`. The file provides narrow static analysis functionality and is intended to flag a warning for code patterns that can cause stack overflow.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

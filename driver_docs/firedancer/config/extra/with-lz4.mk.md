@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile logic to check for LZ4 library and set compilation flags accordingly.
+The `with-lz4.mk` file in the `firedancer` codebase checks for the presence of the `liblz4.a` library and sets compilation flags accordingly, or logs a message if the library is not installed.
 
 # Purpose
-The `Makefile` snippet checks for the presence of the `liblz4.a` library in the specified `$(OPT)/lib` directory. If the library exists, it sets the `FD_HAS_LZ4` variable to 1, adds a preprocessor definition `-DFD_HAS_LZ4=1` to `CFLAGS`, and appends the library path to `LDFLAGS`. If the library is not found, it outputs an informational message indicating that `lz4` is not installed and will be skipped.
+This Makefile snippet checks for the presence of the `liblz4.a` library in a specified directory (`$(OPT)/lib`). If the library is found, it sets a flag (`FD_HAS_LZ4`) and updates the compiler (`CFLAGS`) and linker (`LDFLAGS`) flags to include LZ4 support. If the library is not found, it outputs a message indicating that LZ4 is not installed and skips the related configuration.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

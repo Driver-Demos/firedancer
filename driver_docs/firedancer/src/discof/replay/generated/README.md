@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
+Generated seccomp filter allowing write and fsync only on a given logfile fd.
 
 
 ## Files
-- **[fd_replay_tile_seccomp.h](fd_replay_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
+- **[fd_replay_tile_seccomp.h](fd_replay_tile_seccomp.h.md)**: Generated seccomp filter allowing write and fsync only on a given logfile fd.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
