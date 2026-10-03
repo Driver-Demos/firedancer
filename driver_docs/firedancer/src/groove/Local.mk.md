@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the `fd_groove` library and its components.
+The `Local.mk` file in the `firedancer` codebase defines the build and test configuration for the `fd_groove` library, including its headers, object files, and unit tests.
 
 # Purpose
-The Makefile content automates the build and test process for the `fd_groove` library. It uses the `make-lib` function to create the library and the `add-hdrs` function to include header files such as `fd_groove_base.h`, `fd_groove_meta.h`, `fd_groove_volume.h`, `fd_groove_data.h`, and `fd_groove.h`. The `add-objs` function adds object files like `fd_groove_base`, `fd_groove_meta`, `fd_groove_volume`, `fd_groove_data`, and `fd_groove_data_szc_cfg` to the build. Unit tests are defined and executed using `make-unit-test` and `run-unit-test` for components such as `test_groove_base` and `test_groove_meta`. If the `FD_HAS_HOSTED` condition is true, additional unit tests for `test_groove_volume` and `test_groove_data` are also created and run.
+The provided content is from a Makefile, which is a build automation tool used to manage the build process of software projects. This particular Makefile snippet is designed to automate the compilation and testing of a library named `fd_groove`. It uses custom macros, such as `make-lib`, `add-hdrs`, and `add-objs`, to define the library and its associated header and object files. The file also specifies unit tests for different components of the library, such as `test_groove_base` and `test_groove_meta`, and includes conditional logic to run additional tests if the `FD_HAS_HOSTED` variable is defined. This setup ensures that the library is built correctly and that its components are thoroughly tested.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
