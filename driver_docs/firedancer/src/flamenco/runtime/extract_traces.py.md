@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `extract_traces.py` file in the `firedancer` codebase is a script that reads and compares execution traces from Firedancer and Solana log files to find and report the best matching traces.
+Processes and compares trace logs from Firedancer and Solana to find matching traces.
 
 # Purpose
-This Python script is designed to compare and analyze trace logs from two different sources, specifically Firedancer and Solana. The script reads trace data from log files, processes them to extract relevant information, and then attempts to find the best matching traces between the two sources. The primary functionality is encapsulated in several key functions: [`read_traces_from_file`](#read_traces_from_file) reads and parses trace logs into structured data, [`check_strict_match`](#check_strict_match) verifies if two trace lines match based on specific criteria, and [`traces_diff`](#traces_diff) performs the core comparison logic to identify the closest matching traces between the two sets of logs. The script also includes functionality to cache Solana traces and output the results of the comparison, including writing matched traces to separate log files for further analysis.
+The code is a script designed to compare and analyze trace logs from two different sources, specifically Firedancer and Solana. It reads trace data from log files, processes the traces, and attempts to find matching traces between the two sources. The script uses regular expressions to parse trace lines and extract relevant information such as instruction counts and register values. It then compares these traces to identify the best matches based on specific criteria, such as matching program counters and register values.
 
-The script is intended to be executed as a standalone program, as indicated by the presence of a [`main`](#main) function and the `if __name__ == "__main__":` block. It uses command-line arguments to specify the paths to the log files and the number of traces to process, making it flexible for different use cases. The script leverages regular expressions to parse trace lines and employs multiprocessing to handle potentially large datasets efficiently. Overall, this script provides a specialized tool for developers or analysts working with trace logs from Firedancer and Solana, facilitating the identification of similarities and differences in execution traces between these two systems.
+The script defines a command-line interface using the `argparse` module, allowing users to specify the paths to the Firedancer and Solana log files, the maximum number of traces to process, and the number of traces to skip. The main functions include [`read_traces_from_file`](<#read_traces_from_file>) for reading and parsing trace logs, [`check_strict_match`](<#check_strict_match>) for verifying strict matches between trace lines, and [`traces_diff`](<#traces_diff>) for comparing traces and identifying matches. The script outputs the results of the comparison, including the number of good matches found, and writes the matched traces to separate log files for further analysis.
 # Imports and Dependencies
 
 ---
@@ -30,133 +30,144 @@ The script is intended to be executed as a standalone program, as indicated by t
 
 ---
 ### reg\_val\_pattern
-- **Type**: `Callable[[int], str]`
-- **Description**: `reg_val_pattern` is a lambda function that takes an integer `x` as input and returns a formatted string. This string is a regular expression pattern that matches a 16-character hexadecimal value, with a named group `r{x}` where `x` is the input integer.
-- **Use**: This variable is used to dynamically generate parts of a regular expression pattern for parsing trace lines, specifically to match and capture hexadecimal register values.
+- **Type**: ``Callable[[int], str]``
+- **Description**: Defines a lambda function that takes an integer `x` and returns a formatted string. The string is a regular expression pattern with a named group `r{x}` that matches a 16-character hexadecimal number.
+- **Use**: Used to generate parts of a regular expression pattern for parsing trace lines.
 
 
 ---
 ### trace\_line\_pattern
-- **Type**: `string`
-- **Description**: The `trace_line_pattern` is a string that defines a regular expression pattern used to match and extract information from lines of trace data. It captures instruction count (`ic`), program counter (`pc`), and instruction details (`instr`), along with register values (`r0` to `r10`) formatted as 16-character hexadecimal numbers. The pattern is dynamically constructed using the `reg_val_pattern` function to insert register value patterns into the main regex.
-- **Use**: This variable is used to compile a regular expression that matches specific trace line formats for further processing and analysis.
+- **Type**: ``str``
+- **Description**: A regular expression pattern string that matches a specific format of trace lines. The pattern includes placeholders for instruction count (`ic`), program counter (`pc`), and instruction details (`instr`), as well as register values (`r0` to `r10`) formatted using the `reg_val_pattern` function.
+- **Use**: Used to match and extract information from trace lines in log files.
 
 
 ---
 ### fast\_trace\_line\_pattern
-- **Type**: `string`
-- **Description**: The `fast_trace_line_pattern` is a regular expression pattern defined as a raw string. It is used to match lines in a log file that contain trace information, specifically capturing the instruction count (`ic`) and program counter (`pc`) values. The pattern is designed to be a simplified version of a more detailed trace line pattern, focusing on essential components for quick matching.
-- **Use**: This variable is used to quickly match and extract key components from trace lines in log files during the trace reading process.
+- **Type**: ``str``
+- **Description**: A regular expression pattern that matches lines in a trace log file. It captures two named groups: `ic` for instruction count and `pc` for program counter.
+- **Use**: Used to match and extract specific information from lines in trace log files.
 
 
 ---
 ### trace\_start\_line\_pattern
-- **Type**: `string`
-- **Description**: The `trace_start_line_pattern` is a regular expression pattern defined as a raw string. It is used to match lines in a trace log that start with zero, potentially preceded by spaces. This pattern is useful for identifying the beginning of a new trace in a log file.
-- **Use**: This variable is used to detect the start of a new trace in a log file by matching lines that begin with zero.
+- **Type**: ``str``
+- **Description**: A regular expression pattern that matches lines starting with zero, possibly preceded by spaces. It is used to identify the start of a trace in a log file.
+- **Use**: Used to match and identify the beginning of a trace in log files by checking if a line starts with zero.
 
 
 ---
 ### trace\_line\_regex
-- **Type**: `re.Pattern`
-- **Description**: The `trace_line_regex` is a compiled regular expression pattern used to match and extract information from lines of trace data. It is based on the `trace_line_pattern`, which is a complex pattern designed to capture various components of a trace line, including instruction count, register values, program counter, and instruction details.
-- **Use**: This variable is used to match and parse trace lines in the `read_traces_from_file` and `check_strict_match` functions.
+- **Type**: ``re.Pattern``
+- **Description**: Compiles a regular expression pattern defined by `trace_line_pattern` into a regex object. This regex object can be used to match strings against the pattern, which is designed to parse trace lines with specific format requirements.
+- **Use**: Used to match and extract data from trace lines in the `check_strict_match` function.
 
 
 # Functions
 
 ---
 ### read\_traces\_from\_file<!-- {{#callable:firedancer/src/flamenco/runtime/extract_traces.read_traces_from_file}} -->
-The `read_traces_from_file` function reads and parses trace lines from a log file, grouping them into traces based on a specific pattern and returning a list of these traces.
+[View Source →](<../../../../../src/flamenco/runtime/extract_traces.py#L34>)
+
+Reads and processes trace data from a log file, storing it in a structured format.
 - **Inputs**:
-    - `log_path`: The file path to the log file from which traces are to be read.
+    - `log_path`: The file path to the log file from which to read trace data.
     - `max_traces`: The maximum number of traces to read and process from the log file.
-- **Control Flow**:
-    - Initialize empty lists `traces` and `trace` to store the parsed traces and the current trace, respectively.
-    - Record the start time for performance measurement using `time.time()`.
+- **Logic and Control Flow**:
+    - Initialize empty lists `traces` and `trace` to store processed trace data.
+    - Record the start time in `dt` and `dt2` for performance measurement.
     - Open the log file specified by `log_path` for reading.
     - Iterate over each line in the log file.
     - Use a regular expression to match each line against `fast_trace_line_pattern`.
-    - If the number of traces reaches `max_traces`, break out of the loop.
-    - If a line does not match the pattern, continue to the next line.
-    - Extract named groups from the matched line using `groupdict()`.
-    - Check if the instruction count (`ic`) is '0' and the current trace is not empty; if so, append the current trace to `traces`, reset `trace`, and print progress.
-    - Append the current line and its matched groups to the `trace` list.
-    - After the loop, if `trace` is not empty, append it to `traces`.
-    - Calculate the total time taken for reading and parsing the traces.
-    - Print the total trace time and the number of traces read to standard error.
+    - If the number of traces equals `max_traces`, stop processing further lines.
+    - If a line does not match the pattern, skip to the next line.
+    - Extract matched groups from the line using `groupdict()`.
+    - If the instruction count (`ic`) is '0' and `trace` is not empty, append `trace` to `traces`, reset `trace`, and print progress to `stderr`.
+    - Append the current line and its matched groups to `trace`.
+    - After processing all lines, if `trace` is not empty, append it to `traces`.
+    - Calculate the total processing time and print it to `stderr`.
 - **Output**: A list of traces, where each trace is a list of tuples containing the line and its matched groups.
 
 
 ---
 ### check\_strict\_match<!-- {{#callable:firedancer/src/flamenco/runtime/extract_traces.check_strict_match}} -->
-The `check_strict_match` function compares two trace lines to ensure they match exactly based on specific register and instruction count keys.
+[View Source →](<../../../../../src/flamenco/runtime/extract_traces.py#L62>)
+
+Compares two trace lines for strict equality based on specific keys.
 - **Inputs**:
     - `fd_line`: A string representing a trace line from the Firedancer log.
     - `sl_line`: A string representing a trace line from the Solana log.
-- **Control Flow**:
-    - Use the regular expression `trace_line_pattern` to match and extract data from `fd_line` and `sl_line`.
-    - Store the match results in `fd_strict_match` and `sl_strict_match` respectively.
-    - Iterate over a predefined list of keys: `['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'ic']`.
+- **Logic and Control Flow**:
+    - Use the `re.match` function to match `fd_line` and `sl_line` against the `trace_line_pattern` regular expression.
+    - Store the match objects for `fd_line` and `sl_line` in `fd_strict_match` and `sl_strict_match`, respectively.
+    - Define a list `checked_keys` containing the keys 'r0' to 'r10' and 'ic'.
+    - Iterate over each key in `checked_keys`.
     - For each key, compare the corresponding values in `fd_strict_match` and `sl_strict_match`.
-    - If any value differs, return `False`.
+    - If any value does not match, return `False`.
     - If all values match, return `True`.
-- **Output**: A boolean value indicating whether the two trace lines match exactly based on the specified keys.
+- **Output**: Returns `True` if all specified keys in the matched trace lines are equal; otherwise, returns `False`.
 
 
 ---
 ### traces\_diff<!-- {{#callable:firedancer/src/flamenco/runtime/extract_traces.traces_diff}} -->
-The `traces_diff` function compares traces from two sources, identifying and logging the best matches between them.
+[View Source →](<../../../../../src/flamenco/runtime/extract_traces.py#L72>)
+
+Compares traces from two sources and identifies the best matching trace pairs.
 - **Inputs**:
-    - `fd_traces`: A list of traces from the Firedancer log, where each trace is a list of tuples containing a line and its matched groups.
-    - `sl_traces`: A list of traces from the Solana log, where each trace is a list of tuples containing a line and its matched groups.
+    - `fd_traces`: A list of traces from the Firedancer log file, where each trace is a list of tuples containing a line and its match data.
+    - `sl_traces`: A list of traces from the Solana log file, where each trace is a list of tuples containing a line and its match data.
     - `skip_traces`: An integer indicating the number of initial traces in the Solana log to skip during comparison.
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Initialize a set `used_sl_idxs` to track used Solana trace indices and a counter `n_good_matches` for good matches.
-    - Iterate over each trace in `fd_traces` with its index `fd_idx`.
-    - For each `fd_trace`, initialize `best_n_matches` and `best_sl_idx` to track the best match found.
-    - Iterate over each trace in `sl_traces` with its index `sl_idx`, skipping indices less than `skip_traces` or already used indices.
-    - For each pair of `fd_trace` and `sl_trace`, compare lines based on the 'pc' value and strict matching using [`check_strict_match`](#check_strict_match).
+    - Iterate over each trace in `fd_traces` using its index `fd_idx`.
+    - For each `fd_trace`, initialize `best_n_matches` to zero and `best_sl_idx` to -1 to track the best match found.
+    - Iterate over each trace in `sl_traces` using its index `sl_idx`, skipping indices less than `skip_traces` and those already in `used_sl_idxs`.
+    - For each pair of `fd_trace` and `sl_trace`, compare corresponding lines and matches; increment `n_matches` if they match strictly using [`check_strict_match`](<#check_strict_match>).
     - Update `best_n_matches` and `best_sl_idx` if a better match is found, and break if a perfect match is achieved.
-    - If no match is found for a `fd_trace`, print 'NO MATCH' and continue to the next trace.
-    - If a match is found, log the match details, write the matched traces to log files, and update `used_sl_idxs` and `n_good_matches`.
+    - If no match is found for `fd_trace`, print 'NO MATCH' with the index and continue to the next trace.
+    - If a match is found, extract lines from both traces, check if it is a good match, and update `used_sl_idxs` and `n_good_matches` accordingly.
+    - Print details of the best match found, including indices, number of matches, and percentage match.
+    - Write the lines of the matched traces to separate log files for Firedancer and Solana.
     - After processing all traces, print the total number of traces and good matches.
-- **Output**: The function outputs log files for each Firedancer trace and its best matching Solana trace, and prints match statistics to the console.
-- **Functions called**:
-    - [`firedancer/src/flamenco/runtime/extract_traces.check_strict_match`](#check_strict_match)
+- **Output**: None, but prints match results and writes matched trace lines to log files.
+- **Functions Called**:
+    - [`firedancer/src/flamenco/runtime/extract_traces.check_strict_match`](<#check_strict_match>)
 
 
 ---
 ### cache\_sl<!-- {{#callable:firedancer/src/flamenco/runtime/extract_traces.cache_sl}} -->
-The `cache_sl` function writes each trace from a list of Solana traces to a separate log file.
+[View Source →](<../../../../../src/flamenco/runtime/extract_traces.py#L128>)
+
+Writes each trace from the Solana traces list to a separate log file.
 - **Inputs**:
-    - `sl_traces`: A list of Solana traces, where each trace is a list of tuples, and each tuple contains a line of trace data and its associated match information.
-- **Control Flow**:
-    - Iterates over the list of Solana traces using an enumeration to get both the index and the trace.
-    - For each trace, opens a new log file named 'traces/sl_trace_{i}.log' where {i} is the index of the trace in the list.
-    - Writes the first element of each tuple in the trace (which is a line of trace data) to the log file.
-- **Output**: The function does not return any value; it writes data to log files as a side effect.
+    - `sl_traces`: A list of traces, where each trace is a list of tuples containing trace data.
+- **Logic and Control Flow**:
+    - Iterates over each trace in the `sl_traces` list with its index.
+    - Opens a new log file named `traces/sl_trace_{i}.log` for each trace, where `i` is the index of the trace.
+    - Writes the first element of each tuple in the trace to the log file as a single concatenated string.
+- **Output**: No return value; writes data to log files.
 
 
 ---
 ### main<!-- {{#callable:firedancer/src/flamenco/runtime/extract_traces.main}} -->
-The `main` function parses command-line arguments to read and process log files, then compares traces from Firedancer and Solana logs.
+[View Source →](<../../../../../src/flamenco/runtime/extract_traces.py#L133>)
+
+Parses command-line arguments, reads trace data from specified log files, and compares the traces.
 - **Inputs**: None
-- **Control Flow**:
-    - Initialize an argument parser using `argparse.ArgumentParser()`.
-    - Add required arguments for Firedancer log path, Solana log path, and maximum number of traces, and an optional argument for the number of traces to skip.
-    - Parse the command-line arguments using `arg_parser.parse_args()`.
-    - Read traces from the Firedancer log file using [`read_traces_from_file`](#read_traces_from_file) with the specified path and maximum number of traces.
-    - Print the number of Firedancer traces read.
-    - Read traces from the Solana log file using [`read_traces_from_file`](#read_traces_from_file) with the specified path and maximum number of traces.
-    - Cache the Solana traces using [`cache_sl`](#cache_sl).
-    - Print the number of Solana traces read.
-    - Call [`traces_diff`](#traces_diff) to compare the Firedancer and Solana traces, using the parsed number of traces to skip.
-- **Output**: The function does not return any value; it performs operations such as reading files, printing trace counts, caching traces, and comparing traces.
-- **Functions called**:
-    - [`firedancer/src/flamenco/runtime/extract_traces.read_traces_from_file`](#read_traces_from_file)
-    - [`firedancer/src/flamenco/runtime/extract_traces.cache_sl`](#cache_sl)
-    - [`firedancer/src/flamenco/runtime/extract_traces.traces_diff`](#traces_diff)
+- **Logic and Control Flow**:
+    - Creates an argument parser using `argparse.ArgumentParser()` and adds four arguments: `-f`/`--fd-log-path`, `-s`/`--sl-log-path`, `-n`/`--max-traces`, and `-m`/`--skip-traces`.
+    - Parses the command-line arguments using `arg_parser.parse_args()`.
+    - Calls `read_traces_from_file()` with `args.fd_log_path` and `args.max_traces` to read Firedancer traces and stores the result in `fd_traces`.
+    - Prints the number of Firedancer traces read.
+    - Calls `read_traces_from_file()` with `args.sl_log_path` and `args.max_traces` to read Solana traces and stores the result in `sl_traces`.
+    - Calls `cache_sl()` with `sl_traces` to cache the Solana traces.
+    - Prints the number of Solana traces read.
+    - Calls `traces_diff()` with `fd_traces`, `sl_traces`, and `args.skip_traces` to compare the traces.
+- **Output**: No return value; outputs are printed to the console.
+- **Functions Called**:
+    - [`firedancer/src/flamenco/runtime/extract_traces.read_traces_from_file`](<#read_traces_from_file>)
+    - [`firedancer/src/flamenco/runtime/extract_traces.cache_sl`](<#cache_sl>)
+    - [`firedancer/src/flamenco/runtime/extract_traces.traces_diff`](<#traces_diff>)
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `serialize.pb.c` file contains automatically generated nanopb constant definitions for the `firedancer` codebase, specifically binding protocol buffer messages related to Solana's Sealevel VM memory region and instruction serialization results.
+Automatically generated nanopb constant definitions for Solana Sealevel VM memory and instruction serialization.
 
 # Purpose
-This code is an automatically generated C source file, specifically designed for use with the nanopb library, which is a small code-size Protocol Buffers implementation in C. The file includes constant definitions for Protocol Buffers messages, as indicated by the inclusion of "serialize.pb.h" and the use of the `PB_BIND` macro. The `PB_BIND` macro is used to bind Protocol Buffers message types to their corresponding C structures, in this case, `org_solana_sealevel_v1_vm_mem_region_t` and `org_solana_sealevel_v1_instr_serialize_result_t`. The file also includes a version check to ensure compatibility with the nanopb generator version, prompting regeneration if the version does not match. This file is part of a system that likely involves serialization and deserialization of data structures for communication or storage purposes.
+This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `serialize.pb.h` and checks the `PB_PROTO_HEADER_VERSION` to ensure compatibility with the nanopb generator version 0.4.9.1. The file uses the `PB_BIND` macro to bind protobuf message types `ORG_SOLANA_SEALEVEL_V1_VM_MEM_REGION` and `ORG_SOLANA_SEALEVEL_V1_INSTR_SERIALIZE_RESULT` to their corresponding C structures, `org_solana_sealevel_v1_vm_mem_region_t` and `org_solana_sealevel_v1_instr_serialize_result_t`, with automatic field handling. This setup facilitates the serialization and deserialization of these protobuf messages in C applications.
 # Imports and Dependencies
 
 ---

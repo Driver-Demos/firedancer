@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `TrivialMemcpyWrong.ql` file in the `firedancer` codebase defines a CodeQL query to identify potential errors in `memcpy` calls where the size argument may not match the sizes of the source and destination types, suggesting the use of an assignment expression instead.
+Detects incorrect `memcpy` size arguments when destination and source pointer types differ in size.
 
 # Purpose
-This code is a static analysis rule designed to identify potential errors in the use of the `memcpy` function within C or C++ codebases. The primary focus of this rule is to detect instances where the size argument passed to `memcpy` might be incorrect due to a mismatch in the sizes of the source and destination types. The rule is implemented using a domain-specific language for code analysis, likely intended to be used with a tool that processes and analyzes C/C++ source code to ensure correctness and prevent common programming errors.
+This code defines a static analysis rule to detect potential errors in the use of the `memcpy` function. The rule checks for cases where the size argument in a `memcpy` call is derived from the `sizeof` operator applied to a type, and the source (`src`) and destination (`dst`) pointers point to types of different sizes. The rule suggests that an assignment expression might be more appropriate in such cases, as the size mismatch could lead to incorrect memory copying.
 
-The code defines a class `MemcpyFunction` that extends a `Function` class, identifying functions with global or standard names like `memcpy`, `fd_memcpy`, or `__builtin_memcpy`. Another class, `NotVoidChar`, is defined to filter out types that are neither `CharType` nor `VoidType`. The rule then specifies conditions under which a `memcpy` call is flagged: it checks if the size argument is derived from a `sizeof` operator and compares the sizes of the base types of the source and destination pointers. If there is a discrepancy in these sizes, the rule selects the call and generates a message indicating the potential error.
+The code consists of several components. The `MemcpyFunction` class extends a `Function` class and identifies functions with global or standard names like `memcpy`, `fd_memcpy`, or `__builtin_memcpy`. The `NotVoidChar` class extends a `Type` class and filters out types that are not `CharType` or `VoidType`. The main logic is implemented in a query that selects function calls to `memcpy` where the size argument is a `SizeofTypeOperator`, and the base types of the source and destination pointers differ in size. If these conditions are met, the rule generates a message indicating the potential error.
 
-This code is part of a broader static analysis framework, likely used to enforce coding standards and improve code quality by catching potential bugs at compile time. It does not define a public API or external interface but rather serves as an internal rule within a static analysis tool, focusing on correctness by ensuring that `memcpy` is used with appropriately sized arguments.
+This code is part of a static analysis tool, likely used to ensure code correctness by identifying and reporting potential issues with `memcpy` usage. It does not define a public API or external interface but rather provides a specific rule for internal use within a code analysis framework. The rule is tagged with metadata such as severity, precision, and tags to categorize the type of problem it addresses.
 # Imports and Dependencies
 
 ---
@@ -24,16 +24,18 @@ This code is part of a broader static analysis framework, likely used to enforce
 ### MemcpyFunction
 - **Type**: `class`
 - **Members**:
-    - `MemcpyFunction`: A class that extends Function to identify memcpy function calls.
-- **Description**: The `MemcpyFunction` class is a specialized class that extends the `Function` class to identify and handle calls to the `memcpy` function, including its variants like `fd_memcpy` and `__builtin_memcpy`. It is used in conjunction with other classes and logic to detect potential issues with the size argument in `memcpy` calls, ensuring that the sizes of the source and destination types match the size specified in the `sizeof` operator. This class is part of a larger system designed to catch and report errors related to incorrect usage of the `memcpy` function.
+    - ``MemcpyFunction``: A class that extends `Function` to identify `memcpy` or similar functions.
+    - ``NotVoidChar``: A class that extends `Type` to identify types that are neither `CharType` nor `VoidType`.
+- **Description**: The `MemcpyFunction` class extends the `Function` class to identify calls to `memcpy` or similar functions like `fd_memcpy` and `__builtin_memcpy`. It is used in conjunction with the `NotVoidChar` class to detect potential issues with the size argument in `memcpy` calls, specifically when the sizes of the source and destination types differ or do not match the size specified by the `sizeof` operator. This structure is part of a mechanism to ensure correctness in memory copy operations by flagging potential errors in the size argument.
 
 
 ---
 ### NotVoidChar
-- **Type**: `class`
+- **Type**: ``Type``
 - **Members**:
-    - `NotVoidChar`: A constructor that ensures the type is neither CharType nor VoidType.
-- **Description**: The `NotVoidChar` class is a specialized type that extends the `Type` class, designed to represent types that are neither `CharType` nor `VoidType`. It is used in the context of analyzing `memcpy` function calls to ensure that the base types of the source and destination pointers are not void or char, which could lead to incorrect size calculations in memory operations.
+    - ``CharType``: Represents a character type in the type system.
+    - ``VoidType``: Represents a void type in the type system.
+- **Description**: Represents a type that is neither a character type nor a void type, used to filter out these specific types in type-related operations.
 
 
 

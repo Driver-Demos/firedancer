@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build flags and library links for RocksDB, Snappy, Zstd, and optional liburing.
+Configures build settings for RocksDB with optional io_uring support in the Firedancer project.
 
 # Purpose
-This Makefile fragment checks for the presence of the static archives `librocksdb.a`, `libsnappy.a`, and `libzstd.a` under `$(OPT)/lib` before enabling RocksDB support. When all required libraries exist, it sets `FD_HAS_ROCKSDB:=1`, adds the `FD_HAS_ROCKSDB` and `ROCKSDB_LITE` preprocessor definitions to `CFLAGS`, and assigns the RocksDB link libraries to `ROCKSDB_LIBS`. It also scans `librocksdb.a` with `nm` and adds `-luring` only when the archive references `io_uring_queue_init`, which keeps the link step aligned with the symbols used by the library. If any required library is missing, the file emits a warning and skips RocksDB support.
+The provided Makefile script checks for the presence of specific static library files required for RocksDB integration. It verifies the existence of `librocksdb.a`, `libsnappy.a`, and `libzstd.a` in the specified `$(OPT)/lib` directory. If all these libraries are present, it sets the `FD_HAS_ROCKSDB` flag to 1 and appends necessary compiler flags to `CFLAGS` for enabling RocksDB in a lite mode. Additionally, it checks if the `librocksdb.a` archive references `io_uring` symbols and conditionally links `liburing` if needed. If any of the required libraries are missing, the script issues a warning and skips the RocksDB integration.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
