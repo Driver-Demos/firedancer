@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-APIs, debug checks, and unit tests for persistent shared scratch-pad memory with frames and alloc/trim operations.
+Functions and APIs for shared memory management, Makefile for build configuration, and tests for memory operations.
 
 
 ## Files
-- **[fd_spad.c](fd_spad.c.md)**: Debug checks and sanitizer wrappers for spad reset, delete, push, pop, alloc, trim, prepare, cancel, and publish.
-- **[fd_spad.h](fd_spad.h.md)**: APIs for persistent shared scratch-pad memory with frames, alloc, trim, and prepare/publish.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_spad` component, including running the `test_spad` unit test.
-- **[test_spad.c](test_spad.c.md)**: The `test_spad.c` file in the `firedancer` codebase contains a comprehensive suite of tests for the `fd_spad` memory allocation system, including tests for allocation, trimming, preparation, cancellation, publishing, and frame management, with additional checks for memory alignment and poisoning using AddressSanitizer.
+- **[fd_spad.c](fd_spad.c.md)**: Implements functions for verifying, debugging, and managing memory allocation in a shared memory space.
+- **[fd_spad.h](fd_spad.h.md)**: APIs for high-performance persistent inter-process shared scratch pad memories with frame-based allocation.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_spad` and `fd_util`.
+- **[test_spad.c](test_spad.c.md)**: Tests for the `fd_spad` memory allocation and management functions, including alignment, allocation, and deallocation operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

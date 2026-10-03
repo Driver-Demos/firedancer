@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_bank_abi headers and fd_bank_abi and fd_bank_tile objects when atomic and int128 are enabled.
+Makefile for conditional inclusion of headers and objects based on atomic and int128 support.
 
 # Purpose
-Registers `fd_bank_abi.h` as a header and adds the `fd_bank_abi` and `fd_bank_tile` object files to `fd_discoh` only when both `FD_HAS_ATOMIC` and `FD_HAS_INT128` are defined. This file controls conditional build inclusion for the bank ABI and tile components based on platform support.
+The `Makefile` content uses conditional directives to manage the inclusion of headers and object files based on the presence of certain features. If both `FD_HAS_ATOMIC` and `FD_HAS_INT128` are defined, it adds the header file `fd_bank_abi.h` and the object files `fd_bank_abi`, `fd_bank_tile`, and `fd_discoh` to the build process. This ensures that these components are only included when the necessary atomic and 128-bit integer support is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

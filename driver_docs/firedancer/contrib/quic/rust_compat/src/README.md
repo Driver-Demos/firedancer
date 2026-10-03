@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC interoperability tests and CLI setup for quiche and quinn with optional PCAP logging.
+Main entry point for a QUIC test application and integration with quiche and Quinn for QUIC protocol handling.
 
 
 ## Files
-- **[main.rs](main.rs.md)**: The `main.rs` file in the `firedancer` codebase sets up a command-line interface for testing QUIC connections using different client-server configurations, including quiche and quinn clients with various cryptographic providers.
-- **[quiche.rs](quiche.rs.md)**: QUIC interoperability test between quiche and Firedancer with optional PCAP logging.
-- **[quinn.rs](quinn.rs.md)**: Bridges quinn and Firedancer QUIC, with optional PCAP logging and a test client connection.
+- **[main.rs](main.rs.md)**: Main entry point for a QUIC test application, handling command-line arguments and socket operations.
+- **[quiche.rs](quiche.rs.md)**: Integrates Firedancer components with the quiche library for QUIC protocol handling.
+- **[quinn.rs](quinn.rs.md)**: Integrates Firedancer's QUIC implementation with Quinn, including server certificate verification bypass.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
