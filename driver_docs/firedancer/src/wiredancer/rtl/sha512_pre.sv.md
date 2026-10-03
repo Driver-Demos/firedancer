@@ -3,67 +3,71 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `sha512_pre.sv` file in the `firedancer` codebase implements a SystemVerilog module for preprocessing data blocks for SHA-512 hashing, handling input and output signals, and managing internal state transitions.
+Implements a SHA-512 preprocessing module with input/output logic and state management.
 
 # Purpose
-The provided Verilog code defines a module named `sha512_pre`, which is part of a broader system likely related to cryptographic operations, specifically the SHA-512 hashing algorithm. This module appears to be a preparatory stage for processing data blocks before they are fed into the SHA-512 hashing function. It handles the input and output of data blocks, manages the state transitions necessary for processing these blocks, and prepares the data by padding it according to the SHA-512 specification. The module uses parameters to define the block size (`W_BLK`), data width (`W_D`), and buffer size (`BUFF_SZ`), which are critical for ensuring the correct handling of data sizes in cryptographic operations.
+The `sha512_pre` module is a hardware description for a preprocessing unit used in the SHA-512 hashing algorithm. It is designed to prepare data blocks for the SHA-512 hash computation by managing input and output signals, handling data alignment, and ensuring the correct block size. The module uses parameters such as `W_BLK`, `W_D`, and `BUFF_SZ` to define the width of the data block and buffer size, which are critical for processing 1024-bit blocks as required by the SHA-512 specification.
 
-The module is structured around a state machine that transitions through various states to manage the data flow and processing. It includes functions like `n_blks` to calculate the number of blocks needed for a given size and `l_to_b` to convert data from one format to another. The state machine handles different stages of data preparation, including setting flags, managing data readiness, and performing necessary padding operations. The use of packed structures and logic assignments ensures efficient data handling and state management. This module is a specialized component within a larger cryptographic system, focusing on preparing data for SHA-512 hashing by managing input/output signals, state transitions, and data formatting.
+The module includes several key components, such as functions `n_blks` and `l_to_b`, which calculate the number of blocks needed and convert data from one format to another, respectively. The state machine within the `always_comb` block manages the flow of data through different states, ensuring that data is correctly padded and formatted before being output. The `self_t` structure holds the current and next states of the module, including metadata and data buffers. The module interfaces with external signals through input and output ports, including clock and reset signals, to synchronize operations. This module is part of a larger system that implements the SHA-512 hashing algorithm, focusing on the preprocessing stage.
 # Modules
 
 ---
 ### sha512\_pre
-The `sha512_pre` module is designed to prepare data for SHA-512 hashing by managing input and output signals and processing data blocks. It uses state machines and functions to handle data transformation and control flow for the SHA-512 pre-processing stage.
+Implements a preprocessing stage for the SHA-512 hashing algorithm. Manages input data and prepares it for further processing in the SHA-512 pipeline.
 - **Constants**:
-    - `W_BLK`: Defines the block width for the SHA-512 process, set to 1024 bits.
-    - `W_D`: Defines the data width, set to 512 bits.
-    - `BUFF_SZ`: Defines the buffer size, set to 512 bits.
+    - ``W_BLK``: Defines the block width for the SHA-512 algorithm, set to 1024 bits.
+    - ``W_D``: Defines the data width, set to 512 bits.
+    - ``BUFF_SZ``: Defines the buffer size, set to 512 bits.
 - **Ports**:
-    - `i_r`: Output logic signal indicating readiness.
-    - `i_w`: Input wire signal for write enable.
-    - `i_v`: Input wire signal for valid data.
-    - `i_e`: Input wire signal for end of data.
-    - `i_m`: Input wire for metadata, sized according to `sv_meta2_t`.
-    - `o_v`: Output logic signal indicating valid output.
-    - `o_e`: Output logic signal indicating end of output.
-    - `o_m`: Output logic for metadata, sized according to `sv_meta3_t`.
-    - `clk`: Input wire for clock signal.
-    - `rst`: Input wire for reset signal.
-- **Logic And Control Flow**:
-    - The module uses a state machine with states 0 to 5 to manage data processing and transitions based on input signals.
-    - In state 0, the module initializes output signals and calculates the number of blocks needed using the `n_blks` function.
-    - State 1 handles data writing and transitions based on the input valid and end signals.
-    - State 2 processes additional data and manages transitions based on the extra data flag and input signals.
-    - State 3 and 4 handle padding and finalization of the data block, setting specific bytes to 0x80 or 0x00 as needed.
-    - State 5 finalizes the data block by setting the size and transitioning back to state 0.
-    - The `always_ff` block updates the `self` state on the rising edge of the clock and resets it when the reset signal is active.
+    - ``i_r``: Output logic signal indicating readiness.
+    - ``i_w``: Input wire signal for write enable.
+    - ``i_v``: Input wire signal for valid data.
+    - ``i_e``: Input wire signal for end of data.
+    - ``i_m``: Input wire for metadata of type `sv_meta2_t`.
+    - ``o_v``: Output logic signal indicating valid output data.
+    - ``o_e``: Output logic signal indicating end of output data.
+    - ``o_m``: Output logic for metadata of type `sv_meta3_t`.
+    - ``clk``: Input wire for clock signal.
+    - ``rst``: Input wire for reset signal.
+- **Logic and Control Flow**:
+    - Defines a function `n_blks` to calculate the number of blocks needed based on input size.
+    - Defines a function `l_to_b` to convert logic data to byte format.
+    - Uses a packed struct `self_t` to store internal state and data.
+    - Assigns input metadata `i_m` to internal variable `i_mm`.
+    - Assigns readiness signal `i_r` based on `next.ready`.
+    - Assigns output signals `o_v`, `o_e`, and `o_m` based on internal state `self`.
+    - Uses an `always_comb` block to update `next` state based on current state `self` and input signals.
+    - Implements a state machine with states 0 to 5 to manage data processing and transitions.
+    - Uses an `always_ff` block to update `self` state on the rising edge of `clk` and reset on `rst`.
 
 
 # Functions and Tasks
 
 ---
 ### l\_to\_b
-The function `l_to_b` converts a 1024-bit logic vector into a byte-reversed 2D array of 8-bit logic vectors.
+Converts a 1024-bit logic vector from little-endian to big-endian format.
 - **Inputs**:
-    - `l`: A 1024-bit logic vector that represents the input data to be converted.
-- **Control Flow**:
-    - Declare an integer `i` for loop iteration and a 2D logic array `b` to store the byte-reversed output.
-    - Iterate over each 8-bit segment of the input logic vector `l`, from the least significant byte to the most significant byte.
-    - Assign each 8-bit segment of `l` to the corresponding position in the 2D array `b`, reversing the order of bytes.
-    - Return the byte-reversed 2D array `b` as the function's output.
-- **Output**: The function returns a 2D array of 8-bit logic vectors, representing the byte-reversed version of the input logic vector.
+    - `l`: A 1024-bit logic vector in little-endian format.
+- **Logic and Control Flow**:
+    - Declare an integer `i` for loop iteration.
+    - Declare a 2D logic array `b` to store the converted big-endian format.
+    - Iterate over the 128 8-bit segments of the input vector `l`.
+    - For each segment, reverse the order and store it in `b`.
+    - Return the big-endian formatted vector `b`.
+- **Output**: A 1024-bit logic vector in big-endian format.
 
 
 ---
 ### n\_blks
-The `n_blks` function calculates the number of 128-bit blocks required to store a given size in bits, including padding.
+Calculates the number of 16-byte blocks required for a given size.
 - **Inputs**:
-    - `sz`: A 11-bit logic vector representing the size in bits that needs to be processed into 128-bit blocks.
-- **Control Flow**:
-    - The function first calculates `sz2` by adding 1 and 16 (which is 128/8) to the input size `sz`.
-    - It then extracts the 4 most significant bits from the 8th bit of `sz2` and adds it to the logical OR of the least significant 7 bits of `sz2`.
-    - The result is returned as the number of 128-bit blocks required.
-- **Output**: The function returns a 4-bit logic vector representing the number of 128-bit blocks needed to store the input size, including padding.
+    - `sz`: An 11-bit logic input representing the size to be processed.
+- **Logic and Control Flow**:
+    - Declare a logic variable `sz2` with the same bit-width as `sz`.
+    - Calculate `sz2` by adding 1 and 16 (128/8) to `sz`.
+    - Extract the 4 bits starting from bit 7 of `sz2` and add it to the result of a bitwise OR operation on the first 7 bits of `sz2`.
+    - Return the calculated value as the number of blocks.
+- **Output**: A 4-bit logic value representing the number of 16-byte blocks required.
 
 
 

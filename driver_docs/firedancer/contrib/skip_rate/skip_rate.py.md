@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `skip_rate.py` file in the `firedancer` codebase calculates the skip rate and adjusted skip rate for a Solana validator by analyzing leader slots and determining which slots were missed due to being offline.
+Calculates skip rate and adjusted skip rate for a Solana validator during a given epoch.
 
 # Purpose
-This Python script is designed to interact with the Solana blockchain's testnet API to analyze the performance of a specific validator, identified by the public key `fdVa1oF2FtLq4b5T4HFxTjsgeWSCztDCqwxFegjYbZH`, during a given epoch. The script retrieves epoch information and leader schedules, then determines which slots were successfully processed by the validator and which were missed. It further distinguishes between slots missed due to the validator being offline and those missed for other reasons. The script calculates and prints the skip rate and an adjusted skip rate that accounts for offline periods, providing insights into the validator's operational efficiency.
+This script interacts with the Solana blockchain to calculate the skip rate and the adjusted skip rate for a specific validator during a given epoch. It uses the Solana JSON-RPC API to retrieve epoch information and leader schedules, and it identifies which slots were missed by the validator. The script first retrieves the current epoch and the range of slots within that epoch. It then requests the leader schedule for the validator and determines which slots were missed by checking if blocks were produced for those slots.
 
-The script uses the `requests` library to send JSON-RPC requests to the Solana testnet API, retrieving data about the current epoch and the validator's leader schedule. It processes this data to identify missed and made leader slots, then checks surrounding slots to determine if missed slots were due to the validator being offline. The script outputs detailed statistics, including the skip rate, adjusted skip rate, and counts of made and truly skipped slots, offering a comprehensive view of the validator's performance. This script is a standalone utility, not intended for import as a library, and it does not define any public APIs or external interfaces.
+The script further analyzes the missed slots to determine if they were due to the validator being offline. It does this by checking surrounding slots for the presence of transactions involving the validator. The skip rate is calculated as the ratio of missed slots to total leader slots, while the adjusted skip rate accounts for slots missed due to the validator being offline. The script outputs the skip rate, adjusted skip rate, and lists of missed and made leader slots.
 # Imports and Dependencies
 
 ---
@@ -20,100 +20,100 @@ The script uses the `requests` library to send JSON-RPC requests to the Solana t
 
 ---
 ### api\_endpoint
-- **Type**: `string`
-- **Description**: The `api_endpoint` variable is a string that holds the URL of the Solana testnet API endpoint. It is used to make HTTP POST requests to interact with the Solana blockchain, specifically for retrieving epoch information and leader schedules.
-- **Use**: This variable is used as the target URL for HTTP requests to the Solana testnet API.
+- **Type**: ``str``
+- **Description**: Defines the URL of the Solana testnet API endpoint. This string is used to make HTTP POST requests to the Solana blockchain network for retrieving epoch and leader schedule information.
+- **Use**: Used as the target URL for HTTP requests to interact with the Solana testnet API.
 
 
 ---
 ### json\_data
-- **Type**: `dict`
-- **Description**: The `json_data` variable is a dictionary that represents a JSON-RPC request payload. It is used to interact with the Solana blockchain API, specifically to request information about the leader schedule for a given validator identity. The dictionary contains keys such as 'jsonrpc', 'id', 'method', and 'params', which are standard components of a JSON-RPC request.
-- **Use**: This variable is used to send requests to the Solana API to retrieve leader schedule information and block data for specific slots.
+- **Type**: ``dict``
+- **Description**: A dictionary that represents a JSON-RPC request to the Solana API. It contains keys such as `jsonrpc`, `id`, `method`, and `params` to specify the request details.
+- **Use**: Used to send a request to the Solana API to retrieve the leader schedule for a specific validator identity.
 
 
 ---
 ### fd\_validator
-- **Type**: `string`
-- **Description**: The variable `fd_validator` is a string that represents the identity of a validator in the Solana blockchain network. It is used to identify the validator for which leader slots and block information are being queried.
-- **Use**: This variable is used to specify the validator identity in API requests to the Solana network to retrieve leader schedule and block information.
+- **Type**: ``str``
+- **Description**: A string that represents the identity of a validator in the Solana network. This string is used to identify the validator when making requests to the Solana API.
+- **Use**: Used to specify the validator identity in API requests to retrieve leader schedule and block information.
 
 
 ---
 ### response
-- **Type**: `requests.models.Response`
-- **Description**: The `response` variable is an instance of the `Response` object from the `requests` library, which represents the HTTP response received from making a POST request to the specified API endpoint. It contains information such as the status code, response headers, and the response body, which can be accessed and processed to determine the outcome of the request.
-- **Use**: This variable is used to store the HTTP response from the API requests made to the Solana testnet, allowing the program to check the status and content of the response for further processing.
+- **Type**: ``requests.models.Response``
+- **Description**: The `response` variable stores the HTTP response object returned by the `requests.post` method. This object contains the server's response to the HTTP request made to the specified API endpoint.
+- **Use**: Used to check the status of the HTTP request and to access the JSON data returned by the server.
 
 
 ---
 ### epoch\_json
-- **Type**: `dict`
-- **Description**: The `epoch_json` variable is a dictionary that stores the result of a JSON response from a POST request to the Solana API endpoint. This response contains information about the current epoch, including details such as the epoch number and slot indices.
-- **Use**: This variable is used to extract and store epoch-related data from the API response for further processing and analysis in the script.
+- **Type**: ``dict``
+- **Description**: Contains the result of the JSON response from the Solana API call to get epoch information. The data structure is a dictionary that includes details about the current epoch, such as the epoch number and slot information.
+- **Use**: Used to extract and print the current epoch and calculate slot indices for further processing.
 
 
 ---
 ### cur\_epoch
-- **Type**: `int`
-- **Description**: The `cur_epoch` variable is an integer that represents the current epoch number retrieved from the Solana blockchain API response. It is extracted from the JSON response under the key 'epoch'.
-- **Use**: This variable is used to store and print the current epoch number for further processing in the script.
+- **Type**: ``int``
+- **Description**: Holds the current epoch number obtained from the Solana network's epoch information. The epoch number is extracted from the JSON response of the `getEpochInfo` API call.
+- **Use**: Used to track the current epoch in the Solana network for further processing and calculations.
 
 
 ---
 ### end\_slot
 - **Type**: `int`
-- **Description**: The `end_slot` variable is an integer that represents the absolute slot number at the end of the current epoch. It is derived from the 'absoluteSlot' key in the `epoch_json` dictionary, which is obtained from the response of a Solana API call.
-- **Use**: This variable is used to determine the upper limit for the leader slots that have occurred in the current epoch.
+- **Description**: Represents the absolute slot number at the end of the current epoch as retrieved from the Solana API response.
+- **Use**: Used to determine the range of slots for the current epoch and to filter leader slots that have occurred.
 
 
 ---
 ### start\_slot
 - **Type**: `int`
 - **Description**: The `start_slot` variable is an integer that represents the starting slot number for the current epoch. It is calculated by subtracting the `slotIndex` from the `absoluteSlot` obtained from the `epoch_json` data.
-- **Use**: This variable is used to adjust the leader slots to the correct slot numbers for the current epoch.
+- **Use**: Used to determine the starting point for leader slots in the current epoch.
 
 
 ---
 ### leader\_slots
 - **Type**: `list`
-- **Description**: The `leader_slots` variable is a list that contains the adjusted slot numbers for a specific validator's leadership schedule within the current epoch. It is derived by adding the `start_slot` to each slot in the initial `leader_slots` list obtained from the API response, and filtering out any slots that are beyond the `end_slot`. This ensures that only slots that have already occurred are considered.
-- **Use**: This variable is used to track the slots where the validator was scheduled to lead, allowing the program to determine which slots were missed and which were successfully led.
+- **Description**: A list of leader slots for a specific validator in the current epoch. The list is filtered to include only those slots that have already occurred, based on the current slot index and the start slot of the epoch.
+- **Use**: Used to track and analyze the slots assigned to a validator, determining which slots were missed or successfully processed.
 
 
 ---
 ### missed\_leaders
-- **Type**: `list`
-- **Description**: The `missed_leaders` variable is a list that stores the slots that were missed by the validator during the current epoch. A slot is considered missed if the API response for that slot contains an error, indicating that the block was not produced or confirmed.
-- **Use**: This variable is used to keep track of the slots that were not successfully processed by the validator, which is later used to calculate the skip rate and adjusted skip rate.
+- **Type**: ``list``
+- **Description**: Stores the slots that were missed by the validator during the current epoch. A slot is considered missed if the API response for the slot contains an error.
+- **Use**: Used to keep track of missed leader slots for further analysis and calculation of skip rates.
 
 
 ---
 ### made\_leaders
-- **Type**: `list`
-- **Description**: The `made_leaders` variable is a list that stores the slots for which the leader successfully produced a block. It is populated by iterating over the `leader_slots` and checking if a block was successfully retrieved for each slot.
-- **Use**: This variable is used to keep track of the slots where the leader was able to produce a block, which is later used to calculate the adjusted skip rate.
+- **Type**: ``list``
+- **Description**: Stores the slots that were successfully processed by the leader. The list is populated by iterating over `leader_slots` and checking if a block was successfully retrieved for each slot.
+- **Use**: Used to keep track of slots where the leader successfully processed a block.
 
 
 ---
 ### true\_skipped\_slots
-- **Type**: `list`
-- **Description**: The `true_skipped_slots` variable is a list that stores slots which were actually skipped by the validator due to reasons other than being offline. It is populated by checking surrounding slots for validator activity to determine if the validator was online but still missed the slot.
-- **Use**: This variable is used to calculate the adjusted skip rate by identifying slots that were genuinely skipped by the validator.
+- **Type**: ``list``
+- **Description**: A list that stores slots that were missed due to the validator being offline. It is populated by checking missed slots against nearby slots to determine if the validator was offline during those times.
+- **Use**: Used to calculate the adjusted skip rate by identifying slots that were truly skipped due to the validator being offline.
 
 
 ---
 ### skip\_rate
 - **Type**: `float`
-- **Description**: The `skip_rate` variable is a floating-point number that represents the proportion of leader slots that were missed during a given epoch. It is calculated by dividing the number of missed leader slots (`missed_leaders`) by the total number of leader slots (`leader_slots`).
-- **Use**: This variable is used to quantify the frequency of missed leader slots in the context of Solana's epoch leader schedule.
+- **Description**: Calculates the proportion of leader slots that were missed during the current epoch. It is computed by dividing the number of missed leader slots (`missed_leaders`) by the total number of leader slots (`leader_slots`).
+- **Use**: Used to determine the basic skip rate for leader slots in the current epoch.
 
 
 ---
 ### adjusted\_skip\_rate
-- **Type**: `float`
-- **Description**: The `adjusted_skip_rate` is a floating-point number that represents the proportion of slots that were truly skipped by a validator, adjusted for periods when the validator was offline. It is calculated by dividing the number of truly skipped slots by the sum of made leaders and truly skipped slots.
-- **Use**: This variable is used to provide a more accurate skip rate by accounting for offline periods, helping to assess the validator's performance more precisely.
+- **Type**: ``float``
+- **Description**: Represents the adjusted skip rate for a validator, calculated as the ratio of truly skipped slots to the total of made leaders and truly skipped slots. This calculation accounts for slots that were missed due to reasons other than the validator being offline.
+- **Use**: Used to determine the validator's performance by factoring in offline periods when calculating the skip rate.
 
 
 

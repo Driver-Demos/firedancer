@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase defines build and test configurations for the `rpc_client` component, including header and object files, as well as unit tests, conditional on the `FD_HAS_HOSTED` flag.
+Makefile for building and testing the `fd_rpc_client` with conditional compilation based on `FD_HAS_HOSTED`.
 
 # Purpose
-This is a Makefile snippet that conditionally includes headers, object files, and unit tests for a component named `fd_rpc_client` if the `FD_HAS_HOSTED` variable is defined. It adds the header `fd_rpc_client.h`, compiles the object `fd_rpc_client` with `fddev_shared`, and sets up unit tests `test_rpc_client` and `dump_rpc_client` with dependencies on shared libraries `fddev_shared`, `fd_waltz`, `fd_ballet`, and `fd_util`, and executes the `test_rpc_client` unit test.
+The `Makefile` content defines build instructions for a project component when the `FD_HAS_HOSTED` condition is true. It adds the header file `fd_rpc_client.h` and the object file `fd_rpc_client` to the build process, linking it with `fddev_shared`. It also specifies the creation and execution of unit tests `test_rpc_client` and `dump_rpc_client`, which depend on `fddev_shared`, `fd_waltz`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
