@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test.py` file in the `firedancer` codebase is a cocotb-based test script for verifying the functionality of an ED25519 point addition module by comparing hardware outputs with reference software calculations.
+A cocotb-based test for verifying the ED25519 point addition implementation in a hardware design.
 
 # Purpose
-This Python file is a test script designed to verify the functionality of a digital design using the Cocotb framework, which is a coroutine-based co-simulation library for testing VHDL and Verilog designs. The script specifically tests the behavior of a hardware module that performs operations related to elliptic curve point arithmetic, likely in the context of the Ed25519 elliptic curve, as indicated by the use of the `ref_ed25519` module. The test involves generating random elliptic curve points and performing point addition operations, then comparing the results produced by the hardware under test (dut) with expected results calculated using a reference implementation.
+The code is a test suite for verifying the functionality of a digital design using the Cocotb framework. It tests a hardware design under test (DUT) by simulating clock signals and reset conditions. The test involves generating random elliptic curve points and performing point addition using the `ref_ed25519` module, which implements operations on the Ed25519 elliptic curve. The test checks if the DUT correctly computes the addition of two elliptic curve points and compares the results with expected values.
 
-The script sets up a clock and a reset signal for the device under test, and iteratively feeds it with random inputs. It uses the `wd_cocotil` module to generate random integers and manage the reset signal. The test checks the output of the hardware module against expected values for both the elliptic curve points and a control signal `m_i`, ensuring that the module's output matches the expected results. The script logs detailed information about each test iteration, including discrepancies, and uses assertions to validate the correctness of the hardware's output, making it a critical component in the verification process of the hardware design.
+The test initializes a clock and a reset signal for the DUT, then iterates over a loop to perform multiple test cycles. In each cycle, it generates random inputs, applies them to the DUT, and waits for the DUT to produce outputs. The outputs are then compared against expected results calculated using the reference Ed25519 implementation. The test logs the results and asserts that the DUT's outputs match the expected values, ensuring the correctness of the DUT's implementation of elliptic curve point addition.
 # Imports and Dependencies
 
 ---
@@ -27,21 +27,27 @@ The script sets up a clock and a reset signal for the device under test, and ite
 
 ---
 ### test<!-- {{#callable:firedancer/src/wiredancer/sim/ed25519_point_add/test.test}} -->
-The `test` function is a cocotb test that simulates a digital circuit to verify point addition on elliptic curves and checks the correctness of the output against expected values.
+[View Source →](<../../../../../../src/wiredancer/sim/ed25519_point_add/test.py#L12>)
+
+Executes a test for a digital circuit using cocotb, simulating clock cycles and verifying point addition on elliptic curves.
 - **Decorators**: `@cocotb.test`
 - **Inputs**:
-    - `dut`: The device under test (DUT) which is a digital circuit model to be simulated and tested.
-- **Control Flow**:
-    - Initialize the clock signal for the DUT and start a reset toggle process.
-    - Wait for 1024 clock cycles to ensure the DUT is in a stable state.
-    - Retrieve the width of the multiplier from the DUT and initialize an empty list `es` and a counter `D`.
-    - For 1024 iterations, generate random integers and elliptic curve points, perform point addition, and store results in `es`.
-    - Convert elliptic curve points to binary values and assign them to the DUT's input ports.
-    - Set the multiplier input `m_i` on the DUT and wait for a clock edge.
-    - Check the output multiplier `m_o` from the DUT; if incorrect, increment `D` and continue if `D` is less than 100.
-    - Pop the expected result from `es`, retrieve the DUT's output values, and log the comparison between expected and actual results.
-    - Assert that the DUT's output matches the expected values for the elliptic curve point and multiplier.
-- **Output**: The function does not return a value but logs information and asserts the correctness of the DUT's output against expected results.
+    - `dut`: The device under test, which is a digital circuit model.
+- **Logic and Control Flow**:
+    - Initialize the clock signal for the device under test (DUT) and start it with a 1 ns period.
+    - Toggle the reset signal of the DUT for 32 cycles with active high configuration.
+    - Wait for 1024 rising edges of the clock to ensure the DUT is stable.
+    - Initialize variables `W_M`, `es`, and `D` for use in the test loop.
+    - For 1024 iterations, generate a random integer `m_i` and select random points `P0` and `P1` on the elliptic curve.
+    - Compute the point addition `P2` of `P0` and `P1` and store the result with `m_i` in the list `es`.
+    - Convert the coordinates of `P0` and `P1` into `BinaryValue` objects and assign them to the DUT inputs.
+    - Set the DUT input `m_i` with a bitwise operation to include the random integer `m_i`.
+    - Wait for a rising edge of the clock and check the output `m_o` of the DUT.
+    - If the first bit of `m_o` is not '1', increment `D` and continue the loop if `D` is less than 100.
+    - Pop the first element from `es` to get the expected point `P2` and integer `m_i`.
+    - Retrieve the output coordinates from the DUT and compare them with the expected values, logging the results.
+    - Assert that the DUT outputs match the expected point coordinates and integer value.
+- **Output**: No explicit return value; the function logs information and uses assertions to verify the DUT behavior.
 
 
 
