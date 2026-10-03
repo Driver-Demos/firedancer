@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Send tile logic, headers, build rules, and seccomp policy for QUIC transaction sending.
+Defines a seccomp filter policy, transaction signing and sending, security policies, and Makefile logic.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write, fsync, and getrandom syscalls only.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific syscalls.
 
 ## Files
-- **[fd_send_tile.c](fd_send_tile.c.md)**: Send tile logic for contact info, QUIC connections, vote forwarding, and metrics.
-- **[fd_send_tile.h](fd_send_tile.h.md)**: Sender tile context, connection state, and metrics for signing and sending transactions to leaders.
-- **[fd_send_tile.seccomppolicy](fd_send_tile.seccomppolicy.md)**: The `quic.seccomppolicy` file defines security policies for logging and randomness in the QUIC protocol, specifying conditions for writing and syncing log messages and using cryptographic randomness.
-- **[Local.mk](Local.mk.md)**: Build rule that adds fd_send_tile to fd_discof when FD_HAS_INT128 is set.
+- **[fd_send_tile.c](fd_send_tile.c.md)**: Implements a system for managing and sending network connections using QUIC and UDP protocols, including connection mapping, message handling, and metrics tracking.
+- **[fd_send_tile.h](fd_send_tile.h.md)**: Header file for a sender tile that signs and sends transactions to leaders, primarily for voting.
+- **[fd_send_tile.seccomppolicy](fd_send_tile.seccomppolicy.md)**: Defines security policies for logging and randomness in the Firedancer send tile component.
+- **[Local.mk](Local.mk.md)**: Conditional object file addition for `fd_send_tile` and `fd_discof` based on `FD_HAS_INT128`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

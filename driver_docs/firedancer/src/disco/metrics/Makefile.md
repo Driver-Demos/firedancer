@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/disco/metrics` directory defines a `metrics` target that runs a Python script named `gen_metrics.py` using Python 3.
+Makefile to run the `gen_metrics.py` script using Python.
 
 # Purpose
-This is a Makefile snippet used to define a build automation rule for generating metrics. It sets a variable `PYTHON` to `python3`, which specifies the Python interpreter to be used. The `.PHONY` target `metrics` is declared, which, when invoked, runs the `gen_metrics.py` script using the specified Python interpreter.
+The `Makefile` defines a target named `metrics` that, when executed, runs the Python script `gen_metrics.py` using the Python interpreter specified by the `PYTHON` variable. The `PYTHON` variable defaults to `python3`, but it can be overridden by setting a different value when invoking the `make` command. The `.PHONY` directive indicates that `metrics` is not a file but a command to execute.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

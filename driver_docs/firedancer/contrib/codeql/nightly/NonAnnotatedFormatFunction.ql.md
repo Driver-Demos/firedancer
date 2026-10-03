@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `NonAnnotatedFormatFunction.ql` file in the `firedancer` codebase identifies calls to functions that likely expect a format string but are not annotated as such, issuing a warning for potential issues.
+Detects calls to functions that likely expect a format string but lack a format annotation.
 
 # Purpose
-This code is a query script likely intended for use with a static analysis tool, such as Semgrep or CodeQL, to identify potential issues in C++ codebases. It provides narrow functionality by specifically targeting function calls that are expected to handle format strings but are not annotated as such, which could lead to security vulnerabilities or bugs if format strings are improperly handled. The script imports a C++ library and uses pattern matching to find string literals that resemble format strings being passed to functions that lack a "format" attribute. It then selects these functions for reporting, issuing a warning about the potential issue. This script is not an executable or a library but rather a rule or query designed to be integrated into a larger static analysis framework to enhance code quality and security.
+This code is a query written for a static analysis tool that examines C++ source files. It identifies function calls that likely expect a format string but are not annotated with a "format" attribute. The query searches for string literals containing format specifiers and checks if they are passed to functions without the "format" attribute. It only considers functions defined in files within the "src/" directory and excludes dynamic function calls. If such a function is found, the code generates a warning indicating a potential issue with the function's format string handling.
 # Imports and Dependencies
 
 ---
