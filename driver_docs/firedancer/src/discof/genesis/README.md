@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp filter policy, Solana genesis file management, client-server communication, and Makefile logic.
+Genesis tile, client, hash, seccomp policy, and build rules for genesis file fetch and init
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall access control.
+- **[generated](generated/README.md)**: Generated seccomp BPF filter for genesis tile syscalls and file descriptor checks.
 
 ## Files
-- **[fd_genesi_tile.c](fd_genesi_tile.c.md)**: Implements a tile for managing Solana genesis files, including local file handling and peer retrieval.
-- **[fd_genesi_tile.h](fd_genesi_tile.h.md)**: Defines constants for genesis hash signaling in a blockchain node.
-- **[fd_genesi_tile.seccomppolicy](fd_genesi_tile.seccomppolicy.md)**: Defines security policies for file descriptor operations related to logging, genesis file handling, and client communication.
-- **[fd_genesis_client.c](fd_genesis_client.c.md)**: Implements a client for connecting to and communicating with genesis servers using HTTP over TCP.
-- **[fd_genesis_client.h](fd_genesis_client.h.md)**: Defines the interface for a Genesis client in the Firedancer codebase, including initialization and polling functions.
-- **[genesis_hash.h](genesis_hash.h.md)**: Computes the shred version and genesis hash from a file using SHA-256.
-- **[Local.mk](Local.mk.md)**: Makefile logic for adding objects if FD_HAS_ALLOCA and FD_HAS_INT128 are defined.
+- **[fd_genesi_tile.c](fd_genesi_tile.c.md)**: Loads or downloads genesis.bin, verifies hashes, and initializes the account database.
+- **[fd_genesi_tile.h](fd_genesi_tile.h.md)**: Genesis tile signal constants for publishing learned genesis hash or bootstrap completion.
+- **[fd_genesi_tile.seccomppolicy](fd_genesi_tile.seccomppolicy.md)**: Seccomp policy for genesis file I/O, logging, polling, socket send/recv, and renameat2.
+- **[fd_genesis_client.c](fd_genesis_client.c.md)**: HTTP client for fetching genesis.tar.bz2 from peers with poll-based I/O and SHA-256 check.
+- **[fd_genesis_client.h](fd_genesis_client.h.md)**: Genesis client API for shared-memory setup, init, polling, and pollfd access.
+- **[genesis_hash.h](genesis_hash.h.md)**: Computes a genesis file SHA-256 hash and derives a shred version from it.
+- **[Local.mk](Local.mk.md)**: Build rules that add fd_genesi_tile and fd_genesis_client objects when alloca and int128 are available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
