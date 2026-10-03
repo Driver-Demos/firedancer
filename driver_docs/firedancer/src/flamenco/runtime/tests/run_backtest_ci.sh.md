@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Runs a set of ledger backtest CI cases with fixed ledger, epoch, and cluster settings.
+Shell script to run multiple ledger backtests on different networks and configurations.
 
 # Purpose
-This Bash script runs a set of ledger backtest jobs by calling `src/flamenco/runtime/tests/run_ledger_backtest.sh` many times with fixed ledger names, epoch limits, memory limits, and runtime versions. It provides test execution for several network snapshots, including `mainnet`, `devnet`, `testnet`, and local cases, so it covers a broad set of runtime backtest scenarios. The script uses `set -e` so it stops at the first command failure, which makes it suitable for automated test runs. It acts as a test driver rather than a library file or a general-purpose executable.
+This script is a Bash executable that automates the execution of a series of ledger backtests using the `run_ledger_backtest.sh` script located in the `src/flamenco/runtime/tests` directory. Each line in the script calls the backtest script with specific parameters, such as the ledger identifier (`-l`), the number of years (`-y`), the maximum number of transactions (`-m`), the end epoch (`-e`), and the version of the code (`-c`). The script is designed to test different network environments, including mainnet, devnet, and testnet, with various configurations and conditions. The script uses the `set -e` command to ensure that it stops execution if any command fails, which helps maintain the integrity of the testing process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
