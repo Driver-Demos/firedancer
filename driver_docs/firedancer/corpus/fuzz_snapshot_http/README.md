@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fuzz_snapshot_http` folder in the `firedancer` codebase contains an example HTTP response file named `200-ok`, which demonstrates a 200 OK status code with headers and a "Hello World!" message.
+An HTTP response with status 200 OK, headers, and a "Hello World!" message.
 
 
 ## Files
-- **[200-ok](200-ok.md)**: The `200-ok` file in the `firedancer` codebase is an HTTP response example with a status code of 200 OK, including headers and a simple "Hello World!" message.
+- **[200-ok](200-ok.md)**: An HTTP response with status 200 OK, headers, and a "Hello World!" message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

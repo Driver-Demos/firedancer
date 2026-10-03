@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules that add feature headers and objects when FD_HAS_INT128 is defined.
+Makefile logic for adding headers and objects if 128-bit integer support is available.
 
 # Purpose
-Adds feature-related header files and object files to the build when `FD_HAS_INT128` is defined. The `fd_features.h` and `fd_features_generated.h` headers, and the `fd_features` and `fd_features_generated` objects, are included in the `fd_flamenco` target only under that build condition.
+The `Makefile` snippet uses conditional directives to manage the inclusion of headers and object files based on the presence of the `FD_HAS_INT128` macro. If `FD_HAS_INT128` is defined, it calls the `add-hdrs` function to include `fd_features.h` and `fd_features_generated.h` headers, and the `add-objs` function to include `fd_features`, `fd_features_generated`, and `fd_flamenco` object files. This ensures that the build process includes the necessary files when 128-bit integer support is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

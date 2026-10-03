@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `relayer.proto` file defines the protocol buffer messages and services for a relayer that provides TPU and TPU forward proxy configurations and packet subscription capabilities for Solana validators.
+Defines gRPC services for Solana validators to fetch TPU configurations and subscribe to packet streams.
 
 # Purpose
-The provided content is a Protocol Buffers (proto3) file that defines the structure and services for a relayer system in a Solana blockchain environment. This file specifies the messages and RPC (Remote Procedure Call) services that facilitate communication between Solana validators and relayers. The `Relayer` service offers two main functionalities: fetching TPU (Transaction Processing Unit) configurations and subscribing to packet streams. The `GetTpuConfigs` RPC allows validators to retrieve the TPU and TPU forward socket configurations, enabling them to update their gossip network settings accordingly. The `SubscribePackets` RPC provides a streaming service where validators can receive a combination of packet data and heartbeat signals, allowing them to stay updated with the latest network activity through the relayer.
+The `proto3` syntax file defines a gRPC service named `Relayer` for Solana validators. It imports dependencies from `packet.proto` and `shared.proto` to utilize shared data structures. The `Relayer` service provides two main functionalities: fetching TPU (Transaction Processing Unit) configurations and subscribing to packet streams. The `GetTpuConfigs` RPC allows validators to retrieve TPU and TPU forward socket configurations, which they can use to update their gossip network settings. The `SubscribePackets` RPC enables validators to receive a stream of packets and heartbeats, facilitating real-time data exchange and synchronization with the relayer's TPU ports.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
