@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Detects incorrect overflow checks in integer addition that can lead to reliability and security issues.
+The `BadAdditionOverflowCheck.ql` file in the `firedancer` codebase identifies problematic checks for integer addition overflow that fail when the result is promoted to a larger type, highlighting it as a high-severity security issue.
 
 # Purpose
-This code is a static analysis rule definition for identifying a specific problem in C++ code related to integer addition overflow. The rule checks for incorrect methods of detecting overflow in integer addition operations. Specifically, it identifies cases where the result of an addition is compared against one of the operands to check for overflow, which is ineffective when the result is automatically promoted to a larger data type.
+This source code file is a part of a static analysis tool or a code quality checker, specifically designed to identify a particular problem related to integer overflow in C++ code. The file defines a rule or a check that targets a common mistake in checking for overflow in integer addition operations. The issue arises when the result of an addition is automatically promoted to a larger type, making simple comparisons against one of the operands ineffective for detecting overflow. The code is tagged with high severity levels for both general problem severity and security, indicating its importance in maintaining code reliability and security.
 
-The code imports necessary modules such as `cpp`, `BadAdditionOverflowCheck`, and `filter` to facilitate the analysis. It uses a query to find instances of relational operations (`RelationalOperation cmp`) and addition expressions (`AddExpr a`) that match the criteria defined by the `badAdditionOverflowCheck` function. The query further filters these instances to include only those located in the specified source code files. The results of the query are then selected, providing the location and file path of the problematic code.
+The file imports necessary modules and components such as `cpp`, `BadAdditionOverflowCheck`, and `filter`, which suggests that it leverages existing libraries or frameworks to perform its analysis. The core functionality is encapsulated in a query that uses a combination of relational operations and expressions to identify instances of the problematic pattern in the codebase. The query checks for specific conditions using `badAdditionOverflowCheck` and filters results based on their location in the code, ultimately selecting and reporting the problematic comparisons along with their file paths.
 
-This rule is tagged with several attributes indicating its importance and relevance, such as `reliability`, `correctness`, and `security`. It is associated with external Common Weakness Enumeration (CWE) identifiers `cwe-190` and `cwe-192`, which relate to integer overflow and type conversion issues. The rule is marked with a high severity level, indicating its critical nature in ensuring code reliability and security.
+This code is not an executable or a library intended for direct use in applications but rather a component of a larger static analysis system. It defines a specific check that can be integrated into a broader suite of code quality checks, focusing on reliability, correctness, and security. The use of tags such as `reliability`, `correctness`, and `security`, along with references to external standards like CWE-190 and CWE-192, highlights its role in enforcing coding standards and preventing common vulnerabilities.
 # Imports and Dependencies
 
 ---

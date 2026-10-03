@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for enabling LLVM coverage with Clang in the Firedancer project.
+The `with-llvm-cov.mk` file in the `firedancer` codebase configures build settings for code coverage using `llvm-cov` when Clang is being used, and issues a warning if Clang is not used.
 
 # Purpose
-The `Makefile` snippet configures code coverage settings based on the use of the Clang compiler. If the `FD_USING_CLANG` variable is set to "1", it enables coverage by setting `FD_HAS_COVERAGE` to "1" and appends specific flags to `CPPFLAGS` and `LDFLAGS` to generate profiling information and coverage mapping. If Clang is not used, it issues a warning indicating that `llvm-cov` is requested but Clang is not being used.
+This Makefile snippet conditionally configures the build process to enable code coverage analysis when using the Clang compiler. If the `FD_USING_CLANG` variable is set to "1", it sets the `FD_HAS_COVERAGE` flag, and appends specific flags to `CPPFLAGS` and `LDFLAGS` to generate coverage data. If Clang is not being used, it issues a warning indicating that `llvm-cov` is requested but Clang is not in use.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

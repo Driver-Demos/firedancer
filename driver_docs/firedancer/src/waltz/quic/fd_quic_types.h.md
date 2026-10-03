@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Integer typedefs and a connection ID type definition for QUIC in the Firedancer project.
+Integer typedef macros used by the templ macros.
 
 # Purpose
-This C header file defines type aliases for integer types used in the context of QUIC (Quick UDP Internet Connections) protocol implementation. It uses preprocessor directives to prevent multiple inclusions of the file. The file defines macros that map `uchar`, `ushort`, `uint`, and `ulong` to `fd_quic_uchar`, `fd_quic_ushort`, `fd_quic_uint`, and `fd_quic_ulong`, respectively. Additionally, it defines `FD_QUIC_CONN_ID_TYPE` as an alias for `ulong`, which is likely used to represent connection identifiers in the QUIC protocol.
+Defines the basic type aliases used by the QUIC code. The file maps the generic `uchar`, `ushort`, `uint`, and `ulong` types to the `fd_quic_*` names that the template macros use. It also defines `FD_QUIC_CONN_ID_TYPE` as `ulong` for QUIC connection ID values. The include guard prevents the header from being processed more than once.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
