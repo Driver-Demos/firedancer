@@ -3,23 +3,23 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements commands for backtesting, benchmarking, development, gossip configuration, simulation, and more.
+Commands for backtest, benchmark, dev, gossip, repair, simulation, and snapshot load.
 
 ## Folders
-- **[send_test](send_test/README.md)**: Makefile logic, a command-line tool for send tile testing, and helper functions for gossip and stake handling.
+- **[send_test](send_test/README.md)**: Build rules, send tile tests, and helpers for mock gossip, stake, and vote data.
 
 ## Files
-- **[backtest.c](backtest.c.md)**: Implements a backtest command to simulate and reproduce the behavior of a replay tile using a smaller topology.
-- **[bench.c](bench.c.md)**: Defines a command for testing validator TPS benchmarks with a function that pauses indefinitely.
-- **[core_subtopo.h](core_subtopo.h.md)**: Defines functions to create and manage a 'core' subtopology with network, metrics, and sign tiles.
-- **[dev.c](dev.c.md)**: Defines a command to start a development validator in the Firedancer application.
-- **[gossip.c](gossip.c.md)**: Implements a command for configuring and running a gossip protocol in a network topology, including metrics collection and display.
-- **[gossip.h](gossip.h.md)**: Shared gossip topology setup functions for configuring the gossip subtopology in Firedancer.
-- **[gossip_dump.c](gossip_dump.c.md)**: Defines a command to dump the state of a gossip tile, including contact information and sockets.
-- **[ipecho_server.c](ipecho_server.c.md)**: Implements an IP echo server with configuration, permission checks, and metrics monitoring.
-- **[repair.c](repair.c.md)**: A standalone application for profiling and executing repair operations in various network environments, with command-line argument parsing and topology management.
-- **[sim.c](sim.c.md)**: Implements the "sim" command to simulate a smaller topology for reading archives and replaying behavior.
-- **[snapshot_load.c](snapshot_load.c.md)**: Implements the `snapshot-load` command for configuring and running a snapshot loading topology in Firedancer.
+- **[backtest.c](backtest.c.md)**: Builds the backtest topology and runs replay, exec, snapshot, and support tiles.
+- **[bench.c](bench.c.md)**: The `bench.c` file in the `firedancer` codebase defines a command for testing validator TPS benchmarks, including a function that executes the benchmark and a structure describing the command's properties.
+- **[core_subtopo.h](core_subtopo.h.md)**: Helpers to build the core subtopology and permit links with no producers or consumers.
+- **[dev.c](dev.c.md)**: The `dev.c` file defines a command function for starting a development validator in the Firedancer application, utilizing shared development command functionality.
+- **[gossip.c](gossip.c.md)**: Gossip topology setup and runtime metrics reporting for gossip, gossvf, and ipecho tiles.
+- **[gossip.h](gossip.h.md)**: Shared gossip topology setup function declaration.
+- **[gossip_dump.c](gossip_dump.c.md)**: Dumps gossip tile contact info and socket addresses from shared state.
+- **[ipecho_server.c](ipecho_server.c.md)**: Sets up and runs an ipecho server topology and logs connection metrics.
+- **[repair.c](repair.c.md)**: Repair command for profiler, metrics, and tree views of catchup and repair.
+- **[sim.c](sim.c.md)**: Builds a mini topology for archive playback and replay simulation.
+- **[snapshot_load.c](snapshot_load.c.md)**: Snapshot load command that builds the tile topology and prints load progress metrics.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

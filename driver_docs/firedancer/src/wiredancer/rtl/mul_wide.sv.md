@@ -3,46 +3,45 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a parameterized wide multiplier module with various multiplication strategies in SystemVerilog.
+The `mul_wide.sv` file in the `firedancer` codebase implements a parameterized hardware module for wide multiplication with various configurations and techniques, including native, naive, Karatsuba, and cascaded DSP methods.
 
 # Purpose
-The `mul_wide` module is a parameterized Verilog module designed to perform wide multiplication operations. It supports various multiplication techniques, including native, naive, and Karatsuba methods, as well as cascaded DSP implementations. The module is highly configurable through parameters such as `W`, `W0`, `W1`, `L`, `T`, `M`, and `S`, which define the bit widths and operational modes. The module takes two input operands, `in0` and `in1`, and produces a multiplication result `out0`. It also handles an additional input `m_i` and produces an output `m_o`, which can be used for further processing or pipelining.
+The provided Verilog code defines a module named `mul_wide`, which is designed to perform wide multiplication operations with various configurations and optimizations. This module is highly parameterized, allowing it to handle different bit-widths and multiplication strategies based on the parameters provided. The module supports several multiplication techniques, including native multiplication, naive multiplication, Karatsuba multiplication, and cascaded DSP-based multiplication, each selected through the `CT` parameter. The code also includes provisions for pipelining and intermediate result handling, which are crucial for optimizing performance in hardware implementations.
 
-The module uses a `generate` block to select the appropriate multiplication method based on the `CT` parameter. Each method is implemented in a separate block, allowing for different multiplication strategies to be employed depending on the configuration. For example, the native method directly multiplies the inputs, while the Karatsuba method uses a more complex algorithm to optimize the multiplication of large numbers. The module also includes instances of itself for recursive multiplication in certain configurations, demonstrating its ability to handle complex arithmetic operations. The use of `always_ff` blocks ensures that operations are synchronized with the clock signal, providing reliable and predictable behavior in synchronous digital systems.
+The `mul_wide` module is a versatile component that can be used in a variety of digital signal processing and cryptographic applications where large integer multiplications are required. It includes logic for handling input and output registers, conditional pipelining, and different multiplication strategies, making it suitable for integration into larger systems that require efficient and flexible multiplication capabilities. The module's design allows for recursive instantiation, enabling complex multiplication operations to be broken down into smaller, more manageable sub-tasks, which can be particularly beneficial in FPGA or ASIC designs where resource optimization is critical.
 # Modules
 
 ---
 ### mul\_wide
-Performs wide multiplication of two input values with configurable parameters. Supports different multiplication methods based on the `CT` parameter, including native, naive, W-1, Karatsuba, and cascaded DSP methods.
+The `mul_wide` module is a parameterized Verilog module designed for wide multiplication operations with various configurations based on the control parameter `CT`. It supports different multiplication strategies, including native, naive, W-1, Karatsuba, and cascaded DSP methods, allowing for flexible and efficient multiplication of large bit-width operands.
 - **Constants**:
-    - ``W``: Defines the width of the input and output data.
-    - ``W0``: Sets the width of the first input, defaulting to `W`.
-    - ``W1``: Sets the width of the second input, defaulting to `W`.
-    - ``L``: Specifies a parameter for internal logic, default value is 4.
-    - ``T``: A 32-bit constant used for configuration, default value is `32'h07FCCC`.
-    - ``W2``: Defines half the width of `W`, used in some multiplication methods.
-    - ``R_I``: Determines if input registers are used, default is 0.
-    - ``CT``: Extracts a 4-bit value from `T` to select the multiplication method.
-    - ``ST``: Shifts `T` by 4 bits, used for configuration.
-    - ``M``: Defines the width of the multiplier input and output, default is 32.
-    - ``S``: A parameter for internal logic, default value is 0.
+    - `W`: The width of the input operands, defaulting to 127 bits.
+    - `W0`: Alias for W, representing the width of the first input operand.
+    - `W1`: Alias for W, representing the width of the second input operand.
+    - `L`: A parameter with a default value of 4, possibly used for internal logic or iterations.
+    - `T`: A 32-bit parameter with a default value of 32'h07FCCC, used to determine the control type and shift type.
+    - `W2`: Half the width of W, used in certain multiplication strategies.
+    - `R_I`: A parameter indicating whether to register inputs, defaulting to 0 (no registration).
+    - `CT`: Control type extracted from the parameter T, determining the multiplication strategy.
+    - `ST`: Shift type derived from the parameter T, used in certain multiplication strategies.
+    - `M`: The width of the multiplier input and output, defaulting to 32 bits.
+    - `S`: A parameter with a default value of 0, possibly used for selecting signed or unsigned operations.
 - **Ports**:
-    - ``clk``: Clock input for synchronization.
-    - ``rst``: Reset input to initialize the module.
-    - ``in0``: First input operand for multiplication.
-    - ``in1``: Second input operand for multiplication.
-    - ``m_i``: Input for the multiplier.
-    - ``m_o``: Output of the multiplier.
-    - ``out0``: Output of the multiplication result.
-- **Logic and Control Flow**:
-    - Uses a `generate` block to conditionally instantiate logic based on the `CT` parameter.
-    - If `R_I` is true, registers the inputs `in0`, `in1`, and `m_i` on the rising edge of `clk`.
-    - Implements different multiplication methods based on the value of `CT`.
-    - For `CT == 0`, performs native multiplication with optional pipelining based on `ST`.
-    - For `CT == 1`, uses a naive multiplication approach with sub-module instantiations for partial products.
-    - For `CT == 2`, performs a W-1 multiplication method with sub-module instantiation.
-    - For `CT == 12`, implements the Karatsuba multiplication algorithm with sub-module instantiations and piped adders.
-    - For `CT == 15`, supports cascaded DSP multiplication with different configurations based on `ST`.
+    - `clk`: Clock input for synchronizing operations.
+    - `rst`: Reset input for initializing the module.
+    - `in0`: First input operand with a width of W0 bits.
+    - `in1`: Second input operand with a width of W1 bits.
+    - `m_i`: Input for the multiplier with a width of M bits.
+    - `m_o`: Output for the multiplier with a width of M bits.
+    - `out0`: Output of the multiplication with a width of W0+W1 bits.
+- **Logic And Control Flow**:
+    - The module uses a `generate` block to conditionally instantiate logic based on the `CT` parameter, allowing for different multiplication strategies.
+    - If `R_I` is set, input operands are registered on the rising edge of the clock; otherwise, they are directly assigned.
+    - For `CT == 0`, the module performs native multiplication, either directly or using a pipelined approach if `ST` is non-zero.
+    - For `CT == 1`, a naive multiplication strategy is used, breaking down the operation into smaller parts and recursively instantiating `mul_wide` modules.
+    - For `CT == 2`, a W-1 strategy is employed, adjusting the width of the operands and using a recursive `mul_wide` instance.
+    - For `CT == 12`, the Karatsuba algorithm is implemented, breaking down the multiplication into smaller parts and using piped adders for intermediate calculations.
+    - For `CT == 15`, different strategies are included based on the `ST` parameter, such as cascaded DSP or specific constant multiplications.
 
 
 
