@@ -3,21 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Detects structs that do not fit within their defined footprint macros, issuing warnings.
+CodeQL query that flags structs that do not fit in their footprint macro.
 
 # Purpose
-The code is a script that checks if specific data structures, referred to as structs, fit within predefined memory footprints. It uses a predicate function `fitsInFootprint` to determine if a struct's size is less than or equal to the size specified by a corresponding macro. The script imports modules `cpp` and `filter`, which are likely used to parse and analyze C++ code and apply filtering logic, respectively.
-
-The script defines a series of conditions using the `where` clause. Each condition checks a specific struct against a macro that defines its expected footprint. If a struct does not fit within its defined footprint, the script identifies this as a problem with a severity level of "warning" and a precision level of "high". The script checks multiple struct-macro pairs, such as `fd_funk_private` against `FD_FUNK_FOOTPRINT` and `fd_blake3_private` against `FD_BLAKE3_FOOTPRINT`.
-
-The output of the script is a selection of struct names that do not fit within their respective footprints, along with a message indicating the mismatch. This functionality is useful for developers to ensure that data structures conform to memory constraints, which can be critical for performance and resource management in software systems.
-# Imports and Dependencies
-
----
-- `cpp`
-- `filter`
-
-
+This CodeQL query defines a warning rule named `Footprint bounding` that checks whether specific C `struct` types fit within the size limits set by matching footprint macros. The `fitsInFootprint` predicate compares the size of a named `Struct` against the integer value of a macro invocation and requires the struct to be included in the analyzed source. The `from` and `where` clauses list the exact `struct` and macro pairs that the rule checks, such as `fd_funk_private` with `FD_FUNK_FOOTPRINT` and `fd_frag_meta` with `FD_FRAG_META_FOOTPRINT`. When a struct size is greater than the footprint value, the query reports the struct name and a message that states it does not fit in the named macro.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

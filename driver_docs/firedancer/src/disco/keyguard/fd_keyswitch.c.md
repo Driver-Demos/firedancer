@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for managing memory alignment and lifecycle of `fd_keyswitch_t` objects.
+The `fd_keyswitch.c` file in the `firedancer` codebase provides functions for creating, joining, leaving, and deleting a `fd_keyswitch_t` structure, ensuring proper memory alignment and integrity through magic number checks.
 
 # Purpose
-The code provides functionality for managing a `fd_keyswitch_t` structure, which is likely used for handling a keyswitch mechanism in shared memory. It includes functions to align, create, join, leave, and delete a keyswitch instance. The [`fd_keyswitch_align`](<#fd_keyswitch_align>) and [`fd_keyswitch_footprint`](<#fd_keyswitch_footprint>) functions return alignment and memory footprint requirements, respectively, which are essential for correctly allocating and managing the shared memory used by the keyswitch.
+The provided C source code file defines a set of functions for managing a `fd_keyswitch_t` structure, which appears to be a data structure used for handling some form of stateful operation, likely related to a "keyswitch" mechanism. The file includes functions for creating ([`fd_keyswitch_new`](#fd_keyswitch_new)), joining ([`fd_keyswitch_join`](#fd_keyswitch_join)), leaving ([`fd_keyswitch_leave`](#fd_keyswitch_leave)), and deleting ([`fd_keyswitch_delete`](#fd_keyswitch_delete)) instances of this structure. These functions ensure that the memory is properly aligned and initialized, and they use a "magic" value to verify the integrity of the structure, which is a common technique to detect memory corruption or misuse.
 
-The [`fd_keyswitch_new`](<#fd_keyswitch_new>) function initializes a new keyswitch instance in a given shared memory region, setting its state and verifying alignment. The [`fd_keyswitch_join`](<#fd_keyswitch_join>) function allows a process to join an existing keyswitch instance, checking for correct alignment and a valid magic number to ensure integrity. The [`fd_keyswitch_leave`](<#fd_keyswitch_leave>) function is used to leave a keyswitch instance, and [`fd_keyswitch_delete`](<#fd_keyswitch_delete>) is responsible for deleting an instance, resetting its magic number to indicate it is no longer valid. The code includes error handling through logging warnings when operations encounter issues such as null pointers, misalignment, or invalid magic numbers.
+The code is designed to be part of a larger system, as indicated by the inclusion of a header file (`fd_keyswitch.h`) and the use of macros and functions like `FD_LOG_WARNING`, `FD_COMPILER_MFENCE`, and `FD_VOLATILE`, which suggest a focus on concurrency and memory safety. The functions provide a narrow, specific functionality related to the lifecycle management of the `fd_keyswitch_t` structure, ensuring that the memory is correctly aligned and initialized, and that the structure's integrity is maintained throughout its lifecycle. This file is likely intended to be part of a library or module that can be imported and used by other parts of a software system, providing a controlled interface for managing keyswitch-related operations.
 # Imports and Dependencies
 
 ---
@@ -19,99 +19,88 @@ The [`fd_keyswitch_new`](<#fd_keyswitch_new>) function initializes a new keyswit
 
 ---
 ### fd\_keyswitch\_align<!-- {{#callable:fd_keyswitch_align}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyswitch.c#L3>)
-
-Returns the alignment requirement for a keyswitch.
+The `fd_keyswitch_align` function returns the alignment requirement for a keyswitch structure.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Returns the value of `FD_KEYSWITCH_ALIGN`.
-- **Output**: The function returns an `ulong` representing the alignment requirement for a keyswitch.
+- **Control Flow**:
+    - The function is defined as a constant function, indicating it does not modify any global state and always returns the same value.
+    - It returns the value of the macro `FD_KEYSWITCH_ALIGN`.
+- **Output**: The function returns an unsigned long integer representing the alignment requirement for a keyswitch structure.
 
 
 ---
 ### fd\_keyswitch\_footprint<!-- {{#callable:fd_keyswitch_footprint}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyswitch.c#L8>)
-
-Returns the constant `FD_KEYSWITCH_FOOTPRINT`.
+The `fd_keyswitch_footprint` function returns the constant footprint size required for a keyswitch object.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Return the value of `FD_KEYSWITCH_FOOTPRINT`.
-- **Output**: The function returns an `ulong` value which is the constant `FD_KEYSWITCH_FOOTPRINT`.
+- **Control Flow**:
+    - The function simply returns the value of the constant `FD_KEYSWITCH_FOOTPRINT`.
+- **Output**: The function returns an `ulong` representing the footprint size of a keyswitch object.
 
 
 ---
 ### fd\_keyswitch\_new<!-- {{#callable:fd_keyswitch_new}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyswitch.c#L13>)
-
-Initializes a `fd_keyswitch_t` structure in shared memory with a given state and returns a pointer to it.
+The `fd_keyswitch_new` function initializes a new `fd_keyswitch_t` structure in shared memory with a given state, ensuring proper alignment and setting a magic number for validation.
 - **Inputs**:
     - `shmem`: A pointer to the shared memory where the `fd_keyswitch_t` structure will be initialized.
-    - `state`: An unsigned long integer representing the initial state to set in the `fd_keyswitch_t` structure.
-- **Logic and Control Flow**:
-    - Cast `shmem` to a `fd_keyswitch_t` pointer `ks`.
+    - `state`: An unsigned long integer representing the initial state to be set in the `fd_keyswitch_t` structure.
+- **Control Flow**:
+    - Cast the `shmem` pointer to a `fd_keyswitch_t` pointer named `ks`.
     - Check if `shmem` is NULL; if so, log a warning and return NULL.
-    - Check if `shmem` is aligned according to `fd_keyswitch_align()`; if not, log a warning and return NULL.
-    - Get the footprint size using `fd_keyswitch_footprint()`.
-    - Set the memory at `ks` to zero for the size of the footprint.
-    - Set the `state` field of `ks` to the provided `state` value.
-    - Use `FD_COMPILER_MFENCE()` to ensure memory ordering before and after setting `ks->magic`.
-    - Set `ks->magic` to `FD_KEYSWITCH_MAGIC` using `FD_VOLATILE`.
-    - Return a pointer to the initialized `fd_keyswitch_t` structure.
-- **Output**: A pointer to the initialized `fd_keyswitch_t` structure, or NULL if an error occurs.
-- **Functions Called**:
-    - [`fd_keyswitch_align`](<#fd_keyswitch_align>)
-    - [`fd_keyswitch_footprint`](<#fd_keyswitch_footprint>)
+    - Check if `shmem` is not aligned according to [`fd_keyswitch_align`](#fd_keyswitch_align); if misaligned, log a warning and return NULL.
+    - Retrieve the footprint size using [`fd_keyswitch_footprint`](#fd_keyswitch_footprint).
+    - Zero out the memory for `ks` using `fd_memset` with the footprint size.
+    - Set the `state` field of `ks` to the provided `state` argument.
+    - Use `FD_COMPILER_MFENCE` to ensure memory ordering before and after setting the `magic` field.
+    - Set the `magic` field of `ks` to `FD_KEYSWITCH_MAGIC` to mark it as initialized.
+    - Return the pointer to the initialized `fd_keyswitch_t` structure.
+- **Output**: A pointer to the initialized `fd_keyswitch_t` structure, or NULL if initialization fails due to NULL or misaligned `shmem`.
+- **Functions called**:
+    - [`fd_keyswitch_align`](#fd_keyswitch_align)
+    - [`fd_keyswitch_footprint`](#fd_keyswitch_footprint)
 
 
 ---
 ### fd\_keyswitch\_join<!-- {{#callable:fd_keyswitch_join}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyswitch.c#L40>)
-
-Validates and returns a pointer to a `fd_keyswitch_t` structure if the input is correctly aligned and has the correct magic number.
+The `fd_keyswitch_join` function validates and returns a pointer to a `fd_keyswitch_t` structure if the input shared memory is correctly aligned and initialized.
 - **Inputs**:
-    - `shks`: A pointer to a memory location that is expected to be a `fd_keyswitch_t` structure.
-- **Logic and Control Flow**:
-    - Check if `shks` is NULL; if true, log a warning and return NULL.
-    - Check if `shks` is aligned according to `fd_keyswitch_align()`; if not, log a warning and return NULL.
+    - `shks`: A pointer to shared memory that is expected to contain a `fd_keyswitch_t` structure.
+- **Control Flow**:
+    - Check if `shks` is NULL; if so, log a warning and return NULL.
+    - Check if `shks` is aligned according to [`fd_keyswitch_align`](#fd_keyswitch_align); if not, log a warning and return NULL.
     - Cast `shks` to a `fd_keyswitch_t` pointer and store it in `ks`.
-    - Check if the `magic` field of `ks` equals `FD_KEYSWITCH_MAGIC`; if not, log a warning and return NULL.
+    - Check if `ks->magic` equals `FD_KEYSWITCH_MAGIC`; if not, log a warning and return NULL.
     - Return the `ks` pointer.
 - **Output**: A pointer to a `fd_keyswitch_t` structure if all checks pass, otherwise NULL.
-- **Functions Called**:
-    - [`fd_keyswitch_align`](<#fd_keyswitch_align>)
+- **Functions called**:
+    - [`fd_keyswitch_align`](#fd_keyswitch_align)
 
 
 ---
 ### fd\_keyswitch\_leave<!-- {{#callable:fd_keyswitch_leave}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyswitch.c#L63>)
-
-Returns a pointer to the `fd_keyswitch_t` object if it is not NULL.
+The `fd_keyswitch_leave` function checks if the provided `fd_keyswitch_t` pointer is non-null and returns it as a void pointer, logging a warning if it is null.
 - **Inputs**:
-    - `ks`: A constant pointer to an `fd_keyswitch_t` object.
-- **Logic and Control Flow**:
-    - Check if `ks` is NULL using `FD_UNLIKELY`.
-    - If `ks` is NULL, log a warning message 'NULL ks' and return NULL.
-    - If `ks` is not NULL, return the pointer cast to `void *`.
-- **Output**: A `void *` pointer to the `fd_keyswitch_t` object, or NULL if the input is NULL.
+    - `ks`: A constant pointer to an `fd_keyswitch_t` structure, representing the keyswitch instance to be left.
+- **Control Flow**:
+    - Check if the `ks` pointer is null using `FD_UNLIKELY` macro for unlikely conditions.
+    - If `ks` is null, log a warning message 'NULL ks' and return `NULL`.
+    - If `ks` is not null, cast it to a `void *` and return it.
+- **Output**: Returns the input `ks` cast to a `void *`, or `NULL` if `ks` is null.
 
 
 ---
 ### fd\_keyswitch\_delete<!-- {{#callable:fd_keyswitch_delete}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyswitch.c#L74>)
-
-Deletes a `fd_keyswitch_t` object by validating and resetting its magic number.
+The `fd_keyswitch_delete` function validates and deletes a keyswitch object by resetting its magic number to zero.
 - **Inputs**:
-    - `shks`: A pointer to the `fd_keyswitch_t` object to delete.
-- **Logic and Control Flow**:
-    - Check if `shks` is NULL; if true, log a warning and return NULL.
-    - Check if `shks` is aligned according to [`fd_keyswitch_align`](<#fd_keyswitch_align>); if not, log a warning and return NULL.
+    - `shks`: A pointer to the shared memory region representing the keyswitch object to be deleted.
+- **Control Flow**:
+    - Check if the input pointer `shks` is NULL; if so, log a warning and return NULL.
+    - Verify if `shks` is properly aligned using [`fd_keyswitch_align`](#fd_keyswitch_align); if not, log a warning and return NULL.
     - Cast `shks` to a `fd_keyswitch_t` pointer `ks`.
-    - Check if `ks->magic` is equal to `FD_KEYSWITCH_MAGIC`; if not, log a warning and return NULL.
+    - Check if the `magic` field of `ks` matches `FD_KEYSWITCH_MAGIC`; if not, log a warning and return NULL.
     - Use memory fences to ensure memory operations are completed before and after setting `ks->magic` to 0.
-    - Return the pointer `ks`.
-- **Output**: Returns a pointer to the `fd_keyswitch_t` object if successful, or NULL if any validation fails.
-- **Functions Called**:
-    - [`fd_keyswitch_align`](<#fd_keyswitch_align>)
+    - Return the pointer `ks` cast back to `void *`.
+- **Output**: A pointer to the keyswitch object cast to `void *`, or NULL if any validation checks fail.
+- **Functions called**:
+    - [`fd_keyswitch_align`](#fd_keyswitch_align)
 
 
 

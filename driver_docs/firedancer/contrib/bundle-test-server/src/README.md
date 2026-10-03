@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a gRPC server with authentication and block engine validation services.
+gRPC test server with REPL commands to kill streams or restart the server.
 
 
 ## Files
-- **[main.rs](main.rs.md)**: Implements a gRPC server with authentication and block engine validation services, including command handling and stream management.
+- **[main.rs](main.rs.md)**: gRPC test server with REPL commands to kill streams or restart the server.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
