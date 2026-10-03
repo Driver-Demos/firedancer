@@ -3,14 +3,32 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Environment and command-line parsing helpers that strip keys and convert values to basic types.
+APIs for extracting and converting environment and command line arguments to various data types.
 
 # Purpose
-This header defines environment and command-line helper APIs for reading configuration values from either POSIX environment variables or C-style argument lists. The `fd_env_strip_cmdline_*` functions search for a named key, convert the matched value to a requested type such as `int`, `ulong`, `float`, or `cstr`, and remove matched command-line entries so that separate parts of the code can parse arguments without conflict. The `fd_env_strip_cmdline_cstr` form returns the original string pointer, so its lifetime follows the source value from the environment, command line, or default input. The [`fd_env_strip_cmdline_contains`](<#fd_env_strip_cmdline_contains>) function provides a simpler presence check that also strips the key from the argument list.
+This C header file defines a set of macros and function prototypes for extracting and converting command line arguments and environment variables into various data types. The primary functionality is provided by the `fd_env_strip_cmdline_*` functions, which search for key-value pairs in both the environment and command line arguments, convert the values to specified types, and return the last found value or a default if none is found. The functions also remove these key-value pairs from the command line arguments to support modular command line parsing. The header includes support for multiple data types, such as `char`, `int`, `ulong`, and `float`, and conditionally includes support for `double` if the target environment supports it. Additionally, the [`fd_env_strip_cmdline_contains`](<#fd_env_strip_cmdline_contains>) function checks for the presence of a specific key in the command line arguments and removes it if found.
+# Imports and Dependencies
+
+---
+- `../cstr/fd_cstr.h`
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_env_strip_cmdline_contains`
+### fd\_env\_strip\_cmdline\_contains<!-- {{#callable_declaration:fd_env_strip_cmdline_contains}} -->
+[View Source →](<../../../../../src/util/env/fd_env.h#L63>)
+
+Removes a specified key from command line arguments if present.
+- **Description**: Use this function to check for the presence of a specific key in the command line arguments and remove it if found. This is useful for modular command line parsing, allowing different parts of a program to handle specific arguments independently. The function must be called with valid pointers for `pargc`, `pargv`, and `key`. If any of these pointers are null, the function will not perform any operation and will return 0. The command line arguments are expected to be null-terminated, and the function will update `pargc` and `pargv` to reflect the removal of the key.
+- **Inputs**:
+    - `pargc`: A pointer to an integer representing the number of command line arguments. Must not be null. The function updates this value to reflect the new count after removing the key.
+    - `pargv`: A pointer to an array of strings representing the command line arguments. Must not be null. The function updates this array to remove the specified key.
+    - `key`: A constant string representing the key to search for in the command line arguments. Must not be null. If the key is found, it is removed from the arguments.
+- **Output**: Returns 1 if the key is found and removed, otherwise returns 0.
+- **See Also**: [`fd_env_strip_cmdline_contains`](<fd_env.c.md#fd_env_strip_cmdline_contains>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

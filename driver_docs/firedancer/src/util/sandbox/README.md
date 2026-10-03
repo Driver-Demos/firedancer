@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Linux sandbox setup, seccomp, Landlock, namespaces, limits, and tests.
+Functions and tests for Linux sandboxing, seccomp filtering, and namespace management with architecture-specific policies.
 
 ## Folders
-- **[generated](generated/README.md)**: The `generated` folder in the `firedancer` codebase contains a single generated header file, `test_sandbox_seccomp.h`, which defines a seccomp filter policy for sandboxing by specifying allowed system calls.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for sandboxing with architecture-specific checks and syscall rules.
 
 ## Files
-- **[fd_sandbox.c](fd_sandbox.c.md)**: Linux sandbox setup, UID/GID switching, namespace isolation, Landlock, seccomp, and PID/TID helpers.
-- **[fd_sandbox.h](fd_sandbox.h.md)**: Linux sandbox API with UID/GID switching, PID/TID lookup, and seccomp setup.
-- **[fd_sandbox_private.h](fd_sandbox_private.h.md)**: Sandbox helper prototypes for environment, descriptors, IDs, namespaces, limits, caps, Landlock, and seccomp.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally adds headers, objects, and unit tests for the sandbox utility based on the presence of hosted, Linux, and architecture support.
-- **[test_sandbox.c](test_sandbox.c.md)**: Sandbox utility tests for environment, descriptors, namespaces, caps, rlimits, landlock, seccomp.
-- **[test_sandbox.seccomppolicy](test_sandbox.seccomppolicy.md)**: The `test_sandbox.seccomppolicy` file defines a seccomp policy for the `firedancer` project, specifying allowed system calls and their conditions, such as `write` and `fsync` with specific argument checks, and `exit_group`.
+- **[fd_sandbox.c](fd_sandbox.c.md)**: Functions for managing Linux sandbox environments, including user namespace handling, capability dropping, and seccomp filtering.
+- **[fd_sandbox.h](fd_sandbox.h.md)**: Functions for managing process sandboxing on Linux, including entering a sandbox and switching user IDs.
+- **[fd_sandbox_private.h](fd_sandbox_private.h.md)**: Functions for managing process environment, file descriptors, user and group IDs, namespaces, resource limits, capabilities, and security restrictions in a sandbox environment.
+- **[Local.mk](Local.mk.md)**: Makefile configuration for building and testing the fd_sandbox component on supported architectures.
+- **[test_sandbox.c](test_sandbox.c.md)**: Tests for sandboxing features such as environment clearing, file descriptor checks, and namespace restrictions.
+- **[test_sandbox.seccomppolicy](test_sandbox.seccomppolicy.md)**: Defines a seccomp policy for system calls with specific argument conditions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
