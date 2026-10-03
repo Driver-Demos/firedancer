@@ -3,80 +3,80 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_ipc_init` file is a Bash script used to set up and configure shared memory workspaces for interprocess communication in the `firedancer` project, generating a configuration file with the details.
+Bash script to initialize and configure shared memory for interprocess communication tests.
 
 # Purpose
-This Bash script is designed to set up and configure a shared memory workspace for interprocess communication (IPC) in a specific environment, likely related to a project named "firedancer." It provides narrow functionality, focusing on initializing and configuring shared memory resources, such as creating and managing workspaces and caches, and setting up transmission (TX) and reception (RX) channels. The script checks for the presence of a build directory as an argument and uses various commands to manage shared memory configurations, including creating new control and cache structures. It also generates a configuration file (`test_ipc.conf`) that stores the details of the setup, which can be used for unit testing purposes. The script is intended to be executed from the base directory of the project and assumes certain permissions and system configurations are in place.
+This script is a Bash executable intended to set up and configure a shared memory workspace for interprocess communication (IPC) in a specific environment. It requires a build directory as an argument and is designed to be run from the base directory of the Firedancer project. The script checks for the necessary NUMA node resources and configures shared memory objects, such as control and cache structures, for both transmission (`TX`) and reception (`RX`) processes. It creates a configuration file (`tmp/test_ipc.conf`) that stores the details of the shared memory setup, which includes parameters like workspace name, NUMA index, and the number of transmission and reception channels. The script also includes diagnostic and setup commands for NUMA topology and shared memory sandbox initialization.
 # Global Variables
 
 ---
 ### NUMA\_IDX
 - **Type**: `integer`
-- **Description**: `NUMA_IDX` is a global variable that is initialized to 0. It represents the index of the NUMA (Non-Uniform Memory Access) node that the script will use for allocating resources. This variable is crucial for ensuring that the script interacts with the correct NUMA node, which can affect performance and resource allocation.
-- **Use**: `NUMA_IDX` is used to specify the NUMA node index when creating a new workspace with the `fd_wksp_ctl` command, ensuring that resources are allocated on the specified NUMA node.
+- **Description**: Specifies the NUMA (Non-Uniform Memory Access) node index used for memory allocation and process execution. It is set to 0, indicating the first NUMA node on the system.
+- **Use**: Used to determine the NUMA node for allocating shared memory and other resources in the script.
 
 
 ---
 ### WKSP
-- **Type**: `string`
-- **Description**: The `WKSP` variable is a string that holds the name of the workspace used for interprocess communication in the script. It is set to the value 'test_ipc', which is likely a placeholder or default name for the workspace.
-- **Use**: This variable is used to specify the name of the workspace when creating, deleting, or configuring shared memory objects for interprocess communication.
+- **Type**: ``string``
+- **Description**: The `WKSP` variable is a string that holds the name of a workspace used for interprocess communication in a shared memory environment. It is set to the value 'test_ipc'. This workspace is recreated from scratch if it already exists in the shared memory sandbox.
+- **Use**: Used to specify the name of the workspace for shared memory operations and interprocess communication setup.
 
 
 ---
 ### WKSP\_CNT
 - **Type**: `integer`
-- **Description**: `WKSP_CNT` is a global variable that specifies the number of pages to be used for a workspace in a shared memory setup. It is set to 1, indicating that a single page of the specified type (`WKSP_PAGE`) will be used.
-- **Use**: This variable is used to configure the number of pages allocated for the workspace when creating a new shared memory workspace with `fd_wksp_ctl`.
+- **Description**: The variable `WKSP_CNT` is an integer that specifies the number of pages to allocate for a workspace in a shared memory setup. It is used in the context of setting up interprocess communication using shared memory.
+- **Use**: Used to define the number of pages for the workspace when creating a new shared memory workspace with the `fd_wksp_ctl` command.
 
 
 ---
 ### WKSP\_PAGE
 - **Type**: `string`
-- **Description**: The `WKSP_PAGE` variable is a global string variable set to the value 'gigantic'. It is used to specify the size of the memory pages that will be allocated for the workspace in a shared memory environment.
-- **Use**: This variable is used to define the size of the pages when creating a new workspace with the `fd_wksp_ctl` command.
+- **Description**: The `WKSP_PAGE` variable is a string that specifies the type of memory page to use for the workspace. In this script, it is set to 'gigantic', indicating the use of large memory pages.
+- **Use**: Used to define the type of memory page for the workspace in shared memory operations.
 
 
 ---
 ### TX\_MAX
 - **Type**: `integer`
-- **Description**: `TX_MAX` is a global variable that defines the maximum number of transmission (TX) channels or instances that can be set up in the script. It is initialized with a value of 1, indicating that only one transmission channel is configured by default.
-- **Use**: `TX_MAX` is used in a loop to set up the specified number of transmission channels, where each channel is initialized with control, memory cache, and data cache configurations.
+- **Description**: Defines the maximum number of transmission (TX) setups that the script will configure. It is set to 1, indicating that only one transmission setup will be created.
+- **Use**: Used in a loop to create and configure transmission control, memory cache, and data cache for each transmission setup.
 
 
 ---
 ### RX\_MAX
 - **Type**: `integer`
-- **Description**: `RX_MAX` is a global variable that specifies the maximum number of receive (RX) operations or channels that can be set up in the script. It is set to 16, indicating that up to 16 RX channels can be configured.
-- **Use**: This variable is used in a loop to initialize and configure RX channels, specifically creating control and sequence objects for each channel.
+- **Description**: Defines the maximum number of receive (RX) operations or channels that the script will configure. It is set to 16, indicating that up to 16 RX operations can be initialized.
+- **Use**: Used in a loop to set up RX operations, determining how many RX channels are created.
 
 
 ---
 ### TX\_DEPTH
 - **Type**: `integer`
-- **Description**: The `TX_DEPTH` variable is a global integer variable set to 32768. It represents the depth or capacity of the transmission (TX) queue or buffer used in the script.
-- **Use**: `TX_DEPTH` is used to configure the size of the transmission cache (`TX_MCACHE`) and data cache (`TX_DCACHE`) for each transmission index in the setup process.
+- **Description**: The variable `TX_DEPTH` is an integer that specifies the depth of the transmission (TX) cache. It is set to 32768, indicating the number of entries or the capacity of the TX cache.
+- **Use**: Used to define the capacity of the transmission cache in the setup of TX components.
 
 
 ---
 ### TX\_MTU
 - **Type**: `integer`
-- **Description**: The `TX_MTU` variable is an integer that represents the maximum transmission unit size for the transmission data cache. It is set to 1542, which is a typical size for Ethernet frames including some overhead.
-- **Use**: This variable is used to configure the maximum size of data packets that can be handled by the transmission data cache (`TX_DCACHE`) in the script.
+- **Description**: Defines the maximum transmission unit (MTU) size for the transmission data cache. The value is set to 1542, which typically represents the maximum size of a packet that can be transmitted over a network without fragmentation.
+- **Use**: Used to configure the transmission data cache (`TX_DCACHE`) with the specified MTU size.
 
 
 ---
 ### APP\_SZ
 - **Type**: `integer`
-- **Description**: `APP_SZ` is a global variable defined in the script with a value of 4032. It represents the application size parameter used in various function calls related to shared memory and interprocess communication setup.
-- **Use**: `APP_SZ` is used as a parameter in function calls to configure new CNC, MCACHE, and DCACHE instances, indicating the size of the application data structures.
+- **Description**: The `APP_SZ` variable is an integer that specifies the application size used in the script. It is set to 4032.
+- **Use**: Used as a parameter in various function calls to allocate or configure resources with a specific size.
 
 
 ---
 ### CONF
 - **Type**: `string`
-- **Description**: The `CONF` variable is a string that specifies the file path to a configuration file, `tmp/test_ipc.conf`. This file is used to store details about shared memory objects used for interprocess communications.
-- **Use**: `CONF` is used to define the location where the script writes the configuration details of the shared memory setup.
+- **Description**: The `CONF` variable is a string that specifies the file path 'tmp/test_ipc.conf'. This file is used to store details about shared memory objects for interprocess communications.
+- **Use**: Stores the path where configuration details for shared memory objects are written.
 
 
 
