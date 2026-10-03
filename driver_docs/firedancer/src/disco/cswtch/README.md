@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp filter policy, context switch monitoring, security policies, and Makefile logic for tiles.
+Context-switch metrics, seccomp policy, and build rules for fd_cswtch_tile.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+- **[generated](generated/README.md)**: Generated seccomp BPF filter for allowed syscalls and argument checks.
 
 ## Files
-- **[fd_cswtch_tile.c](fd_cswtch_tile.c.md)**: Implements context switch monitoring for tiles, including initialization and metric updates.
-- **[fd_cswtch_tile.seccomppolicy](fd_cswtch_tile.seccomppolicy.md)**: Defines security policies for logging, metrics, and CPU usage management in a tile environment.
-- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects `fd_cswtch_tile` and `fd_disco` if `FD_HAS_ALLOCA` is defined.
+- **[fd_cswtch_tile.c](fd_cswtch_tile.c.md)**: Reads /proc status files and updates voluntary and involuntary context-switch metrics.
+- **[fd_cswtch_tile.seccomppolicy](fd_cswtch_tile.seccomppolicy.md)**: The `fd_cswtch_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, file synchronization, context switch metrics retrieval, and CPU usage reduction through sleep operations.
+- **[Local.mk](Local.mk.md)**: Build rule that adds fd_cswtch_tile to fd_disco when FD_HAS_ALLOCA is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
