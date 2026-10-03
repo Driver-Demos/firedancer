@@ -3,29 +3,35 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `bundle.proto` file defines the protocol buffer messages and structures for handling bundles, including their acceptance, rejection, and processing results, within the `firedancer` codebase.
+Defines protocol buffer messages for handling bundle processing results, including acceptance, rejection, and status updates.
 
 # Purpose
-The provided content is a Protocol Buffers (proto3) file, which is used to define structured data for serialization and communication between different components of a software system. This file is specifically designed to describe the structure and types of messages related to a "bundle" in a blockchain or distributed ledger context. It includes definitions for various message types such as `Bundle`, `BundleUuid`, `Accepted`, `Rejected`, and `BundleResult`, each of which encapsulates specific data and states related to the processing and validation of bundles. The file provides a narrow functionality focused on the lifecycle and status of bundles, including their acceptance, rejection, and processing outcomes. The relevance of this file to a codebase lies in its role in ensuring consistent data exchange and processing logic across different parts of the system, particularly in scenarios involving validators and auction mechanisms within a blockchain network.
+The file defines a protocol buffer schema using `proto3` syntax, which is used to serialize structured data. It imports two other protocol files, `packet.proto` and `shared.proto`, indicating dependencies on shared message definitions. The schema is organized under the `bundle` package and defines several message types related to the processing of data bundles. The `Bundle` message includes a header and a list of packets, while `BundleUuid` associates a bundle with a unique identifier. The file also defines various result types for bundles, such as `Accepted`, `Rejected`, `WinningBatchBidRejected`, `StateAuctionBidRejected`, `SimulationFailure`, `InternalError`, and `DroppedBundle`, each with specific fields to capture the outcome of bundle processing. Additionally, the `BundleResult` message uses a `oneof` construct to encapsulate different processing results, such as `Accepted`, `Rejected`, `Finalized`, `Processed`, and `Dropped`, providing a comprehensive framework for handling bundle lifecycle events in a distributed system.
 # Content Summary
-The provided content is a Protocol Buffers (proto3) schema definition for a system that manages and processes "bundles" within a blockchain or distributed ledger context. This schema is part of a package named `bundle` and imports definitions from `packet.proto` and `shared.proto`, indicating dependencies on other message structures defined in those files.
+The provided content is a Protocol Buffers (proto3) schema definition for a system that manages and processes data bundles. The schema defines several messages and enumerations that describe the structure and processing outcomes of these bundles.
 
-The primary message types defined in this schema are `Bundle`, `BundleUuid`, and `BundleResult`, each serving distinct roles in the system:
+1. **Package and Imports**: The schema is part of the `bundle` package and imports definitions from `packet.proto` and `shared.proto`. These imports suggest dependencies on other message definitions, specifically for `packet.Packet` and `shared.Header`.
 
-1. **Bundle**: This message encapsulates a collection of packets, each represented by the `packet.Packet` type, and includes a `shared.Header` for metadata. It serves as the core data structure for grouping related packets.
+2. **Primary Messages**:
+   - `Bundle`: This message contains a `shared.Header` and a list of `packet.Packet` objects. It represents a collection of packets with associated metadata.
+   - `BundleUuid`: This message links a `Bundle` with a unique identifier (`uuid`), allowing for distinct identification of each bundle.
 
-2. **BundleUuid**: This message associates a `Bundle` with a unique identifier (`uuid`), facilitating tracking and referencing of specific bundles within the system.
+3. **Result Types**:
+   - `Accepted`: Indicates a bundle was accepted and forwarded to a validator. It includes the slot number and the validator's identity.
+   - `Rejected`: Indicates a bundle was not forwarded due to various reasons encapsulated in a `oneof` construct. Possible reasons include auction bid rejections, simulation failures, internal errors, or other conditions leading to a dropped bundle.
+   - `WinningBatchBidRejected` and `StateAuctionBidRejected`: These messages provide details on why a bundle's bid was rejected in the context of state auctions, including auction identifiers and bid amounts.
+   - `SimulationFailure`, `InternalError`, and `DroppedBundle`: These messages describe specific failure scenarios, each with an optional message field for additional context.
 
-3. **BundleResult**: This message captures the outcome of processing a bundle. It includes a `bundle_id` and a `oneof` field named `result`, which can be one of several types:
-   - **Accepted**: Indicates successful forwarding of the bundle to a validator, with details about the slot and validator identity.
-   - **Rejected**: Captures various reasons for rejection, such as auction bid issues, simulation failures, internal errors, or other conditions leading to a dropped bundle.
-   - **Finalized**: Signifies that the bundle has reached a finalized commitment level.
-   - **Processed**: Indicates the bundle has been processed, with details about the validator, slot, and bundle index.
-   - **Dropped**: Represents bundles that were accepted but did not land on-chain, with reasons such as blockhash expiration or partial processing.
+4. **Processing States**:
+   - `Finalized`: Represents a state where the bundle has reached a finalized commitment level.
+   - `Processed`: Contains details about the validator identity, slot, and bundle index within a block, indicating the bundle has been processed.
+   - `Dropped`: Indicates the bundle was accepted but not finalized, with reasons specified in the `DroppedReason` enumeration.
 
-The schema also defines several specific rejection messages (`WinningBatchBidRejected`, `StateAuctionBidRejected`, `SimulationFailure`, `InternalError`, `DroppedBundle`) and an enumeration `DroppedReason` to categorize the reasons for a bundle being dropped.
+5. **DroppedReason Enumeration**: This enumeration provides reasons for a bundle being dropped, such as `BlockhashExpired`, `PartiallyProcessed`, or `NotFinalized`.
 
-Overall, this schema provides a structured way to define, track, and manage the lifecycle of bundles within a blockchain system, including their acceptance, rejection, processing, and finalization states. It is crucial for developers working with this system to understand the message types and their fields to effectively handle bundle processing and error handling.
+6. **BundleResult**: This message encapsulates the outcome of processing a bundle, identified by `bundle_id`. It uses a `oneof` construct to specify the result, which can be `Accepted`, `Rejected`, `Finalized`, `Processed`, or `Dropped`.
+
+This schema is essential for developers working with the system to understand how bundles are structured, processed, and the possible outcomes of their processing. It provides a clear framework for handling data bundles within the system, including error handling and state management.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

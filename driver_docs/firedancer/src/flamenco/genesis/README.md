@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `genesis` folder in the `firedancer` codebase contains files related to the creation and testing of Solana genesis blocks, including implementation, header, build instructions, and test files.
+Creates and tests Solana genesis blocks with configurable options and includes a Makefile for building.
 
 
 ## Files
-- **[fd_genesis_create.c](fd_genesis_create.c.md)**: The `fd_genesis_create.c` file in the `firedancer` codebase implements the creation of a Solana genesis block, configuring various parameters such as fee rate, rent, inflation, and accounts, and encoding the genesis data into a binary format.
-- **[fd_genesis_create.h](fd_genesis_create.h.md)**: The `fd_genesis_create.h` file provides a tool for creating Solana genesis blobs, which are used to bootstrap a Solana ledger, and includes a structure for specifying genesis creation options.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions and conditional unit test execution for the `fd_genesis_create` and `fd_flamenco` components, contingent on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED` flags.
-- **[test_genesis_create.c](test_genesis_create.c.md)**: The `test_genesis_create.c` file in the `firedancer` codebase tests the creation of a genesis block with various configurations and options, including account funding and feature gates, while managing logging levels and memory buffers.
+- **[fd_genesis_create.c](fd_genesis_create.c.md)**: Creates a Solana genesis block with specified configurations and accounts.
+- **[fd_genesis_create.h](fd_genesis_create.h.md)**: Tool for creating Solana genesis blobs to bootstrap a Solana ledger with configurable options.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing components in the firedancer genesis module.
+- **[test_genesis_create.c](test_genesis_create.c.md)**: Tests the creation of a genesis block with various configurations and options in Firedancer.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

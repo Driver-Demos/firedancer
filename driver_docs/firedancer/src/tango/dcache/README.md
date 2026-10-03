@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `dcache` folder in the `firedancer` codebase contains source files, headers, and a makefile for managing and testing a data cache system, including its creation, alignment, and operations, as well as unit tests to verify its functionality.
+Functions, headers, and tests for managing and validating a data cache with alignment and memory management.
 
 
 ## Files
-- **[fd_dcache.c](fd_dcache.c.md)**: The `fd_dcache.c` file in the `firedancer` codebase provides functions for managing a data cache, including calculating required data sizes, aligning and creating new caches, joining and leaving caches, and checking the safety of compacting a cache.
-- **[fd_dcache.h](fd_dcache.h.md)**: The `fd_dcache.h` file in the `firedancer` codebase defines macros and functions for managing a dcache, including its alignment, footprint, and operations for creating, joining, and deleting dcaches, as well as handling compact storage of fragments.
-- **[fd_dcache_private.h](fd_dcache_private.h.md)**: The `fd_dcache_private.h` file defines the structure and functions for managing the layout of a shared memory region in the Firedancer dcache, including constants and alignment specifications.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_dcache` component, and includes commands to build and run the `test_dcache` unit test.
-- **[test_dcache.c](test_dcache.c.md)**: The `test_dcache.c` file in the `firedancer` codebase contains unit tests for verifying the alignment, footprint calculations, and functionality of the dcache (data cache) implementation, including tests for dcache creation, accessors, and destruction.
+- **[fd_dcache.c](fd_dcache.c.md)**: Functions for managing and validating a data cache, including creation, alignment, and safety checks.
+- **[fd_dcache.h](fd_dcache.h.md)**: Header file for managing a dcache, including alignment, footprint calculations, and memory management functions.
+- **[fd_dcache_private.h](fd_dcache_private.h.md)**: Defines the structure and functions for managing the layout of a shared memory region in a dcache.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_dcache` in the `firedancer` codebase.
+- **[test_dcache.c](test_dcache.c.md)**: Unit tests for verifying the alignment, footprint, and functionality of dcache operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
