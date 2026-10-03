@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.md` file provides instructions for setting up and running an integration test for `fd_quic` and `solana-streamer` within the `firedancer` codebase.
+Integration test for fd_quic and solana-streamer with setup and usage instructions.
 
 # Purpose
-The file provides instructions for setting up and running an integration test for the `fd_quic` and `solana-streamer` components. It specifies the necessary package installations for Debian and Fedora-based systems, followed by commands to build the project in release mode using Cargo and execute the test as both a server and a client.
+The directory contains an integration test for `fd_quic` and `solana-streamer`. To use the test, install the necessary development libraries for Clang on your system using `sudo apt install -y libclang-dev` for Debian-based systems or `sudo dnf install -y clang-devel` for Fedora-based systems. Then, build the project in release mode with `cargo build --release` and execute the test by running `./target/release/firedancer-agave-quic-test` with either the `server` or `client` argument.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
