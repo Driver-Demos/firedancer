@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components with conditional logic based on FD_HAS_ALLOCA.
+Build rules and unit tests for verify and verify_tile, enabled when FD_HAS_ALLOCA is set
 
 # Purpose
-The `Makefile` snippet conditionally includes and runs unit tests based on the presence of the `FD_HAS_ALLOCA` flag. If the flag is defined, it adds object files `fd_verify_tile` and `fd_disco` to the build process. It also defines and runs unit tests `test_verify` and `test_verify_tile`, which depend on the modules `fd_ballet`, `fd_tango`, `fd_util`, and `fd_disco`.
+Build rules under `ifdef FD_HAS_ALLOCA` add the `fd_verify_tile` object to `fd_disco`, define the `test_verify` and `test_verify_tile` unit test targets with their required libraries, and run both tests. The `endif` line closes the conditional block so these rules apply only when `FD_HAS_ALLOCA` is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
