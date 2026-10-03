@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-YAML configuration for a pong message with sender, token, and signature details.
+The `repair_pong.yml` file in the `firedancer` codebase contains configuration data for a pong message, including fields for the sender, token, and signature.
 
 # Purpose
-The YAML configuration defines a `pong` object with three key-value pairs. The `from` key specifies a source identifier, the `token` key provides an authentication token, and the `signature` key contains a digital signature. These elements are likely used for authentication and verification purposes in a software system.
+The file is a YAML configuration file that contains authentication or verification details for a service or application. It specifies a `pong` object with three key-value pairs: `from`, `token`, and `signature`, which are likely used for identifying the source, providing a security token, and verifying the integrity or authenticity of a message or request.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
