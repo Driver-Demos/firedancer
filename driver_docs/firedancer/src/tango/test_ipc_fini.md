@@ -3,19 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A shell script to finalize IPC tests by deleting workspace and configuration files.
+The `test_ipc_fini` file is a bash script that checks for the existence of a configuration file, deletes a workspace using a control command, and then removes the configuration file.
 
 # Purpose
-This script is a Bash executable that manages the initialization and cleanup of a configuration file for inter-process communication (IPC) testing. It checks for the existence of the `tmp/test_ipc.conf` file and exits with a message if the file is not found, indicating that the environment is not initialized. The script sources the configuration file, sets and exports the `FD_LOG_PATH` variable, and then executes a command to delete a workspace using the `fd_wksp_ctl` utility. Finally, it removes the configuration file and outputs "pass" to indicate successful execution.
-# Global Variables
-
----
-### FD\_LOG\_PATH
-- **Type**: ``string``
-- **Description**: `FD_LOG_PATH` is a global variable that is initialized as an empty string. It is intended to store the path for log files.
-- **Use**: Used to define and export the log file path for other scripts or processes to access.
-
-
+This Bash script is designed to perform a specific set of operations related to a configuration file, indicating narrow functionality. It checks for the existence of a configuration file named `tmp/test_ipc.conf` and exits with a message if the file is not found, suggesting that the script is part of a larger system where this configuration file is crucial. Upon finding the file, it sources the configuration, sets and exports an environment variable `FD_LOG_PATH` to an empty string, and then executes a command to delete a workspace using a tool or script located at `$BIN/fd_wksp_ctl`, passing `$WKSP` as an argument. Finally, it removes the configuration file and outputs "pass" to indicate successful completion. This script is likely a utility or maintenance script used in a development or testing environment to manage temporary configurations and resources.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
