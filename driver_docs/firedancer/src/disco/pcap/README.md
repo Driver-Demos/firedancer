@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-PCAP replay tile API, implementation, build rules, and unit tests.
+Replays and tests PCAP files with flow control, diagnostics, and shared memory configurations.
 
 
 ## Files
-- **[fd_pcap_replay.c](fd_pcap_replay.c.md)**: The `fd_pcap_replay.c` file in the `firedancer` codebase implements functionality to replay packets from a pcap file, handling flow control, diagnostics, and housekeeping tasks.
-- **[fd_pcap_replay.h](fd_pcap_replay.h.md)**: PCAP replay tile API, diagnostics, and scratch layout for publishing pcap packets as tango fragments.
-- **[fd_pcap_replay_tile.c](fd_pcap_replay_tile.c.md)**: The `fd_pcap_replay_tile.c` file in the `firedancer` codebase implements a program that replays PCAP files using various command-line parameters and shared memory resources, with error handling and logging throughout the process.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and binary targets for the `fd_pcap_replay` component and its dependencies.
-- **[test_pcap_replay.c](test_pcap_replay.c.md)**: The `test_pcap_replay.c` file in the `firedancer` codebase implements a unit test for the PCAP replay functionality, including both transmission (TX) and reception (RX) tiles, with configuration and execution of the test environment.
+- **[fd_pcap_replay.c](fd_pcap_replay.c.md)**: Replays packets from a pcap file with flow control and diagnostic logging.
+- **[fd_pcap_replay.h](fd_pcap_replay.h.md)**: Header file for replaying packets from a pcap file into a tango fragment stream with flow control diagnostics.
+- **[fd_pcap_replay_tile.c](fd_pcap_replay_tile.c.md)**: A program to replay PCAP files using shared memory and command-line configurations.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing `fd_pcap_replay` and related components in the `firedancer` codebase.
+- **[test_pcap_replay.c](test_pcap_replay.c.md)**: Tests the functionality of PCAP replay in a hosted environment using transmit and receive tiles.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

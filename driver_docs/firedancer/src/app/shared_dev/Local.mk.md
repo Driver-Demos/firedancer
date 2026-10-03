@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile rules for fddev shared objects, actions, tiles, and configure stages.
+Makefile for building and configuring shared development components in the Firedancer project.
 
 # Purpose
-This Makefile fragment defines the `fddev_shared` library and adds the source objects that belong to it when `FD_HAS_HOSTED` and `FD_HAS_LINUX` are enabled. It groups the objects by function, including boot support in `boot/fd_dev_boot`, user commands such as `bench`, `bundle_client`, `dev`, `dump`, `flame`, `load`, `pktgen`, `txn`, `udpecho`, and `wksp`, and tile implementations for `bench`, `pktgen`, and `udpecho`. It also adds configure-stage tools in `commands/configure`, including `netns`, `keys`, and `kill`, and it includes `genesis` only when `FD_HAS_INT128` is defined.
+This Makefile script is used to manage the build process for a software project that includes various components and commands. It checks for the presence of specific conditions, such as `FD_HAS_HOSTED` and `FD_HAS_LINUX`, to determine if the build should proceed. The script uses the `make-lib` function to create a shared library named `fddev_shared`. It then adds multiple object files to this library, categorized into different sections such as boot, actions, tiles, and configure stages. Each section includes specific commands or modules, like `bench`, `bundle_client`, `dev`, and others, which are added to the `fddev_shared` library. Additionally, the script includes a conditional section for `FD_HAS_INT128`, which adds the `genesis` command if the condition is met.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
