@@ -3,10 +3,46 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-64-bit FNV-1a string hash and racesan feature macros.
+Header file for race condition detection utilities, including a 64-bit FNV-1a string hashing function.
 
 # Purpose
-This header file defines the base interface for the `fd_racesan` utility. It sets `FD_HAS_RACESAN` to `0` when the feature is not enabled, declares the opaque `fd_racesan_t` type, and includes the shared utility base header. The file also defines [`fd_racesan_strhash`](<#fd_racesan_strhash>), a `static inline` 64-bit FNV-1a string hash function used to convert hook names into integer values, with the form suitable for compile-time evaluation when the input is constant.
+This C header file defines a utility for race condition analysis, specifically focusing on string hashing. It includes a guard to prevent multiple inclusions and checks for the `FD_HAS_RACESAN` macro, defaulting it to 0 if not defined. The file declares a structure `fd_racesan` and its corresponding typedef `fd_racesan_t`. It provides an inline function [`fd_racesan_strhash`](<#fd_racesan_strhash>), which implements the FNV-1a hash algorithm for 64-bit systems to convert string inputs into hash values. This function is useful for hashing race condition analysis hook names into integers, and it is designed to allow the compiler to resolve the hash value at compile time when possible.
+# Imports and Dependencies
+
+---
+- `../../util/fd_util_base.h`
+
+
+# Data Structures
+
+---
+### fd\_racesan\_t
+- **Type**: ``struct``
+- **Members**:
+    - ``fd_racesan``: An incomplete type definition for a structure.
+- **Description**: Defines an incomplete type `fd_racesan_t` as a `struct fd_racesan`, which is a forward declaration of a structure used in the context of race condition sanitization.
+
+
+# Functions
+
+---
+### fd\_racesan\_strhash<!-- {{#callable:fd_racesan_strhash}} -->
+[View Source →](<../../../../../src/util/racesan/fd_racesan_base.h#L15>)
+
+Implements a 64-bit FNV-1a hash function for strings.
+- **Inputs**:
+    - `s`: A pointer to the input string to hash.
+    - `len`: The length of the input string.
+- **Logic and Control Flow**:
+    - Initialize the hash value `x` to the FNV offset basis `0xCBF29CE484222325UL`.
+    - Iterate over each character in the string `s` while `len` is greater than zero.
+    - For each character, XOR the hash value `x` with the character cast to `ulong`.
+    - Multiply the hash value `x` by the FNV prime `0x100000001B3UL`.
+    - Decrement `len` and increment the string pointer `s` to process the next character.
+    - Return the computed hash value `x`.
+- **Output**: Returns a 64-bit unsigned long integer representing the hash of the input string.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

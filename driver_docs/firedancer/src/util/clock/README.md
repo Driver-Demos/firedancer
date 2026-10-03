@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Clock synchronization APIs, calibration, monotonic time estimation, and unit tests.
+Clock synchronization and recalibration functions, shared memory APIs, build configuration, and tests.
 
 
 ## Files
-- **[fd_clock.c](fd_clock.c.md)**: Clock alignment, recalibration, joint read, and monotonic time estimation functions.
-- **[fd_clock.h](fd_clock.h.md)**: Shared-memory clock synchronization APIs, epochs, and default init/recalibration helpers.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_clock and its unit test when FD_HAS_DOUBLE is set.
-- **[test_clock.c](test_clock.c.md)**: Unit tests for fd_clock calibration, API, and epoch refresh.
+- **[fd_clock.c](fd_clock.c.md)**: Implements clock synchronization and recalibration functions using linear approximations and error handling.
+- **[fd_clock.h](fd_clock.h.md)**: Header file for a shared memory object to synchronize clocks across threads, with APIs for calibration and observation.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fd_clock` component if `FD_HAS_DOUBLE` is defined.
+- **[test_clock.c](test_clock.c.md)**: Tests for the `fd_clock` module, including calibration, error handling, and performance statistics.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

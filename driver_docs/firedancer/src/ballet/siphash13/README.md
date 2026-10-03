@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `siphash13` folder in the `firedancer` codebase contains the implementation, API definitions, testing, and build instructions for the SipHash-1-3 cryptographic hash function.
+Implements and tests the SipHash-1-3 cryptographic hash function with APIs, fuzz testing, and benchmarks.
 
 
 ## Files
-- **[fd_siphash13.c](fd_siphash13.c.md)**: The `fd_siphash13.c` file in the `firedancer` codebase implements a modified version of the SipHash-1-3 cryptographic hash function, providing initialization, data appending, and finalization functionalities.
-- **[fd_siphash13.h](fd_siphash13.h.md)**: The `fd_siphash13.h` file provides APIs for implementing the SipHash1-3 cryptographic hash function, including initialization, data appending, and finalization functions.
-- **[fuzz_siphash13.c](fuzz_siphash13.c.md)**: The `fuzz_siphash13.c` file in the `firedancer` codebase implements a fuzz testing harness for the SipHash-1-3 algorithm, ensuring the correctness of both standard and fast hashing methods.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `siphash13` component, including header and object file additions, unit test creation and execution, and conditional fuzz test setup.
-- **[test_siphash13.c](test_siphash13.c.md)**: The `test_siphash13.c` file in the `firedancer` codebase contains a test suite for the SipHash-1-3 algorithm, including validation against predefined test vectors and benchmarking of its performance.
+- **[fd_siphash13.c](fd_siphash13.c.md)**: Implements the SipHash-1-3 cryptographic hash function with initialization, appending, and finalization.
+- **[fd_siphash13.h](fd_siphash13.h.md)**: APIs for SipHash1-3, including initialization, appending data, and finalizing the hash calculation.
+- **[fuzz_siphash13.c](fuzz_siphash13.c.md)**: Fuzz testing implementation for the SipHash-1-3 algorithm with initialization and input handling.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the SipHash13 implementation with unit and fuzz tests.
+- **[test_siphash13.c](test_siphash13.c.md)**: Tests and benchmarks the fd_siphash13 hashing function for performance and correctness.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

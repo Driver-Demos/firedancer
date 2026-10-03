@@ -3,12 +3,102 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Offline replay backtest loop with Slack alerts, snapshot download, replay, and mismatch minimization.
+A Bash script for running offline replay backtests, updating network parameters, and sending Slack notifications.
 
 # Purpose
-This Bash script runs an automated offline replay loop for a Solana ledger bucket. It watches a cloud storage bucket for a newer slot than the last processed slot, then downloads the matching `rocksdb` data and the closest rooted hourly snapshot. It uses `agave` ledger tools and `firedancer-dev` to build the target code, configure a replay environment, and run a backtest against the downloaded ledger data. The script sends status updates to Slack through the helper functions `send_slack_message`, `send_mismatch_slack_message`, and `send_slack_debug_message`.
+The script is a Bash executable designed to automate the process of replaying a ledger for a specified network. It continuously monitors a Google Cloud Storage bucket for new data, downloads the necessary files, and performs ledger replay operations. The script uses Slack for notifications, sending messages about the progress and any issues encountered during execution.
 
-The script also handles replay errors and mismatch cases. When a replay fails or a bank hash mismatch occurs, it finds the slot range around the problem, creates minimized snapshots and a minimized ledger, uploads the minimized archive to cloud storage, and posts reproduction details to Slack. It keeps counters for repeated failures and mismatches, and it stops after too many repeated errors. When replay succeeds, it updates the last processed bucket slot file and removes temporary data unless debugging data must be kept.
+Key components of the script include functions for sending messages to Slack, which are used to communicate the status of operations such as starting the replay, downloading files, and reporting mismatches or failures. The script also interacts with Google Cloud Storage to list and download files, and it uses various tools to manage and replay the ledger data. The script checks for new data in the storage bucket, updates the local repository, builds the necessary components, and performs the replay using specified configurations.
+
+The script handles errors and mismatches by attempting to minimize the failure and retrying the process. It maintains a count of mismatches and failures, and if these exceed a certain threshold, the script exits. The script also manages snapshots and rocksdb data, ensuring that the necessary files are available for replay and that any issues are logged and reported. The script is designed to run indefinitely, checking for new data every hour and performing the replay process as needed.
+# Imports and Dependencies
+
+---
+- `gcloud`
+- `curl`
+- `git`
+- `cargo`
+- `wget`
+- `zstd`
+- `tar`
+- `awk`
+- `sed`
+- `grep`
+- `chmod`
+- `sleep`
+- `sort`
+- `basename`
+- `awk`
+- `cat`
+- `echo`
+- `mkdir`
+- `cp`
+- `rm`
+- `touch`
+- `chmod`
+- `gsutil`
+
+
+# Global Variables
+
+---
+### OBJDIR
+- **Type**: `string`
+- **Description**: Defines the directory path where the build output will be stored. If the `OBJDIR` environment variable is not set, it defaults to 'build/native/gcc'.
+- **Use**: Used to specify the directory for storing build artifacts, particularly for the `firedancer-dev` tool.
+
+
+---
+### CURRENT\_MISMATCH\_COUNT
+- **Type**: `integer`
+- **Description**: Stores the current count of mismatches encountered during the ledger replay process. It is initialized to 0 at the start of the script and reset to 0 whenever a new bucket slot is processed.
+- **Use**: Tracks the number of mismatches to determine if the script should continue or exit due to excessive mismatches.
+
+
+---
+### CURRENT\_FAILURE\_COUNT
+- **Type**: `integer`
+- **Description**: Stores the current count of failures encountered during the execution of the script. It is initialized to zero and incremented each time a failure occurs.
+- **Use**: Tracks the number of failures to determine if the script should exit due to excessive failures.
+
+
+# Functions
+
+---
+### send\_slack\_message
+Sends a message to a Slack channel using a predefined webhook URL.
+- **Inputs**:
+    - `MESSAGE`: The message text to send to the Slack channel.
+- **Logic and Control Flow**:
+    - Assigns the first argument to the variable `MESSAGE`.
+    - Creates a JSON payload with the `MESSAGE` and sets `link_names` to 1.
+    - Uses `curl` to send a POST request with the JSON payload to the URL specified by `SLACK_WEBHOOK_URL`.
+- **Output**: No explicit output; sends a message to a Slack channel.
+
+
+---
+### send\_mismatch\_slack\_message
+Sends a Slack message to a specific webhook URL for mismatch notifications.
+- **Inputs**:
+    - ``MESSAGE``: The message content to send to the Slack channel.
+- **Logic and Control Flow**:
+    - Takes the input `MESSAGE` and creates a JSON payload with it.
+    - Uses the `curl` command to send a POST request with the JSON payload to the URL specified by the `SLACK_MISMATCH_WEBHOOK_URL` environment variable.
+- **Output**: There is no return value; the function sends a message to a Slack channel.
+
+
+---
+### send\_slack\_debug\_message
+Sends a debug message to a specified Slack webhook URL using a JSON payload.
+- **Inputs**:
+    - `MESSAGE`: The message text to send to the Slack channel.
+- **Logic and Control Flow**:
+    - Takes a single input `MESSAGE` which is the text to send.
+    - Creates a JSON payload with the `MESSAGE` and sets `link_names` to 1.
+    - Uses `curl` to send a POST request with the JSON payload to the URL specified by the `SLACK_DEBUG_WEBHOOK_URL` environment variable.
+- **Output**: No output is returned by the function.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
