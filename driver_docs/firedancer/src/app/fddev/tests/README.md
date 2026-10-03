@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Test harness for fddev configure, workspace, ready, and dev command execution.
+Tests for the `fddev` application, including configuration, workspace, and device readiness.
 
 
 ## Files
-- **[test_fddev.c](test_fddev.c.md)**: Test harness for fddev configure, workspace, ready, and dev command execution.
+- **[test_fddev.c](test_fddev.c.md)**: Tests for the `fddev` application, including configuration, workspace, and device readiness.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

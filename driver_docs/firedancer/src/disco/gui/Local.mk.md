@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for GUI headers, objects, tests, and compressed frontend assets.
+Makefile for building and compressing GUI components with conditional compilation and unit testing.
 
 # Purpose
-This Makefile fragment defines build rules for the `fd_gui` and related GUI support objects when `FD_HAS_INT128` is enabled. It adds the `fd_gui.h`, `fd_gui_printf.h`, and `fd_gui_peers.h` headers, builds the `fd_gui`, `fd_gui_printf`, `fd_gui_peers`, `fd_gui_tile`, and `generated/http_import_dist` objects into `fd_disco`, and links `book/public/fire.svg` to `fd_gui_tile.o` as a build input. It also defines compression rules that create `.gz` and `.zst` files from the `dist_stable`, `dist_alpha`, and `dist_dev` frontend asset trees, then collects those files with `find` and `patsubst` into variables used as dependencies for `generated/http_import_dist.d`. The `make-unit-test` entry adds the `test_live_table` unit test with the `fd_disco` and `fd_util` libraries.
+This Makefile is used to automate the build process for a software project. It includes conditional compilation directives, such as `ifdef FD_HAS_INT128`, to manage dependencies and build targets based on the presence of certain features. The file defines rules for compressing files from different directories (`dist_stable`, `dist_alpha`, `dist_dev`) using `zstd` and `gzip`, and places the compressed files in corresponding `dist_stable_cmp`, `dist_alpha_cmp`, and `dist_dev_cmp` directories. It uses pattern rules to generalize the compression process for files in these directories. The Makefile also defines variables to list files in these directories and their compressed counterparts, which are used as dependencies for generating the `http_import_dist.d` file. This setup ensures that the build process is efficient and only processes files that have changed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

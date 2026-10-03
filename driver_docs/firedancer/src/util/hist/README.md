@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fixed-size exponential histogram functions and unit tests.
+Fixed-size exponential histogram structure and functions, Makefile, and tests for `fd_histf`.
 
 
 ## Files
-- **[fd_histf.h](fd_histf.h.md)**: Fixed-size exponential histogram functions with sampling, percentiles, and subtraction.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of the `fd_histf.h` header and defines a unit test named `test_histf` for the `fd_util` component.
-- **[test_histf.c](test_histf.c.md)**: Unit tests for fd_histf alignment, sampling, percentiles, and performance.
+- **[fd_histf.h](fd_histf.h.md)**: Defines a fixed-size exponential histogram structure and functions for creating, sampling, and analyzing histograms.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and running unit tests for `fd_histf`.
+- **[test_histf.c](test_histf.c.md)**: Tests for the `fd_histf` histogram functionality, including alignment, sampling, and performance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
