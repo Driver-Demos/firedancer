@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for workspace command functions and an external action in the Firedancer codebase.
+The `wksp.h` file declares functions and an external action related to workspace commands in the Firedancer application.
 
 # Purpose
-This code is a C header file that declares functions and an external variable related to workspace commands. It includes the necessary configuration header file `fd_config.h` and defines the function prototypes [`wksp_cmd_perm`](<#wksp_cmd_perm>) and [`wksp_cmd_fn`](<#wksp_cmd_fn>), which are used to perform operations with workspace command arguments and configurations. The `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` macros likely manage the scope or linkage of these prototypes. Additionally, the file declares an external variable `fd_action_wksp` of type `action_t`, which is probably used to represent an action related to workspace operations. The header guard prevents multiple inclusions of this file.
+This code is a C header file that defines function prototypes and an external variable related to workspace commands in a software application. It includes a configuration header file, `fd_config.h`, which suggests that it relies on shared configuration settings. The file declares two functions, [`wksp_cmd_perm`](#wksp_cmd_perm) and [`wksp_cmd_fn`](#wksp_cmd_fn), which likely handle permission checks and other workspace command functionalities, respectively, using arguments and configuration data. Additionally, it declares an external variable, `fd_action_wksp`, which is presumably used to represent or manage actions related to the workspace. The use of include guards ensures that the file's contents are only included once during compilation, preventing redefinition errors.
 # Imports and Dependencies
 
 ---
@@ -17,9 +17,9 @@ This code is a C header file that declares functions and an external variable re
 
 ---
 ### fd\_action\_wksp
-- **Type**: ``action_t``
-- **Description**: `fd_action_wksp` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is located in another source file.
-- **Use**: Used to represent or store an action within the workspace command context.
+- **Type**: `action_t`
+- **Description**: The variable `fd_action_wksp` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is likely found in another source file.
+- **Use**: This variable is used to represent or store an action within the workspace context, accessible across multiple files in the application.
 
 
 

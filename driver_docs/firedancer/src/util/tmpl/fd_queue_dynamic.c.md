@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for a single-threaded, fixed-capacity queue optimized for high-performance contexts.
+The `fd_queue_dynamic.c` file in the `firedancer` codebase implements a family of functions for a single-threaded, high-performance, fixed-capacity queue, providing both simple and advanced APIs for queue operations without error checking.
 
 # Purpose
-The code defines a template for implementing a single-threaded, fixed-capacity queue in C, designed for high-performance contexts. It provides a set of macros and functions that allow users to create a queue with a specified name and element type. The queue operations include creating a new queue, joining and leaving a queue, and deleting a queue. The code also provides accessor functions to check the queue's maximum capacity, current element count, available space, and whether the queue is empty or full.
+This C source code file provides a template for implementing a high-performance, single-threaded, fixed-capacity queue. The code is designed to be included in other C files, where it can be customized by defining the `QUEUE_NAME` and `QUEUE_T` macros to specify the queue's name and the type of elements it will store, respectively. The file defines a comprehensive API for queue operations, including functions for creating, joining, and deleting queues, as well as for accessing and manipulating queue elements. The API includes both simple operations, such as `push` and `pop`, and advanced zero-copy operations, such as `peek_insert` and `peek_remove`, which allow for efficient element access without unnecessary data copying.
 
-The queue supports both simple and advanced operations. Simple operations include pushing and popping elements, while advanced operations allow for zero-copy usage, such as peeking at the most recent or least recent insertions and performing uninitialized insertions or removals. The implementation uses a private structure to manage the queue's state, including the maximum number of elements, the current count of elements, and the indices for the next push and pop operations. The code does not perform error checking, and it assumes that the caller ensures the queue's constraints are met, such as not exceeding the maximum capacity during push operations.
+The code is structured to prioritize performance, with no built-in error checking, and relies on the caller to ensure correct usage, such as maintaining the queue's capacity constraints. The queue's internal structure is encapsulated within a private struct, which manages the queue's state, including its maximum capacity, current element count, and indices for the next elements to be pushed or popped. The file uses inline functions and macros to facilitate efficient queue operations, and it provides both mutable and const versions of certain functions to accommodate different usage scenarios. Overall, this file serves as a flexible and efficient template for implementing fixed-capacity queues in performance-critical applications.
 # Imports and Dependencies
 
 ---
@@ -20,20 +20,18 @@ The queue supports both simple and advanced operations. Simple operations includ
 
 ---
 ### QUEUE\_<!-- {{#callable:QUEUE_}} -->
-[View Source →](<../../../../../src/util/tmpl/fd_queue_dynamic.c#L229>)
-
-Resets the queue to an empty state by setting the count, start, and end indices to zero.
+The `QUEUE_(remove_all)` function resets a queue to an empty state by setting its element count and indices to zero.
 - **Inputs**:
-    - `queue`: A pointer to the queue to be cleared.
-- **Logic and Control Flow**:
+    - `queue`: A pointer to the queue from which all elements are to be removed.
+- **Control Flow**:
     - Retrieve the private header of the queue using `QUEUE_(private_hdr_from_queue)` function.
-    - Set the `cnt` (count of elements) in the header to 0.
-    - Set the `start` index in the header to 0.
-    - Set the `end` index in the header to 0.
+    - Set the `cnt` (element count) of the queue header to 0, indicating the queue is empty.
+    - Set the `start` index of the queue header to 0, resetting the position for the next element to be popped.
+    - Set the `end` index of the queue header to 0, resetting the position for the next element to be pushed.
     - Return the original queue pointer.
-- **Output**: Returns the pointer to the queue that has been reset.
-- **Functions Called**:
-    - [`QUEUE_`](<#queue_>)
+- **Output**: The function returns the original queue pointer, now reset to an empty state.
+- **Functions called**:
+    - [`QUEUE_`](#queue_)
 
 
 

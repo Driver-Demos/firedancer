@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the initialization and termination functions in the `fd_choreo` module.
+The `test_choreo_base.c` file in the `firedancer` codebase contains a simple test program that initializes and halts the `fd_choreo` system.
 
 # Purpose
-This code is a simple C program that initializes and terminates a process using functions from the `fd_choreo.h` header file. The [`main`](<#main>) function takes command-line arguments `argc` and `argv`, which it passes to the `fd_boot` function to perform initialization. After initialization, the program calls `fd_halt` to terminate the process. The program returns `0` to indicate successful execution.
+This C source code file is a minimal program that serves as a basic template for initializing and terminating a system or application using the functions `fd_boot` and `fd_halt`, which are likely defined in the included header file "fd_choreo.h". The [`main`](#main) function takes command-line arguments, which are passed by reference to `fd_boot`, suggesting that this function might perform some initialization tasks that require or modify these arguments. After initialization, the program immediately calls `fd_halt`, which likely performs cleanup or shutdown operations, before returning 0 to indicate successful execution. This structure is typical for applications that require specific setup and teardown procedures.
 # Imports and Dependencies
 
 ---
@@ -17,17 +17,15 @@ This code is a simple C program that initializes and terminates a process using 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/choreo/test_choreo_base.c#L3>)
-
-Initializes the program environment and then terminates the program.
+The `main` function initializes the program using `fd_boot` and then terminates it with `fd_halt`, returning 0 to indicate successful execution.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls the `fd_boot` function with pointers to `argc` and `argv` to initialize the program environment.
-    - Calls the `fd_halt` function to terminate the program.
-    - Returns 0 to indicate successful execution.
-- **Output**: Returns an integer value of 0, indicating successful program termination.
+    - `argc`: An integer representing the number of command-line arguments passed to the program.
+    - `argv`: An array of character pointers listing all the arguments passed to the program.
+- **Control Flow**:
+    - The function begins by calling `fd_boot`, passing the addresses of `argc` and `argv` to initialize the program environment.
+    - After initialization, the function calls `fd_halt` to perform any necessary cleanup or termination procedures.
+    - Finally, the function returns 0, indicating that the program has executed successfully.
+- **Output**: The function returns an integer value of 0, which is a standard convention to indicate successful execution of a program.
 
 
 

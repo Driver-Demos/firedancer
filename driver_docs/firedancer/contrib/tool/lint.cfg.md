@@ -3,39 +3,39 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration settings for the Uncrustify code beautifier, specifying tab sizes, spacing, and alignment rules.
+The `lint.cfg` file in the `firedancer` codebase configures code formatting rules for the Uncrustify tool, specifying settings such as tab sizes, spacing rules, and alignment preferences.
 
 # Purpose
-This configuration file is used to set formatting rules for a codebase, likely for a code beautifier or linter tool. It specifies various parameters that control how the tool processes and formats code, such as tab sizes (`input_tab_size` and `output_tab_size`), comment markers for disabling and enabling processing (`disable_processing_cmt` and `enable_processing_cmt`), and spacing rules around different syntax elements (e.g., `sp_after_type`, `sp_before_semi`). The file also includes settings for indentation (`indent_columns`, `indent_with_tabs`), alignment of code elements (`align_func_params`, `align_var_def_span`), and handling of specific code constructs like macros and comments (`align_nl_cont`, `cmt_indent_multi`). These configurations ensure consistent code style and readability across the codebase by defining how the tool should modify or maintain the code's structure and appearance.
+The provided file is a configuration file for Uncrustify, a source code beautifier and formatter. This file specifies various formatting rules and options that dictate how the code should be styled, such as tab sizes, spacing around operators and punctuation, and alignment of code elements. The configuration is narrow in scope, focusing specifically on code formatting rather than broader application settings or functionality. The file contains multiple conceptual components, all centered around the theme of code aesthetics and readability, such as indentation, spacing, and alignment. This file is crucial to a codebase as it ensures consistent code style across the project, which can improve readability and maintainability for developers working on the code.
 # Content Summary
-The provided configuration file is for Uncrustify, a code formatting tool. This file specifies various formatting rules and options that control how Uncrustify processes and formats code. Below are the key functional details:
+This configuration file is for Uncrustify, a code beautifier and formatter, and it specifies various formatting rules and options for processing source code. The file is structured with key-value pairs, where each key represents a specific formatting option, and the value sets the desired behavior for that option.
 
-1. **Tab and Indentation Settings**:
-   - `input_tab_size` and `output_tab_size` are set to 2, indicating the size of tabs in both input and output.
+Key technical details include:
+
+1. **Tab and Indentation Settings**: 
+   - `input_tab_size` and `output_tab_size` are both set to 2, indicating that both input and output tabs are treated as 2 spaces.
    - `indent_columns` is set to 2, specifying the number of columns to indent per level.
    - `indent_with_tabs` is set to 0, meaning spaces are used exclusively for indentation.
-   - `indent_single_after_return` is true, indicating that tokens after a return statement are indented with regular single indentation.
 
 2. **Comment Processing**:
-   - `disable_processing_cmt` and `enable_processing_cmt` are set to "*LINT-OFF*" and "*LINT-ON*", respectively, to mark sections of code where processing should be disabled or re-enabled.
+   - `disable_processing_cmt` and `enable_processing_cmt` are set to " *LINT-OFF*" and " *LINT-ON*", respectively, to control sections of code that should not be processed by Uncrustify.
 
 3. **Spacing Rules**:
-   - Various spacing options such as `sp_after_type`, `sp_before_semi`, `sp_after_semi_for`, `sp_before_vardef_square`, `sp_before_comma`, and `sp_not` are set to ignore, meaning no specific action is taken to add or remove spaces in these contexts.
-   - `sp_skip_vbrace_tokens` is true, indicating that vbrace tokens are dropped to the previous token and skipped.
+   - Various options like `sp_after_type`, `sp_before_semi`, `sp_after_semi_for`, and others control the addition or removal of spaces in specific contexts, such as after types, before semicolons, and around operators. Most are set to `ignore`, indicating no change from the default behavior.
 
 4. **Alignment Options**:
-   - `align_keep_extra_space`, `align_func_params`, and `align_nl_cont` are true, enabling the alignment of extra spaces, function parameters, and macros with newlines.
-   - `align_var_def_span`, `align_var_def_thresh`, `align_var_struct_span`, and `align_typedef_span` specify the span and threshold for aligning variable definitions, struct/union members, and typedefs.
+   - `align_keep_extra_space`, `align_func_params`, and `align_nl_cont` are set to true, enabling alignment of extra spaces, function parameters, and macros with newlines.
+   - `align_var_def_span`, `align_var_def_thresh`, `align_var_struct_span`, and `align_typedef_span` control the alignment span and threshold for variable definitions, struct/union members, and typedefs.
 
-5. **Modification and Preprocessing**:
-   - `mod_remove_extra_semicolon` is true, allowing the removal of unnecessary semicolons.
+5. **Miscellaneous Options**:
+   - `sp_skip_vbrace_tokens` is true, indicating that vbrace tokens are dropped and skipped.
+   - `indent_single_after_return` is true, meaning tokens after a return statement are indented with regular single indentation.
+   - `nl_func_leave_one_liners` is true, preserving one-line function definitions.
+   - `mod_remove_extra_semicolon` is true, enabling the removal of unnecessary semicolons.
    - `pp_ignore_define_body` is true, indicating that the body of `#define` statements is ignored during formatting.
-   - `use_indent_func_call_param` is false, meaning `indent_func_call_param` is not used.
+   - `use_indent_func_call_param` is false, meaning `indent_func_call_param` will not be used.
 
-6. **Comment Indentation**:
-   - `cmt_indent_multi` is false, indicating that changes to multi-line comments, such as indentation and keyword substitution, are not applied.
-
-These settings collectively define how Uncrustify will format code, focusing on indentation, spacing, alignment, and comment processing.
+This configuration file provides a comprehensive set of rules for formatting code, focusing on indentation, spacing, alignment, and comment processing, allowing developers to maintain consistent code style across their projects.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

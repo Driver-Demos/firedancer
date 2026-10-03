@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Nanopb constant definitions for authentication protocol buffer messages.
+The `auth.pb.c` file in the `firedancer` codebase contains automatically generated nanopb constant definitions for various authentication-related protocol buffer messages.
 
 # Purpose
-This code is a C source file that contains automatically generated constant definitions for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `auth.pb.h`, which likely contains the protobuf message definitions related to authentication processes. The file uses the `PB_BIND` macro to bind various authentication-related protobuf message types, such as `auth_GenerateAuthChallengeRequest`, `auth_GenerateAuthChallengeResponse`, `auth_GenerateAuthTokensRequest`, `auth_Token`, `auth_GenerateAuthTokensResponse`, `auth_RefreshAccessTokenRequest`, and `auth_RefreshAccessTokenResponse`. These bindings facilitate the serialization and deserialization of these message types for communication between systems.
+This C source code file is an automatically generated set of constant definitions for use with the nanopb library, which is a small code-size Protocol Buffers implementation in C. The file is specifically tailored to handle protocol buffer messages related to authentication processes, as indicated by the inclusion of various `auth_*` structures. These structures include requests and responses for generating authentication challenges and tokens, as well as refreshing access tokens. The file is not intended to be executed directly but rather to be included in other C programs that require these protocol buffer definitions for handling authentication-related data.
 
-The file includes a version check for the protobuf header version, ensuring compatibility with the nanopb generator version used to create the file. If the version does not match, it triggers a compilation error, prompting the user to regenerate the file with the current version of the nanopb generator. This ensures that the generated code remains consistent with the expected protobuf definitions and the nanopb library's capabilities.
+The code uses the `PB_BIND` macro to bind C structures to their corresponding protocol buffer message types, facilitating serialization and deserialization of these messages. Each `PB_BIND` invocation associates a C structure with a protocol buffer message, specifying the message type and its encoding options. The file includes a version check to ensure compatibility with the nanopb generator version, which is crucial for maintaining consistency and preventing runtime errors due to version mismatches. This file serves as a crucial component in a larger system that relies on protocol buffers for communication, particularly in scenarios involving authentication workflows.
 # Imports and Dependencies
 
 ---
