@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_tip_prog_blacklist.c` file in the `firedancer` codebase tests the functionality of checking whether specific public keys are blacklisted for bundles and non-bundles using the `fd_pack_tip_prog_check_blacklist` function.
+Tests the blacklist functionality for public keys using base58 encoding in the Firedancer codebase.
 
 # Purpose
-This C source code file is designed to test the functionality of a blacklist checking mechanism for public keys encoded in Base58. The code includes a [`main`](#main) function, indicating that it is an executable program. It utilizes functions from external libraries, such as `fd_base58_decode_32` for decoding Base58-encoded public keys and `fd_pack_tip_prog_check_blacklist` to verify if a given public key is blacklisted. The [`test`](#test) function is a static inline function that decodes a Base58 public key, checks it against a blacklist, and verifies the result against expected values for both bundled and non-bundled transactions. The program tests various public keys, categorized into mainnet, testnet programs, tip payment accounts, and arbitrary accounts, to ensure the blacklist checking mechanism works as intended.
+This code is a C program designed to test the functionality of a blacklist checking mechanism for public keys encoded in Base58. It includes the necessary headers for Base58 decoding and blacklist checking. The program defines a [`test`](<#test>) function that decodes a given Base58-encoded public key and checks if it is blacklisted for bundles or non-bundles using the `fd_pack_tip_prog_check_blacklist` function. The expected result is determined by the `banned_for_bundles` and `banned_for_nonbundles` parameters, and the test asserts that the actual blacklist status matches the expected status.
 
-The code imports headers from a broader codebase, suggesting it is part of a larger project, possibly related to blockchain or cryptocurrency systems, given the use of public keys and Base58 encoding. The primary technical components include the decoding of Base58 public keys and the validation of these keys against a blacklist. The program does not define public APIs or external interfaces but rather serves as a test suite to validate the blacklist functionality. The use of `FD_TEST` macros indicates a testing framework is in place, and the program logs a notice upon successful execution of all tests, ensuring that the blacklist mechanism is functioning correctly.
+The [`main`](<#main>) function initializes the program and runs a series of tests on various public keys, categorized into mainnet and testnet programs, tip payment accounts, and arbitrary accounts. Each test checks if the public key is correctly identified as blacklisted or not, based on predefined conditions. The program logs a notice if all tests pass and then halts execution. This code is intended to be executed as a standalone program to verify the correctness of the blacklist checking logic.
 # Imports and Dependencies
 
 ---
@@ -21,35 +21,40 @@ The code imports headers from a broader codebase, suggesting it is part of a lar
 
 ---
 ### test<!-- {{#callable:test}} -->
-The `test` function decodes a Base58 public key and verifies if it is correctly blacklisted based on the provided ban conditions for bundles and non-bundles.
+[View Source →](<../../../../../src/disco/pack/test_tip_prog_blacklist.c#L5>)
+
+Validates if a Base58-encoded public key is correctly blacklisted based on given conditions.
 - **Inputs**:
-    - `base58_pubkey`: A constant character pointer representing the Base58 encoded public key to be decoded and checked.
-    - `banned_for_bundles`: An integer flag indicating if the public key is banned for bundles (1 for banned, 0 for not banned).
-    - `banned_for_nonbundles`: An integer flag indicating if the public key is banned for non-bundles (1 for banned, 0 for not banned).
-- **Control Flow**:
+    - `base58_pubkey`: A pointer to a constant character string representing the Base58-encoded public key.
+    - `banned_for_bundles`: An integer flag indicating if the public key is banned for bundles (1 if banned, 0 if not).
+    - `banned_for_nonbundles`: An integer flag indicating if the public key is banned for non-bundles (1 if banned, 0 if not).
+- **Logic and Control Flow**:
     - Declare a variable `pubkey` of type `fd_acct_addr_t` to store the decoded public key.
-    - Call `fd_base58_decode_32` to decode the `base58_pubkey` into `pubkey->b` and assert the success of this operation using `FD_TEST`.
-    - Calculate the `expected` value by combining the `banned_for_bundles` and `banned_for_nonbundles` flags into a single integer using bitwise operations.
-    - Call [`fd_pack_tip_prog_check_blacklist`](fd_pack_tip_prog_blacklist.h.md#fd_pack_tip_prog_check_blacklist) with `pubkey` to check its blacklist status and assert that it matches the `expected` value using `FD_TEST`.
-- **Output**: The function does not return a value; it performs assertions to verify the correctness of the blacklist status.
-- **Functions called**:
-    - [`fd_pack_tip_prog_check_blacklist`](fd_pack_tip_prog_blacklist.h.md#fd_pack_tip_prog_check_blacklist)
+    - Decode the `base58_pubkey` into the `pubkey` using `fd_base58_decode_32` and verify the success of this operation with `FD_TEST`.
+    - Calculate the `expected` value by combining the `banned_for_bundles` and `banned_for_nonbundles` flags using bitwise operations.
+    - Check if the result of [`fd_pack_tip_prog_check_blacklist`](<fd_pack_tip_prog_blacklist.h.md#fd_pack_tip_prog_check_blacklist>) for the `pubkey` matches the `expected` value using `FD_TEST`.
+- **Output**: No output is returned; the function uses assertions to validate conditions.
+- **Functions Called**:
+    - [`fd_pack_tip_prog_check_blacklist`](<fd_pack_tip_prog_blacklist.h.md#fd_pack_tip_prog_check_blacklist>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, tests a series of public keys against a blacklist, logs a success message, and then halts the program.
+[View Source →](<../../../../../src/disco/pack/test_tip_prog_blacklist.c#L15>)
+
+Initializes the environment, tests a series of public keys against a blacklist, logs a success message, and halts the program.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Invoke the [`test`](#test) function multiple times with different public keys and ban status flags to check against a blacklist.
-    - Log a notice message indicating success using `FD_LOG_NOTICE`.
-    - Call `fd_halt` to terminate the program.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`test`](#test)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Executes the [`test`](<#test>) function multiple times with different public keys and ban status parameters.
+    - Each [`test`](<#test>) call decodes a base58 public key and checks it against a blacklist using `fd_pack_tip_prog_check_blacklist`.
+    - Logs a notice message 'pass' using `FD_LOG_NOTICE` if all tests pass.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`test`](<#test>)
 
 
 
