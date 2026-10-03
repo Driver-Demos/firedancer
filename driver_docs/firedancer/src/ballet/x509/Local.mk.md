@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and running unit tests for x509 in the firedancer codebase.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_x509_mock` component within the `ballet/x509` directory.
 
 # Purpose
-The content defines build instructions for a software project using a Makefile. It adds the header file `fd_x509_mock.h` and object files `fd_x509_mock` and `fd_ballet` to the build process. It also specifies a unit test named `test_x509`, which depends on the `fd_ballet` and `fd_util` components, and includes instructions to run this unit test.
+This file is a Makefile script used for building and testing components in a software project. It adds header files and object files to the build process, specifically `fd_x509_mock.h` and `fd_x509_mock` with `fd_ballet`. It also defines and executes a unit test named `test_x509`, which depends on `fd_ballet` and `fd_util` libraries.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,20 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp filter policies, security policies, archiver tile implementations, and a Makefile for fd_archiver.
+Generated seccomp policies, fragment handling, replay, and file writing code with build rules.
 
 ## Folders
-- **[generated](generated/README.md)**: Seccomp filter policies for syscall restrictions in archiver feeder, playback, and writer components.
+- **[generated](generated/README.md)**: Generated seccomp filter headers for archiver feeder, playback, and writer file descriptors.
 
 ## Files
-- **[archiver_feeder.seccomppolicy](archiver_feeder.seccomppolicy.md)**: Defines security policies for logging behavior, including file descriptor management and log synchronization.
-- **[archiver_playback.seccomppolicy](archiver_playback.seccomppolicy.md)**: Defines seccomp policy for logging and file operations in the archiver playback process.
-- **[archiver_writer.seccomppolicy](archiver_writer.seccomppolicy.md)**: Defines security policies for logging and file writing in the archiver writer component.
-- **[fd_archiver.h](fd_archiver.h.md)**: Defines constants, macros, and a structure for managing fragment headers in the Firedancer archiver.
-- **[fd_archiver_feeder.c](fd_archiver_feeder.c.md)**: Implements an archiver feeder tile system for capturing and forwarding data fragments to a writer tile.
-- **[fd_archiver_playback.c](fd_archiver_playback.c.md)**: Implements an archiver playback tile that reads from an archive file, adds delay, and forwards data to receiver tiles.
-- **[fd_archiver_writer.c](fd_archiver_writer.c.md)**: Implements an archiver writer tile that timestamps and writes input fragments to an archive tile.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers and object files related to the archiver in the firedancer project.
+- **[archiver_feeder.seccomppolicy](archiver_feeder.seccomppolicy.md)**: The `archiver_feeder.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
+- **[archiver_playback.seccomppolicy](archiver_playback.seccomppolicy.md)**: The `archiver_playback.seccomppolicy` file in the `firedancer` codebase defines security policies for logging and reading operations, specifying conditions for writing to log files, reading from archive files, and synchronizing log files to disk.
+- **[archiver_writer.seccomppolicy](archiver_writer.seccomppolicy.md)**: The `archiver_writer.seccomppolicy` file in the `firedancer` codebase defines security policies for logging and writing operations, specifying conditions under which file descriptors for log and archive files can be written to and synchronized.
+- **[fd_archiver.h](fd_archiver.h.md)**: The `fd_archiver.h` file defines constants, macros, and a structure for handling fragment headers in the Firedancer archiver, including distinguishing between shred and repair input fragments.
+- **[fd_archiver_feeder.c](fd_archiver_feeder.c.md)**: The `fd_archiver_feeder.c` file in the `firedancer` codebase implements the functionality for archiver feeder tiles, which forward data fragments from input links to a single archiver writer tile, supporting flexible topologies like round-robin or 1-1.
+- **[fd_archiver_playback.c](fd_archiver_playback.c.md)**: Replays archive fragments with timing delays and forwards shred and repair output.
+- **[fd_archiver_writer.c](fd_archiver_writer.c.md)**: Writes archiver fragments to a file with timestamps and buffered output.
+- **[Local.mk](Local.mk.md)**: Build rules for archiver headers and objects when FD_HAS_ALLOCA is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the ED25519 point doubling operation using the Cocotb framework.
+The `test.py` file in the `firedancer` codebase contains a cocotb-based test for verifying the functionality of an ED25519 point doubling operation in a hardware design.
 
 # Purpose
-The code is a test suite for a digital design verification environment using the Cocotb framework. It tests a hardware design under test (DUT) by simulating a clock and toggling a reset signal. The test involves generating random inputs and verifying the DUT's output against expected results. The test uses the `wd_cocotil` and `ref_ed25519` modules to generate random integers and perform elliptic curve point operations, respectively. The test iterates 1024 times, during which it generates random elliptic curve points, performs point doubling, and checks if the DUT's output matches the expected results. The test logs information about the operations and asserts the correctness of the DUT's output, ensuring that the hardware design behaves as expected.
+This Python file is a test script designed to verify the functionality of a digital design using the Cocotb framework, which is a coroutine-based co-simulation library for verifying VHDL and Verilog designs. The script is structured as a testbench that interacts with a device under test (DUT) by simulating clock signals and applying test vectors to the DUT's inputs. The primary focus of the test is on elliptic curve point operations, specifically using the Ed25519 curve, as indicated by the use of the `ref_ed25519` module for point multiplication and addition. The test iterates over a series of operations, generating random inputs and comparing the DUT's output against expected results calculated using reference functions.
+
+The script imports several modules, including `cocotb`, `wd_cocotil`, and `ref_ed25519`, which provide essential functions for clock generation, reset toggling, and elliptic curve operations, respectively. The test function, decorated with `@cocotb.test()`, sets up the clock and reset signals, then enters a loop where it performs point multiplication and addition, sending the results to the DUT. It checks the DUT's output against expected values, logging the results and asserting correctness. This script is a specialized testbench for verifying the correctness of hardware implementations of elliptic curve operations, ensuring that the DUT performs as expected under various input conditions.
 # Imports and Dependencies
 
 ---
@@ -25,31 +27,24 @@ The code is a test suite for a digital design verification environment using the
 
 ---
 ### test<!-- {{#callable:firedancer/src/wiredancer/sim/ed25519_point_dbl/test.test}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/ed25519_point_dbl/test.py#L12>)
-
-Executes a test for a digital circuit using a clock and reset signal, performing point multiplication and addition operations, and verifying output values.
+The `test` function is a cocotb test that verifies the behavior of a digital design by simulating clock cycles, generating random inputs, and checking the outputs against expected values.
 - **Decorators**: `@cocotb.test`
 - **Inputs**:
-    - `dut`: The device under test (DUT) which is a digital circuit model.
-- **Logic and Control Flow**:
+    - `dut`: The device under test (DUT) which is a digital design module being verified.
+- **Control Flow**:
     - Initialize the clock signal for the DUT and start it with a 1 ns period.
-    - Start the reset signal toggle for the DUT with a 32-cycle duration and active high configuration.
-    - Wait for 1024 rising edges of the clock signal to synchronize the test.
-    - Initialize variables `W_M`, `es`, and `D` for width, storage, and error count respectively.
-    - Iterate 1024 times to perform the test loop.
-    - Generate a random integer `m_i` within the range of `W_M`.
-    - Select a random point `P0` from predefined options or by multiplying a random integer with a base point `G`.
-    - Compute `P2` by adding `P0` to itself using point addition.
+    - Start a reset toggle process on the DUT's reset signal with a 32-cycle duration and active high configuration.
+    - Wait for 1024 rising edges of the clock to synchronize the testbench with the DUT.
+    - Retrieve the width of the multiplier from the DUT and initialize an empty list `es` and a counter `D`.
+    - For 1024 iterations, generate a random integer `m_i` and a random point `P0`, then compute `P2` as the addition of `P0` with itself.
     - Store the tuple `(P2, m_i)` in the list `es`.
-    - Convert the coordinates of `P0` into 255-bit binary values and assign them to the DUT's input ports.
-    - Set the DUT's `m_i` input by shifting `m_i` left by one and setting the least significant bit to 1.
-    - Wait for a rising edge of the clock signal.
-    - Check if the least significant bit of `dut.m_o` is not '1', increment `D`, assert `D` is less than 100, and continue to the next iteration if true.
-    - Pop the first element from `es` to retrieve `P2` and `m_i`.
-    - Read the output coordinates and `m_o` from the DUT and shift `m_o` right by one.
-    - Log the current iteration, error count, and compare expected and actual values for `m_i`, `x`, `y`, `z`, and `t`.
-    - Assert that the expected and actual values for `x`, `y`, `z`, `t`, and `m_i` match.
-- **Output**: No explicit return value; the function performs assertions and logs information during execution.
+    - Convert the components of `P0` into 255-bit binary values and assign them to the DUT's input ports.
+    - Set the DUT's multiplier input `m_i` with a specific bit pattern and wait for a clock edge.
+    - Check the output multiplier bit; if it is not '1', increment `D`, assert `D` is less than 100, and continue to the next iteration.
+    - Pop the first element from `es` to retrieve `P2` and `m_i`, then read the DUT's output values.
+    - Log the current iteration, discrepancy count, and compare the expected and actual output values.
+    - Assert that the expected and actual output values match for all components of `P2` and `m_i`.
+- **Output**: The function does not return a value but performs assertions to verify the correctness of the DUT's outputs against expected values, logging the results and discrepancies.
 
 
 

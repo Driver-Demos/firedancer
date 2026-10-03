@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Primitives for portable fixed-point arithmetic with rounding and overflow detection, targeting 64-bit unsigned integers.
+The `fd_fxp.h` file in the `firedancer` codebase provides a comprehensive set of functions for performing portable fixed-point arithmetic, including addition, subtraction, multiplication, division, square root, logarithm, and exponential operations, with various rounding modes and overflow detection, specifically targeting 64-bit unsigned integer arithmetic with 30 fractional bits.
 
 # Purpose
-The code is a C header file that provides a collection of functions for performing fixed-point arithmetic operations. It is designed to handle arithmetic operations such as addition, subtraction, multiplication, division, square root, logarithm, and exponential functions using fixed-point representation with 30 fractional bits. The code is optimized for platforms that support 64-bit unsigned integer arithmetic and includes implementations for both 64-bit and 128-bit integer operations, depending on the platform's capabilities.
+The provided C header file, `fd_fxp.h`, is a comprehensive library for performing fixed-point arithmetic operations with a focus on portability and precision. It is designed to handle arithmetic operations such as addition, subtraction, multiplication, division, square root, logarithm, and exponential functions using fixed-point representations. The library is optimized for platforms that support 64-bit unsigned integer arithmetic and is particularly tailored for fixed-point numbers with 30 fractional bits. This file includes a variety of functions that implement different rounding modes, ensuring that operations can be performed with the desired precision and rounding behavior.
 
-The header file defines a private API for internal use and a set of inline functions for fixed-point arithmetic operations. These functions include various rounding modes for multiplication and division, such as round toward zero, round away from zero, and round to nearest with ties handled in different ways. The file also includes functions for computing the square root, logarithm base 2, and exponential functions in fixed-point format. The code is structured to provide both precise and fast variants of these operations, with the fast variants assuming certain conditions for performance optimization. The header file is intended to be included in other C source files to provide fixed-point arithmetic capabilities.
+The file is structured to provide both private and public APIs, with the private API handling internal operations like expansion and contraction of numbers to and from a wider representation. The public API offers a range of arithmetic functions, each with multiple variants to accommodate different rounding strategies, such as rounding towards zero, away from zero, and various forms of nearest rounding. The library also includes fast variants of these functions for scenarios where performance is critical and the user can guarantee certain conditions (e.g., no overflow). Additionally, the file contains approximations for logarithmic and exponential functions, which are implemented using polynomial approximations to achieve high precision. Overall, this header file serves as a robust toolkit for developers needing precise fixed-point arithmetic in their applications.
 # Imports and Dependencies
 
 ---
@@ -20,1133 +20,1022 @@ The header file defines a private API for internal use and a set of inline funct
 
 ---
 ### fd\_fxp\_private\_expand<!-- {{#callable:fd_fxp_private_expand}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L37>)
-
-Expands a 64-bit unsigned integer into two 64-bit parts for fixed-point representation.
+Expands a 64-bit unsigned integer into two 64-bit parts representing a fixed-point format.
 - **Inputs**:
-    - `_yh`: Pointer to store the high part of the expanded value.
-    - `_yl`: Pointer to store the low part of the expanded value.
-    - `x`: The 64-bit unsigned integer to be expanded.
-- **Logic and Control Flow**:
-    - The function shifts `x` right by 34 bits and stores the result in the location pointed to by `_yh`.
-    - The function shifts `x` left by 30 bits and stores the result in the location pointed to by `_yl`.
-- **Output**: The function does not return a value; it modifies the values pointed to by `_yh` and `_yl`.
+    - `_yh`: Pointer to a 64-bit unsigned integer where the high part of the expanded value will be stored.
+    - `_yl`: Pointer to a 64-bit unsigned integer where the low part of the expanded value will be stored.
+    - `x`: A 64-bit unsigned integer to be expanded.
+- **Control Flow**:
+    - The function shifts the input `x` right by 34 bits and stores the result in the location pointed to by `_yh`.
+    - The function shifts the input `x` left by 30 bits and stores the result in the location pointed to by `_yl`.
+- **Output**: The function does not return a value; instead, it modifies the values at the memory locations pointed to by `_yh` and `_yl` to represent the expanded fixed-point format.
 
 
 ---
 ### fd\_fxp\_private\_contract<!-- {{#callable:fd_fxp_private_contract}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L43>)
-
-Contracts two 64-bit unsigned integers into a single 64-bit unsigned integer and stores the carry in a pointer.
+The `fd_fxp_private_contract` function combines two 64-bit unsigned integers into a single 64-bit result while also extracting the high bits into a separate variable.
 - **Inputs**:
-    - `xh`: The high 64 bits of the input value.
-    - `xl`: The low 64 bits of the input value.
-    - `_c`: A pointer to store the carry value.
-- **Logic and Control Flow**:
-    - The function shifts `xh` right by 30 bits and stores the result in the location pointed to by `_c`.
-    - It then shifts `xh` left by 34 bits and combines it with the result of shifting `xl` right by 30 bits using a bitwise OR operation.
-- **Output**: Returns the combined 64-bit unsigned integer result of the operations.
+    - `xh`: The high 64 bits of a 128-bit unsigned integer representation.
+    - `xl`: The low 64 bits of a 128-bit unsigned integer representation.
+    - `_c`: A pointer to a variable where the high bits (after shifting) will be stored.
+- **Control Flow**:
+    - The function first shifts `xh` right by 30 bits and stores the result in the variable pointed to by `_c`.
+    - Then, it combines the shifted `xh` (left-shifted by 34 bits) with the low bits `xl` (right-shifted by 30 bits) using a bitwise OR operation to produce the final result.
+- **Output**: The function returns a 64-bit unsigned integer that represents the combined value of the shifted `xh` and `xl`.
 
 
 ---
 ### fd\_fxp\_private\_split<!-- {{#callable:fd_fxp_private_split}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L28>)
-
-Returns the low 64-bits of a `uint128` and stores the high 64-bits at the provided pointer.
+Splits a `uint128` value into its lower 64 bits and stores the upper 64 bits in a provided pointer.
 - **Inputs**:
-    - `x`: A `uint128` value from which the low and high 64-bits will be extracted.
-    - `_h`: A pointer to a `ulong` where the high 64-bits of `x` will be stored.
-- **Logic and Control Flow**:
-    - The function shifts `x` right by 64 bits to obtain the high 64-bits.
-    - The high 64-bits are stored in the location pointed to by `_h`.
-    - The function returns the low 64-bits of `x` as a `ulong`.
-- **Output**: The low 64-bits of the input `uint128` value.
+    - `x`: A `uint128` value that is to be split into high and low parts.
+    - `_h`: A pointer to an `ulong` where the upper 64 bits of `x` will be stored.
+- **Control Flow**:
+    - The function first shifts `x` right by 64 bits to isolate the upper 64 bits.
+    - It assigns the result of the shift to the location pointed to by `_h`.
+    - Finally, it returns the lower 64 bits of `x` by casting `x` to `ulong`.
+- **Output**: Returns the lower 64 bits of the `uint128` value `x`.
 
 
 ---
 ### fd\_fxp\_add<!-- {{#callable:fd_fxp_add}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L54>)
-
-Computes the sum of two fixed-point numbers and sets a carry flag if an overflow occurs.
+The `fd_fxp_add` function performs fixed-point addition of two unsigned long integers with overflow detection.
 - **Inputs**:
-    - `x`: First fixed-point number represented as an unsigned long.
-    - `y`: Second fixed-point number represented as an unsigned long.
-    - `_c`: Pointer to an unsigned long where the carry flag will be stored.
-- **Logic and Control Flow**:
-    - Checks if `x` is greater than the bitwise negation of `y` to determine if there is a carry.
-    - Stores the result of the addition of `x` and `y`.
-- **Output**: Returns the sum of `x` and `y` as an unsigned long.
+    - `x`: The first operand of type `ulong` to be added.
+    - `y`: The second operand of type `ulong` to be added.
+    - `_c`: A pointer to a `ulong` where the carry-out (if any) will be stored.
+- **Control Flow**:
+    - The function first checks if `x` is greater than the bitwise negation of `y` to determine if there is a carry-out.
+    - The result of the addition `x + y` is computed and returned.
+- **Output**: Returns the sum of `x` and `y` as a `ulong`, while also updating the value pointed to by `_c` to indicate if there was a carry-out.
 
 
 ---
 ### fd\_fxp\_add\_fast<!-- {{#callable:fd_fxp_add_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L55>)
-
-Computes the sum of two `ulong` values.
+The `fd_fxp_add_fast` function performs a fast addition of two 64-bit unsigned integers.
 - **Inputs**:
-    - `x`: First `ulong` value to add.
-    - `y`: Second `ulong` value to add.
-- **Logic and Control Flow**:
-    - Returns the result of adding `x` and `y`.
-- **Output**: Returns the sum of `x` and `y` as a `ulong`.
+    - `x`: The first operand of type `ulong` (unsigned long) to be added.
+    - `y`: The second operand of type `ulong` (unsigned long) to be added.
+- **Control Flow**:
+    - The function directly returns the sum of `x` and `y` without any checks or additional logic.
+    - It utilizes the built-in addition operator for `ulong` types, which is efficient and straightforward.
+- **Output**: The function returns the result of the addition as a `ulong`, which is the sum of `x` and `y`.
 
 
 ---
 ### fd\_fxp\_sub<!-- {{#callable:fd_fxp_sub}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L64>)
-
-Computes the fixed-point subtraction of two unsigned long integers and sets a flag if the result is negative.
+The `fd_fxp_sub` function performs fixed-point subtraction of two unsigned long integers and detects if an underflow occurs.
 - **Inputs**:
-    - `x`: The first unsigned long integer from which to subtract.
-    - `y`: The second unsigned long integer to subtract from the first.
-    - `_b`: A pointer to an unsigned long where the borrow flag will be stored.
-- **Logic and Control Flow**:
-    - Checks if `x` is less than `y` to determine if a borrow occurs.
-    - Stores the borrow flag (1 if borrow occurs, 0 otherwise) in the location pointed to by `_b`.
-    - Returns the result of the subtraction `x - y`.
-- **Output**: Returns the result of the subtraction of `y` from `x`.
+    - `x`: The first operand of type `ulong` from which the second operand will be subtracted.
+    - `y`: The second operand of type `ulong` that will be subtracted from the first operand.
+    - `_b`: A pointer to a `ulong` where the underflow flag will be stored; it will be set to 1 if `x` is less than `y`, otherwise it will be set to 0.
+- **Control Flow**:
+    - The function first checks if `x` is less than `y` and sets the value pointed to by `_b` accordingly.
+    - It then performs the subtraction `x - y` and returns the result.
+- **Output**: The function returns the result of the subtraction `x - y` as a `ulong`.
 
 
 ---
 ### fd\_fxp\_sub\_fast<!-- {{#callable:fd_fxp_sub_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L65>)
-
-Performs fast subtraction of two 64-bit unsigned integers.
+`fd_fxp_sub_fast` performs fast fixed-point subtraction of two unsigned long integers.
 - **Inputs**:
-    - `x`: The first 64-bit unsigned integer.
-    - `y`: The second 64-bit unsigned integer.
-- **Logic and Control Flow**:
+    - `x`: The first operand of type `ulong` from which the second operand will be subtracted.
+    - `y`: The second operand of type `ulong` which will be subtracted from the first operand.
+- **Control Flow**:
     - The function directly returns the result of the subtraction operation `x - y`.
-- **Output**: Returns the result of subtracting `y` from `x`, which is a 64-bit unsigned integer.
+    - No additional checks or operations are performed, making it a straightforward and efficient implementation.
+- **Output**: The function returns the result of the subtraction as a `ulong`, which is the difference between `x` and `y`.
 
 
 ---
 ### fd\_fxp\_mul\_rtz<!-- {{#callable:fd_fxp_mul_rtz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L136>)
-
 Computes the fixed-point multiplication of two unsigned long integers with rounding toward zero.
 - **Inputs**:
-    - `x`: First operand for multiplication, an unsigned long integer.
-    - `y`: Second operand for multiplication, an unsigned long integer.
-    - `_c`: Pointer to an unsigned long where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls `fd_uwide_mul` to perform a wide multiplication of `x` and `y`, storing the high and low parts in `zh` and `zl`.
-    - Calls [`fd_fxp_private_contract`](<#fd_fxp_private_contract>) to contract the result back to fixed-point format and return the result.
-- **Output**: Returns the low 64 bits of the multiplication result, with the carry stored in the location pointed to by `_c`.
-- **Functions Called**:
-    - [`fd_fxp_private_contract`](<#fd_fxp_private_contract>)
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+    - `_c`: A pointer to an unsigned long integer where the carry (if any) will be stored.
+- **Control Flow**:
+    - Calls `fd_uwide_mul` to perform a 64-bit multiplication of `x` and `y`, storing the high and low parts in `zh` and `zl` respectively.
+    - The multiplication is guaranteed to not overflow as the maximum result is within the bounds of 128 bits.
+    - Calls [`fd_fxp_private_contract`](#fd_fxp_private_contract) to contract the 128-bit result back into a 64-bit fixed-point representation, while also updating the carry value pointed to by `_c`.
+- **Output**: Returns the lower 64 bits of the fixed-point multiplication result.
+- **Functions called**:
+    - [`fd_fxp_private_contract`](#fd_fxp_private_contract)
 
 
 ---
 ### fd\_fxp\_mul\_raz<!-- {{#callable:fd_fxp_mul_raz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L161>)
-
-Computes the product of two fixed-point numbers with rounding away from zero.
+Multiplies two fixed-point numbers and rounds away from zero.
 - **Inputs**:
-    - `x`: First multiplicand, a 64-bit unsigned integer.
-    - `y`: Second multiplicand, a 64-bit unsigned integer.
-    - `_c`: Pointer to a 64-bit unsigned integer to store the carry.
-- **Logic and Control Flow**:
-    - Calls `fd_uwide_mul` to multiply `x` and `y`, storing the result in `zh` and `zl`.
-    - Increments the high and low parts of the result by `(1UL << 30) - 1` using `fd_uwide_inc`.
-    - Calls [`fd_fxp_private_contract`](<#fd_fxp_private_contract>) to contract the result back to a 64-bit unsigned integer and return it.
-- **Output**: Returns the low 64 bits of the product of `x` and `y`, rounded away from zero, and updates the carry value through the pointer `_c`.
-- **Functions Called**:
-    - [`fd_fxp_private_contract`](<#fd_fxp_private_contract>)
+    - `x`: The first multiplicand, a fixed-point number represented as an unsigned long.
+    - `y`: The second multiplicand, a fixed-point number represented as an unsigned long.
+    - `_c`: A pointer to an unsigned long where the carry (if any) will be stored.
+- **Control Flow**:
+    - Calls `fd_uwide_mul` to perform a wide multiplication of `x` and `y`, storing the high and low parts in `zh` and `zl` respectively.
+    - Increments the high and low parts (`zh` and `zl`) by (1 << 30) - 1 using `fd_uwide_inc` to account for rounding away from zero.
+    - Calls [`fd_fxp_private_contract`](#fd_fxp_private_contract) to contract the result back into a fixed-point representation and returns the result.
+- **Output**: Returns the low 64 bits of the result of the multiplication, rounded away from zero, while storing any overflow in the variable pointed to by `_c'.
+- **Functions called**:
+    - [`fd_fxp_private_contract`](#fd_fxp_private_contract)
 
 
 ---
 ### fd\_fxp\_mul\_rnz<!-- {{#callable:fd_fxp_mul_rnz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L190>)
-
-Computes the fixed-point multiplication of two unsigned long integers with rounding towards nearest, using a specific method to handle overflow.
+The `fd_fxp_mul_rnz` function performs fixed-point multiplication of two unsigned long integers with rounding to the nearest value.
 - **Inputs**:
-    - `x`: First multiplicand, an unsigned long integer.
-    - `y`: Second multiplicand, an unsigned long integer.
-    - `_c`: Pointer to an unsigned long integer where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls `fd_uwide_mul` to perform a wide multiplication of `x` and `y`, storing the high and low parts in `zh` and `zl`.
-    - Increments the high and low parts by `(1UL << 29) - 1UL` using `fd_uwide_inc` to handle rounding.
-    - Calls [`fd_fxp_private_contract`](<#fd_fxp_private_contract>) to contract the result back to a fixed-point representation and return the low part.
-- **Output**: Returns the low part of the fixed-point multiplication result as an unsigned long integer.
-- **Functions Called**:
-    - [`fd_fxp_private_contract`](<#fd_fxp_private_contract>)
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+    - `_c`: A pointer to an unsigned long integer where the carry (high bits) will be stored.
+- **Control Flow**:
+    - The function first calls `fd_uwide_mul` to multiply `x` and `y`, storing the result in two variables `zh` (high bits) and `zl` (low bits).
+    - Next, it calls `fd_uwide_inc` to increment the high and low parts of the result by (1UL << 29) - 1, which adjusts the result for rounding.
+    - Finally, it calls [`fd_fxp_private_contract`](#fd_fxp_private_contract) to combine the high and low parts into a single fixed-point result, returning the low part and storing the high part in `_c`.
+- **Output**: The function returns the low 64 bits of the fixed-point multiplication result, with rounding applied, and updates the carry value in the provided pointer.
+- **Functions called**:
+    - [`fd_fxp_private_contract`](#fd_fxp_private_contract)
 
 
 ---
 ### fd\_fxp\_mul\_rna<!-- {{#callable:fd_fxp_mul_rna}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L219>)
-
-Computes the fixed-point multiplication of two unsigned long integers with rounding away from zero.
+The `fd_fxp_mul_rna` function performs fixed-point multiplication of two unsigned long integers with rounding away from zero.
 - **Inputs**:
-    - `x`: First multiplicand, an unsigned long integer.
-    - `y`: Second multiplicand, an unsigned long integer.
-    - `_c`: Pointer to an unsigned long integer where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls `fd_uwide_mul` to perform a wide multiplication of `x` and `y`, storing the high and low parts in `zh` and `zl`.
-    - Increments the high and low parts by `1UL << 29` using `fd_uwide_inc` to account for rounding.
-    - Returns the result of [`fd_fxp_private_contract`](<#fd_fxp_private_contract>), which combines the high and low parts and updates the carry.
-- **Output**: Returns the lower 64 bits of the result of the multiplication, adjusted for fixed-point representation.
-- **Functions Called**:
-    - [`fd_fxp_private_contract`](<#fd_fxp_private_contract>)
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+    - `_c`: A pointer to an unsigned long integer where the carry will be stored.
+- **Control Flow**:
+    - The function first calls `fd_uwide_mul` to multiply `x` and `y`, storing the high and low parts of the result in `zh` and `zl` respectively.
+    - Next, it calls `fd_uwide_inc` to increment the high and low parts of the result by 2^29, which is necessary for rounding away from zero.
+    - Finally, it calls [`fd_fxp_private_contract`](#fd_fxp_private_contract) to contract the 128-bit result back into a 64-bit fixed-point representation and returns the result.
+- **Output**: The function returns the low 64 bits of the fixed-point multiplication result, with rounding applied, and updates the carry value through the pointer provided.
+- **Functions called**:
+    - [`fd_fxp_private_contract`](#fd_fxp_private_contract)
 
 
 ---
 ### fd\_fxp\_mul\_rne<!-- {{#callable:fd_fxp_mul_rne}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L242>)
-
-Computes fixed-point multiplication of two unsigned long integers with round-to-nearest-even behavior.
+Computes the fixed-point multiplication of two unsigned long integers with round-to-nearest-even behavior.
 - **Inputs**:
-    - `x`: First multiplicand, an unsigned long integer.
-    - `y`: Second multiplicand, an unsigned long integer.
-    - `_c`: Pointer to an unsigned long where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls `fd_uwide_mul` to perform a wide multiplication of `x` and `y`, storing the high and low parts in `zh` and `zl`.
-    - Calculates a rounding adjustment `t` based on the 30th bit of the low part `zl`.
-    - Calls `fd_uwide_inc` to increment the high and low parts by `t`.
-    - Returns the result of [`fd_fxp_private_contract`](<#fd_fxp_private_contract>), which contracts the wide result back to a fixed-point representation.
-- **Output**: Returns the fixed-point result of the multiplication, with the carry stored in the location pointed to by `_c`.
-- **Functions Called**:
-    - [`fd_fxp_private_contract`](<#fd_fxp_private_contract>)
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+    - `_c`: A pointer to an unsigned long integer where the high part of the result will be stored.
+- **Control Flow**:
+    - Calls `fd_uwide_mul` to perform a wide multiplication of `x` and `y`, storing the high and low parts in `zh` and `zl` respectively.
+    - Calculates a rounding adjustment `t` based on the 30th bit of the low part `zl` to determine how to round the result.
+    - Calls `fd_uwide_inc` to increment the high and low parts by the calculated adjustment `t`.
+    - Returns the final result by calling [`fd_fxp_private_contract`](#fd_fxp_private_contract), which combines the high and low parts and updates the carry pointer.
+- **Output**: Returns the lower 64 bits of the result of the multiplication, rounded to the nearest even number, while also updating the carry value if there is an overflow.
+- **Functions called**:
+    - [`fd_fxp_private_contract`](#fd_fxp_private_contract)
 
 
 ---
 ### fd\_fxp\_mul\_rno<!-- {{#callable:fd_fxp_mul_rno}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L263>)
-
-Computes fixed-point multiplication of two unsigned long integers with rounding toward nearest odd.
+The `fd_fxp_mul_rno` function performs fixed-point multiplication of two unsigned long integers with rounding towards the nearest odd value.
 - **Inputs**:
-    - `x`: First multiplicand, an unsigned long integer.
-    - `y`: Second multiplicand, an unsigned long integer.
-    - `_c`: Pointer to an unsigned long where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calculates the product of `x` and `y` using `fd_uwide_mul`, storing the high and low parts in `zh` and `zl`.
-    - Determines the value of `t` based on the 30th bit of `zl` to decide how to round the result.
-    - Increments the high and low parts by `t` using `fd_uwide_inc`.
-    - Contracts the result back to a fixed-point representation using [`fd_fxp_private_contract`](<#fd_fxp_private_contract>).
-- **Output**: Returns the fixed-point result of the multiplication, with the carry stored in the location pointed to by `_c`.
-- **Functions Called**:
-    - [`fd_fxp_private_contract`](<#fd_fxp_private_contract>)
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+    - `_c`: A pointer to an unsigned long integer where the high part of the result will be stored.
+- **Control Flow**:
+    - The function begins by performing a wide multiplication of `x` and `y` using `fd_uwide_mul`, which produces two parts: `zh` (high) and `zl` (low).
+    - It calculates a temporary variable `t` based on the 30th bit of `zl` to determine how to round the result.
+    - The function then increments the high and low parts of the result using `fd_uwide_inc` with the calculated `t`.
+    - Finally, it calls [`fd_fxp_private_contract`](#fd_fxp_private_contract) to contract the result back to a fixed-point representation and returns the low part.
+- **Output**: The function returns the low part of the fixed-point multiplication result, which is adjusted for rounding towards the nearest odd value.
+- **Functions called**:
+    - [`fd_fxp_private_contract`](#fd_fxp_private_contract)
 
 
 ---
 ### fd\_fxp\_mul\_rtz\_fast<!-- {{#callable:fd_fxp_mul_rtz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L275>)
-
-Computes the fixed-point multiplication of two unsigned long integers with rounding toward zero.
+Performs fast fixed-point multiplication of two unsigned long integers with rounding toward zero.
 - **Inputs**:
-    - `x`: First operand for multiplication, an unsigned long integer.
-    - `y`: Second operand for multiplication, an unsigned long integer.
-- **Logic and Control Flow**:
-    - Multiplies `x` and `y` to get the product.
-    - Shifts the product right by 30 bits to adjust for fixed-point representation.
-- **Output**: Returns the result of the multiplication adjusted for fixed-point representation as an unsigned long integer.
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+- **Control Flow**:
+    - The function computes the product of `x` and `y` using standard multiplication.
+    - The result of the multiplication is then right-shifted by 30 bits to adjust for the fixed-point representation.
+- **Output**: Returns the result of the fixed-point multiplication, which is the product of `x` and `y` divided by 2^30.
 
 
 ---
 ### fd\_fxp\_mul\_raz\_fast<!-- {{#callable:fd_fxp_mul_raz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L276>)
-
-Computes the product of two fixed-point numbers with rounding away from zero.
+The `fd_fxp_mul_raz_fast` function performs fixed-point multiplication of two unsigned long integers with rounding away from zero.
 - **Inputs**:
-    - `x`: First multiplicand, a fixed-point number represented as an unsigned long.
-    - `y`: Second multiplicand, a fixed-point number represented as an unsigned long.
-- **Logic and Control Flow**:
-    - Calculates the product of `x` and `y` using unsigned long multiplication.
-    - Adds a constant value of `((1UL << 30) - 1UL)` to the product to implement rounding away from zero.
-    - Shifts the result right by 30 bits to adjust the fixed-point representation.
-- **Output**: Returns the rounded product as an unsigned long.
+    - `x`: An unsigned long integer representing the first multiplicand.
+    - `y`: An unsigned long integer representing the second multiplicand.
+- **Control Flow**:
+    - The function computes the product of `x` and `y` using standard multiplication.
+    - It adds a constant value of (1UL << 30) - 1 to the product to facilitate rounding away from zero.
+    - The result is then right-shifted by 30 bits to adjust for the fixed-point representation.
+- **Output**: Returns the result of the fixed-point multiplication as an unsigned long integer, rounded away from zero.
 
 
 ---
 ### fd\_fxp\_mul\_rnz\_fast<!-- {{#callable:fd_fxp_mul_rnz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L277>)
-
-Computes the fixed-point multiplication of two unsigned long integers with rounding towards nearest, using a fast method.
+Multiplies two unsigned long integers in fixed-point representation with rounding towards nearest, using a fast bit-shifting method.
 - **Inputs**:
-    - `x`: First unsigned long integer to multiply.
-    - `y`: Second unsigned long integer to multiply.
-- **Logic and Control Flow**:
-    - Calculates the product of `x` and `y`.
-    - Adds a rounding adjustment of `((1UL<<29)-1UL)` to the product.
-    - Shifts the result right by 30 bits to obtain the final fixed-point result.
-- **Output**: Returns the fixed-point result of the multiplication, rounded to the nearest value.
-
-
----
-### fd\_fxp\_mul\_rna\_fast<!-- {{#callable:fd_fxp_mul_rna_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L278>)
-
-Computes the fixed-point multiplication of two unsigned long integers with rounding.
-- **Inputs**:
-    - `x`: First unsigned long integer to multiply.
-    - `y`: Second unsigned long integer to multiply.
-- **Logic and Control Flow**:
-    - Multiplies `x` and `y` to get the product.
-    - Adds `1UL << 29` to the product for rounding.
-    - Shifts the result right by 30 bits to adjust for fixed-point representation.
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+- **Control Flow**:
+    - Calculates the product of `x` and `y` using standard multiplication.
+    - Adds a rounding adjustment of (1UL << 29) - 1 to the product to account for fixed-point rounding.
+    - Right shifts the result by 30 bits to convert the fixed-point representation back to an integer.
 - **Output**: Returns the result of the fixed-point multiplication as an unsigned long integer.
 
 
 ---
-### fd\_fxp\_mul\_rne\_fast<!-- {{#callable:fd_fxp_mul_rne_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L280>)
-
-Computes the fixed-point multiplication of two unsigned long integers with round-to-nearest-even behavior.
+### fd\_fxp\_mul\_rna\_fast<!-- {{#callable:fd_fxp_mul_rna_fast}} -->
+Computes the fixed-point multiplication of two unsigned long integers with rounding towards the nearest integer.
 - **Inputs**:
-    - `x`: First operand of type `ulong` for multiplication.
-    - `y`: Second operand of type `ulong` for multiplication.
-- **Logic and Control Flow**:
-    - Calculates the product `z` of `x` and `y`.
-    - Determines the value of `t` based on the 30th bit of `z` to adjust for rounding.
-    - Returns the final result by right-shifting the sum of `z` and `t` by 30.
-- **Output**: Returns the result of the fixed-point multiplication as a `ulong`.
+    - `x`: The first multiplicand, an unsigned long integer.
+    - `y`: The second multiplicand, an unsigned long integer.
+- **Control Flow**:
+    - The function multiplies `x` and `y` to get the product.
+    - It adds a constant value of (1UL << 29) to the product to facilitate rounding.
+    - The result is then right-shifted by 30 bits to adjust for the fixed-point representation.
+- **Output**: Returns the result of the fixed-point multiplication as an unsigned long integer, rounded to the nearest integer.
+
+
+---
+### fd\_fxp\_mul\_rne\_fast<!-- {{#callable:fd_fxp_mul_rne_fast}} -->
+The `fd_fxp_mul_rne_fast` function performs fast fixed-point multiplication of two unsigned long integers with rounding to the nearest value.
+- **Inputs**:
+    - `x`: An unsigned long integer representing the first multiplicand.
+    - `y`: An unsigned long integer representing the second multiplicand.
+- **Control Flow**:
+    - The function computes the product of `x` and `y`, storing the result in `z`.
+    - It calculates a rounding adjustment `t` based on the value of the 30th bit of `z`.
+    - The adjustment `t` is determined by adding `2^29 - 1` if the 30th bit of `z` is 0, or `2^29` if it is 1.
+    - Finally, the function returns the result of `(z + t) >> 30`, effectively performing a right shift to scale the result.
+- **Output**: The function returns an unsigned long integer that represents the fixed-point multiplication result of `x` and `y`, rounded to the nearest value.
 
 
 ---
 ### fd\_fxp\_mul\_rno\_fast<!-- {{#callable:fd_fxp_mul_rno_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L288>)
-
-Computes the fixed-point multiplication of two unsigned long integers with rounding.
+Computes the fixed-point multiplication of two unsigned long integers with rounding towards the nearest odd value.
 - **Inputs**:
-    - `x`: First operand of type `ulong` for multiplication.
-    - `y`: Second operand of type `ulong` for multiplication.
-- **Logic and Control Flow**:
+    - `x`: The first operand of type `ulong` to be multiplied.
+    - `y`: The second operand of type `ulong` to be multiplied.
+- **Control Flow**:
     - Calculates the product `z` of `x` and `y`.
-    - Determines the value of `t` based on the 30th bit of `z`.
-    - Returns the result of `(z + t) >> 30`.
-- **Output**: Returns the fixed-point result of the multiplication, adjusted for rounding.
+    - Determines the value of `t` based on the 30th bit of `z` to adjust for rounding.
+    - Returns the final result by right-shifting the sum of `z` and `t` by 30.
+- **Output**: Returns the result of the multiplication adjusted for fixed-point representation, effectively rounding the result towards the nearest odd integer.
 
 
 ---
 ### fd\_fxp\_mul\_rdn<!-- {{#callable:fd_fxp_mul_rdn}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L302>)
-
-Computes fixed-point multiplication of two unsigned long integers with rounding down.
+Performs fixed-point multiplication of two unsigned long integers with rounding down.
 - **Inputs**:
-    - `x`: First operand for multiplication, of type `ulong`.
-    - `y`: Second operand for multiplication, of type `ulong`.
-    - `_c`: Pointer to a `ulong` where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_mul_rtz`](<#fd_fxp_mul_rtz>) function to perform the multiplication with rounding toward zero.
-    - The result of the multiplication is returned directly.
-- **Output**: Returns the result of the multiplication as a `ulong`.
-- **Functions Called**:
-    - [`fd_fxp_mul_rtz`](<#fd_fxp_mul_rtz>)
+    - `x`: The first operand for multiplication, represented as an unsigned long integer.
+    - `y`: The second operand for multiplication, represented as an unsigned long integer.
+    - `_c`: A pointer to an unsigned long integer where the carry-out from the multiplication will be stored.
+- **Control Flow**:
+    - Calls the [`fd_fxp_mul_rtz`](#fd_fxp_mul_rtz) function to perform the multiplication with rounding towards zero.
+    - The [`fd_fxp_mul_rtz`](#fd_fxp_mul_rtz) function internally handles the multiplication and rounding logic.
+- **Output**: Returns the result of the multiplication as an unsigned long integer.
+- **Functions called**:
+    - [`fd_fxp_mul_rtz`](#fd_fxp_mul_rtz)
 
 
 ---
 ### fd\_fxp\_mul\_rup<!-- {{#callable:fd_fxp_mul_rup}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L303>)
-
-Computes the fixed-point multiplication of two unsigned long integers with rounding up.
+The `fd_fxp_mul_rup` function performs fixed-point multiplication of two unsigned long integers with rounding up.
 - **Inputs**:
-    - `x`: First operand for multiplication, of type `ulong`.
-    - `y`: Second operand for multiplication, of type `ulong`.
-    - `_c`: Pointer to a `ulong` where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_mul_raz`](<#fd_fxp_mul_raz>) function to perform the multiplication with rounding up.
-    - Returns the result of the multiplication.
-- **Output**: Returns the result of the multiplication as a `ulong`.
-- **Functions Called**:
-    - [`fd_fxp_mul_raz`](<#fd_fxp_mul_raz>)
+    - `x`: The first operand of type `ulong` to be multiplied.
+    - `y`: The second operand of type `ulong` to be multiplied.
+    - `_c`: A pointer to a `ulong` where the carry will be stored.
+- **Control Flow**:
+    - The function calls [`fd_fxp_mul_raz`](#fd_fxp_mul_raz), which performs the actual multiplication with rounding away from zero.
+    - The result of the multiplication is returned directly.
+- **Output**: Returns the result of the multiplication as a `ulong`, with rounding applied according to the specified method.
+- **Functions called**:
+    - [`fd_fxp_mul_raz`](#fd_fxp_mul_raz)
 
 
 ---
 ### fd\_fxp\_mul\_rnd<!-- {{#callable:fd_fxp_mul_rnd}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L304>)
-
-Computes the product of two fixed-point numbers with rounding.
+The `fd_fxp_mul_rnd` function performs fixed-point multiplication of two unsigned long integers with rounding towards the nearest value.
 - **Inputs**:
-    - `x`: First multiplicand, a fixed-point number represented as an unsigned long.
-    - `y`: Second multiplicand, a fixed-point number represented as an unsigned long.
-    - `_c`: Pointer to an unsigned long where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_mul_rnz`](<#fd_fxp_mul_rnz>) function to perform multiplication with rounding.
-    - The result of the multiplication is returned directly.
-- **Output**: Returns the product of `x` and `y` as a fixed-point number, with the carry stored in `_c`.
-- **Functions Called**:
-    - [`fd_fxp_mul_rnz`](<#fd_fxp_mul_rnz>)
+    - `x`: The first operand of type `ulong` to be multiplied.
+    - `y`: The second operand of type `ulong` to be multiplied.
+    - `_c`: A pointer to a `ulong` where the carry (if any) will be stored.
+- **Control Flow**:
+    - The function calls [`fd_fxp_mul_rnz`](#fd_fxp_mul_rnz), which handles the multiplication and rounding.
+    - The multiplication is performed in a way that ensures the result is rounded to the nearest fixed-point representation.
+- **Output**: Returns the result of the fixed-point multiplication as a `ulong`, with the carry stored in the location pointed to by `_c`.
+- **Functions called**:
+    - [`fd_fxp_mul_rnz`](#fd_fxp_mul_rnz)
 
 
 ---
 ### fd\_fxp\_mul\_rnu<!-- {{#callable:fd_fxp_mul_rnu}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L305>)
-
-Computes the product of two fixed-point numbers with rounding towards nearest with ties away from zero.
+The `fd_fxp_mul_rnu` function performs fixed-point multiplication with rounding towards the nearest value, handling overflow through an additional carry.
 - **Inputs**:
-    - `x`: First multiplicand, a 64-bit unsigned integer.
-    - `y`: Second multiplicand, a 64-bit unsigned integer.
-    - `_c`: Pointer to a 64-bit unsigned integer to store carry.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_mul_rna`](<#fd_fxp_mul_rna>) function to perform the multiplication with rounding.
-    - The result of the multiplication is returned directly.
-- **Output**: Returns the product of `x` and `y`, rounded according to the specified mode, and updates the carry value pointed to by `_c`.
-- **Functions Called**:
-    - [`fd_fxp_mul_rna`](<#fd_fxp_mul_rna>)
+    - `x`: The first operand of type `ulong` to be multiplied.
+    - `y`: The second operand of type `ulong` to be multiplied.
+    - `_c`: A pointer to a `ulong` where the carry resulting from the multiplication will be stored.
+- **Control Flow**:
+    - The function calls [`fd_fxp_mul_rna`](#fd_fxp_mul_rna), which performs the actual multiplication with rounding towards the nearest value.
+    - The result of the multiplication is returned directly from the [`fd_fxp_mul_rna`](#fd_fxp_mul_rna) function.
+- **Output**: Returns the result of the fixed-point multiplication of `x` and `y`, rounded to the nearest value, while also updating the carry if necessary.
+- **Functions called**:
+    - [`fd_fxp_mul_rna`](#fd_fxp_mul_rna)
 
 
 ---
 ### fd\_fxp\_mul\_rdn\_fast<!-- {{#callable:fd_fxp_mul_rdn_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L307>)
-
-Computes the product of two unsigned long integers with rounding down.
+The `fd_fxp_mul_rdn_fast` function performs fixed-point multiplication of two unsigned long integers with rounding down.
 - **Inputs**:
-    - `x`: First unsigned long integer to multiply.
-    - `y`: Second unsigned long integer to multiply.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_mul_rtz_fast`](<#fd_fxp_mul_rtz_fast>) with `x` and `y` as arguments.
-    - Returns the result of the multiplication with rounding down.
-- **Output**: Returns the product of `x` and `y`, shifted right by 30 bits.
-- **Functions Called**:
-    - [`fd_fxp_mul_rtz_fast`](<#fd_fxp_mul_rtz_fast>)
+    - `x`: An unsigned long integer representing the first operand in the multiplication.
+    - `y`: An unsigned long integer representing the second operand in the multiplication.
+- **Control Flow**:
+    - The function calls [`fd_fxp_mul_rtz_fast`](#fd_fxp_mul_rtz_fast) to perform the multiplication with truncation rounding.
+    - The result of the multiplication is then returned directly.
+- **Output**: The function returns an unsigned long integer that is the result of the multiplication of `x` and `y`, rounded down.
+- **Functions called**:
+    - [`fd_fxp_mul_rtz_fast`](#fd_fxp_mul_rtz_fast)
 
 
 ---
 ### fd\_fxp\_mul\_rup\_fast<!-- {{#callable:fd_fxp_mul_rup_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L308>)
-
-Computes the product of two fixed-point numbers with rounding up.
+The `fd_fxp_mul_rup_fast` function performs fixed-point multiplication of two unsigned long integers with rounding up.
 - **Inputs**:
-    - `x`: First fixed-point number to multiply.
-    - `y`: Second fixed-point number to multiply.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_mul_raz_fast`](<#fd_fxp_mul_raz_fast>) to perform the multiplication with rounding up.
-    - Returns the result of the multiplication.
-- **Output**: Returns the product of `x` and `y`, rounded up.
-- **Functions Called**:
-    - [`fd_fxp_mul_raz_fast`](<#fd_fxp_mul_raz_fast>)
+    - `x`: The first operand of type `ulong` to be multiplied.
+    - `y`: The second operand of type `ulong` to be multiplied.
+- **Control Flow**:
+    - The function calls [`fd_fxp_mul_raz_fast`](#fd_fxp_mul_raz_fast) to perform the multiplication with rounding up.
+    - The result of the multiplication is returned directly.
+- **Output**: Returns the result of the multiplication of `x` and `y`, rounded up, as an unsigned long integer.
+- **Functions called**:
+    - [`fd_fxp_mul_raz_fast`](#fd_fxp_mul_raz_fast)
 
 
 ---
 ### fd\_fxp\_mul\_rnd\_fast<!-- {{#callable:fd_fxp_mul_rnd_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L309>)
-
-Multiplies two fixed-point numbers with rounding towards zero.
+The `fd_fxp_mul_rnd_fast` function performs fast fixed-point multiplication with rounding towards zero.
 - **Inputs**:
-    - `x`: First fixed-point number to multiply.
-    - `y`: Second fixed-point number to multiply.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_mul_rnz_fast`](<#fd_fxp_mul_rnz_fast>) to perform the multiplication.
-    - Returns the result of the multiplication.
-- **Output**: Returns the product of `x` and `y` as a fixed-point number.
-- **Functions Called**:
-    - [`fd_fxp_mul_rnz_fast`](<#fd_fxp_mul_rnz_fast>)
+    - `x`: An unsigned long integer representing the first operand in the fixed-point multiplication.
+    - `y`: An unsigned long integer representing the second operand in the fixed-point multiplication.
+- **Control Flow**:
+    - The function calls [`fd_fxp_mul_rnz_fast`](#fd_fxp_mul_rnz_fast) with the inputs `x` and `y`.
+    - The [`fd_fxp_mul_rnz_fast`](#fd_fxp_mul_rnz_fast) function computes the product of `x` and `y`, adds a rounding adjustment, and then shifts the result right by 30 bits to account for the fixed-point representation.
+- **Output**: Returns the result of the fixed-point multiplication, rounded towards zero, as an unsigned long integer.
+- **Functions called**:
+    - [`fd_fxp_mul_rnz_fast`](#fd_fxp_mul_rnz_fast)
 
 
 ---
 ### fd\_fxp\_mul\_rnu\_fast<!-- {{#callable:fd_fxp_mul_rnu_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L310>)
-
-Computes fixed point multiplication with round nearest ties up using the [`fd_fxp_mul_rna_fast`](<#fd_fxp_mul_rna_fast>) function.
+The `fd_fxp_mul_rnu_fast` function performs fixed-point multiplication with rounding towards the nearest value, using a fast implementation.
 - **Inputs**:
-    - `x`: First multiplicand, a 64-bit unsigned integer.
-    - `y`: Second multiplicand, a 64-bit unsigned integer.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_mul_rna_fast`](<#fd_fxp_mul_rna_fast>) function to perform the multiplication.
-    - Returns the result of the multiplication.
-- **Output**: Returns the product of `x` and `y`, rounded according to the nearest ties up rule.
-- **Functions Called**:
-    - [`fd_fxp_mul_rna_fast`](<#fd_fxp_mul_rna_fast>)
+    - `x`: An unsigned long integer representing the first operand in the fixed-point multiplication.
+    - `y`: An unsigned long integer representing the second operand in the fixed-point multiplication.
+- **Control Flow**:
+    - The function calls [`fd_fxp_mul_rna_fast`](#fd_fxp_mul_rna_fast) with the inputs `x` and `y`.
+    - The [`fd_fxp_mul_rna_fast`](#fd_fxp_mul_rna_fast) function computes the product of `x` and `y`, adds a rounding adjustment, and shifts the result to account for the fixed-point representation.
+- **Output**: Returns the result of the fixed-point multiplication of `x` and `y`, rounded to the nearest value.
+- **Functions called**:
+    - [`fd_fxp_mul_rna_fast`](#fd_fxp_mul_rna_fast)
 
 
 ---
 ### fd\_fxp\_div\_rtz<!-- {{#callable:fd_fxp_div_rtz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L393>)
-
-Performs fixed-point division with round toward zero.
+Performs fixed-point division of two unsigned long integers with round toward zero (RTZ) behavior.
 - **Inputs**:
-    - `x`: The numerator in the division operation.
-    - `y`: The denominator in the division operation.
-    - `_c`: A pointer to store the high part of the result.
-- **Logic and Control Flow**:
-    - Checks if the denominator `y` is zero to handle divide by zero case.
-    - If `y` is zero, sets the value pointed by `_c` to `ULONG_MAX` and returns 0.
-    - Expands `x` into two parts `zh` and `zl` using [`fd_fxp_private_expand`](<#fd_fxp_private_expand>).
-    - Performs the division of the expanded parts using `fd_uwide_div`.
-    - Stores the high part of the result in `_c` and returns the low part.
-- **Output**: Returns the low part of the division result.
-- **Functions Called**:
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+    - `_c`: A pointer to an unsigned long where the high part of the result will be stored.
+- **Control Flow**:
+    - Checks if the denominator `y` is zero; if so, sets `_c` to ULONG_MAX and returns 0UL to handle division by zero.
+    - Calls [`fd_fxp_private_expand`](#fd_fxp_private_expand) to expand `x` into two parts, `zh` and `zl`, which represent the high and low parts of the fixed-point number.
+    - Calls `fd_uwide_div` to perform the division of the expanded numerator by the denominator, storing the result in `zh` and `zl`.
+    - Stores the high part of the result in `_c` and returns the low part `zl`.
+- **Output**: Returns the low part of the result of the fixed-point division, while the high part is stored in the variable pointed to by `_c`.
+- **Functions called**:
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_div\_raz<!-- {{#callable:fd_fxp_div_raz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L418>)
-
-Computes the division of two fixed-point numbers with rounding away from zero.
+The `fd_fxp_div_raz` function performs fixed-point division with rounding away from zero.
 - **Inputs**:
-    - `x`: The numerator in the division, represented as a fixed-point number.
-    - `y`: The denominator in the division, represented as a fixed-point number.
-    - `_c`: A pointer to store the high part of the result after division.
-- **Logic and Control Flow**:
-    - Checks if the denominator `y` is zero; if so, sets `_c` to `ULONG_MAX` and returns 0.
-    - Expands `x` into two parts, `zh` and `zl`, using [`fd_fxp_private_expand`](<#fd_fxp_private_expand>).
-    - Increments the high part `zh` and low part `zl` by `y - 1` using `fd_uwide_inc`.
-    - Divides the combined value of `zh` and `zl` by `y` using `fd_uwide_div`.
-    - Stores the high part of the result in `_c` and returns the low part.
-- **Output**: Returns the low part of the result of the division, which is the quotient of `x` divided by `y` rounded away from zero.
-- **Functions Called**:
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+    - `_c`: A pointer to an unsigned long where the high part of the result will be stored.
+- **Control Flow**:
+    - The function first checks if the denominator `y` is zero to handle division by zero, setting `_c` to ULONG_MAX and returning 0 if true.
+    - It then expands the numerator `x` into two parts, `zh` and `zl`, using the [`fd_fxp_private_expand`](#fd_fxp_private_expand) function.
+    - Next, it increments the high part `zh` and low part `zl` by `y - 1` using the `fd_uwide_inc` function to prepare for rounding up.
+    - Finally, it performs the division of the expanded numerator by `y` using `fd_uwide_div`, stores the high part in `_c`, and returns the low part `zl`.
+- **Output**: The function returns the low part of the result of the division, while the high part is stored in the variable pointed to by `_c`.
+- **Functions called**:
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_div\_rnz<!-- {{#callable:fd_fxp_div_rnz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L463>)
-
 Performs fixed-point division of two unsigned long integers with rounding towards nearest, returning the quotient and storing the carry.
 - **Inputs**:
-    - `x`: The numerator, an unsigned long integer to be divided.
-    - `y`: The denominator, an unsigned long integer by which to divide.
-    - `_c`: A pointer to an unsigned long integer where the carry will be stored.
-- **Logic and Control Flow**:
-    - Checks if the denominator `y` is zero; if so, sets the carry to `ULONG_MAX` and returns 0.
-    - Expands the numerator `x` into two parts using [`fd_fxp_private_expand`](<#fd_fxp_private_expand>).
-    - Increments the expanded numerator by half of `y - 1` using `fd_uwide_inc`.
-    - Divides the incremented numerator by `y` using `fd_uwide_div`.
-    - Stores the high part of the result in `_c` and returns the low part.
-- **Output**: Returns the low part of the quotient after division.
-- **Functions Called**:
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: The dividend, an unsigned long integer representing the numerator in the division.
+    - `y`: The divisor, an unsigned long integer representing the denominator in the division.
+    - `_c`: A pointer to an unsigned long integer where the carry (the high part of the result) will be stored.
+- **Control Flow**:
+    - Checks if the divisor `y` is zero; if so, sets the carry to ULONG_MAX and returns 0.
+    - Expands the dividend `x` into a higher precision format suitable for fixed-point arithmetic.
+    - Increments the expanded dividend by half of the divisor to prepare for rounding.
+    - Performs the division of the expanded dividend by the divisor.
+    - Stores the high part of the result in the variable pointed to by `_c` and returns the low part of the result.
+- **Output**: Returns the low part of the quotient from the division of `x` by `y`, while the high part is stored in the variable pointed to by `_c`.
+- **Functions called**:
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_div\_rna<!-- {{#callable:fd_fxp_div_rna}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L512>)
-
-Performs fixed-point division of `x` by `y` with rounding towards the nearest integer.
+Performs fixed-point division of two unsigned long integers with rounding towards the nearest integer.
 - **Inputs**:
-    - `x`: The numerator in the fixed-point division.
-    - `y`: The denominator in the fixed-point division.
-    - `_c`: A pointer to store the high part of the result.
-- **Logic and Control Flow**:
-    - Checks if `y` is zero to handle division by zero, setting `_c` to `ULONG_MAX` and returning 0.
-    - Expands `x` into two parts, `zh` and `zl`, using [`fd_fxp_private_expand`](<#fd_fxp_private_expand>).
-    - Increments `zh` and `zl` by half of `y` using `fd_uwide_inc`.
-    - Divides the expanded value by `y` using `fd_uwide_div`.
-    - Stores the high part of the result in `_c` and returns the low part.
-- **Output**: Returns the low part of the result of the division.
-- **Functions Called**:
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: The numerator, an unsigned long integer representing the dividend in fixed-point format.
+    - `y`: The denominator, an unsigned long integer representing the divisor in fixed-point format.
+    - `_c`: A pointer to an unsigned long integer where the carry (high part of the result) will be stored.
+- **Control Flow**:
+    - Checks if the denominator `y` is zero; if so, sets the carry `_c` to ULONG_MAX and returns 0.
+    - Expands the numerator `x` into two parts `zh` and `zl` using the [`fd_fxp_private_expand`](#fd_fxp_private_expand) function.
+    - Increments the high part `zh` and low part `zl` by half of `y` using `fd_uwide_inc` to prepare for division.
+    - Divides the expanded numerator by the denominator `y` using `fd_uwide_div`, storing the result back in `zh` and `zl`.
+    - Sets the carry `_c` to the high part `zh` and returns the low part `zl` as the result.
+- **Output**: Returns the low part of the result of the division, which is the quotient of `x` divided by `y` in fixed-point format.
+- **Functions called**:
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_div\_rne<!-- {{#callable:fd_fxp_div_rne}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L553>)
-
-Computes the fixed-point division of `x` by `y` with rounding to nearest even.
+Performs fixed-point division with rounding to nearest even.
 - **Inputs**:
-    - `x`: The numerator in the division operation, represented as an unsigned long.
-    - `y`: The denominator in the division operation, represented as an unsigned long.
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
     - `_c`: A pointer to an unsigned long where the high part of the result will be stored.
-- **Logic and Control Flow**:
-    - Checks if `y` is zero to handle division by zero, setting `_c` to `ULONG_MAX` and returning 0.
-    - Expands `x` into two parts, `zh` and `zl`, using [`fd_fxp_private_expand`](<#fd_fxp_private_expand>).
-    - Performs the division using `fd_uwide_divrem`, which calculates both the quotient and remainder.
-    - Calculates the midpoint of `y` by right shifting `y` by 1.
-    - Increments the expanded result based on the remainder to achieve rounding to nearest even.
-    - Stores the high part of the result in `_c` and returns the low part.
-- **Output**: Returns the low part of the result of the division, which is the quotient of `x` divided by `y` rounded to the nearest even number.
-- **Functions Called**:
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+- **Control Flow**:
+    - Check if the denominator `y` is zero; if so, set `_c` to ULONG_MAX and return 0.
+    - Expand the numerator `x` into two parts `zh` and `zl` using [`fd_fxp_private_expand`](#fd_fxp_private_expand).
+    - Perform the division using `fd_uwide_divrem`, which computes both the quotient and the remainder.
+    - Calculate the floor of half of `y` to assist in rounding.
+    - Determine if rounding up is necessary based on the remainder and the quotient's parity.
+    - Increment the high part `zh` and low part `zl` if rounding up is required.
+    - Store the high part of the result in `_c` and return the low part `zl`.
+- **Output**: Returns the low part of the result of the fixed-point division, while the high part is stored in the variable pointed to by `_c`.
+- **Functions called**:
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_div\_rno<!-- {{#callable:fd_fxp_div_rno}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L576>)
-
-Performs fixed-point division with rounding towards odd.
+The `fd_fxp_div_rno` function performs fixed-point division of two unsigned long integers with rounding towards the nearest odd integer.
 - **Inputs**:
-    - `x`: The numerator in the division operation, represented as an unsigned long.
-    - `y`: The denominator in the division operation, represented as an unsigned long.
-    - `_c`: A pointer to an unsigned long where the high part of the result will be stored.
-- **Logic and Control Flow**:
-    - Checks if the denominator `y` is zero to handle division by zero, setting `_c` to `ULONG_MAX` and returning 0 if true.
-    - Expands the numerator `x` into two parts, `zh` and `zl`, using [`fd_fxp_private_expand`](<#fd_fxp_private_expand>).
-    - Performs the division using `fd_uwide_divrem`, which calculates both the quotient and remainder.
-    - Calculates the floor of `y/2` and stores it in `flhy`.
-    - Increments the high part of the result based on the remainder and the conditions for rounding towards odd.
-- **Output**: Returns the low part of the division result as an unsigned long.
-- **Functions Called**:
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: The numerator, an unsigned long integer representing the fixed-point value to be divided.
+    - `y`: The denominator, an unsigned long integer representing the fixed-point value by which to divide.
+    - `_c`: A pointer to an unsigned long integer where the high part of the result will be stored.
+- **Control Flow**:
+    - Check if the denominator `y` is zero; if so, set `_c` to ULONG_MAX and return 0UL to handle division by zero.
+    - Expand the numerator `x` into two parts, `zh` and `zl`, using the [`fd_fxp_private_expand`](#fd_fxp_private_expand) function.
+    - Perform the division using `fd_uwide_divrem`, which computes the quotient and remainder of the expanded numerator divided by `y`.
+    - Calculate the floor of `y/2` and store it in `flhy` to assist in rounding.
+    - Increment the high part of the result based on the remainder to achieve rounding towards the nearest odd integer.
+    - Store the high part of the result in `_c` and return the low part of the result.
+- **Output**: Returns the low part of the result of the division, which is the quotient of `x` divided by `y`, rounded towards the nearest odd integer.
+- **Functions called**:
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_div\_rtz\_fast<!-- {{#callable:fd_fxp_div_rtz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L591>)
-
-Performs fixed-point division of two unsigned long integers with rounding toward zero.
+Performs fast fixed-point division with round toward zero.
 - **Inputs**:
-    - `x`: The numerator, an unsigned long integer to be divided.
-    - `y`: The denominator, an unsigned long integer by which to divide.
-- **Logic and Control Flow**:
-    - Shifts `x` left by 30 bits to scale it for fixed-point representation.
-    - Divides the scaled value of `x` by `y`.
-    - Returns the result of the division.
-- **Output**: Returns the result of the division as an unsigned long integer.
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+- **Control Flow**:
+    - The function first shifts `x` left by 30 bits to scale it appropriately for fixed-point representation.
+    - It then performs integer division of the scaled `x` by `y`.
+    - The result of the division is returned directly.
+- **Output**: Returns the result of the division as an unsigned long, which represents the fixed-point result of x/y with truncation.
 
 
 ---
 ### fd\_fxp\_div\_raz\_fast<!-- {{#callable:fd_fxp_div_raz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L592>)
-
-Performs fixed-point division with rounding away from zero.
+Performs fast fixed-point division of two unsigned long integers with rounding towards zero.
 - **Inputs**:
-    - `x`: The numerator in the division, represented as an unsigned long.
-    - `y`: The denominator in the division, represented as an unsigned long.
-- **Logic and Control Flow**:
-    - Checks if `y` is zero to prevent division by zero.
-    - If `y` is zero, sets the output carry to `ULONG_MAX` and returns zero.
-    - Calculates the result of the division by expanding `x` and adjusting for rounding.
-    - Returns the quotient and updates the carry value.
-- **Output**: Returns the result of the division as an unsigned long, with the carry value indicating overflow if `y` is zero.
+    - `x`: The numerator, an unsigned long integer that represents the fixed-point value to be divided.
+    - `y`: The denominator, an unsigned long integer that represents the fixed-point value by which to divide.
+- **Control Flow**:
+    - The function first shifts `x` left by 30 bits to scale it appropriately for fixed-point division.
+    - It then performs integer division of the scaled `x` by `y`.
+    - The result of the division is returned directly.
+- **Output**: Returns the result of the division as an unsigned long integer, which represents the fixed-point result of the division of `x` by `y`.
 
 
 ---
 ### fd\_fxp\_div\_rnz\_fast<!-- {{#callable:fd_fxp_div_rnz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L593>)
-
-Computes the fixed-point division of `x` by `y` with rounding towards nearest, ensuring non-zero results.
+Performs fast fixed-point division of two unsigned long integers with rounding towards nearest, ensuring non-zero results.
 - **Inputs**:
-    - `x`: The numerator, a `ulong` value to be divided.
-    - `y`: The denominator, a `ulong` value by which `x` is divided.
-- **Logic and Control Flow**:
-    - Checks if `y` is zero; if so, sets the output carry to `ULONG_MAX` and returns zero to handle division by zero.
-    - Calculates the result of the division by first shifting `x` left by 30 bits, then adding half of `y` minus one, and finally dividing by `y`.
-- **Output**: Returns the result of the division as a `ulong` value, representing the quotient of `x` divided by `y` with appropriate rounding.
+    - `x`: The numerator, an unsigned long integer representing the fixed-point value to be divided.
+    - `y`: The denominator, an unsigned long integer representing the fixed-point value by which to divide. Must be non-zero.
+- **Control Flow**:
+    - The function first checks if `y` is zero to prevent division by zero, returning 0 and setting the carry to ULONG_MAX if true.
+    - The numerator `x` is left-shifted by 30 bits to scale it appropriately for fixed-point division.
+    - The function computes the division of the scaled numerator by the denominator `y`.
+    - The result is adjusted by adding half of `y` (specifically, (y-1) >> 1) to achieve rounding towards the nearest integer.
+- **Output**: Returns the result of the division as an unsigned long integer, representing the fixed-point result of the division, with rounding applied.
 
 
 ---
 ### fd\_fxp\_div\_rna\_fast<!-- {{#callable:fd_fxp_div_rna_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L594>)
-
-Performs fast fixed-point division of two unsigned long integers.
+The `fd_fxp_div_rna_fast` function performs fast fixed-point division with rounding towards the nearest integer, using a specific formula to adjust the dividend.
 - **Inputs**:
-    - `x`: The numerator, an unsigned long integer.
-    - `y`: The denominator, an unsigned long integer.
-- **Logic and Control Flow**:
-    - Shifts `x` left by 30 bits to scale it for fixed-point representation.
-    - Adds half of `y` (right-shifted by 1) to `x` to prepare for rounding.
-    - Divides the adjusted value by `y` to compute the result.
-- **Output**: Returns the result of the division as an unsigned long integer.
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long integer.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long integer.
+- **Control Flow**:
+    - The function computes the result of the division by first shifting `x` left by 30 bits to scale it appropriately for fixed-point representation.
+    - It then adds half of `y` (i.e., `y >> 1`) to the scaled `x` to implement rounding towards the nearest integer.
+    - Finally, it performs the division of the adjusted numerator by `y` and returns the result.
+- **Output**: The function returns the result of the fixed-point division as an unsigned long integer, which is the quotient of the adjusted numerator divided by the denominator.
 
 
 ---
 ### fd\_fxp\_div\_rne\_fast<!-- {{#callable:fd_fxp_div_rne_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L596>)
-
-Computes the fixed-point division of `x` by `y` with round-to-nearest-even behavior.
+Performs fast fixed-point division with round-to-nearest-even behavior.
 - **Inputs**:
-    - `x`: The numerator, a 64-bit unsigned integer.
-    - `y`: The denominator, a 64-bit unsigned integer.
-- **Logic and Control Flow**:
-    - Shifts `x` left by 30 bits to scale it for fixed-point representation.
-    - Calculates the quotient `q` by dividing the scaled `x` by `y`.
-    - Calculates the remainder `r` by subtracting the product of `q` and `y` from the scaled `x`.
-    - Determines the midpoint value `flhy` as half of `y`.
-    - Returns the quotient `q` adjusted by 1 if the remainder `r` is greater than `flhy`, or if `r` equals `flhy` and `q` is odd.
-- **Output**: Returns the result of the division as a 64-bit unsigned integer, with rounding applied.
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+- **Control Flow**:
+    - The function first shifts `x` left by 30 bits to scale it appropriately for fixed-point arithmetic.
+    - It then performs integer division of the scaled numerator `n` by the denominator `y` to obtain the quotient `q`.
+    - The remainder `r` is calculated by subtracting the product of `q` and `y` from `n`.
+    - A threshold value `flhy` is computed as half of `y` to determine rounding behavior.
+    - Finally, the function returns the quotient `q` adjusted by a rounding condition based on the value of `r` compared to `flhy`.
+- **Output**: Returns the result of the division as an unsigned long, rounded to the nearest even number in case of ties.
 
 
 ---
 ### fd\_fxp\_div\_rno\_fast<!-- {{#callable:fd_fxp_div_rno_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L606>)
-
-Computes the fixed-point division of `x` by `y` with rounding.
+Performs fast fixed-point division with round towards odd behavior.
 - **Inputs**:
-    - `x`: The numerator, a `ulong` value to be divided.
-    - `y`: The denominator, a `ulong` value by which `x` is divided.
-- **Logic and Control Flow**:
-    - Checks if `y` is zero to prevent division by zero.
-    - Calculates `n` as `x` shifted left by 30 bits.
-    - Calculates the quotient `q` as `n` divided by `y`.
-    - Calculates the remainder `r` as `n` minus `q` multiplied by `y`.
-    - Determines the midpoint `flhy` as `y` shifted right by 1.
-    - Returns the quotient `q` adjusted by rounding based on the value of `r`.
-- **Output**: Returns the result of the division as a `ulong`, with rounding applied.
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+- **Control Flow**:
+    - The function first shifts `x` left by 30 bits to scale it appropriately for fixed-point arithmetic.
+    - It then performs integer division of the scaled `x` by `y` to obtain the quotient `q`.
+    - The remainder `r` is calculated by subtracting the product of `q` and `y` from the scaled `x`.
+    - A threshold value `flhy` is computed as half of `y` to assist in rounding.
+    - Finally, the function returns the quotient `q` adjusted by a rounding condition based on the value of `r`.
+- **Output**: Returns the result of the division as an unsigned long, with rounding applied based on the remainder.
 
 
 ---
 ### fd\_fxp\_div\_rdn<!-- {{#callable:fd_fxp_div_rdn}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L622>)
-
-Performs fixed-point division with rounding down.
+The `fd_fxp_div_rdn` function performs fixed-point division with rounding down.
 - **Inputs**:
-    - `x`: The numerator in the division operation.
-    - `y`: The denominator in the division operation.
-    - `_c`: A pointer to store the carry value resulting from the division.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_div_rtz`](<#fd_fxp_div_rtz>) to perform the division operation.
-    - Handles division by zero by setting the carry to `ULONG_MAX` and returning 0.
-- **Output**: Returns the result of the division operation as a `ulong`.
-- **Functions Called**:
-    - [`fd_fxp_div_rtz`](<#fd_fxp_div_rtz>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+    - `_c`: A pointer to an unsigned long where the carry (if any) will be stored.
+- **Control Flow**:
+    - The function first calls [`fd_fxp_div_rtz`](#fd_fxp_div_rtz) to perform the division operation.
+    - If the denominator `y` is zero, it sets the carry `_c` to ULONG_MAX and returns 0.
+    - The result of the division is computed and returned.
+- **Output**: The function returns the result of the fixed-point division, rounded down.
+- **Functions called**:
+    - [`fd_fxp_div_rtz`](#fd_fxp_div_rtz)
 
 
 ---
 ### fd\_fxp\_div\_rup<!-- {{#callable:fd_fxp_div_rup}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L623>)
-
-Computes the fixed-point division of `x` by `y` with rounding up.
+The `fd_fxp_div_rup` function performs fixed-point division with rounding up.
 - **Inputs**:
-    - `x`: The numerator in the division operation, represented as an unsigned long.
-    - `y`: The denominator in the division operation, represented as an unsigned long.
-    - `_c`: A pointer to an unsigned long where the carry will be stored.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_div_raz`](<#fd_fxp_div_raz>) to perform the division with rounding up.
-    - If `y` is zero, it sets the carry to `ULONG_MAX` and returns zero.
-- **Output**: Returns the result of the division as an unsigned long.
-- **Functions Called**:
-    - [`fd_fxp_div_raz`](<#fd_fxp_div_raz>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+    - `_c`: A pointer to an unsigned long where the carry (if any) will be stored.
+- **Control Flow**:
+    - The function calls [`fd_fxp_div_raz`](#fd_fxp_div_raz) to perform the division operation.
+    - If `y` is zero, the function will handle the division by zero case by returning a specific value.
+- **Output**: The function returns the result of the division, rounded up, as an unsigned long.
+- **Functions called**:
+    - [`fd_fxp_div_raz`](#fd_fxp_div_raz)
 
 
 ---
 ### fd\_fxp\_div\_rnd<!-- {{#callable:fd_fxp_div_rnd}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L624>)
-
-Performs fixed-point division with rounding.
+The `fd_fxp_div_rnd` function performs fixed-point division with rounding, returning the result of dividing `x` by `y`.
 - **Inputs**:
-    - `x`: The numerator in the division.
-    - `y`: The denominator in the division.
-    - `_c`: A pointer to store the carry value.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_div_rnz`](<#fd_fxp_div_rnz>) with the same inputs.
-    - Handles the division operation and rounding.
-- **Output**: Returns the result of the division as an unsigned long.
-- **Functions Called**:
-    - [`fd_fxp_div_rnz`](<#fd_fxp_div_rnz>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+    - `_c`: A pointer to an unsigned long where the carry (if any) will be stored.
+- **Control Flow**:
+    - The function first calls [`fd_fxp_div_rnz`](#fd_fxp_div_rnz) with the same parameters to perform the division.
+    - If `y` is zero, the division is undefined, and the function will handle this case by returning a specific value.
+- **Output**: The function returns the result of the fixed-point division of `x` by `y`, rounded according to the specified rounding mode.
+- **Functions called**:
+    - [`fd_fxp_div_rnz`](#fd_fxp_div_rnz)
 
 
 ---
 ### fd\_fxp\_div\_rnu<!-- {{#callable:fd_fxp_div_rnu}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L625>)
-
-Performs fixed-point division with rounding towards nearest, returning the quotient and storing the carry.
+The `fd_fxp_div_rnu` function performs fixed-point division with rounding towards the nearest integer, handling overflow by returning a special value.
 - **Inputs**:
-    - `x`: The numerator in the division operation, represented as an unsigned long.
-    - `y`: The denominator in the division operation, represented as an unsigned long.
-    - `_c`: A pointer to an unsigned long where the carry from the division operation will be stored.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_div_rna`](<#fd_fxp_div_rna>) function to perform the actual division operation.
-    - The function checks if the denominator `y` is zero to avoid division by zero.
-- **Output**: Returns the result of the division as an unsigned long.
-- **Functions Called**:
-    - [`fd_fxp_div_rna`](<#fd_fxp_div_rna>)
+    - `ulong x`: The numerator in the fixed-point division operation, represented as an unsigned long integer.
+    - `ulong y`: The denominator in the fixed-point division operation, represented as an unsigned long integer.
+    - `ulong * _c`: A pointer to an unsigned long integer where the carry (if any) from the division operation will be stored.
+- **Control Flow**:
+    - The function calls [`fd_fxp_div_rna`](#fd_fxp_div_rna), which performs the actual division operation with rounding towards the nearest integer.
+    - The result of the division is returned directly from the [`fd_fxp_div_rna`](#fd_fxp_div_rna) function.
+- **Output**: The function returns the result of the fixed-point division of `x` by `y`, rounded to the nearest integer, while also updating the carry value pointed to by `_c`.
+- **Functions called**:
+    - [`fd_fxp_div_rna`](#fd_fxp_div_rna)
 
 
 ---
 ### fd\_fxp\_div\_rdn\_fast<!-- {{#callable:fd_fxp_div_rdn_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L627>)
-
-Performs fixed-point division of two unsigned long integers with rounding down.
+The `fd_fxp_div_rdn_fast` function performs fixed-point division with rounding down.
 - **Inputs**:
-    - `x`: The dividend, an unsigned long integer.
-    - `y`: The divisor, an unsigned long integer.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_div_rtz_fast`](<#fd_fxp_div_rtz_fast>) to perform the division.
-    - The function [`fd_fxp_div_rtz_fast`](<#fd_fxp_div_rtz_fast>) shifts `x` left by 30 bits and divides by `y`.
-- **Output**: Returns the result of the division as an unsigned long integer.
-- **Functions Called**:
-    - [`fd_fxp_div_rtz_fast`](<#fd_fxp_div_rtz_fast>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+- **Control Flow**:
+    - The function calls [`fd_fxp_div_rtz_fast`](#fd_fxp_div_rtz_fast) to perform the division operation.
+    - The [`fd_fxp_div_rtz_fast`](#fd_fxp_div_rtz_fast) function computes the result by shifting `x` left by 30 bits and dividing by `y`.
+- **Output**: The function returns the result of the fixed-point division, rounded down, as an unsigned long.
+- **Functions called**:
+    - [`fd_fxp_div_rtz_fast`](#fd_fxp_div_rtz_fast)
 
 
 ---
 ### fd\_fxp\_div\_rup\_fast<!-- {{#callable:fd_fxp_div_rup_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L628>)
-
-Computes the division of two unsigned long integers with rounding up.
+`fd_fxp_div_rup_fast` performs a fixed-point division of two unsigned long integers with rounding up.
 - **Inputs**:
-    - `x`: The numerator, an unsigned long integer.
-    - `y`: The denominator, an unsigned long integer.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_div_raz_fast`](<#fd_fxp_div_raz_fast>) to perform the division with rounding up.
-    - The function does not handle division by zero; it relies on the called function to manage that.
-- **Output**: Returns the result of the division as an unsigned long integer.
-- **Functions Called**:
-    - [`fd_fxp_div_raz_fast`](<#fd_fxp_div_raz_fast>)
+    - `x`: The numerator, an unsigned long integer representing the fixed-point value to be divided.
+    - `y`: The denominator, an unsigned long integer representing the fixed-point value by which to divide.
+- **Control Flow**:
+    - The function calls [`fd_fxp_div_raz_fast`](#fd_fxp_div_raz_fast) to perform the division operation.
+    - The [`fd_fxp_div_raz_fast`](#fd_fxp_div_raz_fast) function computes the division and applies rounding away from zero.
+- **Output**: Returns the result of the division as an unsigned long integer, rounded up.
+- **Functions called**:
+    - [`fd_fxp_div_raz_fast`](#fd_fxp_div_raz_fast)
 
 
 ---
 ### fd\_fxp\_div\_rnd\_fast<!-- {{#callable:fd_fxp_div_rnd_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L629>)
-
-Performs fixed-point division with rounding towards zero.
+Performs fast fixed-point division with rounding towards zero.
 - **Inputs**:
-    - `x`: The numerator in the division operation, represented as an unsigned long.
-    - `y`: The denominator in the division operation, represented as an unsigned long.
-- **Logic and Control Flow**:
-    - Checks if `y` is zero to prevent division by zero.
-    - If `y` is zero, sets the output carry to `ULONG_MAX` and returns zero.
-    - Calls [`fd_fxp_div_rnz_fast`](<#fd_fxp_div_rnz_fast>) to perform the division with rounding.
-- **Output**: Returns the result of the division as an unsigned long, with the carry value stored in the provided pointer.
-- **Functions Called**:
-    - [`fd_fxp_div_rnz_fast`](<#fd_fxp_div_rnz_fast>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+- **Control Flow**:
+    - The function calls [`fd_fxp_div_rnz_fast`](#fd_fxp_div_rnz_fast) to perform the division.
+    - If `y` is zero, the function will handle this case by returning a specific value indicating an error (not shown in this function).
+- **Output**: Returns the result of the fixed-point division of `x` by `y`, rounded towards zero.
+- **Functions called**:
+    - [`fd_fxp_div_rnz_fast`](#fd_fxp_div_rnz_fast)
 
 
 ---
 ### fd\_fxp\_div\_rnu\_fast<!-- {{#callable:fd_fxp_div_rnu_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L630>)
-
-Performs fixed-point division with round toward nearest up (RNU) using a fast method.
+Performs fixed-point division with round-to-nearest-up behavior.
 - **Inputs**:
-    - `x`: The numerator in the division operation, represented as an unsigned long.
-    - `y`: The denominator in the division operation, represented as an unsigned long.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_div_rna_fast`](<#fd_fxp_div_rna_fast>) function to perform the division.
-    - The [`fd_fxp_div_rna_fast`](<#fd_fxp_div_rna_fast>) function handles the actual division logic.
-- **Output**: Returns the result of the division as an unsigned long.
-- **Functions Called**:
-    - [`fd_fxp_div_rna_fast`](<#fd_fxp_div_rna_fast>)
+    - `x`: The numerator in the fixed-point division, represented as an unsigned long.
+    - `y`: The denominator in the fixed-point division, represented as an unsigned long.
+- **Control Flow**:
+    - Calls the [`fd_fxp_div_rna_fast`](#fd_fxp_div_rna_fast) function to perform the division operation.
+    - The [`fd_fxp_div_rna_fast`](#fd_fxp_div_rna_fast) function handles the actual division logic.
+- **Output**: Returns the result of the fixed-point division as an unsigned long.
+- **Functions called**:
+    - [`fd_fxp_div_rna_fast`](#fd_fxp_div_rna_fast)
 
 
 ---
 ### fd\_fxp\_sqrt\_rtz<!-- {{#callable:fd_fxp_sqrt_rtz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L710>)
-
-Computes the square root of a fixed-point number using a specific iterative method.
+Computes the square root of a fixed-point number using a right rounding method.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be computed.
-- **Logic and Control Flow**:
-    - Calculates an initial guess for the square root based on the most significant bit of `x`.
-    - If the calculated shift `s` is greater than 15, it is set to 15.
-    - Computes the initial square root approximation `y` by shifting `x` left by `s` and taking the square root.
-    - If `s` equals 15, returns the initial approximation `y` without further iteration.
-    - Expands `x` into two parts for fixed-point iteration.
-    - Enters a loop to refine the approximation of the square root until convergence is achieved.
-- **Output**: Returns the computed square root as a `ulong`.
-- **Functions Called**:
-    - [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>)
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function first checks if the input `x` is zero, returning zero if true.
+    - It calculates `s`, the largest integer such that `x * 2^(2s)` does not overflow, which helps in scaling `x` appropriately.
+    - An initial guess for the square root `y` is computed by scaling `x` and taking its square root.
+    - If `s` is 15, the function returns the initial guess `y` directly, as no further iterations are needed.
+    - If `s` is less than 15, the function expands `x` into two parts for fixed-point iteration.
+    - A loop is initiated to refine the estimate of the square root using the formula `y' = floor((y(y+1) + 2^30 * x) / (2y + 1))` until convergence is achieved.
+- **Output**: Returns the computed square root of `x` as an unsigned long integer, rounded towards zero.
+- **Functions called**:
+    - [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt)
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_sqrt\_raz<!-- {{#callable:fd_fxp_sqrt_raz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L793>)
-
-Computes the square root of a fixed-point number with rounding away from zero.
+Calculates the square root of a fixed-point number using raz rounding.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Checks if `x` is zero and returns zero if true.
-    - Calculates the scaling factor `s` based on the most significant bit of `x`.
-    - Shifts `x` left by `s` to avoid overflow and computes an initial guess for the square root.
-    - If `s` equals 15, it computes the residual to determine if rounding is needed.
-    - Expands `x` into high and low parts for precise calculations.
-    - Iteratively refines the guess for the square root using a modified Newton's method until convergence.
-- **Output**: Returns the computed square root as a `ulong`, rounded away from zero.
-- **Functions Called**:
-    - [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>)
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function first checks if the input `x` is zero, returning zero if true.
+    - It calculates an initial guess for the square root based on the most significant bit of `x`.
+    - If the calculated shift `s` is 15, it returns the initial guess adjusted for any residual.
+    - The function expands `x` into high and low parts for precise calculations.
+    - It enters a loop where it iteratively refines the guess for the square root using a modified Newton's method until convergence is achieved.
+- **Output**: Returns the computed square root of `x` as an unsigned long integer, rounded away from zero.
+- **Functions called**:
+    - [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt)
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_sqrt\_rnz<!-- {{#callable:fd_fxp_sqrt_rnz}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L871>)
-
-Computes the square root of a fixed-point number with round-nearest-zero behavior.
+Calculates the square root of a fixed-point number using round-nearest towards zero (RNZ) rounding.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Checks if `x` is zero and returns zero if true.
-    - Calculates the initial guess for the square root based on the most significant bit of `x`.
-    - If the calculated shift `s` is 15, it returns the initial guess adjusted for rounding.
-    - Expands `x` to a higher precision format for the iterative calculation.
-    - Performs an iterative process to refine the square root estimate until convergence is achieved.
-- **Output**: Returns the computed square root as a `ulong`.
-- **Functions Called**:
-    - [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>)
-    - [`fd_fxp_private_expand`](<#fd_fxp_private_expand>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function first checks if the input `x` is zero, returning zero if true.
+    - It calculates an initial guess for the square root by determining the position of the most significant bit of `x` and adjusting the value accordingly.
+    - If the calculated shift value `s` is 15, it returns the initial guess adjusted for any residual error.
+    - The function then expands `x` into a higher precision format suitable for the iterative calculation.
+    - It enters a loop where it repeatedly refines the guess for the square root using a specific iterative formula until convergence is achieved.
+    - The loop continues until the new guess does not change from the previous guess.
+- **Output**: Returns the computed square root of `x` as an unsigned long integer, rounded according to the RNZ method.
+- **Functions called**:
+    - [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt)
+    - [`fd_fxp_private_expand`](#fd_fxp_private_expand)
 
 
 ---
 ### fd\_fxp\_sqrt\_rna<!-- {{#callable:fd_fxp_sqrt_rna}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L899>)
-
-Computes the square root of a fixed-point number using the [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function.
+Calculates the square root of a fixed-point number using the nearest rounding mode.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function with the input `x`.
-    - Returns the result of the [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function.
-- **Output**: Returns a `ulong` that is the square root of the input fixed-point number.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) to compute the square root with nearest rounding.
+    - The [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) function performs an initial approximation of the square root and iteratively refines it until convergence.
+- **Output**: Returns an unsigned long integer representing the square root of the input fixed-point number.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz)
 
 
 ---
 ### fd\_fxp\_sqrt\_rne<!-- {{#callable:fd_fxp_sqrt_rne}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L900>)
-
-Computes the square root of a fixed-point number using round nearest even mode.
+Computes the square root of a fixed-point number using round-to-nearest-even rounding.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function to compute the square root.
-    - The [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function handles the actual computation.
-- **Output**: Returns a `ulong` that is the square root of the input `x` rounded to the nearest even number.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) to compute the square root with round-to-nearest-zero rounding.
+    - The [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) function handles the actual computation and rounding logic.
+- **Output**: Returns an unsigned long integer representing the square root of the input fixed-point number.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz)
 
 
 ---
 ### fd\_fxp\_sqrt\_rno<!-- {{#callable:fd_fxp_sqrt_rno}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L901>)
-
-Returns the result of [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) for the input value.
+Computes the square root of a fixed-point number using a specific rounding mode.
 - **Inputs**:
-    - `x`: An unsigned long integer input for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls the function [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) with the input `x`.
-    - Returns the result of the [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function.
-- **Output**: The output is the square root of `x`, calculated using the [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) to compute the square root, which handles the rounding mode internally.
+    - If `x` is zero, it immediately returns zero.
+    - The function uses an iterative method to refine the square root approximation until convergence is achieved.
+- **Output**: Returns the computed square root as an unsigned long integer, rounded according to the specified mode.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz)
 
 
 ---
 ### fd\_fxp\_sqrt\_rtz\_fast<!-- {{#callable:fd_fxp_sqrt_rtz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L903>)
-
-Computes the square root of a fixed-point number using a fast method.
+Computes the square root of a fixed-point number using right shift for fast approximation.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>) to compute the square root of `x` shifted left by 30 bits.
-    - Returns the result of the square root computation.
-- **Output**: Returns a `ulong` representing the square root of the input fixed-point number.
-- **Functions Called**:
-    - [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function first left shifts `x` by 30 bits to scale it appropriately for fixed-point representation.
+    - It then calls the [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt) function to compute the square root of the scaled value.
+    - Finally, the result from [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt) is returned directly.
+- **Output**: Returns the square root of the input `x` scaled back to the original fixed-point representation.
+- **Functions called**:
+    - [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt)
 
 
 ---
 ### fd\_fxp\_sqrt\_raz\_fast<!-- {{#callable:fd_fxp_sqrt_raz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L905>)
-
-Computes the square root of a fixed-point number using a fast approximation method.
+Calculates the square root of a fixed-point number with rounding away from zero.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Left shifts `x` by 30 bits to scale it for fixed-point representation.
-    - Calculates the integer square root of the scaled value using [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>).
-    - Calculates the residual `r` as the difference between the scaled value and the square of the computed square root.
-    - Returns the computed square root plus one if the residual is non-zero.
-- **Output**: Returns a `ulong` representing the approximate square root of the input fixed-point number.
-- **Functions Called**:
-    - [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The input `x` is left-shifted by 30 bits to scale it appropriately for fixed-point arithmetic.
+    - The square root of the scaled value is computed using the [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt) function.
+    - The residual `r` is calculated as the difference between the scaled input and the square of the computed square root.
+    - If there is a non-zero residual, the result is incremented by 1 to round up, ensuring correct rounding away from zero.
+- **Output**: Returns the computed square root as an unsigned long integer, rounded away from zero.
+- **Functions called**:
+    - [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt)
 
 
 ---
 ### fd\_fxp\_sqrt\_rnz\_fast<!-- {{#callable:fd_fxp_sqrt_rnz_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L913>)
-
-Computes the square root of a fixed-point number with rounding towards nearest, using a fast approximation method.
+Calculates the square root of a fixed-point number using a fast approximation method.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Left shifts `x` by 30 bits to scale it appropriately for fixed-point arithmetic.
-    - Calculates the integer square root of the scaled value using [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>).
-    - Calculates the remainder `r` by subtracting the square of the computed square root from the scaled value.
-    - Adds 1 to the result if the remainder is greater than the computed square root.
-- **Output**: Returns the computed square root as a `ulong`, rounded towards the nearest integer.
-- **Functions Called**:
-    - [`fd_ulong_sqrt`](<fd_sqrt.h.md#fd_ulong_sqrt>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The input `x` is left-shifted by 30 bits to scale it appropriately for fixed-point arithmetic.
+    - The function [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt) is called to compute the integer square root of the scaled value.
+    - The residual `r` is calculated as the difference between the scaled input and the square of the computed square root.
+    - The function returns the computed square root plus one if the residual is greater than the square root, effectively rounding up.
+- **Output**: Returns an unsigned long integer representing the square root of the input fixed-point number, rounded as necessary.
+- **Functions called**:
+    - [`fd_ulong_sqrt`](fd_sqrt.h.md#fd_ulong_sqrt)
 
 
 ---
 ### fd\_fxp\_sqrt\_rna\_fast<!-- {{#callable:fd_fxp_sqrt_rna_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L921>)
-
-Returns the square root of a fixed-point number using a fast approximation.
+Calculates the square root of a fixed-point number using a fast approximation method.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) to compute the square root.
-    - The function [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) performs the actual calculation.
-- **Output**: Returns a `ulong` that is the square root of the input fixed-point number.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) to compute the square root.
+    - The [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) function performs a fast approximation of the square root by shifting the input left by 30 bits and using the `fd_ulong_sqrt` function to compute the integer square root.
+    - It then calculates the remainder to determine if the result needs to be adjusted up or down based on the residual.
+- **Output**: Returns an unsigned long integer representing the square root of the input fixed-point number, rounded according to the nearest rounding mode.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast)
 
 
 ---
 ### fd\_fxp\_sqrt\_rne\_fast<!-- {{#callable:fd_fxp_sqrt_rne_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L922>)
-
-Returns the result of [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) for the input value.
+The `fd_fxp_sqrt_rne_fast` function computes the square root of a fixed-point number using round-to-nearest-even rounding.
 - **Inputs**:
-    - `x`: An unsigned long integer input for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) with the input `x`.
-    - Returns the result of the [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) function.
-- **Output**: The output is the square root of `x`, computed using the [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) function.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) to compute the square root with round-to-nearest-zero rounding.
+    - The result from [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) is returned directly as the output.
+- **Output**: Returns an unsigned long integer representing the square root of the input fixed-point number, rounded to the nearest even value.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast)
 
 
 ---
 ### fd\_fxp\_sqrt\_rno\_fast<!-- {{#callable:fd_fxp_sqrt_rno_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L923>)
-
-Returns the square root of a fixed-point number using a fast method.
+Computes the square root of a fixed-point number using a fast rounding mode.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) function to compute the square root.
-    - The [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) function performs the actual square root calculation.
-- **Output**: Returns a `ulong` that is the square root of the input `x`.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) to compute the square root.
+    - The [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) function performs the actual computation of the square root using a fast method.
+- **Output**: Returns the square root of the input `x` as an unsigned long integer, rounded according to the fast rounding mode.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast)
 
 
 ---
 ### fd\_fxp\_sqrt\_rdn<!-- {{#callable:fd_fxp_sqrt_rdn}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L931>)
-
-Computes the square root of a fixed-point number with rounding down.
+The `fd_fxp_sqrt_rdn` function computes the square root of a fixed-point number, rounding down.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is calculated.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_sqrt_rtz`](<#fd_fxp_sqrt_rtz>) function to compute the square root with round toward zero.
-    - Returns the result of the square root computation.
-- **Output**: Returns a `ulong` representing the square root of the input value rounded down.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rtz`](<#fd_fxp_sqrt_rtz>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function first calls [`fd_fxp_sqrt_rtz`](#fd_fxp_sqrt_rtz) to compute the square root with round-toward-zero behavior.
+    - The result from [`fd_fxp_sqrt_rtz`](#fd_fxp_sqrt_rtz) is returned directly as the output.
+- **Output**: Returns an unsigned long integer representing the square root of the input `x`, rounded down.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rtz`](#fd_fxp_sqrt_rtz)
 
 
 ---
 ### fd\_fxp\_sqrt\_rup<!-- {{#callable:fd_fxp_sqrt_rup}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L932>)
-
-Computes the square root of a fixed-point number, rounding up.
+Calculates the square root of a fixed-point number, rounding up.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is calculated.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_sqrt_raz`](<#fd_fxp_sqrt_raz>) function to compute the square root.
-    - The [`fd_fxp_sqrt_raz`](<#fd_fxp_sqrt_raz>) function handles the actual computation and rounding.
-- **Output**: Returns the square root of `x`, rounded up to the nearest fixed-point representation.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_raz`](<#fd_fxp_sqrt_raz>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_raz`](#fd_fxp_sqrt_raz) to compute the square root with rounding away from zero.
+    - The [`fd_fxp_sqrt_raz`](#fd_fxp_sqrt_raz) function performs the actual square root calculation and handles the rounding logic.
+- **Output**: Returns an unsigned long integer representing the rounded-up square root of the input fixed-point number.
+- **Functions called**:
+    - [`fd_fxp_sqrt_raz`](#fd_fxp_sqrt_raz)
 
 
 ---
 ### fd\_fxp\_sqrt\_rnd<!-- {{#callable:fd_fxp_sqrt_rnd}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L933>)
-
-Computes the square root of a fixed-point number with rounding towards zero.
+Computes the square root of a fixed-point number with rounding.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) function to compute the square root with rounding towards zero.
-- **Output**: Returns a `ulong` that is the square root of `x` rounded towards zero.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - If `x` is zero, the function immediately returns zero.
+    - The function calculates an initial guess for the square root based on the most significant bit of `x`.
+    - If the initial guess is sufficient (i.e., `s` equals 15), it returns the guess directly.
+    - If further refinement is needed, it enters a loop where it iteratively improves the guess using a fixed-point iteration formula until convergence is achieved.
+- **Output**: Returns the computed square root of `x`, rounded according to the specified rounding mode.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz)
 
 
 ---
 ### fd\_fxp\_sqrt\_rnu<!-- {{#callable:fd_fxp_sqrt_rnu}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L934>)
-
-Computes the square root of a fixed-point number using round toward nearest rounding.
+Computes the square root of a fixed-point number using the [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) function.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>) to compute the square root with round toward zero rounding.
-    - The function does not perform any checks for negative inputs since `ulong` is always non-negative.
-- **Output**: Returns the square root of `x` as a `ulong`.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz`](<#fd_fxp_sqrt_rnz>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) with the input `x`.
+    - The [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz) function performs the actual computation of the square root.
+- **Output**: Returns the square root of the input fixed-point number as an unsigned long integer.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz`](#fd_fxp_sqrt_rnz)
 
 
 ---
 ### fd\_fxp\_sqrt\_rdn\_fast<!-- {{#callable:fd_fxp_sqrt_rdn_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L936>)
-
-Computes the square root of a fixed-point number using round-toward-zero rounding.
+Computes the square root of a fixed-point number using round down fast method.
 - **Inputs**:
-    - `x`: A fixed-point number represented as an unsigned long integer.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_sqrt_rtz_fast`](<#fd_fxp_sqrt_rtz_fast>) to compute the square root.
-    - The function [`fd_fxp_sqrt_rtz_fast`](<#fd_fxp_sqrt_rtz_fast>) performs the square root calculation with round-toward-zero rounding.
-- **Output**: Returns the square root of `x` as an unsigned long integer.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rtz_fast`](<#fd_fxp_sqrt_rtz_fast>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - Calls the [`fd_fxp_sqrt_rtz_fast`](#fd_fxp_sqrt_rtz_fast) function to compute the square root of `x`.
+    - The [`fd_fxp_sqrt_rtz_fast`](#fd_fxp_sqrt_rtz_fast) function performs a left shift on `x` by 30 bits and then computes the square root using `fd_ulong_sqrt`.
+- **Output**: Returns the computed square root as an unsigned long integer.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rtz_fast`](#fd_fxp_sqrt_rtz_fast)
 
 
 ---
 ### fd\_fxp\_sqrt\_rup\_fast<!-- {{#callable:fd_fxp_sqrt_rup_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L937>)
-
-Computes the square root of a fixed-point number, rounding up.
+Computes the fixed-point square root of a given unsigned long integer using a fast approximation method.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is calculated.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_sqrt_raz_fast`](<#fd_fxp_sqrt_raz_fast>) to compute the square root.
-    - The function does not handle any special cases or errors.
-- **Output**: Returns the square root of `x`, rounded up.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_raz_fast`](<#fd_fxp_sqrt_raz_fast>)
+    - `x`: An unsigned long integer for which the square root is to be computed.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_raz_fast`](#fd_fxp_sqrt_raz_fast) to compute the square root.
+    - The [`fd_fxp_sqrt_raz_fast`](#fd_fxp_sqrt_raz_fast) function performs the square root calculation using a fast approximation method.
+- **Output**: Returns the computed square root as an unsigned long integer.
+- **Functions called**:
+    - [`fd_fxp_sqrt_raz_fast`](#fd_fxp_sqrt_raz_fast)
 
 
 ---
 ### fd\_fxp\_sqrt\_rnd\_fast<!-- {{#callable:fd_fxp_sqrt_rnd_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L938>)
-
-Computes the square root of a fixed-point number with rounding towards zero.
+Calculates the square root of a fixed-point number with rounding towards zero.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) to compute the square root.
-    - The function [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) performs the actual square root calculation.
-- **Output**: Returns a `ulong` that is the square root of the input `x`, rounded towards zero.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function first checks if the input `x` is zero, returning zero if true.
+    - It calculates the scale factor `s` based on the most significant bit of `x` to avoid overflow during calculations.
+    - An initial guess for the square root is computed using `fd_ulong_sqrt` and adjusted based on the scale factor.
+    - If the scale factor indicates that no further iterations are needed, the function returns the computed square root.
+    - If further iterations are needed, it enters a loop where it refines the guess using a fixed-point iteration until convergence is achieved.
+- **Output**: Returns an unsigned long integer representing the square root of the input fixed-point number, rounded towards zero.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast)
 
 
 ---
 ### fd\_fxp\_sqrt\_rnu\_fast<!-- {{#callable:fd_fxp_sqrt_rnu_fast}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L939>)
-
 Computes the square root of a fixed-point number using a fast rounding mode.
 - **Inputs**:
-    - `x`: A `ulong` representing the fixed-point number for which the square root is to be calculated.
-- **Logic and Control Flow**:
-    - Calls the [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) function to compute the square root.
-    - The [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>) function performs the actual square root calculation.
-- **Output**: Returns the square root of `x` as a `ulong`.
-- **Functions Called**:
-    - [`fd_fxp_sqrt_rnz_fast`](<#fd_fxp_sqrt_rnz_fast>)
+    - `x`: An unsigned long integer representing the fixed-point number for which the square root is to be calculated.
+- **Control Flow**:
+    - The function calls [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) to compute the square root.
+    - The [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast) function performs the square root calculation using a fast method.
+- **Output**: Returns the square root of the input fixed-point number as an unsigned long integer.
+- **Functions called**:
+    - [`fd_fxp_sqrt_rnz_fast`](#fd_fxp_sqrt_rnz_fast)
+
+
+---
+### fd\_fxp\_log2\_approx<!-- {{#callable:fd_fxp_log2_approx}} -->
+Approximates the logarithm base 2 of a fixed-point number.
+- **Inputs**:
+    - `x`: A non-zero unsigned long integer representing the fixed-point number for which the logarithm is to be calculated.
+    - `_e`: A pointer to an integer where the exponent part of the logarithm will be stored.
+- **Control Flow**:
+    - Checks if the input `x` is zero; if so, sets `_e` to INT_MIN and returns 0.
+    - Finds the index of the most significant bit of `x` to determine the integer part of the logarithm.
+    - Calculates `y`, which represents the fractional part of `x` after extracting the integer part.
+    - Computes a fixed-point approximation of `x` using a derived formula involving `y`.
+    - Uses a series of polynomial approximations to compute the fractional part of the logarithm.
+    - Sets the exponent `_e` based on the integer part calculated earlier and returns the final approximation.
+- **Output**: Returns an unsigned long integer representing the fixed-point approximation of log2(x) scaled by 2^30.
 
 
 ---
 ### fd\_fxp\_exp2\_approx<!-- {{#callable:fd_fxp_exp2_approx}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L1071>)
-
-Computes an approximation of `exp2(x/2^30)` using a polynomial minimax approximation.
+`fd_fxp_exp2_approx` computes an approximate value of `exp2(x/2^30)` using a fixed-point representation.
 - **Inputs**:
-    - `x`: An unsigned long integer representing the input value for which the exponential base 2 is to be computed.
-- **Logic and Control Flow**:
-    - Shifts `x` right by 30 bits to determine the integer part `i`.
-    - Checks if `i` is greater than or equal to 34; if so, returns `ULONG_MAX` to indicate overflow.
-    - Calculates the fractional part `d` by masking `x` with `(1UL<<30)-1UL`.
-    - Applies a series of polynomial calculations to compute the approximation of `exp2`.
-    - Adjusts the result based on the value of `i` to ensure correct scaling.
-- **Output**: Returns an unsigned long integer that approximates `exp2(x/2^30)`, or `ULONG_MAX` if the result would overflow.
+    - `x`: An unsigned long integer representing the fixed-point input value, where the upper bits represent the integer part and the lower 30 bits represent the fractional part.
+- **Control Flow**:
+    - The function first extracts the integer part `i` by right-shifting `x` by 30 bits.
+    - If `i` is greater than or equal to 34, the function returns `ULONG_MAX` to indicate overflow.
+    - The fractional part `d` is obtained by masking `x` with `(1UL << 30) - 1`.
+    - A series of polynomial approximations are applied to compute `y`, which approximates `exp2(x/2^30)`.
+    - The final result is computed by adjusting `y` based on the value of `i` and returning the appropriately scaled result.
+- **Output**: Returns an unsigned long integer representing the approximate value of `exp2(x/2^30)`, or `ULONG_MAX` if the result would overflow.
 
 
 ---
 ### fd\_fxp\_rexp2\_approx<!-- {{#callable:fd_fxp_rexp2_approx}} -->
-[View Source →](<../../../../../src/util/math/fd_fxp.h#L1103>)
-
-Computes an approximation of `exp2(-x/2^30)` using a minimax polynomial.
+Approximates the value of exp2(-x/2^30) using a polynomial minimax approximation.
 - **Inputs**:
-    - `x`: An unsigned long integer representing the input value to approximate.
-- **Logic and Control Flow**:
-    - Extracts the integer part `i` by right shifting `x` by 30 bits.
-    - Checks if `i` is greater than or equal to 31; if so, returns 0.
-    - Calculates the fractional part `d` by masking `x` with `(1UL<<30)-1UL`.
-    - Applies a series of polynomial approximations to compute `y`.
-    - Adjusts `y` based on the value of `d` using bitwise operations.
-    - Calculates the final result by shifting `y` and adding a constant.
-- **Output**: Returns an unsigned long integer representing the approximation of `exp2(-x/2^30)`.
+    - `x`: An unsigned long integer representing the input value for which the exponential function is to be approximated.
+- **Control Flow**:
+    - The function first extracts the integer part `i` by right-shifting `x` by 30 bits.
+    - If `i` is greater than or equal to 31, the function returns 0, indicating an overflow condition.
+    - The fractional part `d` is obtained by masking `x` with ((1UL<<30)-1UL).
+    - A series of polynomial calculations are performed to compute the approximation of exp2(-x/2^30) using the value of `d`.
+    - The final result is computed by adjusting the polynomial result `y` based on the value of `i`.
+- **Output**: Returns an unsigned long integer that approximates exp2(-x/2^30), or 0 if the input is too large.
 
 
 

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for HTTP/2 connection client-side handshake and ping transmission logic.
+The `test_h2_conn.c` file in the `firedancer` codebase contains tests for HTTP/2 connection functionalities, including client-side handshake logic and ping transmission and acknowledgment.
 
 # Purpose
-The code is a C test suite designed to validate the functionality of HTTP/2 client-side connection handling, specifically focusing on handshake and ping operations. It includes tests for client-side handshake sequences and ping transmission and acknowledgment. The code uses structures and functions from the HTTP/2 protocol implementation, such as `fd_h2_conn_t` for connection management and `fd_h2_callbacks_t` for handling connection events. The test suite verifies the correct sequence of HTTP/2 frames during the handshake process and ensures that the client correctly handles server responses, including SETTINGS and SETTINGS ACK frames.
+This C source code file is designed to test various aspects of HTTP/2 connection handling, specifically focusing on client-side handshake logic and ping transmission/acknowledgment. The file includes functions that simulate and verify the behavior of an HTTP/2 client during the handshake process, ensuring that the client correctly follows the protocol's sequence of sending and receiving SETTINGS frames and their acknowledgments. The code also tests the client's ability to handle ping frames, including sending pings, handling full transmission buffers, and processing ping acknowledgments.
 
-The code defines several static functions to test specific aspects of the HTTP/2 client behavior. The [`test_h2_client_handshake`](<#test_h2_client_handshake>) function simulates different handshake scenarios, checking the client's ability to initiate and respond to server settings. The [`test_h2_ping_tx`](<#test_h2_ping_tx>) function tests the client's ability to send and acknowledge ping frames, ensuring that the client correctly manages ping transmission limits and buffer space. The test suite uses assertions (`FD_TEST`) to validate expected outcomes, such as frame contents and connection state flags. The code is intended to be part of a larger test framework, as indicated by the inclusion of header files and the use of utility functions for buffer management and memory comparison.
+The file is structured around two main testing functions: [`test_h2_client_handshake`](#test_h2_client_handshake) and [`test_h2_ping_tx`](#test_h2_ping_tx). The [`test_h2_client_handshake`](#test_h2_client_handshake) function exercises the client-side logic for establishing a connection, verifying that the client sends the correct preface and SETTINGS frames, and correctly processes server responses. The [`test_h2_ping_tx`](#test_h2_ping_tx) function tests the client's ability to send ping frames, handle buffer constraints, and process ping acknowledgments. The code uses callback mechanisms to track connection establishment and ping acknowledgment events, ensuring that the client behaves as expected under various conditions. This file is intended to be part of a larger test suite for an HTTP/2 implementation, focusing on validating the correctness and robustness of the client-side connection management logic.
 # Imports and Dependencies
 
 ---
@@ -23,132 +23,119 @@ The code defines several static functions to test specific aspects of the HTTP/2
 ---
 ### cb\_rec
 - **Type**: ``test_h2_callback_rec_t``
-- **Description**: Represents a structure that contains a counter for the number of times a connection is established in the HTTP/2 protocol test. The `cb_rec` variable is an instance of this structure and is used to track the number of established connections during testing.
-- **Use**: Tracks the count of established connections by incrementing the `cb_established_cnt` field each time a connection is successfully established.
+- **Description**: The `cb_rec` variable is a static instance of the `test_h2_callback_rec_t` structure, which contains a single member, `cb_established_cnt`, a counter for the number of times a connection establishment callback is triggered. This structure is used to track the number of successful connection establishments in the HTTP/2 client handshake process.
+- **Use**: `cb_rec` is used to increment the `cb_established_cnt` each time a connection is successfully established, providing a count of such events.
 
 
 ---
 ### test\_h2\_ping\_tx\_ack\_cnt
-- **Type**: ``ulong``
-- **Description**: `test_h2_ping_tx_ack_cnt` is a static global variable of type `ulong` initialized to 0. It counts the number of ping acknowledgments transmitted in the HTTP/2 connection tests.
-- **Use**: Used to track the number of ping acknowledgments sent during the execution of the `test_h2_ping_tx` function.
+- **Type**: `ulong`
+- **Description**: The `test_h2_ping_tx_ack_cnt` is a static global variable of type `ulong` initialized to zero. It is used to keep track of the number of ping acknowledgments transmitted in the HTTP/2 connection tests.
+- **Use**: This variable is incremented each time a ping acknowledgment is successfully processed in the `test_h2_ping_ack` function.
 
 
 # Data Structures
 
 ---
 ### test\_h2\_callback\_rec
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``cb_established_cnt``: Counts the number of times a connection is established.
-- **Description**: Tracks the number of established connections in an HTTP/2 context by maintaining a counter `cb_established_cnt` that increments each time a connection is successfully established.
+    - `cb_established_cnt`: A counter that tracks the number of times a connection has been established.
+- **Description**: The `test_h2_callback_rec` structure is used to record the number of times a connection establishment callback is triggered in an HTTP/2 client handshake process. It contains a single member, `cb_established_cnt`, which is an unsigned integer that increments each time a connection is successfully established. This structure is primarily used for testing and validation purposes to ensure that the connection establishment logic is functioning correctly.
 
 
 ---
 ### test\_h2\_callback\_rec\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``cb_established_cnt``: Counts the number of times a connection is established.
-- **Description**: Holds a counter for the number of established connections, which is incremented each time a connection is successfully established through the `test_cb_conn_established` function.
+    - `cb_established_cnt`: A counter that tracks the number of times a connection has been established.
+- **Description**: The `test_h2_callback_rec_t` structure is used to record the number of times a connection establishment callback is triggered in an HTTP/2 client handshake process. It contains a single member, `cb_established_cnt`, which is incremented each time a connection is successfully established, allowing for tracking and testing of connection establishment events.
 
 
 # Functions
 
 ---
 ### test\_cb\_conn\_established<!-- {{#callable:test_cb_conn_established}} -->
-[View Source →](<../../../../../src/waltz/h2/test_h2_conn.c#L14>)
-
-Increments the `cb_established_cnt` counter in the `cb_rec` structure when a connection is established.
+The function `test_cb_conn_established` increments a counter each time a connection is established.
 - **Inputs**:
-    - ``conn``: A pointer to an `fd_h2_conn_t` structure representing the connection; it is not used in the function.
-- **Logic and Control Flow**:
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection that has been established.
+- **Control Flow**:
     - The function takes a single argument, `conn`, which is a pointer to an `fd_h2_conn_t` structure.
-    - The function explicitly casts `conn` to void to indicate that it is unused.
-    - The function increments the `cb_established_cnt` field of the `cb_rec` structure by 1.
-- **Output**: No output is returned from this function.
+    - The function explicitly ignores the `conn` argument by casting it to void, indicating it is unused.
+    - The function increments the `cb_established_cnt` field of the `cb_rec` structure, which tracks the number of established connections.
+- **Output**: The function does not return any value; it modifies the global `cb_rec` structure by incrementing its `cb_established_cnt` field.
 
 
 ---
 ### test\_h2\_client\_handshake<!-- {{#callable:test_h2_client_handshake}} -->
-[View Source →](<../../../../../src/waltz/h2/test_h2_conn.c#L36>)
-
-Tests the client-side HTTP/2 handshake process by simulating different handshake sequences and verifying the expected behavior.
+The `test_h2_client_handshake` function tests the client-side HTTP/2 handshake process by simulating different handshake sequences and verifying the correct state transitions and message exchanges.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Initialize buffers `scratch`, `rbuf_rx_b`, and `rbuf_tx_b` for data handling.
-    - Create and initialize an HTTP/2 connection object `conn` with specific settings for window size, frame size, header list size, and concurrent streams.
-    - Initialize callback structure `cb` and set the `conn_established` callback to `test_cb_conn_established`.
-    - Verify that the client initiates the connection with the `FD_H2_CONN_FLAGS_CLIENT_INITIAL` flag.
-    - Initialize a transmit buffer `rbuf_tx` and send a control frame using [`fd_h2_tx_control`](<fd_h2_conn.c.md#fd_h2_tx_control>), then verify the buffer size and content against expected HTTP/2 preface and settings frame.
-    - Check the connection flags for waiting settings and settings acknowledgment, and ensure the transmit buffer is empty after control frame transmission.
-    - Simulate server sending SETTINGS and SETTINGS ACK frames, push them to receive buffer `rbuf_rx`, and process them with [`fd_h2_rx`](<fd_h2_conn.c.md#fd_h2_rx>).
-    - Verify the acknowledgment frame content and update connection flags accordingly.
-    - Repeat the handshake scenario with a different sequence where the server sends SETTINGS ACK before SETTINGS, and verify the connection establishment.
-- **Output**: No output is returned; the function uses assertions (`FD_TEST`) to verify expected states and behaviors during the handshake process.
-- **Functions Called**:
-    - [`fd_h2_callbacks_init`](<fd_h2_callback.c.md#fd_h2_callbacks_init>)
-    - [`fd_h2_tx_control`](<fd_h2_conn.c.md#fd_h2_tx_control>)
-    - [`fd_h2_rbuf_used_sz`](<fd_h2_rbuf.h.md#fd_h2_rbuf_used_sz>)
-    - [`fd_h2_rbuf_pop`](<fd_h2_rbuf.h.md#fd_h2_rbuf_pop>)
-    - [`fd_h2_rbuf_push`](<fd_h2_rbuf.h.md#fd_h2_rbuf_push>)
-    - [`fd_h2_rx`](<fd_h2_conn.c.md#fd_h2_rx>)
+- **Control Flow**:
+    - Initialize buffers and connection structures for testing.
+    - Set initial client connection settings and initialize callback structure.
+    - Verify the client initiates the connection with the correct flags.
+    - Simulate sending a client preface and settings frame, and verify the contents of the transmitted buffer.
+    - Simulate receiving server settings and settings acknowledgment, and verify the client's response and state transitions.
+    - Repeat the handshake process with a different sequence of server responses to ensure robustness.
+    - Verify that the connection is established correctly by checking callback invocation and connection flags.
+- **Output**: The function does not return any value; it uses assertions to verify the correctness of the handshake process and state transitions.
+- **Functions called**:
+    - [`fd_h2_callbacks_init`](fd_h2_callback.c.md#fd_h2_callbacks_init)
+    - [`fd_h2_tx_control`](fd_h2_conn.c.md#fd_h2_tx_control)
+    - [`fd_h2_rbuf_used_sz`](fd_h2_rbuf.h.md#fd_h2_rbuf_used_sz)
+    - [`fd_h2_rbuf_pop`](fd_h2_rbuf.h.md#fd_h2_rbuf_pop)
+    - [`fd_h2_rbuf_push`](fd_h2_rbuf.h.md#fd_h2_rbuf_push)
+    - [`fd_h2_rx`](fd_h2_conn.c.md#fd_h2_rx)
 
 
 ---
 ### test\_h2\_ping\_ack<!-- {{#callable:test_h2_ping_ack}} -->
-[View Source →](<../../../../../src/waltz/h2/test_h2_conn.c#L182>)
-
-Increments the `test_h2_ping_tx_ack_cnt` counter when a PING ACK is received.
+The `test_h2_ping_ack` function increments a counter each time it is called, indicating the number of PING ACKs processed.
 - **Inputs**:
-    - ``conn``: A pointer to an `fd_h2_conn_t` structure, representing the HTTP/2 connection. It is not used in the function body.
-- **Logic and Control Flow**:
-    - The function takes a single argument, `conn`, which is not used in the function body.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection, which is not used in the function.
+- **Control Flow**:
+    - The function takes a single argument, `conn`, which is not utilized within the function body.
     - The function increments the global variable `test_h2_ping_tx_ack_cnt` by one.
-- **Output**: No output is returned from this function.
+- **Output**: The function does not return any value; it modifies a global counter variable.
 
 
 ---
 ### test\_h2\_ping\_tx<!-- {{#callable:test_h2_ping_tx}} -->
-[View Source →](<../../../../../src/waltz/h2/test_h2_conn.c#L188>)
-
-Tests the transmission and acknowledgment of HTTP/2 PING frames in a client connection.
-- **Inputs**:
-    - `void`: No input parameters.
-- **Logic and Control Flow**:
-    - Initialize a client HTTP/2 connection and set the maximum frame size.
-    - Initialize callback structure and set the `ping_ack` callback to `test_h2_ping_ack`.
-    - Initialize a transmission buffer `rbuf_tx` with a size of 128 bytes.
-    - Test the scenario where there are too many pending pings by setting `conn->ping_tx` to `UCHAR_MAX` and verify that [`fd_h2_tx_ping`](<fd_h2_conn.c.md#fd_h2_tx_ping>) returns 0.
-    - Test the scenario where the transmission buffer is full and verify that [`fd_h2_tx_ping`](<fd_h2_conn.c.md#fd_h2_tx_ping>) returns 0.
-    - Test the scenario where there is exactly enough space for a ping in the buffer and verify that [`fd_h2_tx_ping`](<fd_h2_conn.c.md#fd_h2_tx_ping>) returns 1.
-    - Parse the ping from the buffer and verify its header and payload values.
-    - Create a PING ACK frame and push it to a reception buffer `rbuf_rx`.
-    - Verify that the PING ACK callback is triggered by calling [`fd_h2_rx`](<fd_h2_conn.c.md#fd_h2_rx>) and checking the `test_h2_ping_tx_ack_cnt`.
-    - Test that unsolicited PING ACKs are ignored by pushing another PING ACK to `rbuf_rx` and verifying that `test_h2_ping_tx_ack_cnt` does not increase.
-- **Output**: No return value.
-- **Functions Called**:
-    - [`fd_h2_callbacks_init`](<fd_h2_callback.c.md#fd_h2_callbacks_init>)
-    - [`fd_h2_tx_ping`](<fd_h2_conn.c.md#fd_h2_tx_ping>)
-    - [`fd_h2_rbuf_push`](<fd_h2_rbuf.h.md#fd_h2_rbuf_push>)
-    - [`fd_h2_rbuf_skip`](<fd_h2_rbuf.h.md#fd_h2_rbuf_skip>)
-    - [`fd_h2_rbuf_pop_copy`](<fd_h2_rbuf.h.md#fd_h2_rbuf_pop_copy>)
-    - [`fd_h2_frame_typlen`](<fd_h2_proto.h.md#fd_h2_frame_typlen>)
-    - [`fd_h2_rx`](<fd_h2_conn.c.md#fd_h2_rx>)
+The `test_h2_ping_tx` function tests the transmission and acknowledgment of HTTP/2 PING frames, ensuring correct handling of buffer space and unsolicited PING ACKs.
+- **Inputs**: None
+- **Control Flow**:
+    - Initialize an HTTP/2 client connection and set the maximum frame size.
+    - Initialize callback structure and set the ping acknowledgment callback.
+    - Initialize a transmission buffer and set it to maximum capacity.
+    - Test the scenario where too many pings are pending, expecting no new ping to be sent.
+    - Test the scenario where the transmission buffer is full, expecting no new ping to be sent.
+    - Test the scenario where there is exactly enough space for a ping, expecting a ping to be sent.
+    - Parse the sent ping and verify its header and payload values.
+    - Create a PING ACK frame and push it to a reception buffer.
+    - Verify that the PING ACK callback is triggered and the pending ping count is decremented.
+    - Test that unsolicited PING ACKs do not affect the pending ping count.
+- **Output**: The function does not return a value but uses assertions to verify the correct behavior of PING transmission and acknowledgment handling.
+- **Functions called**:
+    - [`fd_h2_callbacks_init`](fd_h2_callback.c.md#fd_h2_callbacks_init)
+    - [`fd_h2_tx_ping`](fd_h2_conn.c.md#fd_h2_tx_ping)
+    - [`fd_h2_rbuf_push`](fd_h2_rbuf.h.md#fd_h2_rbuf_push)
+    - [`fd_h2_rbuf_skip`](fd_h2_rbuf.h.md#fd_h2_rbuf_skip)
+    - [`fd_h2_rbuf_pop_copy`](fd_h2_rbuf.h.md#fd_h2_rbuf_pop_copy)
+    - [`fd_h2_frame_typlen`](fd_h2_proto.h.md#fd_h2_frame_typlen)
+    - [`fd_h2_rx`](fd_h2_conn.c.md#fd_h2_rx)
 
 
 ---
 ### test\_h2\_conn<!-- {{#callable:test_h2_conn}} -->
-[View Source →](<../../../../../src/waltz/h2/test_h2_conn.c#L254>)
-
-Executes tests for HTTP/2 client handshake and ping transmission.
+The `test_h2_conn` function orchestrates the testing of HTTP/2 connection functionalities by invoking client handshake and ping transmission tests.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Calls [`test_h2_client_handshake`](<#test_h2_client_handshake>) to test various client-side handshake state logic, including different sequences of SETTINGS and SETTINGS ACK frames between client and server.
-    - Calls [`test_h2_ping_tx`](<#test_h2_ping_tx>) to test the transmission of PING frames, handling of buffer space, and acknowledgment of PING frames.
-- **Output**: No output is returned as the function is `void` and primarily used for testing purposes.
-- **Functions Called**:
-    - [`test_h2_client_handshake`](<#test_h2_client_handshake>)
-    - [`test_h2_ping_tx`](<#test_h2_ping_tx>)
+- **Control Flow**:
+    - Invoke [`test_h2_client_handshake`](#test_h2_client_handshake) to test various client-side handshake state logic and sequences.
+    - Invoke [`test_h2_ping_tx`](#test_h2_ping_tx) to test the transmission and acknowledgment of HTTP/2 PING frames.
+- **Output**: The function does not return any value; it performs tests and assertions internally to validate HTTP/2 connection behaviors.
+- **Functions called**:
+    - [`test_h2_client_handshake`](#test_h2_client_handshake)
+    - [`test_h2_ping_tx`](#test_h2_ping_tx)
 
 
 
