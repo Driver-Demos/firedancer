@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-TOML files for benchmarking, development, and Solana testnet configuration.
+Benchmarking and configuration files for various CPUs, Firedancer instances, and Solana testnets.
 
 
 ## Files
-- **[bench-icelake-80core.toml](bench-icelake-80core.toml.md)**: The `bench-icelake-80core.toml` file is a configuration file for benchmarking on an Intel Icelake CPU with AVX512 support, specifically designed for a dual socket setup with 80 physical cores, as part of the 1.4 Milestone demo in the `firedancer` codebase.
-- **[bench-zen3-32core.toml](bench-zen3-32core.toml.md)**: The `bench-zen3-32core.toml` file provides a suggested configuration for benchmarking on a Zen3 CPU, specifically tailored for systems with 64 logical cores and 32 physical cores, such as the AMD EPYC 7513.
-- **[bench-zen4-64core.toml](bench-zen4-64core.toml.md)**: The `bench-zen4-64core.toml` file is a configuration file for benchmarking on an AMD Zen4 CPU with 64 physical cores, detailing settings for layout, development, RPC, and tiles in the `firedancer` codebase.
-- **[default.toml](default.toml.md)**: Default Firedancer validator configuration with network, ledger, consensus, layout, and development settings.
-- **[development.toml](development.toml.md)**: The `development.toml` file in the `firedancer` codebase configures development settings, including network namespace enabling and specifying a network interface.
-- **[testnet-jito.toml](testnet-jito.toml.md)**: The `testnet-jito.toml` file in the `firedancer` codebase configures various settings for a Solana testnet environment, including gossip entry points, consensus parameters, RPC settings, and tiles bundle and GUI configurations.
-- **[testnet.toml](testnet.toml.md)**: The `testnet.toml` file in the `firedancer` codebase configures network settings for a Solana testnet, including gossip entrypoints, consensus validators, RPC settings, layout configurations, and reporting metrics.
+- **[bench-icelake-80core.toml](bench-icelake-80core.toml.md)**: Configuration for benchmarking on an Intel Icelake CPU with AVX512 support and 80 physical cores.
+- **[bench-zen3-32core.toml](bench-zen3-32core.toml.md)**: Configuration for benchmarking on a Zen3 CPU with specific core and thread settings.
+- **[bench-zen4-64core.toml](bench-zen4-64core.toml.md)**: Configuration for benchmarking on an AMD Zen4 CPU with 64 physical and 128 logical cores.
+- **[default.toml](default.toml.md)**: Configuration file for Firedancer, detailing settings for instance identification, user permissions, directories, network ports, logging, reporting, ledger management, consensus, CPU core management, memory allocation, network stack, tile behavior, and development options.
+- **[development.toml](development.toml.md)**: Configuration settings for development environment, including network namespace and interface options.
+- **[testnet-jito.toml](testnet-jito.toml.md)**: Configuration file for the Solana testnet with settings for gossip, snapshots, consensus, RPC, and tiles.
+- **[testnet.toml](testnet.toml.md)**: Configuration for a Solana testnet with gossip entrypoints, consensus settings, RPC, layout, and reporting.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

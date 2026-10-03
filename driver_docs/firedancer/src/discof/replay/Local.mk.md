@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for replay objects, headers, and unit tests, with zstd-gated replay support.
+Makefile for adding headers, objects, and unit tests with conditional logic for `fd_discof`.
 
 # Purpose
-This Makefile fragment adds the `fd_exec.h` header and builds the `fd_rdisp` object and the `test_rdisp` unit test with the listed dependencies. It also adds `fd_sched` when `FD_HAS_INT128` is defined, and adds `fd_replay_tile` only when `FD_HAS_ZSTD` is defined, while issuing a warning and skipping replay if `zstd` is not installed. The fragment also adds `fd_vote_tracker.h` and builds the `fd_vote_tracker` object.
+This Makefile script is used to manage the build process for a software project. It defines rules to add header files and object files using the `add-hdrs` and `add-objs` functions, respectively. The script also includes a unit test setup with `make-unit-test` and `run-unit-test` for the `test_rdisp` component. Conditional compilation is supported with checks for `FD_HAS_INT128` and `FD_HAS_ZSTD`, where the presence of these flags determines whether additional object files like `fd_sched` and `fd_replay_tile` are included. If `FD_HAS_ZSTD` is not defined, a warning is issued indicating that the replay functionality is skipped due to the absence of the `zstd` library.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

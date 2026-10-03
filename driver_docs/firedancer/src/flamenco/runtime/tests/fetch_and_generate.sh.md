@@ -3,10 +3,43 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fetches nanopb and protosol, sets up a Python venv, and runs nanopb_generator on proto files.
+Bash script to set up a virtual environment, install dependencies, and fetch specific versions of nanopb and protosol.
 
 # Purpose
-This script prepares a local Protocol Buffers code generation environment and then runs the `nanopb` generator on the `protosol` `.proto` files. It creates a Python virtual environment, installs `protobuf` and `grpcio-tools`, fetches the `nanopb` and `protosol` repositories at fixed versions, and checks out the `nanopb` tag from `nanopb_tag.txt`. The script then invokes `nanopb_generator.py` with the `protosol/proto` include path and writes the generated output to the `generated` directory. This file is a build helper script, not an executable application or a library module.
+This script is a Bash executable that sets up a development environment for working with Protocol Buffers and the nanopb library. It begins by setting a default version for Protocol Buffers, which can be overridden by an environment variable. The script then creates a Python virtual environment using Python 3.11 and installs necessary packages such as `protobuf` and `grpcio-tools`. It proceeds to clone the nanopb repository and checks out a specific tag defined in a file located in a relative path. Additionally, it clones the protosol repository at a specified version or branch. Finally, the script uses the nanopb generator to process `.proto` files located in the protosol directory, generating output in a specified directory.
+# Imports and Dependencies
+
+---
+- `python3.11`
+- `pip`
+- `protobuf`
+- `grpcio-tools`
+- `git`
+
+
+# Global Variables
+
+---
+### PROTO\_VERSION
+- **Type**: `string`
+- **Description**: Specifies the version of the protocol to use when fetching the `protosol` repository. It defaults to 'v1.0.5' if not overridden by an environment variable.
+- **Use**: Used to determine which version of the `protosol` repository to clone or checkout.
+
+
+---
+### SCRIPT\_DIR
+- **Type**: `string`
+- **Description**: Contains the absolute path to the directory where the script is located. It is determined by changing to the directory of the script and then using the `pwd` command to get the current directory path.
+- **Use**: Used to reference the script's directory path for operations that require knowledge of the script's location.
+
+
+---
+### FD\_NANOPB\_TAG
+- **Type**: ``string``
+- **Description**: The `FD_NANOPB_TAG` variable is a string that stores the content of the file located at `../../../ballet/nanopb/nanopb_tag.txt`. This file is expected to contain a specific tag or version identifier for the `nanopb` repository.
+- **Use**: Used to specify the tag or version of the `nanopb` repository to fetch and checkout in the script.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/wiredancer/sim/ed25519_sigverify_1` directory is used to configure and build a simulation environment for the `ed25519_sigverify_1` module using Verilog sources and the Questa simulator.
+Makefile for simulating the `ed25519_sigverify_1` module using Verilog sources and Cocotb.
 
 # Purpose
-This Makefile is used to automate the simulation process for a hardware design verification project, specifically targeting the verification of the `ed25519_sigverify_1` module. It sets up various environment variables and paths necessary for the simulation, such as the simulator to be used (`questa` by default), the module name (`test`), and the directory containing the RTL (Register Transfer Level) source files. The file lists several Verilog and SystemVerilog source files, including those from the Xilinx Vivado library and custom RTL files, which are required for the simulation. Additionally, it includes a makefile from the cocotb framework, which is a coroutine-based co-simulation library for verifying VHDL and Verilog designs, indicating that cocotb is used to facilitate the testbench and simulation environment.
+The `Makefile` is used to automate the build process for a simulation environment. It defines several variables and paths necessary for compiling and simulating Verilog and SystemVerilog source files. The `SIM` variable specifies the simulator to use, defaulting to `questa`, while `MODULE` and `TOPLEVEL` define the test module and top-level module name, respectively. The `VERILOG_SOURCES` variable lists all the Verilog and SystemVerilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files located in the specified `RTL_DIR`. The file also includes additional makefile configurations from `cocotb-config`, which are necessary for integrating with the Cocotb testing framework.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

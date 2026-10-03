@@ -3,10 +3,57 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated seccomp filter allowing write and fsync only on fd 2 or logfile_fd.
+Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
 
 # Purpose
-This generated header defines a seccomp BPF policy for the `fd_poh_tile` component and builds the filter rules used to restrict system calls at runtime. It checks the target architecture with `ARCH_NR`, then allows only `SYS_write` and `SYS_fsync` when they use the expected file descriptor values, including `logfile_fd` for log output. All other system calls, or calls from a different architecture, end with `SECCOMP_RET_KILL_PROCESS`, which stops the process. The file also exposes `sock_filter_policy_fd_poh_tile_instr_cnt` and the [`populate_sock_filter_policy_fd_poh_tile`](<#populate_sock_filter_policy_fd_poh_tile>) function so the codebase can copy the prepared filter into a caller-provided buffer.
+The code is a C header file that defines a seccomp (secure computing mode) filter policy for a specific application. It includes necessary headers for working with seccomp, BPF (Berkeley Packet Filter), and system calls. The file is generated automatically and should not be edited manually. It defines a static function [`populate_sock_filter_policy_fd_poh_tile`](<#populate_sock_filter_policy_fd_poh_tile>) that initializes a BPF filter array to enforce security policies by restricting system calls based on the architecture and specific conditions.
+
+The filter policy checks the architecture of the running process and allows or denies system calls such as `write` and `fsync` based on predefined conditions. If the architecture does not match or if the system call conditions are not met, the process is terminated using `SECCOMP_RET_KILL_PROCESS`. Otherwise, the system call is allowed with `SECCOMP_RET_ALLOW`. The file uses macros to define architecture-specific constants and includes logic to handle different architectures like `i386`, `x86_64`, and `aarch64`. The function [`populate_sock_filter_policy_fd_poh_tile`](<#populate_sock_filter_policy_fd_poh_tile>) copies the filter rules into an output buffer, ensuring that the security policy is applied correctly.
+# Imports and Dependencies
+
+---
+- `../../../../src/util/fd_util_base.h`
+- `linux/audit.h`
+- `linux/capability.h`
+- `linux/filter.h`
+- `linux/seccomp.h`
+- `linux/bpf.h`
+- `sys/syscall.h`
+- `signal.h`
+- `stddef.h`
+
+
+# Global Variables
+
+---
+### sock\_filter\_policy\_fd\_poh\_tile\_instr\_cnt
+- **Type**: ``unsigned int``
+- **Description**: Defines the number of instructions in the socket filter policy for the `fd_poh_tile` component. This constant is used to ensure that the correct number of filter instructions are processed.
+- **Use**: Used to verify the count of instructions in the `populate_sock_filter_policy_fd_poh_tile` function.
+
+
+# Functions
+
+---
+### populate\_sock\_filter\_policy\_fd\_poh\_tile<!-- {{#callable:populate_sock_filter_policy_fd_poh_tile}} -->
+[View Source →](<../../../../../../src/discof/poh/generated/fd_poh_tile_seccomp.h#L26>)
+
+Populates a `sock_filter` array with a predefined seccomp filter policy to control system call permissions.
+- **Inputs**:
+    - `out_cnt`: The number of elements in the `out` array, which must be at least 14.
+    - `out`: A pointer to a `sock_filter` array where the filter policy will be copied.
+    - `logfile_fd`: The file descriptor to be allowed for certain system calls.
+- **Logic and Control Flow**:
+    - Check if `out_cnt` is at least 14 using `FD_TEST` macro.
+    - Define a `sock_filter` array `filter` with 14 elements to specify the seccomp filter policy.
+    - Load the architecture from `seccomp_data` and compare it with `ARCH_NR`; jump to `RET_KILL_PROCESS` if they do not match.
+    - Load the syscall number and check if it is `SYS_write` or `SYS_fsync`; if not, jump to `RET_KILL_PROCESS`.
+    - For `SYS_write`, check if the first argument is 2 or `logfile_fd`; allow the syscall if true, otherwise jump to `RET_KILL_PROCESS`.
+    - For `SYS_fsync`, check if the first argument is `logfile_fd`; allow the syscall if true, otherwise jump to `RET_KILL_PROCESS`.
+    - Use `fd_memcpy` to copy the `filter` array to the `out` array.
+- **Output**: The function does not return a value; it modifies the `out` array in place.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
