@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds send_test objects when FD_HAS_INT128 is defined.
+Makefile logic to add `send_test` objects if `FD_HAS_INT128` is defined.
 
 # Purpose
-Builds the `send_test` object file only when `FD_HAS_INT128` is defined. The `$(call add-objs,send_test,fd_firedancer_dev)` line adds `send_test` to the `fd_firedancer_dev` build target under that condition.
+The `Makefile` snippet conditionally adds objects to the build process. If the macro `FD_HAS_INT128` is defined, it calls the function `add-objs` with the arguments `send_test` and `fd_firedancer_dev`. This inclusion is part of the build configuration, allowing the build system to compile specific components based on the presence of 128-bit integer support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

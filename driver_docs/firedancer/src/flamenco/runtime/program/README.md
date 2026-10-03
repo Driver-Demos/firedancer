@@ -3,41 +3,41 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Runtime program handlers, precompiles, native CPI helpers, and build rules for Solana programs.
+Zero-knowledge proof verification, address lookup, BPF management, built-in programs, compute budget, configuration, loader v4, native CPI, precompiles, stake, system, vote, and ZK ElGamal proof programs with related utilities and documentation.
 
 ## Folders
-- **[zksdk](zksdk/README.md)**: Zero-knowledge proof instructions, transcript and rangeproof support, verification code, and tests.
+- **[zksdk](zksdk/README.md)**: Zero-knowledge proof verification functions, structures, tests, and documentation for the Firedancer ZK-SDK.
 
 ## Files
-- **[fd_address_lookup_table_program.c](fd_address_lookup_table_program.c.md)**: Address lookup table instruction handling, state serialization, and active-address queries.
-- **[fd_address_lookup_table_program.h](fd_address_lookup_table_program.h.md)**: The `fd_address_lookup_table_program.h` file defines constants and function prototypes for executing and managing an address lookup table program within the Firedancer runtime.
-- **[fd_bpf_loader_program.c](fd_bpf_loader_program.c.md)**: Upgradeable BPF loader instruction handling, program deploy, execute, extend, upgrade, close, and migrate logic.
-- **[fd_bpf_loader_program.h](fd_bpf_loader_program.h.md)**: BPF loader v3 constants and APIs for state, deployment, execution, and direct deploy.
-- **[fd_bpf_loader_serialization.c](fd_bpf_loader_serialization.c.md)**: Serialization and deserialization of BPF VM input parameters and account regions.
-- **[fd_bpf_loader_serialization.h](fd_bpf_loader_serialization.h.md)**: BPF loader parameter serialization and deserialization prototypes.
-- **[fd_builtin_programs.c](fd_builtin_programs.c.md)**: Builtin program, precompile, and migration setup, plus account initialization for Solana runtime programs.
-- **[fd_builtin_programs.h](fd_builtin_programs.h.md)**: Builtin, stateless builtin, and precompile program definitions and migration helpers.
-- **[fd_compute_budget_program.c](fd_compute_budget_program.c.md)**: Compute budget instruction parsing, validation, and default compute unit setup for transactions.
-- **[fd_compute_budget_program.h](fd_compute_budget_program.h.md)**: Compute budget limits and instruction execution helpers.
-- **[fd_config_program.c](fd_config_program.c.md)**: Config program instruction processing and account update logic.
-- **[fd_config_program.h](fd_config_program.h.md)**: The `fd_config_program.h` file defines a native program for managing lists of public keys in accounts, requiring designated signers to authorize changes, and includes an entry point for executing instructions within the `firedancer` codebase.
-- **[fd_loader_v4_program.c](fd_loader_v4_program.c.md)**: Loader v4 program instruction handlers for write, copy, resize, deploy, retract, transfer, and finalize.
-- **[fd_loader_v4_program.h](fd_loader_v4_program.h.md)**: The `fd_loader_v4_program.h` file in the `firedancer` codebase defines constants, states, and functions related to the version 4 loader program, detailing its states and operations such as deployment, retraction, and finalization.
-- **[fd_native_cpi.c](fd_native_cpi.c.md)**: The `fd_native_cpi.c` file in the `firedancer` codebase implements functions for invoking native programs and creating account metadata within a runtime environment.
-- **[fd_native_cpi.h](fd_native_cpi.h.md)**: Native CPI invoke and account-meta helper prototypes for native program calls.
-- **[fd_precompiles.c](fd_precompiles.c.md)**: Ed25519, secp256k1, and secp256r1 signature verification precompile logic.
-- **[fd_precompiles.h](fd_precompiles.h.md)**: Precompile error codes and verify entrypoints for Ed25519, Secp256k1, and Secp256r1.
-- **[fd_program_util.h](fd_program_util.h.md)**: Checked ulong add and sub helpers with overflow error handling.
-- **[fd_stake_program.c](fd_stake_program.c.md)**: Stake program instruction processing, state updates, delegation, merge, split, withdraw, and lockup logic.
-- **[fd_stake_program.h](fd_stake_program.h.md)**: Stake program entrypoints and helpers for epoch, config, state, and stake history handling.
-- **[fd_system_program.c](fd_system_program.c.md)**: System instruction execution and nonce account kind detection.
-- **[fd_system_program.h](fd_system_program.h.md)**: System program error codes, nonce account constants, and execution and transaction-age APIs.
-- **[fd_system_program_nonce.c](fd_system_program_nonce.c.md)**: Nonce account instruction handlers and transaction age checks for the system program.
-- **[fd_vote_program.c](fd_vote_program.c.md)**: Solana vote program execution, state updates, and account management.
-- **[fd_vote_program.h](fd_vote_program.h.md)**: Vote program entrypoint, vote state helpers, commission split, and account storage functions.
-- **[fd_zk_elgamal_proof_program.c](fd_zk_elgamal_proof_program.c.md)**: Executes ZK ElGamal proof instructions with feature gating and proof verification.
-- **[fd_zk_elgamal_proof_program.h](fd_zk_elgamal_proof_program.h.md)**: The `fd_zk_elgamal_proof_program.h` file defines instructions and compute units for executing a Zero-Knowledge ElGamal Proof Program within the Firedancer codebase.
-- **[Local.mk](Local.mk.md)**: Build rules for reusable, precompile, and native program headers and objects.
+- **[fd_address_lookup_table_program.c](fd_address_lookup_table_program.c.md)**: Implements functions for managing address lookup tables, including creation, freezing, extension, deactivation, and closure.
+- **[fd_address_lookup_table_program.h](fd_address_lookup_table_program.h.md)**: Defines constants and functions for executing and managing an address lookup table program.
+- **[fd_bpf_loader_program.c](fd_bpf_loader_program.c.md)**: Implements functions for deploying, executing, and managing BPF programs in the Firedancer runtime.
+- **[fd_bpf_loader_program.h](fd_bpf_loader_program.h.md)**: Header file for the third version of the BPF loader program, defining constants, error codes, and function prototypes for program deployment and execution.
+- **[fd_bpf_loader_serialization.c](fd_bpf_loader_serialization.c.md)**: Serialization and deserialization of BPF virtual machine input regions, supporting multiple modes and direct mapping.
+- **[fd_bpf_loader_serialization.h](fd_bpf_loader_serialization.h.md)**: Serialization and deserialization functions for BPF loader input parameters in the Firedancer runtime.
+- **[fd_builtin_programs.c](fd_builtin_programs.c.md)**: Defines and initializes built-in and stateless programs, precompiles, and migration configurations for the Firedancer runtime.
+- **[fd_builtin_programs.h](fd_builtin_programs.h.md)**: Defines data structures and functions for managing and migrating built-in programs to Core BPF.
+- **[fd_compute_budget_program.c](fd_compute_budget_program.c.md)**: Implements functions for executing and managing compute budget instructions in a transaction context.
+- **[fd_compute_budget_program.h](fd_compute_budget_program.h.md)**: Defines constants and functions for managing compute budget limits in the Firedancer runtime.
+- **[fd_config_program.c](fd_config_program.c.md)**: Processes configuration instructions for the Solana Config Program, handling deserialization, validation, and execution.
+- **[fd_config_program.h](fd_config_program.h.md)**: A native program for storing and managing lists of pubkeys with designated signers in accounts.
+- **[fd_loader_v4_program.c](fd_loader_v4_program.c.md)**: Implements functions for managing and executing loader v4 program instructions, including deployment, retraction, and authority transfer.
+- **[fd_loader_v4_program.h](fd_loader_v4_program.h.md)**: Header file for managing and executing loader v4 programs with state transitions and execution context.
+- **[fd_native_cpi.c](fd_native_cpi.c.md)**: Implements functions for invoking native programs and creating account metadata in a runtime environment.
+- **[fd_native_cpi.h](fd_native_cpi.h.md)**: Functions for invoking native programs and creating account metadata in the Firedancer runtime.
+- **[fd_precompiles.c](fd_precompiles.c.md)**: Implements precompiled signature verification for Ed25519, Secp256k1, and Secp256r1 in a runtime environment.
+- **[fd_precompiles.h](fd_precompiles.h.md)**: Defines error codes and verification functions for Ed25519, Secp256k1, and Secp256r1 precompiles.
+- **[fd_program_util.h](fd_program_util.h.md)**: Utility functions for checked addition and subtraction of unsigned long integers with error handling.
+- **[fd_stake_program.c](fd_stake_program.c.md)**: Implements a stake program with functions for account management, delegation, merging, and error handling.
+- **[fd_stake_program.h](fd_stake_program.h.md)**: Defines functions and structures for a stake program that manages coin staking and rewards on validators.
+- **[fd_system_program.c](fd_system_program.c.md)**: Implements functions for executing various system instructions, such as account creation and transfers, in a Solana-like environment.
+- **[fd_system_program.h](fd_system_program.h.md)**: Defines error types, instruction handlers, and user APIs for executing system program operations.
+- **[fd_system_program_nonce.c](fd_system_program_nonce.c.md)**: Implements functions for managing nonce accounts in a Solana-like system, including initialization, authorization, and transaction age verification.
+- **[fd_vote_program.c](fd_vote_program.c.md)**: Implements a vote program with functions for managing vote states, processing votes, and handling account operations.
+- **[fd_vote_program.h](fd_vote_program.h.md)**: Implements the vote program for node registration and consensus participation in Solana, including error codes and state management functions.
+- **[fd_zk_elgamal_proof_program.c](fd_zk_elgamal_proof_program.c.md)**: Executes the ZK ElGamal proof program with various verification instructions and error handling.
+- **[fd_zk_elgamal_proof_program.h](fd_zk_elgamal_proof_program.h.md)**: Defines instructions and compute units for executing a ZK ElGamal proof program.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and objects for various programs in the Firedancer Flamenco runtime.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
