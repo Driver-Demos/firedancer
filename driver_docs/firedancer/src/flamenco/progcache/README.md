@@ -3,20 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Solana program loading, cache records, admin, user APIs, and tests.
+Functions, APIs, and tests for managing Solana program caches, versions, and transactions in Firedancer.
 
 
 ## Files
-- **[fd_prog_load.c](fd_prog_load.c.md)**: Loads executable program data for v1-v4 loaders and derives SBPF version limits from features.
-- **[fd_prog_load.h](fd_prog_load.h.md)**: High-level APIs for loading Solana programs and deriving sBPF versions from feature state.
-- **[fd_progcache_admin.c](fd_progcache_admin.c.md)**: Transaction and record cache administration, publish, cancel, reset, clear, and verify operations.
-- **[fd_progcache_admin.h](fd_progcache_admin.h.md)**: Program cache admin API for join, leave, txn graph updates, reset, clear, and verify.
-- **[fd_progcache_rec.c](fd_progcache_rec.c.md)**: Builds and validates a program cache record from ELF data, or initializes a nonexecutable record.
-- **[fd_progcache_rec.h](fd_progcache_rec.h.md)**: Program cache entry header, accessors, layout, and constructors for executable and non-executable entries.
-- **[fd_progcache_user.c](fd_progcache_user.c.md)**: Program cache fork lookup, insertion, invalidation, and metrics handling.
-- **[fd_progcache_user.h](fd_progcache_user.h.md)**: API for caching, loading, and invalidating Solana on-chain programs.
-- **[Local.mk](Local.mk.md)**: Build rules for progcache public APIs, unit test, and internal object files.
-- **[test_progcache.c](test_progcache.c.md)**: Single-threaded correctness tests for progcache loading, invalidation, publish, and GC.
+- **[fd_prog_load.c](fd_prog_load.c.md)**: Functions for loading executable program content from different loader versions and managing program versions.
+- **[fd_prog_load.h](fd_prog_load.h.md)**: High-level APIs for loading Solana programs from an account database, including ELF loading and sBPF version derivation.
+- **[fd_progcache_admin.c](fd_progcache_admin.c.md)**: Functions for managing and manipulating program cache transactions and metadata in the Firedancer codebase.
+- **[fd_progcache_admin.h](fd_progcache_admin.h.md)**: Defines structures and functions for managing program cache administration, including transaction operations and cache maintenance.
+- **[fd_progcache_rec.c](fd_progcache_rec.c.md)**: Implements functions to create and initialize program cache records for SBPF programs.
+- **[fd_progcache_rec.h](fd_progcache_rec.h.md)**: Defines the structure and functions for managing program cache entries, including executable and non-executable types.
+- **[fd_progcache_user.c](fd_progcache_user.c.md)**: Functions for managing a program cache, including joining, leaving, loading forks, querying, inserting, and invalidating cache entries.
+- **[fd_progcache_user.h](fd_progcache_user.h.md)**: API for managing a cache of Solana on-chain programs with fork management and cache policies.
+- **[Local.mk](Local.mk.md)**: Makefile for managing headers, objects, and unit tests in the `firedancer` codebase.
+- **[test_progcache.c](test_progcache.c.md)**: Single-threaded correctness tests for the progcache component, including various scenarios and edge cases.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies header files, object files, and unit tests for the `bits` utility, including commands to add headers, objects, create unit tests, and run them.
+Makefile for adding headers, objects, and unit tests for bits and utility components.
 
 # Purpose
-The provided content is from a Makefile, which is used to automate the build process of a software project. This Makefile snippet utilizes custom functions, such as `add-hdrs`, `add-objs`, `make-unit-test`, and `run-unit-test`, to manage the compilation and testing of various components within the project. The `add-hdrs` function is used to include header files, while `add-objs` specifies object files to be compiled. The `make-unit-test` function defines unit tests for different modules, such as `test_bits`, `test_float`, and `test_hash`, associating them with the `fd_util` utility. Finally, the `run-unit-test` function executes these unit tests, ensuring that each module functions correctly. This structured approach helps maintain the integrity and reliability of the software by systematically compiling and testing its components.
+The Makefile content defines a series of build and test operations for a software project. It uses the `add-hdrs` function to include header files such as `fd_bits.h` and `fd_float.h` in the build process. The `add-objs` function specifies object files like `fd_bits` and `fd_util` to be compiled. The `make-unit-test` function creates unit tests for various components, including `test_bits` and `test_float`, associating them with the `fd_util` utility. Finally, the `run-unit-test` function executes these unit tests, ensuring that components like `test_bits` and `test_float` function correctly.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

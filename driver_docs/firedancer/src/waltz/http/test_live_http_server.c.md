@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_live_http_server.c` file in the `firedancer` codebase implements a test HTTP server with WebSocket support, handling HTTP requests and WebSocket messages, and includes signal handling for graceful shutdown.
+Tests a live HTTP server with signal handling, request processing, and WebSocket support.
 
 # Purpose
-This C source code file implements a simple HTTP server with WebSocket support. The server is designed to handle HTTP GET requests and WebSocket connections, providing basic functionality for serving HTML content and JSON responses. The code includes signal handling to gracefully terminate the server upon receiving an interrupt signal (SIGINT). The server is configured with specific parameters such as maximum connection counts and buffer sizes, and it uses a set of callback functions to manage HTTP requests, WebSocket events, and connection closures. The main function initializes the server, sets up the signal handler, and enters a loop to poll for incoming connections and requests, periodically broadcasting messages to all WebSocket clients.
+The code is an implementation of a simple HTTP server with WebSocket support. It uses the `fd_http_server` library to handle HTTP requests and WebSocket connections. The server is configured to handle a limited number of connections and WebSocket connections, and it processes incoming HTTP requests by checking the request method and responding accordingly. For GET requests, it serves an HTML page or upgrades the connection to a WebSocket if requested. For other methods, it processes the request body and responds with a JSON-RPC formatted message.
 
-The code is structured to provide a narrow functionality focused on HTTP and WebSocket communication. It defines a `test_http_server_t` structure to maintain server state and uses the `fd_http_server` library for server operations. The server responds to HTTP GET requests with either a simple HTML page or a JSON response, depending on the request details. WebSocket connections are managed through callbacks that log connection events and handle incoming messages. The code is intended to be compiled into an executable, as indicated by the presence of the [`main`](#main) function, and it does not define any public APIs or external interfaces beyond the server's HTTP and WebSocket endpoints.
+The server includes signal handling to allow graceful shutdown on receiving a SIGINT signal. It defines several callback functions for handling HTTP requests, WebSocket events, and connection closures. The [`main`](<#main>) function initializes the server, sets up the signal handler, and enters a loop to poll for incoming connections and requests. The server periodically broadcasts a JSON message to all WebSocket clients. The code is structured to be compiled and executed as a standalone application, providing a basic HTTP and WebSocket server for testing or demonstration purposes.
 # Imports and Dependencies
 
 ---
@@ -24,174 +24,193 @@ The code is structured to provide a narrow functionality focused on HTTP and Web
 
 ---
 ### stop
-- **Type**: `int`
-- **Description**: The `stop` variable is a static volatile integer that is used as a flag to control the termination of the main loop in the program. It is initially set to 0 and is modified by the signal handler to 1 when a SIGINT signal is received, indicating that the program should stop running.
-- **Use**: The `stop` variable is used in the main loop to determine when to exit the loop and terminate the program.
+- **Type**: ``int``
+- **Description**: A static volatile integer variable that indicates whether the server should stop running. It is initialized to 0, meaning the server should continue running.
+- **Use**: Used in the main loop to determine when to exit the loop and stop the server, typically set to 1 by a signal handler when a termination signal is received.
 
 
 # Data Structures
 
 ---
 ### test\_http\_server
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `http`: A pointer to an fd_http_server_t structure, representing the HTTP server instance associated with this test server.
-- **Description**: The `test_http_server` structure is a simple data structure that encapsulates a pointer to an `fd_http_server_t` instance, which is used to manage and operate an HTTP server within the context of a test environment. This structure is primarily used to maintain the state of the HTTP server, allowing for operations such as handling requests, managing WebSocket connections, and broadcasting messages. It serves as a context holder for the server operations defined in the accompanying code.
+    - ``http``: A pointer to an `fd_http_server_t` instance, representing the HTTP server.
+- **Description**: Manages an HTTP server by holding a pointer to an `fd_http_server_t` instance, which is used to handle HTTP requests and responses.
 
 
 ---
 ### test\_http\_server\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `http`: A pointer to an fd_http_server_t structure, representing the HTTP server instance associated with this test HTTP server.
-- **Description**: The `test_http_server_t` structure is a simple wrapper around an `fd_http_server_t` pointer, used to manage and interact with an HTTP server instance in a test environment. It encapsulates the server instance, allowing for easy access and manipulation of the server's state and behavior during testing. This structure is primarily used to facilitate the handling of HTTP requests and WebSocket connections within the test server application.
+    - ``http``: A pointer to an `fd_http_server_t` instance.
+- **Description**: Encapsulates an HTTP server by holding a pointer to an `fd_http_server_t` instance, which manages HTTP server operations and interactions.
 
 
 # Functions
 
 ---
 ### signal\_handler<!-- {{#callable:signal_handler}} -->
-The `signal_handler` function sets a global stop flag when a signal is received.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L11>)
+
+Handles a signal by setting a stop flag to 1.
 - **Inputs**:
-    - `sig`: The signal number that triggered the handler, which is ignored in this function.
-- **Control Flow**:
-    - The function takes an integer `sig` as an argument, which represents the signal number.
-    - The function explicitly ignores the `sig` parameter by casting it to void.
-    - The global variable `stop` is set to 1, indicating that a stop condition has been triggered.
-- **Output**: The function does not return any value.
+    - `sig`: The signal number received by the handler, which is ignored in this function.
+- **Logic and Control Flow**:
+    - Casts the input signal number to void to indicate it is unused.
+    - Sets the global variable `stop` to 1, which is used to signal the program to stop running.
+- **Output**: No output is returned from this function.
 
 
 ---
 ### install\_signal\_handler<!-- {{#callable:install_signal_handler}} -->
-The `install_signal_handler` function sets up a signal handler for the SIGINT signal to gracefully handle interrupt requests.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L17>)
+
+Sets up a signal handler for `SIGINT` to allow graceful termination of the program.
 - **Inputs**: None
-- **Control Flow**:
-    - A `sigaction` structure `sa` is initialized with `signal_handler` as the handler function and no flags.
-    - The `sigaction` function is called to associate the SIGINT signal with the `sa` structure.
-    - If the `sigaction` call fails, an error message is logged using `FD_LOG_ERR`.
-- **Output**: The function does not return any value.
+- **Logic and Control Flow**:
+    - Defines a `sigaction` structure `sa` with `sa_handler` set to `signal_handler` and `sa_flags` set to 0.
+    - Calls `sigaction` to associate the `SIGINT` signal with the `signal_handler` function using the `sa` structure.
+    - Checks if `sigaction` fails using `FD_UNLIKELY`, and logs an error message with `FD_LOG_ERR` if it does.
+- **Output**: No output is returned.
 
 
 ---
 ### request<!-- {{#callable:request}} -->
-The `request` function processes HTTP server requests, handling GET requests with optional WebSocket upgrades and other methods by logging and responding with JSON data.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L34>)
+
+Processes HTTP server requests and generates appropriate responses based on the request method and headers.
 - **Inputs**:
-    - `request`: A pointer to a constant `fd_http_server_request_t` structure representing the incoming HTTP request, containing details such as method, path, headers, and context.
-- **Control Flow**:
-    - The function begins by casting the request's context to a `test_http_server_t` pointer named `state`.
-    - It logs the request details including connection ID, method, path, content type, and context.
-    - If the request method is GET, it checks if the request is a WebSocket upgrade.
-    - If it is a WebSocket upgrade, it returns a response with status 200, WebSocket upgrade flag set, and content type as 'application/json'.
-    - If it is not a WebSocket upgrade, it sends an HTML response with a 'Hello, world!' message and returns a response with status 200, no WebSocket upgrade, and content type as 'text/html'.
-    - For non-GET requests, it logs the request body to stdout, sends a JSON-RPC response, and returns a response with status 200, no WebSocket upgrade, and content type as 'application/json'.
-- **Output**: The function returns an `fd_http_server_response_t` structure representing the HTTP response, with fields for status, WebSocket upgrade flag, and content type.
-- **Functions called**:
-    - [`fd_http_server_method_str`](fd_http_server.c.md#fd_http_server_method_str)
-    - [`fd_http_server_printf`](fd_http_server.c.md#fd_http_server_printf)
-    - [`fd_http_server_stage_body`](fd_http_server.c.md#fd_http_server_stage_body)
+    - ``request``: A pointer to a `fd_http_server_request_t` structure containing details of the HTTP request, such as method, path, headers, and context.
+- **Logic and Control Flow**:
+    - Cast the `ctx` field of the `request` to a `test_http_server_t` pointer and store it in `state`.
+    - Log the request details including connection ID, method, path, content type, and context.
+    - Check if the request method is `FD_HTTP_SERVER_METHOD_GET`.
+    - If the method is GET and the `upgrade_websocket` header is true, create a response with status 200, set `upgrade_websocket` to 1, and content type to `application/json`, then return it.
+    - If the method is GET and `upgrade_websocket` is false, send an HTML response with a simple "Hello, world!" message, create a response with status 200, set `upgrade_websocket` to 0, and content type to `text/html`, then return it.
+    - If the method is not GET, write the request body to standard output, send a JSON-RPC response, create a response with status 200, set `upgrade_websocket` to 0, and content type to `application/json`, then return it.
+- **Output**: Returns a `fd_http_server_response_t` structure containing the HTTP response details, such as status, upgrade_websocket flag, and content type.
+- **Functions Called**:
+    - [`fd_http_server_method_str`](<fd_http_server.c.md#fd_http_server_method_str>)
+    - [`fd_http_server_printf`](<fd_http_server.c.md#fd_http_server_printf>)
+    - [`fd_http_server_stage_body`](<fd_http_server.c.md#fd_http_server_stage_body>)
 
 
 ---
 ### http\_close<!-- {{#callable:http_close}} -->
-The `http_close` function logs a notice message indicating the closure of an HTTP connection with its ID, reason, and context.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L79>)
+
+Logs the closure of an HTTP connection with its ID, reason, and context.
 - **Inputs**:
-    - `conn_id`: The unique identifier for the HTTP connection being closed.
-    - `reason`: An integer representing the reason for the connection closure.
-    - `ctx`: A pointer to a context object associated with the connection.
-- **Control Flow**:
-    - The function logs a notice message using the `FD_LOG_NOTICE` macro.
-    - The log message includes the connection ID, a string representation of the closure reason obtained from `fd_http_server_connection_close_reason_str(reason)`, and the context pointer cast to an unsigned long.
-- **Output**: The function does not return any value; it performs logging as a side effect.
-- **Functions called**:
-    - [`fd_http_server_connection_close_reason_str`](fd_http_server.c.md#fd_http_server_connection_close_reason_str)
+    - `conn_id`: The unique identifier for the HTTP connection to close.
+    - `reason`: The reason code for closing the connection.
+    - `ctx`: A pointer to the context associated with the connection.
+- **Logic and Control Flow**:
+    - Logs a notice message indicating the closure of an HTTP connection.
+    - Uses the `FD_LOG_NOTICE` macro to format and output the log message.
+    - Includes the connection ID, the string representation of the reason, and the context in the log message.
+- **Output**: No return value; the function performs logging as a side effect.
+- **Functions Called**:
+    - [`fd_http_server_connection_close_reason_str`](<fd_http_server.c.md#fd_http_server_connection_close_reason_str>)
 
 
 ---
 ### ws\_open<!-- {{#callable:ws_open}} -->
-The `ws_open` function logs a notice message indicating that a WebSocket connection has been opened, including the connection ID and context.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L86>)
+
+Logs a notice message when a WebSocket connection opens.
 - **Inputs**:
-    - `ws_conn_id`: An unsigned long integer representing the WebSocket connection ID.
-    - `ctx`: A pointer to a context object associated with the WebSocket connection.
-- **Control Flow**:
-    - The function logs a notice message using the `FD_LOG_NOTICE` macro.
-    - The log message includes the WebSocket connection ID and the context pointer, formatted as hexadecimal.
-- **Output**: The function does not return any value; it is a void function.
+    - ``ws_conn_id``: The unique identifier for the WebSocket connection.
+    - ``ctx``: A pointer to the context associated with the WebSocket connection.
+- **Logic and Control Flow**:
+    - Logs a notice message using `FD_LOG_NOTICE` with the WebSocket connection ID and context pointer.
+- **Output**: No output is returned as the function is of type `void`.
 
 
 ---
 ### ws\_close<!-- {{#callable:ws_close}} -->
-The `ws_close` function logs a notice message when a WebSocket connection is closed, including the connection ID, reason for closure, and context.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L92>)
+
+Logs a WebSocket connection closure event with the connection ID, reason, and context.
 - **Inputs**:
-    - `ws_conn_id`: The unique identifier for the WebSocket connection that is being closed.
-    - `reason`: An integer representing the reason for the WebSocket connection closure.
-    - `ctx`: A pointer to a context object associated with the WebSocket connection.
-- **Control Flow**:
-    - The function logs a notice message using the `FD_LOG_NOTICE` macro.
-    - The log message includes the WebSocket connection ID, a string representation of the closure reason obtained from `fd_http_server_connection_close_reason_str(reason)`, and the context pointer cast to an unsigned long.
-- **Output**: The function does not return any value; it performs logging as a side effect.
-- **Functions called**:
-    - [`fd_http_server_connection_close_reason_str`](fd_http_server.c.md#fd_http_server_connection_close_reason_str)
+    - `ws_conn_id`: The unique identifier for the WebSocket connection.
+    - `reason`: The reason code for closing the WebSocket connection.
+    - `ctx`: A pointer to the context associated with the WebSocket connection.
+- **Logic and Control Flow**:
+    - Logs a notice message using `FD_LOG_NOTICE` with the WebSocket connection ID, the string representation of the reason for closure, and the context pointer.
+    - Uses [`fd_http_server_connection_close_reason_str`](<fd_http_server.c.md#fd_http_server_connection_close_reason_str>) to convert the reason code into a human-readable string.
+- **Output**: No return value; the function performs logging as a side effect.
+- **Functions Called**:
+    - [`fd_http_server_connection_close_reason_str`](<fd_http_server.c.md#fd_http_server_connection_close_reason_str>)
 
 
 ---
 ### ws\_message<!-- {{#callable:ws_message}} -->
-The `ws_message` function logs a WebSocket message and writes the message data to the standard output.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L99>)
+
+Logs a WebSocket message and writes it to the standard output.
 - **Inputs**:
-    - `ws_conn_id`: The unique identifier for the WebSocket connection.
+    - `ws_conn_id`: The WebSocket connection identifier.
     - `data`: A pointer to the data received in the WebSocket message.
-    - `data_len`: The length of the data received in the WebSocket message.
-    - `ctx`: A context pointer that can be used to pass additional information.
-- **Control Flow**:
-    - Log the WebSocket connection ID and context using `FD_LOG_NOTICE`.
-    - Write the string '>>>' to the standard output to indicate the start of the message.
-    - Write the WebSocket message data to the standard output using `fwrite`.
-    - Print the string '<<<' followed by a newline to the standard output to indicate the end of the message.
-- **Output**: This function does not return any value; it performs logging and output operations.
+    - `data_len`: The length of the data received.
+    - `ctx`: A context pointer, typically used to pass additional information.
+- **Logic and Control Flow**:
+    - Logs the WebSocket connection ID and context using `FD_LOG_NOTICE`.
+    - Writes the string '>>>' to the standard output.
+    - Writes the received data to the standard output using `fwrite`.
+    - Writes the string '<<<\n' to the standard output.
+- **Output**: No return value; the function performs logging and output operations.
 
 
 ---
 ### ws\_send\_all<!-- {{#callable:ws_send_all}} -->
-The `ws_send_all` function sends a predefined JSON-RPC response to all connected WebSocket clients and verifies the broadcast operation's success.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L110>)
+
+Sends a JSON-RPC response to all connected WebSocket clients and verifies the broadcast operation.
 - **Inputs**:
-    - `http`: A pointer to an `fd_http_server_t` structure representing the HTTP server context.
-- **Control Flow**:
-    - The function calls [`fd_http_server_printf`](fd_http_server.c.md#fd_http_server_printf) to send a JSON-RPC response with a result of 0 and an id of 1 to the HTTP server context.
-    - It then calls [`fd_http_server_ws_broadcast`](fd_http_server.c.md#fd_http_server_ws_broadcast) to broadcast this message to all connected WebSocket clients.
-    - The function uses `FD_TEST` to assert that the broadcast operation was successful, ensuring no errors occurred.
-- **Output**: The function does not return a value; it performs operations on the provided HTTP server context.
-- **Functions called**:
-    - [`fd_http_server_printf`](fd_http_server.c.md#fd_http_server_printf)
-    - [`fd_http_server_ws_broadcast`](fd_http_server.c.md#fd_http_server_ws_broadcast)
+    - `http`: A pointer to an `fd_http_server_t` structure representing the HTTP server instance.
+- **Logic and Control Flow**:
+    - Calls [`fd_http_server_printf`](<fd_http_server.c.md#fd_http_server_printf>) to send a JSON-RPC response with a result of 0 and an ID of 1 to the HTTP server.
+    - Uses `FD_TEST` to assert that [`fd_http_server_ws_broadcast`](<fd_http_server.c.md#fd_http_server_ws_broadcast>) returns a non-error value, indicating successful broadcast to all WebSocket clients.
+- **Output**: No return value; the function performs actions on the HTTP server instance.
+- **Functions Called**:
+    - [`fd_http_server_printf`](<fd_http_server.c.md#fd_http_server_printf>)
+    - [`fd_http_server_ws_broadcast`](<fd_http_server.c.md#fd_http_server_ws_broadcast>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and runs an HTTP server with WebSocket support, handling requests and connections until a termination signal is received.
+[View Source →](<../../../../../src/waltz/http/test_live_http_server.c#L116>)
+
+Initializes and runs an HTTP server with WebSocket support, handling requests and managing server lifecycle.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the application with `fd_boot` using the command-line arguments.
-    - Define server parameters and callback functions for handling HTTP requests and WebSocket events.
-    - Create and join a new HTTP server instance with the specified parameters and callbacks.
-    - Start listening for incoming connections on port 4321.
-    - Install a signal handler to gracefully handle termination signals (e.g., SIGINT).
-    - Enter a loop that continues until a termination signal is received, polling the server for events.
-    - Periodically send WebSocket messages to all connected clients every second.
-    - Upon receiving a termination signal, clean up by deleting and freeing the server resources.
-    - Log a notice indicating successful termination and halt the application.
-- **Output**: The function returns an integer status code, 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_http_server_join`](fd_http_server.c.md#fd_http_server_join)
-    - [`fd_http_server_new`](fd_http_server.c.md#fd_http_server_new)
-    - [`fd_http_server_align`](fd_http_server.c.md#fd_http_server_align)
-    - [`fd_http_server_footprint`](fd_http_server.c.md#fd_http_server_footprint)
-    - [`fd_http_server_listen`](fd_http_server.c.md#fd_http_server_listen)
-    - [`install_signal_handler`](#install_signal_handler)
-    - [`fd_http_server_poll`](fd_http_server.c.md#fd_http_server_poll)
-    - [`ws_send_all`](#ws_send_all)
-    - [`fd_http_server_delete`](fd_http_server.c.md#fd_http_server_delete)
-    - [`fd_http_server_leave`](fd_http_server.c.md#fd_http_server_leave)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Defines `fd_http_server_params_t` with server parameters such as maximum connections and buffer sizes.
+    - Defines `fd_http_server_callbacks_t` with callback functions for handling HTTP requests and WebSocket events.
+    - Creates and joins a new HTTP server instance using [`fd_http_server_new`](<fd_http_server.c.md#fd_http_server_new>) and [`fd_http_server_join`](<fd_http_server.c.md#fd_http_server_join>).
+    - Starts listening on port 4321 using [`fd_http_server_listen`](<fd_http_server.c.md#fd_http_server_listen>).
+    - Logs a notice to run a test script `test_http_server.py`.
+    - Installs a signal handler to handle `SIGINT` for graceful shutdown.
+    - Enters a loop that continues until `stop` is set to 1 by the signal handler.
+    - Within the loop, polls the HTTP server for events using [`fd_http_server_poll`](<fd_http_server.c.md#fd_http_server_poll>).
+    - Checks if one second has passed since the last WebSocket broadcast and sends a message to all WebSocket clients if true.
+    - Frees resources by deleting and leaving the HTTP server instance when the loop exits.
+    - Logs a notice indicating successful execution and calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_http_server_join`](<fd_http_server.c.md#fd_http_server_join>)
+    - [`fd_http_server_new`](<fd_http_server.c.md#fd_http_server_new>)
+    - [`fd_http_server_align`](<fd_http_server.c.md#fd_http_server_align>)
+    - [`fd_http_server_footprint`](<fd_http_server.c.md#fd_http_server_footprint>)
+    - [`fd_http_server_listen`](<fd_http_server.c.md#fd_http_server_listen>)
+    - [`install_signal_handler`](<#install_signal_handler>)
+    - [`fd_http_server_poll`](<fd_http_server.c.md#fd_http_server_poll>)
+    - [`ws_send_all`](<#ws_send_all>)
+    - [`fd_http_server_delete`](<fd_http_server.c.md#fd_http_server_delete>)
+    - [`fd_http_server_leave`](<fd_http_server.c.md#fd_http_server_leave>)
 
 
 
