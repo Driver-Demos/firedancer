@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp policy for managing and logging Firedancer child processes within a PID namespace.
+The `pidns.seccomppolicy` file defines the security policy for the child process in a PID namespace responsible for launching and managing Firedancer tiles, including logging and process supervision.
 
 # Purpose
-The configuration file defines policies for managing the boot process of Firedancer, specifically focusing on the child process that launches tiles within a PID namespace. It specifies logging behavior, where log messages are written to a file and/or STDERR, with 'WARNING' level messages and above being immediately synchronized to disk. The file also outlines the supervision of child tile processes, using `poll()` to detect process exits and `wait4()` to retrieve exit statuses, ensuring that if any child process exits, the entire process group is terminated with a diagnostic message. The configuration ensures that the system handles process exits efficiently, maintaining the integrity of the Firedancer environment.
+The provided content is a configuration file that outlines the policies and behaviors for managing processes within the Firedancer software, specifically focusing on the child process that launches tiles. This file details how logging is handled, specifying that log messages are written to a file and/or STDERR, with critical messages being immediately synchronized to disk. It also describes the supervision of child processes, using polling mechanisms to detect process exits and ensuring that if any child process exits, the entire process group is terminated with a diagnostic message. The configuration ensures that the parent process waits for exit statuses of child processes to manage the termination sequence effectively. This setup is crucial for maintaining the integrity and orderly shutdown of the Firedancer system when processes terminate unexpectedly.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

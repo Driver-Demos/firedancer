@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Primitives for saturating math operations on various data types, mimicking Rust's behavior.
+The `fd_sat.h` file in the `firedancer` codebase provides a set of primitives for performing saturating arithmetic operations on various data types, mimicking Rust's saturating operations to prevent overflow and underflow.
 
 # Purpose
-The code defines a set of functions for performing saturating arithmetic operations on various data types, including `__uint128_t`, `ulong`, `long`, `uint`, and `double`. Saturating arithmetic operations ensure that the result of an operation does not overflow or underflow beyond the limits of the data type. Instead, the result is clamped to the maximum or minimum value of the data type. This behavior is similar to Rust's saturating arithmetic operations. The code provides functions for addition, subtraction, and multiplication for each data type, except for `fd_long_sat_mul`, which is not implemented.
+This C header file, `fd_sat.h`, provides a collection of functions for performing saturating arithmetic operations on various data types, including `__uint128_t`, `ulong`, `long`, `uint`, and `double`. Saturating arithmetic operations are designed to handle overflow and underflow by capping the result at the maximum or minimum value representable by the data type, rather than wrapping around. This file defines functions for addition, subtraction, and multiplication, mimicking the behavior of Rust's saturating operations. The functions utilize built-in overflow detection mechanisms provided by the compiler, such as `__builtin_uaddl_overflow` and `__builtin_saddl_overflow`, to determine if an overflow has occurred and adjust the result accordingly.
 
-The header file is intended to be included in other C source files, providing a consistent interface for saturating arithmetic operations across a codebase. The functions use built-in overflow detection mechanisms, such as `__builtin_uaddl_overflow`, to determine if an overflow occurs and adjust the result accordingly. The code also includes placeholder implementations for `double` operations, indicating that further specification or optimization may be needed. The use of conditional compilation with `FD_HAS_INT128` allows for optional support of 128-bit integer operations, depending on the platform's capabilities.
+The file is structured to be included in other C source files, providing a reusable API for saturating arithmetic operations. It includes conditional compilation to support 128-bit integers if available, and it uses inline functions to ensure efficient execution. The header file is part of a larger codebase, as indicated by the inclusion of `fd_bits.h` and the use of macros like `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END`, which suggest a standardized way of defining function prototypes. The file also includes placeholders for future optimization and hardening, indicating that the current implementations are preliminary and may be improved over time.
 # Imports and Dependencies
 
 ---
@@ -19,209 +19,184 @@ The header file is intended to be included in other C source files, providing a 
 
 ---
 ### fd\_uint128\_sat\_add<!-- {{#callable:__uint128_t::fd_uint128_sat_add}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L20>)
-
-Performs a saturating addition of two 128-bit unsigned integers, returning the maximum value if overflow occurs.
+The `fd_uint128_sat_add` function performs a saturating addition of two 128-bit unsigned integers, returning the maximum possible value if an overflow occurs.
 - **Inputs**:
-    - `x`: The first 128-bit unsigned integer to add.
-    - `y`: The second 128-bit unsigned integer to add.
-- **Logic and Control Flow**:
-    - Calculate the sum of `x` and `y` and store it in `res`.
-    - Check if the result `res` is less than `x`, indicating an overflow.
-    - If overflow is detected, return `UINT128_MAX`; otherwise, return `res`.
-- **Output**: Returns the result of the addition, or `UINT128_MAX` if the addition overflows.
+    - `x`: The first operand, a 128-bit unsigned integer.
+    - `y`: The second operand, a 128-bit unsigned integer.
+- **Control Flow**:
+    - Calculate the sum of x and y, storing the result in res.
+    - Check if the result is less than x, which indicates an overflow has occurred.
+    - If an overflow is detected, return UINT128_MAX; otherwise, return the calculated result.
+- **Output**: The function returns the sum of x and y as a 128-bit unsigned integer, or UINT128_MAX if the addition overflows.
 
 
 ---
 ### fd\_uint128\_sat\_mul<!-- {{#callable:__uint128_t::fd_uint128_sat_mul}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L26>)
-
-Performs multiplication of two 128-bit unsigned integers with saturation to prevent overflow.
+The `fd_uint128_sat_mul` function performs a saturating multiplication of two 128-bit unsigned integers, returning the maximum possible value if an overflow occurs.
 - **Inputs**:
-    - `x`: The first 128-bit unsigned integer operand.
-    - `y`: The second 128-bit unsigned integer operand.
-- **Logic and Control Flow**:
-    - Calculate the product of `x` and `y` and store it in `res`.
-    - Check for overflow by verifying if `x` and `y` are non-zero and if `res` is less than either `x` or `y`, or if dividing `res` by `x` does not equal `y`.
-    - If overflow is detected, return `UINT128_MAX`; otherwise, return `res`.
-- **Output**: Returns the product of `x` and `y` if no overflow occurs; otherwise, returns `UINT128_MAX` to indicate saturation.
+    - `x`: The first operand, a 128-bit unsigned integer.
+    - `y`: The second operand, a 128-bit unsigned integer.
+- **Control Flow**:
+    - Calculate the product of x and y, storing the result in res.
+    - Determine if an overflow occurred by checking if both x and y are non-zero and if res is less than either x or y, or if dividing res by x does not yield y.
+    - Use the fd_uint128_if function to return UINT128_MAX if an overflow is detected, otherwise return the calculated product res.
+- **Output**: The function returns a 128-bit unsigned integer, which is either the product of x and y or UINT128_MAX if an overflow is detected.
 
 
 ---
 ### fd\_uint128\_sat\_sub<!-- {{#callable:__uint128_t::fd_uint128_sat_sub}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L33>)
-
-Performs a saturating subtraction of two 128-bit unsigned integers, returning zero if the result would be negative.
+The `fd_uint128_sat_sub` function performs a saturating subtraction of two 128-bit unsigned integers, returning zero if the result would be negative.
 - **Inputs**:
     - `x`: The minuend, a 128-bit unsigned integer.
     - `y`: The subtrahend, a 128-bit unsigned integer.
-- **Logic and Control Flow**:
+- **Control Flow**:
     - Calculate the result of subtracting `y` from `x` and store it in `res`.
     - Check if `res` is greater than `x`, which indicates an underflow occurred.
     - If underflow is detected, return 0; otherwise, return `res`.
-- **Output**: Returns the result of the subtraction if no underflow occurs; otherwise, returns 0.
+- **Output**: The function returns the result of the subtraction if no underflow occurs; otherwise, it returns 0.
 
 
 ---
 ### fd\_ulong\_sat\_add<!-- {{#callable:fd_ulong_sat_add}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L41>)
-
-Performs saturating addition on two unsigned long integers, returning the maximum value if overflow occurs.
+The `fd_ulong_sat_add` function performs a saturating addition of two unsigned long integers, returning the maximum possible value if an overflow occurs.
 - **Inputs**:
-    - `x`: The first unsigned long integer to add.
-    - `y`: The second unsigned long integer to add.
-- **Logic and Control Flow**:
+    - `x`: The first unsigned long integer to be added.
+    - `y`: The second unsigned long integer to be added.
+- **Control Flow**:
     - Declare a variable `res` to store the result of the addition.
-    - Use the built-in function `__builtin_uaddl_overflow` to add `x` and `y`, storing the result in `res` and checking for overflow, which is indicated by the variable `cf`.
-    - If overflow occurs (`cf` is non-zero), return `ULONG_MAX`; otherwise, return the result `res`.
-- **Output**: Returns the result of the addition if no overflow occurs; otherwise, returns `ULONG_MAX`.
+    - Use the `__builtin_uaddl_overflow` function to add `x` and `y`, storing the result in `res` and checking for overflow, which is indicated by the return value `cf`.
+    - If `cf` is true (indicating an overflow), return `ULONG_MAX`; otherwise, return the result `res`.
+- **Output**: The function returns the result of adding `x` and `y`, or `ULONG_MAX` if the addition overflows.
 
 
 ---
 ### fd\_ulong\_sat\_mul<!-- {{#callable:fd_ulong_sat_mul}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L48>)
-
-Performs multiplication of two unsigned long integers with saturation at the maximum value if overflow occurs.
+The `fd_ulong_sat_mul` function performs a multiplication of two unsigned long integers and returns the result, saturating to `ULONG_MAX` if an overflow occurs.
 - **Inputs**:
-    - `x`: The first unsigned long integer to multiply.
-    - `y`: The second unsigned long integer to multiply.
-- **Logic and Control Flow**:
-    - Declare a variable `res` to store the result of the multiplication.
-    - Use the `__builtin_umull_overflow` function to multiply `x` and `y`, storing the result in `res` and checking for overflow, which sets `cf` to a non-zero value if overflow occurs.
-    - Return the result of `fd_ulong_if`, which returns `ULONG_MAX` if `cf` is non-zero (indicating overflow), otherwise returns `res`.
-- **Output**: Returns the product of `x` and `y`, or `ULONG_MAX` if the multiplication overflows.
+    - `x`: The first unsigned long integer to be multiplied.
+    - `y`: The second unsigned long integer to be multiplied.
+- **Control Flow**:
+    - The function attempts to multiply `x` and `y` using the `__builtin_umull_overflow` intrinsic, which checks for overflow and stores the result in `res`.
+    - If an overflow is detected (`cf` is non-zero), the function returns `ULONG_MAX`.
+    - If no overflow occurs, the function returns the computed result `res`.
+- **Output**: The function returns the product of `x` and `y`, or `ULONG_MAX` if the multiplication overflows.
 
 
 ---
 ### fd\_ulong\_sat\_sub<!-- {{#callable:fd_ulong_sat_sub}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L55>)
-
-Performs a saturating subtraction of two unsigned long integers, returning zero if an underflow occurs.
+The `fd_ulong_sat_sub` function performs a saturating subtraction of two unsigned long integers, returning zero if an underflow occurs.
 - **Inputs**:
     - `x`: The minuend, an unsigned long integer.
     - `y`: The subtrahend, an unsigned long integer.
-- **Logic and Control Flow**:
+- **Control Flow**:
     - Declare a variable `res` to store the result of the subtraction.
-    - Use the `__builtin_usubl_overflow` function to subtract `y` from `x`, storing the result in `res` and checking for underflow.
-    - If underflow occurs (`cf` is non-zero), return 0UL; otherwise, return the result `res`.
-- **Output**: An unsigned long integer representing the result of the subtraction, or zero if underflow occurs.
+    - Use the `__builtin_usubl_overflow` function to perform the subtraction of `x` and `y`, storing the result in `res` and checking for underflow, which sets `cf` to a non-zero value if underflow occurs.
+    - Return the result of `fd_ulong_if`, which returns `0UL` if `cf` is non-zero (indicating underflow), otherwise returns `res`.
+- **Output**: The function returns the result of the subtraction if no underflow occurs, otherwise it returns zero.
 
 
 ---
 ### fd\_long\_sat\_add<!-- {{#callable:fd_long_sat_add}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L62>)
-
-Performs a saturating addition of two long integers, returning the maximum or minimum value if overflow occurs.
+The `fd_long_sat_add` function performs a saturating addition of two long integers, ensuring the result does not overflow.
 - **Inputs**:
-    - `x`: The first operand of type `long`.
-    - `y`: The second operand of type `long`.
-- **Logic and Control Flow**:
+    - `x`: The first operand of type long for the addition.
+    - `y`: The second operand of type long for the addition.
+- **Control Flow**:
     - Declare a variable `res` to store the result of the addition.
-    - Use `__builtin_saddl_overflow` to perform the addition of `x` and `y`, storing the result in `res` and checking for overflow, which sets `cf` to a non-zero value if overflow occurs.
-    - If overflow is detected (`cf` is non-zero), determine the result based on the sign of `x` by shifting `x` right by 63 bits and adding `LONG_MAX` to it.
-    - Return the result of the addition if no overflow occurs, or the calculated saturated value if overflow occurs.
-- **Output**: Returns the result of the saturating addition as a `long` integer.
+    - Use the `__builtin_saddl_overflow` function to perform the addition of `x` and `y`, storing the result in `res` and checking for overflow, which is indicated by the variable `cf`.
+    - If an overflow occurs (`cf` is true), determine the result based on the sign of `x` using a bitwise trick, returning either `LONG_MAX` or `LONG_MIN` to saturate the result.
+    - If no overflow occurs, return the computed result `res`.
+- **Output**: The function returns a long integer which is the result of the saturating addition of `x` and `y`, capped at `LONG_MAX` or `LONG_MIN` in case of overflow.
 
 
 ---
 ### fd\_long\_sat\_sub<!-- {{#callable:fd_long_sat_sub}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L74>)
-
-Performs a saturating subtraction of two long integers, returning the result or the maximum/minimum long value if overflow occurs.
+The `fd_long_sat_sub` function performs a saturating subtraction of two long integers, ensuring the result does not overflow or underflow.
 - **Inputs**:
-    - `x`: The minuend, a long integer.
-    - `y`: The subtrahend, a long integer.
-- **Logic and Control Flow**:
-    - Declare a variable `res` to store the result of the subtraction.
-    - Use `__builtin_ssubl_overflow` to subtract `y` from `x`, storing the result in `res` and checking for overflow, which sets `cf`.
-    - If overflow occurs (`cf` is non-zero), determine the result based on the sign of `x` by shifting `x` right by 63 bits and adding `LONG_MAX`.
-    - If no overflow occurs, return `res`.
-- **Output**: Returns the result of the subtraction if no overflow occurs; otherwise, returns the maximum or minimum long value based on the sign of `x`.
+    - `x`: The minuend, a long integer from which another long integer is to be subtracted.
+    - `y`: The subtrahend, a long integer to be subtracted from the minuend.
+- **Control Flow**:
+    - The function uses the GCC built-in function `__builtin_ssubl_overflow` to perform the subtraction and check for overflow, storing the result in `res` and the overflow flag in `cf`.
+    - If an overflow is detected (`cf` is non-zero), the function returns a saturated value based on the sign of `x`, calculated as `(long)((ulong)x >> 63) + LONG_MAX`.
+    - If no overflow is detected, the function returns the result of the subtraction stored in `res`.
+- **Output**: The function returns a long integer which is the result of the saturating subtraction of `x` and `y`, ensuring it does not exceed the limits of the long integer type.
 
 
 ---
 ### fd\_uint\_sat\_add<!-- {{#callable:fd_uint_sat_add}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L83>)
-
-Performs saturating addition on two unsigned integers, returning the maximum value if overflow occurs.
+The `fd_uint_sat_add` function performs a saturating addition of two unsigned integers, returning the maximum possible value if an overflow occurs.
 - **Inputs**:
-    - `x`: The first unsigned integer to add.
-    - `y`: The second unsigned integer to add.
-- **Logic and Control Flow**:
-    - Declare a variable `res` to store the result of the addition.
-    - Use the built-in function `__builtin_uadd_overflow` to add `x` and `y`, storing the result in `res` and checking for overflow.
-    - If overflow occurs (`cf` is true), return `UINT_MAX`; otherwise, return `res`.
-- **Output**: Returns the result of the addition, or `UINT_MAX` if overflow occurs.
+    - `x`: The first unsigned integer operand for the addition.
+    - `y`: The second unsigned integer operand for the addition.
+- **Control Flow**:
+    - The function attempts to add the two unsigned integers `x` and `y` using the `__builtin_uadd_overflow` intrinsic, which checks for overflow and stores the result in `res`.
+    - If an overflow is detected (indicated by `cf` being non-zero), the function returns `UINT_MAX`, the maximum value for an unsigned integer.
+    - If no overflow occurs, the function returns the result of the addition stored in `res`.
+- **Output**: The function returns the result of the addition if no overflow occurs, otherwise it returns `UINT_MAX`.
 
 
 ---
 ### fd\_uint\_sat\_mul<!-- {{#callable:fd_uint_sat_mul}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L90>)
-
-Performs multiplication of two unsigned integers with saturation at the maximum value if overflow occurs.
+The `fd_uint_sat_mul` function performs a saturating multiplication of two unsigned integers, returning the maximum unsigned integer value if an overflow occurs.
 - **Inputs**:
     - `x`: The first unsigned integer operand for multiplication.
     - `y`: The second unsigned integer operand for multiplication.
-- **Logic and Control Flow**:
-    - Declare a variable `res` to store the result of the multiplication.
-    - Use the `__builtin_umul_overflow` function to multiply `x` and `y`, storing the result in `res` and checking for overflow.
-    - If overflow occurs, `cf` is set to a non-zero value; otherwise, it is zero.
-    - Return `UINT_MAX` if overflow occurred, otherwise return the result `res`.
-- **Output**: Returns the product of `x` and `y` if no overflow occurs; otherwise, returns `UINT_MAX`.
+- **Control Flow**:
+    - The function attempts to multiply `x` and `y` using the `__builtin_umul_overflow` intrinsic, which checks for overflow and stores the result in `res`.
+    - If an overflow is detected (`cf` is non-zero), the function returns `UINT_MAX`.
+    - If no overflow occurs, the function returns the result of the multiplication stored in `res`.
+- **Output**: The function returns the product of `x` and `y` if no overflow occurs, otherwise it returns `UINT_MAX` to indicate saturation.
 
 
 ---
 ### fd\_uint\_sat\_sub<!-- {{#callable:fd_uint_sat_sub}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L97>)
-
-Performs saturating subtraction on two unsigned integers, returning zero if an underflow occurs.
+The `fd_uint_sat_sub` function performs a saturating subtraction of two unsigned integers, returning zero if an underflow occurs.
 - **Inputs**:
-    - `x`: The minuend, an unsigned integer.
-    - `y`: The subtrahend, an unsigned integer.
-- **Logic and Control Flow**:
-    - Use `__builtin_usub_overflow` to subtract `y` from `x` and store the result in `res`, while checking for underflow.
-    - If underflow occurs (`cf` is true), return 0.
-    - If no underflow occurs, return the result `res`.
-- **Output**: An unsigned integer representing the result of the subtraction, or zero if underflow occurs.
+    - `x`: The minuend, an unsigned integer from which another unsigned integer is to be subtracted.
+    - `y`: The subtrahend, an unsigned integer to be subtracted from the minuend.
+- **Control Flow**:
+    - The function uses the GCC built-in function `__builtin_usub_overflow` to attempt the subtraction of `y` from `x`, storing the result in `res` and setting `cf` to indicate if an underflow occurred.
+    - If `cf` is true (indicating an underflow), the function returns 0; otherwise, it returns the result of the subtraction `res`.
+- **Output**: The function returns the result of the subtraction if no underflow occurs, otherwise it returns 0.
 
 
 ---
 ### fd\_double\_sat\_add<!-- {{#callable:fd_double_sat_add}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L104>)
-
-Performs addition of two double precision floating-point numbers without handling overflow or underflow.
+The `fd_double_sat_add` function performs addition on two double-precision floating-point numbers without implementing any saturation logic.
 - **Inputs**:
-    - `x`: The first double precision floating-point number to add.
-    - `y`: The second double precision floating-point number to add.
-- **Logic and Control Flow**:
-    - Adds the two input double precision floating-point numbers `x` and `y`.
-- **Output**: Returns the result of adding `x` and `y` as a double precision floating-point number.
+    - `x`: The first double-precision floating-point number to be added.
+    - `y`: The second double-precision floating-point number to be added.
+- **Control Flow**:
+    - The function takes two double arguments, `x` and `y`.
+    - It computes the sum of `x` and `y` using the `+` operator.
+    - The result of the addition is returned directly without any checks for overflow or saturation.
+- **Output**: The function returns the sum of the two input double-precision floating-point numbers.
 
 
 ---
 ### fd\_double\_sat\_mul<!-- {{#callable:fd_double_sat_mul}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L110>)
-
-Multiplies two double precision floating-point numbers without implementing saturation logic.
+The `fd_double_sat_mul` function performs a multiplication of two double precision floating-point numbers without implementing any saturation logic.
 - **Inputs**:
-    - `x`: The first double precision floating-point number to multiply.
-    - `y`: The second double precision floating-point number to multiply.
-- **Logic and Control Flow**:
-    - Calculates the product of `x` and `y` using the multiplication operator `*`.
-- **Output**: Returns the product of `x` and `y` as a double precision floating-point number.
+    - `x`: The first double precision floating-point number to be multiplied.
+    - `y`: The second double precision floating-point number to be multiplied.
+- **Control Flow**:
+    - The function takes two double precision floating-point numbers as input.
+    - It multiplies the two input numbers together using the `*` operator.
+    - The result of the multiplication is returned directly without any additional checks or logic.
+- **Output**: The function returns the product of the two input double precision floating-point numbers as a double.
 
 
 ---
 ### fd\_double\_sat\_sub<!-- {{#callable:fd_double_sat_sub}} -->
-[View Source →](<../../../../../src/util/bits/fd_sat.h#L116>)
-
-Subtracts two double precision floating-point numbers without handling overflow or underflow.
+The `fd_double_sat_sub` function performs a subtraction of two double precision floating-point numbers without implementing any saturation logic.
 - **Inputs**:
     - `x`: The minuend, a double precision floating-point number.
     - `y`: The subtrahend, a double precision floating-point number.
-- **Logic and Control Flow**:
-    - Subtracts `y` from `x`.
-- **Output**: The result of the subtraction `x - y`, as a double precision floating-point number.
+- **Control Flow**:
+    - The function takes two double precision floating-point numbers as input.
+    - It calculates the result of subtracting the second number (y) from the first number (x).
+    - The function returns the result of the subtraction without any additional checks or saturation logic.
+- **Output**: The function returns the result of the subtraction as a double precision floating-point number.
 
 
 
