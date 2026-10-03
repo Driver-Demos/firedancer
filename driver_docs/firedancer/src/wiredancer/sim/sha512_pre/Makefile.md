@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/wiredancer/sim/sha512_pre` directory is used to configure and run simulations for the `sha512_pre` module using the Questa simulator with Verilog sources.
+Makefile for simulating the `sha512_pre` module using Verilog sources and Cocotb.
 
 # Purpose
-The provided Makefile is used to automate the simulation process of a hardware design, specifically for a module named "test" using the Questa simulator. It sets up various environment variables and paths necessary for the simulation, such as the directory for RTL (Register Transfer Level) files and the top-level module, which is "sha512_pre". The file specifies the language for the top-level module as Verilog and lists several Verilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files. Additionally, it includes a Makefile from the cocotb framework, which is a coroutine-based co-simulation library for writing testbenches in Python, to facilitate the simulation process.
+The `Makefile` is used to automate the build process for a simulation environment. It defines several variables and paths necessary for compiling and simulating Verilog code. The `SIM` variable specifies the simulator to use, defaulting to `questa`, while `MODULE` and `TOPLEVEL` define the test module and top-level module, respectively. The `VERILOG_SOURCES` variable lists the source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files located in the `RTL_DIR`. The file also includes additional makefile configurations from `cocotb-config`, which are necessary for integrating with the cocotb testing framework.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

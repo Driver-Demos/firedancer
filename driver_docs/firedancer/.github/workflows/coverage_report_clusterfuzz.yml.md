@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for ClusterFuzz-based fuzz coverage reporting and Codecov upload.
+GitHub Actions workflow for generating and uploading a daily coverage report using the ClusterFuzz corpus.
 
 # Purpose
-This workflow defines a reusable GitHub Actions job that builds and runs fuzz coverage collection with the ClusterFuzz corpus. It checks out the repository with submodules, installs the required development dependencies, authenticates to Google Cloud with the `FUZZ_SERVICE_ACCT_JSON_BUNDLE` secret, and builds the `fuzz-test` target. The workflow then replaces the local corpus with the ClusterFuzz corpus by running `contrib/test/fetch_clusterfuzz_corpus.sh`, executes the fuzz test, and generates an LCOV coverage file at `build/linux/clang/haswell/cov/cov.lcov`. The final step uploads the coverage report to Codecov with the `clusterfuzz` flag and the `CODECOV_TOKEN` secret.
+The configuration file defines a GitHub Actions workflow named `Coverage Report (ClusterFuzz)`. This workflow generates a coverage report using the ClusterFuzz corpus, which is a set of test cases that ClusterFuzz has identified. The workflow is triggered by a `workflow_call` event and runs on the `ubuntu-latest` environment. It sets up the environment with specific machine and tool configurations, checks out the repository, and authenticates with Google Cloud using credentials stored in a secret. The workflow builds the project, replaces the corpus directory with data from ClusterFuzz, and generates a fuzz coverage report. Finally, it uploads the coverage report to CodeCov, using a token stored in a secret, to facilitate code coverage analysis.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-fuzz.mk` file in the `firedancer` codebase configures build settings for fuzz testing, including compiler and linker flags for sanitization and coverage.
+Makefile settings for fuzz testing with specific compiler and linker flags.
 
 # Purpose
-This Makefile snippet is configuring a build process for a software project with fuzz testing capabilities. It includes an additional configuration file, `config/extra/with-handholding.mk`, and sets a flag `FD_HAS_FUZZ` to indicate the presence of fuzz testing. It modifies the `CPPFLAGS` and `LDFLAGS` to include specific compiler and linker options for enabling fuzzing and coverage analysis, such as `-fsanitize=fuzzer-no-link` and `-fsanitize-coverage=inline-8bit-counters`.
+The Makefile includes additional configuration from `config/extra/with-handholding.mk` and sets the `FD_HAS_FUZZ` variable to `1`, indicating that fuzzing is enabled. It modifies the `CPPFLAGS` to include flags for frame pointer omission and fuzzing sanitization, specifically `-fno-omit-frame-pointer`, `-fsanitize=fuzzer-no-link`, and `-fsanitize-coverage=inline-8bit-counters`. The `LDFLAGS` are also adjusted to include `-fsanitize-coverage=inline-8bit-counters`, and `LDFLAGS_FUZZ` is set to `-fsanitize=fuzzer`, configuring the build process for fuzz testing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
