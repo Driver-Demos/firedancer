@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_fseq.c` file in the `firedancer` codebase contains a series of unit tests for the `fd_fseq` functionality, including alignment checks, memory allocation, and sequence update operations.
+Tests the functionality and alignment of the `fd_fseq` sequence management in shared memory.
 
 # Purpose
-This C source code file is a test suite designed to validate the functionality of a sequence management system, likely part of a larger software library. The code is structured around testing the creation, alignment, and manipulation of a sequence object, referred to as `fseq`, using a shared memory segment. The file includes static assertions to ensure that certain alignment and footprint constants are correctly defined, which are critical for the proper functioning of the sequence management system. The main function initializes the environment, sets up a random number generator, and performs a series of tests to verify the correct behavior of sequence creation, joining, updating, and deletion functions. It also tests edge cases, such as handling null pointers and misaligned memory, and checks for proper handling of invalid magic values.
+This code is a test suite for validating the functionality of a sequence management system, likely part of a larger framework. It includes static assertions to verify alignment and footprint constants for sequence (`FD_FSEQ_ALIGN`, `FD_FSEQ_FOOTPRINT`) and application-specific data (`FD_FSEQ_APP_ALIGN`, `FD_FSEQ_APP_FOOTPRINT`). The main function initializes the environment and sets up a random number generator. It then performs a series of tests to ensure that sequence creation, joining, updating, and deletion functions behave as expected. The tests include checking for correct alignment, handling of null and misaligned pointers, and verifying that sequence updates and queries return the expected values.
 
-The code is intended to be executed as a standalone program, as indicated by the presence of a [`main`](#main) function. It does not define public APIs or external interfaces but rather tests the internal functions of the sequence management system. The use of logging and assertions suggests that the code is designed to provide clear feedback on the success or failure of each test case, which is crucial for debugging and ensuring the reliability of the sequence management functionality. The file is part of a broader testing framework, as it includes functions like `fd_boot` and `fd_halt`, which are likely responsible for initializing and cleaning up the test environment.
+The code uses a shared memory buffer `shmem` to simulate sequence operations and tests various failure cases to ensure robustness. It checks the behavior of functions like `fd_fseq_new`, `fd_fseq_join`, `fd_fseq_update`, `fd_fseq_leave`, and `fd_fseq_delete` under different conditions. The test suite also verifies that the application-specific data is correctly aligned and initialized. Logging is used to provide feedback on the test progress, and the program concludes by cleaning up resources and halting the environment. This code is intended to be executed as a standalone program to validate the sequence management functionality.
 # Imports and Dependencies
 
 ---
@@ -19,36 +19,36 @@ The code is intended to be executed as a standalone program, as indicated by the
 
 ---
 ### shmem
-- **Type**: `uchar array`
-- **Description**: The `shmem` variable is a static array of unsigned characters with a size defined by `FD_FSEQ_FOOTPRINT`, which is 128 bytes. It is aligned to `FD_FSEQ_ALIGN`, which is 128 bytes, ensuring proper memory alignment for operations that require it.
-- **Use**: This variable is used as a shared memory buffer for sequence operations, initialized and manipulated through functions like `fd_fseq_new` and `fd_fseq_join`.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters with a size defined by the macro `FD_FSEQ_FOOTPRINT`. The array is aligned in memory according to the `FD_FSEQ_ALIGN` macro.
+- **Use**: Used as a shared memory buffer for sequence operations in the program.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and tests a sequence management system using shared memory, random number generation, and various validation checks.
+[View Source →](<../../../../../src/tango/fseq/test_fseq.c#L9>)
+
+Initializes the environment, tests sequence functions, and validates memory alignment and sequence operations.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Extract the initial sequence number `seq0` from command-line arguments or use a default value of 1234.
-    - Log the initial sequence number for testing purposes.
-    - Initialize a random number generator `rng`.
-    - Verify alignment and footprint constants using `FD_TEST`.
-    - Create a new sequence in shared memory with `fd_fseq_new` and join it with `fd_fseq_join`, checking for success.
-    - Test failure cases for `fd_fseq_new` and `fd_fseq_join` with null and misaligned inputs.
-    - Modify and test the sequence's magic value to ensure proper error handling.
-    - Retrieve application-specific memory addresses and verify alignment and initialization.
-    - Check initial sequence values using `fd_fseq_seq0` and `fd_fseq_query`.
-    - Perform a loop of 1,000,000 iterations to update the sequence with random values and verify correctness.
-    - Test `fd_fseq_leave` and `fd_fseq_delete` for proper handling of null and misaligned inputs.
-    - Modify and test the sequence's magic value again to ensure proper error handling.
-    - Delete the sequence and clean up the random number generator.
-    - Log a success message and halt the program.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Retrieves the initial sequence number `seq0` from command-line arguments or defaults to 1234.
+    - Logs the initial sequence number for testing purposes.
+    - Initializes a random number generator `rng`.
+    - Validates alignment and footprint constants using `FD_TEST`.
+    - Creates a new sequence object `shfseq` with `fd_fseq_new` and joins it to `fseq`.
+    - Tests failure cases for `fd_fseq_new` and `fd_fseq_join` with null and misaligned inputs.
+    - Modifies and tests the magic value of `shfseq` to ensure proper error handling.
+    - Retrieves application-specific memory addresses and validates alignment and zero-initialization.
+    - Verifies initial sequence number and queries the sequence using `fd_fseq_seq0` and `fd_fseq_query`.
+    - Performs a loop to update the sequence with random values and validates the sequence operations.
+    - Tests `fd_fseq_leave` and `fd_fseq_delete` for null and misaligned inputs, and verifies proper deletion.
+    - Logs a success message and calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 

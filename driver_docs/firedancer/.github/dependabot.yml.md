@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `dependabot.yml` file in the `firedancer` codebase configures Dependabot to update GitHub Actions weekly and npm packages daily.
+Configuration for Dependabot to update GitHub Actions weekly and npm packages daily.
 
 # Purpose
-The file is a configuration for a dependency update tool, specifying update schedules for different package ecosystems. It sets the update interval for GitHub Actions in the root directory to weekly and for npm packages in the '/book' directory to daily.
+The file configures automated updates for dependencies in a project. It specifies two update schedules: one for the `github-actions` package ecosystem, set to update weekly, and another for the `npm` package ecosystem, set to update daily. The `directory` field indicates the location within the project where each package ecosystem is managed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

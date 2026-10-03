@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies object files for various Reed-Solomon implementations to be added to the `fd_reedsol` target.
+Makefile for adding object files related to Reed-Solomon implementations in the `fd_reedsol` module.
 
 # Purpose
-The provided content is from a Makefile, which is a build automation tool used to manage the build process of software projects. This specific section of the Makefile is using a macro or function call syntax, `$(call add-objs,...)`, to add object files to a target named `fd_reedsol`. Each line specifies a different implementation file, such as `fd_reedsol_ppt_impl_17` or `fd_reedsol_fft_impl_128_0`, which are likely source files that need to be compiled into object files as part of the build process. The purpose of this configuration is to ensure that all specified implementations are included in the build process for the `fd_reedsol` target, which may be a library or executable related to Reed-Solomon error correction or similar functionality.
+The content defines a series of object files to be included in the build process for a software project. Each line uses the `$(call add-objs,...)` function to specify object files related to different implementations of Reed-Solomon encoding and Fast Fourier Transform (FFT) algorithms. The object files, such as `fd_reedsol_ppt_impl_17` and `fd_reedsol_fft_impl_128_0`, are associated with the `fd_reedsol` module. This setup allows the build system to compile and link the necessary components for the Reed-Solomon and FFT functionalities within the project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
