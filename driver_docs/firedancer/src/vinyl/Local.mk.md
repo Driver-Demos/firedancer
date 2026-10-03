@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the `fd_vinyl` library and its components.
+Build rules for fd_vinyl and its base header, objects, and unit test.
 
 # Purpose
-The `Makefile` content defines build and test instructions for the `fd_vinyl` library. It calls a function to create the library, adds headers from `fd_vinyl_base.h`, and includes object files from `fd_vinyl_base` into `fd_vinyl`. It also sets up a unit test named `test_vinyl_base`, which depends on the `fd_vinyl`, `fd_tango`, and `fd_util` libraries, and then runs this unit test.
+Build rules define the `fd_vinyl` library, add the `fd_vinyl_base.h` header, and compile the `fd_vinyl_base` object from `fd_vinyl`. The file also defines the `test_vinyl_base` unit test, links it with `fd_vinyl`, `fd_tango`, and `fd_util`, and adds a rule to run that test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
