@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements HMAC using SHA-256, SHA-384, and SHA-512 algorithms.
+The `fd_hmac.c` file in the `firedancer` codebase implements HMAC functionality using SHA-256, SHA-384, and SHA-512 hash algorithms by including a template file `fd_hmac_tmpl.c` with different hash configurations.
 
 # Purpose
-This C source code file configures and includes HMAC (Hash-based Message Authentication Code) implementations for different hash algorithms. It includes the header file `fd_hmac.h` and the SHA-2 family hash functions from `fd_sha256.h` and `fd_sha512.h`. The code defines macros to specify the hash algorithm (`HASH_ALG`), block size (`HASH_BLOCK_SZ`), and hash size (`HASH_SZ`) for SHA-256, SHA-384, and SHA-512. It then includes the template file `fd_hmac_tmpl.c` three times, each time with different macro definitions, to generate HMAC implementations for each specified hash algorithm. This approach allows for code reuse and modularity by using a template to handle different hash functions.
+This C source code file is a configuration and implementation template for HMAC (Hash-based Message Authentication Code) using different SHA (Secure Hash Algorithm) variants. It includes header files for SHA-256, SHA-384, and SHA-512 algorithms, and defines macros to set the hash algorithm, block size, and hash size for each variant. The file then includes a template file, `fd_hmac_tmpl.c`, three times, each time with different macro definitions, effectively generating HMAC implementations for SHA-256, SHA-384, and SHA-512. This approach allows for code reuse and modularity by leveraging a single template to handle multiple hash algorithms with minimal redundancy.
 # Imports and Dependencies
 
 ---

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Command-line tool for managing shared memory regions, querying CPU and NUMA node information.
+The `fd_shmem_ctl_help` file provides command-line usage instructions for managing shared memory regions, including commands for querying CPU and NUMA node information, creating, unlinking, and querying shared memory regions.
 
 # Purpose
-The `fd_shmem_ctl` command-line tool provides several commands to manage shared memory regions and query system information related to CPUs and NUMA nodes. The `help` command displays a list of available commands and their descriptions. The `cpu-cnt` and `numa-cnt` commands print the number of CPUs and NUMA nodes, respectively. The `cpu-idx` and `numa-idx` commands allow users to find the closest CPU to a given NUMA node or the closest NUMA node to a given CPU, printing the index or a dash if the input is invalid. The `create` command creates a shared memory region with specified parameters, distributing pages across CPUs as specified, and setting permissions. The `unlink` command removes a shared memory region, with an option to detect the page size if not specified. The `query` command provides information about a shared memory region, including error codes and page details, with an option to detect the page size if not specified.
+The provided content is a usage guide for a command-line utility named `fd_shmem_ctl`, which is designed to manage shared memory regions in a system. The utility offers several commands, including `help` for displaying usage information, `cpu-cnt` and `numa-cnt` for retrieving the number of CPUs and NUMA nodes, respectively, and `cpu-idx` and `numa-idx` for determining the relationship between CPUs and NUMA nodes. Additionally, the `create` command allows users to create a shared memory region with specified parameters such as name, page count, page size, CPU index sequence, and permissions. The `unlink` command is used to remove a shared memory region, while the `query` command provides detailed information about a specified shared memory region. This utility is particularly useful for systems that require efficient memory management and allocation near specific CPUs or NUMA nodes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

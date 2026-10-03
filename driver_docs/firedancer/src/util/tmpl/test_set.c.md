@@ -3,46 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for set operations, including creation, manipulation, and validation of sets with various operations.
+Tests set operations, iteration, ranges, and invalid index handling.
 
 # Purpose
-The code is a C program that serves as a test suite for a set data structure. It includes various operations on sets, such as insertion, removal, union, intersection, and complement. The program uses a predefined maximum size for the sets, defined by the macro `MAX`, and it includes a series of tests to verify the correctness of the set operations. The tests ensure that the set operations behave as expected, including edge cases like empty sets and full sets. The program also uses random number generation to test set operations under different conditions.
+This file is a test program for the `set` type defined by `fd_set.c`. It builds a concrete set implementation by defining `SET_NAME` as `set` and `SET_MAX` as `12345`, then includes the generic set source file. The [`main`](<#main>) function boots the runtime, creates a random number generator, and runs a large set of checks with `FD_TEST` to verify set creation, validity, element access, insertion, removal, copy, equality, subset, complement, union, intersection, subtraction, xor, conditional operations, and iteration.
 
-The program begins by initializing necessary components, such as a random number generator and several set instances. It then performs a series of tests using the `FD_TEST` macro to validate the behavior of set operations. These tests cover a wide range of scenarios, including checking the validity of sets, counting elements, and comparing sets for equality and subset relationships. The program also includes conditional compilation directives to handle different environments, such as hosted systems. At the end of the tests, the program cleans up by deleting the sets and halting the execution.
-# Imports and Dependencies
-
----
-- `../fd_util.h`
-- `sys/types.h`
-- `sys/wait.h`
-- `unistd.h`
-- `fd_set.c`
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/tmpl/test_set.c#L14>)
-
-Initializes and tests various set operations and random number generation, ensuring correctness through assertions.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Retrieves the maximum set size using `set_max` and verifies it with `FD_TEST`.
-    - Calculates the sum of integers from 1 to `max` and stores it in `sum_full`.
-    - Creates and initializes several sets (`null`, `f0`, `f1`, `full`, `n0`, `n1`, `e`, `ebar`, `t`) using `set_new`, `set_join`, and `set_full`.
-    - Performs various set operations (e.g., `set_ele`, `set_complement`, `set_insert`, `set_remove`) and validates their correctness using `FD_TEST`.
-    - Iterates over the range of set elements, performing operations and checking results with assertions.
-    - Tests set operations with random ranges and validates results using `FD_TEST`.
-    - Handles special cases for hosted environments with `FD_EXPECT_LOG_CRIT` to test critical log triggers.
-    - Cleans up by deleting all sets and the random number generator, then calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-
-
+The file also tests range operations such as `set_range`, `set_insert_range`, `set_select_range`, `set_remove_range`, and `set_range_cnt` with random intervals. In hosted builds with handholding enabled, it forks child processes to confirm that invalid calls trigger `FD_LOG_CRIT`. The program ends by releasing all objects, logging `pass`, and halting.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

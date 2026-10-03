@@ -3,27 +3,27 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, data structures, and tests for the `fd_funk` module, including memory management, transactions, and concurrency.
+Workspace-backed txn, rec, and value APIs, tests, and a benchmark for record and transaction maps.
 
 
 ## Files
-- **[bench_funk_index.c](bench_funk_index.c.md)**: A benchmarking tool for evaluating the performance of the `fd_funk` data structure.
-- **[fd_funk.c](fd_funk.c.md)**: Functions for managing and verifying shared memory structures in the Firedancer codebase.
-- **[fd_funk.h](fd_funk.h.md)**: Header file for a high-performance hybrid database and version control system designed for blockchain applications, detailing data structures, memory management, and transaction handling.
-- **[fd_funk_base.c](fd_funk_base.c.md)**: Maps error codes to their corresponding error message strings.
-- **[fd_funk_base.h](fd_funk_base.h.md)**: Defines data structures and functions for managing key-value records and transactions in a "funk" instance.
-- **[fd_funk_private.h](fd_funk_private.h.md)**: Internal APIs for iterating over all funk record and transaction objects in a non-concurrent environment.
-- **[fd_funk_rec.c](fd_funk_rec.c.md)**: Implements the record map for the Firedancer database, including transaction management and verification.
-- **[fd_funk_rec.h](fd_funk_rec.h.md)**: APIs for managing funk records, including structures, queries, preparation, and publishing functions.
-- **[fd_funk_txn.c](fd_funk_txn.c.md)**: Implements a transaction map and pool for managing transaction states and relationships in the Firedancer system.
-- **[fd_funk_txn.h](fd_funk_txn.h.md)**: APIs for managing funk transactions, including preparation, publishing, and cancellation, with thread-safety considerations.
-- **[fd_funk_val.c](fd_funk_val.c.md)**: Functions for truncating and verifying values in a record within the Firedancer codebase.
-- **[fd_funk_val.h](fd_funk_val.h.md)**: APIs for managing funk record values, including accessors, resizing, initialization, and verification functions.
-- **[Local.mk](Local.mk.md)**: Makefile for managing headers, objects, and unit tests in the `firedancer` codebase.
-- **[test_funk.c](test_funk.c.md)**: Unit tests for the `fd_funk` module, verifying memory alignment, workspace operations, and transaction limits.
-- **[test_funk_base.c](test_funk_base.c.md)**: Tests for the `fd_funk` module, including static assertions and functions for unique key and transaction ID generation.
-- **[test_funk_common.c](test_funk_common.c.md)**: Implements transaction and record management functions for testing purposes in the Firedancer codebase.
-- **[test_funk_common.h](test_funk_common.h.md)**: Defines data structures and functions for a "mini-funk" transaction and record management system.
+- **[bench_funk_index.c](bench_funk_index.c.md)**: The `bench_funk_index.c` file in the `firedancer` codebase implements a benchmarking tool for evaluating the performance of the `fd_funk` data structure, including operations such as record insertion and chain statistics calculation.
+- **[fd_funk.c](fd_funk.c.md)**: Workspace-backed state init, join, delete, and verify logic for txn, rec, and alloc data.
+- **[fd_funk.h](fd_funk.h.md)**: Funk shared-memory transaction and record API with constructors, joins, accessors, and verification.
+- **[fd_funk_base.c](fd_funk_base.c.md)**: The `fd_funk_base.c` file provides a function to convert error codes into human-readable error messages for the Firedancer project.
+- **[fd_funk_base.h](fd_funk_base.h.md)**: Shared-memory funk record and transaction ID types, hashes, equality, copy, and error codes.
+- **[fd_funk_private.h](fd_funk_private.h.md)**: Internal iterators for all funk records and transactions.
+- **[fd_funk_rec.c](fd_funk_rec.c.md)**: Record map operations, transaction lookup, publish, and verification logic.
+- **[fd_funk_rec.h](fd_funk_rec.h.md)**: APIs for querying, preparing, publishing, and verifying funk records.
+- **[fd_funk_txn.c](fd_funk_txn.c.md)**: Transaction map preparation and verification with parent-child link checks.
+- **[fd_funk_txn.h](fd_funk_txn.h.md)**: APIs for preparing, querying, and verifying funk transactions.
+- **[fd_funk_val.c](fd_funk_val.c.md)**: Value truncation and verification functions for record values in workspace memory.
+- **[fd_funk_val.h](fd_funk_val.h.md)**: APIs for managing funk record values, including access, resize, flush, and verify.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_funk headers, objects, unit tests, and a hosted benchmark.
+- **[test_funk.c](test_funk.c.md)**: The `test_funk.c` file in the `firedancer` codebase contains a unit test for the `fd_funk` module, verifying its functionality related to memory alignment, workspace management, and transaction handling.
+- **[test_funk_base.c](test_funk_base.c.md)**: Unit tests for fd_funk error strings, sizes, hashes, equality, copy, and root XID handling.
+- **[test_funk_common.c](test_funk_common.c.md)**: Test helpers for txn and rec management in funk, including insert, publish, cancel, and delete.
+- **[test_funk_common.h](test_funk_common.h.md)**: Mini-funk test API with txn, rec, and funk structs plus helper functions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
