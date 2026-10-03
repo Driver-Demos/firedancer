@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_groove_base.c` file provides a function to convert error codes into human-readable error messages for the Firedancer project.
+Error message translation function for `fd_groove` error codes.
 
 # Purpose
-This C source code file defines a function, [`fd_groove_strerror`](#fd_groove_strerror), which translates error codes into human-readable error messages. It includes a header file, `fd_groove_base.h`, presumably for the definitions of the error codes such as `FD_GROOVE_SUCCESS`, `FD_GROOVE_ERR_INVAL`, and others. The function uses a `switch` statement to map each error code to a corresponding string message, providing a clear and user-friendly description of the error. If an unrecognized error code is passed, it returns "unknown" as a default message. This function is likely part of a larger system where error handling and reporting are necessary, facilitating easier debugging and user communication.
+This code defines a function [`fd_groove_strerror`](<#fd_groove_strerror>) that translates error codes into human-readable error messages. The function takes an integer `err` as input, which represents an error code, and returns a string describing the error. It uses a `switch` statement to map specific error codes, such as `FD_GROOVE_SUCCESS`, `FD_GROOVE_ERR_INVAL`, and others, to corresponding error messages like "success", "bad input", and so on. If the error code does not match any predefined cases, the function returns "unknown". The code includes the header file `fd_groove_base.h`, which likely contains the definitions of the error codes used in the `switch` statement.
 # Imports and Dependencies
 
 ---
@@ -17,14 +17,22 @@ This C source code file defines a function, [`fd_groove_strerror`](#fd_groove_st
 
 ---
 ### fd\_groove\_strerror<!-- {{#callable:fd_groove_strerror}} -->
-The `fd_groove_strerror` function returns a human-readable string describing an error code related to the Groove library.
+[View Source →](<../../../../src/groove/fd_groove_base.c#L3>)
+
+Maps error codes to their corresponding error message strings.
 - **Inputs**:
-    - `err`: An integer representing the error code for which a descriptive string is needed.
-- **Control Flow**:
-    - The function uses a switch statement to match the input error code `err` against predefined error constants.
-    - For each case in the switch statement, if the error code matches a predefined constant, the function returns a corresponding descriptive string.
-    - If the error code does not match any predefined constants, the function returns the string "unknown".
-- **Output**: A constant character pointer to a string that describes the error code.
+    - `err`: An integer representing the error code to be translated into a string message.
+- **Logic and Control Flow**:
+    - Use a `switch` statement to check the value of `err`.
+    - If `err` matches `FD_GROOVE_SUCCESS`, return the string "success".
+    - If `err` matches `FD_GROOVE_ERR_INVAL`, return the string "bad input".
+    - If `err` matches `FD_GROOVE_ERR_AGAIN`, return the string "try again later".
+    - If `err` matches `FD_GROOVE_ERR_CORRUPT`, return the string "corrupt".
+    - If `err` matches `FD_GROOVE_ERR_EMPTY`, return the string "empty".
+    - If `err` matches `FD_GROOVE_ERR_FULL`, return the string "full".
+    - If `err` matches `FD_GROOVE_ERR_KEY`, return the string "key not found".
+    - If `err` does not match any known error code, return the string "unknown".
+- **Output**: A constant character pointer to a string that describes the error.
 
 
 
