@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_dlist.c` file in the `firedancer` codebase provides a comprehensive test suite for doubly linked list operations, including initialization, insertion, removal, and iteration, while also verifying the integrity of these operations through various test cases and boundary condition checks.
+Tests for doubly linked list operations and memory pool management in the Firedancer codebase.
 
 # Purpose
-This C source code file is designed to implement and test a doubly linked list (dlist) and a pool of elements, providing both reference and test implementations. The code includes functions for initializing, manipulating, and verifying the integrity of a doubly linked list and a pool of elements. The reference implementation uses static arrays and indices to manage a fixed-size pool and dlist, while the test implementation uses macros to generate similar functionality with a more flexible design. The code is structured to allow for operations such as pushing and popping elements from the head or tail of the list, inserting elements before or after a given element, and replacing or removing elements. It also includes a main function that performs extensive testing of these operations to ensure correctness and robustness.
+The code is a C program that implements and tests a doubly linked list and a pool of elements. It includes functions for managing a pool of elements (`ref_pool`) and a doubly linked list (`ref_dlist`). The pool management functions allow for initialization, checking if the pool is empty, acquiring an index from the pool, and releasing an index back to the pool. The doubly linked list functions provide operations to check if the list is empty, peek at the head or tail, push elements to the head or tail, pop elements from the head or tail, insert elements before or after a given index, remove elements, and replace elements in the list.
 
-The file is a comprehensive test suite for the doubly linked list and pool functionalities, with a focus on verifying the correctness of operations through a series of randomized tests. It includes boundary condition checks and diagnostic logging to facilitate debugging and validation. The code is intended to be compiled and executed as a standalone program, as indicated by the presence of a [`main`](#main) function. It does not define public APIs or external interfaces, but rather serves as an internal testing tool to validate the behavior of the linked list and pool implementations. The inclusion of headers like `fd_pool.c` and `fd_dlist.c` suggests that these components are modular and can be reused or adapted for other applications requiring similar data structures.
+The program also includes a [`main`](<#main>) function that initializes the environment, sets up a test pool and doubly linked list, and performs various operations to test the functionality of the list and pool. It uses a random number generator to simulate different operations on the list, such as pushing, popping, inserting, and removing elements. The program includes checks to ensure that operations are performed correctly and logs the results. Additionally, it includes a section for testing boundary conditions and error handling, although this part is conditionally compiled based on the `FD_HAS_HOSTED` and `FD_TMPL_USE_HANDHOLDING` macros. The program concludes by cleaning up resources and halting execution.
 # Imports and Dependencies
 
 ---
@@ -24,290 +24,332 @@ The file is a comprehensive test suite for the doubly linked list and pool funct
 
 ---
 ### ref\_ele
-- **Type**: `array of struct`
-- **Description**: `ref_ele` is a static array of structures, where each structure contains three unsigned long integers: `prev`, `next`, and `val`. This array is used to manage a pool of elements and a doubly linked list, with each element in the array representing a node in the list.
-- **Use**: `ref_ele` is used to store and manage the state of each element in a pool and doubly linked list, facilitating operations like insertion, removal, and traversal.
+- **Type**: ``struct``
+- **Description**: Defines an array of structures, each containing three unsigned long integers: `prev`, `next`, and `val`. The array size is determined by the `ELE_MAX` constant.
+- **Use**: Used to manage a pool of elements and a doubly linked list, where each element can store a value and pointers to the previous and next elements.
 
 
 ---
 ### ref\_pool
-- **Type**: `ulong`
-- **Description**: `ref_pool` is a static global variable of type `ulong` initialized to `ELE_IDX_NULL`. It represents the head of a pool of elements that are available for use in a linked list structure.
-- **Use**: `ref_pool` is used to track the first available element in the pool, allowing for efficient acquisition and release of elements as they are needed or returned.
+- **Type**: ``ulong``
+- **Description**: `ref_pool` is a static global variable of type `ulong` that is initialized to `ELE_IDX_NULL`. It represents the index of the first element in a pool of elements that are available for use.
+- **Use**: Tracks the head of a pool of available elements for allocation and deallocation operations.
 
 
 ---
 ### ref\_dlist\_head
-- **Type**: `ulong`
-- **Description**: `ref_dlist_head` is a global variable of type `ulong` that is initialized to `ELE_IDX_NULL`, which is defined as the bitwise negation of 0 (`~0UL`). This variable represents the index of the head element in a doubly linked list structure used within the code.
-- **Use**: It is used to track the starting point of the doubly linked list, allowing operations such as insertion, deletion, and traversal to be performed from the head of the list.
+- **Type**: ``ulong``
+- **Description**: Stores the index of the head element in a doubly linked list. It is initialized to `ELE_IDX_NULL`, indicating an empty list.
+- **Use**: Tracks the starting point of the doubly linked list for operations like insertion, deletion, and traversal.
 
 
 ---
 ### ref\_dlist\_tail
-- **Type**: `ulong`
-- **Description**: `ref_dlist_tail` is a static global variable of type `ulong` that is initialized to `ELE_IDX_NULL`, which is defined as the bitwise negation of 0 (`~0UL`). This effectively sets `ref_dlist_tail` to the maximum possible value for an unsigned long, often used as a sentinel value to indicate a null or uninitialized state.
-- **Use**: It is used to track the index of the last element in a doubly linked list, allowing operations to efficiently access or modify the tail of the list.
+- **Type**: ``ulong``
+- **Description**: Stores the index of the last element in a doubly linked list. It is initialized to `ELE_IDX_NULL`, indicating that the list is empty.
+- **Use**: Tracks the tail of the doubly linked list to facilitate operations like adding or removing elements from the end of the list.
 
 
 # Data Structures
 
 ---
 ### tst\_ele
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `prev_cidx`: A field of type CIDX_T representing the index of the previous element in a list.
-    - `next_cidx`: A field of type CIDX_T representing the index of the next element in a list.
-    - `val`: A field of type ulong representing the value stored in the element.
-- **Description**: The `tst_ele` structure is a node used in a doubly linked list, where each node contains an index to the previous and next elements, as well as a value. This structure is designed to facilitate operations on a doubly linked list, such as insertion, deletion, and traversal, by maintaining references to adjacent nodes through the `prev_cidx` and `next_cidx` fields. The `val` field stores the actual data associated with the node.
+    - ``prev_cidx``: Stores the index of the previous element in the list.
+    - ``next_cidx``: Stores the index of the next element in the list.
+    - ``val``: Holds the value associated with the element.
+- **Description**: Defines a structure for a doubly linked list element, where `prev_cidx` and `next_cidx` are used to navigate between elements, and `val` stores the data value of the element.
 
 
 ---
 ### tst\_ele\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `prev_cidx`: Stores the index of the previous element in the list.
-    - `next_cidx`: Stores the index of the next element in the list.
-    - `val`: Holds the value associated with the element.
-- **Description**: The `tst_ele_t` structure is a node used in a doubly linked list, where each node contains a value and indices to the previous and next nodes in the list. The `prev_cidx` and `next_cidx` fields are used to navigate through the list, while the `val` field stores the data associated with the node. This structure is part of a pool and doubly linked list implementation, allowing for efficient element management and traversal.
+    - ``prev_cidx``: Stores the index of the previous element in the list.
+    - ``next_cidx``: Stores the index of the next element in the list.
+    - ``val``: Holds the value associated with the element.
+- **Description**: Defines a structure for a doubly linked list element, where `prev_cidx` and `next_cidx` are used to navigate between elements, and `val` stores the data value of the element.
 
 
 # Functions
 
 ---
 ### ref\_pool\_init<!-- {{#callable:ref_pool_init}} -->
-The `ref_pool_init` function initializes a pool of elements by setting up a linked list structure for a specified number of elements.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L21>)
+
+Initializes the reference pool and sets up the linked list structure for a specified number of elements.
 - **Inputs**:
-    - `ele_cnt`: The number of elements to initialize in the pool, which should be in the range [0, ELE_MAX].
-- **Control Flow**:
-    - Check if `ele_cnt` is zero; if so, set `ref_pool` to `ELE_IDX_NULL` and return.
-    - Set `ref_pool` to 0, indicating the start of the pool.
-    - Iterate over the range from 1 to `ele_cnt - 1`, setting up each element's `prev`, `next`, and `val` fields to create a linked list structure.
-    - Set the last element's `prev`, `next`, and `val` fields to finalize the linked list.
-- **Output**: The function does not return a value; it initializes the global `ref_pool` and `ref_ele` array to represent a pool of elements.
+    - `ele_cnt`: The number of elements to initialize in the reference pool, must be in the range [0, ELE_MAX].
+- **Logic and Control Flow**:
+    - Check if `ele_cnt` is zero; if true, set `ref_pool` to `ELE_IDX_NULL` and return.
+    - Set `ref_pool` to 0 to indicate the start of the pool.
+    - Iterate over the range from 1 to `ele_cnt - 1`, setting the `prev` field of each element to `ELE_IDX_NULL`, the `next` field to the next index, and the `val` field to 0.
+    - Set the `prev`, `next`, and `val` fields of the last element in the range to `ELE_IDX_NULL`, `ELE_IDX_NULL`, and 0, respectively.
+- **Output**: No return value; modifies the global `ref_pool` and `ref_ele` array to initialize the pool.
 
 
 ---
 ### ref\_pool\_is\_empty<!-- {{#callable:ref_pool_is_empty}} -->
-The `ref_pool_is_empty` function checks if the reference pool is empty by comparing the `ref_pool` variable to `ELE_IDX_NULL`.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L41>)
+
+Checks if the reference pool is empty by comparing `ref_pool` to `ELE_IDX_NULL`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function checks if the global variable `ref_pool` is equal to `ELE_IDX_NULL`.
-    - If `ref_pool` is equal to `ELE_IDX_NULL`, the function returns 1, indicating the pool is empty.
-    - If `ref_pool` is not equal to `ELE_IDX_NULL`, the function returns 0, indicating the pool is not empty.
-- **Output**: The function returns an integer: 1 if the pool is empty, 0 otherwise.
+- **Logic and Control Flow**:
+    - Compares the global variable `ref_pool` with the constant `ELE_IDX_NULL`.
+    - Returns 1 if `ref_pool` is equal to `ELE_IDX_NULL`, indicating the pool is empty.
+    - Returns 0 otherwise, indicating the pool has elements.
+- **Output**: Returns 1 if the pool is empty, 0 otherwise.
 
 
 ---
 ### ref\_pool\_idx\_acquire<!-- {{#callable:ref_pool_idx_acquire}} -->
-The `ref_pool_idx_acquire` function retrieves and removes the first element index from a pool, assuming the pool is not empty.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L46>)
+
+Acquires an element index from the reference pool and updates the pool to point to the next available element.
 - **Inputs**: None
-- **Control Flow**:
-    - The function initializes a local variable `ele_idx` with the current head of the pool, `ref_pool`.
-    - It updates `ref_pool` to point to the next element in the pool using `ref_ele[ele_idx].next`.
-    - Finally, it returns the index `ele_idx` of the acquired element.
-- **Output**: The function returns an `ulong` representing the index of the element that was acquired from the pool.
+- **Logic and Control Flow**:
+    - Assigns the current `ref_pool` value to `ele_idx`, which represents the index of the element being acquired.
+    - Updates `ref_pool` to point to the next element in the pool using `ref_ele[ele_idx].next`.
+    - Returns the acquired element index `ele_idx`.
+- **Output**: Returns the index of the acquired element from the pool as an `ulong`.
 
 
 ---
 ### ref\_pool\_idx\_release<!-- {{#callable:ref_pool_idx_release}} -->
-The `ref_pool_idx_release` function releases an element index back to the pool by updating the pool's head to point to this index.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L53>)
+
+Releases an element index back to the pool by updating the pool's head to the released index.
 - **Inputs**:
-    - `ele_idx`: The index of the element to be released back into the pool; it is assumed that this element is not currently in the pool or in the doubly linked list.
-- **Control Flow**:
-    - The function sets the `next` field of the element at `ele_idx` to the current head of the pool, `ref_pool`.
-    - The function updates `ref_pool` to point to `ele_idx`, effectively making it the new head of the pool.
-- **Output**: The function does not return a value; it modifies the global state of the pool by updating the `ref_pool` and the `next` field of the element at `ele_idx`.
+    - `ele_idx`: The index of the element to release back to the pool.
+- **Logic and Control Flow**:
+    - Sets the `next` field of the element at `ele_idx` to the current head of the pool (`ref_pool`).
+    - Updates `ref_pool` to point to `ele_idx`, making it the new head of the pool.
+- **Output**: The element index `ele_idx` is now part of the pool.
 
 
 ---
 ### ref\_dlist\_is\_empty<!-- {{#callable:ref_dlist_is_empty}} -->
-The function `ref_dlist_is_empty` checks if the doubly linked list is empty by comparing the head index to a null value.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L59>)
+
+Checks if the doubly linked list is empty by comparing the head index to `ELE_IDX_NULL`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function checks if `ref_dlist_head` is equal to `ELE_IDX_NULL`.
-    - If `ref_dlist_head` is `ELE_IDX_NULL`, it returns 1, indicating the list is empty.
-    - Otherwise, it returns 0, indicating the list is not empty.
-- **Output**: The function returns an integer: 1 if the doubly linked list is empty, and 0 otherwise.
+- **Logic and Control Flow**:
+    - Compares `ref_dlist_head` to `ELE_IDX_NULL`.
+    - Returns 1 if `ref_dlist_head` is equal to `ELE_IDX_NULL`, indicating the list is empty.
+    - Returns 0 otherwise, indicating the list is not empty.
+- **Output**: Returns 1 if the doubly linked list is empty, 0 otherwise.
 
 
 ---
 ### ref\_dlist\_idx\_peek\_head<!-- {{#callable:ref_dlist_idx_peek_head}} -->
-The function `ref_dlist_idx_peek_head` returns the index of the head element in a doubly linked list, assuming the list is not empty.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L64>)
+
+Returns the index of the head element in a doubly linked list.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the global variable `ref_dlist_head`, which holds the index of the head element of the doubly linked list.
-- **Output**: The function returns an `ulong` representing the index of the head element in the doubly linked list.
+- **Logic and Control Flow**:
+    - Assumes the doubly linked list is not empty.
+    - Returns the value of the `ref_dlist_head` variable, which holds the index of the head element in the list.
+- **Output**: The index of the head element in the doubly linked list as an `ulong`.
 
 
 ---
 ### ref\_dlist\_idx\_peek\_tail<!-- {{#callable:ref_dlist_idx_peek_tail}} -->
-The function `ref_dlist_idx_peek_tail` returns the index of the last element in a doubly linked list, assuming the list is not empty.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L69>)
+
+Returns the index of the tail element in a doubly linked list.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the global variable `ref_dlist_tail`, which holds the index of the last element in the doubly linked list.
-    - The function assumes that the list is not empty, so it does not perform any checks or modifications.
-- **Output**: The function returns an `ulong` representing the index of the last element in the doubly linked list.
+- **Logic and Control Flow**:
+    - Assumes the doubly linked list is not empty.
+    - Returns the value of the `ref_dlist_tail` variable, which holds the index of the tail element in the list.
+- **Output**: The index of the tail element in the doubly linked list as an `ulong`.
 
 
 ---
 ### ref\_dlist\_idx\_push\_head<!-- {{#callable:ref_dlist_idx_push_head}} -->
-The `ref_dlist_idx_push_head` function inserts an element at the head of a doubly linked list, updating the list's head and tail pointers as necessary.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L74>)
+
+Adds an element to the head of a doubly linked list.
 - **Inputs**:
-    - `ele_idx`: The index of the element to be inserted at the head of the doubly linked list; it is assumed that this element is not currently in the list or pool.
-- **Control Flow**:
+    - `ele_idx`: Index of the element to add to the head of the doubly linked list; it is assumed that this element is not already in the list or pool.
+- **Logic and Control Flow**:
     - Retrieve the current head index of the doubly linked list and store it in `next_idx`.
-    - Set the `prev` pointer of the element at `ele_idx` to `ELE_IDX_NULL`, indicating it will be the new head.
-    - Set the `next` pointer of the element at `ele_idx` to `next_idx`, linking it to the current head.
-    - If `next_idx` is `ELE_IDX_NULL`, indicating the list was empty, set the list's tail to `ele_idx`.
-    - Otherwise, update the `prev` pointer of the current head element to point to `ele_idx`.
-    - Finally, update the list's head to `ele_idx`, completing the insertion.
-- **Output**: The function does not return a value; it modifies the global state of the doubly linked list by updating the head and possibly the tail.
+    - Set the `prev` pointer of the element at `ele_idx` to `ELE_IDX_NULL`, indicating it is now the head.
+    - Set the `next` pointer of the element at `ele_idx` to `next_idx`, linking it to the previous head.
+    - If `next_idx` is `ELE_IDX_NULL`, set `ref_dlist_tail` to `ele_idx`, indicating the list was empty and now has one element.
+    - Otherwise, set the `prev` pointer of the element at `next_idx` to `ele_idx`, linking the previous head back to the new head.
+    - Update `ref_dlist_head` to `ele_idx`, making it the new head of the list.
+- **Output**: No return value; the function modifies the global state of the doubly linked list by adding a new head element.
 
 
 ---
 ### ref\_dlist\_idx\_push\_tail<!-- {{#callable:ref_dlist_idx_push_tail}} -->
-The `ref_dlist_idx_push_tail` function appends an element, identified by its index, to the tail of a doubly linked list, updating the list's head and tail pointers as necessary.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L84>)
+
+Adds an element to the tail of a doubly linked list.
 - **Inputs**:
-    - `ele_idx`: The index of the element to be added to the tail of the doubly linked list; it is assumed that this element is not already in the list or the pool.
-- **Control Flow**:
+    - `ele_idx`: Index of the element to add to the doubly linked list.
+- **Logic and Control Flow**:
     - Retrieve the current tail index of the doubly linked list and store it in `prev_idx`.
-    - Set the `prev` pointer of the element at `ele_idx` to `prev_idx`, and its `next` pointer to `ELE_IDX_NULL`, indicating it will be the new tail.
-    - If `prev_idx` is `ELE_IDX_NULL`, indicating the list was empty, set the list's head to `ele_idx`.
-    - Otherwise, set the `next` pointer of the current tail element to `ele_idx`, linking the new element to the end of the list.
-    - Update the list's tail to `ele_idx`, making it the new tail of the list.
-- **Output**: The function does not return a value; it modifies the global state of the doubly linked list by adding a new element to its tail.
+    - Set the `prev` pointer of the element at `ele_idx` to `prev_idx`.
+    - Set the `next` pointer of the element at `ele_idx` to `ELE_IDX_NULL`.
+    - If `prev_idx` is `ELE_IDX_NULL`, set `ref_dlist_head` to `ele_idx`, indicating the list was empty and `ele_idx` is now the head.
+    - Otherwise, set the `next` pointer of the element at `prev_idx` to `ele_idx`, linking the previous tail to the new tail.
+    - Update `ref_dlist_tail` to `ele_idx`, making it the new tail of the list.
+- **Output**: No return value; modifies the global state of the doubly linked list by adding a new tail element.
 
 
 ---
 ### ref\_dlist\_idx\_pop\_head<!-- {{#callable:ref_dlist_idx_pop_head}} -->
-The `ref_dlist_idx_pop_head` function removes and returns the index of the head element from a doubly linked list, updating the list's head and tail pointers accordingly.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L94>)
+
+Removes and returns the index of the head element from a doubly linked list, updating the list's head and tail pointers accordingly.
 - **Inputs**: None
-- **Control Flow**:
-    - Retrieve the index of the current head element from `ref_dlist_head`.
-    - Get the index of the next element in the list from `ref_ele[ele_idx].next`.
+- **Logic and Control Flow**:
+    - Retrieve the index of the head element from `ref_dlist_head`.
+    - Get the index of the next element in the list using `ref_ele[ele_idx].next`.
     - Update `ref_dlist_head` to point to the next element's index.
     - If the next element's index is `ELE_IDX_NULL`, set `ref_dlist_tail` to `ELE_IDX_NULL`, indicating the list is now empty.
     - Otherwise, set the `prev` pointer of the new head element to `ELE_IDX_NULL`.
     - Return the index of the removed head element.
-- **Output**: The function returns the index of the element that was removed from the head of the doubly linked list.
+- **Output**: Returns the index of the removed head element from the doubly linked list.
 
 
 ---
 ### ref\_dlist\_idx\_pop\_tail<!-- {{#callable:ref_dlist_idx_pop_tail}} -->
-The `ref_dlist_idx_pop_tail` function removes and returns the index of the last element from a doubly linked list, updating the list's tail and potentially its head if the list becomes empty.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L104>)
+
+Removes and returns the index of the last element from a doubly linked list, updating the list's tail and head pointers as necessary.
 - **Inputs**: None
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Retrieve the index of the current tail element from `ref_dlist_tail`.
-    - Get the previous element's index from the `prev` field of the current tail element.
+    - Get the previous element's index from `ref_ele[ele_idx].prev`.
     - Update `ref_dlist_tail` to the previous element's index.
     - If the previous index is `ELE_IDX_NULL`, set `ref_dlist_head` to `ELE_IDX_NULL`, indicating the list is now empty.
-    - Otherwise, set the `next` field of the new tail element to `ELE_IDX_NULL`.
-    - Return the index of the removed tail element.
-- **Output**: The function returns the index of the element that was removed from the tail of the doubly linked list.
+    - Otherwise, set the `next` pointer of the previous element to `ELE_IDX_NULL`, effectively removing the tail element from the list.
+    - Return the index of the removed element.
+- **Output**: Returns the index of the removed tail element, which is no longer in the doubly linked list or pool.
 
 
 ---
 ### ref\_dlist\_idx\_insert\_before<!-- {{#callable:ref_dlist_idx_insert_before}} -->
-The `ref_dlist_idx_insert_before` function inserts an element into a doubly linked list before a specified element.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L114>)
+
+Inserts an element into a doubly linked list before a specified index.
 - **Inputs**:
-    - `ele_idx`: The index of the element to be inserted, which is assumed to not be in the doubly linked list or pool.
-    - `dlist_idx`: The index of the element in the doubly linked list before which the new element will be inserted, and is assumed to be in the list.
-- **Control Flow**:
-    - Retrieve the index of the previous element to `dlist_idx` from the doubly linked list.
-    - Set the `prev` pointer of the element at `ele_idx` to the retrieved previous index.
-    - Set the `next` pointer of the element at `ele_idx` to `dlist_idx`.
-    - Update the `prev` pointer of the element at `dlist_idx` to `ele_idx`.
-    - If the previous index is `ELE_IDX_NULL`, update the head of the doubly linked list to `ele_idx`.
-    - Otherwise, update the `next` pointer of the previous element to `ele_idx`.
-- **Output**: The function does not return a value; it modifies the doubly linked list structure in place.
+    - `ele_idx`: The index of the element to insert, which is assumed to be not in the list and not in the pool.
+    - `dlist_idx`: The index of the element in the list before which the new element will be inserted, which is assumed to be in the list.
+- **Logic and Control Flow**:
+    - Retrieve the previous index of the element at `dlist_idx` from `ref_ele` array.
+    - Set the `prev` field of the element at `ele_idx` to the retrieved previous index.
+    - Set the `next` field of the element at `ele_idx` to `dlist_idx`.
+    - Update the `prev` field of the element at `dlist_idx` to `ele_idx`.
+    - If the previous index is `ELE_IDX_NULL`, update `ref_dlist_head` to `ele_idx`, indicating the new element is now the head of the list.
+    - Otherwise, update the `next` field of the element at the previous index to `ele_idx`.
+- **Output**: The element at `ele_idx` is inserted into the doubly linked list before the element at `dlist_idx`.
 
 
 ---
 ### ref\_dlist\_idx\_insert\_after<!-- {{#callable:ref_dlist_idx_insert_after}} -->
-The `ref_dlist_idx_insert_after` function inserts an element into a doubly linked list immediately after a specified element.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L128>)
+
+Inserts an element into a doubly linked list immediately after a specified element.
 - **Inputs**:
-    - `ele_idx`: The index of the element to be inserted into the doubly linked list, which is assumed to be not currently in the list or pool.
-    - `dlist_idx`: The index of the element in the doubly linked list after which the new element will be inserted, which is assumed to be currently in the list.
-- **Control Flow**:
+    - `ele_idx`: Index of the element to insert, which is assumed not to be in the list or pool.
+    - `dlist_idx`: Index of the element in the list after which the new element will be inserted, which is assumed to be in the list.
+- **Logic and Control Flow**:
     - Retrieve the index of the element following `dlist_idx` in the list and store it in `next_idx`.
-    - Set the `next` pointer of the element at `ele_idx` to `next_idx` and the `prev` pointer to `dlist_idx`.
-    - Update the `next` pointer of the element at `dlist_idx` to point to `ele_idx`.
-    - If `next_idx` is `ELE_IDX_NULL`, update the list's tail to `ele_idx`; otherwise, update the `prev` pointer of the element at `next_idx` to `ele_idx`.
+    - Set the `next` pointer of the element at `ele_idx` to `next_idx`.
+    - Set the `prev` pointer of the element at `ele_idx` to `dlist_idx`.
+    - Update the `next` pointer of the element at `dlist_idx` to `ele_idx`.
+    - If `next_idx` is `ELE_IDX_NULL`, update `ref_dlist_tail` to `ele_idx`, indicating that the new element is now the last element in the list.
+    - Otherwise, update the `prev` pointer of the element at `next_idx` to `ele_idx`.
 - **Output**: The function does not return a value; it modifies the linked list structure in place.
 
 
 ---
 ### ref\_dlist\_idx\_remove<!-- {{#callable:ref_dlist_idx_remove}} -->
-The `ref_dlist_idx_remove` function removes an element from a doubly linked list by updating the previous and next pointers of the surrounding elements.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L142>)
+
+Removes an element from a doubly linked list by updating the previous and next pointers of adjacent elements.
 - **Inputs**:
-    - `ele_idx`: The index of the element to be removed from the doubly linked list, which is assumed to be currently in the list.
-- **Control Flow**:
+    - `ele_idx`: The index of the element to remove from the doubly linked list.
+- **Logic and Control Flow**:
     - Retrieve the previous and next indices of the element at `ele_idx` from the `ref_ele` array.
-    - If `prev_idx` is `ELE_IDX_NULL`, update `ref_dlist_head` to `next_idx`, otherwise set the `next` pointer of the element at `prev_idx` to `next_idx`.
-    - If `next_idx` is `ELE_IDX_NULL`, update `ref_dlist_tail` to `prev_idx`, otherwise set the `prev` pointer of the element at `next_idx` to `prev_idx`.
-- **Output**: The function does not return a value; it modifies the global state of the doubly linked list by removing the specified element.
+    - If `prev_idx` is `ELE_IDX_NULL`, set `ref_dlist_head` to `next_idx`, otherwise set `ref_ele[prev_idx].next` to `next_idx`.
+    - If `next_idx` is `ELE_IDX_NULL`, set `ref_dlist_tail` to `prev_idx`, otherwise set `ref_ele[next_idx].prev` to `prev_idx`.
+- **Output**: The element at `ele_idx` is removed from the doubly linked list, and the list's head and tail pointers are updated if necessary.
 
 
 ---
 ### ref\_dlist\_idx\_replace<!-- {{#callable:ref_dlist_idx_replace}} -->
-The `ref_dlist_idx_replace` function replaces an element in a doubly linked list with another element, updating the list's head and tail pointers as necessary.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L154>)
+
+Replaces an element in a doubly linked list with a new element, updating the list's head and tail pointers as necessary.
 - **Inputs**:
-    - `ele_idx`: The index of the new element to be inserted into the doubly linked list, which is assumed to be not currently in the list or pool.
-    - `old_idx`: The index of the existing element in the doubly linked list that is to be replaced.
-- **Control Flow**:
+    - `ele_idx`: The index of the new element to insert into the doubly linked list, which is assumed to be not in the list and not in the pool.
+    - `old_idx`: The index of the existing element in the doubly linked list that will be replaced.
+- **Logic and Control Flow**:
     - Retrieve the previous and next indices of the element at `old_idx` from the `ref_ele` array.
     - Set the `prev` and `next` pointers of the element at `ele_idx` to the retrieved previous and next indices, respectively.
-    - If the previous index is `ELE_IDX_NULL`, update the `ref_dlist_head` to `ele_idx`; otherwise, set the `next` pointer of the element at the previous index to `ele_idx`.
-    - If the next index is `ELE_IDX_NULL`, update the `ref_dlist_tail` to `ele_idx`; otherwise, set the `prev` pointer of the element at the next index to `ele_idx`.
-- **Output**: The function does not return a value; it modifies the doubly linked list in place, replacing the element at `old_idx` with the element at `ele_idx`.
+    - If the previous index is `ELE_IDX_NULL`, update `ref_dlist_head` to `ele_idx`; otherwise, set the `next` pointer of the element at the previous index to `ele_idx`.
+    - If the next index is `ELE_IDX_NULL`, update `ref_dlist_tail` to `ele_idx`; otherwise, set the `prev` pointer of the element at the next index to `ele_idx`.
+- **Output**: No return value; the function modifies the doubly linked list in place.
 
 
 ---
 ### ref\_dlist\_remove\_all<!-- {{#callable:ref_dlist_remove_all}} -->
-The `ref_dlist_remove_all` function clears all elements from the doubly linked list by setting the head and tail indices to null.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L171>)
+
+Removes all elements from the doubly linked list by setting the head and tail indices to null.
 - **Inputs**: None
-- **Control Flow**:
-    - The function sets `ref_dlist_head` to `ELE_IDX_NULL`, indicating the list is empty.
-    - The function sets `ref_dlist_tail` to `ELE_IDX_NULL`, further indicating the list is empty.
-- **Output**: The function does not return any value; it modifies the global state of the doubly linked list to be empty.
+- **Logic and Control Flow**:
+    - Set `ref_dlist_head` to `ELE_IDX_NULL` to indicate the list is empty.
+    - Set `ref_dlist_tail` to `ELE_IDX_NULL` to indicate the list is empty.
+- **Output**: The doubly linked list is empty, with no elements in the list or pool.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and tests a doubly linked list (dlist) implementation with various operations, including insertion, deletion, and verification, while logging the process and handling errors.
+[View Source →](<../../../../../src/util/tmpl/test_dlist.c#L201>)
+
+Initializes and tests a doubly linked list (dlist) and its operations using a random number generator and a reference implementation for validation.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment and parse command-line arguments to determine the maximum number of elements (`ele_max`).
-    - Log the start of testing with the specified `ele_max`.
-    - Initialize a random number generator (`rng`) and a scratch memory buffer with specific alignment and footprint.
-    - Check for configuration errors related to `ele_max`, alignment, and footprint, logging errors if any are found.
-    - Initialize a reference pool and join a test pool with the specified `ele_max`.
-    - Log the start of construction testing and perform various tests on the dlist's alignment, footprint, and creation.
-    - Join the dlist and perform a series of operations to test its functionality, including checking if the list is empty, pushing elements to the head and tail, popping elements from the head and tail, inserting elements before and after others, removing elements, and replacing elements.
-    - Iterate through a large number of operations (1 billion) to test the dlist's robustness, logging progress at intervals.
-    - If hosted and handholding is enabled, test boundary conditions and log critical errors for invalid operations.
-    - Log the start of destruction testing, leave and delete the dlist, and verify the operations.
-    - Clean up by deleting the test pool and random number generator, then log the successful completion of tests and halt the program.
-- **Output**: The function returns an integer, 0, indicating successful execution.
-- **Functions called**:
-    - [`ref_pool_init`](#ref_pool_init)
-    - [`ref_dlist_is_empty`](#ref_dlist_is_empty)
-    - [`ref_dlist_idx_peek_head`](#ref_dlist_idx_peek_head)
-    - [`ref_dlist_idx_peek_tail`](#ref_dlist_idx_peek_tail)
-    - [`ref_pool_is_empty`](#ref_pool_is_empty)
-    - [`ref_pool_idx_acquire`](#ref_pool_idx_acquire)
-    - [`ref_dlist_idx_push_head`](#ref_dlist_idx_push_head)
-    - [`ref_dlist_idx_push_tail`](#ref_dlist_idx_push_tail)
-    - [`ref_dlist_idx_pop_head`](#ref_dlist_idx_pop_head)
-    - [`ref_pool_idx_release`](#ref_pool_idx_release)
-    - [`ref_dlist_idx_pop_tail`](#ref_dlist_idx_pop_tail)
-    - [`ref_dlist_idx_insert_before`](#ref_dlist_idx_insert_before)
-    - [`ref_dlist_idx_insert_after`](#ref_dlist_idx_insert_after)
-    - [`ref_dlist_idx_remove`](#ref_dlist_idx_remove)
-    - [`ref_dlist_idx_replace`](#ref_dlist_idx_replace)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Retrieves the maximum number of elements (`ele_max`) from the command line or defaults to `ELE_MAX`.
+    - Logs the start of testing with the `ele_max` value.
+    - Initializes a random number generator `rng`.
+    - Defines and aligns a scratch memory area for testing.
+    - Checks if `ele_max` exceeds `ELE_MAX`, if `tst_pool_align` is aligned, and if `tst_pool_footprint` fits within `SCRATCH_FOOTPRINT`.
+    - Initializes a reference pool and joins a test pool with the scratch memory.
+    - Logs the start of construction tests and performs various alignment and footprint checks.
+    - Creates and joins a doubly linked list (`dlist`) and performs tests to ensure it is empty initially.
+    - Iterates over a range to test adding and removing elements from the `dlist`, ensuring it matches the reference implementation.
+    - Performs a large number of random operations on the `dlist`, including pushing, popping, inserting, removing, and replacing elements, while validating against the reference implementation.
+    - Tests boundary conditions and error handling for operations on an empty `dlist`.
+    - Logs the start of destruction tests and verifies the proper deletion and cleanup of the `dlist`.
+    - Cleans up resources, deletes the test pool and random number generator, and logs the successful completion of tests.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`ref_pool_init`](<#ref_pool_init>)
+    - [`ref_dlist_is_empty`](<#ref_dlist_is_empty>)
+    - [`ref_dlist_idx_peek_head`](<#ref_dlist_idx_peek_head>)
+    - [`ref_dlist_idx_peek_tail`](<#ref_dlist_idx_peek_tail>)
+    - [`ref_pool_is_empty`](<#ref_pool_is_empty>)
+    - [`ref_pool_idx_acquire`](<#ref_pool_idx_acquire>)
+    - [`ref_dlist_idx_push_head`](<#ref_dlist_idx_push_head>)
+    - [`ref_dlist_idx_push_tail`](<#ref_dlist_idx_push_tail>)
+    - [`ref_dlist_idx_pop_head`](<#ref_dlist_idx_pop_head>)
+    - [`ref_pool_idx_release`](<#ref_pool_idx_release>)
+    - [`ref_dlist_idx_pop_tail`](<#ref_dlist_idx_pop_tail>)
+    - [`ref_dlist_idx_insert_before`](<#ref_dlist_idx_insert_before>)
+    - [`ref_dlist_idx_insert_after`](<#ref_dlist_idx_insert_after>)
+    - [`ref_dlist_idx_remove`](<#ref_dlist_idx_remove>)
+    - [`ref_dlist_idx_replace`](<#ref_dlist_idx_replace>)
 
 
 

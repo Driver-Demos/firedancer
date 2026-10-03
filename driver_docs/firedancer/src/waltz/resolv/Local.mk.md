@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for DNS resolution headers, objects, unit tests, and fuzz tests.
+Makefile for building and testing DNS resolution components in the `firedancer` codebase.
 
 # Purpose
-This build file section adds DNS and name-resolution headers and object files when `FD_HAS_HOSTED` is enabled. It groups the sources into high level API, configuration, and low level DNS parts by registering files such as `fd_netdb.h`, `fd_lookup.h`, and `fd_resolv.h`, along with implementations like `fd_getaddrinfo`, `fd_resolvconf`, `fd_dns_parse`, and `fd_res_mkquery`. It also defines unit tests and fuzz tests for functions such as `test_getaddrinfo`, `fuzz_dn_expand`, `fuzz_lookup_literal`, and `fuzz_dns_parse`, and it runs `test_resolv` as part of the test flow.
+The content defines a build configuration for a software project that includes conditional compilation based on the presence of the `FD_HAS_HOSTED` flag. It specifies the inclusion of header files and object files for different components of the project, such as high-level API, configuration, and low-level DNS operations. The `add-hdrs` and `add-objs` functions are used to add headers and object files, respectively, to the build process. Additionally, the configuration sets up unit tests and fuzz tests for various components, using `make-unit-test` and `make-fuzz-test` functions to define the tests and `run-unit-test` to execute them. This setup ensures that the necessary files are compiled and tested as part of the build process when the `FD_HAS_HOSTED` condition is met.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

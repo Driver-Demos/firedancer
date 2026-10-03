@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `bn254_scalar_64.c` file in the `firedancer` codebase provides an implementation of arithmetic operations for the BN254 scalar field using word-by-word Montgomery multiplication, including functions for addition, subtraction, multiplication, squaring, and conversion between Montgomery and non-Montgomery domains.
+Implementation of arithmetic operations for the bn254_scalar curve using word-by-word Montgomery reduction.
 
 # Purpose
-The provided C source code file is an implementation of arithmetic operations in the Montgomery domain for the BN254 scalar field, which is a specific prime field used in cryptographic applications, particularly in elliptic curve cryptography. The code is auto-generated and provides a comprehensive set of functions to perform arithmetic operations such as addition, subtraction, multiplication, and squaring of field elements, both in and out of the Montgomery domain. It also includes functions for converting between Montgomery and non-Montgomery representations, serialization and deserialization of field elements, and utility functions like conditional moves and checking for non-zero values.
+The code in `bn254_scalar_64.c` is an implementation of arithmetic operations for the BN254 scalar field using the Montgomery representation. This file is part of a cryptographic library that provides functions for performing arithmetic operations on field elements, which are crucial for cryptographic algorithms such as elliptic curve cryptography. The operations are implemented for a 64-bit architecture, as indicated by the `machine_wordsize = 64` comment.
 
-The file defines several key types and functions that facilitate these operations. It uses 64-bit machine words to represent field elements and employs techniques like carry propagation and conditional selection to ensure efficient computation. The code is structured to handle the specific modulus of the BN254 scalar field, ensuring that all operations respect the field's properties. Additionally, the file includes functions for advanced operations such as computing the modular inverse using the Bernstein-Yang inversion method, which is crucial for cryptographic protocols. Overall, this file is a specialized library intended for use in cryptographic systems that require efficient and secure arithmetic in the BN254 scalar field.
+The file defines several types and functions to handle field elements in both Montgomery and non-Montgomery domains. Key functions include [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>), [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>), and [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>), which perform addition with carry, subtraction with borrow, and multiplication, respectively. The file also includes functions for converting between Montgomery and non-Montgomery representations, such as [`fiat_bn254_scalar_to_montgomery`](<#fiat_bn254_scalar_to_montgomery>) and [`fiat_bn254_scalar_from_montgomery`](<#fiat_bn254_scalar_from_montgomery>). Additionally, it provides utility functions like [`fiat_bn254_scalar_nonzero`](<#fiat_bn254_scalar_nonzero>) to check if a field element is non-zero, and [`fiat_bn254_scalar_to_bytes`](<#fiat_bn254_scalar_to_bytes>) and [`fiat_bn254_scalar_from_bytes`](<#fiat_bn254_scalar_from_bytes>) for serialization and deserialization of field elements. The code is auto-generated and optimized for performance, ensuring that all operations respect the bounds and properties of the field elements.
 # Imports and Dependencies
 
 ---
@@ -20,356 +20,407 @@ The file defines several key types and functions that facilitate these operation
 ---
 ### fiat\_bn254\_scalar\_int128
 - **Type**: ``typedef signed __int128``
-- **Description**: The `fiat_bn254_scalar_int128` is a type definition for a signed 128-bit integer using the `__int128` type, which is an extension provided by GCC and Clang compilers. This type allows for operations on 128-bit signed integers, which are larger than the standard 64-bit integers.
-- **Use**: This variable is used to perform arithmetic operations that require 128-bit signed integer precision, such as in cryptographic computations.
+- **Description**: Defines `fiat_bn254_scalar_int128` as a signed 128-bit integer type using the `__int128` type extension. This type is used to represent large signed integers in computations.
+- **Use**: Used in arithmetic operations that require 128-bit signed integer precision.
 
 
 ---
 ### fiat\_bn254\_scalar\_uint128
-- **Type**: `unsigned __int128`
-- **Description**: The `fiat_bn254_scalar_uint128` is a typedef for an unsigned 128-bit integer type, which is used to represent large integers that require more than the standard 64-bit integer size. This type is particularly useful in cryptographic computations where large numbers are common.
-- **Use**: This variable is used in arithmetic operations that require handling of large integers, such as multiplication and addition with carry, within the context of the bn254 scalar field arithmetic.
+- **Type**: ``unsigned __int128``
+- **Description**: This is a type definition for an unsigned 128-bit integer. It is used to represent large integer values that require more than the standard 64-bit integer size.
+- **Use**: Used in arithmetic operations that require handling of large numbers, such as in cryptographic computations.
 
 
 # Functions
 
 ---
 ### fiat\_bn254\_scalar\_addcarryx\_u64<!-- {{#callable:fiat_bn254_scalar_addcarryx_u64}} -->
-The function `fiat_bn254_scalar_addcarryx_u64` performs a 64-bit addition with carry, returning the sum modulo 2^64 and the carry-out.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L62>)
+
+Performs addition of two 64-bit unsigned integers with a carry input and produces a carry output.
 - **Inputs**:
-    - `out1`: A pointer to a uint64_t where the result of the addition modulo 2^64 will be stored.
-    - `out2`: A pointer to a fiat_bn254_scalar_uint1 where the carry-out of the addition will be stored.
-    - `arg1`: A fiat_bn254_scalar_uint1 representing the initial carry-in for the addition.
-    - `arg2`: A uint64_t representing the first operand of the addition.
-    - `arg3`: A uint64_t representing the second operand of the addition.
-- **Control Flow**:
-    - Declare a 128-bit unsigned integer `x1` to hold the intermediate sum of `arg1`, `arg2`, and `arg3`.
+    - ``out1``: Pointer to a `uint64_t` where the result of the addition will be stored.
+    - ``out2``: Pointer to a `fiat_bn254_scalar_uint1` where the carry-out will be stored.
+    - ``arg1``: A `fiat_bn254_scalar_uint1` representing the carry-in for the addition.
+    - ``arg2``: A `uint64_t` representing the first operand for the addition.
+    - ``arg3``: A `uint64_t` representing the second operand for the addition.
+- **Logic and Control Flow**:
+    - Declare a `fiat_bn254_scalar_uint128` variable `x1` to hold the intermediate sum of `arg1`, `arg2`, and `arg3`.
     - Calculate `x1` as the sum of `arg1`, `arg2`, and `arg3`.
     - Extract the lower 64 bits of `x1` and store it in `x2`.
-    - Extract the upper bits of `x1` (carry-out) and store it in `x3`.
+    - Extract the upper bits of `x1` (carry) and store it in `x3`.
     - Store `x2` in the location pointed to by `out1`.
     - Store `x3` in the location pointed to by `out2`.
-- **Output**: The function outputs the sum of `arg1`, `arg2`, and `arg3` modulo 2^64 in `out1`, and the carry-out in `out2`.
+- **Output**: The function outputs the sum of `arg1`, `arg2`, and `arg3` modulo 2^64 in `out1` and the carry-out in `out2`.
 
 
 ---
 ### fiat\_bn254\_scalar\_subborrowx\_u64<!-- {{#callable:fiat_bn254_scalar_subborrowx_u64}} -->
-The function `fiat_bn254_scalar_subborrowx_u64` performs a subtraction of two 64-bit unsigned integers with an additional borrow input, and outputs the result along with a borrow flag.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L88>)
+
+Performs subtraction with borrow on two 64-bit unsigned integers and a borrow flag, producing a result and a new borrow flag.
 - **Inputs**:
-    - `out1`: A pointer to a 64-bit unsigned integer where the result of the subtraction will be stored.
-    - `out2`: A pointer to a fiat_bn254_scalar_uint1 where the borrow flag will be stored.
-    - `arg1`: A fiat_bn254_scalar_uint1 representing the initial borrow input.
-    - `arg2`: A 64-bit unsigned integer representing the minuend.
-    - `arg3`: A 64-bit unsigned integer representing the subtrahend.
-- **Control Flow**:
-    - Calculate the intermediate result `x1` as the difference of `arg2`, `arg1`, and `arg3` cast to a 128-bit integer.
-    - Extract the borrow flag `x2` by right-shifting `x1` by 64 bits and casting to a fiat_bn254_scalar_int1.
-    - Extract the lower 64 bits of `x1` as `x3` by applying a bitwise AND with `UINT64_C(0xffffffffffffffff)`.
+    - `out1`: Pointer to a 64-bit unsigned integer where the result of the subtraction will be stored.
+    - `out2`: Pointer to a `fiat_bn254_scalar_uint1` where the new borrow flag will be stored.
+    - `arg1`: A `fiat_bn254_scalar_uint1` representing the initial borrow flag.
+    - `arg2`: A 64-bit unsigned integer, the minuend.
+    - `arg3`: A 64-bit unsigned integer, the subtrahend.
+- **Logic and Control Flow**:
+    - Calculate the intermediate result `x1` by subtracting `arg1` and `arg3` from `arg2` using 128-bit arithmetic to handle potential overflow.
+    - Extract the borrow flag `x2` by right-shifting `x1` by 64 bits, which indicates if the subtraction resulted in a negative value.
+    - Extract the lower 64 bits of `x1` as `x3`, which is the result of the subtraction without the borrow.
     - Store `x3` in the location pointed to by `out1`.
-    - Calculate the final borrow flag by subtracting `x2` from 0 and store it in the location pointed to by `out2`.
-- **Output**: The function outputs the result of the subtraction in `out1` and the borrow flag in `out2`.
+    - Calculate the new borrow flag by subtracting `x2` from 0 and store it in the location pointed to by `out2`.
+- **Output**: The function does not return a value but outputs the result of the subtraction in `out1` and the new borrow flag in `out2`.
 
 
 ---
 ### fiat\_bn254\_scalar\_mulx\_u64<!-- {{#callable:fiat_bn254_scalar_mulx_u64}} -->
-The function `fiat_bn254_scalar_mulx_u64` performs a 64-bit multiplication of two unsigned integers and returns the result as a 128-bit value split into two 64-bit parts.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L113>)
+
+Performs a 64-bit multiplication of two unsigned integers and returns the result as a double-width product.
 - **Inputs**:
-    - `out1`: A pointer to a uint64_t where the lower 64 bits of the result will be stored.
-    - `out2`: A pointer to a uint64_t where the upper 64 bits of the result will be stored.
-    - `arg1`: A uint64_t representing the first operand of the multiplication.
-    - `arg2`: A uint64_t representing the second operand of the multiplication.
-- **Control Flow**:
-    - Declare a 128-bit unsigned integer `x1` to store the full result of the multiplication of `arg1` and `arg2`.
-    - Perform the multiplication of `arg1` and `arg2`, storing the result in `x1`.
-    - Extract the lower 64 bits of `x1` and store them in `x2`.
-    - Extract the upper 64 bits of `x1` by right-shifting `x1` by 64 bits and store them in `x3`.
-    - Assign the value of `x2` to the location pointed to by `out1`.
-    - Assign the value of `x3` to the location pointed to by `out2`.
-- **Output**: The function outputs two 64-bit unsigned integers through the pointers `out1` and `out2`, representing the lower and upper halves of the 128-bit multiplication result, respectively.
+    - `out1`: Pointer to a `uint64_t` where the lower 64 bits of the product will be stored.
+    - `out2`: Pointer to a `uint64_t` where the upper 64 bits of the product will be stored.
+    - `arg1`: First 64-bit unsigned integer operand.
+    - `arg2`: Second 64-bit unsigned integer operand.
+- **Logic and Control Flow**:
+    - Multiply `arg1` and `arg2` to get a 128-bit result stored in `x1`.
+    - Extract the lower 64 bits of `x1` and store in `x2`.
+    - Extract the upper 64 bits of `x1` and store in `x3`.
+    - Assign `x2` to the location pointed by `out1`.
+    - Assign `x3` to the location pointed by `out2`.
+- **Output**: The function outputs the lower and upper 64 bits of the 128-bit product through the pointers `out1` and `out2`, respectively.
 
 
 ---
 ### fiat\_bn254\_scalar\_cmovznz\_u64<!-- {{#callable:fiat_bn254_scalar_cmovznz_u64}} -->
-The function `fiat_bn254_scalar_cmovznz_u64` performs a conditional move operation on two 64-bit unsigned integers based on a single-bit condition.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L137>)
+
+Performs a conditional move between two 64-bit unsigned integers based on a condition flag.
 - **Inputs**:
-    - `out1`: A pointer to a 64-bit unsigned integer where the result will be stored.
-    - `arg1`: A single-bit unsigned integer (0 or 1) that acts as the condition for the move operation.
-    - `arg2`: A 64-bit unsigned integer that will be selected if `arg1` is 0.
-    - `arg3`: A 64-bit unsigned integer that will be selected if `arg1` is 1.
-- **Control Flow**:
-    - The function first negates `arg1` twice to ensure it is either 0 or 1, storing the result in `x1`.
-    - It calculates `x2` as the bitwise AND of the negated `x1` and the maximum 64-bit unsigned integer, effectively creating a mask of all 1s if `arg1` is 1, or all 0s if `arg1` is 0.
-    - The function then computes `x3` as the bitwise OR of `x2` AND `arg3` and the bitwise NOT of `x2` AND `arg2`, effectively selecting `arg3` if `arg1` is 1, or `arg2` if `arg1` is 0.
-    - Finally, the result `x3` is stored in the location pointed to by `out1`.
-- **Output**: The function outputs the selected 64-bit unsigned integer, either `arg2` or `arg3`, based on the value of `arg1`, and stores it in the location pointed to by `out1`.
+    - `out1`: A pointer to a `uint64_t` where the result will be stored.
+    - `arg1`: A `fiat_bn254_scalar_uint1` condition flag that determines which value to select.
+    - `arg2`: A `uint64_t` value to select if `arg1` is 0.
+    - `arg3`: A `uint64_t` value to select if `arg1` is 1.
+- **Logic and Control Flow**:
+    - Initialize `x1` as the logical negation of `arg1` to determine the condition.
+    - Compute `x2` as the bitwise AND of the negated `x1` and the maximum 64-bit unsigned integer value, effectively creating a mask based on `arg1`.
+    - Compute `x3` as the bitwise OR of `x2` AND `arg3` with the bitwise NOT of `x2` AND `arg2`, selecting `arg3` if `arg1` is 1, otherwise `arg2`.
+    - Store the result in the location pointed to by `out1`.
+- **Output**: The function does not return a value but stores the result in the location pointed to by `out1`.
 
 
 ---
 ### fiat\_bn254\_scalar\_mul<!-- {{#callable:fiat_bn254_scalar_mul}} -->
-The function `fiat_bn254_scalar_mul` performs multiplication of two field elements in the Montgomery domain for the BN254 scalar field.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L158>)
+
+Multiplies two field elements in the Montgomery domain and reduces the result modulo a prime.
 - **Inputs**:
-    - `out1`: A pointer to a `fiat_bn254_scalar_montgomery_domain_field_element` where the result of the multiplication will be stored.
-    - `arg1`: A constant pointer to a `fiat_bn254_scalar_montgomery_domain_field_element` representing the first operand in the Montgomery domain.
-    - `arg2`: A constant pointer to a `fiat_bn254_scalar_montgomery_domain_field_element` representing the second operand in the Montgomery domain.
-- **Control Flow**:
+    - ``out1``: A pointer to a `fiat_bn254_scalar_montgomery_domain_field_element` where the result will be stored.
+    - ``arg1``: A constant pointer to a `fiat_bn254_scalar_montgomery_domain_field_element` representing the first operand.
+    - ``arg2``: A constant pointer to a `fiat_bn254_scalar_montgomery_domain_field_element` representing the second operand.
+- **Logic and Control Flow**:
     - Initialize local variables to store intermediate results and carry bits.
-    - Extract individual 64-bit words from the input field elements `arg1` and `arg2`.
-    - Perform a series of 64-bit multiplications using [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64) to compute partial products of the input elements.
-    - Use [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64) to accumulate the results of the partial products, handling carry bits appropriately.
-    - Compute the Montgomery reduction by multiplying the intermediate result with a constant and reducing modulo the prime modulus using additional multiplications and additions.
-    - Perform conditional subtraction using [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64) to ensure the result is within the field range.
-    - Use [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64) to conditionally select the final result based on the carry from the subtraction.
-    - Store the final result in the output parameter `out1`.
-- **Output**: The function outputs the product of `arg1` and `arg2` in the Montgomery domain, stored in `out1`.
-- **Functions called**:
-    - [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64)
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
+    - Perform a series of multiplications using [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>) to compute partial products of `arg1` and `arg2`.
+    - Use [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>) to accumulate the results of the multiplications, handling carry bits appropriately.
+    - Multiply the intermediate result by a constant using [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>) to prepare for reduction modulo the prime.
+    - Perform additional additions with carry to accumulate the results of the reduction process.
+    - Use [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>) to subtract the prime modulus, ensuring the result is reduced modulo the prime.
+    - Use [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>) to conditionally select the correct result based on the borrow flag.
+    - Store the final reduced result in `out1`.
+- **Output**: The function does not return a value but stores the result in the `out1` parameter, which is a field element in the Montgomery domain.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>)
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_square<!-- {{#callable:fiat_bn254_scalar_square}} -->
-The function `fiat_bn254_scalar_square` computes the square of a field element in the Montgomery domain for the BN254 scalar field.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L513>)
+
+Squares a field element in the Montgomery domain for the BN254 scalar field.
 - **Inputs**:
-    - `out1`: A pointer to an array of four 64-bit unsigned integers where the result will be stored.
-    - `arg1`: A pointer to an array of four 64-bit unsigned integers representing the input field element in the Montgomery domain.
-- **Control Flow**:
+    - `out1`: A pointer to an array of four `uint64_t` elements where the result will be stored.
+    - `arg1`: A constant pointer to an array of four `uint64_t` elements representing the input field element in the Montgomery domain.
+- **Logic and Control Flow**:
     - Initialize local variables to store intermediate results and carry bits.
-    - Extract the four 64-bit words from the input array `arg1`.
-    - Perform a series of multiplications and additions to compute the square of the input element, using the [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64) and [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64) functions to handle 64-bit arithmetic with carry.
-    - Reduce the result modulo the prime modulus using Montgomery reduction, which involves further multiplications and additions.
-    - Use conditional moves ([`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)) to ensure the result is less than the modulus, handling any potential overflow from the reduction.
-    - Store the final result in the output array `out1`.
-- **Output**: The function outputs the square of the input field element in the Montgomery domain, stored in the array `out1`.
-- **Functions called**:
-    - [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64)
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
+    - Extract individual components of the input field element `arg1`.
+    - Perform a series of multiplications and additions to compute the square of the input element, using the [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>) and [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>) functions.
+    - Reduce the result modulo the prime modulus using Montgomery reduction, involving further multiplications and additions.
+    - Use conditional moves to ensure the result is within the field's bounds.
+    - Store the final result in the `out1` array.
+- **Output**: The function does not return a value but stores the squared result in the `out1` array.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>)
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_add<!-- {{#callable:fiat_bn254_scalar_add}} -->
-The function `fiat_bn254_scalar_add` adds two field elements in the Montgomery domain and reduces the result modulo the prime modulus.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L869>)
+
+Adds two field elements in the Montgomery domain and reduces the result modulo the prime modulus.
 - **Inputs**:
-    - `out1`: A pointer to an array of four 64-bit unsigned integers where the result will be stored.
-    - `arg1`: A constant pointer to an array of four 64-bit unsigned integers representing the first field element in the Montgomery domain.
-    - `arg2`: A constant pointer to an array of four 64-bit unsigned integers representing the second field element in the Montgomery domain.
-- **Control Flow**:
-    - Initialize temporary variables for intermediate results and carry flags.
-    - Perform addition with carry for each corresponding pair of elements from `arg1` and `arg2`, storing results in temporary variables.
-    - Perform subtraction with borrow to reduce the result modulo the prime modulus, using constants representing the modulus components.
-    - Use conditional move operations to select between the reduced and non-reduced results based on the final borrow flag.
-    - Store the final result in the `out1` array.
-- **Output**: The function outputs the result of the addition, reduced modulo the prime, in the `out1` array.
-- **Functions called**:
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
+    - `out1`: A pointer to the output field element in the Montgomery domain.
+    - `arg1`: A pointer to the first input field element in the Montgomery domain.
+    - `arg2`: A pointer to the second input field element in the Montgomery domain.
+- **Logic and Control Flow**:
+    - Initialize variables for intermediate results and carry flags.
+    - Perform addition with carry for each of the four 64-bit limbs of the input field elements `arg1` and `arg2`.
+    - Subtract the prime modulus from the result using subtraction with borrow to ensure the result is less than the modulus.
+    - Use conditional move to select the correct result based on the borrow flag, ensuring the result is reduced modulo the prime modulus.
+    - Store the final result in the output field element `out1`.
+- **Output**: The function does not return a value but stores the result in the `out1` parameter, which is a field element in the Montgomery domain.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_sub<!-- {{#callable:fiat_bn254_scalar_sub}} -->
-The function `fiat_bn254_scalar_sub` subtracts two field elements in the Montgomery domain and ensures the result is within the field's bounds.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L922>)
+
+Subtracts two field elements in the Montgomery domain and ensures the result is within the field's bounds.
 - **Inputs**:
-    - `out1`: A pointer to a `fiat_bn254_scalar_montgomery_domain_field_element` where the result will be stored.
-    - `arg1`: A `fiat_bn254_scalar_montgomery_domain_field_element` representing the minuend.
-    - `arg2`: A `fiat_bn254_scalar_montgomery_domain_field_element` representing the subtrahend.
-- **Control Flow**:
-    - Initialize variables for intermediate results and carry/borrow flags.
-    - Perform subtraction with borrow for each limb of the input arrays `arg1` and `arg2` using [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64).
-    - Check if the final borrow flag indicates a negative result, and conditionally set a mask to correct the result by adding the modulus if necessary.
-    - Use [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64) to add the modulus conditionally to the result if the borrow flag was set, ensuring the result is non-negative and within the field's bounds.
-    - Store the final result in `out1`.
-- **Output**: The function outputs the result of the subtraction in the `out1` parameter, which is a `fiat_bn254_scalar_montgomery_domain_field_element`.
-- **Functions called**:
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
+    - `out1`: A `fiat_bn254_scalar_montgomery_domain_field_element` array to store the result of the subtraction.
+    - `arg1`: A `fiat_bn254_scalar_montgomery_domain_field_element` array representing the minuend.
+    - `arg2`: A `fiat_bn254_scalar_montgomery_domain_field_element` array representing the subtrahend.
+- **Logic and Control Flow**:
+    - Initialize variables for intermediate results and borrow flags.
+    - Perform subtraction with borrow for each element of the input arrays `arg1` and `arg2` using [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>), storing results in `x1`, `x3`, `x5`, and `x7`.
+    - Check if the final borrow flag `x8` is set, indicating a negative result, and conditionally set `x9` to a mask of all 1s or 0s using [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>).
+    - Add the modulus to the result if the borrow flag was set, using [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>) to ensure the result is non-negative and within the field's bounds.
+    - Store the final result in the `out1` array.
+- **Output**: The result of the subtraction is stored in the `out1` array, which is a `fiat_bn254_scalar_montgomery_domain_field_element`.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_opp<!-- {{#callable:fiat_bn254_scalar_opp}} -->
-The function `fiat_bn254_scalar_opp` computes the negation of a field element in the Montgomery domain, ensuring the result is within the field's modulus.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L965>)
+
+Negates a field element in the Montgomery domain for the BN254 scalar field.
 - **Inputs**:
-    - `out1`: A pointer to an array of four 64-bit unsigned integers where the result will be stored.
-    - `arg1`: A constant pointer to an array of four 64-bit unsigned integers representing the field element to be negated.
-- **Control Flow**:
-    - Initialize temporary variables for intermediate calculations.
-    - Perform a series of subtraction operations with borrow to compute the negation of each limb of the input field element `arg1`.
-    - Use a conditional move operation to determine if the result needs to be adjusted by adding the modulus, based on the borrow flag from the last subtraction.
-    - Add the modulus conditionally to ensure the result is non-negative and within the field's modulus.
-    - Store the final result in the output array `out1`.
-- **Output**: The function outputs the negated field element in the Montgomery domain, stored in the array `out1`.
-- **Functions called**:
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
+    - `out1`: A pointer to an array of four `uint64_t` elements where the result will be stored.
+    - `arg1`: A constant pointer to an array of four `uint64_t` elements representing the input field element in the Montgomery domain.
+- **Logic and Control Flow**:
+    - Initialize variables `x1` to `x17` for intermediate calculations.
+    - Perform a series of subtraction operations using [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>) to compute the negation of `arg1` with respect to zero, storing results in `x1`, `x3`, `x5`, and `x7`.
+    - Use [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>) to conditionally select between zero and the maximum 64-bit unsigned integer based on the borrow from the last subtraction, storing the result in `x9`.
+    - Add the results of the subtractions to the modulus components using [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>), storing the results in `x10`, `x12`, `x14`, and `x16`.
+    - Store the final results in the `out1` array.
+- **Output**: The output is stored in the `out1` array, which contains the negated field element in the Montgomery domain.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_from\_montgomery<!-- {{#callable:fiat_bn254_scalar_from_montgomery}} -->
-The function `fiat_bn254_scalar_from_montgomery` converts a field element from the Montgomery domain to the standard representation.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1008>)
+
+Converts a field element from the Montgomery domain to the standard representation.
 - **Inputs**:
-    - `out1`: A pointer to an array of four 64-bit unsigned integers where the result will be stored, representing the field element in the non-Montgomery domain.
-    - `arg1`: A pointer to an array of four 64-bit unsigned integers representing the field element in the Montgomery domain.
-- **Control Flow**:
-    - Initialize several 64-bit unsigned integers and fiat_bn254_scalar_uint1 variables for intermediate calculations.
-    - Extract the first element of the input array `arg1` and perform a series of multiplications and additions to compute intermediate values.
-    - Use the [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64) function to perform multiplications and [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64) to handle additions with carry, iterating over each element of `arg1`.
-    - For each element, compute a temporary value by multiplying with a constant and then reduce it using the modulus of the field, performing carry operations as needed.
-    - After processing all elements, perform a series of subtractions using [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64) to ensure the result is within the field's modulus.
-    - Use conditional moves [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64) to select the correct result based on the final carry flag.
-    - Store the final result in the `out1` array.
-- **Output**: The function outputs a field element in the non-Montgomery domain, stored in the `out1` array.
-- **Functions called**:
-    - [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64)
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
+    - `out1`: A pointer to an array of four `uint64_t` where the result will be stored.
+    - `arg1`: A constant pointer to an array of four `uint64_t` representing the field element in the Montgomery domain.
+- **Logic and Control Flow**:
+    - Initialize variables for intermediate calculations.
+    - Extract the first element of `arg1` and perform a series of multiplications and additions to compute intermediate values `x2` to `x16`.
+    - Add the first element of `arg1` to `x10` and store the result in `x18`.
+    - Continue adding intermediate results to compute `x20`, `x22`, and `x24`.
+    - Add the second element of `arg1` to `x20` and store the result in `x26`.
+    - Repeat the process for the remaining elements of `arg1`, updating `x28`, `x30`, `x32`, `x34`, `x36`, `x38`, `x40`, `x42`, `x44`, `x46`, `x48`, `x50`, `x52`, `x54`, `x56`, `x58`, `x60`, `x62`, `x64`, `x66`, `x68`, `x70`, `x72`, `x74`, `x76`, `x78`, `x80`, `x82`, `x84`, `x86`, `x88`, `x90`, `x92`, `x94`, `x96`, `x98`, `x100`, `x102`, `x104`, `x106`, `x108`, `x110`, `x112`, `x114`, `x116`, `x118`, `x120`, `x122`, `x124`, `x126`, `x128`, `x130`.
+    - Perform a series of subtractions to compute `x117`, `x119`, `x121`, `x123`, `x125`.
+    - Use conditional moves to select the final values for `x127`, `x128`, `x129`, `x130` based on the result of the subtraction.
+    - Store the final results in `out1`.
+- **Output**: The function outputs a field element in the standard representation, stored in the array `out1`.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>)
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_to\_montgomery<!-- {{#callable:fiat_bn254_scalar_to_montgomery}} -->
-The function `fiat_bn254_scalar_to_montgomery` converts a field element from the non-Montgomery domain to the Montgomery domain for the BN254 scalar field.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1223>)
+
+Converts a field element from the non-Montgomery domain to the Montgomery domain using a specific modulus.
 - **Inputs**:
-    - `out1`: A pointer to an array of four 64-bit unsigned integers where the result in the Montgomery domain will be stored.
-    - `arg1`: A constant pointer to an array of four 64-bit unsigned integers representing the input field element in the non-Montgomery domain.
-- **Control Flow**:
-    - Extracts the four 64-bit words from the input array `arg1` into variables `x1`, `x2`, `x3`, and `x4`.
-    - Performs a series of multiplications and additions using the extracted words and specific constants to compute intermediate results.
-    - Uses the [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64) function to perform 64-bit multiplications and [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64) to handle additions with carry.
-    - Computes the Montgomery reduction by multiplying with a constant and reducing modulo the prime modulus using a series of multiplications and additions.
-    - Performs conditional moves using [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64) to ensure the result is within the field's bounds.
-    - Stores the final result in the output array `out1`.
+    - `out1`: A pointer to an array of four `uint64_t` elements where the result will be stored.
+    - `arg1`: A constant pointer to an array of four `uint64_t` elements representing the input field element in the non-Montgomery domain.
+- **Logic and Control Flow**:
+    - Initialize variables `x1` to `x195` for intermediate calculations.
+    - Extract elements from `arg1` into `x1`, `x2`, `x3`, and `x4`.
+    - Perform a series of multiplications and additions using [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>) and [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>) to compute intermediate results.
+    - Multiply the intermediate result by a constant using [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>) to obtain `x19` and `x20`.
+    - Perform further multiplications and additions to compute the Montgomery representation.
+    - Use [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>) to ensure the result is within the modulus.
+    - Use [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>) to conditionally move values based on the borrow flag.
+    - Store the final result in `out1`.
 - **Output**: The function outputs the Montgomery domain representation of the input field element in the array `out1`.
-- **Functions called**:
-    - [`fiat_bn254_scalar_mulx_u64`](#fiat_bn254_scalar_mulx_u64)
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
+- **Functions Called**:
+    - [`fiat_bn254_scalar_mulx_u64`](<#fiat_bn254_scalar_mulx_u64>)
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_nonzero<!-- {{#callable:fiat_bn254_scalar_nonzero}} -->
-The function `fiat_bn254_scalar_nonzero` checks if a 4-element array of 64-bit unsigned integers is non-zero and outputs a single non-zero word if it is, or zero otherwise.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1540>)
+
+Outputs a single non-zero word if the input array is non-zero, otherwise outputs zero.
 - **Inputs**:
-    - `out1`: A pointer to a 64-bit unsigned integer where the result will be stored.
-    - `arg1`: An array of four 64-bit unsigned integers representing the input to be checked for non-zero values.
-- **Control Flow**:
-    - The function initializes a local variable `x1` to the bitwise OR of all elements in the input array `arg1`.
-    - The result of the OR operation, `x1`, is assigned to the dereferenced pointer `out1`.
-- **Output**: The function outputs a single 64-bit unsigned integer through the pointer `out1`, which is non-zero if any element of `arg1` is non-zero, and zero otherwise.
+    - `out1`: A pointer to a `uint64_t` where the result will be stored.
+    - `arg1`: An array of four `uint64_t` values representing the input to check for non-zero status.
+- **Logic and Control Flow**:
+    - Declare a local variable `x1` of type `uint64_t`.
+    - Compute the bitwise OR of all elements in `arg1` and store the result in `x1`.
+    - Assign the value of `x1` to the location pointed to by `out1`.
+- **Output**: A single `uint64_t` value stored at the location pointed to by `out1`, which is non-zero if any element of `arg1` is non-zero, otherwise zero.
 
 
 ---
 ### fiat\_bn254\_scalar\_selectznz<!-- {{#callable:fiat_bn254_scalar_selectznz}} -->
-The function `fiat_bn254_scalar_selectznz` performs a conditional selection between two 4-element arrays based on a single-bit flag.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1559>)
+
+Selects between two 256-bit values based on a condition.
 - **Inputs**:
-    - `out1`: An array of four 64-bit unsigned integers where the result will be stored.
-    - `arg1`: A single-bit flag (0 or 1) of type `fiat_bn254_scalar_uint1` that determines which array to select.
-    - `arg2`: A 4-element array of 64-bit unsigned integers, representing the first option for selection.
-    - `arg3`: A 4-element array of 64-bit unsigned integers, representing the second option for selection.
-- **Control Flow**:
-    - The function initializes four local variables `x1`, `x2`, `x3`, and `x4` to store the selected values from either `arg2` or `arg3` based on `arg1`.
-    - It calls [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64) four times, each time selecting between corresponding elements of `arg2` and `arg3` based on `arg1`.
-    - The selected values are stored in `x1`, `x2`, `x3`, and `x4`.
-    - Finally, the selected values are assigned to the `out1` array.
-- **Output**: The function outputs the selected 4-element array in `out1`, which is either `arg2` or `arg3` based on the value of `arg1`.
-- **Functions called**:
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
+    - `out1`: An array of four 64-bit unsigned integers where the result is stored.
+    - `arg1`: A single-bit unsigned integer that acts as the condition for selection.
+    - `arg2`: An array of four 64-bit unsigned integers representing the first value to select from.
+    - `arg3`: An array of four 64-bit unsigned integers representing the second value to select from.
+- **Logic and Control Flow**:
+    - Calls [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>) four times, once for each 64-bit segment of the input arrays `arg2` and `arg3`.
+    - Each call to [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>) selects between the corresponding elements of `arg2` and `arg3` based on `arg1`.
+    - Stores the result of each selection in the corresponding element of `out1`.
+- **Output**: The selected 256-bit value is stored in `out1`, with each 64-bit segment determined by the condition `arg1`.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
 
 
 ---
 ### fiat\_bn254\_scalar\_to\_bytes<!-- {{#callable:fiat_bn254_scalar_to_bytes}} -->
-The function `fiat_bn254_scalar_to_bytes` converts a 256-bit scalar represented as four 64-bit unsigned integers into a 32-byte array in little-endian order.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1587>)
+
+Converts a 256-bit scalar from a 4-element array of 64-bit integers to a 32-byte array in little-endian order.
 - **Inputs**:
-    - `out1`: A 32-element array of uint8_t where the resulting bytes will be stored.
-    - `arg1`: A 4-element array of uint64_t representing the scalar to be converted to bytes.
-- **Control Flow**:
-    - Extract the least significant byte from each 64-bit integer in `arg1` and store it in `out1` in little-endian order.
-    - Shift the 64-bit integer right by 8 bits and repeat the extraction process for the next byte, continuing until all bytes are extracted.
-    - Repeat the above steps for each of the four 64-bit integers in `arg1`.
-- **Output**: The function does not return a value; it populates the `out1` array with the byte representation of the input scalar.
+    - `out1`: A 32-byte array where the function will store the serialized output.
+    - `arg1`: A 4-element array of 64-bit unsigned integers representing the scalar to be serialized.
+- **Logic and Control Flow**:
+    - Extracts each 64-bit integer from `arg1` and processes it in little-endian order.
+    - For each 64-bit integer, extracts 8 bytes by masking and shifting operations.
+    - Stores each extracted byte into the `out1` array in sequence.
+- **Output**: A 32-byte array `out1` containing the serialized scalar in little-endian order.
 
 
 ---
 ### fiat\_bn254\_scalar\_from\_bytes<!-- {{#callable:fiat_bn254_scalar_from_bytes}} -->
-The function `fiat_bn254_scalar_from_bytes` converts a 32-byte array into a 4-element array of 64-bit unsigned integers, representing a field element in little-endian order.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1756>)
+
+Converts a 32-byte array into a 4-element array of 64-bit unsigned integers, interpreting the input as a little-endian number.
 - **Inputs**:
     - `out1`: A 4-element array of 64-bit unsigned integers where the result will be stored.
-    - `arg1`: A 32-element array of 8-bit unsigned integers representing the input bytes in little-endian order.
-- **Control Flow**:
-    - Initialize multiple 64-bit unsigned integers to store intermediate results.
-    - Extract and shift each byte from the input array `arg1` to construct 64-bit integers, combining them to form four 64-bit integers.
-    - Store the resulting 64-bit integers into the output array `out1`.
-- **Output**: The function outputs a 4-element array of 64-bit unsigned integers representing the deserialized field element.
+    - `arg1`: A 32-byte array representing a number in little-endian order.
+- **Logic and Control Flow**:
+    - Initialize 60 local variables to store intermediate results.
+    - Extract each byte from `arg1` and shift it to its correct position to form 64-bit integers.
+    - Combine the shifted bytes to form four 64-bit integers, each representing a segment of the input number.
+    - Store the resulting 64-bit integers in the `out1` array.
+- **Output**: A 4-element array of 64-bit unsigned integers representing the input number in little-endian order.
 
 
 ---
 ### fiat\_bn254\_scalar\_set\_one<!-- {{#callable:fiat_bn254_scalar_set_one}} -->
-The function `fiat_bn254_scalar_set_one` initializes a field element in the Montgomery domain to represent the value one.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1891>)
+
+Sets the output field element to the representation of one in the Montgomery domain for the BN254 scalar field.
 - **Inputs**:
-    - `out1`: A pointer to a `fiat_bn254_scalar_montgomery_domain_field_element`, which is an array of four 64-bit unsigned integers, where the result will be stored.
-- **Control Flow**:
-    - The function directly assigns specific constant values to each of the four elements of the `out1` array.
-    - These constants are precomputed values that represent the number one in the Montgomery domain for the bn254 scalar field.
-- **Output**: The function does not return a value; it modifies the `out1` array in place to represent the number one in the Montgomery domain.
+    - `out1`: A `fiat_bn254_scalar_montgomery_domain_field_element` array of size 4 that will hold the output value.
+- **Logic and Control Flow**:
+    - Assigns the constant `0xac96341c4ffffffb` to `out1[0]`.
+    - Assigns the constant `0x36fc76959f60cd29` to `out1[1]`.
+    - Assigns the constant `0x666ea36f7879462e` to `out1[2]`.
+    - Assigns the constant `0xe0a77c19a07df2f` to `out1[3]`.
+- **Output**: The function does not return a value but modifies the `out1` array to represent the number one in the Montgomery domain.
 
 
 ---
 ### fiat\_bn254\_scalar\_msat<!-- {{#callable:fiat_bn254_scalar_msat}} -->
-The function `fiat_bn254_scalar_msat` initializes an array with the saturated representation of the prime modulus for the bn254_scalar curve.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1908>)
+
+Returns the saturated representation of the prime modulus for the BN254 scalar field.
 - **Inputs**:
-    - `out1`: An array of 5 uint64_t elements where the saturated representation of the prime modulus will be stored.
-- **Control Flow**:
-    - The function assigns the first element of the array `out1` to the constant `0x43e1f593f0000001`.
-    - The second element of `out1` is set to `0x2833e84879b97091`.
-    - The third element of `out1` is set to `0xb85045b68181585d`.
-    - The fourth element of `out1` is set to `0x30644e72e131a029`.
-    - The fifth element of `out1` is set to `0x0`.
-- **Output**: The function does not return a value; it modifies the `out1` array in place to contain the saturated representation of the prime modulus.
+    - `out1`: An array of 5 `uint64_t` elements where the function will store the saturated representation of the prime modulus.
+- **Logic and Control Flow**:
+    - Assigns the constant value `0x43e1f593f0000001` to `out1[0]`.
+    - Assigns the constant value `0x2833e84879b97091` to `out1[1]`.
+    - Assigns the constant value `0xb85045b68181585d` to `out1[2]`.
+    - Assigns the constant value `0x30644e72e131a029` to `out1[3]`.
+    - Assigns the value `0x0` to `out1[4]`.
+- **Output**: The function outputs the saturated representation of the prime modulus in the `out1` array.
 
 
 ---
 ### fiat\_bn254\_scalar\_divstep\_precomp<!-- {{#callable:fiat_bn254_scalar_divstep_precomp}} -->
-The function `fiat_bn254_scalar_divstep_precomp` initializes a 4-element array with precomputed constants for the Bernstein-Yang inversion in Montgomery form.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1926>)
+
+Initializes a 4-element array with precomputed constants for Bernstein-Yang inversion in Montgomery form.
 - **Inputs**:
-    - `out1`: A pointer to an array of four 64-bit unsigned integers where the precomputed values will be stored.
-- **Control Flow**:
-    - The function assigns the first element of the array `out1` to the constant `0x99ddb8c9f8b62554`.
-    - The function assigns the second element of the array `out1` to the constant `0x9d24a395a4811e46`.
-    - The function assigns the third element of the array `out1` to the constant `0x241215ce0ed81b0`.
-    - The function assigns the fourth element of the array `out1` to the constant `0x2e6a72a316e4cfb6`.
-- **Output**: The function does not return a value; it modifies the array `out1` in place.
+    - `out1`: A 4-element array of type `uint64_t` where the function will store the precomputed constants.
+- **Logic and Control Flow**:
+    - Assigns the constant `0x99ddb8c9f8b62554` to `out1[0]`.
+    - Assigns the constant `0x9d24a395a4811e46` to `out1[1]`.
+    - Assigns the constant `0x241215ce0ed81b0` to `out1[2]`.
+    - Assigns the constant `0x2e6a72a316e4cfb6` to `out1[3]`.
+- **Output**: The function does not return a value; it modifies the `out1` array in place.
 
 
 ---
 ### fiat\_bn254\_scalar\_divstep<!-- {{#callable:fiat_bn254_scalar_divstep}} -->
-The function `fiat_bn254_scalar_divstep` performs a division step in the context of the BN254 scalar field arithmetic, updating multiple output arrays based on the input conditions and values.
+[View Source →](<../../../../../src/ballet/fiat-crypto/bn254_scalar_64.c#L1963>)
+
+Computes a divstep operation for the BN254 scalar field, updating multiple output arrays based on the input conditions.
 - **Inputs**:
-    - `out1`: A pointer to a uint64_t where the result of the division step will be stored.
-    - `out2`: An array of 5 uint64_t elements that will be updated based on the division step.
-    - `out3`: An array of 5 uint64_t elements that will be updated based on the division step.
-    - `out4`: An array of 4 uint64_t elements that will be updated based on the division step.
-    - `out5`: An array of 4 uint64_t elements that will be updated based on the division step.
-    - `arg1`: A uint64_t input value used in the division step.
-    - `arg2`: An array of 5 uint64_t elements representing one of the input values for the division step.
-    - `arg3`: An array of 5 uint64_t elements representing another input value for the division step.
-    - `arg4`: An array of 4 uint64_t elements representing one of the input values for the division step.
-    - `arg5`: An array of 4 uint64_t elements representing another input value for the division step.
-- **Control Flow**:
-    - Initialize variables and perform bitwise operations to determine the control flow based on the least significant bit of `arg3[0]` and the sign of `arg1`.
-    - Use conditional moves ([`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)) to select between `arg2` and `arg3`, and between `arg4` and `arg5`, based on the control flow condition.
-    - Perform arithmetic operations including addition with carry ([`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)) and subtraction with borrow ([`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)) to compute intermediate values.
-    - Update `out1` with the result of incrementing or decrementing `arg1` based on the control flow condition.
-    - Update `out2`, `out3`, `out4`, and `out5` with the computed values based on the control flow condition and the results of the arithmetic operations.
-- **Output**: The function updates the values pointed to by `out1`, `out2`, `out3`, `out4`, and `out5` based on the division step logic and the input arguments.
-- **Functions called**:
-    - [`fiat_bn254_scalar_addcarryx_u64`](#fiat_bn254_scalar_addcarryx_u64)
-    - [`fiat_bn254_scalar_cmovznz_u64`](#fiat_bn254_scalar_cmovznz_u64)
-    - [`fiat_bn254_scalar_subborrowx_u64`](#fiat_bn254_scalar_subborrowx_u64)
+    - `out1`: Pointer to a `uint64_t` where the function stores the result of the divstep operation.
+    - `out2`: Array of 5 `uint64_t` elements where the function stores the updated value of `arg2` or `arg3` based on conditions.
+    - `out3`: Array of 5 `uint64_t` elements where the function stores the result of a computation involving `arg2` and `arg3`.
+    - `out4`: Array of 4 `uint64_t` elements where the function stores the result of a computation involving `arg4` and `arg5`.
+    - `out5`: Array of 4 `uint64_t` elements where the function stores the result of a computation involving `arg4` and `arg5`.
+    - `arg1`: A `uint64_t` input value used in the divstep computation.
+    - `arg2`: Array of 5 `uint64_t` elements representing one of the input values for the divstep operation.
+    - `arg3`: Array of 5 `uint64_t` elements representing another input value for the divstep operation.
+    - `arg4`: Array of 4 `uint64_t` elements representing one of the input values for the divstep operation.
+    - `arg5`: Array of 4 `uint64_t` elements representing another input value for the divstep operation.
+- **Logic and Control Flow**:
+    - Initialize variables and perform bitwise operations to determine the condition `x3` based on `arg1` and `arg3`.
+    - Use conditional move operations ([`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)) to select values for `x6` to `x11` based on `x3`.
+    - Compute the negation of `arg2` and store results in `x12` to `x20`.
+    - Use conditional move operations to select values for `x22` to `x26` based on `x3`.
+    - Perform arithmetic operations to compute `x31` to `x38` and check if the result is less than a constant, updating `x39` to `x47`.
+    - Compute the negation of `arg4` and store results in `x53` to `x60`, then adjust based on a condition to get `x62` to `x68`.
+    - Use conditional move operations to select values for `x70` to `x73` based on `x3`.
+    - Determine if `x22` is odd and use conditional move operations to adjust `x75` to `x79`.
+    - Perform arithmetic operations to compute `x80` to `x89` and adjust based on conditions to get `x94` to `x101`.
+    - Check if the result is less than a constant, updating `x102` to `x110`.
+    - Compute the final result for `out1` and shift values for `out3` to get `x114` to `x118`.
+    - Use conditional move operations to select final values for `out4` and `out5` based on conditions.
+- **Output**: The function updates the values of `out1`, `out2`, `out3`, `out4`, and `out5` based on the divstep computation.
+- **Functions Called**:
+    - [`fiat_bn254_scalar_addcarryx_u64`](<#fiat_bn254_scalar_addcarryx_u64>)
+    - [`fiat_bn254_scalar_cmovznz_u64`](<#fiat_bn254_scalar_cmovznz_u64>)
+    - [`fiat_bn254_scalar_subborrowx_u64`](<#fiat_bn254_scalar_subborrowx_u64>)
 
 
 
