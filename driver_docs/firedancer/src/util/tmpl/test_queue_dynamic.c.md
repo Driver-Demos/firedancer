@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests dynamic queue operations with various push and pop methods, including zero-copy operations.
+The `test_queue_dynamic.c` file in the `firedancer` codebase tests the functionality of a dynamic queue implementation, including operations such as push, pop, and zero-copy push/pop, while ensuring alignment and footprint constraints are met.
 
 # Purpose
-The code is a C program that tests the functionality of a dynamic queue implementation. It includes a static buffer with a maximum size defined by `BUF_MAX` and provides basic operations to push and pop integers from this buffer. The program uses a dynamic queue, defined in the included file `fd_queue_dynamic.c`, to perform similar operations. The main function initializes the environment, sets up a random number generator, and configures the maximum size of the queue. It then performs a series of tests to verify the queue's construction, accessors, and operations, including push, pop, zero-copy push, and zero-copy pop.
+This C source code file is designed to test the functionality of a dynamic queue implementation. It includes a simple circular buffer mechanism for managing integer data, with functions to push and pop elements. The file also integrates a more complex queue system from an external source, `fd_queue_dynamic.c`, which is included and utilized to perform various queue operations. The code is structured to test the queue's construction, accessors, and operations, ensuring that the queue behaves correctly under various conditions, including random operations and resets.
 
-The program uses a scratch memory region for the queue's storage, ensuring alignment and footprint constraints are met. It performs a large number of iterations to test the queue's operations under various conditions, including random resets of the buffer. The tests include checks for queue properties such as maximum size, current count, availability, emptiness, and fullness. The program logs notices and warnings to provide feedback on the test progress and results. It concludes by cleaning up resources and halting the execution.
+The main function initializes the environment, sets up a random number generator, and configures the maximum size of the queue. It then performs a series of tests on the queue, including pushing and popping elements, both with and without zero-copy operations. The code uses assertions to verify the correctness of each operation, ensuring that the queue's state matches expected values. The file is intended to be an executable test harness rather than a library or header file, as it contains a [`main`](#main) function and directly executes tests on the queue implementation. The use of logging and assertions indicates a focus on validating the queue's behavior and performance.
 # Imports and Dependencies
 
 ---
@@ -20,98 +20,89 @@ The program uses a scratch memory region for the queue's storage, ensuring align
 
 ---
 ### buf
-- **Type**: ``int[]``
-- **Description**: An array of integers with a size defined by the macro `BUF_MAX`. It is used to store integer values in a circular buffer fashion.
-- **Use**: Stores integer values in a circular buffer for push and pop operations.
+- **Type**: `int array`
+- **Description**: The `buf` variable is a static integer array with a size defined by the macro `BUF_MAX`, which is set to 8. It is used to store integer values in a circular buffer fashion.
+- **Use**: This variable is used to hold elements in a circular buffer, allowing for efficient push and pop operations within the defined maximum size.
 
 
 ---
 ### buf\_start
-- **Type**: ``ulong``
-- **Description**: `buf_start` is a static global variable of type `ulong` that represents the starting index of a circular buffer `buf`. It is initialized to 0 and is used to track the position from which elements are removed from the buffer.
-- **Use**: Tracks the starting index for element removal in the circular buffer `buf`.
+- **Type**: `ulong`
+- **Description**: `buf_start` is a static global variable of type `ulong` that represents the starting index of a circular buffer used in the program. It is initialized to 0UL and is used to track the position from which elements are removed from the buffer.
+- **Use**: `buf_start` is used to manage the position of the next element to be popped from the circular buffer, ensuring correct buffer operations.
 
 
 ---
 ### buf\_end
-- **Type**: ``ulong``
-- **Description**: Represents the index position in the `buf` array where the next element will be inserted. It is used to track the end of the buffer in a circular buffer implementation.
-- **Use**: Tracks the position for the next insertion in the circular buffer.
+- **Type**: `ulong`
+- **Description**: `buf_end` is a static global variable of type `ulong` that represents the index position in the buffer array `buf` where the next element will be inserted. It is initialized to 0UL, indicating that the buffer is initially empty.
+- **Use**: `buf_end` is used to track the end position of the buffer for insertion operations, wrapping around to 0 when it reaches the buffer's maximum capacity (`BUF_MAX`).
 
 
 ---
 ### buf\_cnt
-- **Type**: ``ulong``
-- **Description**: Counts the number of elements currently in the buffer `buf`. It is initialized to zero and is incremented or decremented as elements are added or removed from the buffer.
-- **Use**: Tracks the current number of elements in the buffer to ensure it does not exceed `BUF_MAX`.
+- **Type**: `ulong`
+- **Description**: `buf_cnt` is a static global variable of type `ulong` that keeps track of the number of elements currently stored in the buffer `buf`. It is initialized to zero and is used to ensure that the buffer does not exceed its maximum capacity, `BUF_MAX`. The variable is incremented when an element is pushed into the buffer and decremented when an element is popped from the buffer.
+- **Use**: `buf_cnt` is used to manage the current count of elements in the buffer, ensuring operations respect the buffer's capacity constraints.
 
 
 ---
 ### scratch
-- **Type**: ``uchar[]``
-- **Description**: An array of unsigned characters with a size defined by `SCRATCH_FOOTPRINT`, which is 1024 bytes. The array is aligned in memory according to `SCRATCH_ALIGN`, which is 128 bytes.
-- **Use**: Serves as a memory region for operations related to the `test_queue`.
+- **Type**: `uchar array`
+- **Description**: The `scratch` variable is a global array of unsigned characters with a size defined by `SCRATCH_FOOTPRINT`. It is aligned in memory according to `SCRATCH_ALIGN` using the `__attribute__((aligned(SCRATCH_ALIGN)))` directive.
+- **Use**: This variable is used as a memory buffer for operations involving the `test_queue` data structure, providing a scratch space for queue operations.
 
 
 # Functions
 
 ---
 ### buf\_push<!-- {{#callable:buf_push}} -->
-[View Source →](<../../../../../src/util/tmpl/test_queue_dynamic.c#L10>)
-
-Adds an integer to the end of a circular buffer if there is space available.
+The `buf_push` function adds an integer to a circular buffer, ensuring it does not exceed its maximum capacity.
 - **Inputs**:
-    - `i`: The integer to add to the buffer.
-- **Logic and Control Flow**:
-    - Check if the buffer is not full using `FD_TEST(buf_cnt<BUF_MAX)`; if full, the function does not proceed.
-    - Assign the integer `i` to the position in the buffer indicated by `buf_end`.
-    - Increment `buf_cnt` to reflect the addition of a new element.
-    - Increment `buf_end` to point to the next position in the buffer.
-    - If `buf_end` reaches `BUF_MAX`, reset `buf_end` to 0 to maintain the circular nature of the buffer.
-- **Output**: No output is returned; the function modifies the global buffer state.
+    - `i`: The integer value to be added to the buffer.
+- **Control Flow**:
+    - Check if the buffer count is less than the maximum buffer size using `FD_TEST` macro.
+    - Assign the integer `i` to the current end position of the buffer array `buf`.
+    - Increment the buffer count `buf_cnt` and the buffer end index `buf_end`.
+    - If `buf_end` reaches or exceeds `BUF_MAX`, reset `buf_end` to 0 to maintain the circular nature of the buffer.
+- **Output**: The function does not return a value; it modifies the global buffer state.
 
 
 ---
 ### buf\_pop<!-- {{#callable:buf_pop}} -->
-[View Source →](<../../../../../src/util/tmpl/test_queue_dynamic.c#L17>)
-
-Removes and returns the integer at the start of a circular buffer, updating the buffer's state accordingly.
+The `buf_pop` function removes and returns the integer at the start of a circular buffer, updating the buffer's state accordingly.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Checks if the buffer is not empty using `FD_TEST(buf_cnt)`.
-    - Retrieves the integer at the current `buf_start` index from the `buf` array and stores it in `i`.
-    - Decrements `buf_cnt` to reflect the removal of an element.
-    - Increments `buf_start` to point to the next element in the buffer.
-    - Checks if `buf_start` has reached `BUF_MAX` and resets it to `0UL` if true, maintaining the circular nature of the buffer.
-    - Returns the integer `i` that was removed from the buffer.
-- **Output**: Returns the integer that was at the start of the buffer.
+- **Control Flow**:
+    - Check if the buffer is not empty using `FD_TEST(buf_cnt)`; if empty, the function will not proceed.
+    - Retrieve the integer at the current `buf_start` index of the buffer.
+    - Decrement the buffer count `buf_cnt` to reflect the removal of an element.
+    - Increment the `buf_start` index to point to the next element in the buffer.
+    - If `buf_start` exceeds or equals `BUF_MAX`, reset `buf_start` to 0 to maintain the circular nature of the buffer.
+    - Return the integer that was at the start of the buffer.
+- **Output**: The function returns the integer value that was at the start of the buffer before it was removed.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/tmpl/test_queue_dynamic.c#L31>)
-
-Initializes and tests a dynamic queue with random operations, ensuring alignment and footprint constraints are met.
+The `main` function initializes a random number generator, configures and tests a dynamic queue with various operations, and logs the results.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: The array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment.
-    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Parses the `--max` command-line argument to determine the maximum queue size, defaulting to `BUF_MAX`.
-    - Checks if `max` exceeds `BUF_MAX` or if the queue's alignment and footprint exceed `SCRATCH_ALIGN` and `SCRATCH_FOOTPRINT`, respectively, logging warnings and exiting if so.
-    - Logs the maximum queue size being tested.
-    - Tests queue construction by checking alignment and footprint, then creates and joins a new queue.
-    - Logs and tests queue accessors to ensure the queue is initialized correctly.
-    - Performs 100 million iterations of random queue operations (push, pop, zero-copy push, zero-copy pop) based on random values generated by `rng`.
-    - Resets the buffer and queue if a randomly generated reset condition is met.
-    - Verifies queue operations using `FD_TEST` to ensure correctness after each operation.
-    - Leaves and deletes the queue, then deletes the random number generator.
-    - Logs a success message and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 after successful execution and testing of the queue operations.
-- **Functions Called**:
-    - [`buf_push`](<#buf_push>)
-    - [`buf_pop`](<#buf_pop>)
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program environment with `fd_boot` and set up a random number generator.
+    - Parse the `--max` command-line argument to determine the maximum queue size, defaulting to `BUF_MAX`.
+    - Check if the `max` value exceeds `BUF_MAX` or if the queue's alignment and footprint exceed predefined limits, logging warnings and exiting if so.
+    - Log the maximum queue size and begin testing the queue's construction, ensuring alignment and footprint constraints are met.
+    - Create and join a new queue using the `test_queue` functions, logging the success of these operations.
+    - Test the queue's accessors to ensure the maximum size and initial count are correct.
+    - Perform 100 million iterations of random queue operations, including push, pop, zero-copy push, and zero-copy pop, resetting the queue occasionally.
+    - For each operation, verify the queue's state and contents using `FD_TEST` assertions.
+    - After the loop, leave and delete the queue, ensuring the scratch space is correctly restored.
+    - Delete the random number generator and log the successful completion of the tests before halting the program.
+- **Output**: The function returns an integer status code, `0`, indicating successful execution.
+- **Functions called**:
+    - [`buf_push`](#buf_push)
+    - [`buf_pop`](#buf_pop)
 
 
 

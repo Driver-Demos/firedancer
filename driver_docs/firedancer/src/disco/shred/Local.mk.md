@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components in the `firedancer` codebase with conditional compilation.
+Build rules and unit test targets for shred components, gated by int128, sandbox, and hosted support.
 
 # Purpose
-The content is a Makefile script used to manage the build process and testing of various components in a software project. It uses conditional statements to check for specific features or architecture support, such as `FD_HAS_INT128` and `FD_ARCH_SUPPORTS_SANDBOX`, to determine which object files and unit tests to include. The `add-objs` function is called to add object files like `fd_shred_dest`, `fd_shredder`, and others to the build process, associating them with the `fd_disco` module. The `make-unit-test` function is used to define unit tests for components such as `test_shred_dest`, `test_fec_resolver`, and `test_stake_ci`, specifying their dependencies. The `run-unit-test` function executes these tests, ensuring that the components function correctly under the specified conditions.
+This build script section adds `fd_disco` object files when `FD_HAS_INT128` is defined, and it registers unit tests for shred, FEC resolver, and stake calculation components. It also adds the `test_shred_tile` unit test only when `FD_ARCH_SUPPORTS_SANDBOX` is defined, which limits that test to supported build targets. The `make-unit-test` calls define each test target and list the required libraries, while the `run-unit-test` calls mark selected tests for execution. When `FD_HAS_HOSTED` is defined, the script also builds and runs `test_shredder` for hosted environments.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
