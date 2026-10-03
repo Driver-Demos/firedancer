@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile logic to add headers and objects if 128-bit integer support is available.
+The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and objects related to `fd_epoch` and `fd_choreo` based on the presence of 128-bit integer support.
 
 # Purpose
-The `Makefile` snippet uses a conditional directive to check if the macro `FD_HAS_INT128` is defined. If it is defined, the script calls the `add-hdrs` function to include the header file `fd_epoch.h` and calls the `add-objs` function to add the object files `fd_epoch` and `fd_choreo`. This setup is used to conditionally compile and link specific components based on the availability of 128-bit integer support.
+This file is a Makefile snippet used in a build system to conditionally include headers and objects based on the presence of a feature macro `FD_HAS_INT128`. If `FD_HAS_INT128` is defined, it adds `fd_epoch.h` to the headers and `fd_epoch` and `fd_choreo` to the objects for compilation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
