@@ -3,32 +3,29 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `block_engine.proto` file defines the protocol buffer messages and services for a block engine system, including functionality for subscribing to packet and bundle streams, managing accounts and programs of interest, and handling expiring packet batches and heartbeats.
+Defines gRPC services and messages for block engine validators and relayers to manage packets and bundles.
 
 # Purpose
-The provided content is a Protocol Buffers (proto3) file, which is used to define the structure of data and the services for communication between different components in a distributed system. This file specifically configures the communication protocol for a "Block Engine" system, which appears to be part of a blockchain or decentralized network infrastructure. It defines several messages and services that facilitate the exchange of packets and bundles between validators and relayers, as well as the management of accounts and programs of interest. The file includes service definitions for `BlockEngineValidator` and `BlockEngineRelayer`, which outline RPC (Remote Procedure Call) methods for subscribing to data streams and retrieving fee information. The content of this file is crucial for ensuring that different components of the system can communicate effectively, enabling functionalities such as packet forwarding, bundle subscription, and fee management, which are essential for the operation of the block engine within the network.
+The file defines a Protocol Buffers (`proto3`) schema for a block engine system, which facilitates communication between validators, relayers, and block engines. It imports definitions from `packet.proto`, `shared.proto`, and `bundle.proto`, indicating dependencies on these files for shared data structures. The schema includes several message types such as `SubscribePacketsRequest`, `SubscribePacketsResponse`, `BlockBuilderFeeInfoRequest`, and `ExpiringPacketBatch`, each serving specific roles in the communication process. For example, `ExpiringPacketBatch` includes a header, a batch of packets, and an expiry time, which helps manage packet forwarding to validators. The file also defines two services: `BlockEngineValidator` and `BlockEngineRelayer`. These services provide remote procedure calls (RPCs) for subscribing to packet and bundle streams, retrieving block builder fee information, and managing accounts and programs of interest. The RPCs facilitate the exchange of data streams and updates between the block engine and connected entities, ensuring efficient and targeted data handling within the network.
 # Content Summary
-The provided content is a Protocol Buffers (proto3) definition file for a service architecture involving block engines, validators, and relayers. This file defines the structure and communication protocols for a system that handles packet and bundle subscriptions, fee information, and accounts of interest updates, primarily in the context of blockchain operations.
+The provided content is a Protocol Buffers (proto3) file that defines the structure and services for a block engine system. This system facilitates communication between validators, relayers, and block engines, primarily for handling packets and bundles in a blockchain environment.
 
-Key components of the file include:
+Key components and services defined in the file include:
 
-1. **Package and Imports**: The package is named `block_engine`, and it imports three other proto files: `packet.proto`, `shared.proto`, and `bundle.proto`. These imports suggest dependencies on external message definitions, likely for packet handling, shared data structures, and bundle management.
+1. **Messages**:
+   - `SubscribePacketsRequest` and `SubscribePacketsResponse`: Used for subscribing to packet streams. The response includes a header and a batch of packets.
+   - `SubscribeBundlesRequest` and `SubscribeBundlesResponse`: Used for subscribing to bundle streams. The response includes a list of bundle UUIDs.
+   - `BlockBuilderFeeInfoRequest` and `BlockBuilderFeeInfoResponse`: Used to request and receive fee information for block builders, including a public key and commission rate.
+   - `AccountsOfInterest` and related messages: Define accounts that are of interest, allowing the system to focus on specific transactions.
+   - `ProgramsOfInterestRequest` and `ProgramsOfInterestUpdate`: Similar to accounts, but for programs of interest.
+   - `ExpiringPacketBatch`: Represents a batch of packets with an expiration time, providing a mechanism for censorship resistance.
+   - `PacketBatchUpdate`: A multiplexed message that can contain either expiring packet batches or heartbeats for time synchronization.
 
-2. **Messages**: Several message types are defined to facilitate communication between different components:
-   - `SubscribePacketsRequest` and `SubscribePacketsResponse` manage packet subscription requests and responses, with the latter including a `shared.Header` and a `packet.PacketBatch`.
-   - `SubscribeBundlesRequest` and `SubscribeBundlesResponse` handle bundle subscription, with responses containing a list of `bundle.BundleUuid`.
-   - `BlockBuilderFeeInfoRequest` and `BlockBuilderFeeInfoResponse` provide information on block builder fees, including a public key and commission rate.
-   - `AccountsOfInterest` and related messages manage accounts of interest, allowing for targeted transaction forwarding.
-   - `ProgramsOfInterestRequest` and `ProgramsOfInterestUpdate` manage updates for programs of interest.
-   - `ExpiringPacketBatch` and `PacketBatchUpdate` handle packets with expiration, including a mechanism for time synchronization via heartbeats.
+2. **Services**:
+   - `BlockEngineValidator`: Allows validators to subscribe to streams of packets and bundles. It also provides a method to get block builder fee information.
+   - `BlockEngineRelayer`: Enables relayers to forward packets to block engines and receive updates on accounts and programs of interest. It includes a bi-directional stream for packets and heartbeats, addressing a specific issue with Envoy's handling of streams.
 
-3. **Services**: Two main services are defined:
-   - `BlockEngineValidator`: This service allows validators to subscribe to streams of packets and bundles, and to retrieve block builder fee information. It supports RPC methods for subscribing to packets and bundles and for obtaining fee information.
-   - `BlockEngineRelayer`: This service enables relayers to forward packets to block engines and receive updates on accounts and programs of interest. It includes RPC methods for subscribing to accounts and programs of interest and for starting a stream of expiring packet batches.
-
-4. **Communication Protocols**: The file defines several RPC (Remote Procedure Call) methods that facilitate streaming data between clients and servers. Notably, the `StartExpiringPacketStream` method is a bi-directional stream, addressing a specific issue with Envoy's handling of half-closed client-side streams.
-
-Overall, this proto file outlines a sophisticated communication framework for managing blockchain-related data streams, focusing on efficient packet handling, fee management, and targeted transaction processing. It is designed to enhance the resilience and efficiency of blockchain operations by providing structured and time-sensitive data exchanges between validators, relayers, and block engines.
+The file imports other proto files (`packet.proto`, `shared.proto`, `bundle.proto`) to define shared structures and types used across messages and services. The package is named `block_engine`, indicating its role in managing block-related operations within a blockchain network.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
