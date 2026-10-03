@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A copy of the Nanopb library C source code, unmodified from tag "nanopb-0.4.9.1".
+The `README.txt` file in the `firedancer/src/ballet/nanopb` directory explains that it contains an unmodified copy of the Nanopb library C source code from tag "nanopb-0.4.9.1" and provides instructions for updating and licensing information.
 
 # Purpose
-The directory contains an unmodified copy of the Nanopb library C source code from the tag `nanopb-0.4.9.1`. Users should not make local modifications to the Nanopb code; instead, they should upstream changes or create a local patch if necessary. To update the library, use the `fetch.sh` script and the `nanopb_tag.txt` file. Licensing information is available in the `NOTICE` file located in the root of the repository.
+This file serves as documentation for the inclusion and management of the Nanopb library within a software project. It specifies that the library is included as an exact copy from the "nanopb-0.4.9.1" tag without any modifications and advises against making local changes, suggesting upstream contributions or local patches instead. It also provides instructions for updating the library using `fetch.sh` and `nanopb_tag.txt` and directs users to the root NOTICE file for licensing details.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

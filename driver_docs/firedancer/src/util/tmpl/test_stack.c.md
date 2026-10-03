@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests stack operations including push, pop, and zero-copy methods with a buffer and scratch space.
+The `test_stack.c` file in the `firedancer` codebase tests the functionality of a stack implementation, including operations such as push, pop, and zero-copy push/pop, while ensuring alignment and footprint constraints are met.
 
 # Purpose
-The code is an executable C program that tests the functionality of a stack data structure. It includes a simple buffer implementation with push and pop operations, defined by [`buf_push`](<#buf_push>) and [`buf_pop`](<#buf_pop>), which are used to validate the stack operations. The stack is implemented using macros and functions from an included file `fd_stack.c`, which is parameterized by defining `STACK_NAME` and `STACK_T` before inclusion. The program uses a scratch memory area for stack operations, ensuring alignment and footprint constraints are met.
+This C source code file is designed to test the functionality of a stack data structure, specifically focusing on operations such as push, pop, and zero-copy push/pop. The code includes a main function, indicating that it is an executable program rather than a library or header file. It utilizes a buffer to simulate stack operations and verifies the correctness of these operations through a series of tests. The stack operations are performed using a set of macros and functions defined in an included file, "fd_stack.c", which suggests that the stack implementation is modular and can be reused in other contexts. The code also includes mechanisms for handling command-line arguments to set the maximum stack size and uses a random number generator to simulate various stack operations in a loop, ensuring robustness through extensive testing.
 
-The [`main`](<#main>) function initializes the environment and a random number generator, then performs a series of tests on the stack. It checks the construction, accessors, and various operations of the stack, including push, pop, zero-copy push, and zero-copy pop. The program uses assertions (`FD_TEST`) to verify that the stack behaves as expected, comparing the stack's state with the buffer's state. It also handles command-line arguments to set the maximum stack size and logs warnings if constraints are not met. The program concludes by cleaning up resources and logging the test results.
+The file includes several technical components, such as buffer management, random number generation, and logging for test results. It uses a scratch memory region with specific alignment and footprint requirements to manage the stack's memory, ensuring that the stack operations are performed efficiently. The code is structured to handle edge cases, such as stack overflow and underflow, and provides detailed logging to track the progress and results of the tests. The use of macros and static functions for buffer operations indicates a focus on performance and encapsulation, while the inclusion of test assertions (FD_TEST) ensures that any deviations from expected behavior are caught during execution. Overall, this file serves as a comprehensive test suite for validating the functionality and reliability of a stack implementation in C.
 # Imports and Dependencies
 
 ---
@@ -20,78 +20,70 @@ The [`main`](<#main>) function initializes the environment and a random number g
 
 ---
 ### buf
-- **Type**: ``int[]``
-- **Description**: An array of integers with a maximum size defined by `BUF_MAX`. It is used to store integer values in a stack-like manner.
-- **Use**: Stores integer values for stack operations using `buf_push` and `buf_pop` functions.
+- **Type**: `int array`
+- **Description**: The `buf` variable is a static integer array with a size defined by the macro `BUF_MAX`, which is set to 8. It is used to store integer values in a stack-like manner, where elements can be pushed to and popped from the array.
+- **Use**: The `buf` array is used to temporarily store integer values in a stack-like structure, supporting operations such as push and pop.
 
 
 ---
 ### buf\_cnt
-- **Type**: ``ulong``
-- **Description**: `buf_cnt` is a static global variable of type `ulong` that tracks the number of elements currently stored in the `buf` array. It is initialized to zero and is used to manage the index for adding and removing elements from the buffer.
-- **Use**: Tracks the current count of elements in the `buf` array and is incremented or decremented during push and pop operations.
+- **Type**: `ulong`
+- **Description**: `buf_cnt` is a static global variable of type `ulong` that keeps track of the number of elements currently stored in the `buf` array. It is initialized to zero and is incremented or decremented as elements are pushed to or popped from the buffer.
+- **Use**: `buf_cnt` is used to manage the current count of elements in the buffer, ensuring operations like push and pop are performed within the buffer's capacity.
 
 
 ---
 ### scratch
-- **Type**: ``uchar[]``
-- **Description**: An array of unsigned characters with a size defined by `SCRATCH_FOOTPRINT`, which is 1024 bytes. The array is aligned in memory according to `SCRATCH_ALIGN`, which is 128 bytes.
-- **Use**: Used as a memory region for stack operations in the program.
+- **Type**: `uchar array`
+- **Description**: The `scratch` variable is a global array of unsigned characters with a size defined by `SCRATCH_FOOTPRINT`, which is 1024 bytes. It is aligned in memory according to `SCRATCH_ALIGN`, which is 128 bytes, to ensure proper memory alignment for operations that require it.
+- **Use**: This variable is used as a memory buffer for stack operations, providing a scratch space for temporary data storage during the execution of the program.
 
 
 # Functions
 
 ---
 ### buf\_push<!-- {{#callable:buf_push}} -->
-[View Source →](<../../../../../src/util/tmpl/test_stack.c#L6>)
-
-Adds an integer to the buffer if it is not full.
+The `buf_push` function adds an integer to a static buffer if it is not full.
 - **Inputs**:
-    - `i`: The integer to add to the buffer.
-- **Logic and Control Flow**:
+    - `i`: The integer value to be added to the buffer.
+- **Control Flow**:
     - Check if the buffer count `buf_cnt` is less than the maximum buffer size `BUF_MAX` using `FD_TEST`.
-    - If the buffer is not full, add the integer `i` to the buffer at the current buffer count index `buf[buf_cnt]`.
-    - Increment the buffer count `buf_cnt` by 1.
-- **Output**: No output is returned.
+    - If the buffer is not full, add the integer `i` to the buffer at the current buffer count index `buf_cnt`.
+    - Increment the buffer count `buf_cnt` by one.
+- **Output**: This function does not return any value.
 
 
 ---
 ### buf\_pop<!-- {{#callable:buf_pop}} -->
-[View Source →](<../../../../../src/util/tmpl/test_stack.c#L7>)
-
-Removes and returns the last element from the buffer if it is not empty.
+The `buf_pop` function removes and returns the last element from a static buffer if it is not empty.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Checks if `buf_cnt` is greater than zero using `FD_TEST` macro to ensure the buffer is not empty.
-    - Decrements `buf_cnt` by one to point to the last element in the buffer.
-    - Returns the element at the new `buf_cnt` index from the `buf` array.
-- **Output**: Returns the integer value of the last element in the buffer.
+- **Control Flow**:
+    - The function first checks if the buffer is not empty using `FD_TEST(buf_cnt)`.
+    - If the buffer is not empty, it decrements the `buf_cnt` to point to the last element in the buffer.
+    - The function then returns the element at the decremented position in the buffer.
+- **Output**: The function returns the integer value of the last element in the buffer before it was removed.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/tmpl/test_stack.c#L15>)
-
-Initializes the environment, tests stack operations, and logs results.
+The `main` function initializes a random number generator, configures a stack, and performs a series of randomized stack operations to test the stack's functionality and performance.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Initializes a random number generator `rng`.
-    - Parses the `--max` command-line argument to determine the maximum buffer size, defaulting to `BUF_MAX`.
-    - Checks if `max` exceeds `BUF_MAX` or if stack alignment and footprint exceed predefined limits, logging warnings and exiting if so.
-    - Logs the maximum buffer size.
-    - Tests stack construction by checking alignment and footprint, creating and joining a new stack.
-    - Logs and tests stack accessors to ensure the stack is initialized correctly.
-    - Performs 100 million iterations of random stack operations: push, pop, zero-copy push, and zero-copy pop, with random resets.
-    - Logs and tests stack operations to ensure they behave as expected, including checking stack count, maximum, availability, fullness, and emptiness.
-    - Leaves and deletes the stack, ensuring resources are cleaned up.
-    - Deletes the random number generator and halts the program, logging a pass message.
-- **Output**: Returns 0 after completing all operations and tests.
-- **Functions Called**:
-    - [`buf_push`](<#buf_push>)
-    - [`buf_pop`](<#buf_pop>)
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program environment using `fd_boot` and set up a random number generator.
+    - Parse the command-line argument `--max` to determine the maximum stack size, defaulting to `BUF_MAX`.
+    - Check if the `max` value exceeds `BUF_MAX` or if the stack's alignment and footprint exceed predefined limits, logging warnings and exiting if so.
+    - Log the maximum stack size and begin testing stack construction by checking alignment and footprint constraints.
+    - Create and join a new stack using the `test_stack_new` and `test_stack_join` functions, ensuring successful creation.
+    - Log and test stack accessors to verify the stack's maximum size and initial count.
+    - Perform 100 million iterations of randomized stack operations, including push, pop, zero-copy push, and zero-copy pop, with occasional resets.
+    - For each operation, verify the stack's state using various test functions to ensure correctness.
+    - After the loop, leave and delete the stack, clean up the random number generator, and log a success message before halting the program.
+- **Output**: The function returns an integer status code, typically 0, indicating successful execution or early termination due to configuration issues.
+- **Functions called**:
+    - [`buf_push`](#buf_push)
+    - [`buf_pop`](#buf_pop)
 
 
 

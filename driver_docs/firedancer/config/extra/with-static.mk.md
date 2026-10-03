@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for a fully static build, not compatible with glibc.
+The `with-static.mk` file in the `firedancer` codebase configures the build process to produce a fully static build by adding the `-static` flag to `LDFLAGS`, noting that it is not compatible with glibc.
 
 # Purpose
-The file configures the build process to create a fully static build by appending the `-static` flag to the `LDFLAGS` variable. This ensures that the linker includes all necessary libraries directly into the executable, making it independent of shared libraries. Note that this configuration is not compatible with the GNU C Library (glibc).
+This file is a Makefile snippet that sets a linker flag to produce a fully static build of a software application. By appending `-static` to the `LDFLAGS` variable, it instructs the linker to include all necessary libraries within the executable, resulting in a standalone binary that does not rely on shared libraries, specifically noting incompatibility with glibc.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

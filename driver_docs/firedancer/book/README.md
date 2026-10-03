@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-VitePress documentation, API and guide pages, and site configuration files.
+VitePress docs, guides, and API references for Firedancer.
 
 ## Folders
-- **[.vitepress](.vitepress/README.md)**: CSS styles and JavaScript for VitePress theme, configuration for documentation site, and version plugin.
-- **[api](api/README.md)**: Documentation for the `fdctl` CLI, system metrics, data queues, QUIC tiles, Prometheus, and WebSocket API.
-- **[guide](guide/README.md)**: Documentation for configuring, setting up, running, monitoring, and troubleshooting Firedancer and Frankendancer.
+- **[.vitepress](.vitepress/README.md)**: The `.vitepress` folder in the `firedancer` codebase contains configuration and theme setup files for a VitePress site, including a `config.mts` for site configuration, a `version-plugin.js` for version management, and a `theme` folder for styling.
+- **[api](api/README.md)**: CLI, metrics, and WebSocket API documentation for running, monitoring, and managing Firedancer.
+- **[guide](guide/README.md)**: Guides for configuring, initializing, monitoring, troubleshooting, tuning, and internals.
 
 ## Files
-- **[index.md](index.md.md)**: Documentation for the Firedancer Solana validator, highlighting its performance, security, and independence.
-- **[package.json](package.json.md)**: Defines development dependencies and scripts for a VitePress project.
-- **[README.md](README.md.md)**: Instructions for setting up and developing the Firedancer book using VitePress and Bun.
+- **[index.md](index.md.md)**: The `index.md` file serves as the home page for the Firedancer documentation, introducing it as a new, high-performance Solana validator client with features emphasizing speed, security, and independence.
+- **[package.json](package.json.md)**: The `package.json` file in the `firedancer` codebase specifies development dependencies and scripts for using VitePress to develop, build, and preview documentation.
+- **[README.md](README.md.md)**: The `README.md` file in the `firedancer/book` directory provides instructions for setting up and developing a local documentation site using VitePress and bun.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
