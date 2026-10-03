@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_backtrace.c` file provides a function to print a backtrace to a specified file descriptor using the `execinfo` library.
+Prints a backtrace to a file descriptor using the execinfo library.
 
 # Purpose
-This C source code file defines a function [`fd_backtrace_print`](#fd_backtrace_print) that captures and prints a backtrace of the current call stack to a specified file descriptor. It includes the necessary header `execinfo.h` to utilize the `backtrace` and `backtrace_symbols_fd` functions, which are part of the GNU C Library. The function allocates an array `bt` to store up to 1024 stack frames, captures the backtrace into this array, and then writes the symbolic representation of the backtrace to the file descriptor `fd`. This code is typically used for debugging purposes, allowing developers to trace the sequence of function calls leading to a particular point in the program.
+The code is a C source file that provides a function to print a backtrace to a specified file descriptor. It includes the header file `fd_backtrace.h` and the standard library `execinfo.h` to access backtrace functionalities. The function [`fd_backtrace_print`](<#fd_backtrace_print>) captures the current call stack into an array `bt` of pointers, with a maximum size of 1024. It then uses `backtrace_symbols_fd` to write the symbolic representation of the call stack to the file descriptor specified by the parameter `fd`. This is useful for debugging purposes, allowing developers to trace the sequence of function calls leading to a particular point in the program.
 # Imports and Dependencies
 
 ---
@@ -18,14 +18,16 @@ This C source code file defines a function [`fd_backtrace_print`](#fd_backtrace_
 
 ---
 ### fd\_backtrace\_print<!-- {{#callable:fd_backtrace_print}} -->
-The `fd_backtrace_print` function captures the current call stack and writes the backtrace symbols to a specified file descriptor.
+[View Source →](<../../../../../src/util/sanitize/fd_backtrace.c#L5>)
+
+Generates a backtrace and writes the symbols to a specified file descriptor.
 - **Inputs**:
-    - `fd`: An integer representing the file descriptor to which the backtrace symbols will be written.
-- **Control Flow**:
+    - `fd`: An integer representing the file descriptor where the backtrace symbols will be written.
+- **Logic and Control Flow**:
     - Declare an array `bt` of 1024 void pointers to store the backtrace addresses.
-    - Call the `backtrace` function to fill the `bt` array with the current call stack addresses, storing the number of addresses in `bt_size`.
-    - Use `backtrace_symbols_fd` to convert the addresses in `bt` to human-readable strings and write them to the file descriptor `fd`.
-- **Output**: This function does not return a value; it writes the backtrace information directly to the specified file descriptor.
+    - Call `backtrace` to fill `bt` with the current call stack addresses, storing the number of addresses in `bt_size`.
+    - Call `backtrace_symbols_fd` to write the symbols corresponding to the addresses in `bt` to the file descriptor `fd`.
+- **Output**: No return value; writes the backtrace symbols to the specified file descriptor.
 
 
 

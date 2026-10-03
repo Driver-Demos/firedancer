@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Instruction tests for bitwise, integer math, jump, load, opcode, and shift operations.
+Test cases and definitions for bitwise, arithmetic, jump, load, opcode, and shift operations in a VM.
 
 ## Folders
-- **[v0](v0/README.md)**: Instruction tests for bitwise, integer math, jump, load, opcode, and shift operations.
-- **[v2](v2/README.md)**: Test instructions for bitwise, integer math, jump, load, opcode, and shift operations.
+- **[v0](v0/README.md)**: Test cases and definitions for bitwise, arithmetic, jump, load, opcode, and shift operations in a virtual machine.
+- **[v2](v2/README.md)**: Tests for bitwise, integer arithmetic, jump, load, opcode, and shift operations in a virtual machine.
 
 
 ---

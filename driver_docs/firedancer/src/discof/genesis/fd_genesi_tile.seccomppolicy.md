@@ -3,10 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp policy for genesis file I/O, logging, polling, socket send/recv, and renameat2.
+Defines security policies for file descriptor operations related to logging, genesis file handling, and client communication.
 
 # Purpose
-This policy file defines file-descriptor rules for a process that handles logging, genesis file access, and client network communication. It assigns named descriptors such as `logfile_fd`, `in_genesis_fd`, `out_genesis_fd`, and `out_dir_fd`, then uses them to control which operations are allowed on each descriptor. The `write`, `fsync`, `fstat`, `close`, `read`, `sendto`, `recvfrom`, and `renameat2` rules limit access to the log file, the genesis file, and client sockets, while also enforcing required flags and argument values such as `MSG_NOSIGNAL`. The `ppoll` and `exit` entries allow polling of existing connections and normal shutdown behavior.
+This configuration file defines the behavior of file descriptors used in a software system, focusing on logging, file operations, and client-server communication. It specifies how log messages are handled, with 'WARNING' level and above being written to `STDERR` and all messages being logged to a file. The file also outlines operations related to a "genesis" file, including reading, closing, and renaming it. Additionally, it manages client communication by defining rules for sending and receiving messages, ensuring that certain file descriptors, such as those for logging and `STDERR`, are not used for these operations. The file provides a structured approach to managing file descriptors, ensuring that each operation is performed on the correct descriptor and adheres to the defined rules.
+# Content Summary
+This configuration file defines the behavior of logging, file handling, and client-server communication within a software system. It uses file descriptors to manage these operations.
+
+1. **Logging**: The system writes all log messages to a file and/or a pipe. Messages with a severity of 'WARNING' or higher are also written to the STDERR pipe. The file descriptor for STDERR is always 2. The system ensures that the log file is synchronized to disk immediately when a 'WARNING' or higher message is logged.
+
+2. **Genesis File Handling**: The genesis file is a critical component, and the system uses specific file descriptors to manage it. The `fstat` operation checks the status of the genesis file, while the `read` operation reads data from it. After reading, the system closes the genesis file using the `close` operation, ensuring it does not close other important file descriptors like the log file or STDERR.
+
+3. **Client-Server Communication**: The system supports sending and receiving messages through client connections. It restricts sending and receiving operations from certain file descriptors, including the log file and STDERR. The `sendto` and `recvfrom` operations are configured to prevent sending or receiving messages to/from these restricted descriptors.
+
+4. **File Renaming**: After downloading a genesis file, the system renames it from a temporary name to its final name using the `renameat2` operation. This operation ensures that the file is renamed within the same directory, as indicated by the use of the same file descriptor for both the source and destination directories.
+
+5. **Shutdown**: The system calls an exit operation during shutdown, which is associated with the file descriptor 0.
+
+This configuration file is essential for managing logging, file operations, and communication protocols within the software system, ensuring that each operation is performed with the correct file descriptors and restrictions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

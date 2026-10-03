@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Pull request workflow that runs tests, backtests, benchmarks, and build checks.
+GitHub Actions workflow for handling pull request events with jobs for testing, backtesting, benchmarking, and build checks.
 
 # Purpose
-This workflow runs when a pull request is opened, reopened, synchronized, or marked ready for review, and it also runs for merge queue events through `merge_group`. It prevents duplicate runs by using `concurrency` with `cancel-in-progress: true`, and it grants read access to repository contents plus write access to issues and pull requests for status updates and related automation. For non-draft pull requests, it starts reusable workflows for `tests`, `backtest`, `benchmark`, and two build check jobs that call `./.github/workflows/builds.yml` with different parameters. The build check jobs use `gcc_exceptions` and `clang_exceptions` lists to control which compiler, machine, and target combinations are included or excluded from the checks.
+This GitHub Actions workflow configuration file automates processes triggered by pull request events. It specifies that the workflow should activate on pull request events such as `synchronize`, `opened`, `reopened`, and `ready_for_review`. The `concurrency` section ensures that only one workflow runs per pull request, canceling any in-progress runs if a new one starts. The `permissions` section grants read access to contents and write access to issues and pull requests. The `jobs` section defines multiple jobs, including `tests`, `backtest`, `benchmark`, and two `build_checks`, each conditioned to run only if the pull request is not a draft. These jobs use predefined workflows and inherit secrets, with specific configurations for build checks, such as compiler and machine exceptions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

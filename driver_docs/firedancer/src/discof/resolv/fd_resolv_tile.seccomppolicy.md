@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
+Defines security policies for logging, including file descriptor management and log message handling.
 
 # Purpose
-The provided content appears to be a configuration file that outlines the logging behavior for a software system. It specifies that log messages are typically written to a log file upon system boot, with the option to disable this feature through configuration. The file describes how log messages of 'WARNING' level and above are directed to the STDERR pipe, while all messages are consistently logged to a file. The configuration uses file descriptors to manage where logs are written, with descriptor 2 designated for STDERR. Additionally, it ensures that log messages of 'WARNING' level and above are immediately synchronized to disk using the `fsync` operation, ensuring data integrity and timely updates to the log file.
+The configuration file defines the logging behavior for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above also directed to the STDERR pipe. The file descriptor for logging is identified by `logfile_fd`, which can be disabled by configuration, but typically opens a log file on boot to record all messages. The `write` operation checks if the file descriptor is either STDERR (descriptor 2) or `logfile_fd`, ensuring that messages are correctly routed. Additionally, for messages of 'WARNING' level and above, the `fsync` operation ensures that the log file is immediately synchronized to disk, using the `logfile_fd` descriptor.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
