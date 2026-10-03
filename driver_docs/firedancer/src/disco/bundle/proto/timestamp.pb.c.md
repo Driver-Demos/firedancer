@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `timestamp.pb.c` file contains automatically generated nanopb constant definitions for the `google_protobuf_Timestamp` structure in the `firedancer` codebase.
+Automatically generated nanopb constant definitions for `google_protobuf_Timestamp`.
 
 # Purpose
-This code is a C header file that contains automatically generated constant definitions for use with the nanopb library, specifically for handling Protocol Buffers (protobuf) messages. It includes a check to ensure compatibility with the nanopb version used to generate the file, requiring regeneration if the version does not match. The `PB_BIND` macro is used to bind the `google_protobuf_Timestamp` message type, facilitating its serialization and deserialization. This file is part of a system that uses Protocol Buffers for efficient data interchange, particularly for timestamp data.
+This code is a C header file that contains automatically generated constant definitions for use with the nanopb library, version 0.4.9.1. It includes the header file `timestamp.pb.h`, which is likely related to Protocol Buffers (protobuf) definitions for a `google_protobuf_Timestamp` structure. The code checks if the `PB_PROTO_HEADER_VERSION` is equal to 40, and if not, it triggers a compilation error instructing the user to regenerate the file with the current version of the nanopb generator. The `PB_BIND` macro is used to bind the `google_protobuf_Timestamp` structure for automatic handling by nanopb.
 # Imports and Dependencies
 
 ---

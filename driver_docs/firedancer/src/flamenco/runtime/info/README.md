@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Instruction account metadata, signer and writable checks, and lamport sum helpers with build rules.
+Functions and data structures for managing transaction instructions and Makefile logic for 128-bit support.
 
 
 ## Files
-- **[fd_instr_info.c](fd_instr_info.c.md)**: Instruction account info initialization and lamport accumulation helpers.
-- **[fd_instr_info.h](fd_instr_info.h.md)**: Instruction account metadata, signer and writable checks, and lamport sum helpers.
-- **[Local.mk](Local.mk.md)**: Build rules that add fd_instr_info header and object files when FD_HAS_INT128 is set.
+- **[fd_instr_info.c](fd_instr_info.c.md)**: Functions for initializing, accumulating, and summing lamports in transaction instruction contexts.
+- **[fd_instr_info.h](fd_instr_info.h.md)**: Defines data structures and functions for managing instruction accounts and their properties in transactions.
+- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add headers and objects if 128-bit integer support is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

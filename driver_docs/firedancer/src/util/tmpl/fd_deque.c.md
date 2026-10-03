@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_deque.c` file in the `firedancer` codebase implements a high-performance, single-threaded, fixed-capacity double-ended queue (deque) using a circular buffer, providing a comprehensive API for operations such as pushing, popping, and iterating over elements.
+Functions for a single-threaded, fixed-capacity, high-performance deque using a circular buffer.
 
 # Purpose
-This C source code file provides a template for implementing a single-threaded, compile-time fixed-capacity double-ended queue (deque) using a circular buffer. The code is designed for high-performance contexts where operations on the deque need to be efficient and fast. The implementation allows for pushing and popping elements from both ends of the deque, and it is optimized for scenarios where the maximum capacity (`DEQUE_MAX`) is a power of two, although this is not strictly required. The file is intended to be included in other C files, where the user defines the specific type of elements (`DEQUE_T`) and the name of the deque (`DEQUE_NAME`) to create a customized deque API for their specific use case.
+The code defines a template for creating a single-threaded, compile-time fixed-capacity double-ended queue (deque) using a circular buffer. This implementation is designed for high-performance contexts and allows for pushing and popping elements from both ends of the deque. The code requires the user to define `DEQUE_NAME`, `DEQUE_T`, and `DEQUE_MAX` before including the file, which customizes the deque's name, element type, and maximum capacity, respectively. The implementation uses a circular buffer to manage the deque's elements, and it is optimized for scenarios where the maximum number of operations is less than \(2^{63}\), especially when `DEQUE_MAX` is a power of two.
 
-The file defines a comprehensive API for managing the deque, including constructors, accessors, and both simple and advanced manipulation functions. The constructors handle the creation, joining, and deletion of the deque, while the accessors provide information about the deque's state, such as its capacity and whether it is full or empty. The simple API includes functions for pushing and popping elements, with additional "wrap" functions that handle overflow by discarding elements from the opposite end. The advanced API offers zero-copy operations for more efficient data handling, as well as iteration functions for traversing the deque in both forward and reverse order. The code emphasizes performance by avoiding error checking within the functions, relying on the caller to ensure valid operations.
+The code provides a comprehensive API for deque operations, including constructors, accessors, and both simple and advanced manipulation functions. Constructors handle the creation, joining, and deletion of deques, while accessors provide information about the deque's state, such as its capacity and element count. The simple API includes functions for pushing and popping elements, with additional wrap functions that handle full deques by discarding elements. The advanced API supports zero-copy operations, allowing direct access to elements without copying, and includes functions for inserting and removing elements at both ends. The code also provides iteration functions to traverse the deque from head to tail or in reverse. The implementation does not include error checking for performance reasons, and it assumes that the user will manage conditions such as deque overflow and underflow.
 # Imports and Dependencies
 
 ---
@@ -21,17 +21,19 @@ The file defines a comprehensive API for managing the deque, including construct
 
 ---
 ### DEQUE\_<!-- {{#callable:DEQUE_}} -->
-The `DEQUE_(iter_ele_const)` function retrieves a constant pointer to an element in a deque at a specified iterator position, ensuring the iterator is within valid bounds if handholding is enabled.
+[View Source →](<../../../../../src/util/tmpl/fd_deque.c#L526>)
+
+Retrieves a constant element from a deque at a specified iterator position.
 - **Inputs**:
-    - `deque`: A constant pointer to the deque from which an element is to be retrieved.
-    - `iter`: An iterator of type `DEQUE_(iter_t)` indicating the position of the element to be accessed.
-- **Control Flow**:
+    - ``deque``: A pointer to a constant `DEQUE_T` deque from which to retrieve the element.
+    - ``iter``: An iterator of type `DEQUE_(iter_t)` indicating the position of the element to retrieve.
+- **Logic and Control Flow**:
     - Retrieve the constant header of the deque using `DEQUE_(private_const_hdr_from_deque)` function.
-    - If handholding is enabled, check if the iterator is out of bounds (less than `hdr->start` or greater than `hdr->end`) and log a critical error if it is.
-    - Return a constant pointer to the element in the deque at the position determined by the iterator, using the `DEQUE_(private_slot)` function to map the iterator to the correct slot.
-- **Output**: A constant pointer to the element in the deque at the specified iterator position.
-- **Functions called**:
-    - [`DEQUE_`](#deque_)
+    - Check if `iter` is out of bounds (less than `hdr->start` or greater than `hdr->end`) if `FD_TMPL_USE_HANDHOLDING` is enabled, and log a critical error if so.
+    - Return a pointer to the element at the position calculated by `DEQUE_(private_slot)(iter)` in the deque.
+- **Output**: A pointer to a constant `DEQUE_T` element at the specified iterator position in the deque.
+- **Functions Called**:
+    - [`DEQUE_`](<#deque_>)
 
 
 

@@ -3,18 +3,100 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Async race-sanitizer context type and function prototypes for create, step, reset, and delete.
+Defines structures and functions for asynchronous race condition detection using context switching.
 
 # Purpose
-This header defines the `fd_racesan_async` interface for running race-sanitizer work on a separate user-space context. It declares the `fd_racesan_async_t` state object, which stores the coroutine context, the caller context, the target function, its argument, a name hash, a completion flag, and a fixed stack buffer of `FD_RACESAN_ASYNC_STACK_MAX` bytes. The file also declares the lifecycle and control functions [`fd_racesan_async_new`](<#fd_racesan_async_new>), [`fd_racesan_async_delete`](<#fd_racesan_async_delete>), [`fd_racesan_async_step`](<#fd_racesan_async_step>), [`fd_racesan_async_hook_name_eq`](<#fd_racesan_async_hook_name_eq>), and [`fd_racesan_async_reset`](<#fd_racesan_async_reset>), which create, destroy, advance, match, and reset an async execution instance.
+The code is a C header file that defines an interface for managing asynchronous operations using user-level context switching. It provides a structure, `fd_racesan_async_t`, which encapsulates the context required for an asynchronous function execution, including a stack, function pointer, and context data. The structure also includes a `ucontext_t` for the asynchronous function and its caller, a hash for the function name, and a flag to indicate completion.
+
+The file declares several functions to manage the lifecycle and execution of asynchronous tasks. `fd_racesan_async_new` initializes a new asynchronous context, [`fd_racesan_async_delete`](<#fd_racesan_async_delete>) cleans up resources, and [`fd_racesan_async_step`](<#fd_racesan_async_step>) executes a step of the asynchronous function. Additionally, [`fd_racesan_async_hook_name_eq`](<#fd_racesan_async_hook_name_eq>) checks if a given hook name matches the stored name hash, and [`fd_racesan_async_reset`](<#fd_racesan_async_reset>) resets the asynchronous context for reuse. The header file is intended to be included in other C source files that require asynchronous execution capabilities.
+# Imports and Dependencies
+
+---
+- `fd_racesan.h`
+- `ucontext.h`
+
+
+# Data Structures
+
+---
+### fd\_racesan\_async
+- **Type**: ``struct``
+- **Members**:
+    - `ctx`: Stores the execution context for the asynchronous operation.
+    - `caller`: Points to the caller's execution context.
+    - `fn_ctx`: Holds the context for the function to execute asynchronously.
+    - `fn`: Points to the function to execute asynchronously.
+    - `name_hash`: Stores a hash of the name associated with the asynchronous operation.
+    - `done`: Indicates if the asynchronous operation is complete.
+    - `stack`: Provides a stack space for the asynchronous operation, aligned to 64 bytes.
+- **Description**: Facilitates asynchronous operations by storing execution contexts, function pointers, and related metadata, allowing for non-blocking function execution with a dedicated stack space.
+
+
+---
+### fd\_racesan\_async\_t
+- **Type**: ``struct``
+- **Members**:
+    - `ctx`: Stores the execution context for the asynchronous operation.
+    - `caller`: Points to the context of the caller.
+    - `fn_ctx`: Holds the context for the function to be executed asynchronously.
+    - `fn`: Points to the function to be executed asynchronously.
+    - `name_hash`: Stores a hash of the name associated with the asynchronous operation.
+    - `done`: Indicates if the asynchronous operation is complete.
+    - `stack`: Provides a stack space for the asynchronous operation, aligned to 64 bytes.
+- **Description**: Manages asynchronous operations using execution contexts, function pointers, and a dedicated stack space, allowing for non-blocking execution of functions with context switching capabilities.
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_racesan_async_new`
-- `fd_racesan_async_delete`
-- `fd_racesan_async_step`
-- `fd_racesan_async_hook_name_eq`
-- `fd_racesan_async_reset`
+### fd\_racesan\_async\_delete<!-- {{#callable_declaration:fd_racesan_async_delete}} -->
+[View Source →](<../../../../../src/util/racesan/fd_racesan_async.h#L34>)
+
+Deletes an asynchronous operation context.
+- **Description**: Use this function to delete an asynchronous operation context previously created with `fd_racesan_async_new`. This function does not perform any operation on the provided context and always returns `NULL`. It is safe to call this function with a `NULL` pointer, as it will have no effect. Ensure that the context is no longer in use before calling this function to avoid undefined behavior.
+- **Inputs**:
+    - `async`: A pointer to an `fd_racesan_async_t` structure representing the asynchronous operation context to delete. The pointer can be `NULL`, in which case the function does nothing.
+- **Output**: Always returns `NULL`. No changes are made to the input.
+- **See Also**: [`fd_racesan_async_delete`](<fd_racesan_async.c.md#fd_racesan_async_delete>)  (Implementation)
+
+
+---
+### fd\_racesan\_async\_step<!-- {{#callable_declaration:fd_racesan_async_step}} -->
+[View Source →](<../../../../../src/util/racesan/fd_racesan_async.h#L37>)
+
+Performs a step in the asynchronous function execution.
+- **Description**: Use this function to advance the execution of an asynchronous function encapsulated in the `fd_racesan_async_t` structure. It must be called repeatedly to continue the execution until the function completes. The function checks if the asynchronous operation is already done and returns immediately if so. It swaps the current context with the asynchronous function's context to execute a portion of the function. Ensure that the `fd_racesan_async_t` structure is properly initialized and not already marked as done before calling this function.
+- **Inputs**:
+    - `async`: A pointer to an `fd_racesan_async_t` structure representing the asynchronous function context. Must not be null. The structure should be initialized and not marked as done.
+- **Output**: Returns 0 if the asynchronous function is already done, otherwise returns 1 after performing a context switch.
+- **See Also**: [`fd_racesan_async_step`](<fd_racesan_async.c.md#fd_racesan_async_step>)  (Implementation)
+
+
+---
+### fd\_racesan\_async\_hook\_name\_eq<!-- {{#callable_declaration:fd_racesan_async_hook_name_eq}} -->
+[View Source →](<../../../../../src/util/racesan/fd_racesan_async.h#L40>)
+
+Checks if the hash of a hook name matches the stored hash in an async object.
+- **Description**: Use this function to verify if a given hook name corresponds to the stored hash value in the specified asynchronous object. This is useful for ensuring that the hook name matches the expected value associated with the asynchronous operation. The function requires a valid asynchronous object and a non-null hook name string. It returns a non-zero value if the hashes match, indicating equality, and zero if they do not.
+- **Inputs**:
+    - `async`: A pointer to a `fd_racesan_async_t` object. Must not be null. The function uses this object to compare the stored hash value.
+    - `hook_name`: A constant character pointer representing the hook name to compare. Must not be null. The function calculates the hash of this string to check against the stored hash in the `async` object.
+- **Output**: Returns a non-zero integer if the hash of `hook_name` matches the stored hash in `async`, otherwise returns zero.
+- **See Also**: [`fd_racesan_async_hook_name_eq`](<fd_racesan_async.c.md#fd_racesan_async_hook_name_eq>)  (Implementation)
+
+
+---
+### fd\_racesan\_async\_reset<!-- {{#callable_declaration:fd_racesan_async_reset}} -->
+[View Source →](<../../../../../src/util/racesan/fd_racesan_async.h#L44>)
+
+Resets the asynchronous context for reuse.
+- **Description**: Use this function to reset the asynchronous context to its initial state, allowing it to be reused. This function sets the context to a predefined target and marks the operation as not done. It is important to ensure that the `async` parameter is a valid pointer to an `fd_racesan_async_t` structure before calling this function.
+- **Inputs**:
+    - `async`: A pointer to an `fd_racesan_async_t` structure. Must not be null. The function assumes the structure is properly initialized and valid.
+- **Output**: None
+- **See Also**: [`fd_racesan_async_reset`](<fd_racesan_async.c.md#fd_racesan_async_reset>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
