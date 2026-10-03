@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-JavaScript modules for UI and grid management, CSS for AG Grid themes, design system, and responsive UI.
+React UI, AG Grid runtime, and theme CSS for validator and slot views
 
 
 ## Files
-- **[index-BbnoLtlG.js](index-BbnoLtlG.js.md)**: Implements a JavaScript module for UI rendering, state management, routing, and date-time handling.
-- **[index-BjT-fLah.css](index-BjT-fLah.css.md)**: Defines styles for AG Grid themes, managing layout, colors, responsiveness, and accessibility features.
-- **[index-dIJC52lb.js](index-dIJC52lb.js.md)**: JavaScript module manages a grid system with features like drag-and-drop, filtering, column management, data processing, CSV export, and accessibility, using various global variables, classes, and functions to handle grid components, events, and configurations.
-- **[index-DPmA2Gzi.css](index-DPmA2Gzi.css.md)**: Defines custom properties and styles for a web app's design system, supporting themes and responsive UI.
+- **[index-BbnoLtlG.js](index-BbnoLtlG.js.md)**: Provides React UI, routing, state, validation, and chart helpers for validator and slot views.
+- **[index-BjT-fLah.css](index-BjT-fLah.css.md)**: Defines AG Grid quartz theme styles, icons, layout, colors, and interaction states.
+- **[index-dIJC52lb.js](index-dIJC52lb.js.md)**: Implements AG Grid runtime, APIs, CSV export, and a React data grid view.
+- **[index-DPmA2Gzi.css](index-DPmA2Gzi.css.md)**: Defines Radix Themes CSS variables, component styles, and responsive utility classes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

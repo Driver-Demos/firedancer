@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and APIs for C string manipulation, conversion, formatting, tokenization, and related tests.
+C string parsing, formatting, tokenizing, hashing, UTF-8 append, and tests.
 
 
 ## Files
-- **[fd_cstr.c](fd_cstr.c.md)**: Functions for converting C strings to various data types, formatting strings, and tokenizing strings.
-- **[fd_cstr.h](fd_cstr.h.md)**: APIs for manipulating null-terminated character strings, including conversion, hashing, and tokenization functions.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_cstr` in the `firedancer` codebase.
-- **[test_cstr.c](test_cstr.c.md)**: Tests for various C string operations, including conversion, formatting, and tokenization functions.
+- **[fd_cstr.c](fd_cstr.c.md)**: The `fd_cstr.c` file in the `firedancer` codebase provides various utility functions for handling C-style strings, including conversion to different data types, sequence parsing, case-insensitive comparison, length calculation, formatted printing, and tokenization.
+- **[fd_cstr.h](fd_cstr.h.md)**: C string parsing, formatting, tokenizing, hashing, and UTF-8 append helpers.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_cstr` component within the `firedancer/src/util/cstr` directory.
+- **[test_cstr.c](test_cstr.c.md)**: Tests cstr parsing, formatting, tokenizing, UTF-8, and character classification.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
