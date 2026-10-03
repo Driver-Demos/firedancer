@@ -3,33 +3,33 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ed25519_sub_modp.sv` file implements a hardware module for performing subtraction modulo a prime number in the context of the Ed25519 signature verification process.
+Implements a module for subtraction modulo a prime number in the Ed25519 signature scheme.
 
 # Purpose
-The provided Verilog code defines a module named `ed25519_sub_modp`, which is designed to perform modular subtraction operations specifically tailored for the Ed25519 elliptic curve cryptography. This module takes two wide input operands (`in0` and `in1`) and computes their difference modulo a prime number associated with the Ed25519 curve, denoted as `ED25519_P`. The module is parameterized to handle input widths of 255 bits and a modulus width of 128 bits, making it suitable for cryptographic operations that require high precision and large number arithmetic.
+The `ed25519_sub_modp` module implements a subtraction operation in the context of the Ed25519 elliptic curve cryptography. It performs modular subtraction of two input values, `in0` and `in1`, with respect to a prime modulus `ED25519_P`. The module takes two 255-bit wide inputs (`in0` and `in1`) and a 128-bit modulus input (`m_i`). It outputs a 255-bit result (`out0`) and a 128-bit modified modulus (`m_o`). The module uses a `shift_adder_3` component to perform the subtraction and conditional addition of the modulus when `in0` is less than `in1`, ensuring the result remains non-negative.
 
-The core functionality of the module is implemented using a `shift_adder_3` instance, which is a specialized component for performing arithmetic operations with configurable parameters. The module also includes logic to determine if the result of the subtraction should be adjusted by adding the modulus, ensuring the result remains non-negative. This is achieved by comparing the inputs and conditionally adding the modulus if the first input is less than the second. The module is designed to be used in synchronous digital systems, as indicated by the clock (`clk`) and reset (`rst`) inputs, and it outputs the result of the subtraction (`out0`) along with a modified version of the modulus (`m_o`). This module is likely a part of a larger cryptographic library or system, providing a specific arithmetic operation needed for implementing Ed25519-based cryptographic protocols.
+The module is designed to operate synchronously with a clock (`clk`) and reset (`rst`) signal. It includes logic to determine if the subtraction result requires adjustment by comparing the intermediate result `c_2_AB` with the modulus `ED25519_P`. The `shift_adder_3` instance is configured to handle the arithmetic operations, including the inversion of `in1` and conditional addition of the modulus. The module is part of a broader cryptographic library, as indicated by the import statement `import wd_sigverify::*`, which suggests integration with other cryptographic verification components.
 # Modules
 
 ---
 ### ed25519\_sub\_modp
-The `ed25519_sub_modp` module performs modular subtraction of two inputs, `in0` and `in1`, under the modulus defined by `ED25519_P`. It utilizes a `shift_adder_3` instance to compute the result and outputs the subtraction result and a modified input.
+Performs subtraction modulo a prime number, specifically for the Ed25519 curve. Utilizes a shift adder to compute the result and handles input and output through specified ports.
 - **Constants**:
-    - `W`: Defines the bit-width of the main input and output data, set to 255.
-    - `M`: Defines the bit-width of the auxiliary input and output data, set to 128.
+    - ``W``: Specifies the bit-width of the input and output data, set to 255.
+    - ``M``: Specifies the bit-width of the modulus input and output, set to 128.
 - **Ports**:
-    - `clk`: Clock signal input for synchronization.
-    - `rst`: Reset signal input to initialize the module.
-    - `in0`: First input operand for the subtraction operation.
-    - `in1`: Second input operand for the subtraction operation.
-    - `m_i`: Auxiliary input data of width M.
-    - `m_o`: Auxiliary output data of width M.
-    - `out0`: Output of the subtraction operation, representing the result of in0 - in1 mod ED25519_P.
-- **Logic And Control Flow**:
-    - The module defines internal logic signals `m_o_p`, `c_2_AB`, and `c_2_AB_ge_p` for intermediate calculations.
-    - The `c_2_AB_ge_p` signal is assigned the result of comparing `c_2_AB` with `ED25519_P`.
-    - The `c_0_a_lt_b` signal is assigned the result of comparing `in0` with `in1`.
-    - A `shift_adder_3` instance is used to perform the subtraction operation, taking into account the comparison result `c_0_a_lt_b` to conditionally add `ED25519_P` to the result.
+    - ``clk``: Clock signal input for synchronization.
+    - ``rst``: Reset signal input to initialize the module.
+    - ``in0``: First input operand for the subtraction operation.
+    - ``in1``: Second input operand for the subtraction operation.
+    - ``m_i``: Input modulus value for the operation.
+    - ``m_o``: Output modulus value after the operation.
+    - ``out0``: Result of the subtraction operation modulo the prime.
+- **Logic and Control Flow**:
+    - Defines internal logic signals `m_o_p`, `c_2_AB`, and `c_2_AB_ge_p` for intermediate calculations.
+    - Assigns `c_2_AB_ge_p` to check if `c_2_AB` is greater than or equal to `ED25519_P`.
+    - Defines `c_0_a_lt_b` to determine if `in0` is less than `in1`.
+    - Instantiates `shift_adder_3` module to perform the subtraction and modulo operation, using `in0`, `~in1`, and a conditional input based on `c_0_a_lt_b`.
 
 
 

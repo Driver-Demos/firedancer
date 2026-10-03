@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for Prometheus and metrics headers and objects when FD_HAS_ALLOCA is set.
+Makefile for adding headers and objects related to Prometheus and metrics if FD_HAS_ALLOCA is defined.
 
 # Purpose
-Build rules add the `fd_prometheus.h` and `fd_metrics.h` header files when `FD_HAS_ALLOCA` is defined. They also add the `fd_prometheus`, `fd_metrics`, and `fd_metric_tile` object files to the `fd_disco` target under the same condition.
+The `Makefile` configuration uses conditional directives to manage the inclusion of headers and object files based on the presence of the `FD_HAS_ALLOCA` macro. If `FD_HAS_ALLOCA` is defined, it adds the headers `fd_prometheus.h` and `fd_metrics.h` and the object files `fd_prometheus`, `fd_metrics`, and `fd_metric_tile` to the build process, associating them with the `fd_disco` target. This setup allows for conditional compilation and linking of specific components depending on the system's capabilities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

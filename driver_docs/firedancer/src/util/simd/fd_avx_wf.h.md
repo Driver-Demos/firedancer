@@ -3,207 +3,233 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_avx_wf.h` file in the `firedancer` codebase provides a comprehensive API for operations on AVX vector floats, including constructors, arithmetic, logical, and conversion operations, as well as memory and reduction operations, specifically designed for handling 8-lane single-precision floating-point vectors.
+AVX-based vector float API for operations on 256-bit wide vectors of single-precision floats.
 
 # Purpose
-This C source code file is a specialized utility for handling SIMD (Single Instruction, Multiple Data) operations using AVX (Advanced Vector Extensions) instructions, specifically targeting vectorized operations on single-precision floating-point numbers. The file defines a set of macros and inline functions that facilitate the creation, manipulation, and computation of 256-bit wide vectors, where each vector consists of eight 32-bit floating-point elements. The code provides a comprehensive API for constructing vectors, performing arithmetic and logical operations, memory operations, and conversions between different data types, all optimized for AVX instructions. The file is intended to be included indirectly through a header file named `fd_avx.h`, as indicated by the preprocessor directive at the beginning, which ensures that the file is not included directly.
+The code defines a set of macros and inline functions for handling vectorized single-precision floating-point operations using AVX (Advanced Vector Extensions) instructions in C. It provides a specialized API for manipulating vectors of floats, where each vector (`wf_t`) consists of eight 32-bit lanes, each holding a single-precision floating-point value. The operations assume that the input values are not exotic, meaning they do not include NaNs, infinities, or denormalized numbers, and the handling of signed zero is not guaranteed.
 
-The functionality provided by this file is broad within the context of SIMD operations, covering a wide range of operations such as arithmetic (addition, subtraction, multiplication, division), logical operations, conditional operations, and data type conversions. It also includes specialized operations like fast reciprocal and square root calculations, which are optimized for performance but may not provide full precision. The file defines a public API for vector operations, which can be used by other parts of a program to leverage the performance benefits of AVX instructions. The use of macros and inline functions is prevalent to ensure that the operations are executed efficiently, minimizing the overhead that might be introduced by function calls. This file is a critical component for applications that require high-performance computing capabilities, such as scientific simulations, graphics processing, or any domain where large-scale numerical computations are necessary.
+The code includes constructors for creating vectors, memory operations for loading and storing vectors, arithmetic operations such as addition and multiplication, logical operations, and conversion operations between different data types. It also provides reduction operations to compute the sum, minimum, or maximum of all elements in a vector. The code is intended to be used as part of a larger system, as indicated by the inclusion guard at the beginning, which suggests that it should be included through a specific header file (`fd_avx.h`). The use of macros and inline functions aims to optimize performance by leveraging AVX instructions directly, reducing the risk of compiler interference.
 # Functions
 
 ---
 ### wf\_bcast\_pair<!-- {{#callable:wf_bcast_pair}} -->
-The `wf_bcast_pair` function creates a vector of eight single-precision floating-point values by alternating two input floats across the vector.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L38>)
+
+Creates a vector of eight floats by alternating two input float values.
 - **Inputs**:
-    - `f0`: The first float value to be broadcasted in the vector.
-    - `f1`: The second float value to be broadcasted in the vector.
-- **Control Flow**:
-    - The function uses the `_mm256_setr_ps` intrinsic to create a vector of eight floats.
-    - The values `f0` and `f1` are alternated in the vector, resulting in the pattern `[f0, f1, f0, f1, f0, f1, f0, f1]`.
-- **Output**: A `wf_t` type vector containing the pattern `[f0, f1, f0, f1, f0, f1, f0, f1]`.
+    - `f0`: The first float value to be broadcasted.
+    - `f1`: The second float value to be broadcasted.
+- **Logic and Control Flow**:
+    - Uses the `_mm256_setr_ps` intrinsic to set the values of the vector.
+    - Alternates the values of `f0` and `f1` across the eight lanes of the vector.
+- **Output**: A `wf_t` vector containing the pattern `[f0, f1, f0, f1, f0, f1, f0, f1]`.
 
 
 ---
 ### wf\_bcast\_lohi<!-- {{#callable:wf_bcast_lohi}} -->
-The `wf_bcast_lohi` function creates a vector of eight single-precision floating-point values, where the first four elements are set to `f0` and the last four elements are set to `f1`.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L43>)
+
+Creates a vector with the first four elements set to `f0` and the last four elements set to `f1`.
 - **Inputs**:
-    - `f0`: A single-precision floating-point value to be broadcasted to the first four elements of the vector.
-    - `f1`: A single-precision floating-point value to be broadcasted to the last four elements of the vector.
-- **Control Flow**:
-    - The function uses the `_mm256_setr_ps` intrinsic to create a vector of eight floats.
-    - The first four elements of the vector are set to the value of `f0`.
-    - The last four elements of the vector are set to the value of `f1`.
-- **Output**: The function returns a `wf_t` type, which is a vector of eight single-precision floating-point values with the specified broadcast pattern.
+    - `f0`: The float value to broadcast to the first four elements of the vector.
+    - `f1`: The float value to broadcast to the last four elements of the vector.
+- **Logic and Control Flow**:
+    - Uses the `_mm256_setr_ps` intrinsic to create a vector of eight floats.
+    - Sets the first four elements of the vector to `f0`.
+    - Sets the last four elements of the vector to `f1`.
+- **Output**: Returns a `wf_t` vector with the pattern `[f0, f0, f0, f0, f1, f1, f1, f1]`.
 
 
 ---
 ### wf\_bcast\_quad<!-- {{#callable:wf_bcast_quad}} -->
-The `wf_bcast_quad` function creates a vector of eight single-precision floating-point values by repeating a sequence of four input floats twice.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L48>)
+
+Creates a vector of eight single-precision floating-point values by repeating a sequence of four input floats twice.
 - **Inputs**:
-    - `f0`: The first float value to be included in the vector.
-    - `f1`: The second float value to be included in the vector.
-    - `f2`: The third float value to be included in the vector.
-    - `f3`: The fourth float value to be included in the vector.
-- **Control Flow**:
-    - The function takes four float inputs: f0, f1, f2, and f3.
-    - It calls the `_mm256_setr_ps` intrinsic function with these four floats repeated twice, creating a vector of eight floats.
-    - The resulting vector is returned, containing the sequence [f0, f1, f2, f3, f0, f1, f2, f3].
-- **Output**: A vector of type `wf_t` (which is an alias for `__m256`), containing the sequence [f0, f1, f2, f3, f0, f1, f2, f3].
+    - `f0`: The first float value to include in the vector.
+    - `f1`: The second float value to include in the vector.
+    - `f2`: The third float value to include in the vector.
+    - `f3`: The fourth float value to include in the vector.
+- **Logic and Control Flow**:
+    - Uses the `_mm256_setr_ps` intrinsic to create a vector with the specified float values.
+    - The vector is constructed by placing `f0`, `f1`, `f2`, and `f3` in the first four positions and then repeating the same sequence in the next four positions.
+- **Output**: Returns a `wf_t` vector containing the sequence `[f0, f1, f2, f3, f0, f1, f2, f3]`.
 
 
 ---
 ### wf\_bcast\_wide<!-- {{#callable:wf_bcast_wide}} -->
-The `wf_bcast_wide` function creates a vector of eight single-precision floating-point values where each pair of adjacent elements is a duplicate of one of the four input floats.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L53>)
+
+Creates a vector of eight floats where each pair of elements is a duplicate of the input floats.
 - **Inputs**:
-    - `f0`: The first float value to be duplicated in the vector.
-    - `f1`: The second float value to be duplicated in the vector.
-    - `f2`: The third float value to be duplicated in the vector.
-    - `f3`: The fourth float value to be duplicated in the vector.
-- **Control Flow**:
-    - The function takes four float inputs: f0, f1, f2, and f3.
-    - It uses the `_mm256_setr_ps` intrinsic to create a 256-bit AVX vector.
-    - The vector is constructed such that the first two elements are f0, the next two are f1, the following two are f2, and the last two are f3.
-- **Output**: A 256-bit AVX vector (`wf_t`) containing eight floats arranged as [f0, f0, f1, f1, f2, f2, f3, f3].
+    - `f0`: The first float value to duplicate in the vector.
+    - `f1`: The second float value to duplicate in the vector.
+    - `f2`: The third float value to duplicate in the vector.
+    - `f3`: The fourth float value to duplicate in the vector.
+- **Logic and Control Flow**:
+    - Uses the `_mm256_setr_ps` intrinsic to set the elements of the vector.
+    - Duplicates each input float value in adjacent positions in the vector.
+- **Output**: Returns a `wf_t` vector with the pattern `[f0, f0, f1, f1, f2, f2, f3, f3]`.
 
 
 ---
 ### wf\_exch\_adj\_quad<!-- {{#callable:wf_exch_adj_quad}} -->
-The `wf_exch_adj_quad` function rearranges the elements of a vector of eight single-precision floating-point numbers by swapping the first and second 128-bit lanes.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L67>)
+
+Reorders the elements of a vector float by swapping the lower and upper 128-bit lanes.
 - **Inputs**:
-    - `f`: A vector of type `wf_t` containing eight single-precision floating-point numbers.
-- **Control Flow**:
-    - The function takes a vector `f` as input, which is of type `wf_t` (an alias for `__m256`).
-    - It uses the `_mm256_permute2f128_ps` intrinsic to permute the 128-bit lanes of the input vector `f`.
-    - The intrinsic is called with the same vector `f` for both source operands and a control value of `1`, which swaps the two 128-bit lanes of the vector.
-- **Output**: A vector of type `wf_t` with the first and second 128-bit lanes swapped, resulting in the order [f4, f5, f6, f7, f0, f1, f2, f3].
+    - `f`: A vector float (`wf_t`) containing eight 32-bit single precision floating point values.
+- **Logic and Control Flow**:
+    - Uses the `_mm256_permute2f128_ps` intrinsic to swap the lower and upper 128-bit lanes of the input vector `f`.
+- **Output**: A vector float with the elements reordered as `[f4 f5 f6 f7 f0 f1 f2 f3]`.
 
 
 ---
 ### wf\_extract<!-- {{#callable:wf_extract}} -->
-The `wf_extract` function extracts a specific float value from a vector of floats based on a given lane index.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L128>)
+
+Extracts a float from a specified lane of a vector float `wf_t` using an immediate value `imm`.
 - **Inputs**:
-    - `a`: A vector of floats (`wf_t`), which is an AVX 256-bit wide vector containing 8 single-precision floating point values.
-    - `imm`: An integer representing the lane index from which to extract the float; it should be a compile-time constant in the range 0 to 7.
-- **Control Flow**:
-    - Calculate `avx_lane` by right-shifting `imm` by 2 to determine which 128-bit lane to extract from the 256-bit vector.
-    - Calculate `sse_lane` by performing a bitwise AND of `imm` with 3 to determine the specific float within the 128-bit lane.
-    - Use `_mm256_extractf128_ps` to extract the 128-bit lane from the vector `a` based on `avx_lane`.
-    - If `sse_lane` is non-zero, use `_mm_extract_epi32` and `_mm_insert_epi32` to extract and insert the specific float within the 128-bit lane.
-    - Convert the resulting 128-bit vector to a single float using `_mm_cvtss_f32`.
-- **Output**: A single float value extracted from the specified lane of the input vector.
+    - `a`: A vector float of type `wf_t` from which to extract a float.
+    - `imm`: An integer immediate value that specifies the lane (0-7) from which to extract the float.
+- **Logic and Control Flow**:
+    - Calculate `avx_lane` by right-shifting `imm` by 2 to determine the AVX lane.
+    - Calculate `sse_lane` by performing a bitwise AND of `imm` with 3 to determine the SSE lane.
+    - Extract a 128-bit lane from the vector `a` using `_mm256_extractf128_ps` with `avx_lane`.
+    - If `sse_lane` is non-zero, extract a 32-bit integer from the 128-bit lane, insert it into a zeroed 128-bit integer, and cast it back to a 128-bit float.
+    - Convert the first float in the 128-bit float to a scalar float using `_mm_cvtss_f32`.
+- **Output**: A scalar float extracted from the specified lane of the vector float.
 
 
 ---
 ### wf\_extract\_variable<!-- {{#callable:wf_extract_variable}} -->
-The `wf_extract_variable` function extracts a specific float value from a vector of eight floats based on a given index.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L144>)
+
+Extracts a float value from a specified lane of a vector float `wf_t`.
 - **Inputs**:
-    - `a`: A vector of type `wf_t` (which is an AVX 256-bit vector) containing eight 32-bit wide lanes, each holding a single precision IEEE 754 floating point value.
-    - `n`: An integer index specifying which lane (0 to 7) of the vector `a` to extract the float from.
-- **Control Flow**:
-    - Declare a local array `f` of eight floats with a specific attribute `W_ATTR` for alignment or optimization purposes.
-    - Store the contents of the vector `a` into the array `f` using the `_mm256_store_ps` intrinsic, which transfers the vector's data into the array.
-    - Return the float at the index `n` from the array `f`.
-- **Output**: A single float value extracted from the specified lane `n` of the input vector `a`.
+    - `a`: A vector float of type `wf_t` containing 8 single precision floating point values.
+    - `n`: An integer index specifying the lane (0 to 7) from which to extract the float value.
+- **Logic and Control Flow**:
+    - Declare an array `f` of 8 floats with the attribute `W_ATTR`.
+    - Store the contents of the vector float `a` into the array `f` using `_mm256_store_ps`.
+    - Return the float value at index `n` from the array `f`.
+- **Output**: A single precision float value extracted from the specified lane `n` of the vector float `a`.
 
 
 ---
 ### wf\_insert\_variable<!-- {{#callable:wf_insert_variable}} -->
-The `wf_insert_variable` function replaces a specific element in a vector of floats with a new float value and returns the modified vector.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L151>)
+
+Replaces the float at a specified index in a vector of floats with a new value and returns the updated vector.
 - **Inputs**:
-    - `a`: A vector of 8 single-precision floating point values (type `wf_t`).
-    - `n`: An integer index (0 to 7) indicating which element in the vector to replace.
-    - `v`: A single-precision floating point value to insert into the vector at the specified index.
-- **Control Flow**:
-    - Store the elements of the vector `a` into a local array `f` of 8 floats using `_mm256_store_ps`.
-    - Replace the element at index `n` in the array `f` with the new value `v`.
-    - Load the modified array `f` back into a vector using `_mm256_load_ps` and return it.
-- **Output**: A vector of 8 single-precision floating point values (`wf_t`) with the element at index `n` replaced by `v`.
+    - ``a``: A vector of 8 single-precision floating point values (`wf_t`).
+    - ``n``: An integer index (0 to 7) indicating which element in the vector to replace.
+    - ``v``: A single-precision floating point value to insert into the vector at the specified index.
+- **Logic and Control Flow**:
+    - Store the contents of vector `a` into a local array `f` of 8 floats.
+    - Replace the element at index `n` in array `f` with the value `v`.
+    - Load the modified array `f` back into a vector and return it.
+- **Output**: Returns a vector of 8 single-precision floating point values (`wf_t`) with the specified element replaced by the new value.
 
 
 ---
 ### wf\_to\_wl<!-- {{#callable:wf_to_wl}} -->
-The `wf_to_wl` function converts a 128-bit portion of a 256-bit vector of floats (`wf_t`) into a 256-bit vector of longs (`__m256i`).
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L304>)
+
+Converts a 256-bit vector of floats (`wf_t`) to a 256-bit vector of longs (`__m256i`) based on a specified half of the vector.
 - **Inputs**:
-    - `f`: A 256-bit vector of floats (`wf_t`) from which a 128-bit portion will be extracted and converted.
-    - `imm_hi`: An integer that determines which 128-bit portion of the input vector `f` to extract; if non-zero, the higher 128 bits are extracted, otherwise the lower 128 bits are extracted.
-- **Control Flow**:
-    - A union is used to store the extracted 128-bit portion of the input vector `f` as an array of four floats.
-    - The `_mm_store_ps` function is used to extract either the lower or higher 128 bits of `f` based on the value of `imm_hi`.
-    - Each float in the extracted portion is cast to a long and stored in another union as an array of four longs.
-    - The `_mm256_load_si256` function is used to load the array of longs into a 256-bit vector of longs (`__m256i`).
-- **Output**: A 256-bit vector of longs (`__m256i`) containing the converted values from the selected 128-bit portion of the input vector `f`.
+    - `f`: A 256-bit vector of floats (`wf_t`) to convert.
+    - `imm_hi`: An integer that determines which half of the vector to process; 0 for the lower half and 1 for the upper half.
+- **Logic and Control Flow**:
+    - Declare two unions: one for storing floats and another for storing longs.
+    - Use `_mm256_extractf128_ps` to extract either the lower or upper 128-bit half of the input vector `f` based on `imm_hi`.
+    - Store the extracted 128-bit float vector into the float array of the first union using `_mm_store_ps`.
+    - Convert each float in the array to a long and store it in the long array of the second union.
+    - Load the long array into a 256-bit integer vector using `_mm256_load_si256`.
+- **Output**: A 256-bit vector of longs (`__m256i`) containing the converted values from the specified half of the input float vector.
 
 
 ---
 ### wf\_to\_wv<!-- {{#callable:wf_to_wv}} -->
-The `wf_to_wv` function converts a 256-bit vector of single-precision floating-point values to a 256-bit vector of unsigned long integers, using a specified half of the input vector.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L315>)
+
+Converts a 128-bit portion of a 256-bit vector of floats to a 256-bit vector of unsigned long integers.
 - **Inputs**:
-    - `f`: A 256-bit vector (`wf_t`) containing eight single-precision floating-point values.
-    - `imm_hi`: An integer that determines which half of the input vector `f` to process; if non-zero, the upper half is used, otherwise the lower half is used.
-- **Control Flow**:
-    - A union is used to store the selected half of the input vector `f` as an array of four floats.
-    - The `_mm_store_ps` function extracts either the lower or upper 128-bit half of the vector `f` based on the value of `imm_hi` and stores it in the float array of the union.
-    - Each float in the array is cast to an unsigned long and stored in another union's unsigned long array.
-    - The `_mm256_load_si256` function loads the unsigned long array into a 256-bit integer vector and returns it.
-- **Output**: A 256-bit vector (`__m256i`) containing four unsigned long integers converted from the selected half of the input vector `f`.
+    - `f`: A 256-bit vector of floats (`wf_t`).
+    - `imm_hi`: An integer that determines which 128-bit portion of the vector `f` to process; 0 for the lower half and 1 for the upper half.
+- **Logic and Control Flow**:
+    - Declare two unions: `t` for storing floats and `u` for storing unsigned long integers.
+    - Use `_mm256_extractf128_ps` to extract either the lower or upper 128-bit portion of `f` based on `imm_hi`.
+    - Store the extracted 128-bit portion into the float array `t->f` using `_mm_store_ps`.
+    - Convert each float in `t->f` to an unsigned long integer and store it in `u->u`.
+    - Load the unsigned long integers from `u->v` into a 256-bit vector using `_mm256_load_si256`.
+- **Output**: A 256-bit vector of unsigned long integers (`__m256i`).
 
 
 ---
 ### wf\_to\_wu\_fast<!-- {{#callable:wf_to_wu_fast}} -->
-The `wf_to_wu_fast` function converts a vector of single-precision floating-point numbers to a vector of unsigned 32-bit integers, handling values in the range [0, 2^32) efficiently.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L345>)
+
+Converts a vector of floats to a vector of unsigned integers, handling values in the range [0, 2^32) using AVX instructions.
 - **Inputs**:
-    - `a`: A vector of single-precision floating-point numbers (`wf_t`) assumed to be in the range [0, 2^32).
-- **Control Flow**:
-    - Broadcasts the value 2^31 to all elements of a vector `s`.
+    - `a`: A vector of floats (`wf_t`) assumed to be integers in the range [0, 2^32).
+- **Logic and Control Flow**:
+    - Broadcasts the value 2^31 into a vector `s`.
     - Compares each element of `a` with `s` to create a condition vector `c` where each element is -1 if the corresponding element in `a` is less than 2^31, and 0 otherwise.
-    - Subtracts `s` from `a` to get `as`, which is `a - 2^31`.
-    - Uses the condition vector `c` to select between `a` and `as`, converting the result to a signed integer vector `u`.
-    - Adds 2^31 to each element of `u` to get `us`, which is `a + 2^31` if `a` was less than 2^31, and `a` otherwise.
-    - Blends `us` and `u` based on the condition vector `c` to produce the final result, which is cast to an unsigned integer vector.
-- **Output**: A vector of unsigned 32-bit integers (`__m256i`) representing the converted values from the input vector `a`.
+    - Subtracts `s` from `a` to get `as`.
+    - Uses the condition vector `c` to select between `a` and `as`, converting the result to a vector of signed integers `u`.
+    - Adds 2^31 to each element of `u` to get `us`.
+    - Blends `us` and `u` based on the condition vector `c` to produce the final result.
+- **Output**: A vector of unsigned integers (`__m256i`) corresponding to the input vector of floats.
 
 
 ---
 ### wf\_sum\_all<!-- {{#callable:wf_sum_all}} -->
-The `wf_sum_all` function computes the sum of all elements in a vector of floats and returns a vector where each element is the sum.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L365>)
+
+Computes the sum of all elements in a vector of floats and broadcasts the result across all lanes of the vector.
 - **Inputs**:
-    - `x`: A vector of floats (`wf_t`) containing 8 single-precision floating point values.
-- **Control Flow**:
-    - The function first adds the two 128-bit halves of the 256-bit vector `x` using `_mm256_permute2f128_ps` and `_mm256_add_ps`, resulting in a vector where each element is the sum of corresponding elements from the two halves.
-    - It then performs a horizontal addition on the vector using `_mm256_hadd_ps`, which sums adjacent pairs of elements, reducing the vector to four sums.
-    - Finally, another horizontal addition is performed to sum the remaining elements, resulting in a vector where each element is the total sum of the original vector.
-- **Output**: A vector of floats (`wf_t`) where each element is the sum of all elements in the input vector `x`.
+    - `x`: A vector of type `wf_t` containing eight 32-bit wide lanes, each holding a single precision floating point value.
+- **Logic and Control Flow**:
+    - Add the vector `x` to itself after permuting its 128-bit lanes, effectively summing pairs of elements across the vector.
+    - Perform a horizontal addition on the vector to sum adjacent pairs of elements, reducing the vector to four sums.
+    - Perform another horizontal addition to sum the remaining pairs, resulting in the total sum of all elements in the vector.
+    - Broadcast the total sum across all lanes of the vector and return it.
+- **Output**: A vector of type `wf_t` where each lane contains the sum of all elements from the input vector `x`.
 
 
 ---
 ### wf\_min\_all<!-- {{#callable:wf_min_all}} -->
-The `wf_min_all` function computes the minimum value across all elements of a vector of floats and broadcasts this minimum value across all elements of the vector.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L372>)
+
+Finds the minimum value in a vector of floats and broadcasts it across all lanes.
 - **Inputs**:
-    - `x`: A vector of 8 single-precision floating point values (wf_t) to find the minimum value from.
-- **Control Flow**:
-    - Permute the input vector `x` to swap its two 128-bit lanes, storing the result in `y`.
-    - Compute the element-wise minimum of `x` and `y`, updating `x` with the result.
-    - Permute `x` to swap adjacent pairs of elements, storing the result in `y`.
-    - Compute the element-wise minimum of `x` and `y`, updating `x` with the result.
-    - Permute `x` to swap adjacent elements, storing the result in `y`.
-    - Compute the element-wise minimum of `x` and `y`, updating `x` with the result.
-    - Return the vector `x`, which now contains the minimum value of the original vector broadcasted across all elements.
-- **Output**: A vector (wf_t) where each element is the minimum value found in the input vector `x`, broadcasted across all elements.
+    - ``x``: A vector of type `wf_t` containing eight 32-bit wide lanes, each holding a single precision floating point value.
+- **Logic and Control Flow**:
+    - Permute the input vector `x` to swap its two 128-bit halves using `_mm256_permute2f128_ps` and store the result in `y`.
+    - Compute the element-wise minimum of `x` and `y` using `_mm256_min_ps` and store the result back in `x`.
+    - Permute `x` to swap adjacent pairs of elements using `_mm256_permute_ps` with `_MM_SHUFFLE(1, 0, 3, 2)` and store the result in `y`.
+    - Compute the element-wise minimum of `x` and `y` again using `_mm256_min_ps` and store the result back in `x`.
+    - Permute `x` to swap adjacent elements using `_mm256_permute_ps` with `_MM_SHUFFLE(2, 3, 0, 1)` and store the result in `y`.
+    - Compute the element-wise minimum of `x` and `y` once more using `_mm256_min_ps` and store the result back in `x`.
+- **Output**: A vector of type `wf_t` where all lanes contain the minimum value found in the original input vector `x`.
 
 
 ---
 ### wf\_max\_all<!-- {{#callable:wf_max_all}} -->
-The `wf_max_all` function computes the maximum value across all elements of a vector of floats and broadcasts this maximum value across all elements of the vector.
+[View Source →](<../../../../../src/util/simd/fd_avx_wf.h#L383>)
+
+Finds the maximum value in a vector of floats and broadcasts it across all lanes.
 - **Inputs**:
-    - `x`: A vector of floats (`wf_t`) containing 8 single-precision floating point values.
-- **Control Flow**:
-    - Permute the input vector `x` to swap its two 128-bit lanes, storing the result in `y`.
-    - Compute the element-wise maximum of `x` and `y`, updating `x`.
-    - Permute `x` to swap adjacent pairs of elements, storing the result in `y`.
-    - Compute the element-wise maximum of `x` and `y`, updating `x`.
-    - Permute `x` to swap adjacent elements, storing the result in `y`.
-    - Compute the element-wise maximum of `x` and `y`, updating `x`.
-- **Output**: A vector of floats (`wf_t`) where each element is the maximum value found in the input vector `x`.
+    - `x`: A vector of type `wf_t` containing eight 32-bit wide lanes, each holding a single precision floating point value.
+- **Logic and Control Flow**:
+    - Permute the input vector `x` to swap its two 128-bit halves using `_mm256_permute2f128_ps` and store the result in `y`.
+    - Compute the element-wise maximum of `x` and `y` using `_mm256_max_ps` and store the result back in `x`.
+    - Permute `x` to swap adjacent pairs of elements using `_mm256_permute_ps` with `_MM_SHUFFLE(1, 0, 3, 2)` and store the result in `y`.
+    - Compute the element-wise maximum of `x` and `y` again using `_mm256_max_ps` and store the result back in `x`.
+    - Permute `x` to swap adjacent elements using `_mm256_permute_ps` with `_MM_SHUFFLE(2, 3, 0, 1)` and store the result in `y`.
+    - Compute the element-wise maximum of `x` and `y` one last time using `_mm256_max_ps` and store the result back in `x`.
+- **Output**: A vector of type `wf_t` where all lanes contain the maximum value found in the input vector `x`.
 
 
 

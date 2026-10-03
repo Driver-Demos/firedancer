@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `txn` folder in the `firedancer` codebase contains various scripts and data files for testing and handling transactions, including Bash scripts for executing and logging transaction tests, and Base64-encoded data files for storing or transmitting binary data.
+Scripts and files for testing transaction transmissions and encoding binary data in Base64.
 
 
 ## Files
-- **[all.txns](all.txns.md)**: The `all.txns` file in the `firedancer` codebase contains Base64-encoded data blocks with metadata headers, used for storing or transmitting binary data in a text-friendly format, requiring decoding and understanding of its structure and context for effective and secure handling within software systems.
-- **[test-transactions-parallel.sh](test-transactions-parallel.sh.md)**: The `test-transactions-parallel.sh` file is a Bash script used to execute a specified number of transactions in parallel using the `parallel` command, while reporting the number of successful transmissions.
-- **[test-transactions.sh](test-transactions.sh.md)**: The `test-transactions.sh` file is a Bash script used to test transaction transmissions by reading a specified number of transactions from a file and logging the results.
-- **[test-txns.sh](test-txns.sh.md)**: The `test-txns.sh` file is a Bash script used to execute QUIC transaction tests within a specific network namespace in the `firedancer` codebase.
-- **[test.sh](test.sh.md)**: The `test.sh` file in the `firedancer` codebase facilitates the execution of tests by using Make to select the appropriate build directory based on the current environment variables.
-- **[tx](tx.md)**: The `tx` file in the `firedancer` codebase contains a large block of base64-encoded data intended for storage or transmission in text-only environments, serving as a data payload that requires decoding to reveal its original binary form for use by a specific application or system.
+- **[all.txns](all.txns.md)**: Encodes binary data in Base64 for text-based storage and transmission, requiring decoding for use.
+- **[test-transactions-parallel.sh](test-transactions-parallel.sh.md)**: A Bash script to test parallel transaction transmissions using specified parameters and network namespaces.
+- **[test-transactions.sh](test-transactions.sh.md)**: A Bash script to test transaction transmission using a specified number of transactions and log results.
+- **[test-txns.sh](test-txns.sh.md)**: Shell script to test QUIC transactions using a specified transaction file.
+- **[test.sh](test.sh.md)**: Executes unit tests through Make, ensuring correct build directory selection for the environment.
+- **[tx](tx.md)**: Encodes binary data in Base64 for text-based transmission or storage, requiring decoding for use.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
