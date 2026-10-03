@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Zero-knowledge proof verification functions, structures, tests, and documentation for the Firedancer ZK-SDK.
+Zero-knowledge proof instructions, transcript and rangeproof support, verification code, and tests.
 
 ## Folders
-- **[instructions](instructions/README.md)**: Functions, structures, and tests for verifying zero-knowledge proofs, ciphertext validity, and equality in the Firedancer ZK-SDK.
-- **[merlin](merlin/README.md)**: Strobe-128 internals, Merlin transcript functions, structures, Makefile, and tests for cryptographic operations.
-- **[rangeproofs](rangeproofs/README.md)**: Functions and data structures for range proofs using Curve25519 and Ristretto255, with a Makefile.
-- **[tests](tests/README.md)**: Bash script to recreate a ledger with ZK SDK transactions using Solana and SPL Token dependencies.
-- **[transcript](transcript/README.md)**: Functions and macros for handling zk-SNARK transcripts with the Merlin protocol.
+- **[instructions](instructions/README.md)**: Zero-knowledge proof instructions for ciphertext, range, percentage, and public key validity.
+- **[merlin](merlin/README.md)**: Merlin transcript implementation, headers, build rules, and unit test.
+- **[rangeproofs](rangeproofs/README.md)**: The `rangeproofs` folder in the `firedancer` codebase contains source and header files for implementing, verifying, and optimizing cryptographic range proofs, utilizing various architectures and protocols, and includes a makefile for build configuration.
+- **[tests](tests/README.md)**: The `tests` folder in the `firedancer` codebase contains a bash script for testing ledger creation with ZK SDK transactions using Solana and SPL Token dependencies.
+- **[transcript](transcript/README.md)**: The `transcript` folder in the `firedancer` codebase contains the `fd_zksdk_transcript.h` file, which provides definitions and functions for managing zero-knowledge proof transcripts using the Merlin and rangeproofs libraries.
 
 ## Files
-- **[fd_zksdk.c](fd_zksdk.c.md)**: Implements functions for processing and verifying zero-knowledge proofs in a runtime environment.
-- **[fd_zksdk.h](fd_zksdk.h.md)**: Functions for closing a context account and verifying proofs in the zksdk runtime.
-- **[fd_zksdk_private.h](fd_zksdk_private.h.md)**: Header file for defining structures, constants, and macros for zero-knowledge proof verification functions.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fd_zksdk` component with conditional compilation flags.
-- **[README.md](README.md.md)**: Documentation for the implementation of Solana ZK SDK and ZkE1Gama1Proof11111111111111111111111111111 program.
-- **[test_zksdk.c](test_zksdk.c.md)**: Unit test for verifying public key validity using zk-SDK in the Firedancer codebase.
+- **[fd_zksdk.c](fd_zksdk.c.md)**: ZK proof verification and context-state close handling for ElGamal proof instructions.
+- **[fd_zksdk.h](fd_zksdk.h.md)**: The `fd_zksdk.h` file in the `firedancer` codebase declares functions for processing and verifying proofs and managing context accounts within the zkSDK framework.
+- **[fd_zksdk_private.h](fd_zksdk_private.h.md)**: The `fd_zksdk_private.h` file in the `firedancer` codebase defines internal structures, constants, and function prototypes for verifying various zero-knowledge proof instructions related to ciphertext and public key validity.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_zksdk headers, objects, and unit tests when int128 and hosted support are enabled.
+- **[README.md](README.md.md)**: The `README.md` file provides an overview of the Solana ZK SDK implementation and the `ZkE1Gama1Proof11111111111111111111111111111` program.
+- **[test_zksdk.c](test_zksdk.c.md)**: Unit tests for pubkey validity proof verification and executor error handling.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

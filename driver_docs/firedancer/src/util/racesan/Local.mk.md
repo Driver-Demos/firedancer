@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests related to `fd_racesan` in the `firedancer` codebase.
+Build rules for racesan headers, objects, and a unit test.
 
 # Purpose
-This Makefile snippet defines build instructions for a software project. It uses the `add-hdrs` and `add-objs` functions to specify header files and object files for different components, such as `fd_racesan_base.h`, `fd_racesan.h`, and `fd_racesan_async.h`. The `make-unit-test` function creates a unit test target named `test_racesan`, which depends on the `test_racesan` and `fd_util` components.
+Defines build targets for the `fd_racesan` components by registering header files and object files for `fd_racesan`, `fd_racesan_async`, and `fd_racesan_weave` with `fd_util` as a dependency. It also adds the `test_racesan` unit test target and links it against `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
