@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CLI, metrics, and WebSocket API documentation for running, monitoring, and managing Firedancer.
+Documentation for the `fdctl` CLI, system metrics, data queues, QUIC tiles, Prometheus, and WebSocket API.
 
 
 ## Files
-- **[cli.md](cli.md.md)**: Command-line subcommands for running, monitoring, configuring, and managing Firedancer.
-- **[metrics-generated.md](metrics-generated.md.md)**: Metrics documentation for Firedancer tiles and link counters.
-- **[metrics-link-preamble.md](metrics-link-preamble.md.md)**: The `metrics-link-preamble.md` file in the `firedancer` codebase describes the metrics reported for data queues between tiles, detailing the labels used to identify the links and consumers.
-- **[metrics-tile-preamble.md](metrics-tile-preamble.md.md)**: The `metrics-tile-preamble.md` file in the `firedancer` codebase explains the structure and labeling of performance counters for QUIC tiles, detailing how metrics are reported per tile with specific labels for identification.
-- **[metrics.md](metrics.md.md)**: The `metrics.md` file in the `firedancer` codebase provides an overview of the internal performance counters exposed via a Prometheus HTTP endpoint, detailing the types of metrics available and their intended use for developers and diagnostics.
-- **[websocket.md](websocket.md.md)**: WebSocket API for validator status, gossip, epoch, peer, and slot data.
+- **[cli.md](cli.md.md)**: Documentation for the `fdctl` command line interface, detailing subcommands for managing and monitoring Firedancer.
+- **[metrics-generated.md](metrics-generated.md.md)**: Documentation of various metrics related to network, transactions, and system performance in the Firedancer codebase.
+- **[metrics-link-preamble.md](metrics-link-preamble.md.md)**: Documentation for metrics related to single-producer multi-consumer data queues between tiles.
+- **[metrics-tile-preamble.md](metrics-tile-preamble.md.md)**: Documentation for performance counters in QUIC tiles, detailing metric labels and examples.
+- **[metrics.md](metrics.md.md)**: Documentation for Firedancer's internal performance counters exposed via a Prometheus HTTP endpoint.
+- **[websocket.md](websocket.md.md)**: Documentation for the Firedancer WebSocket API, detailing connection, compression, data streaming, and query functionalities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
