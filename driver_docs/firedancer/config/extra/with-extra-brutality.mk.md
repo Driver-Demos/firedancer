@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-extra-brutality.mk` file in the `firedancer` codebase configures additional compiler flags for Clang and GCC to enforce stricter code checks and diagnostics.
+Makefile configuration for setting compiler flags with extra warnings and attributes for Clang and GCC.
 
 # Purpose
-This file is a Makefile snippet that configures compiler flags for a C/C++ project. It defines preprocessor flags to add attributes for function purity and constancy, and conditionally adds warning and diagnostic flags based on whether the Clang or GCC compiler is being used. The flags enhance code analysis and diagnostics by suggesting attributes and enabling colored output for GCC.
+The `Makefile` content defines preprocessor flags and compiler warnings for C/C++ code compilation. It sets `CPPFLAGS` to include attributes for function purity and constancy using `__attribute__((pure))` and `__attribute__((const))`. If the `FD_USING_CLANG` variable is defined, it adds the `-Winline` and `-Wproperty-attribute-mismatch` warnings for Clang. If the `FD_USING_GCC` variable is defined, it adds several warning flags for GCC, including `-Winline`, `-Wsuggest-attribute` options for various attributes, and enables colored diagnostics with `-fdiagnostics-color=always`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

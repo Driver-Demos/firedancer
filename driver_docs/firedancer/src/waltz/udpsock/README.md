@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `udpsock` folder in the `firedancer` codebase contains files for implementing and testing a UDP socket abstraction, including source and header files for socket operations, a makefile for build instructions, and a test file for a UDP echo server.
+UDP socket abstraction implementation, unprivileged driver, Makefile, and echo server test.
 
 
 ## Files
-- **[fd_udpsock.c](fd_udpsock.c.md)**: The `fd_udpsock.c` file in the `firedancer` codebase implements a UDP socket abstraction with support for sending and receiving packets, including mock Ethernet and IPv4 headers, and provides functions for managing socket memory and configuration.
-- **[fd_udpsock.h](fd_udpsock.h.md)**: The `fd_udpsock.h` file defines an unprivileged, single-threaded UDP socket driver for debugging purposes, implementing the `fd_aio` abstraction and providing functions for managing UDP socket operations in the `firedancer` codebase.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `udpsock` component, including headers, object files, and a unit test, conditioned on the `FD_HAS_HOSTED` flag.
-- **[test_udpsock_echo.c](test_udpsock_echo.c.md)**: The `test_udpsock_echo.c` file in the `firedancer` codebase implements a UDP echo server that listens on a specified port, swaps the source and destination of incoming UDP packets, and sends them back to the sender.
+- **[fd_udpsock.c](fd_udpsock.c.md)**: Implementation of a UDP socket abstraction with functions for sending, receiving, and managing packet data.
+- **[fd_udpsock.h](fd_udpsock.h.md)**: An unprivileged UDP socket driver for debugging with single-threaded operation and aio abstraction.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for UDP socket functionality if hosted.
+- **[test_udpsock_echo.c](test_udpsock_echo.c.md)**: A UDP echo server test that swaps source and destination addresses in received packets.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

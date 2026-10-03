@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_pcap_main.c` file in the `firedancer` codebase provides a tool for analyzing Solana network QUIC traffic captures, supporting both pcap and pcap-ng file formats, and includes functionality for handling TLS keys and QUIC packet decryption.
+A tool for analyzing Solana network QUIC traffic captures from pcap and pcap-ng files.
 
 # Purpose
-This C source code file is designed to analyze QUIC traffic captured in packet capture (PCAP) files, specifically for the Solana network. The code provides a command-line tool that processes PCAP and PCAP-NG files to extract and analyze QUIC traffic data. It supports various commands to print traffic statistics, per-peer statistics, and trace traffic metadata to CSV format. The code includes functionality to handle different file formats and link layers, such as Ethernet and Linux SLL, and it is capable of parsing and decrypting QUIC packets using TLS keys.
+The code is a C program designed to analyze QUIC traffic captured in packet capture (PCAP) files, specifically for the Solana network. It processes both traditional PCAP and PCAP-NG file formats, supporting specific link layers and cipher suites. The program defines several data structures and functions to handle QUIC traffic, including parsing and decrypting QUIC packets, managing encryption keys, and mapping connection IDs to client random values. It includes functionality to read and process QUIC initial, handshake, and 1-RTT packets, and it can handle both Ethernet and Linux SLL link types.
 
-The file defines several key components, including data structures for managing QUIC packet iteration and key mapping, as well as functions for processing and decrypting QUIC packets. It utilizes external libraries and headers for QUIC protocol handling, packet capture parsing, and network utilities. The code is structured to handle command-line arguments, manage memory allocation for data structures, and perform secure random number generation for cryptographic operations. The main function initializes the environment, processes command-line arguments, and executes the appropriate analysis based on the input PCAP file. The code is intended to be compiled into an executable tool for network traffic analysis, with a focus on QUIC traffic in the context of the Solana blockchain network.
+The program provides a command-line interface with commands and flags for specifying the PCAP file and configuring the maximum number of concurrent TLS keys. It uses several external libraries and headers for QUIC protocol handling, packet capture processing, and network utilities. The main function initializes the environment, processes command-line arguments, and runs the packet capture analysis using the defined data structures and functions. The program is structured to handle errors and log warnings for unsupported features or malformed data.
 # Imports and Dependencies
 
 ---
@@ -34,455 +34,490 @@ The file defines several key components, including data structures for managing 
 
 ---
 ### map\_seed
-- **Type**: `ulong`
-- **Description**: `map_seed` is a static global variable of type `ulong` that is used to store a seed value for hash functions in the program. It is initialized in the `random_seeds` function using a secure random number generator.
-- **Use**: This variable is used as a seed for hash functions to ensure randomness and uniqueness in operations such as mapping keys in data structures.
+- **Type**: ``ulong``
+- **Description**: `map_seed` is a static global variable of type `ulong` that stores a seed value for hash functions used in map operations.
+- **Use**: Used to initialize the hash function for mapping operations, ensuring unique and secure hash values.
 
 
 # Data Structures
 
 ---
 ### key32
-- **Type**: `union`
+- **Type**: ``union``
 - **Members**:
-    - `key`: An array of 32 unsigned characters (uchar) used to store a 256-bit key.
-    - `ul`: An array of 4 unsigned long integers (ulong) used to store the same 256-bit key as four 64-bit segments.
-- **Description**: The `key32` union is a data structure designed to store a 256-bit key in two different formats: as an array of 32 bytes or as an array of four 64-bit unsigned long integers. This allows for flexible manipulation and access to the key data, depending on the requirements of the operations being performed. The `key32_t` typedef provides a convenient alias for this union, facilitating its use in various cryptographic and data processing contexts.
+    - ``key``: An array of 32 unsigned characters (`uchar`) used to store a key.
+    - ``ul``: An array of 4 unsigned long integers (`ulong`) used to store a key.
+- **Description**: The `key32` union provides a way to store a 32-byte key in two different formats: as an array of 32 `uchar` elements or as an array of 4 `ulong` elements. This allows for flexible access and manipulation of the key data, depending on the requirements of the application.
 
 
 ---
 ### key32\_t
 - **Type**: `union`
 - **Members**:
-    - `key`: An array of 32 unsigned characters (uchar) representing a 32-byte key.
-    - `ul`: An array of 4 unsigned long integers (ulong) providing an alternative view of the 32-byte key as four 8-byte segments.
-- **Description**: The `key32_t` data structure is a union that provides two different ways to access a 32-byte key. It can be accessed as an array of 32 unsigned characters, which is useful for byte-level operations, or as an array of four unsigned long integers, which can be beneficial for operations that require larger data chunks. This union is typically used in contexts where both byte-level and word-level manipulations of a 32-byte key are needed, such as in cryptographic applications or network protocols.
+    - `key`: An array of 32 unsigned characters.
+    - `ul`: An array of 4 unsigned long integers.
+- **Description**: A `union` that provides two different ways to access a 32-byte key, either as an array of 32 `uchar` or as an array of 4 `ulong`, facilitating operations on 32-byte keys in maps.
 
 
 ---
 ### key\_map
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `client_random`: A 32-byte key used as the client random value in the key map.
-    - `server_app_secret`: A 32-byte array storing the server application secret.
-    - `client_app_secret`: A 32-byte array storing the client application secret.
-- **Description**: The `key_map` structure is designed to map a client random value to its corresponding encryption keys, specifically the server and client application secrets. It is used in the context of handling QUIC traffic, where it helps in managing and retrieving encryption keys based on the client random value. The structure currently supports a single set of keys, but there is a note indicating potential future support for a ring buffer to handle multiple keys.
+    - `client_random`: A `key32_t` type that stores a 32-byte client random value.
+    - `server_app_secret`: An array of 32 unsigned characters that stores the server application secret.
+    - `client_app_secret`: An array of 32 unsigned characters that stores the client application secret.
+- **Description**: Stores a mapping between a client random value and its associated server and client application secrets, which are used in encryption processes.
 
 
 ---
 ### key\_map\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `client_random`: A 32-byte key used as the client random value in the TLS handshake.
-    - `server_app_secret`: A 32-byte array storing the server application secret key.
-    - `client_app_secret`: A 32-byte array storing the client application secret key.
-- **Description**: The `key_map_t` structure is used to map a client's random value to its corresponding encryption keys in a TLS handshake. It contains a `client_random` field, which is a 32-byte key representing the client random value, and two 32-byte arrays, `server_app_secret` and `client_app_secret`, which store the server and client application secret keys, respectively. This structure is part of a larger system for analyzing QUIC traffic and managing encryption keys.
+    - `client_random`: A `key32_t` union that stores a 32-byte client random value.
+    - `server_app_secret`: A 32-byte array that stores the server application secret.
+    - `client_app_secret`: A 32-byte array that stores the client application secret.
+- **Description**: Stores mappings between a 32-byte client random value and corresponding encryption keys, specifically the server and client application secrets. This structure is used in the context of QUIC traffic analysis to manage encryption keys associated with client random values.
 
 
 ---
 ### conn\_map
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `conn_id`: A unique identifier for a connection, represented as an unsigned long integer.
-    - `client_random`: A 32-byte array representing a random value associated with the client for cryptographic purposes.
-- **Description**: The `conn_map` structure is designed to map a connection ID to a client random value, which is typically used in cryptographic operations within network protocols. This structure is part of a larger system that processes QUIC traffic, and it helps in associating specific connections with their corresponding cryptographic parameters, facilitating secure communication.
+    - ``conn_id``: A unique identifier for a connection, represented as an unsigned long integer.
+    - ``client_random``: An array of 32 unsigned characters that stores a random value associated with the client.
+- **Description**: Maps a connection ID to a client random value, which is used in the context of QUIC protocol operations to associate a connection with its cryptographic parameters.
 
 
 ---
 ### conn\_map\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `conn_id`: A unique identifier for a connection, represented as an unsigned long integer.
-    - `client_random`: A 32-byte array representing the client random value used in the connection.
-- **Description**: The `conn_map_t` structure is used to map a connection ID to a client random value in the context of QUIC traffic analysis. It is part of a larger system that processes packet capture files to analyze network traffic, specifically focusing on QUIC protocol communications. The structure holds a connection ID and a corresponding client random value, which are essential for identifying and decrypting QUIC packets.
+    - ``conn_id``: A unique identifier for a connection.
+    - ``client_random``: An array of 32 bytes representing the client random value used in the connection.
+- **Description**: Maps a connection ID to a client random value, which is used in QUIC protocol operations to associate a connection with its cryptographic parameters.
 
 
 ---
 ### quic\_pcap\_params
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `pcap_path`: A constant character pointer to the path of the pcap file.
-    - `key_max`: An unsigned long integer representing the maximum number of concurrent TLS keys.
-- **Description**: The `quic_pcap_params` structure is used to store parameters for processing QUIC packet capture files. It contains a file path to the pcap file and a limit on the number of TLS keys that can be concurrently processed. This structure is essential for initializing and configuring the QUIC packet capture iterator, which is responsible for analyzing network traffic captures.
+    - ``pcap_path``: A pointer to a constant character string that specifies the path to the pcap file.
+    - ``key_max``: An unsigned long integer that specifies the maximum number of concurrent TLS keys.
+- **Description**: Defines parameters for processing QUIC traffic from a pcap file, including the file path and the maximum number of TLS keys to handle.
 
 
 ---
 ### quic\_pcap\_params\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `pcap_path`: A constant character pointer to the path of the pcap file.
-    - `key_max`: An unsigned long integer representing the maximum number of concurrent TLS keys allowed.
-- **Description**: The `quic_pcap_params_t` structure is used to store parameters for processing QUIC packet capture files. It contains a file path to the pcap file and a limit on the number of TLS keys that can be concurrently processed. This structure is essential for initializing and configuring the QUIC packet capture iterator, which is responsible for analyzing network traffic data.
+    - ``pcap_path``: A pointer to a constant character string that specifies the path to the pcap file.
+    - ``key_max``: An unsigned long integer that specifies the maximum number of concurrent TLS keys.
+- **Description**: Defines parameters for processing QUIC traffic from a pcap file, including the file path and the maximum number of TLS keys to handle concurrently.
 
 
 ---
 ### quic\_pcap\_iter
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `pcap_file`: A pointer to a FILE object representing the pcap file being processed.
-    - `conn_map`: A pointer to a conn_map_t structure that maps connection IDs to client random values.
-    - `key_map`: A pointer to a key_map_t structure that maps client random values to encryption keys.
-    - `key_max`: An unsigned long representing the maximum number of keys that can be stored.
-    - `key_cnt`: An unsigned long representing the current count of keys stored.
-    - `key_ignore_cnt`: An unsigned long representing the count of keys ignored due to exceeding the maximum limit.
-- **Description**: The `quic_pcap_iter` structure is designed to facilitate the iteration and processing of QUIC traffic data from a pcap file. It holds references to the pcap file, connection and key maps, and tracks the number of keys processed and ignored. This structure is central to managing the state and data necessary for analyzing QUIC traffic captures, particularly in the context of handling encryption keys and connection identifiers.
+    - ``pcap_file``: A pointer to a `FILE` object representing the pcap file.
+    - ``conn_map``: A pointer to a `conn_map_t` structure for mapping connection IDs to client random values.
+    - ``key_map``: A pointer to a `key_map_t` structure for mapping client random values to encryption keys.
+    - ``key_max``: An unsigned long integer representing the maximum number of keys allowed.
+    - ``key_cnt``: An unsigned long integer representing the current count of keys.
+    - ``key_ignore_cnt``: An unsigned long integer representing the count of ignored keys due to exceeding the maximum limit.
+- **Description**: Manages the iteration over a QUIC packet capture file, maintaining mappings between connection IDs and client random values, as well as between client random values and encryption keys, while tracking the number of keys processed and ignored.
 
 
 ---
 ### quic\_pcap\_iter\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `pcap_file`: A pointer to a FILE object representing the open pcap file.
-    - `conn_map`: A pointer to a conn_map_t structure used to map connection IDs to client random values.
-    - `key_map`: A pointer to a key_map_t structure used to map client random values to encryption keys.
-    - `key_max`: An unsigned long representing the maximum number of keys that can be stored.
-    - `key_cnt`: An unsigned long representing the current count of keys stored.
-    - `key_ignore_cnt`: An unsigned long representing the count of keys ignored due to exceeding the maximum limit.
-- **Description**: The `quic_pcap_iter_t` structure is designed to facilitate the iteration over QUIC packet capture files, specifically for analyzing QUIC traffic. It holds references to the pcap file being processed, as well as maps for managing connection IDs and encryption keys. The structure also tracks the maximum number of keys allowed, the current count of keys, and the number of keys ignored due to reaching the limit. This setup is crucial for efficiently processing and decrypting QUIC traffic data from pcap files.
+    - ``pcap_file``: A pointer to a `FILE` object representing the open pcap file.
+    - ``conn_map``: A pointer to a `conn_map_t` structure for mapping connection IDs to client random values.
+    - ``key_map``: A pointer to a `key_map_t` structure for mapping client random values to encryption keys.
+    - ``key_max``: An unsigned long integer representing the maximum number of keys allowed.
+    - ``key_cnt``: An unsigned long integer representing the current count of keys.
+    - ``key_ignore_cnt``: An unsigned long integer representing the count of ignored keys due to exceeding the maximum limit.
+- **Description**: `quic_pcap_iter_t` is a structure used to iterate over QUIC packet capture files, maintaining mappings between connection IDs and client random values, as well as between client random values and encryption keys. It includes a file pointer to the pcap file, maps for connections and keys, and counters for managing the number of keys processed and ignored.
 
 
 ---
 ### fd\_sll\_hdr
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `packet_type`: Specifies the type of packet being processed.
-    - `arphrd_type`: Indicates the ARP hardware type.
-    - `ll_addr_sz`: Represents the size of the link-layer address.
+    - `packet_type`: Specifies the type of packet.
+    - `arphrd_type`: Specifies the ARP hardware type.
+    - `ll_addr_sz`: Specifies the size of the link-layer address.
     - `ll_addr`: Stores the link-layer address, with a maximum size of 8 bytes.
-    - `protocol_type`: Defines the protocol type of the packet.
-- **Description**: The `fd_sll_hdr` structure is used to represent a Linux cooked-mode capture header, which is a simplified form of packet header used in capturing network traffic. It contains fields for packet type, ARP hardware type, link-layer address size, the link-layer address itself, and the protocol type, providing essential information for processing and analyzing network packets in a Linux environment.
+    - `protocol_type`: Specifies the protocol type.
+- **Description**: Defines a header structure for Linux cooked capture (SLL) packets, containing fields for packet type, ARP hardware type, link-layer address size, link-layer address, and protocol type.
 
 
 ---
 ### fd\_sll\_hdr\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `packet_type`: A 16-bit unsigned integer representing the packet type.
-    - `arphrd_type`: A 16-bit unsigned integer representing the ARP hardware type.
-    - `ll_addr_sz`: A 16-bit unsigned integer representing the size of the link-layer address.
-    - `ll_addr`: An array of 8 unsigned characters representing the link-layer address.
-    - `protocol_type`: A 16-bit unsigned integer representing the protocol type.
-- **Description**: The `fd_sll_hdr_t` structure represents a Linux cooked-mode capture header, which is used in packet capture files to describe the link-layer header for packets captured in cooked mode. This structure includes fields for the packet type, ARP hardware type, size of the link-layer address, the link-layer address itself, and the protocol type, providing essential metadata for interpreting the captured packet data.
+    - ``packet_type``: Holds the type of the packet as a `ushort`.
+    - ``arphrd_type``: Stores the ARP hardware type as a `ushort`.
+    - ``ll_addr_sz``: Indicates the size of the link-layer address as a `ushort`.
+    - ``ll_addr``: Contains the link-layer address as an array of 8 `uchar` elements.
+    - ``protocol_type``: Specifies the protocol type as a `ushort`.
+- **Description**: Defines a header structure for Linux SLL (Socket Link Layer) captures, which includes fields for packet type, ARP hardware type, link-layer address size, link-layer address, and protocol type. This structure is used to interpret the headers of packets captured in a Linux SLL format.
 
 
 # Functions
 
 ---
 ### usage\_short<!-- {{#callable:usage_short}} -->
-The `usage_short` function prints a brief usage message for the `fd_quic_pcap` command to the standard error stream.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L21>)
+
+Outputs a short usage message to the standard error stream.
 - **Inputs**: None
-- **Control Flow**:
-    - The function calls `fputs` to print a usage message to `stderr`.
-- **Output**: The function does not return any value (void function).
+- **Logic and Control Flow**:
+    - Calls the `fputs` function to write a usage message to `stderr`.
+- **Output**: No return value; outputs a string to `stderr`.
 
 
 ---
 ### usage<!-- {{#callable:usage}} -->
-The `usage` function provides a brief usage message for the `fd_quic_pcap` tool, with additional detailed information commented out for future implementation.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L26>)
+
+Displays a short usage message for the `fd_quic_pcap` tool.
 - **Inputs**: None
-- **Control Flow**:
-    - The function calls `usage_short()` to print a brief usage message to `stderr`.
-    - A block of code is commented out, which when uncommented, would print detailed information about the tool's capabilities, supported formats, commands, and optional flags using `fprintf`.
-- **Output**: The function does not return any value or output.
-- **Functions called**:
-    - [`usage_short`](#usage_short)
+- **Logic and Control Flow**:
+    - Calls the [`usage_short`](<#usage_short>) function to print a basic usage message to `stderr`.
+    - Contains a commented-out block of code intended to provide detailed usage information, which is currently not active.
+- **Output**: No output is returned as the function is of type `void`.
+- **Functions Called**:
+    - [`usage_short`](<#usage_short>)
 
 
 ---
 ### usage\_invalid<!-- {{#callable:usage_invalid}} -->
-The `usage_invalid` function prints an error message for invalid arguments and then calls another function to display a short usage message.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L52>)
+
+Outputs an error message for invalid arguments and displays a brief usage guide.
 - **Inputs**: None
-- **Control Flow**:
-    - The function writes the string 'Invalid arguments!\n' to the standard error stream using `fputs`.
-    - It then calls the [`usage_short`](#usage_short) function to display a brief usage message.
-- **Output**: The function does not return any value; it performs output operations to the standard error stream.
-- **Functions called**:
-    - [`usage_short`](#usage_short)
+- **Logic and Control Flow**:
+    - Writes 'Invalid arguments!' to the standard error output using `fputs`.
+    - Calls the [`usage_short`](<#usage_short>) function to display a brief usage guide.
+- **Output**: No return value; outputs directly to standard error.
+- **Functions Called**:
+    - [`usage_short`](<#usage_short>)
 
 
 ---
 ### reject\_unknown\_flags<!-- {{#callable:reject_unknown_flags}} -->
-The `reject_unknown_flags` function filters out unsupported command-line flags from the argument list, logging an error for each unsupported flag encountered.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L58>)
+
+Filters out unsupported command-line flags from the argument list.
 - **Inputs**:
     - `pargc`: A pointer to an integer representing the number of command-line arguments.
     - `pargv`: A pointer to an array of strings representing the command-line arguments.
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Initialize `expect_flag` to 1 and `new_argc` to 0.
     - Iterate over each argument in `*pargv` using a for loop with index `arg`.
-    - Check if `expect_flag` is false or the current argument does not start with '--'.
-    - If true, copy the argument to the new position in `*pargv` and increment `new_argc`.
-    - If the argument starts with '--', increment `arg` to check the next argument.
-    - If the next argument starts with '0', set `expect_flag` to 0, indicating no more flags are expected.
-    - If the next argument does not start with '0', log an error indicating an unsupported flag.
-- **Output**: The function modifies the `*pargv` array in place to remove unsupported flags and logs errors for each unsupported flag encountered.
+    - If `expect_flag` is false or the current argument does not start with '--', copy the argument to the new position in `*pargv` and increment `new_argc`.
+    - If the current argument starts with '--', check the next argument.
+    - If the next argument starts with '0', set `expect_flag` to 0.
+    - If the next argument does not start with '0', log an error for the unsupported flag.
+- **Output**: The function does not return a value but modifies the `*pargv` array to exclude unsupported flags.
 
 
 ---
 ### random\_seeds<!-- {{#callable:random_seeds}} -->
-The `random_seeds` function initializes a global seed variable `map_seed` using a secure random number generator at program startup.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L86>)
+
+Initializes the `map_seed` variable with a secure random value using `fd_rng_secure`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is marked with the `constructor` attribute, ensuring it runs before `main()` when the program starts.
-    - It calls `fd_rng_secure` to fill `map_seed` with secure random data.
-    - If `fd_rng_secure` fails, it logs a warning message using `FD_LOG_WARNING`.
-- **Output**: The function does not return any value; it initializes the `map_seed` variable.
+- **Logic and Control Flow**:
+    - The function is marked with the `constructor` attribute, which means it will execute before `main` starts.
+    - Calls `fd_rng_secure` to fill `map_seed` with a secure random value.
+    - If `fd_rng_secure` fails, logs a warning message using `FD_LOG_WARNING`.
+- **Output**: No output is returned as the function is `void`.
 
 
 ---
 ### quic\_pcap\_iter\_new<!-- {{#callable:quic_pcap_iter_new}} -->
-The `quic_pcap_iter_new` function initializes a QUIC packet capture iterator with memory allocations for key and connection maps and opens a specified pcap file for reading.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L150>)
+
+Initializes a `quic_pcap_iter_t` structure with memory allocations for key and connection maps and opens a pcap file for reading.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure that will be initialized by the function.
-    - `params`: A constant pointer to a `quic_pcap_params_t` structure containing parameters such as the path to the pcap file and the maximum number of keys.
-- **Control Flow**:
-    - Calculate the logarithm of the slot count based on the maximum number of keys specified in `params`.
-    - Allocate aligned memory for the key map and initialize it with the calculated slot count.
-    - Join the key map to the allocated memory and check for allocation failure, logging an error if it occurs.
-    - Allocate aligned memory for the connection map and initialize it similarly, checking for allocation failure.
-    - Open the pcap file specified in `params` for reading in binary mode, logging an error if the file cannot be opened.
-    - Initialize the `iter` structure with the opened pcap file, the allocated connection map, the allocated key map, and the maximum number of keys from `params`.
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure that will be initialized.
+    - ``params``: A pointer to a `quic_pcap_params_t` structure containing parameters such as the path to the pcap file and the maximum number of keys.
+- **Logic and Control Flow**:
+    - Calculate `lg_slot_cnt` using `fd_ulong_find_msb_w_default` and `fd_ulong_pow2_up` based on `params->key_max`.
+    - Allocate memory for `key_map` using `aligned_alloc` and initialize it with `key_map_new` and `key_map_join`.
+    - Check if `key_map` is successfully allocated; log an error and exit if not.
+    - Allocate memory for `conn_map` using `aligned_alloc` and initialize it with `conn_map_new` and `conn_map_join`.
+    - Check if `conn_map` is successfully allocated; log an error and exit if not.
+    - Open the pcap file specified in `params->pcap_path` for reading in binary mode.
+    - Check if the pcap file is successfully opened; log an error and exit if not.
+    - Initialize the `iter` structure with the opened pcap file, `conn_map`, `key_map`, and `key_max` from `params`.
     - Return the initialized `iter` pointer.
 - **Output**: Returns a pointer to the initialized `quic_pcap_iter_t` structure.
 
 
 ---
 ### quic\_pcap\_iter\_add\_one\_key<!-- {{#callable:quic_pcap_iter_add_one_key}} -->
-The `quic_pcap_iter_add_one_key` function processes a single TLS key log line, extracting and storing client random and encryption keys into a key map if they are valid and within size constraints.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L177>)
+
+Processes a TLS key log line to extract and store client random and encryption keys in a key map, while handling malformed or oversized lines.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which contains the key map and other iteration parameters.
-    - `str`: A constant character pointer to the string containing the TLS key log line.
-    - `str_sz`: An unsigned long representing the size of the string `str`.
-- **Control Flow**:
-    - Check if the string size `str_sz` is less than 6 and return if true, as it is considered too small to be valid.
-    - Copy the string `str` into a mutable buffer `line` if its size is within the buffer limit; otherwise, log a warning and return.
-    - Tokenize the `line` into three parts using space as a delimiter; if the token count is not three, log a warning and return.
-    - Validate the length of the second token (client random) and decode it into a `key32_t` structure; log a warning and return if invalid.
-    - Validate the length of the third token (encryption key) and decode it into a 32-byte array; log a warning and return if invalid.
-    - Query the key map for an existing record with the client random; if not found, check if the key map has reached its maximum capacity and log a warning if so, then return.
-    - If a new record is needed and capacity allows, insert the client random into the key map and initialize a new record.
-    - Check the first token to determine if it is a client or server traffic secret and if it is not a handshake key.
-    - If the key index is zero, copy the encryption key to the appropriate application secret in the record and increment the key count; otherwise, log a debug message and increment the ignore count.
-- **Output**: The function does not return a value; it modifies the `iter` structure by potentially adding a new key record or updating existing records, and it logs warnings or debug messages as necessary.
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure that contains the key map and other iteration parameters.
+    - ``str``: A constant character pointer to the TLS key log line to process.
+    - ``str_sz``: An unsigned long representing the size of the string `str`.
+- **Logic and Control Flow**:
+    - If `str_sz` is less than 6, return immediately as the line is too small to process.
+    - Copy the string `str` into a mutable buffer `line` if its size is less than 512; otherwise, log a warning and return.
+    - Tokenize the `line` into three tokens using space as a delimiter; if tokenization fails to produce exactly three tokens, log a warning and return.
+    - Check the length of the second token (client random) and decode it into a `key32_t` structure; if decoding fails, log a warning and return.
+    - Check the length of the third token (encryption key) and decode it into a 32-byte array; if decoding fails, log a warning and return.
+    - Query the key map using the client random; if no record exists and the key map is full, log a warning and return.
+    - If no record exists, insert a new record into the key map with the client random.
+    - Check the first token to determine if it is a client or server traffic secret and if the key index is zero; if not, log a debug message and return.
+    - Copy the encryption key to the appropriate field in the record based on whether it is a client or server secret, and increment the key count.
+- **Output**: No output is returned; the function modifies the `iter` structure by updating the key map and counters.
 
 
 ---
 ### quic\_pcap\_iter\_add\_keys<!-- {{#callable:quic_pcap_iter_add_keys}} -->
-The `quic_pcap_iter_add_keys` function processes a string of TLS key log data, extracting and adding individual keys to a QUIC packet capture iterator.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L264>)
+
+Processes a string to extract and add keys to a QUIC packet capture iterator.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which holds the state and data structures for processing QUIC packet captures.
-    - `str`: A constant character pointer to the string containing TLS key log data.
-    - `str_sz`: An unsigned long integer representing the size of the string `str`.
-- **Control Flow**:
-    - The function enters a loop that continues as long as `str_sz` is non-zero.
-    - Within the loop, it searches for the end of a line using `memmem` to find a CRLF sequence or `memchr` to find a LF character.
-    - It determines the end of the current line (`eol`) based on the presence of CRLF or LF, or defaults to the end of the string if neither is found.
-    - The function calls [`quic_pcap_iter_add_one_key`](#quic_pcap_iter_add_one_key) to process and add the key from the current line to the iterator.
-    - It updates `str_sz` by subtracting the length of the processed line from it, effectively moving to the next line in the string.
-- **Output**: The function does not return a value; it modifies the state of the `quic_pcap_iter_t` structure by adding keys.
-- **Functions called**:
-    - [`quic_pcap_iter_add_one_key`](#quic_pcap_iter_add_one_key)
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure where keys will be added.
+    - ``str``: A constant character pointer to the string containing key data.
+    - ``str_sz``: An unsigned long representing the size of the string `str`.
+- **Logic and Control Flow**:
+    - While `str_sz` is not zero, the function searches for the end of a line in the string using `memmem` to find a carriage return and line feed (`\r\n`) or `memchr` to find a line feed (`\n`).
+    - Determines the end of the line (`eol`) based on the presence of `\r\n` or `\n`, or defaults to the end of the string if neither is found.
+    - Calls [`quic_pcap_iter_add_one_key`](<#quic_pcap_iter_add_one_key>) to add a key from the current line to the iterator.
+    - Decreases `str_sz` by the length of the processed line to move to the next line.
+- **Output**: No return value; the function modifies the `iter` structure by adding keys.
+- **Functions Called**:
+    - [`quic_pcap_iter_add_one_key`](<#quic_pcap_iter_add_one_key>)
 
 
 ---
 ### quic\_pcap\_iter\_deliver\_initial<!-- {{#callable:quic_pcap_iter_deliver_initial}} -->
-The `quic_pcap_iter_deliver_initial` function processes an initial QUIC packet, decrypts it, and extracts the ClientHello message from the TLS handshake.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L277>)
+
+Processes an initial QUIC packet by decoding, decrypting, and verifying its contents.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which is not used in this function.
-    - `ip4_saddr`: An unsigned integer representing the IPv4 source address, which is not used in this function.
-    - `data`: A pointer to an array of unsigned characters representing the packet data to be processed.
-    - `data_sz`: An unsigned long representing the size of the data array.
-    - `out_pkt_sz`: A pointer to an unsigned long where the function will store the size of the processed packet.
-- **Control Flow**:
-    - The function begins by decoding the initial QUIC packet using `fd_quic_decode_initial` and checks for parsing failure.
-    - If the total size of the packet exceeds the available data size, the function returns without processing further.
-    - Initial secrets are generated using [`fd_quic_gen_initial_secrets`](crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_initial_secrets), and keys are derived from these secrets using [`fd_quic_gen_keys`](crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_keys).
-    - The function attempts to decrypt the packet header using [`fd_quic_crypto_decrypt_hdr`](crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt_hdr); if unsuccessful, it logs a warning and returns.
-    - The packet number is decoded, and the function attempts to decrypt the packet payload using [`fd_quic_crypto_decrypt`](crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt); if unsuccessful, it logs a warning and returns.
-    - The function checks if the first frame is a CRYPTO frame and decodes it using `fd_quic_decode_crypto_frame`.
-    - The function verifies that the first TLS message is a ClientHello and logs the ClientRandom value.
-- **Output**: The function outputs the size of the processed packet through the `out_pkt_sz` pointer and logs the ClientRandom value if the packet is successfully processed.
-- **Functions called**:
-    - [`fd_quic_gen_initial_secrets`](crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_initial_secrets)
-    - [`fd_quic_gen_keys`](crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_keys)
-    - [`fd_quic_crypto_decrypt_hdr`](crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt_hdr)
-    - [`fd_quic_crypto_decrypt`](crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt)
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure, which is not used in this function.
+    - ``ip4_saddr``: An unsigned integer representing the IPv4 source address, which is not used in this function.
+    - ``data``: A pointer to an array of unsigned characters representing the packet data to be processed.
+    - ``data_sz``: An unsigned long integer representing the size of the packet data.
+    - ``out_pkt_sz``: A pointer to an unsigned long integer where the function will store the size of the processed packet.
+- **Logic and Control Flow**:
+    - Decode the initial QUIC packet using `fd_quic_decode_initial` and check for parsing failure.
+    - Calculate the total size of the packet and verify it does not exceed `data_sz`.
+    - Store the total size in `out_pkt_sz` and update `data_sz`.
+    - Generate initial secrets and keys for decryption using [`fd_quic_gen_initial_secrets`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_initial_secrets>) and [`fd_quic_gen_keys`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_keys>).
+    - Decrypt the packet header using [`fd_quic_crypto_decrypt_hdr`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt_hdr>) and check for decryption success.
+    - Determine the packet number size and decode the packet number using `fd_quic_pktnum_decode`.
+    - Decrypt the packet payload using [`fd_quic_crypto_decrypt`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt>) and check for decryption success.
+    - Verify that the first frame is a CRYPTO frame and decode it using `fd_quic_decode_crypto_frame`.
+    - Check that the first TLS message is a ClientHello and log the ClientRandom value.
+- **Output**: No explicit return value; modifies `out_pkt_sz` to store the size of the processed packet.
+- **Functions Called**:
+    - [`fd_quic_gen_initial_secrets`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_initial_secrets>)
+    - [`fd_quic_gen_keys`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_gen_keys>)
+    - [`fd_quic_crypto_decrypt_hdr`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt_hdr>)
+    - [`fd_quic_crypto_decrypt`](<crypto/fd_quic_crypto_suites.c.md#fd_quic_crypto_decrypt>)
 
 
 ---
 ### quic\_pcap\_iter\_deliver\_handshake<!-- {{#callable:quic_pcap_iter_deliver_handshake}} -->
-The `quic_pcap_iter_deliver_handshake` function is a placeholder function intended to process QUIC handshake packets, but currently does nothing with its parameters.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L346>)
+
+Does nothing with the provided inputs and is a placeholder function.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which is used to manage the state of the QUIC packet capture iteration.
-    - `ip4_saddr`: An unsigned integer representing the IPv4 source address of the packet.
-    - `data`: A constant pointer to an unsigned character array containing the packet data.
-    - `data_sz`: An unsigned long integer representing the size of the packet data.
-    - `out_pkt_sz`: A pointer to an unsigned long integer where the size of the processed packet should be stored.
-- **Control Flow**:
-    - The function is defined as static, meaning it is limited to the file scope.
-    - All input parameters are cast to void, indicating that they are not used within the function body.
-    - The function does not perform any operations or return any values, serving as a placeholder.
-- **Output**: The function does not produce any output or modify its input parameters.
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure, which is intended to represent the current state of a QUIC packet capture iteration.
+    - ``ip4_saddr``: An unsigned integer representing the IPv4 source address.
+    - ``data``: A constant pointer to an unsigned character array, representing the data to be processed.
+    - ``data_sz``: An unsigned long integer representing the size of the data.
+    - ``out_pkt_sz``: A pointer to an unsigned long integer, intended to store the size of the output packet.
+- **Logic and Control Flow**:
+    - The function takes five parameters but does not use any of them.
+    - All parameters are cast to void to suppress unused variable warnings.
+- **Output**: No output is produced as the function body is empty and does not modify any inputs.
 
 
 ---
 ### quic\_pcap\_iter\_deliver\_1rtt<!-- {{#callable:quic_pcap_iter_deliver_1rtt}} -->
-The `quic_pcap_iter_deliver_1rtt` function is a placeholder function intended to process 1-RTT QUIC packets, but currently does nothing with its parameters.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L361>)
+
+Does nothing with the provided inputs and is a placeholder function.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which contains information about the QUIC packet capture iteration.
-    - `ip4_saddr`: An unsigned integer representing the IPv4 source address of the packet.
-    - `data`: A constant pointer to an unsigned character array containing the packet data.
-    - `data_sz`: An unsigned long integer representing the size of the data array.
-- **Control Flow**:
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure, which is intended to represent an iterator for processing QUIC packets.
+    - ``ip4_saddr``: An unsigned integer representing the IPv4 source address.
+    - ``data``: A constant pointer to an unsigned character array, representing the data to be processed.
+    - ``data_sz``: An unsigned long integer representing the size of the data.
+- **Logic and Control Flow**:
     - The function takes four parameters: `iter`, `ip4_saddr`, `data`, and `data_sz`.
-    - All parameters are cast to void, indicating they are unused in the current implementation.
-    - The function body is empty, meaning no operations are performed on the inputs.
-- **Output**: The function does not return any value or produce any output.
+    - All parameters are cast to void, indicating they are unused in the function body.
+    - The function does not perform any operations or return any values.
+- **Output**: No output is produced as the function body is empty and all inputs are unused.
 
 
 ---
 ### quic\_pcap\_iter\_deliver\_datagram<!-- {{#callable:quic_pcap_iter_deliver_datagram}} -->
-The `quic_pcap_iter_deliver_datagram` function processes a QUIC datagram by determining its packet type and dispatching it to the appropriate handler function for further processing.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L374>)
+
+Processes a QUIC datagram by determining its type and delivering it to the appropriate handler function.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which contains state information for processing QUIC packets.
-    - `ip4_saddr`: An unsigned integer representing the IPv4 source address of the datagram.
-    - `data`: A pointer to an array of unsigned characters representing the datagram data to be processed.
-    - `data_sz`: An unsigned long integer representing the size of the datagram data in bytes.
-- **Control Flow**:
-    - The function enters a loop that continues as long as there is data to process (`data_sz` is non-zero).
-    - It checks if the first byte of the data indicates a long header using `fd_quic_h0_hdr_form`.
-    - If the header is long, it determines the packet type using `fd_quic_h0_long_packet_type`.
-    - Depending on the packet type, it calls either [`quic_pcap_iter_deliver_initial`](#quic_pcap_iter_deliver_initial) or [`quic_pcap_iter_deliver_handshake`](#quic_pcap_iter_deliver_handshake) to process the packet, updating `data` and `data_sz` accordingly.
-    - If the header is not long, it calls [`quic_pcap_iter_deliver_1rtt`](#quic_pcap_iter_deliver_1rtt) to process a 1-RTT packet and breaks the loop by setting `data_sz` to zero.
-- **Output**: The function does not return a value; it processes the datagram in place and updates the state of the `iter` structure as needed.
-- **Functions called**:
-    - [`quic_pcap_iter_deliver_initial`](#quic_pcap_iter_deliver_initial)
-    - [`quic_pcap_iter_deliver_handshake`](#quic_pcap_iter_deliver_handshake)
-    - [`quic_pcap_iter_deliver_1rtt`](#quic_pcap_iter_deliver_1rtt)
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure, which contains the state and context for processing the datagram.
+    - ``ip4_saddr``: The source IPv4 address of the datagram.
+    - ``data``: A pointer to the datagram data to be processed.
+    - ``data_sz``: The size of the datagram data in bytes.
+- **Logic and Control Flow**:
+    - Check if `data_sz` is non-zero to enter the processing loop.
+    - Determine if the datagram is a long header packet using `fd_quic_h0_hdr_form`.
+    - If it is a long header packet, determine the packet type using `fd_quic_h0_long_packet_type`.
+    - Based on the packet type, call the appropriate handler function ([`quic_pcap_iter_deliver_initial`](<#quic_pcap_iter_deliver_initial>) or [`quic_pcap_iter_deliver_handshake`](<#quic_pcap_iter_deliver_handshake>)) and update `data` and `data_sz` accordingly.
+    - If it is not a long header packet, call [`quic_pcap_iter_deliver_1rtt`](<#quic_pcap_iter_deliver_1rtt>) and set `data_sz` to zero to exit the loop.
+- **Output**: No return value; the function processes the datagram in place and updates the state of the `iter` structure.
+- **Functions Called**:
+    - [`quic_pcap_iter_deliver_initial`](<#quic_pcap_iter_deliver_initial>)
+    - [`quic_pcap_iter_deliver_handshake`](<#quic_pcap_iter_deliver_handshake>)
+    - [`quic_pcap_iter_deliver_1rtt`](<#quic_pcap_iter_deliver_1rtt>)
 
 
 ---
 ### quic\_pcap\_iter\_deliver\_ethernet<!-- {{#callable:quic_pcap_iter_deliver_ethernet}} -->
-The `quic_pcap_iter_deliver_ethernet` function processes Ethernet frames to extract and deliver UDP datagrams for further processing in a QUIC packet capture iterator.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L415>)
+
+Processes Ethernet frames to extract and deliver UDP datagrams for further processing.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which holds the state and context for processing QUIC packet captures.
-    - `data`: A pointer to the start of the Ethernet frame data to be processed.
-    - `data_sz`: The size of the Ethernet frame data in bytes.
-- **Control Flow**:
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure that manages the state of the packet capture iteration.
+    - ``data``: A pointer to the start of the Ethernet frame data.
+    - ``data_sz``: The size of the Ethernet frame data in bytes.
+- **Logic and Control Flow**:
     - Initialize pointers `cur` and `end` to the start and end of the data buffer, respectively.
     - Cast the start of the data buffer to an Ethernet header and advance the `cur` pointer by the size of the Ethernet header.
-    - Check if the `cur` pointer has exceeded the `end` pointer, and return if true.
+    - Check if the `cur` pointer exceeds the `end` pointer, and return if true.
     - Verify that the Ethernet type is IP by checking the `net_type` field of the Ethernet header; return if it is not IP.
-    - Cast the current position of the `cur` pointer to an IPv4 header and check if the header fits within the data buffer; return if it does not.
-    - Advance the `cur` pointer by the length of the IPv4 header as specified in the header itself, and check if it exceeds the `end` pointer; return if true.
-    - Verify that the protocol in the IPv4 header is UDP; return if it is not.
-    - Cast the current position of the `cur` pointer to a UDP header and check if the header fits within the data buffer; return if it does not.
-    - Advance the `cur` pointer by the size of the UDP header and check if it exceeds the `end` pointer; return if true.
+    - Cast the current position of the `cur` pointer to an IPv4 header and advance the `cur` pointer by the length of the IPv4 header.
+    - Check if the `cur` pointer exceeds the `end` pointer, and return if true.
+    - Verify that the protocol in the IPv4 header is UDP; return if it is not UDP.
+    - Cast the current position of the `cur` pointer to a UDP header and advance the `cur` pointer by the size of the UDP header.
+    - Check if the `cur` pointer exceeds the `end` pointer, and return if true.
     - Extract the source IP address from the IPv4 header.
-    - Call [`quic_pcap_iter_deliver_datagram`](#quic_pcap_iter_deliver_datagram) with the iterator, source IP address, and the remaining data buffer to process the UDP datagram.
-- **Output**: This function does not return a value; it processes the data in place and calls another function to handle the UDP datagram.
-- **Functions called**:
-    - [`quic_pcap_iter_deliver_datagram`](#quic_pcap_iter_deliver_datagram)
+    - Call [`quic_pcap_iter_deliver_datagram`](<#quic_pcap_iter_deliver_datagram>) with the remaining data after the UDP header.
+- **Output**: No direct output; the function processes data and calls [`quic_pcap_iter_deliver_datagram`](<#quic_pcap_iter_deliver_datagram>) to handle the UDP payload.
+- **Functions Called**:
+    - [`quic_pcap_iter_deliver_datagram`](<#quic_pcap_iter_deliver_datagram>)
 
 
 ---
 ### quic\_pcap\_iter\_deliver\_cooked<!-- {{#callable:quic_pcap_iter_deliver_cooked}} -->
-The `quic_pcap_iter_deliver_cooked` function logs an error indicating that Linux SLL captures are not supported.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L453>)
+
+Logs an error message indicating that Linux SLL captures are not supported.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which is used to iterate over pcap data.
-    - `data`: A constant pointer to an unsigned character array representing the data to be processed.
-    - `data_sz`: An unsigned long integer representing the size of the data array.
-- **Control Flow**:
-    - The function begins by casting the input parameters to void to suppress unused variable warnings.
-    - It then logs an error message using `FD_LOG_ERR` to indicate that Linux SLL captures are not supported.
-- **Output**: The function does not return any value as it is a void function.
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure, which is not used in the function.
+    - ``data``: A pointer to a constant unsigned character array representing the data to be processed, which is not used in the function.
+    - ``data_sz``: An unsigned long integer representing the size of the data, which is not used in the function.
+- **Logic and Control Flow**:
+    - The function takes three parameters: `iter`, `data`, and `data_sz`, but does not use them.
+    - It calls the `FD_LOG_ERR` macro to log an error message stating that Linux SLL captures are not supported.
+- **Output**: There is no return value as the function's return type is `void`.
 
 
 ---
 ### quic\_pcap\_iter\_run\_pcap<!-- {{#callable:quic_pcap_iter_run_pcap}} -->
-The `quic_pcap_iter_run_pcap` function processes packets from a pcap file, determining their type and delivering them accordingly.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L461>)
+
+Processes a pcap file to iterate over packets and deliver them based on their link type.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which contains the state and configuration for processing the pcap file.
-- **Control Flow**:
-    - Initialize a new pcap iterator using the file from the `iter` structure.
-    - Check if the pcap iterator was successfully created; if not, log an error and exit.
-    - Determine the type of pcap link (Ethernet or Cooked) and set the `is_cooked` flag accordingly.
-    - Enter a loop to process each packet in the pcap file.
-    - For each packet, read the packet data and timestamp using `fd_pcap_iter_next`.
-    - If no more packets are available, break the loop.
-    - Depending on the `is_cooked` flag, deliver the packet using either [`quic_pcap_iter_deliver_cooked`](#quic_pcap_iter_deliver_cooked) or [`quic_pcap_iter_deliver_ethernet`](#quic_pcap_iter_deliver_ethernet).
-    - After processing all packets, delete the pcap iterator.
-- **Output**: The function does not return a value; it processes packets and logs errors if any issues occur.
-- **Functions called**:
-    - [`quic_pcap_iter_deliver_cooked`](#quic_pcap_iter_deliver_cooked)
-    - [`quic_pcap_iter_deliver_ethernet`](#quic_pcap_iter_deliver_ethernet)
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure that contains the pcap file and maps for connection and key management.
+- **Logic and Control Flow**:
+    - Create a new pcap iterator using `fd_pcap_iter_new` with the pcap file from `iter`.
+    - Check if the pcap iterator is successfully created; if not, log an error and exit.
+    - Determine the pcap link type using `fd_pcap_iter_type` and set `is_cooked` based on the type.
+    - Enter a loop to read packets using `fd_pcap_iter_next` until no more packets are available.
+    - For each packet, check if it is cooked or ethernet and call the appropriate delivery function ([`quic_pcap_iter_deliver_cooked`](<#quic_pcap_iter_deliver_cooked>) or [`quic_pcap_iter_deliver_ethernet`](<#quic_pcap_iter_deliver_ethernet>)).
+    - Delete the pcap iterator using `fd_pcap_iter_delete` after processing all packets.
+- **Output**: No return value; the function processes packets and logs errors if any issues occur.
+- **Functions Called**:
+    - [`quic_pcap_iter_deliver_cooked`](<#quic_pcap_iter_deliver_cooked>)
+    - [`quic_pcap_iter_deliver_ethernet`](<#quic_pcap_iter_deliver_ethernet>)
 
 
 ---
 ### quic\_pcap\_iter\_run\_pcapng<!-- {{#callable:quic_pcap_iter_run_pcapng}} -->
-The `quic_pcap_iter_run_pcapng` function processes a pcapng file to extract and handle QUIC traffic frames, including TLS keys and network packets, based on their link type.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L492>)
+
+Processes a pcapng file to extract and handle network frames, including TLS keys and different link types.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure that contains the state and data necessary for iterating over a pcapng file, including the file pointer and maps for connection and key management.
-- **Control Flow**:
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure that contains the state and data needed for processing the pcapng file.
+- **Logic and Control Flow**:
     - Allocate memory for the pcapng iterator using `aligned_alloc` with alignment and footprint determined by `fd_pcapng_iter_align` and `fd_pcapng_iter_footprint` respectively.
-    - Initialize a `fd_pcapng_iter_t` pointer to NULL.
-    - Enter a loop that continues until the end of the pcap file is reached (`feof`).
-    - If the `pcap` iterator is NULL, create a new pcapng iterator using `fd_pcapng_iter_new` and assign it to `pcap`. If creation fails, log an error and exit.
-    - Retrieve the next frame from the pcapng iterator using `fd_pcapng_iter_next`. If no frame is returned, check for errors using `fd_pcapng_iter_err`. If the error is -1, delete the current iterator and set `pcap` to NULL to restart the iteration. Otherwise, log an error and exit.
-    - If the frame type is `FD_PCAPNG_FRAME_TLSKEYS`, call [`quic_pcap_iter_add_keys`](#quic_pcap_iter_add_keys) to process the TLS keys in the frame data.
+    - Initialize a `fd_pcapng_iter_t` pointer `pcap` to NULL.
+    - Enter a loop that continues until the end of the file is reached (`feof` on `iter->pcap_file`).
+    - If `pcap` is NULL, create a new pcapng iterator using `fd_pcapng_iter_new` and assign it to `pcap`. If creation fails, log an error and exit.
+    - Retrieve the next frame using `fd_pcapng_iter_next`. If retrieval fails, check the error code using `fd_pcapng_iter_err`. If the error code is -1, delete the current iterator and set `pcap` to NULL to restart the iteration. Otherwise, log an error and exit.
+    - If the frame type is `FD_PCAPNG_FRAME_TLSKEYS`, call [`quic_pcap_iter_add_keys`](<#quic_pcap_iter_add_keys>) to process the TLS keys in the frame data.
     - If the frame type is not `FD_PCAPNG_FRAME_SIMPLE` or `FD_PCAPNG_FRAME_ENHANCED`, continue to the next iteration.
-    - Determine the link type from the frame's interface index and handle the frame data accordingly:
-    - - If the link type is `FD_PCAPNG_LINKTYPE_ETHERNET`, call [`quic_pcap_iter_deliver_ethernet`](#quic_pcap_iter_deliver_ethernet) to process the Ethernet frame.
-    - - If the link type is `FD_PCAPNG_LINKTYPE_COOKED`, call [`quic_pcap_iter_deliver_cooked`](#quic_pcap_iter_deliver_cooked) to process the cooked frame.
-    - - For unsupported link types, log a notice message.
-- **Output**: The function does not return a value; it processes the pcapng file and handles frames internally, potentially logging errors or notices.
-- **Functions called**:
-    - [`quic_pcap_iter_add_keys`](#quic_pcap_iter_add_keys)
-    - [`quic_pcap_iter_deliver_ethernet`](#quic_pcap_iter_deliver_ethernet)
-    - [`quic_pcap_iter_deliver_cooked`](#quic_pcap_iter_deliver_cooked)
+    - Determine the link type from the frame's interface index and handle it accordingly:
+    - For `FD_PCAPNG_LINKTYPE_ETHERNET`, call [`quic_pcap_iter_deliver_ethernet`](<#quic_pcap_iter_deliver_ethernet>) to process the Ethernet frame.
+    - For `FD_PCAPNG_LINKTYPE_COOKED`, call [`quic_pcap_iter_deliver_cooked`](<#quic_pcap_iter_deliver_cooked>) to process the cooked frame.
+    - For unsupported link types, log a notice message.
+- **Output**: No return value; the function processes data and logs errors or notices as needed.
+- **Functions Called**:
+    - [`quic_pcap_iter_add_keys`](<#quic_pcap_iter_add_keys>)
+    - [`quic_pcap_iter_deliver_ethernet`](<#quic_pcap_iter_deliver_ethernet>)
+    - [`quic_pcap_iter_deliver_cooked`](<#quic_pcap_iter_deliver_cooked>)
 
 
 ---
 ### quic\_pcap\_iter\_run<!-- {{#callable:quic_pcap_iter_run}} -->
-The `quic_pcap_iter_run` function determines the type of packet capture file (pcap or pcapng) and processes it accordingly.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L540>)
+
+Determines the type of packet capture file and processes it accordingly.
 - **Inputs**:
-    - `iter`: A pointer to a `quic_pcap_iter_t` structure, which contains information about the packet capture file and associated maps for connection and key management.
-- **Control Flow**:
-    - Read the magic number from the beginning of the packet capture file to determine its format.
-    - If the magic number indicates a pcap file (0xa1b2c3d4 or 0xa1b23c4d), call [`quic_pcap_iter_run_pcap`](#quic_pcap_iter_run_pcap) to process the file.
-    - If the magic number indicates a pcapng file (0x0a0d0d0a), call [`quic_pcap_iter_run_pcapng`](#quic_pcap_iter_run_pcapng) to process the file.
-    - If the magic number does not match any known format, log an error indicating an unsupported packet capture file format.
-- **Output**: This function does not return a value; it processes the packet capture file based on its format.
-- **Functions called**:
-    - [`quic_pcap_iter_run_pcap`](#quic_pcap_iter_run_pcap)
-    - [`quic_pcap_iter_run_pcapng`](#quic_pcap_iter_run_pcapng)
+    - ``iter``: A pointer to a `quic_pcap_iter_t` structure that contains information about the packet capture file and associated maps.
+- **Logic and Control Flow**:
+    - Reads the first 4 bytes of the file to determine the magic number, which identifies the file format.
+    - If the magic number matches `0xa1b2c3d4U` or `0xa1b23c4dU`, it calls [`quic_pcap_iter_run_pcap`](<#quic_pcap_iter_run_pcap>) to process a pcap file.
+    - If the magic number matches `0x0a0d0d0aU`, it calls [`quic_pcap_iter_run_pcapng`](<#quic_pcap_iter_run_pcapng>) to process a pcapng file.
+    - If the magic number does not match any known format, it logs an error indicating an unsupported packet capture file format.
+- **Output**: No return value; the function processes the packet capture file based on its format.
+- **Functions Called**:
+    - [`quic_pcap_iter_run_pcap`](<#quic_pcap_iter_run_pcap>)
+    - [`quic_pcap_iter_run_pcapng`](<#quic_pcap_iter_run_pcapng>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function processes command-line arguments to configure and run a QUIC packet capture analysis tool.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_pcap_main.c#L562>)
+
+Processes command-line arguments, initializes QUIC packet capture iteration, and runs the packet capture analysis.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Iterates over command-line arguments to check for the '--help' flag, calling `usage()` and exiting if found.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Iterates over command-line arguments to check for the '--help' flag and displays usage information if found.
     - Sets the environment variable 'FD_LOG_PATH' to suppress logs.
-    - Calls `fd_boot` to initialize the environment with the remaining command-line arguments.
-    - Strips the '--key-max' flag from the command-line arguments, setting a default maximum key count if not provided.
-    - Calls [`reject_unknown_flags`](#reject_unknown_flags) to remove any unsupported flags from the arguments.
-    - Checks if the remaining arguments are exactly two, otherwise calls `usage_invalid()` and exits with an error.
+    - Calls 'fd_boot' to initialize the environment with the command-line arguments.
+    - Strips the '--key-max' flag from the command-line arguments and sets 'key_max' to its value or a default value if not provided.
+    - Calls 'reject_unknown_flags' to remove any unsupported flags from the command-line arguments.
+    - Checks if the remaining arguments are exactly two; if not, displays invalid usage information and exits with an error.
     - Extracts the command and pcap file path from the remaining arguments.
-    - Initializes `quic_pcap_params_t` with the pcap path and key maximum value.
-    - Creates a new `quic_pcap_iter_t` instance using [`quic_pcap_iter_new`](#quic_pcap_iter_new) with the initialized parameters.
-    - If the iterator initialization fails, logs an error and aborts.
-    - Runs the QUIC packet capture iteration using [`quic_pcap_iter_run`](#quic_pcap_iter_run).
-    - Calls `fd_halt` to perform cleanup before exiting.
-- **Output**: Returns 0 on successful execution or 1 if there are invalid arguments.
-- **Functions called**:
-    - [`usage`](#usage)
-    - [`reject_unknown_flags`](#reject_unknown_flags)
-    - [`usage_invalid`](#usage_invalid)
-    - [`quic_pcap_iter_new`](#quic_pcap_iter_new)
-    - [`quic_pcap_iter_run`](#quic_pcap_iter_run)
+    - Initializes 'quic_pcap_params_t' with the pcap file path and 'key_max'.
+    - Creates a new 'quic_pcap_iter_t' using 'quic_pcap_iter_new' with the initialized parameters.
+    - If the iterator is not successfully created, logs an error and aborts.
+    - Runs the packet capture analysis using 'quic_pcap_iter_run'.
+    - Calls 'fd_halt' to perform cleanup before exiting.
+- **Output**: Returns 0 on successful execution or 1 if there is an error in the command-line arguments.
+- **Functions Called**:
+    - [`usage`](<#usage>)
+    - [`reject_unknown_flags`](<#reject_unknown_flags>)
+    - [`usage_invalid`](<#usage_invalid>)
+    - [`quic_pcap_iter_new`](<#quic_pcap_iter_new>)
+    - [`quic_pcap_iter_run`](<#quic_pcap_iter_run>)
 
 
 
