@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-gcc.mk` file in the `firedancer` codebase configures the build system to use GCC as the compiler and linker, setting relevant flags and defining `FD_USING_GCC`.
+Makefile configuration for using GCC as the compiler and linker with specific flags.
 
 # Purpose
-This Makefile snippet is used to configure a build system to compile a project using the GNU Compiler Collection (GCC). It sets the C and C++ compilers to `gcc` and `g++`, respectively, and specifies that the linker should also use `g++`. The file defines preprocessor and linker flags to indicate the use of GCC, ensuring that the project is compiled with static linking for the GCC runtime library. Additionally, it sets a flag `FD_USING_GCC` to denote that GCC is being used, with a note that it should not be set simultaneously with a similar flag for Clang.
+This Makefile configuration sets the compiler and linker to use GNU Compiler Collection (`gcc` for C and `g++` for C++). It defines the preprocessor flag `FD_USING_GCC` to indicate the use of GCC, and it adds the `-static-libgcc` option to the linker flags to statically link the GCC runtime library. The comment notes that `FD_USING_GCC` and `FD_USING_CLANG` should not be set at the same time, and references `with-clang.mk` for related behavior.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
