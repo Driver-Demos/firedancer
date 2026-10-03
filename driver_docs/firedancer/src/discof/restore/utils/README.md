@@ -3,39 +3,39 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-HTTP and snapshot management utilities, parsers, peer selectors, pingers, fuzz testing, and test files.
+Snapshot restore parsers, peer selection, HTTP resolution, and test and fuzz harnesses.
 
 
 ## Files
-- **[fd_http_resolver.c](fd_http_resolver.c.md)**: Implements an HTTP resolver for managing peer connections and state transitions using socket operations and deadline lists.
-- **[fd_http_resolver.h](fd_http_resolver.h.md)**: Resolves snapshot slot information for HTTP snapshot peers through HTTP requests.
-- **[fd_slot_delta_parser.c](fd_slot_delta_parser.c.md)**: Implements a state machine for parsing slot delta entries with error handling and memory management.
-- **[fd_slot_delta_parser.h](fd_slot_delta_parser.h.md)**: Defines data structures and functions for parsing slot delta entries in the Firedancer codebase.
-- **[fd_ssarchive.c](fd_ssarchive.c.md)**: Utilities for parsing, managing, and removing snapshot files in a directory.
-- **[fd_ssarchive.h](fd_ssarchive.h.md)**: Functions for parsing snapshot filenames, finding the latest snapshot pair, and removing old snapshots.
-- **[fd_ssctrl.h](fd_ssctrl.h.md)**: Defines state machine constants and control message structures for synchronizing snapshot processing tiles.
-- **[fd_sshttp.c](fd_sshttp.c.md)**: Implements an HTTP client for sending requests, handling responses, and managing HTTP state transitions.
-- **[fd_sshttp.h](fd_sshttp.h.md)**: Defines structures and functions for managing HTTP snapshots in shared memory.
-- **[fd_ssload.c](fd_ssload.c.md)**: Functions to recover blockhashes and restore bank state from a snapshot manifest in the Firedancer codebase.
-- **[fd_ssload.h](fd_ssload.h.md)**: Functions for recovering blockhashes and snapshot manifests in the Firedancer codebase.
-- **[fd_ssmanifest_parser.c](fd_ssmanifest_parser.c.md)**: Parses and processes snapshot manifest data, managing state transitions and validating input.
-- **[fd_ssmanifest_parser.h](fd_ssmanifest_parser.h.md)**: Header file for a parser that manages and processes snapshot manifests in shared memory.
-- **[fd_ssmsg.h](fd_ssmsg.h.md)**: Defines data structures and functions for managing snapshot manifests, vote accounts, and stake delegations.
-- **[fd_ssparse.c](fd_ssparse.c.md)**: Implements functions and structures for parsing and managing sparse data archives in memory.
-- **[fd_ssparse.h](fd_ssparse.h.md)**: Header file for a Solana snapshot parser, defining data structures, constants, and functions for streaming snapshot parsing.
-- **[fd_sspeer_selector.c](fd_sspeer_selector.c.md)**: Implements a peer selector with data structures for managing peers, including scoring and selection logic.
-- **[fd_sspeer_selector.h](fd_sspeer_selector.h.md)**: Header file for a snapshot peer selector that manages and selects optimal peers for downloading snapshots.
-- **[fd_ssping.c](fd_ssping.c.md)**: Implements a system for managing and sending ICMP pings to peers, tracking their states and latencies.
-- **[fd_ssping.h](fd_ssping.h.md)**: Header file for a snapshot pinger that manages and selects peers based on ICMP ping latency.
-- **[fd_ssresolve.c](fd_ssresolve.c.md)**: Implements a snapshot resolution utility for sending requests and handling responses in a networked environment.
-- **[fd_ssresolve.h](fd_ssresolve.h.md)**: Header file for resolving snapshot slots from peers using HTTP requests and handling HTTP redirects.
-- **[fuzz_slot_delta_parser.c](fuzz_slot_delta_parser.c.md)**: Fuzz testing for slot delta parser initialization and input processing.
-- **[fuzz_snapshot_parser.c](fuzz_snapshot_parser.c.md)**: Fuzz testing utilities for snapshot parsing, including custom mutator and input testing functions.
-- **[fuzz_ssarchive_parser.c](fuzz_ssarchive_parser.c.md)**: Fuzz testing utility for parsing filenames in the `fd_ssarchive` component.
-- **[fuzz_ssmanifest_parser.c](fuzz_ssmanifest_parser.c.md)**: Fuzz testing setup for `fd_ssmanifest_parser` using LLVM's libFuzzer.
-- **[test_slot_delta_parser.c](test_slot_delta_parser.c.md)**: Tests for the `fd_slot_delta_parser` with various scenarios including errors and multiple entries.
-- **[test_ssmanifest_parser.c](test_ssmanifest_parser.c.md)**: Tests the functionality of the `fd_ssmanifest_parser` by reading and parsing a manifest file.
-- **[test_sspeer_selector.c](test_sspeer_selector.c.md)**: Tests for peer selection functionality in the `fd_sspeer_selector` component.
+- **[fd_http_resolver.c](fd_http_resolver.c.md)**: HTTP snapshot resolver with peer state, deadlines, sockets, and poll-based refresh logic.
+- **[fd_http_resolver.h](fd_http_resolver.h.md)**: HTTP snapshot peer slot resolution API with add, join, and advance functions.
+- **[fd_slot_delta_parser.c](fd_slot_delta_parser.c.md)**: State machine parser for slot delta entries, groups, and transaction results.
+- **[fd_slot_delta_parser.h](fd_slot_delta_parser.h.md)**: Parser API and data structures for slot delta entries and grouped transaction hashes.
+- **[fd_ssarchive.c](fd_ssarchive.c.md)**: Snapshot filename parsing, latest snapshot selection, and old snapshot removal utilities.
+- **[fd_ssarchive.h](fd_ssarchive.h.md)**: Snapshot filename parsing, latest pair selection, and old snapshot removal helpers.
+- **[fd_ssctrl.h](fd_ssctrl.h.md)**: Snapshot control states, message codes, and init/meta message structs for snapshot pipeline synchronization.
+- **[fd_sshttp.c](fd_sshttp.c.md)**: HTTP snapshot downloader with redirect handling and response body streaming.
+- **[fd_sshttp.h](fd_sshttp.h.md)**: HTTP snapshot request state and advance functions for restore utilities.
+- **[fd_ssload.c](fd_ssload.c.md)**: Snapshot restore logic for bank state, blockhashes, stake, and vote data.
+- **[fd_ssload.h](fd_ssload.h.md)**: Snapshot recovery prototypes for block hashes, manifest, banks, and vote state credits.
+- **[fd_ssmanifest_parser.c](fd_ssmanifest_parser.c.md)**: Parser for snapshot manifest fields with validation and state-driven decoding.
+- **[fd_ssmanifest_parser.h](fd_ssmanifest_parser.h.md)**: Snapshot manifest parser API with shared-memory init, join, and consume functions.
+- **[fd_ssmsg.h](fd_ssmsg.h.md)**: Snapshot manifest message types, constants, and slot conversion helpers.
+- **[fd_ssparse.c](fd_ssparse.c.md)**: State machine parser for tar snapshots, manifests, status cache, and account data.
+- **[fd_ssparse.h](fd_ssparse.h.md)**: Streaming Solana snapshot parser API with account batch support and test helpers.
+- **[fd_sspeer_selector.c](fd_sspeer_selector.c.md)**: Peer selection and scoring logic with pools, maps, treaps, and cluster slot updates.
+- **[fd_sspeer_selector.h](fd_sspeer_selector.h.md)**: Snapshot peer selection API and peer, slot, and score data types.
+- **[fd_ssping.c](fd_ssping.c.md)**: ICMP ping state machine for peers, with add/remove, timeout, and reply handling.
+- **[fd_ssping.h](fd_ssping.h.md)**: Snapshot peer ping tracker with add, remove, invalidate, advance, and best-peer selection.
+- **[fd_ssresolve.c](fd_ssresolve.c.md)**: HTTP snapshot request and redirect parsing for snapshot slot resolution.
+- **[fd_ssresolve.h](fd_ssresolve.h.md)**: HTTP snapshot resolution state machine and result type.
+- **[fuzz_slot_delta_parser.c](fuzz_slot_delta_parser.c.md)**: Fuzzer harness for slot delta parser initialization and input consumption.
+- **[fuzz_snapshot_parser.c](fuzz_snapshot_parser.c.md)**: Fuzz target for snapshot tar parsing with custom input generation and parser advancement.
+- **[fuzz_ssarchive_parser.c](fuzz_ssarchive_parser.c.md)**: LibFuzzer harness for fd_ssarchive_parse_filename with fd_boot setup and cleanup.
+- **[fuzz_ssmanifest_parser.c](fuzz_ssmanifest_parser.c.md)**: Fuzzer harness that initializes a snapshot manifest parser and feeds it input data.
+- **[test_slot_delta_parser.c](test_slot_delta_parser.c.md)**: Tests slot delta parser cases for entries, errors, duplicates, and entry limits.
+- **[test_ssmanifest_parser.c](test_ssmanifest_parser.c.md)**: Test program that reads a manifest file and parses it with fd_ssmanifest_parser.
+- **[test_sspeer_selector.c](test_sspeer_selector.c.md)**: Tests peer selection and scoring for full and incremental slots.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
