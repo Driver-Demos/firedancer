@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for managing versioning and build configurations in the Firedancer application.
+Makefile rules for version generation, config dependencies, and firedancer build targets.
 
 # Purpose
-The provided content is a Makefile used to automate the build process for the Firedancer software. It includes directives to generate a version header file, `version2.h`, by defining version-related macros such as `FIREDANCER_MAJOR_VERSION`, `FIREDANCER_MINOR_VERSION`, and `FIREDANCER_PATCH_VERSION`. The file also checks if the existing `version.h` file needs updating by comparing it with `version2.h` and copying it if changes are detected. Additionally, the Makefile specifies dependencies for object files related to different network configurations and includes conditional compilation based on the presence of certain features like threading, alloca, and specific libraries. The Makefile also defines targets for building the Firedancer core and its associated commands, ensuring that the necessary libraries and binaries are compiled if the required conditions are met.
+This Makefile fragment defines how the `firedancer` build uses version data and how it links source files into the final targets. It generates `src/app/firedancer/version2.h` from `src/app/firedancer/version.mk`, copies it to `src/app/firedancer/version.h` only when the content changes, and then includes `src/app/firedancer/version.h` so the version macros are available during the build. It also declares build dependencies for configuration files such as `default.toml`, `testnet.toml`, `devnet.toml`, and `mainnet.toml`, and it adds object files for the `firedancer` core, command code, and the `firedancer_version` library. The build of the `firedancer` binary is enabled only when the required feature flags are present, and it is disabled with a warning when `zstd` support is not available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

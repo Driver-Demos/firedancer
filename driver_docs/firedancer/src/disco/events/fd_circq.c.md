@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a circular queue for message storage with functions for creation, manipulation, and verification.
+The `fd_circq.c` file implements a circular queue data structure with functions for creating, joining, leaving, deleting, pushing, and popping messages, as well as verifying and evicting messages within the queue.
 
 # Purpose
-The code defines a circular queue data structure and its associated operations. It provides functionality to manage a circular buffer, which is a data structure that uses a single, fixed-size buffer as if it were connected end-to-end. The main components include the `fd_circq_message_private` structure, which holds metadata for each message in the queue, and the `fd_circq_t` structure, which represents the circular queue itself. The code includes functions to create a new circular queue ([`fd_circq_new`](<#fd_circq_new>)), join an existing queue ([`fd_circq_join`](<#fd_circq_join>)), leave a queue ([`fd_circq_leave`](<#fd_circq_leave>)), and delete a queue ([`fd_circq_delete`](<#fd_circq_delete>)). 
+This C source code file implements a circular queue (or circular buffer) data structure, which is a common data structure used for buffering data streams. The file provides a set of functions to manage the lifecycle and operations of a circular queue, including creation, joining, leaving, and deletion of the queue, as well as pushing and popping messages to and from the queue. The circular queue is designed to operate in shared memory, allowing multiple processes or threads to interact with the queue concurrently. The code includes mechanisms to handle message alignment and footprint within the buffer, ensuring efficient use of memory and proper data alignment.
 
-The code also provides functions to manipulate the queue, such as [`fd_circq_push_back`](<#fd_circq_push_back>) to add a message to the end of the queue and [`fd_circq_pop_front`](<#fd_circq_pop_front>) to remove a message from the front. The [`verify`](<#fd_fn_unusedverify>) function checks the integrity of the queue, ensuring that the head and tail pointers are within bounds and that the message count is consistent. The [`evict`](<#evict>) function removes messages from the queue when necessary to make space for new messages. The code is intended to be part of a larger system where the circular queue is used for efficient message passing or data buffering.
+The file defines a private structure `fd_circq_message_private` to manage individual messages within the queue, and a typedef `fd_circq_message_t` for ease of use. Key functions include [`fd_circq_new`](#fd_circq_new) for initializing a new queue, [`fd_circq_push_back`](#fd_circq_push_back) for adding messages to the queue, and [`fd_circq_pop_front`](#fd_circq_pop_front) for removing messages. The [`evict`](#evict) function is used to manage buffer space by removing old messages when necessary. The code also includes utility functions like [`fd_circq_align`](#fd_circq_align) and [`fd_circq_footprint`](#fd_circq_footprint) to calculate alignment and memory footprint requirements. The file is intended to be part of a larger system, likely as a library component, providing a robust and efficient mechanism for message passing in concurrent applications.
 # Imports and Dependencies
 
 ---
@@ -19,185 +19,165 @@ The code also provides functions to manipulate the queue, such as [`fd_circq_pus
 
 ---
 ### fd\_circq\_message\_private
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `align`: Specifies the alignment requirement for the message.
+    - `align`: Specifies the alignment requirement for the message within the circular buffer.
     - `footprint`: Indicates the size of the message in the circular buffer.
-    - `next`: Stores the offset within the circular buffer where the next message starts.
-- **Description**: Defines a private structure for managing messages within a circular queue, ensuring proper alignment and tracking the size and position of each message in the buffer.
+    - `next`: Holds the offset within the circular buffer where the next message starts.
+- **Description**: The `fd_circq_message_private` structure is a component of a circular queue implementation, designed to manage messages within a circular buffer. It ensures that each message is properly aligned and tracks the size of the message (footprint) and the position of the next message in the buffer (next). This structure is crucial for maintaining the integrity and efficiency of the circular queue, especially when messages wrap around the end of the buffer.
 
 
 ---
 ### fd\_circq\_message\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `align`: Specifies the alignment requirement for the message.
-    - `footprint`: Indicates the size of the message in the circular queue.
-    - `next`: Stores the offset within the circular buffer where the next message starts.
-- **Description**: Defines a private structure used in a circular queue to manage messages, including their alignment, size, and the offset to the next message in the buffer.
+    - `align`: Specifies the alignment requirement for the message within the circular buffer.
+    - `footprint`: Indicates the size of the message in the circular buffer.
+    - `next`: Holds the offset within the circular buffer where the next message starts.
+- **Description**: The `fd_circq_message_t` structure is a private data structure used to represent a message within a circular queue buffer. It contains metadata about the message, including its alignment (`align`), size (`footprint`), and the offset to the next message (`next`). This structure is crucial for managing the placement and retrieval of messages in a circular buffer, ensuring that messages are correctly aligned and that the buffer can wrap around efficiently.
 
 
 # Functions
 
 ---
 ### fd\_circq\_align<!-- {{#callable:fd_circq_align}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L16>)
-
-Returns the alignment requirement for a circular queue.
+The `fd_circq_align` function returns the alignment requirement for a circular queue.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Returns the constant `FD_CIRCQ_ALIGN`.
-- **Output**: The function returns an `ulong` value representing the alignment requirement for a circular queue.
+- **Control Flow**:
+    - The function is defined as a constant function, meaning it does not modify any global state or depend on any external state.
+    - It simply returns the value of the macro `FD_CIRCQ_ALIGN`.
+- **Output**: The function returns an unsigned long integer representing the alignment requirement for a circular queue, as defined by the macro `FD_CIRCQ_ALIGN`.
 
 
 ---
 ### fd\_circq\_footprint<!-- {{#callable:fd_circq_footprint}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L21>)
-
-Calculates the memory footprint of a circular queue given its size.
+The `fd_circq_footprint` function calculates the memory footprint required for a circular queue structure and its associated data.
 - **Inputs**:
-    - `sz`: The size of the circular queue in bytes.
-- **Logic and Control Flow**:
-    - Calculate the total memory footprint by adding the size of the `fd_circq_t` structure to the provided size `sz`.
-- **Output**: Returns the total memory footprint in bytes as an unsigned long integer.
+    - `sz`: The size of the data region in the circular queue, specified as an unsigned long integer.
+- **Control Flow**:
+    - The function takes a single input parameter `sz`, which represents the size of the data region.
+    - It calculates the total memory footprint by adding the size of the `fd_circq_t` structure to the input size `sz`.
+    - The function returns the calculated total size.
+- **Output**: The function returns an unsigned long integer representing the total memory footprint required for the circular queue structure and its data region.
 
 
 ---
 ### fd\_circq\_new<!-- {{#callable:fd_circq_new}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L26>)
-
-Initializes a circular queue structure in shared memory with a specified size.
+The `fd_circq_new` function initializes a circular queue structure in shared memory with a specified size.
 - **Inputs**:
-    - `shmem`: A pointer to the shared memory where the circular queue will be initialized.
+    - `shmem`: A pointer to the shared memory location where the circular queue structure will be initialized.
     - `sz`: The size of the circular queue to be initialized.
-- **Logic and Control Flow**:
-    - Cast the `shmem` pointer to a `fd_circq_t` pointer named `circq`.
-    - Set the `cnt` field of `circq` to 0, indicating the queue is empty.
-    - Set the `head` field of `circq` to 0, indicating the start of the queue.
-    - Set the `tail` field of `circq` to 0, indicating the end of the queue.
-    - Set the `size` field of `circq` to `sz`, defining the maximum size of the queue.
-    - Return the `shmem` pointer.
-- **Output**: Returns the pointer to the shared memory (`shmem`) where the circular queue is initialized.
+- **Control Flow**:
+    - Cast the shared memory pointer `shmem` to a `fd_circq_t` pointer named `circq`.
+    - Initialize the `cnt` (count) field of `circq` to 0, indicating the queue is empty.
+    - Set the `head` and `tail` fields of `circq` to 0, marking the start of the queue.
+    - Assign the provided size `sz` to the `size` field of `circq`.
+    - Return the original shared memory pointer `shmem`.
+- **Output**: Returns the original shared memory pointer `shmem` after initializing the circular queue structure.
 
 
 ---
 ### fd\_circq\_join<!-- {{#callable:fd_circq_join}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L37>)
-
-Casts a shared buffer pointer to a `fd_circq_t` pointer.
+The `fd_circq_join` function casts a shared buffer pointer to a circular queue pointer type.
 - **Inputs**:
-    - `shbuf`: A pointer to a shared buffer that is to be cast to a `fd_circq_t` pointer.
-- **Logic and Control Flow**:
-    - Casts the input pointer `shbuf` to a `fd_circq_t` pointer.
-    - Returns the casted pointer.
-- **Output**: A pointer to `fd_circq_t` that is cast from the input `shbuf`.
+    - `shbuf`: A pointer to a shared buffer that is intended to be used as a circular queue.
+- **Control Flow**:
+    - The function takes a single argument, `shbuf`, which is a pointer to a shared buffer.
+    - It casts the `shbuf` pointer to a `fd_circq_t` pointer type.
+    - The function returns the casted pointer.
+- **Output**: A pointer to `fd_circq_t`, which is the circular queue type.
 
 
 ---
 ### fd\_circq\_leave<!-- {{#callable:fd_circq_leave}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L42>)
-
-Returns the pointer to the circular queue buffer.
+The `fd_circq_leave` function returns a pointer to the circular queue buffer passed to it.
 - **Inputs**:
-    - ``buf``: A pointer to the circular queue buffer of type `fd_circq_t`.
-- **Logic and Control Flow**:
-    - Casts the input `buf` to a `void *` type.
-    - Returns the casted pointer.
-- **Output**: A `void *` pointer to the circular queue buffer.
+    - `buf`: A pointer to an `fd_circq_t` structure representing the circular queue buffer.
+- **Control Flow**:
+    - The function takes a single argument, `buf`, which is a pointer to a circular queue buffer.
+    - It casts the `buf` pointer to a `void *` type and returns it.
+- **Output**: A `void *` pointer to the circular queue buffer that was passed as an argument.
 
 
 ---
 ### fd\_circq\_delete<!-- {{#callable:fd_circq_delete}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L47>)
-
-Returns the input pointer `shbuf` without modification.
+The `fd_circq_delete` function returns the input pointer without modification.
 - **Inputs**:
-    - `shbuf`: A pointer to a shared buffer, which is expected to be of type `void *`.
-- **Logic and Control Flow**:
-    - Receives a pointer `shbuf` as input.
-    - Returns the same pointer `shbuf` without any changes.
-- **Output**: The function returns the same pointer `shbuf` that it receives as input.
+    - `shbuf`: A pointer to a shared buffer, presumably representing a circular queue.
+- **Control Flow**:
+    - The function takes a single input parameter, `shbuf`.
+    - It immediately returns the `shbuf` parameter without performing any operations on it.
+- **Output**: The function returns the same pointer that was passed to it as an argument.
 
 
 ---
 ### verify<!-- {{#callable:FD_FN_UNUSED::verify}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L52>)
-
-Validates the internal state of a circular queue (`fd_circq_t`) to ensure consistency and correctness.
+The `verify` function checks the integrity and consistency of a circular queue structure by validating its head, tail, and message alignment properties.
 - **Inputs**:
-    - `circq`: A pointer to the `fd_circq_t` structure representing the circular queue to verify.
-- **Logic and Control Flow**:
-    - Check that `circq->head` and `circq->tail` are less than `circq->size`.
-    - Ensure that if `circq->tail` equals `circq->head`, then `circq->cnt` is less than or equal to 1.
-    - If `circq->cnt` is zero, verify that both `circq->head` and `circq->tail` are zero.
-    - If `circq->cnt` is one, verify that `circq->head` equals `circq->tail`.
-    - Initialize a buffer pointer `buf` to point to the data region of the circular queue.
-    - Iterate over each message in the queue using a loop that runs `circq->cnt` times.
-    - For each message, calculate the `start` and `end` positions based on alignment and footprint.
-    - If the queue has wrapped, ensure that `end` is less than or equal to `circq->head`.
-    - Verify that `start` is less than `end` and `end` is less than or equal to `circq->size`.
-    - Update `current` to the `next` position of the message and set `wrapped` if `current` is less than `start`.
-- **Output**: No output is returned; the function performs internal consistency checks using assertions.
+    - `circq`: A pointer to an `fd_circq_t` structure representing the circular queue to be verified.
+- **Control Flow**:
+    - Check if the `head` and `tail` indices are within the bounds of the circular queue size.
+    - Ensure that if the `tail` equals the `head`, the count of messages (`cnt`) is at most 1.
+    - If the queue is empty (`cnt` is 0), verify that both `head` and `tail` are set to 0.
+    - If the queue has exactly one message (`cnt` is 1), ensure `head` equals `tail`.
+    - Initialize a buffer pointer to the memory location immediately after the `fd_circq_t` structure.
+    - Iterate over each message in the queue, checking alignment and size constraints for each message.
+    - For each message, calculate the start and end positions, ensuring they are valid and within the queue's size.
+    - Update the `current` position to the `next` message's offset, and track if the queue has wrapped around.
+- **Output**: The function does not return a value; it performs assertions to verify the integrity of the circular queue.
 
 
 ---
 ### evict<!-- {{#callable:evict}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L80>)
-
-Removes messages from a circular queue that overlap with a specified range.
+The `evict` function removes messages from a circular queue that overlap with a specified range, updating the queue's state accordingly.
 - **Inputs**:
-    - ``circq``: A pointer to the circular queue structure `fd_circq_t`.
-    - ``from``: The start of the range to check for overlap.
-    - ``to``: The end of the range to check for overlap.
-- **Logic and Control Flow**:
-    - Convert the `circq` pointer to a buffer pointer `buf` that points to the data region of the circular queue.
-    - Enter an infinite loop to process messages in the queue.
-    - Check if the queue is empty (`circq->cnt` is zero); if so, exit the function.
-    - Retrieve the message at the head of the queue and calculate its start and end positions.
-    - Check if the message overlaps with the specified range (`from` to `to`).
-    - If there is an overlap, decrement the message count (`circq->cnt`) and increment the drop count (`circq->metrics.drop_cnt`).
-    - If the queue becomes empty after removing the message, reset the head and tail pointers to zero; otherwise, update the head pointer to the next message.
-    - If there is no overlap, exit the loop.
-- **Output**: No output is returned; the function modifies the state of the circular queue `circq` in place.
+    - `circq`: A pointer to the circular queue structure (`fd_circq_t`) from which messages may be evicted.
+    - `from`: The start of the range to check for overlapping messages.
+    - `to`: The end of the range to check for overlapping messages.
+- **Control Flow**:
+    - The function enters an infinite loop to process messages in the queue.
+    - It first checks if the queue is empty (`circq->cnt` is zero); if so, it returns immediately.
+    - It retrieves the message at the head of the queue and calculates its start and end positions in the buffer.
+    - It checks if the message overlaps with the specified range (`from` to `to`).
+    - If there is an overlap, it decrements the message count (`circq->cnt`) and increments the drop count (`circq->metrics.drop_cnt`).
+    - If the queue becomes empty after removing the message, it resets the head and tail pointers to zero; otherwise, it updates the head pointer to the next message.
+    - If there is no overlap, the loop breaks, ending the eviction process.
+- **Output**: The function does not return a value; it modifies the state of the circular queue in place.
 
 
 ---
 ### fd\_circq\_push\_back<!-- {{#callable:fd_circq_push_back}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L105>)
-
-Adds a new message to the back of a circular queue with specified alignment and footprint.
+The `fd_circq_push_back` function attempts to add a new message to the end of a circular queue, ensuring proper alignment and handling buffer overflow by evicting old messages if necessary.
 - **Inputs**:
-    - `circq`: A pointer to the circular queue structure where the message will be added.
-    - `align`: The alignment requirement for the message, which must be a power of 2 and not exceed `FD_CIRCQ_ALIGN`.
+    - `circq`: A pointer to the circular queue structure (`fd_circq_t`) where the message will be added.
+    - `align`: The alignment requirement for the new message, which must be a power of 2 and not exceed `FD_CIRCQ_ALIGN`.
     - `footprint`: The size of the message to be added to the circular queue.
-- **Logic and Control Flow**:
-    - Check if `align` is a power of 2 and does not exceed `FD_CIRCQ_ALIGN`; log a warning and return `NULL` if not.
-    - Calculate the total required space for the message, including alignment, and check if it exceeds the circular queue's size; log a warning and return `NULL` if it does.
-    - Initialize a buffer pointer to the start of the circular queue's data region.
-    - If the queue is not empty, calculate the current position for the new message based on the tail position, alignment, and footprint of the last message.
-    - If the calculated position plus required space exceeds the queue's size, evict messages to make space, reset the tail to the start, and update the `next` pointer of the last message if applicable.
-    - If there is enough space, evict messages from the current position to the end of the required space, update the tail to the current position, and set the `next` pointer of the last message if applicable.
-    - Increment the message count in the queue.
-    - Set the alignment and footprint for the new message and return a pointer to the start of the message's data area.
-- **Output**: A pointer to the start of the new message's data area in the circular queue, or `NULL` if the operation fails.
-- **Functions Called**:
-    - [`evict`](<#evict>)
+- **Control Flow**:
+    - Check if `align` is a power of 2 and does not exceed `FD_CIRCQ_ALIGN`; if not, log a warning and return `NULL`.
+    - Calculate the total required space for the new message, including alignment and footprint; if it exceeds the queue size, log a warning and return `NULL`.
+    - Determine the current position in the buffer where the new message can be added, considering the alignment of the last message if the queue is not empty.
+    - If the required space exceeds the remaining buffer size, evict messages from the current position to the end of the buffer and from the start to the required position, then reset the tail to 0.
+    - If there is enough space, evict messages from the current position to the end of the required space.
+    - Update the tail position and the `next` pointer of the last message if the queue is not empty.
+    - Increment the message count and set the alignment and footprint for the new message.
+    - Return a pointer to the start of the new message's data area.
+- **Output**: A pointer to the start of the new message's data area in the circular queue, or `NULL` if the message could not be added due to alignment or size constraints.
+- **Functions called**:
+    - [`evict`](#evict)
 
 
 ---
 ### fd\_circq\_pop\_front<!-- {{#callable:fd_circq_pop_front}} -->
-[View Source →](<../../../../../src/disco/events/fd_circq.c#L153>)
-
-Removes and returns the front message from a circular queue if it is not empty.
+The `fd_circq_pop_front` function removes and returns the front message from a circular queue if it is not empty.
 - **Inputs**:
-    - `circq`: A pointer to the `fd_circq_t` circular queue structure from which to pop the front message.
-- **Logic and Control Flow**:
-    - Check if the circular queue `circq` is empty by evaluating `circq->cnt`; if it is empty, return `NULL`.
+    - `circq`: A pointer to the circular queue (`fd_circq_t`) from which the front message is to be popped.
+- **Control Flow**:
+    - Check if the circular queue is empty by evaluating `circq->cnt`; if it is, return `NULL`.
     - Decrement the message count `circq->cnt` by one.
-    - Calculate the address of the front message using `circq->head` and cast it to `fd_circq_message_t *`.
-    - If the queue is now empty after popping, set both `circq->head` and `circq->tail` to `0UL`.
-    - If the queue is not empty, update `circq->head` to point to the next message using `message->next`.
-    - Assert that `circq->head` is within the valid range of the circular queue size using `FD_TEST`.
+    - Calculate the address of the front message using the `circq->head` offset and cast it to `fd_circq_message_t *`.
+    - If the queue becomes empty after popping, reset both `circq->head` and `circq->tail` to `0UL`.
+    - Otherwise, update `circq->head` to point to the next message using `message->next`.
+    - Assert that the new `circq->head` is within the valid range of the circular queue size.
     - Return a pointer to the message data, which is located immediately after the `fd_circq_message_t` structure.
 - **Output**: A pointer to the data of the message that was at the front of the queue, or `NULL` if the queue was empty.
 
