@@ -3,10 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Nanopb constant bindings for fd_solcap protobuf messages.
+Automatically generated nanopb constant definitions for various fd_solcap data structures.
 
 # Purpose
-This file contains automatically generated nanopb binding definitions for the `fd_solcap` protocol buffer types. It includes `fd_solcap.pb.h` and checks `PB_PROTO_HEADER_VERSION` to make sure the generated code matches the installed nanopb version. The `PB_BIND` entries connect the message types `fd_solcap_FileMeta`, `fd_solcap_BankPreimage`, `fd_solcap_AccountTableMeta`, `fd_solcap_AccountMeta`, `fd_solcap_StakeRewardEpoch`, `fd_solcap_StakeRewardEvent`, `fd_solcap_VoteAccountPayout`, `fd_solcap_StakeAccountPayout`, and `fd_solcap_Transaction` to nanopb's generated support code.
+This C source code file contains automatically generated constant definitions for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `fd_solcap.pb.h` and checks the `PB_PROTO_HEADER_VERSION` to ensure compatibility with version 40, prompting regeneration if there is a mismatch. The file uses the `PB_BIND` macro to bind several protobuf message types, such as `fd_solcap_FileMeta`, `fd_solcap_BankPreimage`, and others, to their corresponding C structures with automatic field handling. This setup facilitates the serialization and deserialization of these message types in applications that use nanopb for lightweight protobuf handling.
+# Imports and Dependencies
+
+---
+- `fd_solcap.pb.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

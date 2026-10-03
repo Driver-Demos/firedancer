@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `gdb` folder in the `firedancer` codebase contains Python scripts and documentation aimed at enhancing the debugging experience for Firedancer code by providing custom pretty printers for specific data types in GDB.
+GDB scripts and pretty printers for `fd_hash` and `fd_signature` types in Firedancer.
 
 
 ## Files
-- **[fd_gdb.py](fd_gdb.py.md)**: The `fd_gdb.py` file defines custom pretty printers for `fd_hash` and `fd_signature` types in GDB, converting their values to hexadecimal strings for display.
-- **[README.md](README.md.md)**: The `README.md` file in the `firedancer/contrib/gdb` directory explains that the directory contains Python GDB scripts designed to enhance the debugging experience for Firedancer code.
+- **[fd_gdb.py](fd_gdb.py.md)**: Defines GDB pretty printers for `fd_hash` and `fd_signature` types in the Firedancer codebase.
+- **[README.md](README.md.md)**: Python GDB scripts to improve the debugging experience of Firedancer code.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

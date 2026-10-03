@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects for building and testing components related to XDP and eBPF under certain conditions.
+Makefile for adding headers, objects, and unit tests for XDP components in the Firedancer project.
 
 # Purpose
-This is a Makefile snippet used for building and testing components in a software project. It conditionally adds header files and object files to the build process if the environment supports hosted and Linux configurations. Additionally, it defines and runs a unit test for the `test_xdp_ebpf` component, ensuring it is built and executed with the specified dependencies.
+The `Makefile` content defines build and test instructions for a software project. It uses conditional statements to check if the `FD_HAS_HOSTED` and `FD_HAS_LINUX` variables are defined. If both conditions are true, it adds header files `fd_xsk.h` and `fd_xdp_redirect_user.h` and object files `fd_xsk`, `fd_xdp1`, `fd_xdp_redirect_user`, and `fd_waltz` to the build process. It also specifies a unit test named `test_xdp_ebpf` that depends on `fd_waltz` and `fd_util`, and includes instructions to run this test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
