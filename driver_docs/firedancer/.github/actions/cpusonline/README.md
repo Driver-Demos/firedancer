@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `cpusonline` folder in the `firedancer` codebase contains a GitHub Action configuration file, `action.yml`, which is designed to switch all CPUs to an online state using a bash script.
+A GitHub Action to switch all CPUs to online using a bash script.
 
 
 ## Files
-- **[action.yml](action.yml.md)**: The `action.yml` file in the `firedancer` codebase defines a GitHub Action named `cpusonline` that switches all CPUs to an online state using a bash script.
+- **[action.yml](action.yml.md)**: A GitHub Action to switch all CPUs to online using a bash script.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
