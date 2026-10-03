@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the random number generator utilities, including `fd_rng` and `fd_rng_secure`.
+Makefile for adding headers, objects, and unit tests for the RNG module.
 
 # Purpose
-The file is a Makefile snippet used for building and testing components in a software project. It defines the inclusion of header files (`fd_rng.h`), specifies object files (`fd_rng`, `fd_rng_secure`, `fd_util`) to be compiled, and sets up a unit test named `test_rng` using the `fd_util` library. It also includes a command to execute the `test_rng` unit test.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` function to include the header file `fd_rng.h`. The `add-objs` function specifies object files `fd_rng`, `fd_rng_secure`, and `fd_util` for compilation. The `make-unit-test` function creates a unit test named `test_rng` with dependencies on `fd_util`. Finally, the `run-unit-test` function executes the `test_rng` unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
