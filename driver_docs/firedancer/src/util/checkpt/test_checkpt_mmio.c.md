@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_checkpt_mmio.c` file in the `firedancer` codebase contains a comprehensive set of tests for checkpoint and restore operations using memory-mapped I/O, including various frame styles and error handling scenarios.
+Unit tests for checkpoint and restore functions with various frame styles and error handling.
 
 # Purpose
-This C source code file is a comprehensive test suite for checkpointing and restoring data using a custom framework. The code is structured around testing various functionalities of the `fd_checkpt` and `fd_restore` modules, which are likely part of a larger system for data serialization and deserialization. The file includes a main function that initializes the testing environment, sets up random data, and performs a series of tests to validate the correctness and robustness of the checkpointing and restoring processes. The tests cover a wide range of scenarios, including different frame styles (raw and LZ4), various buffer sizes, and edge cases such as null pointers and buffer overflows.
+The code is a C program designed to test the functionality of checkpointing and restoring data using memory-mapped I/O (MMIO). It includes a series of tests to validate the behavior of functions related to checkpointing (`fd_checkpt_*`) and restoring (`fd_restore_*`) data. The program uses static assertions to ensure that certain constants are defined correctly, such as error codes and frame styles. It initializes buffers and structures for checkpointing and restoring, and it performs various operations to test the correctness of these processes, including opening, closing, and handling data frames in both raw and LZ4 compressed styles.
 
-The code is organized to ensure that each function in the `fd_checkpt` and `fd_restore` modules is thoroughly tested. It uses assertions to verify that the functions behave as expected under normal and erroneous conditions. The file also includes detailed logging to track the progress and results of each test case. This test suite is crucial for ensuring the reliability of the checkpointing and restoring mechanisms, which are essential for data integrity in systems that require data persistence or recovery. The use of static assertions and runtime checks helps maintain consistency and detect potential issues early in the development process.
+The program is structured to handle command-line arguments for data and MMIO sizes, and it logs the progress of tests using a logging mechanism. It checks for the presence of LZ4 support and adjusts the tests accordingly. The main function initializes a random number generator to create test data and iterates through multiple test scenarios, including end-to-end tests, buffer size variations, and frame style variations. The program ensures that the checkpoint and restore operations handle different data sizes and conditions, such as zero-sized buffers and unsupported frame styles, and it verifies that the data integrity is maintained throughout the process.
 # Imports and Dependencies
 
 ---
@@ -19,59 +19,64 @@ The code is organized to ensure that each function in the `fd_checkpt` and `fd_r
 
 ---
 ### in
-- **Type**: `uchar array`
-- **Description**: The `in` variable is a static array of unsigned characters (uchar) with a size defined by the constant `BUF_MAX`, which is set to 1048576UL. This array is used to store input data for processing within the program.
-- **Use**: The `in` array is used to hold data that is processed and manipulated throughout the program, particularly in the context of checkpoint and restore operations.
+- **Type**: ``uchar` array`
+- **Description**: An array of unsigned characters with a size defined by `BUF_MAX`. It is used to store input data for processing.
+- **Use**: Stores input data for various operations in the program.
 
 
 ---
 ### out
-- **Type**: `uchar array`
-- **Description**: The `out` variable is a static array of unsigned characters (`uchar`) with a size defined by `BUF_MAX`, which is set to 1048576UL. This array is used to store data that is output from various operations in the program, such as data restoration.
-- **Use**: The `out` array is used to hold the output data during the restoration process, ensuring that the data matches the input data after various operations.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters with a size defined by `BUF_MAX`. It is used to store output data during the execution of the program.
+- **Use**: Stores output data for operations involving checkpoint and restore processes.
 
 
 ---
 ### mmio
-- **Type**: `uchar array`
-- **Description**: The `mmio` variable is a static array of unsigned characters with a size defined by `BUF_MAX`, which is set to 1048576UL. This array is used to store data in memory-mapped I/O operations.
-- **Use**: The `mmio` array is used as a buffer for memory-mapped I/O operations, particularly in checkpoint and restore functions.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters with a size defined by `BUF_MAX`. It is used to store data for memory-mapped I/O operations.
+- **Use**: Used as a buffer for memory-mapped I/O operations in the checkpoint and restore processes.
 
 
 ---
 ### \_checkpt
-- **Type**: `fd_checkpt_t`
-- **Description**: The `_checkpt` variable is a static array of type `fd_checkpt_t` with a single element. It is used to manage checkpoint operations, likely involving memory-mapped I/O (MMIO) for data persistence or recovery.
-- **Use**: This variable is used to initialize, manage, and finalize checkpoint operations in the program, ensuring data can be saved and restored efficiently.
+- **Type**: ``fd_checkpt_t` array`
+- **Description**: The `_checkpt` variable is a static array of type `fd_checkpt_t` with a size of 1. It is used to manage checkpoint operations in memory-mapped I/O (MMIO) contexts.
+- **Use**: Used to initialize and manage checkpoint operations in the program.
 
 
 ---
 ### \_restore
-- **Type**: `fd_restore_t`
-- **Description**: The `_restore` variable is a static array of type `fd_restore_t` with a single element. It is used to manage the state and operations related to restoring data from a memory-mapped input/output (MMIO) buffer.
-- **Use**: This variable is used to initialize, manage, and finalize the restoration process of data from a memory-mapped buffer, supporting operations like opening, closing, and seeking within the buffer.
+- **Type**: ``fd_restore_t` array`
+- **Description**: An array of type `fd_restore_t` with a single element, used to store state information for restoration operations. The `fd_restore_t` type is likely a structure that holds data necessary for restoring a checkpoint or similar operation.
+- **Use**: Used to initialize and manage restoration operations, such as opening, closing, and handling data frames.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, processes command-line arguments, generates test data, and performs extensive testing of checkpoint and restore functionalities using various data sizes and frame styles.
+[View Source →](<../../../../../src/util/checkpt/test_checkpt_mmio.c#L32>)
+
+Executes a series of tests for checkpoint and restore functionalities, including data handling, error checking, and frame style management.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Check for LZ4 support and log a warning if not supported.
-    - Parse command-line arguments for `--data-sz` and `--mmio-sz`, ensuring they do not exceed `BUF_MAX`.
-    - Initialize a random number generator `rng`.
-    - Set frame styles for raw and LZ4 based on LZ4 support.
-    - Generate random test data to fill the `in` buffer.
-    - Test various checkpoint and restore functions, including `fd_checkpt_strerror`, `fd_checkpt_init_mmio`, `fd_checkpt_fini`, `fd_checkpt_open`, `fd_checkpt_close`, `fd_checkpt_meta`, `fd_checkpt_data`, `fd_restore_init_mmio`, `fd_restore_fini`, `fd_restore_open`, `fd_restore_close`, `fd_restore_meta`, `fd_restore_data`, `fd_restore_sz`, and `fd_restore_seek`.
-    - Perform end-to-end tests for checkpoint and restore operations with different buffer sizes and frame styles.
-    - Test edge cases such as buffer sizes exceeding limits and mixed frame styles.
-    - Log the success of tests and halt the program.
-- **Output**: The function returns an integer, `0`, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Checks for LZ4 support and logs a warning if not available.
+    - Retrieves `--data-sz` and `--mmio-sz` from command-line arguments, defaulting to `BUF_MAX` if not specified.
+    - Logs the sizes of data and MMIO being used.
+    - Validates that `data_sz` and `mmio_sz` do not exceed `BUF_MAX`, logging an error if they do.
+    - Initializes a random number generator `rng`.
+    - Sets frame styles for raw and LZ4 based on LZ4 support.
+    - Generates random test data and stores it in the `in` buffer.
+    - Performs a series of tests on various checkpoint and restore functions, including `fd_checkpt_strerror`, `fd_checkpt_init_mmio`, `fd_checkpt_fini`, `fd_checkpt_open`, `fd_checkpt_close`, `fd_checkpt_meta`, `fd_checkpt_data`, `fd_restore_init_mmio`, `fd_restore_fini`, `fd_restore_open`, `fd_restore_close`, `fd_restore_meta`, `fd_restore_data`, `fd_restore_sz`, and `fd_restore_seek`.
+    - Tests include handling of NULL pointers, misaligned memory, unsupported frame styles, and various data sizes.
+    - Conducts end-to-end tests for checkpoint and restore operations with different buffer sizes and frame styles.
+    - Tests non-trivial gather/scatter operations to stress test the LZ4 compressor and gather/scatter optimizations.
+    - Logs the results of each test and halts the program with `fd_halt` after all tests pass.
+- **Output**: Returns 0 upon successful completion of all tests.
 
 
 
