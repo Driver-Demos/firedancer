@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the build configuration for the SHA-512 implementation, including headers, object files, assembly files for AVX and AVX512, and unit and fuzz tests.
+Makefile for building and testing SHA-512 and SHA-384 implementations with AVX and AVX512 support.
 
 # Purpose
-The provided content is a Makefile script used in a software build system to manage the compilation and testing of components related to SHA-512 and SHA-384 cryptographic functions. It utilizes conditional logic to include additional assembly and object files optimized for specific CPU instruction sets, such as AVX and AVX512, if they are available. The script defines unit tests for both SHA-512 and SHA-384, ensuring that these cryptographic functions are correctly implemented and function as expected. Additionally, if the environment supports hosted execution, it includes fuzz testing for these cryptographic functions to identify potential vulnerabilities or errors. This configuration ensures that the cryptographic components are robust, optimized, and thoroughly tested across different hardware capabilities.
+The Makefile content defines build and test instructions for components related to SHA-512 and SHA-384 cryptographic functions. It uses conditional logic to include additional assembly and object files if specific hardware capabilities, such as AVX or AVX512, are available. The `add-hdrs`, `add-objs`, and `add-asms` functions are used to manage header, object, and assembly files, respectively, for the `fd_ballet` module. The file also specifies unit tests for `test_sha512` and `test_sha384`, and includes conditional fuzz testing for these components if the `FD_HAS_HOSTED` environment is defined. This setup ensures that the build process is optimized for the available hardware and that the cryptographic functions are thoroughly tested.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
