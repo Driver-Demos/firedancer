@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-LtHash APIs, streaming adder, build rules, and tests with benchmarks.
+APIs for lattice-based incremental hashing with Blake3, a Makefile, and tests for `fd_lthash` functions.
 
 
 ## Files
-- **[fd_lthash.h](fd_lthash.h.md)**: Lattice-based incremental hash APIs with zero, add, sub, and Base58 encoding helpers.
-- **[fd_lthash_adder.c](fd_lthash_adder.c.md)**: Initializes and deletes an lthash adder, with alignment checks and SIMD batch pointer setup.
-- **[fd_lthash_adder.h](fd_lthash_adder.h.md)**: Optimized streaming LtHash adder with batched BLAKE3 hashing and Solana account support.
-- **[Local.mk](Local.mk.md)**: Build rules for lthash headers, object, and unit test.
-- **[test_lthash.c](test_lthash.c.md)**: Tests lthash add, sub, zero, and BLAKE3 hash output, with benchmarks.
-- **[test_lthash_adder.c](test_lthash_adder.c.md)**: Tests and benchmarks lthash adder push, Solana account push, and flush against a reference hash.
+- **[fd_lthash.h](fd_lthash.h.md)**: APIs for lattice-based incremental hashing using Blake3, with functions for hash operations and encoding.
+- **[fd_lthash_adder.c](fd_lthash_adder.c.md)**: Defines and initializes a parallelized lthash adder with AVX512 and AVX support.
+- **[fd_lthash_adder.h](fd_lthash_adder.h.md)**: Optimized streaming LtHash adder using SIMD parallelism for high-throughput BLAKE3 hashing.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests related to `fd_lthash` in the `firedancer` codebase.
+- **[test_lthash.c](test_lthash.c.md)**: Tests and benchmarks for the lthash implementation using BLAKE3 hashing in the Firedancer codebase.
+- **[test_lthash_adder.c](test_lthash_adder.c.md)**: Tests and benchmarks for the `fd_lthash_adder` functionality, including random input generation and validation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

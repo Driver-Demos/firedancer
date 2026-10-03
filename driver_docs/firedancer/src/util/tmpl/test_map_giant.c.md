@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_map_giant.c` file in the `firedancer` codebase is a test suite for verifying the functionality and integrity of a map data structure, including operations such as insertion, deletion, and iteration, while also handling edge cases and logging critical errors.
+Tests for the `fd_map_giant` implementation, including insertion, deletion, and iteration of map elements.
 
 # Purpose
-This C source code file is an executable program designed to test the functionality of a map data structure, specifically focusing on insertion, deletion, and iteration operations. The code includes a custom data structure `pair_t` that holds key-value pairs, and it utilizes sorting and mapping utilities from included files `fd_sort.c` and `fd_map_giant.c`. The program initializes a random number generator and uses it to shuffle and manipulate the `pair_t` structures, ensuring that the map can handle various operations correctly. The code is structured to perform extensive testing, including boundary conditions and error handling, to verify the robustness of the map implementation.
+The code is a C program that tests the functionality of a map data structure, specifically designed to handle key-value pairs. It includes a [`main`](<#main>) function, which is the entry point of the program, and several utility functions and macros to facilitate the testing process. The program uses a custom data structure `pair_t` to represent key-value pairs, where each pair consists of a key (`mykey`), a next pointer (`mynext`), a value (`val`), and a tag (`tag`). The code includes sorting and mapping functionalities by incorporating external files `fd_sort.c` and `fd_map_giant.c`, which provide implementations for sorting and map operations, respectively.
 
-The main technical components of this file include the definition of the `pair_t` structure, the use of macros to configure sorting and mapping operations, and the implementation of a test suite that exercises the map's capabilities. The program is designed to be run in a hosted environment, as indicated by the conditional inclusion of system headers and the use of process control functions like `fork` and `wait`. The code also includes logging and debugging features to provide detailed feedback during execution. Overall, this file serves as a comprehensive test harness for validating the correctness and performance of a map data structure in C.
+The program initializes a random number generator and sets up test parameters such as maximum number of pairs, seed for randomness, and the number of iterations for testing. It performs various operations on the map, including insertion, deletion, and verification of key-value pairs, while ensuring the integrity and correctness of the map's behavior. The code also includes tests for edge cases, such as handling of null pointers and misaligned memory, and uses logging to report the progress and results of the tests. The program is designed to run in a hosted environment, as indicated by the conditional compilation directives, and it uses a memory buffer `mem` for map operations, ensuring proper alignment.
 # Imports and Dependencies
 
 ---
@@ -24,75 +24,78 @@ The main technical components of this file include the definition of the `pair_t
 
 ---
 ### mem
-- **Type**: `uchar array`
-- **Description**: The `mem` variable is a global array of unsigned characters with a size of 32,768 bytes. It is aligned to a 128-byte boundary using the `__attribute__((aligned(128)))` directive, which ensures that the starting address of the array is a multiple of 128.
-- **Use**: This variable is used as a memory buffer for operations that require specific alignment and size constraints, such as creating and managing a map data structure in the program.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters with a size of 32,768 bytes, aligned to a 128-byte boundary. The `__attribute__((aligned(128)))` ensures that the starting address of the array is a multiple of 128, which can be important for performance optimizations on certain hardware architectures.
+- **Use**: Used as a memory buffer for operations that require specific alignment and size constraints, such as the `map_new` function in the code.
 
 
 # Data Structures
 
 ---
 ### pair
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `mykey`: A unique key of type unsigned long used for identifying the pair.
-    - `mynext`: An unsigned long used for linking to the next element in a data structure.
-    - `val`: An unsigned integer representing the value associated with the key.
-    - `tag`: An unsigned integer used as a tag for various purposes, such as marking or iteration.
-- **Description**: The `pair` structure is a compound data type designed to store a key-value pair with additional linking and tagging capabilities. It consists of four members: `mykey`, which serves as a unique identifier for the pair; `mynext`, which is used for linking to the next element in a data structure, facilitating operations like sorting and mapping; `val`, which holds the value associated with the key; and `tag`, which is used for tagging purposes, such as marking elements during iteration or other operations. This structure is utilized in various operations, including sorting and mapping, as demonstrated in the accompanying code.
+    - ``mykey``: A `ulong` that stores the key for the pair.
+    - ``mynext``: A `ulong` that stores the next element's key in a linked list or similar structure.
+    - ``val``: A `uint` that stores the value associated with the key.
+    - ``tag``: A `uint` used for tagging or marking purposes.
+- **Description**: Defines a data structure that represents a key-value pair with additional fields for linking and tagging, useful in map or sorting operations.
 
 
 ---
 ### pair\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `mykey`: A unique and non-zero key of type ulong used for sorting and mapping.
-    - `mynext`: A ulong used to link to the next element in a map or list.
-    - `val`: A uint representing the value associated with the key.
-    - `tag`: A uint used for tagging or marking purposes, often in iteration or testing.
-- **Description**: The `pair_t` structure is a compound data type used to represent a key-value pair with additional linking and tagging capabilities. It consists of a unique key (`mykey`) for sorting and mapping, a `mynext` field for linking to other elements, a `val` field for storing the associated value, and a `tag` field for marking or tagging during operations such as iteration or testing. This structure is utilized in sorting and mapping operations, as demonstrated by its integration with sorting and map functionalities in the provided code.
+    - ``mykey``: A `ulong` that stores the key of the pair.
+    - ``mynext``: A `ulong` that stores the next element's key in a linked structure.
+    - ``val``: A `uint` that stores the value associated with the key.
+    - ``tag``: A `uint` used for tagging or marking purposes.
+- **Description**: Defines a structure `pair_t` that represents a key-value pair with additional fields for linking and tagging, used in sorting and mapping operations.
 
 
 # Functions
 
 ---
 ### shuffle\_pair<!-- {{#callable:shuffle_pair}} -->
-The `shuffle_pair` function randomly shuffles an array of `pair_t` structures using the Fisher-Yates shuffle algorithm.
+[View Source →](<../../../../../src/util/tmpl/test_map_giant.c#L28>)
+
+Randomizes the order of elements in an array of `pair_t` structures using the Fisher-Yates shuffle algorithm.
 - **Inputs**:
-    - `rng`: A pointer to an `fd_rng_t` random number generator used to generate random indices for shuffling.
-    - `pair`: A pointer to an array of `pair_t` structures that will be shuffled.
-    - `cnt`: The number of elements in the `pair` array to shuffle.
-- **Control Flow**:
-    - The function iterates over the array starting from the second element (index 1) to the last element (index `cnt-1`).
-    - For each element at index `i`, it generates a random index `j` such that `0 <= j <= i` using the `fd_rng_ulong_roll` function.
-    - It then swaps the elements at indices `i` and `j` in the `pair` array.
-- **Output**: The function does not return a value; it modifies the `pair` array in place to shuffle its elements.
+    - ``rng``: A pointer to a random number generator of type `fd_rng_t` used to generate random indices.
+    - ``pair``: A pointer to an array of `pair_t` structures that will be shuffled.
+    - ``cnt``: The number of elements in the `pair` array to shuffle.
+- **Logic and Control Flow**:
+    - Iterates over the `pair` array starting from the second element (index 1) to the last element (index `cnt-1`).
+    - For each element at index `i`, generates a random index `j` such that `0 <= j <= i` using the `fd_rng_ulong_roll` function.
+    - Swaps the elements at indices `i` and `j` in the `pair` array.
+- **Output**: The function does not return a value; it modifies the `pair` array in place.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a random number generator, sets up a map data structure, and performs extensive testing of map operations including insertion, deletion, and iteration.
+[View Source →](<../../../../../src/util/tmpl/test_map_giant.c#L40>)
+
+Initializes and tests a map data structure with randomized operations and logging.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment and parse command-line arguments for `--max`, `--seed`, and `--iter-max` with default values 512, 1234, and 1000 respectively.
-    - Log the testing parameters.
-    - Initialize a random number generator `rng`.
-    - Create two arrays `ref` and `tst` of `pair_t` structures, each with a maximum size of 512.
-    - Check if `max` exceeds 512 and log a warning if so, then exit.
-    - Populate `ref` and `tst` arrays with unique keys and random values, then sort `ref`.
-    - Check map alignment and footprint constraints, logging a warning and exiting if constraints are not met.
-    - Create a new map with `map_new` and join it with `map_join`, performing various tests on map properties and operations.
-    - Perform a series of random operations on the map, including key equality checks, hashing, copying, and verification.
-    - Iterate over the map, inserting and verifying elements, ensuring the map is not full until expected.
-    - Shuffle the `tst` array and perform deletions, verifying map integrity after each operation.
-    - Test additional map operations under hosted conditions, if applicable.
-    - Leave and delete the map, ensuring proper cleanup.
-    - Delete the random number generator and halt the program.
-- **Output**: The function returns an integer, specifically 0, indicating successful execution.
-- **Functions called**:
-    - [`shuffle_pair`](#shuffle_pair)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Extracts `--max`, `--seed`, and `--iter-max` values from the command-line arguments with default values of 512, 1234, and 1000, respectively.
+    - Logs the testing parameters using `FD_LOG_NOTICE`.
+    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Creates two arrays `ref` and `tst` of `pair_t` structures, each with a maximum size of 512.
+    - Populates `ref` and `tst` with unique keys and random values, then sorts `ref` using `sort_pair_inplace`.
+    - Checks the alignment and footprint of the map using `map_align` and `map_footprint`.
+    - Creates a shared map `shmap` using `map_new` and verifies its properties with `FD_TEST`.
+    - Performs a series of randomized operations on the map, including insertion, lookup, and deletion, while verifying map integrity with `FD_TEST`.
+    - Logs progress at every 100 iterations using `FD_LOG_NOTICE`.
+    - Tests map operations under various conditions, including full and empty states, using `FD_TEST`.
+    - Handles special cases and potential errors with logging and conditional compilation directives.
+    - Cleans up resources by deleting the random number generator and halting the program with `fd_halt`.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`shuffle_pair`](<#shuffle_pair>)
 
 
 
