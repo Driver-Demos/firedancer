@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `cJSON.h` file in the `firedancer` codebase provides the interface for a C library that facilitates parsing, printing, and manipulating JSON data structures, with support for custom memory management and platform-specific symbol visibility.
+Header file for the cJSON library, defining structures, macros, and functions for JSON parsing and manipulation.
 
 # Purpose
-This C header file defines the interface for the cJSON library, which is a lightweight JSON parser and generator written in C. The file provides a comprehensive set of functions and macros for creating, parsing, manipulating, and serializing JSON data structures. It includes definitions for various JSON data types such as objects, arrays, strings, numbers, booleans, and null values, encapsulated within the `cJSON` structure. The library supports both formatted and unformatted JSON output, and it allows for deep copying and comparison of JSON objects. Additionally, the file includes functionality for memory management, enabling users to specify custom memory allocation functions.
+The code is a C header file for the `cJSON` library, which provides functionality for parsing, creating, and manipulating JSON data in C. It defines the `cJSON` structure, which represents JSON data types such as objects, arrays, strings, numbers, booleans, and null values. The file includes macros and function declarations for handling JSON data, such as parsing JSON strings into `cJSON` objects, printing `cJSON` objects as JSON strings, and managing memory allocation for JSON data structures.
 
-The header file is designed to be cross-platform, with specific considerations for Windows and Unix-like systems, including conditional compilation directives to handle symbol visibility and calling conventions. It defines a public API with functions prefixed by `CJSON_PUBLIC`, which ensures the correct export or import of symbols depending on the build configuration. The file also includes versioning information and a set of utility macros to facilitate common operations, such as iterating over JSON arrays or setting values within JSON objects. Overall, this header file serves as a crucial component of the cJSON library, providing a clear and structured interface for developers to interact with JSON data in C applications.
+The header file also includes platform-specific configurations for symbol visibility and calling conventions, particularly for Windows and Unix-like systems. It defines several macros to control the export and import of symbols, ensuring compatibility across different compilers and platforms. Additionally, the file provides utility functions for creating and modifying JSON objects and arrays, as well as functions for comparing and duplicating `cJSON` items. The file is intended to be included in C projects that require JSON parsing and manipulation capabilities, and it defines a public API for interacting with JSON data through the `cJSON` library.
 # Imports and Dependencies
 
 ---
@@ -19,27 +19,27 @@ The header file is designed to be cross-platform, with specific considerations f
 
 ---
 ### cJSON
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `next`: Pointer to the next cJSON item in a linked list, used for traversing arrays or objects.
-    - `prev`: Pointer to the previous cJSON item in a linked list, used for traversing arrays or objects.
-    - `child`: Pointer to the first child of a cJSON item, used for arrays or objects containing other items.
-    - `type`: Integer representing the type of the cJSON item, such as string, number, array, or object.
-    - `valuestring`: Pointer to a string value if the cJSON item is of type string or raw.
-    - `valueint`: Deprecated integer value of the cJSON item, use cJSON_SetNumberValue instead.
-    - `valuedouble`: Double value of the cJSON item if it is of type number.
-    - `valueulong`: Unsigned long value associated with the cJSON item.
-    - `string`: Pointer to the name string of the cJSON item if it is a child or part of an object.
-- **Description**: The cJSON structure is a fundamental component of the cJSON library, representing a JSON data item. It is designed to handle various JSON data types, including strings, numbers, arrays, and objects. The structure uses linked list pointers (next, prev) to facilitate navigation through JSON arrays and objects, while the child pointer is used to access nested items within arrays or objects. The type field indicates the specific JSON type of the item, and the structure includes fields for storing string and numeric values. The cJSON structure is versatile, allowing for the creation, manipulation, and traversal of JSON data in C programs.
+    - ``next``: Points to the next item in an array or object chain.
+    - ``prev``: Points to the previous item in an array or object chain.
+    - ``child``: Points to the first child in an array or object.
+    - ``type``: Stores the type of the JSON item.
+    - ``valuestring``: Holds the string value if the item is a string or raw JSON.
+    - ``valueint``: Deprecated integer value of the item.
+    - ``valuedouble``: Stores the numeric value if the item is a number.
+    - ``valueulong``: Stores an unsigned long value.
+    - ``string``: Holds the name of the item if it is a child or subitem of an object.
+- **Description**: Represents a JSON item in a tree structure, allowing navigation through JSON arrays and objects with pointers to next, previous, and child items, and storing data types and values for JSON elements.
 
 
 ---
 ### cJSON\_Hooks
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `malloc_fn`: A function pointer to a custom memory allocation function.
-    - `free_fn`: A function pointer to a custom memory deallocation function.
-- **Description**: The `cJSON_Hooks` structure is designed to allow users to specify custom memory management functions for the cJSON library. It contains two function pointers, `malloc_fn` and `free_fn`, which can be set to user-defined functions for allocating and freeing memory, respectively. This is particularly useful for integrating cJSON with custom memory management systems or for ensuring compatibility with different calling conventions, especially on Windows platforms.
+    - ``malloc_fn``: A function pointer for memory allocation, using the `CJSON_CDECL` calling convention.
+    - ``free_fn``: A function pointer for memory deallocation, using the `CJSON_CDECL` calling convention.
+- **Description**: Defines custom memory allocation and deallocation functions for use with the cJSON library, allowing users to specify their own `malloc` and `free` functions, which is particularly useful for integrating with different memory management systems or environments.
 
 
 

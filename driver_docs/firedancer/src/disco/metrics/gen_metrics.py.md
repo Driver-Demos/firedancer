@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `gen_metrics.py` file in the `firedancer` codebase reads and processes metrics from an XML file, then generates code and documentation based on those metrics.
+Generates code and documentation from metrics defined in an XML file.
 
 # Purpose
-This Python script is a narrowly focused utility designed to process and transform data from an XML file named 'metrics.xml'. It imports specific functions and classes from other modules, indicating that it is part of a larger codebase. The script's main function reads and parses the XML file to extract metrics, applies a layout operation on the parsed data, and then generates code and documentation based on these metrics using the `write_codegen` and `write_docs` functions. The script is intended to be executed as a standalone program, as indicated by the `if __name__ == '__main__':` block, which ensures that the `main()` function is called when the script is run directly.
+This script processes metrics data from an XML file and generates code and documentation based on that data. It imports functions and classes from the `generate` package and the `pathlib` module. The [`main`](<#main>) function reads the contents of a file named `metrics.xml`, parses it into a `metrics` object, and then calls the `layout` method on this object. After processing the metrics, it uses the `write_codegen` and `write_docs` functions to generate code and documentation, respectively. The script executes the [`main`](<#main>) function when run as a standalone program.
 # Imports and Dependencies
 
 ---
@@ -20,20 +20,21 @@ This Python script is a narrowly focused utility designed to process and transfo
 
 ---
 ### main<!-- {{#callable:firedancer/src/disco/metrics/gen_metrics.main}} -->
-The `main` function orchestrates the reading, parsing, and processing of metrics from an XML file, and then generates code and documentation based on these metrics.
+[View Source →](<../../../../../src/disco/metrics/gen_metrics.py#L6>)
+
+Executes the main workflow to parse metrics from an XML file, layout the metrics, and generate code and documentation.
 - **Inputs**: None
-- **Control Flow**:
-    - Read the contents of 'metrics.xml' file into a string.
-    - Parse the string content to create a 'metrics' object using 'parse_metrics'.
-    - Call the 'layout' method on the 'metrics' object to prepare it for further processing.
-    - Pass the 'metrics' object to 'write_codegen' to generate code based on the metrics.
-    - Pass the 'metrics' object to 'write_docs' to generate documentation based on the metrics.
-- **Output**: The function does not return any value; it performs file reading, parsing, and calls other functions to generate code and documentation as side effects.
-- **Functions called**:
-    - [`firedancer/src/disco/metrics/generate/types.parse_metrics`](generate/types.py.md#parse_metrics)
-    - [`firedancer/src/disco/metrics/generate/types.Metrics.layout`](generate/types.py.md#metricslayout)
-    - [`firedancer/src/disco/metrics/generate/write_codegen.write_codegen`](generate/write_codegen.py.md#write_codegen)
-    - [`firedancer/src/disco/metrics/generate/write_docs.write_docs`](generate/write_docs.py.md#write_docs)
+- **Logic and Control Flow**:
+    - Reads the content of the 'metrics.xml' file using `Path.read_text()` and parses it with [`parse_metrics`](<generate/types.py.md#parse_metrics>).
+    - Calls the [`layout`](<generate/types.py.md#metricslayout>) method on the `metrics` object to arrange or format the metrics data.
+    - Passes the `metrics` object to [`write_codegen`](<generate/write_codegen.py.md#write_codegen>) to generate code based on the metrics.
+    - Passes the `metrics` object to [`write_docs`](<generate/write_docs.py.md#write_docs>) to generate documentation based on the metrics.
+- **Output**: No return value; the function performs actions as side effects.
+- **Functions Called**:
+    - [`firedancer/src/disco/metrics/generate/types.parse_metrics`](<generate/types.py.md#parse_metrics>)
+    - [`firedancer/src/disco/metrics/generate/types.Metrics.layout`](<generate/types.py.md#metricslayout>)
+    - [`firedancer/src/disco/metrics/generate/write_codegen.write_codegen`](<generate/write_codegen.py.md#write_codegen>)
+    - [`firedancer/src/disco/metrics/generate/write_docs.write_docs`](<generate/write_docs.py.md#write_docs>)
 
 
 
