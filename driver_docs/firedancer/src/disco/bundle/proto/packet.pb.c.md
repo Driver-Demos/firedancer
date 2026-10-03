@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `packet.pb.c` file contains automatically generated nanopb constant definitions for the `firedancer` codebase, specifically binding various packet-related structures.
+Automatically generated nanopb constant definitions for packet-related structures.
 
 # Purpose
-This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) messages using the nanopb library, specifically version 0.4.9.1. It includes the header file "packet.pb.h" and checks for compatibility with the expected protobuf header version, ensuring that the file is regenerated if the version does not match. The `PB_BIND` macro is used to bind C structures to their corresponding protobuf message definitions, such as `packet_PacketBatch`, `packet_Packet`, `packet_Meta`, and `packet_PacketFlags`, with some bindings using an automatic field count and others specifying a field count of 2. This file is part of a system that serializes and deserializes data structures for communication or storage, leveraging nanopb's lightweight protobuf implementation for embedded systems.
+This code is an automatically generated C source file for defining protocol buffer constants using the nanopb library. It includes the header file `packet.pb.h` and checks if the `PB_PROTO_HEADER_VERSION` is 40, issuing an error if not, to ensure compatibility with the nanopb generator version used. The file uses the `PB_BIND` macro to bind protocol buffer message types such as `packet_PacketBatch`, `packet_Packet`, `packet_Meta`, and `packet_PacketFlags` to their respective structures, with some bindings using the `AUTO` option and others specifying a version number of 2. This setup facilitates the serialization and deserialization of protocol buffer messages in C applications.
 # Imports and Dependencies
 
 ---

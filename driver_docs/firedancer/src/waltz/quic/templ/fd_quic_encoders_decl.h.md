@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_encoders_decl.h` file declares inline functions for encoding QUIC frames and calculating their footprints in the Firedancer codebase.
+Defines macros for QUIC encoders and their footprint calculations.
 
 # Purpose
-This code is a C header file that defines macros for generating inline function declarations related to encoding operations in a QUIC (Quick UDP Internet Connections) protocol implementation. The `FD_TEMPL_DEF_STRUCT_BEGIN` macro is used to declare two inline functions for a given structure `NAME`: one for encoding the structure into a buffer (`fd_quic_encode_##NAME`) and another for determining the memory footprint required for encoding (`fd_quic_encode_footprint_##NAME`). The `fd_quic_##NAME##_t` is a placeholder for a specific QUIC-related data structure. The inclusion of "fd_quic_dft.h" suggests that this header file relies on additional definitions or templates provided in that file, likely to handle various QUIC frame types. This setup facilitates the modular and reusable definition of encoding functions for different QUIC frames.
+This code defines macros for encoding operations related to QUIC (Quick UDP Internet Connections) frames. The macro `FD_TEMPL_DEF_STRUCT_BEGIN(NAME)` generates two inline function declarations for a given `NAME`. The first function, `fd_quic_encode_##NAME`, encodes a QUIC frame of type `fd_quic_##NAME##_t` into a buffer, while the second function, `fd_quic_encode_footprint_##NAME`, calculates the footprint of the frame. The inclusion of the header file `fd_quic_dft.h` suggests that it contains default definitions or additional utilities related to QUIC encoding. This code is part of a template system to facilitate the creation of encoding functions for different QUIC frame types.
 # Imports and Dependencies
 
 ---
