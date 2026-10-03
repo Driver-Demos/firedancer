@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Simulations and tests for ED25519 operations, SHA-512, CPU, and PCIe using Verilog, Cocotb, and Questa.
+The `sim` folder in the `firedancer` codebase contains various subfolders and a README file dedicated to simulating and verifying hardware designs using Verilog, Questa, and cocotb, focusing on operations like ED25519 point addition and doubling, signature verification, wide multiplication, CPU simulation, and SHA-512 processing.
 
 ## Folders
-- **[ed25519_point_add](ed25519_point_add/README.md)**: Makefile and Cocotb-based test for simulating and verifying ED25519 point addition in hardware.
-- **[ed25519_point_dbl](ed25519_point_dbl/README.md)**: Makefile and test script for simulating and testing ED25519 point doubling with Verilog and Cocotb.
-- **[ed25519_sigverify_0](ed25519_sigverify_0/README.md)**: Makefile and Cocotb test for simulating and verifying the ED25519 signature verification module.
-- **[ed25519_sigverify_1](ed25519_sigverify_1/README.md)**: Makefile for simulating the `ed25519_sigverify_1` module and a cocotb-based test with random input.
-- **[mul_wide](mul_wide/README.md)**: Makefile for simulating Verilog modules and a test script for verifying wide multiplication logic.
-- **[schl_cpu](schl_cpu/README.md)**: Makefile and tests for simulating Verilog sources and CPU simulation using cocotb.
-- **[sha512_modq_meta](sha512_modq_meta/README.md)**: Makefile for simulating `sha512_modq_meta` with Verilog and Questa, and cocotb tests for SHA-512 modulo Q.
-- **[sha512_pre](sha512_pre/README.md)**: Makefile for simulating `sha512_pre` with Verilog and Cocotb; test.py for SHA-512 pre-processing tests.
-- **[top_f1](top_f1/README.md)**: Makefile for Verilog simulation and cocotb test for PCIe and ED25519 in firedancer.
-- **[top_f1_models](top_f1_models/README.md)**: Modules for ED25519 signature verification, CPU modeling, and PCIe transaction testing with a Makefile for simulation.
+- **[ed25519_point_add](ed25519_point_add/README.md)**: The `ed25519_point_add` folder in the `firedancer` codebase contains a `Makefile` for simulating the ED25519 point addition module using Verilog and Questa, and a `test.py` script for verifying the module's functionality with cocotb.
+- **[ed25519_point_dbl](ed25519_point_dbl/README.md)**: The `ed25519_point_dbl` folder in the `firedancer` codebase contains configuration and testing files for simulating and verifying the ED25519 point doubling operation in a hardware design using Verilog and cocotb.
+- **[ed25519_sigverify_0](ed25519_sigverify_0/README.md)**: The `ed25519_sigverify_0` folder in the `firedancer` codebase contains a `Makefile` for configuring and running Verilog simulations and a `test.py` file for cocotb-based testing of the `ed25519_sigverify_0` module.
+- **[ed25519_sigverify_1](ed25519_sigverify_1/README.md)**: The `ed25519_sigverify_1` folder in the `firedancer` codebase contains a `Makefile` for building a simulation environment and a `test.py` script for testing the ED25519 signature verification module.
+- **[mul_wide](mul_wide/README.md)**: The `mul_wide` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog module using Questa and a `test.py` script for testing wide multiplication functionality with cocotb.
+- **[schl_cpu](schl_cpu/README.md)**: The `schl_cpu` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog-based CPU module with Questa and a `test.py` script for verifying the CPU simulation using the cocotb framework.
+- **[sha512_modq_meta](sha512_modq_meta/README.md)**: The `sha512_modq_meta` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog module using Questa and a `test.py` script for cocotb-based testing of SHA-512 modulo Q metadata processing in hardware design.
+- **[sha512_pre](sha512_pre/README.md)**: The `sha512_pre` folder in the `firedancer` codebase contains configuration and testing scripts for simulating and verifying the SHA-512 preprocessing logic using Verilog and cocotb.
+- **[top_f1](top_f1/README.md)**: The `top_f1` folder in the `firedancer` codebase contains a `Makefile` for configuring and building a Verilog simulation environment with Questa, and a `test.py` file for simulating and verifying hardware design behavior using cocotb.
+- **[top_f1_models](top_f1_models/README.md)**: The `top_f1_models` folder in the `firedancer` codebase contains SystemVerilog modules and a cocotb-based test script for simulating and verifying hardware designs related to Ed25519 signature verification, hash data processing, and includes a Makefile for building the simulation environment.
 
 ## Files
-- **[README.md](README.md.md)**: Simulations for RTL verification and testing using Cocotb v1.7.2 and Questa v2019.4.
+- **[README.md](README.md.md)**: The `README.md` file provides instructions for running simulations for RTL verification and testing using Cocotb and Questa within the `firedancer` codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

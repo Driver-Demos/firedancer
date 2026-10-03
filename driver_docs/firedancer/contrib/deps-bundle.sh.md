@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Creates a redistributable bundle of build dependencies using Zstandard compression and GNU tar.
+Creates a compressed tar bundle of build dependencies from ./opt.
 
 # Purpose
-The `deps-bundle.sh` script is a Bash script that creates a redistributable bundle of build dependencies. It is intended to simplify the build process by packaging necessary static libraries and include files into a compressed archive named `deps-bundle.tar.zst`. This script requires a recent compiler and linker, along with the Zstandard compression tool and GNU tar, to function. Before running this script, users must create a dependency prefix at `./opt` using another script named `deps.sh`. The resulting bundle is approximately 13 MB in size and can be stored in blob storage systems like Git LFS.
+A Bash script creates a redistributable dependency bundle for a build environment. It removes any existing `deps-bundle.tar.zst`, then uses GNU `tar` with `zstd` compression to package the `./opt/include` and `./opt/lib` trees, plus selected `bzip2` source files under `./opt/git/bzip2`. The script is intended to work after `deps.sh` has created the dependency prefix in `./opt`, so the bundle contains only static libraries and header files for later use.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

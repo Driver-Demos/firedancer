@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the `fdctl_shared` library and its components in a Linux environment.
+Build rules for fdctl_shared, unit tests, fuzz tests, and command objects.
 
 # Purpose
-The provided content is a Makefile script used to automate the build process for a software project. It includes conditional compilation directives, such as `ifdef FD_HAS_HOSTED`, `ifdef FD_HAS_LINUX`, and `ifdef FD_HAS_INT128`, which ensure that the build process only proceeds if certain conditions are met. The script defines a shared library target `fdctl_shared` and adds various object files to this target using the `add-objs` function. These object files include components for configuration parsing, object callbacks, unit tests, and various command implementations. Additionally, the script includes targets for unit tests and fuzz tests, such as `test_config_parse` and `fuzz_fdctl_config`, which are executed to verify the functionality and robustness of the code.
+This build file defines the `fdctl_shared` library and adds the source objects that belong to it under the `FD_HAS_HOSTED`, `FD_HAS_LINUX`, and `FD_HAS_INT128` build conditions. It also defines and runs the `test_config_parse` unit test, and defines the `fuzz_fdctl_config` fuzz test, both linked with the shared `fdctl` support libraries. The file then lists the object files for the boot code and for each `fdctl` command module, including help, keys, metrics, network configuration, identity, version, system configuration, monitoring, watch, and run support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

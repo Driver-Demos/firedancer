@@ -3,41 +3,55 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header-only API for fast manipulation of versioned offsets using atomic operation-friendly types.
+The `fd_voff.c` file provides a header-only API for efficiently manipulating versioned offsets using atomic operation-friendly unsigned integers, which are useful for building interprocess lock-free algorithms.
 
 # Purpose
-The code defines a header-only API for manipulating versioned offsets, which are useful in interprocess lock-free algorithms. The API allows users to define a custom type for versioned offsets by specifying a name through the [`VOFF_NAME`](<#voff_name>) macro. The versioned offset is represented as a pair of version and offset packed into a single unsigned integer type, which is atomic operation friendly. The code provides macros and functions to define the bit width for the version and offset, calculate their maximum values, and pack and unpack the version and offset from the custom type.
+This C header file provides a template for creating a header-only API designed for efficient manipulation of versioned offsets, which are useful in developing interprocess lock-free algorithms. The code is structured to allow users to define their own versioned offset types by specifying a name and optionally customizing the underlying data type and version bit width. The template uses preprocessor directives to generate a set of functions and type definitions that facilitate packing and unpacking version and offset values into a single atomic operation-friendly unsigned integer type. This approach allows for efficient handling of versioned data, which is critical in concurrent programming scenarios where atomicity and performance are paramount.
 
-The API is designed to be flexible and efficient, allowing users to specify the underlying type (`VOFF_TYPE`) and the bit width for the version (`VOFF_VER_WIDTH`). By default, `VOFF_TYPE` is set to `ulong`, and `VOFF_VER_WIDTH` is set to 20 bits, leaving the remaining bits for the offset. The code includes inline functions to retrieve the bit widths and maximum values for the version and offset, as well as to pack and unpack these values into and from the custom type. The design ensures that the API is safe for multiple inclusions and can be fine-tuned for specific use cases.
+The file defines a set of macros and inline functions that provide the core functionality for managing versioned offsets. Key components include the definition of a custom type for the versioned offset, functions to retrieve the bit widths and maximum values for versions and offsets, and functions to pack and unpack version and offset values. The use of macros allows for flexibility and reusability, enabling developers to easily integrate this functionality into their projects by simply defining a name and including the template. This design pattern ensures that the code is safe for multiple inclusions and can be fine-tuned to meet specific requirements, making it a versatile tool for developers working on concurrent systems.
+# Global Variables
+
+---
+### VER\_WIDTH
+- **Type**: `enum constant`
+- **Description**: `VER_WIDTH` is an enumerated constant that represents the bit width allocated for the version component in a versioned offset system. It is defined as `VOFF_VER_WIDTH`, which defaults to 20 bits, allowing for a maximum version number of 2^20-1.
+- **Use**: `VER_WIDTH` is used to determine the number of bits dedicated to the version part of a versioned offset, facilitating atomic operations in interprocess lock-free algorithms.
+
+
+---
+### VOFF\_
+- **Type**: `enum`
+- **Description**: The `VOFF_` variable is an enumeration that defines constants for version and offset bit widths used in a versioned offset system. It is part of a header-only API designed for fast manipulation of versioned offsets, which are useful in interprocess lock-free algorithms.
+- **Use**: This variable is used to define the bit widths for version and offset in a versioned offset system, facilitating atomic operations.
+
+
 # Functions
 
 ---
 ### VOFF\_<!-- {{#callable:VOFF_}} -->
-[View Source →](<../../../../../src/util/tmpl/fd_voff.c#L72>)
-
-Extracts the offset component from a versioned offset by right-shifting the input value.
+The `VOFF_(off)` function extracts the offset component from a versioned offset by shifting the input value to the right by the number of bits allocated for the version.
 - **Inputs**:
-    - ``voff``: A versioned offset of type `VOFF_(t)` from which the offset component is extracted.
-- **Logic and Control Flow**:
-    - Right-shift the input `voff` by `VOFF_VER_WIDTH` bits to isolate the offset component.
-- **Output**: Returns the offset component of the versioned offset as a `VOFF_TYPE`.
-- **Functions Called**:
-    - [`VOFF_`](<#voff_>)
+    - `voff`: A versioned offset of type `VOFF_(t)`, which is a packed representation of a version and an offset.
+- **Control Flow**:
+    - The function takes a versioned offset `voff` as input.
+    - It performs a right bitwise shift on `voff` by `VOFF_VER_WIDTH` bits, effectively discarding the version bits and isolating the offset bits.
+    - The result of the shift operation is returned as the offset component.
+- **Output**: The function returns the offset component of the versioned offset, which is of type `VOFF_TYPE`.
+- **Functions called**:
+    - [`VOFF_`](#voff_)
 
 
 ---
 ### VOFF\_NAME<!-- {{#callable:VOFF_NAME}} -->
-[View Source →](<../../../../../src/util/tmpl/fd_voff.c#L65>)
-
-Packs the least significant bits of a version and offset into a single `VOFF_TYPE` value.
+The `VOFF_NAME` function combines a version and an offset into a single packed value using bit manipulation.
 - **Inputs**:
-    - `ver`: The version value to pack, of type `VOFF_TYPE`.
-    - `off`: The offset value to pack, of type `VOFF_TYPE`.
-- **Logic and Control Flow**:
-    - Masks the `ver` value to retain only the least significant bits as defined by `VOFF_VER_WIDTH`.
-    - Shifts the `off` value left by `VOFF_VER_WIDTH` bits.
-    - Combines the masked `ver` and shifted `off` using a bitwise OR operation to produce the packed result.
-- **Output**: Returns a `VOFF_TYPE` value that combines the version and offset.
+    - `ver`: The version component, represented as a `VOFF_TYPE`, which is typically an unsigned long integer.
+    - `off`: The offset component, also represented as a `VOFF_TYPE`, which is typically an unsigned long integer.
+- **Control Flow**:
+    - The function first masks the `ver` input to ensure it only uses the least significant bits up to `VOFF_VER_WIDTH` by performing a bitwise AND with a mask created by shifting 1 left by `VOFF_VER_WIDTH` and subtracting 1.
+    - The function then shifts the `off` input left by `VOFF_VER_WIDTH` bits to position it correctly in the packed value.
+    - Finally, the function combines the masked `ver` and shifted `off` using a bitwise OR operation to produce the packed result.
+- **Output**: The function returns a `VOFF_(t)` type, which is a packed representation of the version and offset as a single unsigned integer.
 
 
 

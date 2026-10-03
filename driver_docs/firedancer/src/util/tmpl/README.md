@@ -3,72 +3,72 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Templates and tests for high-performance data structures and algorithms, including maps, queues, trees, and sets.
+Data structure templates and tests for maps, sets, queues, trees, pools, sorting, and vectors.
 
 
 ## Files
-- **[fd_bplus.c](fd_bplus.c.md)**: Generates prototypes and implementations for a high-performance B+ tree-based key-value store with various operations and configurations.
-- **[fd_deque.c](fd_deque.c.md)**: Functions for a single-threaded, fixed-capacity, high-performance deque using a circular buffer.
-- **[fd_deque_dynamic.c](fd_deque_dynamic.c.md)**: Functions for a single-threaded, fixed-capacity, high-performance double-ended queue (deque) implementation.
-- **[fd_dlist.c](fd_dlist.c.md)**: Generates prototypes, inlines, and implementations for high-performance computing doubly linked lists.
-- **[fd_heap.c](fd_heap.c.md)**: Generates high-performance, zero-copy heap implementations for non-sequential memory storage.
-- **[fd_map.c](fd_map.c.md)**: Implements ultra high performance dynamic key-value maps with compile-time bounded size and static inline APIs.
-- **[fd_map.h](fd_map.h.md)**: Defines error codes, flags, and a function for map operations in the Firedancer utility library.
-- **[fd_map_chain.c](fd_map_chain.c.md)**: Generates high-performance map implementations using hash chains, supporting various configurations and operations.
-- **[fd_map_chain_para.c](fd_map_chain_para.c.md)**: Generates prototypes, inlines, and implementations for concurrent persistent shared maps using chaining, supporting high concurrency and low conflict risk.
-- **[fd_map_dynamic.c](fd_map_dynamic.c.md)**: Implements ultra high performance dynamic key-value maps with bounded runtime size and various operations.
-- **[fd_map_giant.c](fd_map_giant.c.md)**: Generates high-performance dynamic key-value maps of large size with features for persistence, concurrency, and memory efficiency.
-- **[fd_map_perfect.c](fd_map_perfect.c.md)**: Macros and functions for creating compile-time perfect hash tables with error checking for hash function validity.
-- **[fd_map_slot_para.c](fd_map_slot_para.c.md)**: Prototypes, inlines, and implementations for concurrent persistent shared maps using linear probing and cuckoo hashing techniques.
-- **[fd_map_util.c](fd_map_util.c.md)**: Maps error codes to error message strings for the fd_map module.
-- **[fd_pool.c](fd_pool.c.md)**: Header-only library for creating and managing object pools with a bounded maximum size for high-performance IPC.
-- **[fd_pool_para.c](fd_pool_para.c.md)**: Generates prototypes and implementations for concurrent shared element pools using a lock-free stack.
-- **[fd_prq.c](fd_prq.c.md)**: Header-only template for ultra high performance priority queues with customizable event types and timeouts.
-- **[fd_queue.c](fd_queue.c.md)**: Implements a single-threaded, compile-time fixed-capacity queue for high-performance contexts.
-- **[fd_queue_dynamic.c](fd_queue_dynamic.c.md)**: Functions for a single-threaded, fixed-capacity queue optimized for high-performance contexts.
-- **[fd_redblack.c](fd_redblack.c.md)**: Functions for a single-threaded, fixed-capacity red-black tree with operations like insert, remove, and find.
-- **[fd_set.c](fd_set.c.md)**: Functions for fast manipulation of large, interprocess-shared index sets with compile-time bounded elements.
-- **[fd_set_dynamic.c](fd_set_dynamic.c.md)**: Functions for fast manipulation of interprocess shared index sets with a large runtime-bounded number of elements.
-- **[fd_slist.c](fd_slist.c.md)**: Generates prototypes, inlines, and implementations for high-performance singly linked lists with various operations and memory efficiency features.
-- **[fd_smallset.c](fd_smallset.c.md)**: Header-only API for fast manipulation of index sets using primitive unsigned integer types.
-- **[fd_sort.c](fd_sort.c.md)**: A template for generating single-threaded and parallel sorting functions for POD types, with customizable sorting criteria and performance optimizations.
-- **[fd_stack.c](fd_stack.c.md)**: Functions for a single-threaded, fixed-capacity stack optimized for high-performance contexts.
-- **[fd_treap.c](fd_treap.c.md)**: Generates high-performance treap data structures, combining binary search trees and heaps, with customizable API options.
-- **[fd_vec.c](fd_vec.c.md)**: Header-only library for vectors with bounded run-time maximum size, suitable for persistent and IPC usage.
-- **[fd_voff.c](fd_voff.c.md)**: Header-only API for fast manipulation of versioned offsets using atomic operation-friendly types.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for various data structures in `fd_util`.
-- **[test_bplus.c](test_bplus.c.md)**: Unit tests for B+ tree operations, including insertion, deletion, and querying, using a custom memory allocator.
-- **[test_deque.c](test_deque.c.md)**: Tests for deque operations, including push, pop, and iteration, with boundary condition checks.
-- **[test_deque_dynamic.c](test_deque_dynamic.c.md)**: Tests dynamic deque operations and boundary conditions in the Firedancer codebase.
-- **[test_dlist.c](test_dlist.c.md)**: Tests for doubly linked list operations and memory pool management in the Firedancer codebase.
-- **[test_heap.c](test_heap.c.md)**: Tests for heap and pool data structures, including operations like insert, remove, and verify.
-- **[test_map.c](test_map.c.md)**: Tests for map data structure operations, including insertion, deletion, and key-value integrity checks.
-- **[test_map_chain.c](test_map_chain.c.md)**: Tests for map chain functionality, including insertion, deletion, iteration, and verification of map elements.
-- **[test_map_chain_multi.c](test_map_chain_multi.c.md)**: Tests for multi-key map chaining functionality using a custom pair structure and random data.
-- **[test_map_chain_para.c](test_map_chain_para.c.md)**: Tests for concurrent operations and error handling on a parallel map and pool implementation.
-- **[test_map_dynamic.c](test_map_dynamic.c.md)**: Tests for dynamic map operations, including insertion, deletion, and validation of key-value pairs.
-- **[test_map_giant.c](test_map_giant.c.md)**: Tests for the `fd_map_giant` implementation, including insertion, deletion, and iteration of map elements.
-- **[test_map_giant_concur.c](test_map_giant_concur.c.md)**: Tests concurrent operations on a giant map data structure using multiple threads.
-- **[test_map_giant_mem.c](test_map_giant_mem.c.md)**: Tests the functionality and performance of a giant memory map implementation using randomized operations.
-- **[test_map_perfect.c](test_map_perfect.c.md)**: Tests for perfect hash maps with various key types and values, including AVX512 optimizations.
-- **[test_map_slot_para.c](test_map_slot_para.c.md)**: Tests for concurrent operations and error handling on a custom map data structure using multiple tiles.
-- **[test_pool.c](test_pool.c.md)**: Tests for the `mypool` memory pool implementation, including construction, operations, and deconstruction.
-- **[test_pool_para.c](test_pool_para.c.md)**: Tests for concurrent acquire and release operations on a memory pool with error handling and logging.
-- **[test_prq.c](test_prq.c.md)**: Tests for priority queue implementations with different sorting criteria and operations.
-- **[test_queue.c](test_queue.c.md)**: Tests the functionality of a queue implementation with operations like push, pop, and zero-copy access.
-- **[test_queue_dynamic.c](test_queue_dynamic.c.md)**: Tests dynamic queue operations with various push and pop methods, including zero-copy operations.
-- **[test_redblack.c](test_redblack.c.md)**: Tests for red-black tree operations including insertion, deletion, and verification.
-- **[test_redblack2.c](test_redblack2.c.md)**: Unit tests for red-black tree operations, including insertion, deletion, and permutation tests.
-- **[test_set.c](test_set.c.md)**: Tests for set operations, including creation, manipulation, and validation of sets with various operations.
-- **[test_set_dynamic.c](test_set_dynamic.c.md)**: Tests for dynamic set operations, including creation, manipulation, and validation of sets.
-- **[test_slist.c](test_slist.c.md)**: Tests for singly linked list operations and memory pool management in the Firedancer codebase.
-- **[test_smallset.c](test_smallset.c.md)**: Tests for the `fd_smallset` implementation, verifying set operations and properties.
-- **[test_sort.c](test_sort.c.md)**: Tests for various sorting algorithms, including insertion, stable, and in-place sorts, using random data.
-- **[test_sort_para.c](test_sort_para.c.md)**: Tests parallel sorting algorithms using various data configurations and thread pools.
-- **[test_stack.c](test_stack.c.md)**: Tests stack operations including push, pop, and zero-copy methods with a buffer and scratch space.
-- **[test_treap.c](test_treap.c.md)**: Tests for treap data structure operations, including insertion, deletion, iteration, and merging.
-- **[test_vec.c](test_vec.c.md)**: Tests for the `myvec` vector implementation, including operations like expand, contract, and remove.
-- **[test_voff.c](test_voff.c.md)**: Tests for `my_voff` and `my_voff1` version and offset width functionality using static assertions and random values.
+- **[fd_bplus.c](fd_bplus.c.md)**: The `fd_bplus.c` file in the `firedancer` codebase provides a high-performance implementation of a B+ tree-based key-value store, supporting operations such as insertion, deletion, querying, and iteration with efficient memory management and concurrency capabilities.
+- **[fd_deque.c](fd_deque.c.md)**: The `fd_deque.c` file in the `firedancer` codebase implements a high-performance, single-threaded, fixed-capacity double-ended queue (deque) using a circular buffer, providing a comprehensive API for operations such as pushing, popping, and iterating over elements.
+- **[fd_deque_dynamic.c](fd_deque_dynamic.c.md)**: The `fd_deque_dynamic.c` file in the `firedancer` codebase implements a high-performance, single-threaded, fixed-capacity double-ended queue (deque) with various operations for managing elements, including pushing, popping, peeking, and iterating over elements.
+- **[fd_dlist.c](fd_dlist.c.md)**: The `fd_dlist.c` file in the `firedancer` codebase provides a template for creating high-performance, doubly linked lists with operations that are generally O(1) in time complexity and designed for efficient memory usage, supporting features like inter-process usage, memory relocation, and serialization.
+- **[fd_heap.c](fd_heap.c.md)**: The `fd_heap.c` file in the `firedancer` codebase provides a template for generating high-performance, zero-copy heap data structures that support non-sequential memory storage, inter-process usage, and efficient memory operations, with customizable element types and comparison functions.
+- **[fd_map.c](fd_map.c.md)**: Header-only template for bounded open-addressing key-value maps with insert, remove, and query.
+- **[fd_map.h](fd_map.h.md)**: Common map error codes, flags, and an error-string function prototype.
+- **[fd_map_chain.c](fd_map_chain.c.md)**: Hash-chain map templates with insert, remove, query, iteration, verify, and optional multi-key support.
+- **[fd_map_chain_para.c](fd_map_chain_para.c.md)**: Concurrent persistent chained map generator with transactions, iteration, and verification.
+- **[fd_map_dynamic.c](fd_map_dynamic.c.md)**: The `fd_map_dynamic.c` file in the `firedancer` codebase provides a template for creating ultra high-performance dynamic key-value maps with bounded runtime size, offering a variety of static inline APIs for map management, including insertion, removal, querying, and memory management.
+- **[fd_map_giant.c](fd_map_giant.c.md)**: Header-only giant dynamic key-value map with IPC, persistence, and iteration support.
+- **[fd_map_perfect.c](fd_map_perfect.c.md)**: The `fd_map_perfect.c` file in the `firedancer` codebase provides macros and functions for creating ultra high-performance compile-time perfect hash tables, supporting both key-value maps and sets for efficient containment queries.
+- **[fd_map_slot_para.c](fd_map_slot_para.c.md)**: Header-only template for concurrent persistent shared maps with linear probing and version locks.
+- **[fd_map_util.c](fd_map_util.c.md)**: Maps fd_map error codes to short error strings.
+- **[fd_pool.c](fd_pool.c.md)**: Static inline APIs for bounded shared-memory object pools with acquire and release operations.
+- **[fd_pool_para.c](fd_pool_para.c.md)**: Concurrent persistent shared element pool APIs with lock-free acquire and release.
+- **[fd_prq.c](fd_prq.c.md)**: The `fd_prq.c` file in the `firedancer` codebase provides a template for creating ultra high performance priority queues with bounded run-time size, offering static inline APIs for operations such as insertion, removal, and memory management.
+- **[fd_queue.c](fd_queue.c.md)**: The `fd_queue.c` file in the `firedancer` codebase implements a family of functions for a single-threaded, compile-time fixed-capacity queue designed for high-performance contexts, providing both simple and advanced APIs for queue operations without error checking.
+- **[fd_queue_dynamic.c](fd_queue_dynamic.c.md)**: The `fd_queue_dynamic.c` file in the `firedancer` codebase implements a family of functions for a single-threaded, high-performance, fixed-capacity queue, providing both simple and advanced APIs for queue operations without error checking.
+- **[fd_redblack.c](fd_redblack.c.md)**: Single-threaded fixed-capacity red-black tree with pool allocation and search, insert, remove, verify APIs.
+- **[fd_set.c](fd_set.c.md)**: Bitset operations for shared-memory index sets with iteration, set algebra, and range APIs.
+- **[fd_set_dynamic.c](fd_set_dynamic.c.md)**: The `fd_set_dynamic.c` file in the `firedancer` codebase provides a template for implementing fast manipulation of index sets that can be shared between processes, optimized for dense sets with a large maximum number of elements.
+- **[fd_slist.c](fd_slist.c.md)**: Template for intrusive singly linked lists with pool-based index operations and iteration.
+- **[fd_smallset.c](fd_smallset.c.md)**: The `fd_smallset.c` file in the `firedancer` codebase provides a header-only API for efficient manipulation of index sets using a primitive unsigned integer type, supporting operations such as set construction, boolean operations, unary and binary operations, iteration, and range-based operations.
+- **[fd_sort.c](fd_sort.c.md)**: Template for stable, in-place, selection, search, and parallel sorting functions.
+- **[fd_stack.c](fd_stack.c.md)**: The `fd_stack.c` file in the `firedancer` codebase provides a template for implementing a high-performance, single-threaded, fixed-capacity stack with various operations such as push, pop, and advanced zero-copy usage, designed for contexts where error checking is not performed for performance reasons.
+- **[fd_treap.c](fd_treap.c.md)**: Template for high-performance treaps with queries, insert, remove, merge, iteration, and verification.
+- **[fd_vec.c](fd_vec.c.md)**: The `fd_vec.c` file in the `firedancer` codebase provides a template for creating vectors of bounded run-time maximum size, designed for persistent and IPC usage with POD types, offering various operations such as creation, joining, expansion, contraction, and element removal.
+- **[fd_voff.c](fd_voff.c.md)**: The `fd_voff.c` file provides a header-only API for efficiently manipulating versioned offsets using atomic operation-friendly unsigned integers, which are useful for building interprocess lock-free algorithms.
+- **[Local.mk](Local.mk.md)**: Build rules and unit tests for utility data structure headers and objects.
+- **[test_bplus.c](test_bplus.c.md)**: The `test_bplus.c` file in the `firedancer` codebase contains a comprehensive set of unit tests for a B+ tree implementation, including tests for construction, insertion, querying, removal, and various operations on the tree.
+- **[test_deque.c](test_deque.c.md)**: The `test_deque.c` file in the `firedancer` codebase implements a comprehensive test suite for a deque data structure, including various operations such as push, pop, and iteration, while also verifying boundary conditions and handling invalid arguments.
+- **[test_deque_dynamic.c](test_deque_dynamic.c.md)**: The `test_deque_dynamic.c` file in the `firedancer` codebase provides a comprehensive test suite for a dynamic deque implementation, including operations such as push, pop, and iteration, while also handling edge cases and boundary conditions.
+- **[test_dlist.c](test_dlist.c.md)**: The `test_dlist.c` file in the `firedancer` codebase provides a comprehensive test suite for doubly linked list operations, including initialization, insertion, removal, and iteration, while also verifying the integrity of these operations through various test cases and boundary condition checks.
+- **[test_heap.c](test_heap.c.md)**: The `test_heap.c` file in the `firedancer` codebase contains a comprehensive test suite for heap operations, including insertion, removal, and validation of heap properties, using a custom data structure and memory pool.
+- **[test_map.c](test_map.c.md)**: The `test_map.c` file in the `firedancer` codebase tests the functionality of a map data structure, including insertion, deletion, and querying of key-value pairs, with additional checks for memory alignment and handling of edge cases.
+- **[test_map_chain.c](test_map_chain.c.md)**: Tests map chain insertion, removal, query, iteration, and verification with pool-backed elements.
+- **[test_map_chain_multi.c](test_map_chain_multi.c.md)**: The `test_map_chain_multi.c` file in the `firedancer` codebase is a test program that verifies the functionality of a multi-key map data structure, including operations such as insertion, deletion, and iteration over elements.
+- **[test_map_chain_para.c](test_map_chain_para.c.md)**: The `test_map_chain_para.c` file in the `firedancer` codebase is a comprehensive test suite for concurrent operations on a map data structure, including initialization, transaction handling, and parallel iteration, using a custom element pool and shared memory allocation.
+- **[test_map_dynamic.c](test_map_dynamic.c.md)**: Tests dynamic map insert, query, remove, and error handling.
+- **[test_map_giant.c](test_map_giant.c.md)**: The `test_map_giant.c` file in the `firedancer` codebase is a test suite for verifying the functionality and integrity of a map data structure, including operations such as insertion, deletion, and iteration, while also handling edge cases and logging critical errors.
+- **[test_map_giant_concur.c](test_map_giant_concur.c.md)**: The `test_map_giant_concur.c` file in the `firedancer` codebase tests the concurrent operations of a map data structure using multiple threads to ensure correctness and performance under high iteration counts.
+- **[test_map_giant_mem.c](test_map_giant_mem.c.md)**: The `test_map_giant_mem.c` file in the `firedancer` codebase is a test program that verifies the functionality of a map data structure, including operations such as insertion, deletion, and iteration, using randomized test cases.
+- **[test_map_perfect.c](test_map_perfect.c.md)**: The `test_map_perfect.c` file in the `firedancer` codebase contains tests for various perfect hash maps, including those for prime numbers, primitive roots, permutations, and AVX512-based operations.
+- **[test_map_slot_para.c](test_map_slot_para.c.md)**: The `test_map_slot_para.c` file in the `firedancer` codebase is a test suite for concurrent operations on a hash map implementation, verifying its functionality and robustness under various conditions and configurations.
+- **[test_pool.c](test_pool.c.md)**: The `test_pool.c` file in the `firedancer` codebase contains a comprehensive test suite for a memory pool implementation, including tests for construction, special values, conversions, accessors, operations, and deconstruction, with additional checks for error handling and logging.
+- **[test_pool_para.c](test_pool_para.c.md)**: Unit tests for fd_pool_para construction, accessors, conversion, locking, and concurrent acquire/release.
+- **[test_prq.c](test_prq.c.md)**: The `test_prq.c` file in the `firedancer` codebase contains tests for priority queue implementations, including event queues, max queues, and implicit queues, verifying their construction, insertion, removal, and order maintenance functionalities.
+- **[test_queue.c](test_queue.c.md)**: The `test_queue.c` file in the `firedancer` codebase implements a test suite for a queue data structure, verifying its construction, accessors, and various operations such as push, pop, and zero-copy push/pop.
+- **[test_queue_dynamic.c](test_queue_dynamic.c.md)**: The `test_queue_dynamic.c` file in the `firedancer` codebase tests the functionality of a dynamic queue implementation, including operations such as push, pop, and zero-copy push/pop, while ensuring alignment and footprint constraints are met.
+- **[test_redblack.c](test_redblack.c.md)**: Red-black tree tests for insert, replace, remove, search, traversal, and pool relocation.
+- **[test_redblack2.c](test_redblack2.c.md)**: The `test_redblack2.c` file in the `firedancer` codebase contains a suite of unit tests for verifying the functionality of a red-black tree implementation, including tests for tree creation, insertion, deletion, and various tree properties.
+- **[test_set.c](test_set.c.md)**: Tests set operations, iteration, ranges, and invalid index handling.
+- **[test_set_dynamic.c](test_set_dynamic.c.md)**: The `test_set_dynamic.c` file in the `firedancer` codebase contains a comprehensive test suite for dynamic set operations, including creation, manipulation, and validation of sets, as well as testing various set operations like union, intersection, and complement.
+- **[test_slist.c](test_slist.c.md)**: Tests pool and singly linked list operations, iterators, verify, and boundary cases.
+- **[test_smallset.c](test_smallset.c.md)**: The `test_smallset.c` file contains a comprehensive suite of tests for the `fd_smallset` module, verifying the functionality of set operations such as union, intersection, complement, and range manipulation within the `firedancer` codebase.
+- **[test_sort.c](test_sort.c.md)**: The `test_sort.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various sorting algorithms, including insertion sort, stable sort, and in-place sort, for both ascending and descending order using floating-point numbers.
+- **[test_sort_para.c](test_sort_para.c.md)**: The `test_sort_para.c` file in the `firedancer` codebase tests various parallel sorting algorithms on arrays of floats, using a thread pool to manage concurrency and verifying the correctness of the sorting operations through multiple test cases.
+- **[test_stack.c](test_stack.c.md)**: The `test_stack.c` file in the `firedancer` codebase tests the functionality of a stack implementation, including operations such as push, pop, and zero-copy push/pop, while ensuring alignment and footprint constraints are met.
+- **[test_treap.c](test_treap.c.md)**: Tests treap and lreap insert, remove, query, iteration, merge, and duplicate handling.
+- **[test_vec.c](test_vec.c.md)**: The `test_vec.c` file is a test suite for the `myvec` vector implementation, verifying its functionality through various operations such as expansion, contraction, and element removal.
+- **[test_voff.c](test_voff.c.md)**: The `test_voff.c` file in the `firedancer` codebase tests the functionality of versioned offsets (`voff`) with different configurations, ensuring correct version and offset width handling through assertions and random value checks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

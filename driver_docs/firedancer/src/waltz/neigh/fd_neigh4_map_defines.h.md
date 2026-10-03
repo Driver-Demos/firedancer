@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines macros for a hash map with specific types and a hash function for IPv4 addresses.
+The `fd_neigh4_map_defines.h` file defines macros for a hash map implementation, specifying the map name, element type, key type, key, and key hash function.
 
 # Purpose
-This code defines a set of macros for configuring a hash map in C. The macro `MAP_NAME` specifies the name of the hash map as `fd_neigh4_hmap`. The macro `MAP_ELE_T` defines the type of elements stored in the map as `fd_neigh4_entry_t`. The macro `MAP_KEY_T` sets the type of the key used in the map as `uint`, and `MAP_KEY` specifies the key field within the element as `ip4_addr`. The macro `MAP_KEY_HASH` provides a hashing function for the key, which combines the dereferenced key value with a seed using the `fd_uint_hash` function. These macros are likely used to configure a generic hash map implementation.
+This code is a configuration header file for a hash map implementation in C, specifically tailored for handling IPv4 neighbor entries. It defines several macros that configure the hash map's characteristics, such as `MAP_NAME` for the map's identifier, `MAP_ELE_T` for the type of elements stored in the map, and `MAP_KEY_T` for the type of the keys, which are unsigned integers (`uint`). The `MAP_KEY` macro specifies that the key is an IPv4 address (`ip4_addr`), and `MAP_KEY_HASH` defines a hashing function that combines the key and a seed using a bitwise XOR operation, followed by a call to `fd_uint_hash` to generate a hash value. This setup is likely part of a larger system for managing network neighbor information efficiently.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SHA-256 hashing, batch AVX/AVX512, test vectors, fuzzing, and benchmarks.
+SHA-256 APIs, constants, batch AVX code, tests, fuzzing, and CAVP vectors.
 
 ## Folders
-- **[cavp](cavp/README.md)**: SHA-256 Monte Carlo and short message test vectors for byte-oriented implementations.
+- **[cavp](cavp/README.md)**: SHA-256 Monte Carlo and short message test vectors.
 
 ## Files
-- **[fd_sha256.c](fd_sha256.c.md)**: Implements SHA-256 hashing functions with support for initialization, appending, and finalizing hashes.
-- **[fd_sha256.h](fd_sha256.h.md)**: APIs and data structures for SHA-256 hashing, including batch processing with AVX and AVX-512 support.
-- **[fd_sha256_batch_avx.c](fd_sha256_batch_avx.c.md)**: Implements a batched SHA-256 hashing function optimized for AVX SIMD instructions.
-- **[fd_sha256_batch_avx512.c](fd_sha256_batch_avx512.c.md)**: Implements SHA-256 batch processing using AVX512 and AVX SIMD optimizations.
-- **[fd_sha256_constants.h](fd_sha256_constants.h.md)**: SHA-256 constants for use in cryptographic computations, including initial hash values and round constants.
-- **[fd_sha256_test_vector.c](fd_sha256_test_vector.c.md)**: Test vectors for SHA-256 computed using OpenSSL on randomly generated text strings.
-- **[fuzz_sha256.c](fuzz_sha256.c.md)**: Fuzz testing for SHA-256 hashing functions with single and batch message processing.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing SHA-256 components with optional AVX and AVX512 optimizations.
-- **[test_sha256.c](test_sha256.c.md)**: Tests and benchmarks for the SHA-256 implementation, including single, incremental, and batched hashing.
+- **[fd_sha256.c](fd_sha256.c.md)**: SHA-256 init, update, finalize, one-shot hash, and repeated 32-byte hash functions.
+- **[fd_sha256.h](fd_sha256.h.md)**: SHA-256 hashing APIs, state layout, and batch hashing helpers.
+- **[fd_sha256_batch_avx.c](fd_sha256_batch_avx.c.md)**: AVX batched SHA-256 hashing with tail padding and result stores
+- **[fd_sha256_batch_avx512.c](fd_sha256_batch_avx512.c.md)**: AVX-512 batched SHA-256 with fallback to narrower AVX for small batches.
+- **[fd_sha256_constants.h](fd_sha256_constants.h.md)**: SHA-256 round constants and initial hash values.
+- **[fd_sha256_test_vector.c](fd_sha256_test_vector.c.md)**: The `fd_sha256_test_vector.c` file in the `firedancer` codebase contains a set of predefined SHA-256 test vectors, which were generated using OpenSSL on various randomly generated text strings.
+- **[fuzz_sha256.c](fuzz_sha256.c.md)**: The `fuzz_sha256.c` file in the `firedancer` codebase implements a fuzz testing framework for the SHA-256 hashing algorithm, supporting both single message and batch hashing operations.
+- **[Local.mk](Local.mk.md)**: Build rules for SHA-256 headers, objects, unit test, and fuzz test.
+- **[test_sha256.c](test_sha256.c.md)**: SHA-256 unit tests, batch tests, benchmarks, and large-input verification.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
