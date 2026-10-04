@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Macros for pretty-printing QUIC structures in a formatted and traceable manner.
+The `fd_quic_pretty_print.h` file provides macros for generating pretty-printing functions for QUIC-related data structures in the Firedancer codebase.
 
 # Purpose
-The code provides a set of macros for generating functions that perform pretty-printing of data structures related to QUIC (Quick UDP Internet Connections) protocol. The primary functionality is to format and output the contents of these structures in a human-readable form, likely for debugging or logging purposes. The macros define how to begin and end the pretty-printing function for a given structure, and they specify how to format different types of data elements within the structure, such as integers and arrays.
+This C source code file provides functionality for pretty-printing data structures, specifically tailored for use with QUIC (Quick UDP Internet Connections) protocol data types. The code defines a series of macros that facilitate the generation of formatted output strings, which are useful for debugging or logging purposes. The macros are designed to handle various data types, including unsigned integers and arrays, and they format these data types into human-readable strings. The formatted output is written into a buffer, with careful management of buffer size to prevent overflow.
 
-The code includes macros like `FD_TEMPL_DEF_STRUCT_BEGIN` and `FD_TEMPL_DEF_STRUCT_END` to define the start and end of a pretty-print function for a specific structure. It uses `pretty_print` to format individual elements, with specific macros for different data types and formats, such as `FD_TEMPL_MBR_ELEM`, `FD_TEMPL_MBR_ELEM_VAR`, and `FD_TEMPL_MBR_ELEM_ARRAY`. These macros handle various data types and formats, including unsigned integers and hexadecimal representations. The code is intended to be included in other C files, as indicated by the inclusion of `fd_quic_dft.h`, and it does not define a standalone executable or public API.
+The file is not an executable on its own but rather a utility intended to be included in other C programs, as indicated by the use of macros and the inclusion of a header file (`fd_quic_dft.h`). The macros defined in this file, such as `FD_TEMPL_DEF_STRUCT_BEGIN` and `FD_TEMPL_DEF_STRUCT_END`, are used to wrap the pretty-printing logic for different structures, allowing for flexible and reusable code. This file does not define public APIs or external interfaces directly but provides internal functionality that can be leveraged by other components of a larger system dealing with QUIC protocol data.
 # Imports and Dependencies
 
 ---
