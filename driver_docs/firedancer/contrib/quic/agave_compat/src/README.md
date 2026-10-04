@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for sending data via QUIC and testing QUIC protocol interactions with Solana.
+QUIC interop test and benchmark commands, plus a sender for random-sized data batches.
 
 
 ## Files
-- **[blaster.rs](blaster.rs.md)**: A function to send random-sized data batches to a specified destination using a QUIC connection.
-- **[main.rs](main.rs.md)**: Main entry point for a QUIC test application with commands for blasting, pinging, and benchmarking.
+- **[blaster.rs](blaster.rs.md)**: The `blaster.rs` file in the `firedancer` codebase implements a function to send random-sized batches of predefined data to a specified destination using a QUIC connection.
+- **[main.rs](main.rs.md)**: QUIC interop test and benchmark commands for Firedancer and Agave.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
