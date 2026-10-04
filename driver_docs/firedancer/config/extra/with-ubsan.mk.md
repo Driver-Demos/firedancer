@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configures UBSan with various sanitizers for undefined behavior detection in the build process.
+The `with-ubsan.mk` file in the `firedancer` codebase configures the build system to enable various undefined behavior sanitizers for enhanced error detection during compilation.
 
 # Purpose
-The configuration file sets compiler flags to enable various undefined behavior sanitizers during the build process. The `FD_HAS_UBSAN` and `FD_UNALIGNED_ACCESS_STYLE` variables are defined and added to `CPPFLAGS` to indicate the presence of undefined behavior sanitization and specify the unaligned access style, respectively. The `LDFLAGS` and `CPPFLAGS` are appended with `-fsanitize=undefined` and other specific sanitizers to detect issues such as shift errors, integer division by zero, unreachable code, and various other potential runtime errors. These flags help identify and prevent undefined behavior in the code by enabling runtime checks for a wide range of error conditions.
+The provided content is a configuration snippet, likely from a Makefile, that sets up compiler and linker flags for a C/C++ project to enable various undefined behavior sanitizers. The file defines two variables, `FD_HAS_UBSAN` and `FD_UNALIGNED_ACCESS_STYLE`, and appends them to `CPPFLAGS` to ensure these settings are included during the compilation process. The `LDFLAGS` and `CPPFLAGS` are augmented with `-fsanitize=undefined` and a comprehensive list of specific sanitizers, such as `shift`, `integer-divide-by-zero`, and `null`, among others. These flags are used to detect and report undefined behaviors during runtime, which aids developers in identifying and fixing potential bugs and vulnerabilities in the code. The initial comment suggests a cautionary note about the order of flag application to prevent certain optimizations from overriding the intended settings.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

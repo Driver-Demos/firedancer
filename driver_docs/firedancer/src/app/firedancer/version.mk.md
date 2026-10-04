@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile variables for versioning and Git commit hash retrieval.
+Version variables and the current Git commit hash.
 
 # Purpose
-The file defines versioning information and a commit reference for a software project. It sets the major, minor, and patch version numbers using `VERSION_MAJOR`, `VERSION_MINOR`, and `VERSION_PATCH`, respectively. The `FIREDANCER_CI_COMMIT` variable captures the current Git commit hash using the `git rev-parse HEAD` command, which is useful for tracking the specific state of the codebase in continuous integration processes.
+Defines version metadata for the project by setting the major, minor, and patch numbers to `0`, `1`, and `1`. It also sets `FIREDANCER_CI_COMMIT` to the current Git commit hash by running `git rev-parse HEAD`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

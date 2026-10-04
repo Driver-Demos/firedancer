@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a repair window index with header details including signature, sender, recipient, and timestamp.
+The `repair_window_index.yml` file in the `firedancer` codebase defines a data structure for a window index, including details such as header information, slot, and shred index.
 
 # Purpose
-The metadata defines a `window_index` structure containing a `header` and additional fields. The `header` includes a `signature`, `sender`, `recipient`, `timestamp`, and `nonce`, which are likely used for message verification and tracking. The `slot` and `shred_index` fields provide additional identifiers for data organization or retrieval within a system.
+The file contains metadata for a specific data packet or message within a distributed system or blockchain network. It includes a header with cryptographic details such as a signature, sender, recipient, timestamp, and nonce, which are used for authentication and integrity verification. Additionally, it specifies a slot and shred index, which likely relate to the data's position or sequence within the system's data structure.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
