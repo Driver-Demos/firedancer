@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/wiredancer/sim/mul_wide` directory is configured to simulate a Verilog module named `mul_wide` using the Questa simulator, with source files specified from Xilinx Vivado and a local RTL directory.
+Makefile for simulating Verilog modules with Questa and Cocotb in the mul_wide directory.
 
 # Purpose
-This Makefile is used to automate the simulation of a Verilog hardware design using the Cocotb framework. It specifies the simulator to be used (defaulting to Questa), the module name, the directory for RTL (Register Transfer Level) files, and the top-level module for simulation. It also lists the Verilog source files required for the simulation, including those from the Xilinx Vivado library and custom RTL files. The file concludes by including a Cocotb configuration makefile to integrate with the Cocotb simulation environment.
+The `Makefile` is used to automate the build process for a simulation environment. It sets default values for simulation tools and parameters, such as `SIM` for the simulator and `TOPLEVEL_LANG` for the language, which defaults to Verilog. The file specifies the module to test (`MODULE`), the top-level module (`TOPLEVEL`), and the directory for RTL files (`RTL_DIR`). It also defines the simulation arguments (`SIM_ARGS`) and lists the Verilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files. The `Makefile` includes additional makefile configurations from `cocotb-config` to integrate with the cocotb testing framework.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
