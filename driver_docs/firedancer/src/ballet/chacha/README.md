@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-ChaCha20 block function and RNG implementations with SSE, AVX optimizations, tests, and build scripts.
+ChaCha block functions, RNG APIs, SIMD refill routines, and tests.
 
 
 ## Files
-- **[fd_chacha.c](fd_chacha.c.md)**: Reference implementation of the ChaCha20 block function with functions for 8 and 20 round variants.
-- **[fd_chacha.h](fd_chacha.h.md)**: Defines constants and functions for the ChaCha20 block cipher, including block and key sizes.
-- **[fd_chacha_rng.c](fd_chacha_rng.c.md)**: Functions for managing and refilling a ChaCha-based random number generator.
-- **[fd_chacha_rng.h](fd_chacha_rng.h.md)**: APIs for a ChaCha-based random number generator used in the Solana protocol, with different modes and initialization functions.
-- **[fd_chacha_rng_avx.c](fd_chacha_rng_avx.c.md)**: Implements AVX-optimized functions for refilling ChaCha RNG buffers in the Firedancer codebase.
-- **[fd_chacha_rng_avx512.c](fd_chacha_rng_avx512.c.md)**: Implements AVX-512 optimized functions for refilling ChaCha RNG buffers.
-- **[fd_chacha_sse.c](fd_chacha_sse.c.md)**: Implements ChaCha8 and ChaCha20 block functions using SSE optimizations.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing ChaCha and ChaCha-RNG components with optional SSE and AVX support.
-- **[test_chacha.c](test_chacha.c.md)**: Tests and benchmarks the `fd_chacha20_block` function using a test vector from IETF RFC 7539.
-- **[test_chacha_rng.c](test_chacha_rng.c.md)**: Tests and benchmarks for the ChaCha random number generator implementation.
-- **[test_chacha_rng_roll.c](test_chacha_rng_roll.c.md)**: Tests for the ChaCha20 random number generator, including command-line usage and validation against Rust samples.
+- **[fd_chacha.c](fd_chacha.c.md)**: Reference ChaCha20 block function and ChaCha8/20 wrappers.
+- **[fd_chacha.h](fd_chacha.h.md)**: ChaCha20 block function prototypes and size constants.
+- **[fd_chacha_rng.c](fd_chacha_rng.c.md)**: ChaCha RNG state setup, buffer refill, and shared-memory lifecycle helpers.
+- **[fd_chacha_rng.h](fd_chacha_rng.h.md)**: ChaCha-based RNG APIs, state management, refill functions, and uniform ulong sampling.
+- **[fd_chacha_rng_avx.c](fd_chacha_rng_avx.c.md)**: AVX ChaCha RNG refill routines for 8 and 20 rounds.
+- **[fd_chacha_rng_avx512.c](fd_chacha_rng_avx512.c.md)**: AVX-512 ChaCha RNG refill logic for 8- and 20-round variants.
+- **[fd_chacha_sse.c](fd_chacha_sse.c.md)**: SSE ChaCha block generation for 8- and 20-round variants.
+- **[Local.mk](Local.mk.md)**: Build rules for ChaCha and ChaCha-RNG headers, objects, and unit tests.
+- **[test_chacha.c](test_chacha.c.md)**: Tests and benchmarks fd_chacha20_block with an RFC 7539 vector.
+- **[test_chacha_rng.c](test_chacha_rng.c.md)**: Tests ChaCha RNG init, output, refill, and delete functions with benchmarks.
+- **[test_chacha_rng_roll.c](test_chacha_rng_roll.c.md)**: Tests ChaCha20 RNG roll results against Rust samples and iterates a debug roll loop.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

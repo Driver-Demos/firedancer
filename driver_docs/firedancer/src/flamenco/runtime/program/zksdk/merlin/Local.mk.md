@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and running unit tests for the Merlin component.
+Build rules for fd_merlin headers, objects, and unit test.
 
 # Purpose
-This Makefile script automates the build and test process for a software project. It adds the header file `fd_merlin.h` and object files `fd_merlin` and `fd_flamenco` to the build. It also defines a unit test named `test_merlin`, which depends on the components `fd_flamenco`, `fd_ballet`, and `fd_util`. Finally, it runs the `test_merlin` unit test to verify the functionality of the specified components.
+Build rules add the `fd_merlin.h` header and the `fd_merlin` object file from `fd_flamenco`. They also define the `test_merlin` unit test, link it with `fd_flamenco`, `fd_ballet`, and `fd_util`, and run that test target.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
