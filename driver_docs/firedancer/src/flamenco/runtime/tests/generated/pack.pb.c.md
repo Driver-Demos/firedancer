@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Automatically generated nanopb constant definitions for compute budget context, effects, and fixture.
+The `pack.pb.c` file contains automatically generated nanopb constant definitions for the `firedancer` codebase, specifically for the `FD_EXEC_TEST_PACK_COMPUTE_BUDGET_CONTEXT`, `FD_EXEC_TEST_PACK_COMPUTE_BUDGET_EFFECTS`, and `FD_EXEC_TEST_PACK_COMPUTE_BUDGET_FIXTURE` structures.
 
 # Purpose
-This C source code file contains automatically generated constant definitions for use with the nanopb library, which is a small code-size Protocol Buffers implementation in C. The file includes the header `pack.pb.h` and checks the `PB_PROTO_HEADER_VERSION` to ensure compatibility with version 40 of the nanopb generator. If the version does not match, it triggers a preprocessor error to prompt regeneration with the correct version. The file uses the `PB_BIND` macro to bind Protocol Buffer message types to their corresponding C structures: `fd_exec_test_pack_compute_budget_context_t`, `fd_exec_test_pack_compute_budget_effects_t`, and `fd_exec_test_pack_compute_budget_fixture_t`, with the `AUTO` option indicating automatic field handling.
+This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library, specifically version 0.4.9.1. It includes a header file, "pack.pb.h," which likely contains the protobuf message definitions. The file checks for compatibility with the nanopb generator by verifying the `PB_PROTO_HEADER_VERSION` and prompts regeneration if there is a version mismatch. The `PB_BIND` macro is used to bind C structures to their corresponding protobuf message types, facilitating serialization and deserialization of data structures like `fd_exec_test_pack_compute_budget_context_t`, `fd_exec_test_pack_compute_budget_effects_t`, and `fd_exec_test_pack_compute_budget_fixture_t`. This file is part of a system that uses nanopb to handle protobuf messages efficiently in C.
 # Imports and Dependencies
 
 ---
