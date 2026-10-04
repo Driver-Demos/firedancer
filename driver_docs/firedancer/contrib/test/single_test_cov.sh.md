@@ -3,26 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generates a coverage report for a single test using Clang, LLVM, and Lcov.
+Generates an lcov coverage report for a single test using llvm-cov and genhtml.
 
 # Purpose
-This script is a Bash executable that generates a code coverage report for a single test using Clang, LLVM, and Lcov. It requires the test binary to be compiled with coverage instrumentation and uses `llvm-profdata` and `llvm-cov` to process the coverage data. The script first executes the test binary while collecting profiling data into a `default.profraw` file. It then merges this data into a `default.profdata` file and exports the coverage information in the Lcov format to `default.lcov`. Finally, it generates an HTML report in the `./report` directory using `genhtml`, providing a visual representation of the code coverage.
-# Global Variables
-
----
-### BINARY
-- **Type**: ``string``
-- **Description**: The `BINARY` variable is a string that stores the first argument passed to the script. It represents the path to the binary executable that is being tested for code coverage.
-- **Use**: Used to specify the binary executable for which the coverage report is generated.
-
-
----
-### COMMAND
-- **Type**: ``string``
-- **Description**: `COMMAND` is a global variable that stores the entire command-line input given to the script, including the script name and all arguments. It is initialized with the special parameter `$@`, which represents all the positional parameters passed to the script.
-- **Use**: Stores the command-line input to be evaluated for generating a coverage report.
-
-
+Generates a coverage report for a single test run by using Clang and LLVM coverage tools. The script runs the target binary with `LLVM_PROFILE_FILE=default.profraw`, checks that coverage data was created, and then merges the raw profile with `llvm-profdata`. It exports the coverage data with `llvm-cov` in `lcov` format, removes any old report output, and builds an HTML report in the `report` directory with `genhtml`. This is a small utility script for test coverage analysis, not a general application or library file.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

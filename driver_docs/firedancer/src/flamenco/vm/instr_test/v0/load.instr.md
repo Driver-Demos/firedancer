@@ -3,29 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for load instructions with various offsets and immediate values in a virtual machine environment.
+Tests eBPF load instructions and region-boundary access checks.
 
 # Purpose
-This file contains a series of test cases for verifying the behavior of load instructions in a low-level assembly-like language. The instructions include `ldxb`, `ldxh`, `ldxw`, `ldxdw`, and `lddw`, which load bytes, halfwords, words, doublewords, and immediate values into registers, respectively. Each test case specifies the operation code (`op`), destination register (`dst`), source register (`src`), offset (`off`), and immediate value (`imm`), along with the expected result or error status. The file also defines region boundaries to test loading across different memory regions. The purpose of these tests is to ensure that the load instructions function correctly, handle errors appropriately, and verify the integrity of data loading operations within the software codebase.
-# Content Summary
-The provided content is a configuration file that describes a series of load operations for a register-based system. The file specifies different types of load operations, including `ldxb`, `ldxh`, `ldxw`, `ldxdw`, and `lddw`, each with specific parameters and outcomes. These operations are used to load data from memory into registers, with varying sizes and conditions.
-
-1. **Input Data**: The file begins with an `input` line that provides a sequence of hexadecimal values (`00010203040506070809101112131415`). This data is used in the load operations to simulate memory content.
-
-2. **Load Operations**:
-   - **`ldxb` (Load Byte)**: Loads a byte from memory into a register. The operations specify the destination register (`dst`), source register (`src`), offset (`off`), and immediate value (`imm`). The result of each operation is indicated as `ok` or `err`, with the final register value shown if successful.
-   - **`ldxh` (Load Halfword)**: Loads a halfword (2 bytes) from memory. Similar parameters are used, and the results are documented.
-   - **`ldxw` (Load Word)**: Loads a word (4 bytes) from memory. The operations follow the same pattern, with results indicating success or failure.
-   - **`ldxdw` (Load Doubleword)**: Loads a doubleword (8 bytes) from memory. The operations include error checks for invalid offsets.
-   - **`lddw` (Load Doubleword Immediate)**: Loads an immediate doubleword value directly into a register. This operation does not involve memory offsets.
-
-3. **Verification (`vfy`)**: Some operations end with a `vfy` status, indicating that they are used for verification purposes rather than actual data loading.
-
-4. **Region Boundaries**: The file specifies `region_boundary` values (`04`, `08`, `09`, `10`), which likely define memory regions or boundaries that affect the load operations. These boundaries are important for understanding the context of memory access and potential errors.
-
-5. **Error Handling**: The file includes several operations that result in errors (`err`), often due to invalid offsets or boundary violations. These errors are crucial for developers to understand the limitations and constraints of the load operations.
-
-Overall, this configuration file is essential for developers to understand how data is loaded into registers, the conditions under which operations succeed or fail, and the impact of memory boundaries on these operations.
+This file defines test cases for eBPF load instructions and checks how each instruction reads data from memory through a register plus offset. It covers byte, halfword, word, and doubleword loads with `ldxb`, `ldxh`, `ldxw`, `ldxdw`, and immediate 64-bit loads with `lddw`, and it records the expected register values after each operation. The file also verifies error handling for invalid offsets, invalid register use, and verifier rejections marked as `vfy`. In the last section, it tests loads across multiple memory regions by using `region_boundary` values to confirm that reads stop or fail when they cross a region limit.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

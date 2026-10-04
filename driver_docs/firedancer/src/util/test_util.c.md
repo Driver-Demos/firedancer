@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A test utility that initializes, logs a notice, and halts the Firedancer application.
+The `test_util.c` file contains a simple test program that initializes and halts the Firedancer utility framework, logging a "pass" message.
 
 # Purpose
-The code is a simple C program that initializes and terminates a system using functions from the `fd_util.h` header file. It starts by calling the `fd_boot` function, which takes pointers to the command-line argument count and argument vector. After initialization, it logs a notice message "pass" using the `FD_LOG_NOTICE` macro. Finally, it calls the `fd_halt` function to perform any necessary cleanup before the program exits with a return value of 0.
+This code is a simple C program that serves as a basic template for initializing and terminating a framework or library, likely related to the "fd" (possibly "framework daemon" or similar) utility functions. It includes a header file "fd_util.h" which presumably contains declarations for the `fd_boot`, `FD_LOG_NOTICE`, and `fd_halt` functions. The [`main`](#main) function initializes the framework with `fd_boot`, logs a notice message "pass" using `FD_LOG_NOTICE`, and then gracefully shuts down the framework with `fd_halt`. This structure suggests the program is designed to ensure proper setup and teardown of the environment, possibly for testing or demonstration purposes.
 # Imports and Dependencies
 
 ---
@@ -17,21 +17,19 @@ The code is a simple C program that initializes and terminates a system using fu
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/util/test_util.c#L3>)
-
-Initializes the program, logs a notice, and then halts execution.
+The `main` function initializes the program, logs a notice, and then halts execution.
 - **Inputs**:
-    - `argc`: The count of command-line arguments.
-    - `argv`: The array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls [`fd_boot`](<fd_util.c.md#fd_boot>) with pointers to `argc` and `argv` to initialize the program.
-    - Logs a notice message 'pass' using `FD_LOG_NOTICE`.
-    - Calls [`fd_halt`](<fd_util.c.md#fd_halt>) to terminate the program.
-    - Returns 0 to indicate successful execution.
-- **Output**: Returns an integer value 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_boot`](<fd_util.c.md#fd_boot>)
-    - [`fd_halt`](<fd_util.c.md#fd_halt>)
+    - `argc`: An integer representing the number of command-line arguments passed to the program.
+    - `argv`: An array of character pointers listing all the arguments passed to the program.
+- **Control Flow**:
+    - The function begins by calling [`fd_boot`](fd_util.c.md#fd_boot) with pointers to `argc` and `argv` to perform any necessary initialization.
+    - A log notice with the message "pass" is recorded using `FD_LOG_NOTICE`.
+    - The function calls [`fd_halt`](fd_util.c.md#fd_halt) to perform any necessary cleanup or shutdown procedures.
+    - Finally, the function returns 0, indicating successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`fd_boot`](fd_util.c.md#fd_boot)
+    - [`fd_halt`](fd_util.c.md#fd_halt)
 
 
 
