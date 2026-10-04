@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/flamenco/features` directory automates the generation of feature files and formats the Python script using Black.
+Makefile for generating and formatting feature files using Python and Black.
 
 # Purpose
-This Makefile is used to automate tasks in a software project. It defines the Python interpreter version to use and sets up commands for generating files (`fd_features_generated.h` and `fd_features_generated.c`) from a Python script (`gen_features.py`) and a JSON file (`feature_map.json`). Additionally, it includes a target to format the `gen_features.py` script using the Black code formatter.
+This Makefile automates tasks for a Python project. It defines the `PYTHON` variable to specify the Python interpreter version as `python3.8` and the `BLACK` variable to format Python code using the `black` tool. The `generate` target, marked as `.PHONY`, depends on the `gen_features.py` script and `feature_map.json` file to produce `fd_features_generated.h` and `fd_features_generated.c`. The `format` target, also marked as `.PHONY`, formats the `gen_features.py` script using the `black` tool.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
