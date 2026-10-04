@@ -3,10 +3,49 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests slot hashes bincode size, footprint, and alignment bounds.
+Tests for sysvar slot hashes, including boundary checks and decoding footprint validation.
 
 # Purpose
-This file defines a small C test case for the `fd_sysvar_slot_hashes` binary format. It imports a reference binary blob with `FD_IMPORT_BINARY` and checks that the blob size matches `FD_SYSVAR_SLOT_HASHES_BINCODE_SZ`. The [`test_sysvar_slot_hashes_bounds`](<#test_sysvar_slot_hashes_bounds>) function also verifies that `fd_slot_hashes_decode_footprint` returns `FD_BINCODE_SUCCESS`, that the decoded object size matches `FD_SYSVAR_SLOT_HASHES_FOOTPRINT`, and that `fd_slot_hashes_align()` matches `FD_SYSVAR_SLOT_HASHES_ALIGN`. The [`test_sysvar_slot_hashes`](<#test_sysvar_slot_hashes>) function runs these bounds checks and leaves a placeholder for more tests.
+This code is a C test suite designed to validate the integrity and correctness of slot hash data within a binary file. It includes the header `fd_sysvar_slot_hashes.h` and a types header `fd_types.h`, and imports binary data from `test_sysvar_slot_hashes.bin` using the `FD_IMPORT_BINARY` macro. The function [`test_sysvar_slot_hashes_bounds`](<#test_sysvar_slot_hashes_bounds>) checks that the size of the imported binary data matches the expected size defined by `FD_SYSVAR_SLOT_HASHES_BINCODE_SZ`. It also verifies that the decoded footprint and alignment of the slot hashes match the expected values `FD_SYSVAR_SLOT_HASHES_FOOTPRINT` and `FD_SYSVAR_SLOT_HASHES_ALIGN`, respectively. The [`test_sysvar_slot_hashes`](<#test_sysvar_slot_hashes>) function calls [`test_sysvar_slot_hashes_bounds`](<#test_sysvar_slot_hashes_bounds>) and is intended to include additional tests, as indicated by the `FIXME` comment.
+# Imports and Dependencies
+
+---
+- `fd_sysvar_slot_hashes.h`
+- `../../types/fd_types.h`
+
+
+# Functions
+
+---
+### test\_sysvar\_slot\_hashes\_bounds<!-- {{#callable:test_sysvar_slot_hashes_bounds}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/sysvar/test_sysvar_slot_hashes.c#L6>)
+
+Validates the size, footprint, and alignment of slot hash data against expected constants.
+- **Inputs**: None
+- **Logic and Control Flow**:
+    - Check if `example_slot_hashes_sz` equals `FD_SYSVAR_SLOT_HASHES_BINCODE_SZ` using `FD_TEST`.
+    - Initialize a `fd_bincode_decode_ctx_t` structure `ctx` with `data` pointing to `example_slot_hashes` and `dataend` pointing to the end of `example_slot_hashes`.
+    - Declare `obj_sz` and initialize it to 0.
+    - Verify that `fd_slot_hashes_decode_footprint` returns `FD_BINCODE_SUCCESS` and updates `obj_sz`.
+    - Check if `obj_sz` equals `FD_SYSVAR_SLOT_HASHES_FOOTPRINT` using `FD_TEST`.
+    - Verify that `fd_slot_hashes_align` equals `FD_SYSVAR_SLOT_HASHES_ALIGN` using `FD_TEST`.
+- **Output**: No output is returned; the function uses assertions to validate conditions.
+
+
+---
+### test\_sysvar\_slot\_hashes<!-- {{#callable:test_sysvar_slot_hashes}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/sysvar/test_sysvar_slot_hashes.c#L19>)
+
+Calls the [`test_sysvar_slot_hashes_bounds`](<#test_sysvar_slot_hashes_bounds>) function to perform boundary tests on system variable slot hashes.
+- **Inputs**: None
+- **Logic and Control Flow**:
+    - Calls the [`test_sysvar_slot_hashes_bounds`](<#test_sysvar_slot_hashes_bounds>) function to execute boundary tests.
+    - Contains a placeholder comment indicating that more tests should be added.
+- **Output**: No output is returned as the function is of type `void`.
+- **Functions Called**:
+    - [`test_sysvar_slot_hashes_bounds`](<#test_sysvar_slot_hashes_bounds>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

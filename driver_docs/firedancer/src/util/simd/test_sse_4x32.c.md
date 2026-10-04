@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_sse_4x32.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various SIMD operations, including constructors, arithmetic, logical, bit manipulation, and conversion operations for different data types using SSE instructions.
+Tests for SSE 4x32 vector operations, including constructors, arithmetic, logical, and conversion functions.
 
 # Purpose
-This C source code file is a comprehensive test suite for vector operations, specifically focusing on testing various vector data types and their associated operations. The file includes tests for vector constructors, arithmetic operations, logical operations, bit manipulation, and type conversion for different vector types such as `vc_t` (vector of characters), `vf_t` (vector of floats), `vi_t` (vector of integers), `vu_t` (vector of unsigned integers), `vd_t` (vector of doubles), `vl_t` (vector of longs), and `vv_t` (vector of unsigned longs). The code is structured to validate the correctness of these operations by comparing the results of vector operations against expected outcomes using a series of assertions (`FD_TEST`).
+The code is a test suite for vector operations using various data types such as integers, floats, and doubles. It includes tests for vector construction, arithmetic operations, logical operations, bit manipulation, and type conversion. The code defines several test functions like [`vc_test`](<#vc_test>), [`vf_test`](<#vf_test>), [`vi_test`](<#vi_test>), [`vu_test`](<#vu_test>), [`vd_test`](<#vd_test>), [`vl_test`](<#vl_test>), and [`vv_test`](<#vv_test>) to verify the correctness of operations on different vector types (`vc_t`, `vf_t`, `vi_t`, `vu_t`, `vd_t`, `vl_t`, and `vv_t`). These tests ensure that the vector operations produce expected results for a wide range of input values.
 
-The file is designed to be executed as a standalone program, as indicated by the presence of a [`main`](#main) function. It initializes a random number generator to produce test data and systematically tests each vector operation, ensuring that the operations behave as expected across a wide range of inputs. The code is organized into sections that test specific functionalities, such as constructors, arithmetic operations, logical operations, and conversions, for each vector type. This test suite is crucial for verifying the integrity and performance of vector operations, which are often used in high-performance computing and applications requiring parallel data processing. The inclusion of various vector operations and the extensive range of tests make this file a critical component for ensuring the reliability of vector processing in the associated software library.
+The main function initializes a random number generator and performs a series of tests on vector operations. It uses macros to generate random values for testing and defines various operations such as broadcasting, permutation, arithmetic, logical, and conversion operations. The code also includes tests for reduction operations like sum, minimum, and maximum, as well as miscellaneous operations like vector transposition. The test suite is comprehensive in its coverage of vector operations, ensuring that each operation behaves as expected across different data types and scenarios. The code concludes by logging a "pass" message if all tests are successful and then halts execution.
 # Imports and Dependencies
 
 ---
@@ -21,146 +21,161 @@ The file is designed to be executed as a standalone program, as indicated by the
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a random number generator and performs extensive testing on various vector operations, including constructors, arithmetic, logical, and conversion operations, using a series of test macros to validate the correctness of these operations.
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L15>)
+
+Executes a series of tests on vector operations and random number generation using various data types.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the random number generator using `fd_rng_new` and `fd_rng_join`.
-    - Define several macros for generating random numbers of different types (e.g., `crand`, `frand`, `irand`, etc.).
-    - Perform a series of tests on vector operations using `FD_TEST` macros, which include constructors, binary operations, logical operations, conditional operations, conversion operations, reduction operations, and miscellaneous operations for different vector types (e.g., `vc_t`, `vf_t`, `vi_t`, `vu_t`).
-    - Iterate over various ranges to test different combinations of vector operations, ensuring comprehensive coverage of possible cases.
-    - Delete the random number generator using `fd_rng_delete` and `fd_rng_leave`.
-    - Log a notice indicating the tests passed and halt the program with `fd_halt`.
-- **Output**: The function returns an integer, `0`, indicating successful execution.
-- **Functions called**:
-    - [`vc_test`](test_sse_common.c.md#vc_test)
-    - [`vc_bcast`](fd_sse_vc.h.md#vc_bcast)
-    - [`vc_bcast_pair`](fd_sse_vc.h.md#vc_bcast_pair)
-    - [`vc_bcast_wide`](fd_sse_vc.h.md#vc_bcast_wide)
-    - [`vi_test`](test_sse_common.c.md#vi_test)
-    - [`vu_test`](test_sse_common.c.md#vu_test)
-    - [`vf_test`](test_sse_common.c.md#vf_test)
-    - [`vd_test`](test_sse_common.c.md#vd_test)
-    - [`vl_test`](test_sse_common.c.md#vl_test)
-    - [`vv_test`](test_sse_common.c.md#vv_test)
-    - [`vc_expand`](fd_sse_vc.h.md#vc_expand)
-    - [`vf_bcast_pair`](fd_sse_vf.h.md#vf_bcast_pair)
-    - [`vf_bcast_wide`](fd_sse_vf.h.md#vf_bcast_wide)
-    - [`vf_to_vu_fast`](fd_sse_vf.h.md#vf_to_vu_fast)
-    - [`vf_sum_all`](fd_sse_vf.h.md#vf_sum_all)
-    - [`vf_min_all`](fd_sse_vf.h.md#vf_min_all)
-    - [`vf_max_all`](fd_sse_vf.h.md#vf_max_all)
-    - [`vi_bcast_pair`](fd_sse_vi.h.md#vi_bcast_pair)
-    - [`vi_bcast_wide`](fd_sse_vi.h.md#vi_bcast_wide)
-    - [`vi_rol_variable`](fd_sse_vi.h.md#vi_rol_variable)
-    - [`vi_ror_variable`](fd_sse_vi.h.md#vi_ror_variable)
-    - [`vi_sum_all`](fd_sse_vi.h.md#vi_sum_all)
-    - [`vi_min_all`](fd_sse_vi.h.md#vi_min_all)
-    - [`vi_max_all`](fd_sse_vi.h.md#vi_max_all)
-    - [`vu_bcast_pair`](fd_sse_vu.h.md#vu_bcast_pair)
-    - [`vu_bcast_wide`](fd_sse_vu.h.md#vu_bcast_wide)
-    - [`vu_bswap`](fd_sse_vu.h.md#vu_bswap)
-    - [`vu_rol_variable`](fd_sse_vu.h.md#vu_rol_variable)
-    - [`vu_ror_variable`](fd_sse_vu.h.md#vu_ror_variable)
-    - [`vu_to_vf`](fd_sse_vu.h.md#vu_to_vf)
-    - [`vu_sum_all`](fd_sse_vu.h.md#vu_sum_all)
-    - [`vu_min_all`](fd_sse_vu.h.md#vu_min_all)
-    - [`vu_max_all`](fd_sse_vu.h.md#vu_max_all)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Initializes the environment with `fd_boot` and sets up a random number generator `rng`.
+    - Defines several macros for generating random numbers of different types (`crand`, `frand`, `irand`, `urand`, `drand`, `lrand`, `vrand`).
+    - Performs tests on vector constructors, binary operations, logical operations, conditional operations, conversion operations, and reduction operations for different data types (`vc_t`, `vf_t`, `vi_t`, `vu_t`, `vd_t`, `vl_t`, `vv_t`).
+    - Uses nested loops to test vector operations with different combinations of inputs.
+    - Cleans up the random number generator and logs a success message before halting the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`vc_test`](<test_sse_common.c.md#vc_test>)
+    - [`vc_bcast`](<fd_sse_vc.h.md#vc_bcast>)
+    - [`vc_bcast_pair`](<fd_sse_vc.h.md#vc_bcast_pair>)
+    - [`vc_bcast_wide`](<fd_sse_vc.h.md#vc_bcast_wide>)
+    - [`vi_test`](<test_sse_common.c.md#vi_test>)
+    - [`vu_test`](<test_sse_common.c.md#vu_test>)
+    - [`vf_test`](<test_sse_common.c.md#vf_test>)
+    - [`vd_test`](<test_sse_common.c.md#vd_test>)
+    - [`vl_test`](<test_sse_common.c.md#vl_test>)
+    - [`vv_test`](<test_sse_common.c.md#vv_test>)
+    - [`vc_expand`](<fd_sse_vc.h.md#vc_expand>)
+    - [`vf_bcast_pair`](<fd_sse_vf.h.md#vf_bcast_pair>)
+    - [`vf_bcast_wide`](<fd_sse_vf.h.md#vf_bcast_wide>)
+    - [`vf_to_vu_fast`](<fd_sse_vf.h.md#vf_to_vu_fast>)
+    - [`vf_sum_all`](<fd_sse_vf.h.md#vf_sum_all>)
+    - [`vf_min_all`](<fd_sse_vf.h.md#vf_min_all>)
+    - [`vf_max_all`](<fd_sse_vf.h.md#vf_max_all>)
+    - [`vi_bcast_pair`](<fd_sse_vi.h.md#vi_bcast_pair>)
+    - [`vi_bcast_wide`](<fd_sse_vi.h.md#vi_bcast_wide>)
+    - [`vi_rol_variable`](<fd_sse_vi.h.md#vi_rol_variable>)
+    - [`vi_ror_variable`](<fd_sse_vi.h.md#vi_ror_variable>)
+    - [`vi_sum_all`](<fd_sse_vi.h.md#vi_sum_all>)
+    - [`vi_min_all`](<fd_sse_vi.h.md#vi_min_all>)
+    - [`vi_max_all`](<fd_sse_vi.h.md#vi_max_all>)
+    - [`vu_bcast_pair`](<fd_sse_vu.h.md#vu_bcast_pair>)
+    - [`vu_bcast_wide`](<fd_sse_vu.h.md#vu_bcast_wide>)
+    - [`vu_bswap`](<fd_sse_vu.h.md#vu_bswap>)
+    - [`vu_rol_variable`](<fd_sse_vu.h.md#vu_rol_variable>)
+    - [`vu_ror_variable`](<fd_sse_vu.h.md#vu_ror_variable>)
+    - [`vu_to_vf`](<fd_sse_vu.h.md#vu_to_vf>)
+    - [`vu_sum_all`](<fd_sse_vu.h.md#vu_sum_all>)
+    - [`vu_min_all`](<fd_sse_vu.h.md#vu_min_all>)
+    - [`vu_max_all`](<fd_sse_vu.h.md#vu_max_all>)
 
 
 # Function Declarations (Public API)
 
 ---
 ### vc\_test<!-- {{#callable_declaration:vc_test}} -->
-Tests the correctness of vector operations on a boolean vector.
-- **Description**: This function is used to verify the correctness of various vector operations on a boolean vector type `vc_t`. It checks the packing, unpacking, extraction, insertion, and storage operations, ensuring they behave as expected with the given boolean values. The function should be called with a vector and four boolean values representing the expected state of the vector. It returns 1 if all tests pass, indicating the vector operations are correct, and 0 if any test fails. This function is useful for validating vector operations in environments that support vector processing.
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L7>)
+
+Tests the correctness of vector operations with given parameters.
+- **Description**: Use this function to verify that a vector `vc_t` and its components match expected values. It checks if the packed representation of the vector matches the bitwise combination of the input components. It also verifies the correctness of various vector operations such as extraction, insertion, loading, and storing. Call this function when you need to ensure that vector operations produce the expected results. The function returns 1 if all tests pass and 0 if any test fails.
 - **Inputs**:
-    - `c`: A boolean vector of type `vc_t` representing the vector to be tested. The caller retains ownership.
-    - `c0`: An integer representing the expected boolean value of the first element in the vector. Must be 0 or 1.
-    - `c1`: An integer representing the expected boolean value of the second element in the vector. Must be 0 or 1.
-    - `c2`: An integer representing the expected boolean value of the third element in the vector. Must be 0 or 1.
-    - `c3`: An integer representing the expected boolean value of the fourth element in the vector. Must be 0 or 1.
-- **Output**: Returns 1 if all vector operations are correct, otherwise returns 0.
-- **See also**: [`vc_test`](test_sse_common.c.md#vc_test)  (Implementation)
+    - `c`: A vector of type `vc_t` to test. The caller must ensure this vector is correctly initialized.
+    - `c0`: An integer representing the expected value of the first component of the vector. Must be either 0 or 1.
+    - `c1`: An integer representing the expected value of the second component of the vector. Must be either 0 or 1.
+    - `c2`: An integer representing the expected value of the third component of the vector. Must be either 0 or 1.
+    - `c3`: An integer representing the expected value of the fourth component of the vector. Must be either 0 or 1.
+- **Output**: Returns 1 if all vector operations produce the expected results; otherwise, returns 0.
+- **See Also**: [`vc_test`](<test_sse_common.c.md#vc_test>)  (Implementation)
 
 
 ---
 ### vf\_test<!-- {{#callable_declaration:vf_test}} -->
-Tests if a vector of floats matches specified values and performs various vector operations.
-- **Description**: This function is used to verify that a given vector of floats, represented by `vf_t`, matches the specified float values `f0`, `f1`, `f2`, and `f3`. It performs a series of checks and operations on the vector, including extraction, insertion, and comparison of elements, as well as storing and loading operations. The function is useful for validating vector operations and ensuring that the vector behaves as expected when subjected to various transformations. It returns a success indicator based on the outcome of these checks.
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L8>)
+
+Validates a vector of floats against specified values.
+- **Description**: Use this function to verify that a vector of floats matches the provided individual float values. It checks if each element in the vector corresponds to the specified float values in order. This function is useful for testing and validation purposes, ensuring that vector operations produce expected results. It returns a non-zero value if the vector matches the specified values and zero otherwise. Ensure that the vector and float values are correctly initialized before calling this function.
 - **Inputs**:
-    - `f`: A vector of floats (`vf_t`) to be tested. The vector should contain four elements corresponding to the provided float values.
-    - `f0`: The expected value of the first element in the vector. Must be a valid float.
-    - `f1`: The expected value of the second element in the vector. Must be a valid float.
-    - `f2`: The expected value of the third element in the vector. Must be a valid float.
-    - `f3`: The expected value of the fourth element in the vector. Must be a valid float.
-- **Output**: Returns 1 if all tests pass, indicating the vector matches the specified values and operations are successful; returns 0 otherwise.
-- **See also**: [`vf_test`](test_sse_common.c.md#vf_test)  (Implementation)
+    - `f`: A vector of floats to test. Must be a valid `vf_t` type and initialized before use.
+    - `f0`: The expected float value for the first element of the vector. Must be a valid float.
+    - `f1`: The expected float value for the second element of the vector. Must be a valid float.
+    - `f2`: The expected float value for the third element of the vector. Must be a valid float.
+    - `f3`: The expected float value for the fourth element of the vector. Must be a valid float.
+- **Output**: Returns 1 if the vector matches the specified float values; otherwise, returns 0.
+- **See Also**: [`vf_test`](<test_sse_common.c.md#vf_test>)  (Implementation)
 
 
 ---
 ### vi\_test<!-- {{#callable_declaration:vi_test}} -->
-Tests if a vector of integers matches specified values.
-- **Description**: This function checks if the elements of a given vector of integers match the specified integer values at corresponding positions. It is used to verify the integrity and correctness of vector operations by comparing the vector's elements with expected values. The function returns a success indicator based on the comparison results. It should be called when you need to validate that a vector's contents are as expected after certain operations. Ensure that the vector and integer values are properly initialized before calling this function.
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L9>)
+
+Validates a vector of integers against specified values.
+- **Description**: Use this function to verify that a vector of integers matches a set of specified integer values. It checks if each element in the vector corresponds to the given integers. This function is useful for testing and validation purposes, ensuring that the vector's contents are as expected. It returns a success indicator based on the comparison results.
 - **Inputs**:
-    - `i`: A vector of integers to be tested. The vector should be initialized and contain at least four elements.
-    - `i0`: The expected integer value at position 0 of the vector. Must be a valid integer.
-    - `i1`: The expected integer value at position 1 of the vector. Must be a valid integer.
-    - `i2`: The expected integer value at position 2 of the vector. Must be a valid integer.
-    - `i3`: The expected integer value at position 3 of the vector. Must be a valid integer.
-- **Output**: Returns 1 if the vector matches the specified values at all positions; otherwise, returns 0.
-- **See also**: [`vi_test`](test_sse_common.c.md#vi_test)  (Implementation)
+    - `i`: A vector of integers to test. Must be a valid `vi_t` type.
+    - `i0`: The expected integer value for the first element of the vector.
+    - `i1`: The expected integer value for the second element of the vector.
+    - `i2`: The expected integer value for the third element of the vector.
+    - `i3`: The expected integer value for the fourth element of the vector.
+- **Output**: Returns 1 if the vector matches the specified values; otherwise, returns 0.
+- **See Also**: [`vi_test`](<test_sse_common.c.md#vi_test>)  (Implementation)
 
 
 ---
 ### vu\_test<!-- {{#callable_declaration:vu_test}} -->
-Tests if a vector matches specified unsigned integer values.
-- **Description**: This function checks if the elements of a given vector match the specified unsigned integer values at corresponding positions. It is used to verify the integrity and correctness of vector operations by comparing the vector's elements with expected values. The function returns a success indicator based on whether all comparisons are successful. It should be called when you need to validate that a vector's contents match expected values, typically in a testing or debugging context.
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L10>)
+
+Validates a vector against four unsigned integers.
+- **Description**: Use this function to verify that a vector `u` matches the specified unsigned integers `u0`, `u1`, `u2`, and `u3`. It checks if each element of the vector corresponds to the given integers in sequence. If all elements match, the function returns 1, indicating success. If any element does not match, it returns 0, indicating failure. This function is useful for testing or validating vector operations where specific values are expected. Ensure that the vector `u` is properly initialized before calling this function.
 - **Inputs**:
-    - `u`: A vector of type `vu_t` whose elements are to be tested against the specified unsigned integers. The caller retains ownership and it must be a valid vector.
-    - `u0`: An unsigned integer representing the expected value of the first element in the vector. It should be a valid `uint` value.
-    - `u1`: An unsigned integer representing the expected value of the second element in the vector. It should be a valid `uint` value.
-    - `u2`: An unsigned integer representing the expected value of the third element in the vector. It should be a valid `uint` value.
-    - `u3`: An unsigned integer representing the expected value of the fourth element in the vector. It should be a valid `uint` value.
-- **Output**: Returns an integer value: 1 if the vector matches the specified values, 0 otherwise.
-- **See also**: [`vu_test`](test_sse_common.c.md#vu_test)  (Implementation)
+    - `u`: A vector of type `vu_t` to be tested. Must be initialized and contain at least four elements.
+    - `u0`: An unsigned integer representing the expected value of the first element in the vector. Valid range is 0 to UINT_MAX.
+    - `u1`: An unsigned integer representing the expected value of the second element in the vector. Valid range is 0 to UINT_MAX.
+    - `u2`: An unsigned integer representing the expected value of the third element in the vector. Valid range is 0 to UINT_MAX.
+    - `u3`: An unsigned integer representing the expected value of the fourth element in the vector. Valid range is 0 to UINT_MAX.
+- **Output**: Returns 1 if the vector matches the specified integers; otherwise, returns 0.
+- **See Also**: [`vu_test`](<test_sse_common.c.md#vu_test>)  (Implementation)
 
 
 ---
 ### vd\_test<!-- {{#callable_declaration:vd_test}} -->
-Tests if a vector of doubles matches specified values.
-- **Description**: This function checks if the first two elements of a vector of doubles match the specified double values. It is used to verify the integrity and correctness of vector operations involving double precision floating-point numbers. The function returns a success indicator based on the comparison results. It is important to ensure that the vector and the double values are correctly initialized and represent the intended data before calling this function.
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L11>)
+
+Validates a double-precision vector against expected values.
+- **Description**: Use this function to verify that a double-precision vector `d` matches the expected values `d0` and `d1`. It checks if the first two elements of the vector `d` are equal to `d0` and `d1`, respectively. The function performs additional checks using various vector operations to ensure the integrity of the vector data. Call this function when you need to confirm that a vector has been correctly initialized or manipulated to match specific double values. The function returns an integer indicating success or failure of the validation.
 - **Inputs**:
-    - `d`: A vector of doubles to be tested. The vector must be properly initialized and contain at least two elements.
-    - `d0`: The expected value of the first element in the vector. Must be a valid double.
-    - `d1`: The expected value of the second element in the vector. Must be a valid double.
-- **Output**: Returns 1 if the vector matches the specified values, otherwise returns 0.
-- **See also**: [`vd_test`](test_sse_common.c.md#vd_test)  (Implementation)
+    - `d`: A double-precision vector to validate. Must be a valid `vd_t` type. The function expects this vector to have at least two elements.
+    - `d0`: The expected value for the first element of the vector `d`. Must be a valid double.
+    - `d1`: The expected value for the second element of the vector `d`. Must be a valid double.
+- **Output**: Returns 1 if the vector `d` matches the expected values `d0` and `d1`, otherwise returns 0.
+- **See Also**: [`vd_test`](<test_sse_common.c.md#vd_test>)  (Implementation)
 
 
 ---
 ### vl\_test<!-- {{#callable_declaration:vl_test}} -->
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L12>)
+
 Tests if a vector matches specified long values.
-- **Description**: Use this function to verify that a vector of type `vl_t` matches the specified long values `l0` and `l1`. It checks if the first two elements of the vector are equal to `l0` and `l1`, respectively, and performs various operations to ensure the vector's integrity. This function is useful for validating vector operations and ensuring data consistency. It returns a non-zero value if all tests pass, indicating a match, and zero if any test fails. Ensure that the vector `l` is properly initialized before calling this function.
+- **Description**: Use this function to verify if a vector `l` matches the specified long values `l0` and `l1`. It checks if the first two elements of the vector `l` are equal to `l0` and `l1`, respectively. If the vector matches these values, the function returns 1; otherwise, it returns 0. This function is useful for validating vector operations or ensuring data integrity in vectorized computations.
 - **Inputs**:
-    - `l`: A vector of type `vl_t` to be tested. It must be initialized and contain at least two elements.
-    - `l0`: A long integer representing the expected value of the first element in the vector. It should be within the range of valid long integers.
-    - `l1`: A long integer representing the expected value of the second element in the vector. It should be within the range of valid long integers.
-- **Output**: Returns 1 if the vector matches the specified values and passes all tests; otherwise, returns 0.
-- **See also**: [`vl_test`](test_sse_common.c.md#vl_test)  (Implementation)
+    - `l`: A vector of type `vl_t` to test. The vector must be initialized and contain at least two elements.
+    - `l0`: A long integer representing the expected value of the first element in the vector `l`.
+    - `l1`: A long integer representing the expected value of the second element in the vector `l`.
+- **Output**: Returns 1 if the vector `l` matches the specified values `l0` and `l1`; otherwise, returns 0.
+- **See Also**: [`vl_test`](<test_sse_common.c.md#vl_test>)  (Implementation)
 
 
 ---
 ### vv\_test<!-- {{#callable_declaration:vv_test}} -->
-Tests the equality of vector elements with given values.
-- **Description**: This function checks if the first two elements of the vector `v` match the provided values `v0` and `v1`. It performs a series of tests to ensure that the vector operations, such as extraction, insertion, and loading, maintain the expected values. The function is useful for validating vector operations in environments that support vector processing. It returns a boolean indicating whether all tests pass, which can be used to verify the correctness of vector operations.
+[View Source →](<../../../../../src/util/simd/test_sse_4x32.c#L13>)
+
+Tests if a vector matches specified values.
+- **Description**: Use this function to verify if the first two elements of a vector match the given unsigned long values. It checks the vector against the provided values using various extraction and insertion methods. If the vector matches the specified values, the function returns 1; otherwise, it returns 0. This function is useful for validating vector operations and ensuring data integrity. Ensure that the vector and values are correctly initialized before calling this function.
 - **Inputs**:
-    - `v`: A vector of type `vv_t` whose first two elements are to be compared with `v0` and `v1`. The vector must be properly initialized and contain at least two elements.
-    - `v0`: An unsigned long integer representing the expected value of the first element of the vector `v`.
-    - `v1`: An unsigned long integer representing the expected value of the second element of the vector `v`.
-- **Output**: Returns an integer: 1 if all tests pass and the vector elements match the given values, 0 otherwise.
-- **See also**: [`vv_test`](test_sse_common.c.md#vv_test)  (Implementation)
+    - `v`: A vector of type `vv_t` to test. Must be initialized and contain at least two elements.
+    - `v0`: An unsigned long value to compare with the first element of the vector. Must be a valid `ulong`.
+    - `v1`: An unsigned long value to compare with the second element of the vector. Must be a valid `ulong`.
+- **Output**: Returns 1 if the vector matches the specified values; otherwise, returns 0.
+- **See Also**: [`vv_test`](<test_sse_common.c.md#vv_test>)  (Implementation)
 
 
 
