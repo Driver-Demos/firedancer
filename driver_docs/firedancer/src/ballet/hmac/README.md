@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `hmac` folder in the `firedancer` codebase contains source files for implementing, testing, and configuring HMAC functionality using SHA-256, SHA-384, and SHA-512 algorithms, including a template for hash function implementation, fuzz testing, and unit tests.
+HMAC implementations, APIs, templates, fuzz testing, and unit tests using SHA-256, SHA-384, and SHA-512.
 
 
 ## Files
-- **[fd_hmac.c](fd_hmac.c.md)**: The `fd_hmac.c` file in the `firedancer` codebase implements HMAC functionality using SHA-256, SHA-384, and SHA-512 hash algorithms by including a template file `fd_hmac_tmpl.c` with different hash configurations.
-- **[fd_hmac.h](fd_hmac.h.md)**: The `fd_hmac.h` file in the `firedancer` codebase provides APIs for computing HMAC digests using SHA-256, SHA-384, and SHA-512 algorithms for message authentication.
-- **[fd_hmac_tmpl.c](fd_hmac_tmpl.c.md)**: The `fd_hmac_tmpl.c` file in the `firedancer` codebase defines a template for implementing HMAC using a specified hash function, requiring definitions for the hash algorithm, its output size, and block size.
-- **[fuzz_hmac.c](fuzz_hmac.c.md)**: The `fuzz_hmac.c` file in the `firedancer` codebase implements a fuzz testing harness for HMAC functions using SHA-256, SHA-384, and SHA-512 algorithms.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build and test configurations for the HMAC component, including header and object file additions, unit test creation, and conditional fuzz test setup.
-- **[test_hmac.c](test_hmac.c.md)**: The `test_hmac.c` file in the `firedancer` codebase contains test cases for verifying the correctness of HMAC implementations using SHA-256, SHA-384, and SHA-512 algorithms against predefined test vectors.
+- **[fd_hmac.c](fd_hmac.c.md)**: Implements HMAC using SHA-256, SHA-384, and SHA-512 algorithms.
+- **[fd_hmac.h](fd_hmac.h.md)**: APIs for computing HMAC digests using SHA-256, SHA-384, and SHA-512 algorithms.
+- **[fd_hmac_tmpl.c](fd_hmac_tmpl.c.md)**: Defines a template for HMAC functions using a specified hash algorithm, with configurable parameters.
+- **[fuzz_hmac.c](fuzz_hmac.c.md)**: Fuzz testing for HMAC implementations using SHA-256, SHA-384, and SHA-512 algorithms.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing HMAC components with unit and fuzz tests.
+- **[test_hmac.c](test_hmac.c.md)**: Tests HMAC implementations using SHA-256, SHA-384, and SHA-512 with predefined test vectors.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated seccomp BPF filter for netlink syscalls and fd checks.
+Defines a seccomp filter policy for netlink communication with architecture checks.
 
 
 ## Files
-- **[netlink_seccomp.h](netlink_seccomp.h.md)**: Generated seccomp BPF filter for netlink syscalls and fd checks.
+- **[netlink_seccomp.h](netlink_seccomp.h.md)**: Header file for a generated seccomp filter policy using BPF to control system call permissions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

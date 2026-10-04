@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Streaming Zstandard decompression APIs, private layout defs, build rules, and tests.
+Functions, APIs, and tests for Zstandard decompression streams, with a Makefile for integration.
 
 
 ## Files
-- **[fd_zstd.c](fd_zstd.c.md)**: The `fd_zstd.c` file in the `firedancer` codebase provides functions for handling Zstandard decompression streams, including initialization, reading, resetting, and deleting operations, while ensuring compatibility with the libzstd library.
-- **[fd_zstd.h](fd_zstd.h.md)**: The `fd_zstd.h` file in the `firedancer` codebase provides APIs for handling Zstandard compressed streams, focusing on streaming decompression without dynamic heap allocations or syscalls, and includes functions for managing memory and processing Zstandard frames.
-- **[fd_zstd_private.h](fd_zstd_private.h.md)**: Zstd dstream alignment, magic value, and private stream layout definitions.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build and test instructions for the ZSTD component, including header and object file additions and unit test execution, conditional on `FD_HAS_ZSTD`.
-- **[test_zstd.c](test_zstd.c.md)**: The `test_zstd.c` file in the `firedancer` codebase contains tests for Zstandard decompression functionality, including alignment checks, decompression of test vectors, and validation of the decompression stream's behavior.
+- **[fd_zstd.c](fd_zstd.c.md)**: Functions for handling Zstandard decompression streams, including initialization, reading, and deletion.
+- **[fd_zstd.h](fd_zstd.h.md)**: APIs for Zstandard compressed streams, including streaming decompression and memory management.
+- **[fd_zstd_private.h](fd_zstd_private.h.md)**: Defines a structure for Zstandard decompression streams with specific alignment and magic number.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for ZSTD in the Firedancer project.
+- **[test_zstd.c](test_zstd.c.md)**: Tests for Zstandard decompression functionality using predefined test vectors and validation checks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

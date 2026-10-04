@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_reedsol_private.h` file in the `firedancer` codebase contains internal function declarations for encoding and recovering data using Reed-Solomon codes, with support for various Galois Field arithmetic implementations.
+Internal function declarations for Reed-Solomon encoding, recovery, and Galois Field arithmetic selection.
 
 # Purpose
-This C header file, `fd_reedsol_private.h`, is part of an implementation of Reed-Solomon error correction codes, specifically focusing on internal encoding and recovery functions. The file is not intended for public API exposure but rather serves as a private component within a larger library, likely used internally by other parts of the system. It provides function declarations for encoding data into parity shreds and recovering data from potentially corrupted or missing shreds. The file includes conditional compilation directives to select different implementations of Galois Field arithmetic, which is crucial for the performance of Reed-Solomon encoding and decoding. These implementations range from unaccelerated to various levels of hardware acceleration using AVX and GFNI instructions, depending on the capabilities of the host system.
+The code in this file is a C header file that provides internal function declarations and configurations for Reed-Solomon encoding and recovery operations. It is part of a larger library that deals with error correction and data recovery using Reed-Solomon codes. The file defines several private functions for encoding data into parity shreds and recovering data from potentially corrupted or missing shreds. These functions are specialized for different numbers of shreds, such as 16, 32, 64, 128, and 256, to accommodate various data sizes and configurations.
 
-The file defines several functions for encoding and recovering data, each tailored to different sizes of data shreds, such as 16, 32, 64, 128, and 256. It also includes functions for generating specific mathematical constructs (Pi and 1/Pi') used in the encoding and recovery processes, based on the presence of erasures. The header file is structured to optimize performance by allowing pre-computed values for common cases, although these are not yet defined. The use of macros and conditional compilation ensures that the most efficient arithmetic implementation is selected at compile time, enhancing the performance of the Reed-Solomon operations. Overall, this file is a specialized component of a Reed-Solomon library, focusing on the internal mechanics of encoding and recovery, with an emphasis on performance optimization through hardware acceleration.
+The file also includes logic to select the appropriate implementation of Galois Field arithmetic based on available hardware acceleration features, such as AVX and GFNI. This selection is controlled by the `FD_REEDSOL_ARITH_IMPL` macro, which determines which arithmetic implementation to use. Additionally, the file provides functions to generate specific mathematical constructs (Pi and 1/Pi') used in the encoding and recovery processes, as described in referenced academic papers. These functions are intended for internal use within the library and are not part of the public API. The header file ensures that the necessary arithmetic operations are optimized for performance by leveraging hardware capabilities when available.
 # Imports and Dependencies
 
 ---
@@ -22,183 +22,211 @@ The file defines several functions for encoding and recovering data, each tailor
 
 ---
 ### fd\_reedsol\_private\_encode\_16<!-- {{#callable_declaration:fd_reedsol_private_encode_16}} -->
-Generates parity shreds for Reed-Solomon encoding.
-- **Description**: This function is used to generate parity shreds for a set of data shreds using Reed-Solomon encoding. It should be called when you have a set of data shreds and need to produce parity shreds for error correction purposes. The function requires that the number of data shreds does not exceed 16. It processes each shred position individually and updates the parity shreds accordingly. The function does not return a value but modifies the parity shreds in place. Ensure that the parity shreds array is properly allocated and that the total number of shreds (data plus parity) does not exceed the implementation limits.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L48>)
+
+Generates parity shreds from data shreds using Reed-Solomon encoding.
+- **Description**: Use this function to compute parity shreds from a given set of data shreds using Reed-Solomon encoding. This function requires that the number of data shreds does not exceed 16. It processes the data shreds and writes the resulting parity shreds into the provided parity shred buffers. Ensure that the parity shred buffers are large enough to hold the computed parity shreds. This function does not return a value and assumes that the input pointers are valid and non-null.
 - **Inputs**:
-    - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
-    - `data_shred`: An array of pointers to the data shreds. Each pointer must point to a valid memory location of at least shred_sz bytes. The array must contain data_shred_cnt elements.
-    - `data_shred_cnt`: The number of data shreds. Must be between 1 and 16, inclusive.
-    - `parity_shred`: An array of pointers to the parity shreds. Each pointer must point to a valid memory location of at least shred_sz bytes. The array must contain parity_shred_cnt elements.
-    - `parity_shred_cnt`: The number of parity shreds to generate. Must be a non-negative integer such that data_shred_cnt + parity_shred_cnt does not exceed 16.
+    - `shred_sz`: Specifies the size of each shred in bytes. Must be a positive integer.
+    - `data_shred`: An array of pointers to the data shreds. Each pointer must point to a buffer of at least 'shred_sz' bytes. The array must contain 'data_shred_cnt' elements.
+    - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 16.
+    - `parity_shred`: An array of pointers to the parity shreds. Each pointer must point to a buffer of at least 'shred_sz' bytes. The array must contain 'parity_shred_cnt' elements.
+    - `parity_shred_cnt`: The number of parity shreds to generate. Must be a non-negative integer.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_encode_16`](fd_reedsol_encode_16.c.md#fd_reedsol_private_encode_16)  (Implementation)
+- **See Also**: [`fd_reedsol_private_encode_16`](<fd_reedsol_encode_16.c.md#fd_reedsol_private_encode_16>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_encode\_32<!-- {{#callable_declaration:fd_reedsol_private_encode_32}} -->
-Generates parity shreds for Reed-Solomon encoding.
-- **Description**: This function is used to generate parity shreds for a set of data shreds using Reed-Solomon encoding. It should be called when you have a set of data shreds and need to compute the corresponding parity shreds for error correction purposes. The function requires that the number of data shreds does not exceed 32. It processes the data in chunks and writes the computed parity shreds to the provided parity shred buffers. The function does not return a value, and it is the caller's responsibility to ensure that the input pointers are valid and that the buffers are appropriately sized.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L59>)
+
+Generates parity shreds from data shreds using Reed-Solomon encoding.
+- **Description**: Use this function to create parity shreds from a given set of data shreds for error correction purposes. It requires the number of data shreds to be less than or equal to 32. The function processes each shred position and updates the parity shreds accordingly. Ensure that the `data_shred` and `parity_shred` arrays are correctly allocated and that their counts are set appropriately. This function does not return a value and operates directly on the provided parity shred buffers.
 - **Inputs**:
-    - `shred_sz`: The size of each shred in bytes. It must be a positive integer.
-    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred. The array must contain at least 'data_shred_cnt' valid pointers, and each pointer must point to a buffer of at least 'shred_sz' bytes. The caller retains ownership.
-    - `data_shred_cnt`: The number of data shreds. It must be less than or equal to 32.
-    - `parity_shred`: A pointer to an array of pointers, each pointing to a parity shred buffer. The array must contain at least 'parity_shred_cnt' valid pointers, and each pointer must point to a buffer of at least 'shred_sz' bytes. The caller retains ownership.
-    - `parity_shred_cnt`: The number of parity shreds to generate. It must be a non-negative integer.
+    - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
+    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred. The array must contain at least `data_shred_cnt` elements. Must not be null.
+    - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 32.
+    - `parity_shred`: A pointer to an array of pointers, each pointing to a parity shred buffer. The array must contain at least `parity_shred_cnt` elements. Must not be null.
+    - `parity_shred_cnt`: The number of parity shreds to generate. Must be a non-negative integer.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_encode_32`](fd_reedsol_encode_32.c.md#fd_reedsol_private_encode_32)  (Implementation)
+- **See Also**: [`fd_reedsol_private_encode_32`](<fd_reedsol_encode_32.c.md#fd_reedsol_private_encode_32>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_encode\_64<!-- {{#callable_declaration:fd_reedsol_private_encode_64}} -->
-Generates parity shreds for Reed-Solomon encoding.
-- **Description**: This function is used to generate parity shreds for a set of data shreds using Reed-Solomon encoding. It should be called when you have a set of data shreds and need to produce parity shreds for error correction purposes. The function requires that the number of data shreds does not exceed 64. It processes the data shreds and writes the resulting parity shreds into the provided parity shred buffers. The function does not return a value, and it is the caller's responsibility to ensure that the input parameters meet the required conditions.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L66>)
+
+Generates parity shreds from data shreds using Reed-Solomon encoding.
+- **Description**: Use this function to generate parity shreds from a given set of data shreds using Reed-Solomon encoding. This function requires that the number of data shreds does not exceed 64. It processes the data shreds and writes the resulting parity shreds to the provided parity shred buffers. Ensure that the parity shred buffers are large enough to hold the required number of parity shreds. This function does not return a value and assumes that the input pointers are valid and non-null.
 - **Inputs**:
-    - `shred_sz`: The size of each shred in bytes. It must be a positive integer.
-    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred. The array must contain at least 'data_shred_cnt' valid pointers, and each pointer must point to a buffer of at least 'shred_sz' bytes. The caller retains ownership of the data.
-    - `data_shred_cnt`: The number of data shreds. It must be less than or equal to 64.
-    - `parity_shred`: A pointer to an array of pointers, each pointing to a parity shred buffer. The array must contain at least 'parity_shred_cnt' valid pointers, and each pointer must point to a buffer of at least 'shred_sz' bytes. The function writes the generated parity shreds into these buffers.
-    - `parity_shred_cnt`: The number of parity shreds to generate. It must be a non-negative integer.
+    - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
+    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred. The array must contain at least 'data_shred_cnt' valid pointers.
+    - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 64.
+    - `parity_shred`: A pointer to an array of pointers, each pointing to a buffer where a parity shred will be written. The array must contain at least 'parity_shred_cnt' valid pointers.
+    - `parity_shred_cnt`: The number of parity shreds to generate. Must be a non-negative integer.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_encode_64`](fd_reedsol_encode_64.c.md#fd_reedsol_private_encode_64)  (Implementation)
+- **See Also**: [`fd_reedsol_private_encode_64`](<fd_reedsol_encode_64.c.md#fd_reedsol_private_encode_64>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_encode\_128<!-- {{#callable_declaration:fd_reedsol_private_encode_128}} -->
-Generates parity shreds for Reed-Solomon encoding.
-- **Description**: This function is used to generate parity shreds for a set of data shreds using Reed-Solomon encoding. It should be called when you have a set of data shreds and need to produce parity shreds for error correction purposes. The function requires that the number of data shreds does not exceed 128. It processes each shred position up to the specified shred size, generating the necessary parity shreds and storing them in the provided parity shred buffers. The function does not return a value, and it is expected that the parity shred buffers are pre-allocated and large enough to hold the generated parity data.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L73>)
+
+Generates parity shreds from data shreds using Reed-Solomon encoding.
+- **Description**: Use this function to generate parity shreds from a given set of data shreds using Reed-Solomon encoding. This function requires that the number of data shreds does not exceed 128. It processes the data shreds and writes the resulting parity shreds into the provided parity shred buffers. Ensure that the parity shred buffers are large enough to hold the required number of parity shreds. This function does not return a value and assumes that the input pointers are valid and non-null.
 - **Inputs**:
-    - `shred_sz`: The size of each shred in bytes. It must be a positive integer.
-    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred. The array must contain at least 'data_shred_cnt' valid pointers, and each data shred must be at least 'shred_sz' bytes long. The caller retains ownership.
-    - `data_shred_cnt`: The number of data shreds. It must be less than or equal to 128.
-    - `parity_shred`: A pointer to an array of pointers, each pointing to a buffer where parity shreds will be stored. The array must contain at least 'parity_shred_cnt' valid pointers, and each buffer must be at least 'shred_sz' bytes long. The caller retains ownership.
-    - `parity_shred_cnt`: The number of parity shreds to generate. It must be a non-negative integer.
+    - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
+    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred. The array must contain at least 'data_shred_cnt' valid pointers. Must not be null.
+    - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 128.
+    - `parity_shred`: A pointer to an array of pointers, each pointing to a buffer where a parity shred will be written. The array must contain at least 'parity_shred_cnt' valid pointers. Must not be null.
+    - `parity_shred_cnt`: The number of parity shreds to generate. Must be a non-negative integer.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_encode_128`](fd_reedsol_encode_128.c.md#fd_reedsol_private_encode_128)  (Implementation)
+- **See Also**: [`fd_reedsol_private_encode_128`](<fd_reedsol_encode_128.c.md#fd_reedsol_private_encode_128>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_recover\_var\_16<!-- {{#callable_declaration:fd_reedsol_private_recover_var_16}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L123>)
+
 Recovers missing data from Reed-Solomon encoded shreds.
-- **Description**: This function attempts to recover missing data from a set of Reed-Solomon encoded shreds, given the size of each shred, the number of data and parity shreds, and an array indicating which shreds are erased. It requires that at least `data_shred_cnt` of the first 16 shreds are not erased. The function modifies the `shred` array in place, filling in the missing data for shreds marked as erased. It should be used when you need to restore data integrity in a set of shreds where some data might be missing or corrupted. The function returns a status code indicating success, partial recovery, or data corruption.
+- **Description**: Use this function to verify and recover missing data from a set of Reed-Solomon encoded shreds. It requires at least `data_shred_cnt` un-erased shreds among the first 16 shreds. The function processes both data and parity shreds, with parity shreds following data shreds in the input array. The `erased` array indicates which shreds are missing or corrupted. The function modifies the `shred` array to restore missing data. Ensure that the sum of `data_shred_cnt` and `parity_shred_cnt` does not exceed 134, as shreds beyond this index are ignored. Call this function when you need to recover data from a partially corrupted set of shreds.
 - **Inputs**:
     - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
-    - `shred`: An array of pointers to shreds, where each pointer points to a buffer of size `shred_sz`. The array must have at least `data_shred_cnt + parity_shred_cnt` elements.
+    - `shred`: An array of pointers to shreds. Each pointer must point to a buffer of size `shred_sz`. The array must contain at least `data_shred_cnt + parity_shred_cnt` elements.
     - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 16.
-    - `parity_shred_cnt`: The number of parity shreds. The sum of `data_shred_cnt` and `parity_shred_cnt` must not exceed 16.
-    - `erased`: An array of bytes indicating which shreds are erased (1) or not erased (0). Must have at least `data_shred_cnt + parity_shred_cnt` elements.
-- **Output**: Returns `FD_REEDSOL_SUCCESS` on successful recovery, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there is insufficient data to recover the shreds.
-- **See also**: [`fd_reedsol_private_recover_var_16`](fd_reedsol_recover_16.c.md#fd_reedsol_private_recover_var_16)  (Implementation)
+    - `parity_shred_cnt`: The number of parity shreds. The sum of `data_shred_cnt` and `parity_shred_cnt` must not exceed 134.
+    - `erased`: An array indicating the status of each shred. Each element must be 0 if the corresponding shred is valid or 1 if it is missing or corrupted. The array must have at least `data_shred_cnt + parity_shred_cnt` elements.
+- **Output**: Returns `FD_REEDSOL_SUCCESS` if recovery is successful, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there is insufficient data to recover the shreds.
+- **See Also**: [`fd_reedsol_private_recover_var_16`](<fd_reedsol_recover_16.c.md#fd_reedsol_private_recover_var_16>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_recover\_var\_32<!-- {{#callable_declaration:fd_reedsol_private_recover_var_32}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L130>)
+
 Recovers missing data from Reed-Solomon encoded shreds.
-- **Description**: This function is used to verify the consistency of Reed-Solomon encoded data and recover any missing data shreds. It requires at least `data_shred_cnt` un-erased shreds among the first `data_shred_cnt + parity_shred_cnt` shreds. The function modifies the `shred` array in place, filling in the missing data for shreds marked as erased. It should be called when you need to ensure data integrity and recover lost data in a set of shreds. The function returns an error code if the data cannot be recovered due to insufficient un-erased shreds or if the shreds are inconsistent with a valid Reed-Solomon encoding.
+- **Description**: Use this function to verify and recover missing data from a set of Reed-Solomon encoded shreds. It requires at least `data_shred_cnt` un-erased shreds among the first 32 shreds. The function processes both data and parity shreds, with parity shreds following data shreds in the input array. The `erased` array indicates which shreds are missing or corrupted. The function modifies the `shred` array to restore missing data. It returns a status code indicating success, partial recovery, or data corruption. Ensure that the sum of `data_shred_cnt` and `parity_shred_cnt` does not exceed 134.
 - **Inputs**:
     - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
-    - `shred`: An array of pointers to shreds, where each shred is a byte array of size `shred_sz`. The caller retains ownership, and the function will modify the contents of shreds marked as erased.
+    - `shred`: An array of pointers to shreds. Each pointer must point to a buffer of size `shred_sz`. The function modifies this array to restore missing data.
     - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 32.
     - `parity_shred_cnt`: The number of parity shreds. The sum of `data_shred_cnt` and `parity_shred_cnt` must not exceed 134.
-    - `erased`: An array indicating which shreds are erased (1) and which are not (0). Must have at least `data_shred_cnt + parity_shred_cnt` elements.
-- **Output**: Returns `FD_REEDSOL_SUCCESS` if recovery is successful, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there are not enough un-erased shreds to recover the data.
-- **See also**: [`fd_reedsol_private_recover_var_32`](fd_reedsol_recover_32.c.md#fd_reedsol_private_recover_var_32)  (Implementation)
+    - `erased`: An array indicating the status of each shred. A value of 0 means the shred is valid, and 1 means it is missing or corrupted. The array must have at least `data_shred_cnt + parity_shred_cnt` elements.
+- **Output**: Returns `FD_REEDSOL_SUCCESS` if recovery is successful, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there is insufficient data to recover.
+- **See Also**: [`fd_reedsol_private_recover_var_32`](<fd_reedsol_recover_32.c.md#fd_reedsol_private_recover_var_32>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_recover\_var\_64<!-- {{#callable_declaration:fd_reedsol_private_recover_var_64}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L137>)
+
 Recovers missing data from Reed-Solomon encoded shreds.
-- **Description**: This function is used to verify the consistency of Reed-Solomon encoded data and recover any missing data shreds. It requires at least `data_shred_cnt` un-erased shreds among the first `data_shred_cnt + parity_shred_cnt` shreds. The function modifies the `shred` array in place, filling in the missing data for shreds marked as erased. It should be called when you need to restore data integrity after some shreds have been lost or corrupted. The function returns a status code indicating success, partial recovery, or data corruption.
+- **Description**: Use this function to verify and recover missing data from a set of Reed-Solomon encoded shreds. It requires at least `data_shred_cnt` un-erased shreds among the first `data_shred_cnt + parity_shred_cnt` shreds. The function modifies the `shred` array to fill in the missing data for shreds marked as erased. Ensure that the `erased` array correctly indicates which shreds are missing. The function returns an error if there are not enough un-erased shreds to perform recovery or if the shreds are inconsistent with a valid Reed-Solomon encoding.
 - **Inputs**:
-    - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
-    - `shred`: An array of pointers to shreds, where each shred is a byte array of size `shred_sz`. The array must contain at least `data_shred_cnt + parity_shred_cnt` elements. The function modifies this array in place.
+    - `shred_sz`: The size of each shred in bytes. Must be a positive value.
+    - `shred`: An array of pointers to shreds. Each pointer must point to a buffer of size `shred_sz`. The function modifies this array to recover missing data.
     - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 64.
     - `parity_shred_cnt`: The number of parity shreds. The sum of `data_shred_cnt` and `parity_shred_cnt` must not exceed 134.
-    - `erased`: An array indicating which shreds are erased (1) or not erased (0). Must have at least `data_shred_cnt + parity_shred_cnt` elements. Values must be either 0 or 1.
-- **Output**: Returns `FD_REEDSOL_SUCCESS` on successful recovery, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there is insufficient data to recover the shreds.
-- **See also**: [`fd_reedsol_private_recover_var_64`](fd_reedsol_recover_64.c.md#fd_reedsol_private_recover_var_64)  (Implementation)
+    - `erased`: An array indicating which shreds are erased. Each element must be 0 if the corresponding shred is valid or 1 if it is erased. The array must have at least `data_shred_cnt + parity_shred_cnt` elements.
+- **Output**: Returns `FD_REEDSOL_SUCCESS` if recovery is successful, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there are not enough un-erased shreds to recover the data.
+- **See Also**: [`fd_reedsol_private_recover_var_64`](<fd_reedsol_recover_64.c.md#fd_reedsol_private_recover_var_64>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_recover\_var\_128<!-- {{#callable_declaration:fd_reedsol_private_recover_var_128}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L144>)
+
 Recovers missing data from Reed-Solomon encoded shreds.
-- **Description**: This function attempts to recover missing data from a set of Reed-Solomon encoded shreds, given the size of each shred, the number of data and parity shreds, and an array indicating which shreds are erased. It requires that at least `data_shred_cnt` of the first 128 shreds are un-erased. The function modifies the `shred` array to restore missing data where possible. It should be used when you need to verify and recover data from a potentially incomplete or corrupted set of shreds. The function returns a status code indicating success, partial recovery, or corruption.
+- **Description**: Use this function to recover missing data from a set of Reed-Solomon encoded shreds. It requires at least `data_shred_cnt` un-erased shreds among the first `data_shred_cnt + parity_shred_cnt` shreds. The function checks the consistency of the shreds and recovers any missing data. If the number of un-erased shreds is insufficient, it returns an error. The function modifies the `shred` array in place, writing recovered data to positions marked as erased. Ensure that the `erased` array correctly indicates which shreds are missing before calling this function.
 - **Inputs**:
     - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
-    - `shred`: An array of pointers to shreds, where each shred is a byte array of size `shred_sz`. The array must have at least `data_shred_cnt + parity_shred_cnt` elements. The function modifies this array to restore missing data.
+    - `shred`: An array of pointers to shreds. Each pointer must point to a buffer of at least `shred_sz` bytes. The array must contain at least `data_shred_cnt + parity_shred_cnt` elements.
     - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 128.
     - `parity_shred_cnt`: The number of parity shreds. The sum of `data_shred_cnt` and `parity_shred_cnt` must not exceed 134.
-    - `erased`: An array of bytes indicating the erasure status of each shred. Each element must be 0 if the corresponding shred is valid or 1 if it is erased. The array must have at least `data_shred_cnt + parity_shred_cnt` elements.
-- **Output**: Returns an integer status code: `FD_REEDSOL_SUCCESS` if recovery is successful, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there is insufficient data to recover all shreds.
-- **See also**: [`fd_reedsol_private_recover_var_128`](fd_reedsol_recover_128.c.md#fd_reedsol_private_recover_var_128)  (Implementation)
+    - `erased`: An array indicating which shreds are erased. Must have at least `data_shred_cnt + parity_shred_cnt` elements. Each element should be 0 if the corresponding shred is valid or 1 if it is erased.
+- **Output**: Returns `FD_REEDSOL_SUCCESS` if recovery is successful, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there are not enough un-erased shreds to recover the data.
+- **See Also**: [`fd_reedsol_private_recover_var_128`](<fd_reedsol_recover_128.c.md#fd_reedsol_private_recover_var_128>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_recover\_var\_256<!-- {{#callable_declaration:fd_reedsol_private_recover_var_256}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L151>)
+
 Recovers missing data from Reed-Solomon encoded shreds.
-- **Description**: This function attempts to recover missing data from a set of Reed-Solomon encoded shreds, given the size of each shred, the number of data and parity shreds, and an array indicating which shreds are erased. It requires that at least `data_shred_cnt` of the first `data_shred_cnt + parity_shred_cnt` shreds are un-erased. The function modifies the `shred` array in place, overwriting erased shreds with recovered data. It returns a status code indicating success, partial recovery due to insufficient data, or corruption if the shreds are inconsistent with a valid Reed-Solomon encoding.
+- **Description**: Use this function to recover missing data from a set of Reed-Solomon encoded shreds. It requires at least `data_shred_cnt` un-erased shreds among the first `data_shred_cnt + parity_shred_cnt` shreds. The function modifies the `shred` array to fill in the missing data for shreds marked as erased. Ensure that the `erased` array correctly indicates which shreds are missing (1 for erased, 0 for present). The function returns an error if there is insufficient data to recover the original shreds or if the shreds are inconsistent with a valid Reed-Solomon encoding.
 - **Inputs**:
-    - `shred_sz`: The size of each shred in bytes. Must be a positive integer.
-    - `shred`: An array of pointers to shreds, where each pointer points to a buffer of size `shred_sz`. The array must have at least `data_shred_cnt + parity_shred_cnt` elements. The function modifies this array in place.
+    - `shred_sz`: Specifies the size of each shred in bytes. Must be a positive integer.
+    - `shred`: An array of pointers to shreds. Each pointer must point to a buffer of size `shred_sz`. The function modifies this array to recover missing data.
     - `data_shred_cnt`: The number of data shreds. Must be less than or equal to 256.
     - `parity_shred_cnt`: The number of parity shreds. The sum of `data_shred_cnt` and `parity_shred_cnt` must not exceed 134.
-    - `erased`: An array of bytes indicating which shreds are erased (1) or not erased (0). Must have at least `data_shred_cnt + parity_shred_cnt` elements.
-- **Output**: Returns `FD_REEDSOL_SUCCESS` on successful recovery, `FD_REEDSOL_ERR_PARTIAL` if there is not enough un-erased data to recover, or `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent with a valid encoding.
-- **See also**: [`fd_reedsol_private_recover_var_256`](fd_reedsol_recover_256.c.md#fd_reedsol_private_recover_var_256)  (Implementation)
+    - `erased`: An array indicating which shreds are erased (1 for erased, 0 for present). Must have at least `data_shred_cnt + parity_shred_cnt` elements.
+- **Output**: Returns `FD_REEDSOL_SUCCESS` on successful recovery, `FD_REEDSOL_ERR_CORRUPT` if the shreds are inconsistent, or `FD_REEDSOL_ERR_PARTIAL` if there is not enough data to recover the original shreds.
+- **See Also**: [`fd_reedsol_private_recover_var_256`](<fd_reedsol_recover_256.c.md#fd_reedsol_private_recover_var_256>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_gen\_pi\_16<!-- {{#callable_declaration:fd_reedsol_private_gen_pi_16}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L193>)
+
 Generates Pi and 1/Pi' values for Reed-Solomon erasure codes.
-- **Description**: This function computes the Pi and 1/Pi' values for a set of elements used in Reed-Solomon erasure codes, based on whether each element is erased or not. It should be used when you need to determine these values for elements indexed from 0 to 15. The function requires that both input arrays, `is_erased` and `output`, are aligned to 32 bytes. The `is_erased` array must contain only 0s and 1s, where 0 indicates a non-erased element and 1 indicates an erased element. The function will store the Pi value for non-erased elements and the 1/Pi' value for erased elements in the `output` array. Undefined behavior occurs if `is_erased` contains values other than 0 or 1.
+- **Description**: Use this function to compute the Pi and 1/Pi' values for a set of elements in a Reed-Solomon erasure code. The function requires two arrays: `is_erased` and `output`, both of which must be aligned to 32 bytes and indexed from 0 to 15. The `is_erased` array indicates whether each element is erased (1) or not (0). The function writes the Pi value to `output[i]` if `is_erased[i]` is 0, and 1/Pi' if `is_erased[i]` is 1. Ensure that `is_erased` contains only 0s and 1s, as other values result in undefined behavior.
 - **Inputs**:
-    - `is_erased`: A pointer to an array of 16 unsigned characters, each representing whether the corresponding element is erased (1) or not (0). The array must be aligned to 32 bytes and contain only 0s and 1s.
-    - `output`: A pointer to an array of 16 unsigned characters where the function will store the computed Pi or 1/Pi' values. The array must be aligned to 32 bytes.
+    - `is_erased`: A pointer to an array of 16 bytes indicating erasure status for each element. Each byte must be 0 (not erased) or 1 (erased). The array must be aligned to 32 bytes.
+    - `output`: A pointer to an array of 16 bytes where the function will store the computed Pi or 1/Pi' values. The array must be aligned to 32 bytes.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_gen_pi_16`](fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_16)  (Implementation)
+- **See Also**: [`fd_reedsol_private_gen_pi_16`](<fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_16>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_gen\_pi\_32<!-- {{#callable_declaration:fd_reedsol_private_gen_pi_32}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L194>)
+
 Generates Pi and 1/Pi' values for Reed-Solomon erasure codes.
-- **Description**: This function computes the Pi and 1/Pi' values for a set of elements used in Reed-Solomon erasure codes, based on whether each element is erased or not. It should be used when you need to determine these values for elements indexed from 0 to 31. The function requires that both input arrays, `is_erased` and `output`, are aligned to 32 bytes. The `is_erased` array must contain only 0s and 1s, where 0 indicates the element is not erased and 1 indicates it is erased. The function will store the computed Pi value in the `output` array for non-erased elements and 1/Pi' for erased elements.
+- **Description**: Use this function to compute the Pi and 1/Pi' values for a set of elements in Reed-Solomon erasure codes. It requires two arrays: one indicating which elements are erased and another to store the output. The function processes 32 elements, and both input and output arrays must be aligned to 32 bytes. The function assumes that the input array contains only 0s and 1s, where 0 indicates a non-erased element and 1 indicates an erased element. The output array will store the Pi value for non-erased elements and the 1/Pi' value for erased elements. Ensure that the input array does not contain values other than 0 or 1 to avoid undefined behavior.
 - **Inputs**:
-    - `is_erased`: A pointer to an array of 32 bytes, each byte must be either 0 or 1, indicating whether the corresponding element is erased (1) or not (0). The array must be 32-byte aligned.
-    - `output`: A pointer to an array of 32 bytes where the function will store the computed Pi or 1/Pi' values. The array must be 32-byte aligned.
+    - `is_erased`: A pointer to an array of 32 bytes indicating erased elements. Each byte must be 0 (not erased) or 1 (erased). The array must be aligned to 32 bytes.
+    - `output`: A pointer to an array of 32 bytes where the function will store the computed Pi or 1/Pi' values. The array must be aligned to 32 bytes.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_gen_pi_32`](fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_32)  (Implementation)
+- **See Also**: [`fd_reedsol_private_gen_pi_32`](<fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_32>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_gen\_pi\_64<!-- {{#callable_declaration:fd_reedsol_private_gen_pi_64}} -->
-Generates Pi and 1/Pi' values for Reed-Solomon erasure codes.
-- **Description**: This function computes the Pi and 1/Pi' values for a set of elements used in Reed-Solomon erasure codes, based on whether each element is erased or not. It should be used when you need to generate these values for 64 elements, where the erasure status of each element is provided. The function requires that both input arrays, `is_erased` and `output`, are aligned to 32 bytes and indexed from 0 to 63. The function assumes that `is_erased` contains only 0s and 1s, where 0 indicates the element is not erased and 1 indicates it is erased. The output array will store the computed Pi value for non-erased elements and 1/Pi' for erased elements.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L195>)
+
+Generates Pi and 1/Pi' for Reed-Solomon erasure codes.
+- **Description**: Use this function to compute the Pi and 1/Pi' values for elements in Reed-Solomon erasure codes. It requires two arrays: `is_erased` and `output`, both aligned to 32 bytes and indexed from 0 to 64. The function calculates Pi for non-erased elements and 1/Pi' for erased elements, storing the results in the `output` array. Ensure that `is_erased` contains only 0s and 1s, as other values result in undefined behavior.
 - **Inputs**:
-    - `is_erased`: A pointer to an array of 64 unsigned characters, each representing whether the corresponding element is erased (1) or not (0). The array must be aligned to 32 bytes and contain only 0s and 1s.
-    - `output`: A pointer to an array of 64 unsigned characters where the function will store the computed Pi or 1/Pi' values. The array must be aligned to 32 bytes.
-- **Output**: The `output` array is populated with Pi values for non-erased elements and 1/Pi' values for erased elements.
-- **See also**: [`fd_reedsol_private_gen_pi_64`](fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_64)  (Implementation)
+    - `is_erased`: A pointer to an array of 64 bytes indicating erased (1) or non-erased (0) elements. Must be aligned to 32 bytes and contain only 0 or 1.
+    - `output`: A pointer to an array of 64 bytes where the function stores the computed Pi or 1/Pi' values. Must be aligned to 32 bytes.
+- **Output**: None
+- **See Also**: [`fd_reedsol_private_gen_pi_64`](<fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_64>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_gen\_pi\_128<!-- {{#callable_declaration:fd_reedsol_private_gen_pi_128}} -->
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L196>)
+
 Generates Pi and 1/Pi' values for Reed-Solomon erasure codes.
-- **Description**: This function computes the Pi and 1/Pi' values for elements in a Reed-Solomon erasure code, based on whether each element is erased or not. It should be used when you need to generate these values for a set of 128 elements, where the erasure status of each element is known. The function requires that both input arrays, `is_erased` and `output`, are aligned to 32 bytes and indexed from 0 to 127. The function assumes that `is_erased` contains only 0s and 1s, where 0 indicates a non-erased element and 1 indicates an erased element. The output array will store the computed Pi value for non-erased elements and 1/Pi' for erased elements. Undefined behavior occurs if `is_erased` contains values other than 0 or 1.
+- **Description**: Use this function to compute the Pi and 1/Pi' values for elements in a Reed-Solomon erasure code. It requires two arrays: one indicating which elements are erased and another to store the output. The function processes 128 elements, and both input and output arrays must be aligned to 32 bytes. The function assumes that the input array contains only 0s and 1s, where 0 indicates a non-erased element and 1 indicates an erased element. The output array will store the Pi value for non-erased elements and the 1/Pi' value for erased elements. This function is part of a set that supports different element counts, and it is important to ensure the correct alignment and input values to avoid undefined behavior.
 - **Inputs**:
-    - `is_erased`: A pointer to an array of 128 bytes indicating the erasure status of each element. Each byte must be either 0 (not erased) or 1 (erased). The array must be 32-byte aligned.
-    - `output`: A pointer to an array of 128 bytes where the function will store the computed Pi or 1/Pi' values. The array must be 32-byte aligned and will be overwritten by the function.
+    - `is_erased`: A pointer to an array of 128 unsigned characters, each representing whether the corresponding element is erased (1) or not (0). The array must be aligned to 32 bytes and contain only 0s and 1s.
+    - `output`: A pointer to an array of 128 unsigned characters where the function will store the computed Pi or 1/Pi' values. The array must be aligned to 32 bytes.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_gen_pi_128`](fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_128)  (Implementation)
+- **See Also**: [`fd_reedsol_private_gen_pi_128`](<fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_128>)  (Implementation)
 
 
 ---
 ### fd\_reedsol\_private\_gen\_pi\_256<!-- {{#callable_declaration:fd_reedsol_private_gen_pi_256}} -->
-Generates Pi and 1/Pi' values for Reed-Solomon erasure codes.
-- **Description**: This function computes the Pi and 1/Pi' values for a set of elements used in Reed-Solomon erasure codes, based on whether each element is erased or not. It should be used when you need to generate these values for 256 elements, where the input specifies which elements are erased. The function requires that both input arrays are aligned to 32 bytes. The output array will contain the Pi value for non-erased elements and the 1/Pi' value for erased elements. It is important to ensure that the `is_erased` array only contains values of 0 or 1, as other values will result in undefined behavior.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_private.h#L197>)
+
+Generates Pi and 1/Pi' for Reed-Solomon erasure codes.
+- **Description**: Use this function to compute the Pi and 1/Pi' values for elements in Reed-Solomon erasure codes. It requires two arrays: `is_erased` and `output`, both aligned to 32 bytes and indexed from 0 to 255. The function calculates Pi for non-erased elements and 1/Pi' for erased elements, storing the results in the `output` array. Ensure that `is_erased` contains only 0s and 1s, as other values result in undefined behavior.
 - **Inputs**:
-    - `is_erased`: A pointer to an array of 256 unsigned characters, each indicating whether the corresponding element is erased (1) or not (0). The array must be aligned to 32 bytes and contain only 0s and 1s.
-    - `output`: A pointer to an array of 256 unsigned characters where the function will store the computed Pi or 1/Pi' values. The array must be aligned to 32 bytes.
+    - `is_erased`: A pointer to an array of 256 bytes indicating erased elements. Each byte must be 0 (not erased) or 1 (erased). The array must be 32-byte aligned.
+    - `output`: A pointer to an array of 256 bytes where the function stores the computed Pi or 1/Pi' values. The array must be 32-byte aligned.
 - **Output**: None
-- **See also**: [`fd_reedsol_private_gen_pi_256`](fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_256)  (Implementation)
+- **See Also**: [`fd_reedsol_private_gen_pi_256`](<fd_reedsol_pi.c.md#fd_reedsol_private_gen_pi_256>)  (Implementation)
 
 
 

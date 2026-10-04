@@ -3,10 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Macros for extracting config values, arrays, and table fields from a pod.
+Macros for extracting configuration values from a pod structure in various formats.
 
 # Purpose
-This file defines a set of C preprocessor macros for reading configuration data from a `pod` structure and storing it in a `config` object. The `CFG_POP` and `CFG_POP1` macros read one value, convert it with a `fdctl_cfg_get_##type` helper, and remove the matched key from the input. The `CFG_POP_ARRAY` and `CFG_POP1_ARRAY` macros read array values from a subpod, check the array size, fill a fixed-size destination array, and store the number of parsed items in a `_cnt` field. The `CFG_POP_TABLE` macro reads a table of subpods, extracts one field from each entry, and `CFG_POP_TABLE_FINI` removes the table key after parsing is complete.
+The code defines a set of macros for extracting configuration values from a data structure referred to as a "pod." These macros facilitate the retrieval and removal of configuration data from the pod, which is likely a structured data container. The macros include `CFG_POP`, `CFG_POP1`, `CFG_POP_ARRAY`, `CFG_POP1_ARRAY`, `CFG_POP_TABLE`, and `CFG_POP_TABLE_FINI`. Each macro is designed to handle different types of configuration data, such as single values, arrays, and tables, and they ensure that the extracted data is stored in a specified configuration structure.
+
+The macros use a consistent pattern to query the pod for a specific key, check the type of the retrieved data, and then extract the data into a configuration structure. If the data type does not match the expected type, or if there are too many values, the macros log a warning and return `NULL`. The macros also remove the extracted data from the pod after processing. These macros are intended to be used in a context where configuration data needs to be dynamically extracted and managed, providing a streamlined way to handle various data types within a configuration management system.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
