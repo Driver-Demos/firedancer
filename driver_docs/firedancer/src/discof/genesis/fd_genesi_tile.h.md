@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Genesis tile signal constants for publishing learned genesis hash or bootstrap completion.
+Defines constants for genesis hash signaling in a blockchain node.
 
 # Purpose
-This header file defines two symbolic constants that describe the genesis state used by the `genesi` tile. `GENESI_SIG_GENESIS_HASH` marks a node that is not bootstrapping and only publishes the learned genesis hash. `GENESI_SIG_BOOTSTRAP_COMPLETED` marks a node that is bootstrapping the chain and publishes the genesis hash together with the genesis information. The include guard prevents the header from being included more than once.
+This code is a simple C header file that defines preprocessor macros for signaling different states in a node's lifecycle within a distributed system. The macro `GENESI_SIG_GENESIS_HASH` is set to `0` and indicates that the node is not a bootstrapping node but is publishing a learned genesis hash. The macro `GENESI_SIG_BOOTSTRAP_COMPLETED` is set to `1` and signifies that the node is bootstrapping the chain and should publish the genesis hash along with additional genesis information. The header guards prevent multiple inclusions of this file, ensuring that the macros are defined only once during compilation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
