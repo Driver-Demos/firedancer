@@ -3,30 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tile logic, replay, repair, restore, gossip, send, and backtest support with seccomp and build rules.
+Backtesting, bank operations, execution logic, forest data structures, genesis management, gossip protocol, IP echo, PoH, reassembly, repair, replay, resolution, restoration, transaction sending, shred capture, tower management, seccomp policies, and Makefile logic with related functions.
 
 ## Folders
-- **[backtest](backtest/README.md)**: RocksDB-backed backtest accessors, playback validation, and conditional build rules.
-- **[bank](bank/README.md)**: Bank tile execution, error mapping, seccomp policy, generated filters, and build rules.
-- **[exec](exec/README.md)**: Execution tile logic, seccomp policy, and build rules for single-transaction processing.
-- **[forest](forest/README.md)**: Block repair forest API, tree repair logic, and unit tests for insert, publish, iterator, and FEC handling.
-- **[genesis](genesis/README.md)**: Genesis tile, client, hash, seccomp policy, and build rules for genesis file fetch and init
-- **[gossip](gossip/README.md)**: Gossip tile logic, filters, headers, seccomp policies, and build rules.
-- **[ipecho](ipecho/README.md)**: Nonblocking IP echo client, server, tile logic, tests, fuzzing, and seccomp policy.
-- **[poh](poh/README.md)**: Proof-of-history state, tile logic, generated seccomp policy, and conditional build rules.
-- **[reasm](reasm/README.md)**: Reassembly API, state, and tests for FEC set replay order.
-- **[repair](repair/README.md)**: Repair request, message, metrics, tile, policy, test, and build files with seccomp rules.
-- **[replay](replay/README.md)**: Replay scheduling, execution, vote tracking, tests, and generated seccomp policy files.
-- **[resolv](resolv/README.md)**: Transaction resolution tile code, replay signal message, seccomp policy, build rules, and generated filter.
-- **[restore](restore/README.md)**: Snapshot restore tiles, seccomp policies, parsers, and build rules.
-- **[send](send/README.md)**: Send tile logic, headers, build rules, and seccomp policy for QUIC transaction sending.
-- **[sender](sender/README.md)**: Signs replayed transactions and sends them to leader, gossip, and dedup outputs.
-- **[shredcap](shredcap/README.md)**: Captures shred, repair, gossip, and replay data to CSV and binary files.
-- **[tower](tower/README.md)**: Vote tower tile state update, seccomp policy, and build rules.
+- **[backtest](backtest/README.md)**: Implements a backtesting tile with RocksDB and Makefile logic for conditional compilation.
+- **[bank](bank/README.md)**: Functions for bank operations, error code mapping, security policies, and Makefile logic for build configuration.
+- **[exec](exec/README.md)**: Seccomp filter policy, transaction execution logic, security policies, and Makefile logic.
+- **[forest](forest/README.md)**: Functions and API for forest data structures, Makefile logic, and tests for `fd_forest`.
+- **[genesis](genesis/README.md)**: Seccomp filter policy, Solana genesis file management, client-server communication, and Makefile logic.
+- **[gossip](gossip/README.md)**: Gossip networking protocol implementation, seccomp filter policy, and Makefile logic for SSE support.
+- **[ipecho](ipecho/README.md)**: IP echo client and server implementations, seccomp filter policy, fuzz testing, and build rules.
+- **[poh](poh/README.md)**: Implementation of the Proof of History (PoH) state machine, tile, and Makefile logic with security policies.
+- **[reasm](reasm/README.md)**: Functions and tests for reassembly data structures, FEC set management, and network equivocation handling.
+- **[repair](repair/README.md)**: FEC chainer and repair management, seccomp filter policy, repair protocol, security policies, and tests.
+- **[replay](replay/README.md)**: Epoch fork management, execution slice parsing, microblock replay, seccomp policies, and build configuration.
+- **[resolv](resolv/README.md)**: Includes `fd_resolv_tile.c`, `fd_resolv_tile.h`, `fd_resolv_tile.seccomppolicy`, and Makefile logic with `FD_HAS_ALLOCA` and `FD_HAS_INT128`.
+- **[restore](restore/README.md)**: Seccomp filter policies, HTTP and snapshot utilities, state machines for snapshot management, and Makefile.
+- **[send](send/README.md)**: Defines a seccomp filter policy, transaction signing and sending, security policies, and Makefile logic.
+- **[sender](sender/README.md)**: Signs and sends single-signature transactions to the current leader.
+- **[shredcap](shredcap/README.md)**: Seccomp filter policy, network shred capture and analysis, security policies, and Makefile logic.
+- **[tower](tower/README.md)**: Seccomp filter policy, `fd_tower_tile` structures and functions, security policies, and Makefile logic.
 
 ## Files
-- **[fd_discof.h](fd_discof.h.md)**: Packed shredcap slice and bank hash message formats with validation helpers.
-- **[Local.mk](Local.mk.md)**: Build rules for the fd_discof library and header file.
+- **[fd_discof.h](fd_discof.h.md)**: Defines data structures and validation functions for shredcap slice and bank hash capture formats.
+- **[Local.mk](Local.mk.md)**: Makefile commands to create a library and add headers for `fd_discof`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

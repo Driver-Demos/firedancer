@@ -3,34 +3,34 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC template, frame, parser, encoder, transport parameter, test, and fuzz support files.
+Template macros, data structures, functions, and tests for QUIC protocol implementation in Firedancer.
 
 
 ## Files
-- **[fd_quic_defs.h](fd_quic_defs.h.md)**: The `fd_quic_defs.h` file in the `firedancer` codebase provides template macros for defining structures and their members related to QUIC protocol implementation.
-- **[fd_quic_dft.h](fd_quic_dft.h.md)**: The `fd_quic_dft.h` file in the `firedancer` codebase provides default macro definitions to simplify the use of templates in the QUIC module.
-- **[fd_quic_encoders.h](fd_quic_encoders.h.md)**: The `fd_quic_encoders.h` file in the `firedancer` codebase provides macros and inline functions for encoding various data types and structures in the QUIC protocol, with considerations for buffer overflows and platform optimizations.
-- **[fd_quic_encoders_decl.h](fd_quic_encoders_decl.h.md)**: The `fd_quic_encoders_decl.h` file declares inline functions for encoding QUIC frames and calculating their footprints in the Firedancer codebase.
-- **[fd_quic_encoders_footprint.h](fd_quic_encoders_footprint.h.md)**: The `fd_quic_encoders_footprint.h` file defines macros for calculating the upper bound of the footprint of QUIC encoders without actually encoding the data in the `firedancer` codebase.
-- **[fd_quic_frame.c](fd_quic_frame.c.md)**: The `fd_quic_frame.c` file in the `firedancer` codebase defines lookup tables for QUIC frame types and metric IDs, and implements frame handlers for interpreting and handling QUIC frames.
-- **[fd_quic_frame.h](fd_quic_frame.h.md)**: The `fd_quic_frame.h` file defines QUIC frame types, their attributes, and provides a function to check if a frame type is allowed for a given packet type in the Firedancer codebase.
-- **[fd_quic_frame_handler_decl.h](fd_quic_frame_handler_decl.h.md)**: The `fd_quic_frame_handler_decl.h` file defines a macro for declaring a function to handle QUIC frames within the Firedancer project.
-- **[fd_quic_frames_templ.h](fd_quic_frames_templ.h.md)**: The `fd_quic_frames_templ.h` file in the `firedancer` codebase defines various QUIC frame structures, including padding, ping, acknowledgment, reset stream, stop sending, crypto, new token, stream, max data, max stream data, max streams, data blocked, stream data blocked, streams blocked, new connection ID, retire connection ID, path challenge, path response, connection close, and handshake done frames.
-- **[fd_quic_max_footprint.h](fd_quic_max_footprint.h.md)**: The `fd_quic_max_footprint.h` file in the `firedancer` codebase defines macros to calculate the maximum encoding sizes for QUIC frames at compile time by constructing structs with character arrays.
-- **[fd_quic_parse_util.h](fd_quic_parse_util.h.md)**: QUIC varint and packet header encode/decode helpers.
-- **[fd_quic_parsers.h](fd_quic_parsers.h.md)**: The `fd_quic_parsers.h` file in the `firedancer` codebase provides macros for parsing QUIC protocol data structures, including handling various data types and ensuring proper alignment and size checks.
-- **[fd_quic_parsers_decl.h](fd_quic_parsers_decl.h.md)**: The `fd_quic_parsers_decl.h` file declares functions for decoding QUIC packets and frames, specifying the structure and behavior of these decoding operations.
-- **[fd_quic_pretty_print.h](fd_quic_pretty_print.h.md)**: The `fd_quic_pretty_print.h` file provides macros for generating pretty-printing functions for QUIC-related data structures in the Firedancer codebase.
-- **[fd_quic_pretty_print_decl.h](fd_quic_pretty_print_decl.h.md)**: The `fd_quic_pretty_print_decl.h` file defines a macro for beginning the declaration of a pretty print function for QUIC structures in the Firedancer codebase.
-- **[fd_quic_templ.h](fd_quic_templ.h.md)**: The `fd_quic_templ.h` file in the `firedancer` codebase defines various structures for handling QUIC protocol packet headers and transport parameters, including long header packets, version negotiation packets, initial packets, handshake packets, retry packets, 1-RTT packets, transport parameter entries, common fragments, ACK range fragments, ECN counts, and preferred addresses.
-- **[fd_quic_templ_dump.h](fd_quic_templ_dump.h.md)**: The `fd_quic_templ_dump.h` file defines macros for generating functions to print the contents of QUIC-related data structures in a formatted manner.
-- **[fd_quic_templ_dump_decl.h](fd_quic_templ_dump_decl.h.md)**: The `fd_quic_templ_dump_decl.h` file defines a macro for beginning the declaration of a function to dump the structure of a QUIC-related data type in the Firedancer codebase.
-- **[fd_quic_transport_params.c](fd_quic_transport_params.c.md)**: The `fd_quic_transport_params.c` file in the `firedancer` codebase provides functions for encoding, decoding, dumping, and validating QUIC transport parameters.
-- **[fd_quic_transport_params.h](fd_quic_transport_params.h.md)**: QUIC transport parameter definitions, parsing, encoding, and dump helpers.
-- **[fd_quic_undefs.h](fd_quic_undefs.h.md)**: The `fd_quic_undefs.h` file in the `firedancer` codebase contains preprocessor directives to undefine a series of macros related to QUIC template structures and elements.
-- **[fuzz_quic_parse_transport_params.c](fuzz_quic_parse_transport_params.c.md)**: Fuzzes QUIC transport parameter decode/encode round trips and checks dump equality.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and fuzz tests for the QUIC module within the Waltz component.
-- **[test_quic_transport_params.c](test_quic_transport_params.c.md)**: The `test_quic_transport_params.c` file in the `firedancer` codebase contains tests for QUIC transport parameters, including encoding and decoding of preferred addresses, handling of maximum size transport parameters, and ensuring the decoder skips unknown parameters.
+- **[fd_quic_defs.h](fd_quic_defs.h.md)**: Template macros for defining and structuring QUIC-related data structures in the Firedancer codebase.
+- **[fd_quic_dft.h](fd_quic_dft.h.md)**: Defines macros for simplifying template structures in the Firedancer QUIC implementation.
+- **[fd_quic_encoders.h](fd_quic_encoders.h.md)**: Macros and inline functions for encoding QUIC frames with error handling and buffer management.
+- **[fd_quic_encoders_decl.h](fd_quic_encoders_decl.h.md)**: Defines macros for QUIC encoders and their footprint calculations.
+- **[fd_quic_encoders_footprint.h](fd_quic_encoders_footprint.h.md)**: Defines macros for calculating the upper bound of QUIC encoder footprints without encoding data.
+- **[fd_quic_frame.c](fd_quic_frame.c.md)**: Defines lookup tables and frame handlers for QUIC frame types and metrics in the Firedancer codebase.
+- **[fd_quic_frame.h](fd_quic_frame.h.md)**: Defines QUIC frame types, their attributes, and a function to check frame type allowance for packet types.
+- **[fd_quic_frame_handler_decl.h](fd_quic_frame_handler_decl.h.md)**: Defines a macro for handling QUIC frames with a customizable context and data structure.
+- **[fd_quic_frames_templ.h](fd_quic_frames_templ.h.md)**: Defines structures for various QUIC frames, including PADDING, PING, ACK, and others, with specific formats.
+- **[fd_quic_max_footprint.h](fd_quic_max_footprint.h.md)**: Macros for calculating maximum encoding sizes of QUIC frames at compile time using struct definitions.
+- **[fd_quic_parse_util.h](fd_quic_parse_util.h.md)**: Utility functions for encoding and decoding QUIC variable-length integers and packet headers.
+- **[fd_quic_parsers.h](fd_quic_parsers.h.md)**: Macros for parsing QUIC protocol data structures with support for various data types and error handling.
+- **[fd_quic_parsers_decl.h](fd_quic_parsers_decl.h.md)**: Declarations for `fd_quic_decode_*` functions to decode QUIC packets and frames.
+- **[fd_quic_pretty_print.h](fd_quic_pretty_print.h.md)**: Macros for pretty-printing QUIC structures in a formatted and traceable manner.
+- **[fd_quic_pretty_print_decl.h](fd_quic_pretty_print_decl.h.md)**: Defines a macro for generating pretty-print functions for QUIC structures.
+- **[fd_quic_templ.h](fd_quic_templ.h.md)**: Defines data structures for various QUIC packet types and transport parameters.
+- **[fd_quic_templ_dump.h](fd_quic_templ_dump.h.md)**: Macros for defining and printing QUIC structure data in various formats.
+- **[fd_quic_templ_dump_decl.h](fd_quic_templ_dump_decl.h.md)**: Defines a macro for beginning a static inline function to dump QUIC structure declarations.
+- **[fd_quic_transport_params.c](fd_quic_transport_params.c.md)**: Functions and macros for encoding, decoding, and dumping QUIC transport parameters.
+- **[fd_quic_transport_params.h](fd_quic_transport_params.h.md)**: Defines and manages QUIC transport parameters, including encoding, decoding, and parameter manipulation functions.
+- **[fd_quic_undefs.h](fd_quic_undefs.h.md)**: Undefines template macros related to QUIC structure definitions and frame contexts.
+- **[fuzz_quic_parse_transport_params.c](fuzz_quic_parse_transport_params.c.md)**: Fuzz testing for QUIC transport parameters encoding and decoding.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and objects, and creating unit and fuzz tests for QUIC transport parameters.
+- **[test_quic_transport_params.c](test_quic_transport_params.c.md)**: Tests for QUIC transport parameters, including encoding, decoding, and handling unknown parameters.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
