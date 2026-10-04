@@ -3,10 +3,57 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Slot-done update struct and tower tile declaration for vote, root, and reset state.
+Defines the `fd_tower_slot_done` structure for managing vote state updates and root advancement in a tower tile.
 
 # Purpose
-This header file defines the data interface for the tower tile in the `discof` replay and voting path. It declares `struct fd_tower_slot_done`, which carries the results of finishing replay for a slot, including the vote slot, any new root slot, the unsigned vote transaction, and the reset target for the leader pipeline. The file also includes `fd_topo.h` for topology types, defines the `fd_tower_slot_done_t` alias, and exports the `fd_tile_tower` tile entry point used by the runtime.
+This C header file defines a structure `fd_tower_slot_done` used in a system that manages voting and slot replay in a distributed network. The structure contains fields to track the current voting slot, potential new root slots, and associated block identifiers. It also includes a field for a vote transaction, which is necessary for maintaining the current state of the voting tower, even when no new vote slot is available. The structure supports leader pipeline reset functionality, ensuring that the system can continue building on the correct consensus fork. Additionally, the file includes an external declaration for `fd_tile_tower`, which is likely a function or variable related to the operation of the tower tile in the network.
+# Imports and Dependencies
+
+---
+- `../../disco/topo/fd_topo.h`
+
+
+# Global Variables
+
+---
+### fd\_tile\_tower
+- **Type**: ``fd_topo_run_tile_t``
+- **Description**: `fd_tile_tower` is a global variable of type `fd_topo_run_tile_t`. It is declared as an external variable, indicating that it is defined elsewhere in the program.
+- **Use**: Used to represent a tile in the topology run, likely related to the tower's operation in the system.
+
+
+# Data Structures
+
+---
+### fd\_tower\_slot\_done
+- **Type**: ``struct``
+- **Members**:
+    - `vote_slot`: Stores the slot being voted on, set to `ULONG_MAX` if there is no slot to vote on.
+    - `root_slot`: Indicates the new root slot if a slot replay causes a new root, otherwise set to `ULONG_MAX`.
+    - `root_block_id`: Holds the block ID of the new root slot, set to all zeros if no new root is established.
+    - `new_root`: Flags whether a new root has been established, with 1 indicating a new root and 0 otherwise.
+    - `vote_txn_sz`: Specifies the size of the vote transaction.
+    - `vote_txn`: Contains the vote transaction data, not yet signed.
+    - `reset_slot`: Represents the slot to reset the leader pipeline to, always set.
+    - `reset_block_id`: Holds the block ID for the reset slot.
+- **Description**: Manages the state of a voting process in a distributed system, including the current vote slot, potential new root slot, and reset slot for leader pipeline, along with associated block IDs and transaction data.
+
+
+---
+### fd\_tower\_slot\_done\_t
+- **Type**: ``struct``
+- **Members**:
+    - `vote_slot`: The slot being voted on, set to `ULONG_MAX` when there is no slot to vote on.
+    - `root_slot`: The slot that may become the new root, set to `ULONG_MAX` if not applicable.
+    - `root_block_id`: The block ID associated with the new root slot, set to all zeros if not applicable.
+    - `new_root`: Indicates if a new root has been established, with 1 for true and 0 for false.
+    - `vote_txn_sz`: The size of the vote transaction data.
+    - `vote_txn`: An array containing the vote transaction data, not yet signed.
+    - `reset_slot`: The slot to reset the leader pipeline to, always set.
+    - `reset_block_id`: The block ID associated with the reset slot.
+- **Description**: Represents the state of a slot in the tower tile, including voting information, potential root advancement, and leader pipeline reset details. It manages the vote slot, root slot, and reset slot, along with their associated block IDs and transaction data. The structure supports internal book-keeping and vote refreshing logic.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

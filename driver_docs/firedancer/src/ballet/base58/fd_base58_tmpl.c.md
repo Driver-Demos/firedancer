@@ -3,33 +3,37 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_base58_tmpl.c` file in the `firedancer` codebase provides template functions for encoding and decoding binary data to and from base58, specifically for binary data of lengths 32 or 64 bytes.
+Template for base58 encoding and decoding functions for binary data of specific sizes (32 or 64 bytes).
 
 # Purpose
-This C source code file provides a template for encoding and decoding binary data to and from Base58 format, specifically for binary data of lengths 32 or 64 bytes. The code is designed to be included multiple times with different configurations, as it uses preprocessor directives to define the size of the binary data (`N`), the size of the intermediate representation (`INTERMEDIATE_SZ`), and the size of the binary data in 32-bit limbs (`BINARY_SIZE`). The file defines two main functions: `fd_base58_encode` and `fd_base58_decode`, which handle the conversion of binary data to a Base58 encoded string and vice versa. The encoding process involves converting the binary data into an intermediate format and then into Base58, while the decoding process reverses this transformation.
+The code provides functions for encoding and decoding binary data to and from Base58 format, specifically for binary data of lengths 32 or 64 bytes. Base58 is a binary-to-text encoding scheme that is commonly used in applications like Bitcoin addresses. The code is structured as a template, requiring the user to define certain parameters (`N`, `INTERMEDIATE_SZ`, and `BINARY_SIZE`) before use. These parameters determine the size of the binary data and the intermediate storage required for the conversion process. The code includes two main functions: `fd_base58_encode` and `fd_base58_decode`, which handle the conversion of binary data to Base58 encoded strings and vice versa.
 
-The code is highly optimized for performance, utilizing AVX instructions when available to accelerate the encoding and decoding processes. It includes detailed handling of edge cases, such as leading zeros in the binary data and ensuring that the encoded string has the correct number of leading '1' characters. The file does not define a public API directly but provides a mechanism for generating specific encoding and decoding functions based on the defined size of the binary data. This makes it a specialized utility for applications that require efficient Base58 encoding and decoding of fixed-size binary data, such as cryptographic applications or data serialization tasks.
+The encoding function, `fd_base58_encode`, processes the input binary data by first counting leading zeros, converting the data into a series of 32-bit limbs, and then transforming it into an intermediate format. This intermediate format is further converted into Base58 characters, taking care to handle leading zeros appropriately. The decoding function, `fd_base58_decode`, validates the input Base58 string, converts it back into the intermediate format, and then reconstructs the original binary data. The code is designed to be safe for multiple inclusions and uses conditional compilation to optimize for systems with AVX support. The functions rely on pre-defined tables (`enc_table_N`, `dec_table_N`) and constants (`FD_BASE58_ENCODED_N_SZ`) that must be provided for the specific binary size being used.
 # Functions
 
 ---
 ### SUFFIX<!-- {{#callable:SUFFIX}} -->
-The `SUFFIX(fd_base58_decode)` function decodes a Base58-encoded string into its original binary form, ensuring the input is valid and properly formatted.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_tmpl.c#L299>)
+
+Decodes a Base58 encoded string into its original binary form, ensuring the output matches the expected format and constraints.
 - **Inputs**:
-    - `encoded`: A constant character pointer to the Base58-encoded string that needs to be decoded.
-    - `out`: A pointer to an unsigned character array where the decoded binary data will be stored.
-- **Control Flow**:
-    - Initialize a character count and iterate over the encoded string to validate each character against the Base58 inverse table.
-    - If any character is invalid or the string is too long, return NULL.
-    - Prepend zeros to the raw Base58 array to ensure it has a fixed size, then convert the Base58 characters to their corresponding values using the inverse table.
-    - Convert the raw Base58 values to an intermediate format using base 58^5.
-    - Transform the intermediate values into a binary format using a conversion table, ensuring no overflow occurs by adjusting values to fit within 32-bit limits.
-    - Check if the largest binary term exceeds 2^32, returning NULL if it does.
-    - Convert the binary terms to big-endian format and store them in the output array.
-    - Ensure the number of leading '1's in the encoded string matches the number of leading zeros in the decoded output, returning NULL if they do not match.
-    - Return the output array if all checks pass.
-- **Output**: The function returns a pointer to the output array containing the decoded binary data, or NULL if the input is invalid or improperly formatted.
-- **Functions called**:
-    - [`SUFFIX`](#suffix)
+    - `encoded`: A pointer to a null-terminated string containing the Base58 encoded data.
+    - `out`: A pointer to a buffer where the decoded binary data will be stored.
+- **Logic and Control Flow**:
+    - Initialize `char_cnt` to count characters in `encoded` before the null terminator.
+    - Iterate over `encoded` to validate each character using `base58_inverse` and count valid characters.
+    - Return `NULL` if the string is too long or contains invalid characters.
+    - Calculate the number of leading zeros to prepend to `raw_base58` to make it `RAW58_SZ` characters long.
+    - Convert `raw_base58` to an intermediate format using base 58^5.
+    - Convert the intermediate format to an overcomplete base 2^32 format, ensuring no overflow occurs.
+    - Adjust terms in `binary` to ensure each is less than 2^32, propagating any overflow to the next term.
+    - Return `NULL` if the largest term in `binary` exceeds 2^32, indicating an overflow.
+    - Convert each term in `binary` to big endian and store in `out`.
+    - Ensure the number of leading '1's in `encoded` matches the number of leading zeros in `out`, returning `NULL` if not.
+    - Return `out` if all checks pass.
+- **Output**: A pointer to the `out` buffer containing the decoded binary data, or `NULL` if decoding fails.
+- **Functions Called**:
+    - [`SUFFIX`](<#suffix>)
 
 
 
