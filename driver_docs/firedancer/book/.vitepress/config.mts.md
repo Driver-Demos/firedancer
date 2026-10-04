@@ -3,37 +3,28 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for the Firedancer documentation site using VitePress with custom plugins and theme settings.
+The `config.mts` file in the `firedancer` codebase configures the VitePress site for the Firedancer documentation, including site metadata, navigation, sidebar structure, and plugins.
 
 # Purpose
-The file is a configuration file for VitePress, a static site generator. It defines the site settings for a project named "Firedancer." The configuration specifies the language as 'en-US', sets the site title and description, and includes metadata for the site's head, such as the favicon and theme color. It also configures the VitePress theme, including navigation and sidebar structure, which organizes the documentation into sections like 'Guide', 'API', and 'Internals'. Additionally, it integrates a plugin for version management and provides links for social media and editing the documentation on GitHub. The configuration ensures that the site is structured and styled according to the specified parameters, facilitating easy navigation and access to the documentation.
+The provided file is a configuration file for VitePress, a static site generator powered by Vite, used to set up and customize the documentation site for a project named "Firedancer." This file defines various site-wide settings, including language, title, and description, and configures the site's appearance and functionality through metadata, navigation, and sidebar structures. It specifies the use of a custom plugin, `latestVersion`, to enhance the site's capabilities. The configuration is organized into several conceptual components, such as `head` for HTML metadata, `themeConfig` for visual and navigational elements, and `vite` for plugin integration. This file is crucial for the codebase as it dictates how the documentation is presented and interacted with, ensuring that users have a coherent and accessible experience when accessing the project's guides, API references, and other resources.
 # Content Summary
-The provided configuration file is a VitePress site configuration file for a project named "Firedancer." This file is written in JavaScript and uses the `defineConfig` function from VitePress to set up various site parameters and options.
+The provided configuration file is a VitePress site configuration script for a project named "Firedancer." This file is essential for setting up the documentation site, defining its structure, appearance, and functionality. Here are the key technical details:
 
-Key technical details include:
+1. **Basic Site Information**: The configuration specifies the language (`en-US`), title ("Firedancer"), and description ("Firedancer") of the site. The base URL is set to `'/'`, and the `lastUpdated` feature is enabled to show the last modification date of the pages.
 
-1. **Basic Site Information**: 
-   - The language is set to English (US) with `lang: 'en-US'`.
-   - The site title is "Firedancer" and the description is also "Firedancer".
-   - The base URL for the site is set to `'/'`.
-   - The `lastUpdated` option is enabled, which likely tracks the last update time of the content.
+2. **Head Configuration**: The `head` array includes metadata and link elements for the site. It sets a favicon (`/fire.svg`), a theme color (`#1ce7c2`), and Open Graph metadata for social media sharing, such as the site type (`website`), locale (`en`), and site name (`Firedancer`).
 
-2. **Head Configuration**:
-   - The site includes a link to an SVG icon (`/fire.svg`) and sets a theme color (`#1ce7c2`).
-   - Open Graph meta tags are configured for type, locale, and site name, all related to "Firedancer".
+3. **Vite Plugins**: The configuration imports and uses a plugin named `latestVersion` from `version-plugin.js`, which is integrated into the Vite build process.
 
-3. **Vite Configuration**:
-   - A plugin named `latestVersion` is included, which is imported from a local file `version-plugin.js`.
+4. **Theme Configuration**: 
+   - **Logo**: The site logo is defined with a source path (`/fire.svg`) and dimensions (24x24 pixels).
+   - **Navigation**: The top navigation bar includes links to the "Guide" and "API" sections.
+   - **Sidebar**: The sidebar is organized into sections with collapsible items. It includes guides on "Introduction," "Performance," "Operating," and "Internals," each with relevant subtopics. The API section covers the Command Line Interface, Metrics, and WebSocket.
+   - **Social Links**: A link to the project's GitHub repository is provided, using a GitHub icon.
+   - **Edit Link**: An edit link pattern is set up to allow users to edit pages directly on GitHub, enhancing community contributions.
+   - **Search**: A local search provider is configured for the site, enabling users to search through the documentation efficiently.
 
-4. **Theme Configuration**:
-   - A logo is specified with a source path `/fire.svg` and dimensions of 24x24 pixels.
-   - Navigation links are provided for a "Guide" and "API" section.
-   - The sidebar is organized into sections such as "Guide", "Performance", "Operating", "Internals", and "API", each with relevant links to documentation pages.
-   - Social links include a GitHub icon linking to the Firedancer GitHub repository.
-   - An edit link is configured to allow users to edit pages on GitHub, with a specific URL pattern.
-   - Local search functionality is enabled with `search: { provider: 'local' }`.
-
-This configuration file is essential for setting up the structure, appearance, and functionality of the Firedancer documentation site using VitePress.
+This configuration file is crucial for developers working on the Firedancer documentation site, as it defines the site's structure, navigation, and integration with external resources like GitHub.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
