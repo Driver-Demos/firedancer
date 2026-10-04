@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Builds and runs CI tests, with optional coverage export.
+Builds and runs CI tests, optionally exporting coverage data, and warns about build directory destruction.
 
 # Purpose
-This shell script runs the continuous integration test flow for the project. It checks that `MACHINES` is set, selects default build targets in `TARGETS` when needed, and then loops over each machine value to clean the build tree, build the requested targets, and run unit, fuzz, and script tests unless `NOTEST` is set. When `EXTRAS` includes `llvm-cov`, it also exports coverage data for each build, and when `COV_REPORT` is set it creates a combined coverage report from all object directories. The script is a CI helper entry point, not a library file, and it controls build and test execution across multiple machine configurations.
+The `ci_tests.sh` script is a Bash script designed to automate the process of building and running tests in a continuous integration (CI) environment. It checks for necessary environment variables, such as `MACHINES` and `TARGETS`, and defaults to specific test targets if not set. The script iterates over specified machines, building the project and executing various test suites, including unit tests, fuzz tests, and script tests. It also supports optional coverage data export using `llvm-cov` and can generate a coverage report if the `COV_REPORT` variable is set. The script warns that running it will delete the current build directory, indicating its role in preparing a clean environment for each test run.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
