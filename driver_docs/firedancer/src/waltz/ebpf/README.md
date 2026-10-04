@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Macros for eBPF assembly and BPF syscall wrappers for Linux operations.
+eBPF instruction macros and Linux BPF syscall wrappers.
 
 
 ## Files
-- **[fd_ebpf_asm.h](fd_ebpf_asm.h.md)**: Macros for eBPF assembly instruction encoding and register definitions.
-- **[fd_linux_bpf.h](fd_linux_bpf.h.md)**: BPF syscall wrappers for operations like map manipulation and object pinning on Linux.
+- **[fd_ebpf_asm.h](fd_ebpf_asm.h.md)**: eBPF instruction encoding macros for loads, ALU ops, jumps, calls, and exit.
+- **[fd_linux_bpf.h](fd_linux_bpf.h.md)**: The `fd_linux_bpf.h` file provides inline functions that wrap BPF syscalls for operations such as getting the next key, updating, deleting, and pinning elements in BPF maps on Linux systems.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

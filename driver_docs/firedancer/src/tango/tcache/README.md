@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and headers for a transactional cache system, a Makefile, and unit tests for `fd_tcache`.
+The `tcache` folder in the `firedancer` codebase contains source code and configuration files for managing a transactional cache system, including its implementation, header definitions, build instructions, and unit tests to ensure functionality and performance.
 
 
 ## Files
-- **[fd_tcache.c](fd_tcache.c.md)**: Functions for managing a transactional cache, including creation, joining, leaving, and deletion.
-- **[fd_tcache.h](fd_tcache.h.md)**: Header file for a 64-bit tag cache system optimized for deduplication and performance-critical contexts.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_tcache` in the `firedancer` codebase.
-- **[test_tcache.c](test_tcache.c.md)**: Unit tests for the `fd_tcache` component, including alignment, footprint, query, remove, reset, and benchmarking functionalities.
+- **[fd_tcache.c](fd_tcache.c.md)**: The `fd_tcache.c` file in the `firedancer` codebase provides functions for managing a transactional cache, including creating, joining, leaving, and deleting cache instances with alignment and validation checks.
+- **[fd_tcache.h](fd_tcache.h.md)**: The `fd_tcache.h` file in the `firedancer` codebase defines a cache system for deduplicating traffic by storing and managing a history of unique 64-bit tags, optimized for performance in memory-efficient environments.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_tcache` component, and includes commands to build and run the `test_tcache` unit test.
+- **[test_tcache.c](test_tcache.c.md)**: The `test_tcache.c` file in the `firedancer` codebase contains unit tests for the `tcache` component, verifying its alignment, footprint, mapping, querying, removal, reset, and insertion functionalities, as well as benchmarking its performance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,38 +3,38 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A Bash script to test parallel transaction transmissions using specified parameters and network namespaces.
+The `test-transactions-parallel.sh` file is a Bash script used to execute a specified number of transactions in parallel using the `parallel` command, while reporting the number of successful transmissions.
 
 # Purpose
-This script is a Bash executable that automates the execution of network transactions in parallel. It uses Bash strict mode to ensure robust error handling and sets the internal field separator for safe parsing of input. The script changes the working directory to the script's location and removes temporary files with the prefix `/tmp/run-*`. It reads a specified number of transactions from a transaction file and executes them in parallel using the `parallel` command, with a default of 64 concurrent jobs. Each transaction is processed using the `nsenter` command to enter a network namespace and execute the `fddev txn` command with a base64-encoded payload. The script concludes by reporting the number of successfully transmitted transactions.
+This Bash script is designed to execute a batch processing task, specifically handling network transactions in parallel. It is an executable script that utilizes GNU Parallel to manage the concurrent execution of a specified number of transactions, which are read from a transaction file. The script is configured to run a default of 8,102 transactions from a file named `all.txns`, using up to 64 parallel jobs, unless overridden by command-line arguments. It employs strict error handling to ensure robustness and uses `nsenter` to execute commands within a specific network namespace, indicating its use in a network testing or simulation environment. The script concludes by reporting the number of successful transactions, providing a summary of the operation's effectiveness.
 # Global Variables
 
 ---
 ### SCRIPT\_DIR
 - **Type**: `string`
-- **Description**: `SCRIPT_DIR` is a string variable that stores the absolute path of the directory where the script is located. It uses a combination of shell commands to determine this path by navigating to the directory of the script file and then obtaining the current working directory.
-- **Use**: Stores the script's directory path to ensure subsequent commands execute in the correct directory context.
+- **Description**: `SCRIPT_DIR` is a string variable that stores the absolute path of the directory where the script is located. It is determined by using the `dirname` command on the script's source path (`BASH_SOURCE[0]`) and converting it to an absolute path with `pwd`. This ensures that the script can reliably reference its own directory regardless of the current working directory when the script is executed.
+- **Use**: `SCRIPT_DIR` is used to change the current working directory to the script's directory, ensuring that subsequent commands are executed in the correct context.
 
 
 ---
 ### NUM\_TRANSACTIONS
-- **Type**: ``integer``
-- **Description**: The `NUM_TRANSACTIONS` variable is an integer that specifies the number of transactions to process from the transaction file. It is initialized with a default value of 8102, but can be overridden by a command-line argument.
-- **Use**: Controls the number of lines read from the transaction file and processed in parallel.
+- **Type**: `integer`
+- **Description**: NUM_TRANSACTIONS is a global variable that holds the number of transactions to be processed. It is initialized with a default value of 8102, but can be overridden by a command-line argument.
+- **Use**: This variable is used to determine how many lines from the transaction file (TX_FILE) should be processed in parallel.
 
 
 ---
 ### TX\_FILE
-- **Type**: ``string``
-- **Description**: The `TX_FILE` variable is a global variable that specifies the file name containing transaction data. It is initialized with a default value of `all.txns`, but can be overridden by a command-line argument.
-- **Use**: Specifies the file from which the script reads transaction data to process.
+- **Type**: `string`
+- **Description**: `TX_FILE` is a global variable that holds the name of the file containing transaction data. It is initialized with a default value of 'all.txns', but can be overridden by a second command-line argument when the script is executed.
+- **Use**: This variable is used to specify the source file from which a specified number of transactions are read and processed in parallel.
 
 
 ---
 ### NUM\_JOBS
 - **Type**: `integer`
-- **Description**: The `NUM_JOBS` variable is an integer that specifies the number of parallel jobs to run. It is set to a default value of 64, but can be overridden by providing a third argument when executing the script.
-- **Use**: Controls the number of concurrent processes executed by the `parallel` command.
+- **Description**: `NUM_JOBS` is a global variable that specifies the number of parallel jobs to run when executing the `parallel` command in the script. It is set to a default value of 64, but can be overridden by providing a third argument when running the script.
+- **Use**: This variable is used to control the concurrency level of the `parallel` command, determining how many jobs are executed simultaneously.
 
 
 

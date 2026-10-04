@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Function prototypes for benchmarking commands and topology configuration in the Firedancer application.
+The `bench.h` file in the `firedancer` codebase declares functions and structures for configuring and executing benchmarking commands and topologies.
 
 # Purpose
-This C header file defines function prototypes for benchmarking commands within a software application. It includes necessary dependencies from `fd_config.h` and `fd_action.h` to configure and execute these commands. The function [`bench_cmd_fn`](<#bench_cmd_fn>) is designed to execute a benchmark command using the provided arguments and configuration. The function [`bench_cmd_args`](<#bench_cmd_args>) is responsible for parsing and setting up command-line arguments for the benchmark. Additionally, the [`add_bench_topo`](<#add_bench_topo>) function is declared to configure a benchmarking topology with various parameters such as tile counts, transaction mode, and network settings. The file uses include guards to prevent multiple inclusions.
+This C header file defines the interface for a benchmarking module within a larger application, likely related to network or distributed system performance testing. It includes function prototypes for [`bench_cmd_fn`](#bench_cmd_fn) and [`bench_cmd_args`](#bench_cmd_args), which are presumably used to execute a benchmark command and handle its arguments, respectively. Additionally, the [`add_bench_topo`](#add_bench_topo) function is declared, which appears to configure a benchmarking topology with various parameters such as tile counts, transaction modes, and network settings. The file includes other headers for configuration and action handling, indicating its integration into a broader system. The use of include guards ensures that the header is only included once, preventing redefinition errors during compilation.
 # Imports and Dependencies
 
 ---
@@ -18,29 +18,25 @@ This C header file defines function prototypes for benchmarking commands within 
 
 ---
 ### bench\_cmd\_fn<!-- {{#callable_declaration:bench_cmd_fn}} -->
-[View Source →](<../../../../../../../src/app/shared_dev/commands/bench/bench.h#L7>)
-
 Configures and initializes the benchmarking environment.
-- **Description**: Use this function to set up the necessary configuration and initialize the environment for benchmarking. It adjusts configuration settings based on the provided arguments and ensures that CPU affinity settings are consistent. It also prepares the network namespace and installs XDP if required. This function must be called with valid configuration and argument structures, and it assumes that the configuration file has been properly set up. It logs an error if CPU affinity settings are inconsistent across different configuration sections.
+- **Description**: This function sets up the necessary configuration and initializes the environment for running benchmarks. It should be called with valid configuration and argument structures to ensure proper setup. The function adjusts network settings, CPU affinity, and other parameters based on the provided configuration. It also performs necessary checks to ensure consistency in CPU affinity settings across different components. This function must be called before executing any benchmarking tasks to ensure the environment is correctly configured.
 - **Inputs**:
-    - `args`: A pointer to an `args_t` structure containing command-line arguments. Must not be null.
-    - `config`: A pointer to a `config_t` structure containing configuration settings. Must not be null and should be properly initialized before calling this function.
+    - `args`: A pointer to an `args_t` structure containing command-line arguments and options. The structure must be properly initialized and must not be null. The function uses this to determine specific configuration options, such as whether QUIC is disabled.
+    - `config`: A pointer to a `config_t` structure containing the configuration settings for the benchmarking environment. This structure must be fully initialized and must not be null. The function modifies this configuration to set up the environment, including network and CPU affinity settings.
 - **Output**: None
-- **See Also**: [`bench_cmd_fn`](<bench.c.md#bench_cmd_fn>)  (Implementation)
+- **See also**: [`bench_cmd_fn`](bench.c.md#bench_cmd_fn)  (Implementation)
 
 
 ---
 ### bench\_cmd\_args<!-- {{#callable_declaration:bench_cmd_args}} -->
-[View Source →](<../../../../../../../src/app/shared_dev/commands/bench/bench.h#L10>)
-
 Parses command-line arguments to configure benchmark settings.
-- **Description**: Use this function to parse command-line arguments and update the benchmark settings in the `args` structure. It checks for the presence of the `--no-quic` flag in the command-line arguments and updates the `no_quic` field in the `args` structure accordingly. This function must be called with valid pointers to the argument count and argument vector, as well as a valid `args` structure. Ensure that the command-line arguments are correctly formatted and that the pointers provided are not null.
+- **Description**: This function processes command-line arguments to adjust the benchmark configuration, specifically checking for the presence of the '--no-quic' flag. It should be called during the initialization phase of a benchmark application to modify the behavior of the benchmark based on user-specified command-line options. The function updates the 'args' structure to reflect the presence of the '--no-quic' flag, which disables QUIC protocol usage in the benchmark. It is important to ensure that 'pargc' and 'pargv' are correctly initialized with the command-line argument count and values, respectively, before calling this function.
 - **Inputs**:
-    - `pargc`: Pointer to the argument count. Must not be null. The function uses this to access and modify the number of command-line arguments.
-    - `pargv`: Pointer to the argument vector. Must not be null. The function uses this to access and modify the list of command-line arguments.
-    - `args`: Pointer to an `args_t` structure where the parsed command-line options will be stored. Must not be null. The function updates the `no_quic` field based on the presence of the `--no-quic` flag.
+    - `pargc`: A pointer to an integer representing the count of command-line arguments. It must not be null and should be initialized with the number of arguments passed to the program.
+    - `pargv`: A pointer to an array of strings representing the command-line arguments. It must not be null and should be initialized with the argument values passed to the program.
+    - `args`: A pointer to an 'args_t' structure where the parsed command-line options will be stored. The caller retains ownership and it must be a valid pointer.
 - **Output**: None
-- **See Also**: [`bench_cmd_args`](<bench.c.md#bench_cmd_args>)  (Implementation)
+- **See also**: [`bench_cmd_args`](bench.c.md#bench_cmd_args)  (Implementation)
 
 
 
