@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_neigh4_netlink.c` file in the `firedancer` codebase tests the functionality of dumping and managing neighbor tables for network interfaces using netlink in a Linux environment.
+Tests the functionality of dumping neighbor tables for all Ethernet interfaces using netlink.
 
 # Purpose
-This C source code file is an executable program designed to interact with the Linux kernel's networking stack using the Netlink protocol. Its primary purpose is to retrieve and display the neighbor tables for all Ethernet interfaces on a system. The code achieves this by sending Netlink requests to the kernel to list all network interfaces and then iterating over these interfaces to request and process their neighbor tables. The neighbor tables are stored in a hash map structure (`fd_neigh4_hmap_t`), which is initialized, populated, and then reinitialized for each interface. The program logs the output to standard error, providing a detailed view of the neighbor tables for diagnostic or monitoring purposes.
+The code is an executable C program that interacts with network interfaces to manage and display neighbor tables for Ethernet interfaces using the Netlink protocol. It includes functions to request and process network interface information and neighbor table entries. The program initializes a workspace and sets up Netlink sockets to communicate with the kernel. It uses these sockets to send requests for network interface information and to dump neighbor tables for each Ethernet interface found. The neighbor table entries are stored in a hash map structure, which is initialized, populated, and then reinitialized after dumping the current state to standard error output.
 
-The code is structured around several key components: the [`main`](#main) function, which sets up the environment and initializes resources; the [`dump_neighbor_table`](#dump_neighbor_table) function, which handles the retrieval and processing of neighbor table data for a specific interface; and the [`dump_all_neighbor_tables`](#dump_all_neighbor_tables) function, which orchestrates the process for all interfaces. The program uses a combination of custom data structures and functions (e.g., `fd_neigh4_hmap_t`, `fd_netlink_t`) and standard Linux networking headers to perform its tasks. It does not define public APIs or external interfaces, as it is intended to be run as a standalone utility rather than a library to be imported elsewhere.
+The main components of the code include the [`dump_neighbor_table`](<#dump_neighbor_table>) and [`dump_all_neighbor_tables`](<#dump_all_neighbor_tables>) functions, which handle the retrieval and display of neighbor table information. The [`main`](<#main>) function sets up the environment, initializes necessary resources, and orchestrates the process of dumping neighbor tables. The program uses several utility functions and structures, such as `fd_neigh4_hmap_t` for managing neighbor table entries and `fd_netlink_t` for Netlink communication. The code is structured to handle errors and log messages, ensuring that the operations are traceable and any issues are reported.
 # Imports and Dependencies
 
 ---
@@ -27,70 +27,73 @@ The code is structured around several key components: the [`main`](#main) functi
 
 ---
 ### dump\_neighbor\_table<!-- {{#callable:dump_neighbor_table}} -->
-The `dump_neighbor_table` function retrieves and logs the neighbor table for a specified network interface, then reinitializes the neighbor hash map.
+[View Source →](<../../../../../src/waltz/neigh/test_neigh4_netlink.c#L11>)
+
+Dumps and reinitializes the neighbor table for a specified network interface.
 - **Inputs**:
-    - `map`: A pointer to an `fd_neigh4_hmap_t` structure representing the neighbor hash map to be updated and reinitialized.
-    - `netlink1`: A pointer to an `fd_netlink_t` structure used for sending and receiving netlink messages.
-    - `if_idx`: An integer representing the index of the network interface for which the neighbor table is to be dumped.
-- **Control Flow**:
-    - Call [`fd_neigh4_netlink_request_dump`](fd_neigh4_netlink.c.md#fd_neigh4_netlink_request_dump) to request a dump of the neighbor table for the specified interface index using `netlink1`.
-    - Initialize a buffer and an iterator for processing netlink messages.
-    - Iterate over the netlink messages using `fd_netlink_iter_init`, `fd_netlink_iter_done`, and `fd_netlink_iter_next`.
-    - For each message, call [`fd_neigh4_netlink_ingest_message`](fd_neigh4_netlink.c.md#fd_neigh4_netlink_ingest_message) to update the neighbor hash map with the message data.
-    - Retrieve and print the interface name using `if_indextoname` and log the current neighbor table using [`fd_neigh4_hmap_fprintf`](fd_neigh4_map.c.md#fd_neigh4_hmap_fprintf).
-    - Flush the log buffer to ensure all messages are output.
-    - Retrieve parameters of the current hash map such as `ele_max`, `lock_cnt`, `probe_max`, `seed`, `shmap`, `shele`, and `ljoin`.
-    - Delete the current hash map using `fd_neigh4_hmap_delete`.
-    - Clear the hash map entries using `fd_memset`.
-    - Recreate the hash map with `fd_neigh4_hmap_new` and rejoin it with `fd_neigh4_hmap_join`.
-- **Output**: The function does not return a value; it operates by side effects on the provided neighbor hash map and logs output to `stderr`.
-- **Functions called**:
-    - [`fd_neigh4_netlink_request_dump`](fd_neigh4_netlink.c.md#fd_neigh4_netlink_request_dump)
-    - [`fd_neigh4_netlink_ingest_message`](fd_neigh4_netlink.c.md#fd_neigh4_netlink_ingest_message)
-    - [`fd_neigh4_hmap_fprintf`](fd_neigh4_map.c.md#fd_neigh4_hmap_fprintf)
+    - `map`: A pointer to the `fd_neigh4_hmap_t` structure representing the neighbor table.
+    - `netlink1`: A pointer to the `fd_netlink_t` structure used for netlink communication.
+    - `if_idx`: An integer representing the index of the network interface.
+- **Logic and Control Flow**:
+    - Calls [`fd_neigh4_netlink_request_dump`](<fd_neigh4_netlink.c.md#fd_neigh4_netlink_request_dump>) to request a dump of the neighbor table for the specified interface.
+    - Initializes a buffer and an iterator for processing netlink messages.
+    - Iterates over the netlink messages using `fd_netlink_iter_init`, `fd_netlink_iter_done`, and `fd_netlink_iter_next`.
+    - Ingests each netlink message into the neighbor table using [`fd_neigh4_netlink_ingest_message`](<fd_neigh4_netlink.c.md#fd_neigh4_netlink_ingest_message>).
+    - Prints the current state of the neighbor table to `stderr` using [`fd_neigh4_hmap_fprintf`](<fd_neigh4_map.c.md#fd_neigh4_hmap_fprintf>).
+    - Reinitializes the neighbor table by deleting the current map, clearing the entries, and creating a new map with the same parameters.
+- **Output**: No return value; the function operates on the provided data structures and outputs to `stderr`.
+- **Functions Called**:
+    - [`fd_neigh4_netlink_request_dump`](<fd_neigh4_netlink.c.md#fd_neigh4_netlink_request_dump>)
+    - [`fd_neigh4_netlink_ingest_message`](<fd_neigh4_netlink.c.md#fd_neigh4_netlink_ingest_message>)
+    - [`fd_neigh4_hmap_fprintf`](<fd_neigh4_map.c.md#fd_neigh4_hmap_fprintf>)
 
 
 ---
 ### dump\_all\_neighbor\_tables<!-- {{#callable:dump_all_neighbor_tables}} -->
-The `dump_all_neighbor_tables` function retrieves and processes the neighbor tables for all Ethernet interfaces using netlink sockets.
+[View Source →](<../../../../../src/waltz/neigh/test_neigh4_netlink.c#L46>)
+
+Dumps neighbor tables for all Ethernet interfaces by sending a netlink request and processing the responses.
 - **Inputs**:
-    - `map`: A pointer to a `fd_neigh4_hmap_t` structure, which is used to store and manage the neighbor table entries.
-    - `netlink0`: A pointer to a `fd_netlink_t` structure, used for sending and receiving netlink messages to list network interfaces.
-    - `netlink1`: A pointer to a `fd_netlink_t` structure, used for processing individual neighbor tables for each interface.
-- **Control Flow**:
-    - Initialize a netlink message request to list all network interfaces with Ethernet type using `netlink0`.
-    - Send the request using the `send` function and check for errors in sending the message.
-    - Log a notice indicating the start of dumping neighbor tables for all Ethernet interfaces.
-    - Initialize a buffer and an iterator for processing netlink messages received in response to the request.
-    - Iterate over the received netlink messages using `fd_netlink_iter_t` to process each message.
-    - Check for errors in the netlink messages and log errors if any are found.
-    - For each valid `RTM_NEWLINK` message, extract the interface index and call [`dump_neighbor_table`](#dump_neighbor_table) to process the neighbor table for that interface.
-- **Output**: The function does not return a value; it performs operations to dump neighbor tables and logs the results.
-- **Functions called**:
-    - [`dump_neighbor_table`](#dump_neighbor_table)
+    - ``map``: A pointer to `fd_neigh4_hmap_t`, which is used to store the neighbor table data.
+    - ``netlink0``: A pointer to `fd_netlink_t`, used to send and receive netlink messages for listing network interfaces.
+    - ``netlink1``: A pointer to `fd_netlink_t`, used to send and receive netlink messages for dumping neighbor tables.
+- **Logic and Control Flow**:
+    - Initialize a netlink request to list all network interfaces with `RTM_GETLINK` and `NLM_F_DUMP` flags.
+    - Send the netlink request using `netlink0` and check for errors in sending.
+    - Log a notice about dumping neighbor tables for all Ethernet interfaces.
+    - Initialize a buffer and an iterator for processing netlink messages.
+    - Iterate over the received netlink messages using `fd_netlink_iter_t`.
+    - For each message, check if it is an error message (`NLMSG_ERROR`) and log an error if so.
+    - If the message type is not `RTM_NEWLINK`, log a debug message and continue to the next message.
+    - For each valid `RTM_NEWLINK` message, extract the interface index and call [`dump_neighbor_table`](<#dump_neighbor_table>) to process the neighbor table for that interface.
+- **Output**: No return value; the function logs errors and notices, and processes neighbor tables for each Ethernet interface.
+- **Functions Called**:
+    - [`dump_neighbor_table`](<#dump_neighbor_table>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, sets up shared memory and network link structures, processes command-line arguments, creates a hash map for network neighbors, dumps neighbor tables for all Ethernet interfaces, and then cleans up resources before exiting.
+[View Source →](<../../../../../src/waltz/neigh/test_neigh4_netlink.c#L102>)
+
+Initializes the environment, sets up shared memory and network link structures, processes command-line arguments, and dumps neighbor tables for all Ethernet interfaces.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Determine the CPU index and adjust if it exceeds the shared memory CPU count.
-    - Parse command-line arguments for page size, page count, and NUMA index, with defaults if not provided.
-    - Convert the page size string to an actual size and log an error if unsupported.
-    - Create an anonymous workspace with the specified page size, count, and NUMA index.
-    - Initialize two netlink structures with different sequence numbers and verify their creation.
-    - Allocate memory for a hash map and its elements in the workspace and verify allocations.
-    - Create a new hash map for network neighbors and join it to the allocated memory.
-    - Dump all neighbor tables for Ethernet interfaces using the initialized netlink structures.
-    - Finalize the netlink structures and clean up the hash map and workspace allocations.
-    - Log a success message and halt the program.
-- **Output**: The function returns an integer, specifically 0, indicating successful execution.
-- **Functions called**:
-    - [`dump_all_neighbor_tables`](#dump_all_neighbor_tables)
+    - `argc`: The count of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Determines the CPU index using `fd_tile_cpu_id` and `fd_tile_idx`, and adjusts it if it exceeds the shared memory CPU count.
+    - Processes command-line arguments to get page size, page count, and NUMA index, with defaults if not provided.
+    - Converts the page size string to an unsigned long and logs an error if the conversion fails.
+    - Creates an anonymous workspace with the specified page size, page count, and NUMA index, and checks for successful creation.
+    - Initializes two `fd_netlink_t` structures with different IDs and checks for successful initialization.
+    - Allocates memory for a hash map and element storage in the workspace, and checks for successful allocation.
+    - Creates a new neighbor hash map and joins it to the allocated memory, checking for success.
+    - Calls [`dump_all_neighbor_tables`](<#dump_all_neighbor_tables>) to process and display neighbor tables for all Ethernet interfaces.
+    - Finalizes the `fd_netlink_t` structures and releases resources associated with the neighbor hash map and workspace.
+    - Logs a notice indicating successful completion and calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`dump_all_neighbor_tables`](<#dump_all_neighbor_tables>)
 
 
 

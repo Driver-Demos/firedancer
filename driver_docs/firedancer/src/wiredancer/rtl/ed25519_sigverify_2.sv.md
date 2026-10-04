@@ -3,34 +3,34 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ed25519_sigverify_2.sv` file implements a module for verifying Ed25519 signatures using modular multiplication within the Firedancer codebase.
+Implements an ED25519 signature verification module with state management and modular multiplication.
 
 # Purpose
-The provided Verilog code defines a module named `ed25519_sigverify_2`, which is part of a digital signature verification process using the Ed25519 algorithm. This module is specifically designed to handle the multiplication and modular reduction operations required in the signature verification process. The module interfaces with other components through input and output signals, including a clock (`clk`) and reset (`rst`) signal, and it uses a state machine to control the flow of data through the module. The key technical components include the instantiation of another module, `ed25519_mul_modp`, which performs the core multiplication and modular reduction operations, and the use of state variables (`st_i` and `st_o`) to manage the sequence of operations.
+The `ed25519_sigverify_2` module is designed to perform signature verification using the Ed25519 algorithm. It is a specialized component that interfaces with other modules to verify digital signatures. The module takes several inputs, including a clock signal (`clk`), a reset signal (`rst`), and various data inputs (`i_w`, `i_v`, `i_m`). It produces outputs that indicate the verification status (`o_v`) and processed metadata (`o_m`). The module uses a state machine to manage its operations, transitioning between states based on input conditions and internal logic.
 
-The module is structured to handle inputs and outputs related to the signature verification process, such as `i_m` and `o_m`, which are metadata types (`sv_meta6_t` and `sv_meta7_t`) that likely encapsulate necessary parameters for the Ed25519 operations. The module's primary function is to prepare and process data for the `ed25519_mul_modp` instance, ensuring that the multiplication results are correctly verified against expected values. This code is a specialized component within a larger cryptographic system, focusing on the mathematical operations needed for Ed25519 signature verification, and it is not a general-purpose library but rather a specific implementation detail within a cryptographic verification pipeline.
+A key component of this module is the instantiation of the `ed25519_mul_modp` submodule, which performs modular multiplication, a critical operation in the Ed25519 signature verification process. The module uses internal logic to prepare inputs for the multiplication operation and processes the results to determine the validity of the signature. The state machine controls the flow of data and ensures that the module operates correctly in response to the clock and reset signals. The use of `sv_meta6_t` and `sv_meta7_t` types suggests that the module handles complex data structures, likely related to the signature and metadata involved in the verification process.
 # Modules
 
 ---
 ### ed25519\_sigverify\_2
-The `ed25519_sigverify_2` module is designed to perform signature verification using the Ed25519 algorithm. It interfaces with an internal multiplication module to process input data and produce verification results.
+Implements a signature verification process using the Ed25519 algorithm. Utilizes a modular multiplication submodule to perform cryptographic operations.
 - **Constants**:
-    - `MUL_T`: A constant parameter set to 32'h007F_CCC2, used in the multiplication module for configuration.
+    - ``MUL_T``: A constant parameter set to `32'h007F_CCC2`, used in the `ed25519_mul_modp` submodule.
 - **Ports**:
-    - `i_r`: Output logic signal indicating the state of the input process.
-    - `i_w`: Input wire signal used to control the write operation.
-    - `i_v`: Input wire signal used to control the verification operation.
-    - `i_m`: Input wire carrying metadata of type `sv_meta6_t`.
-    - `o_v`: Output logic signal indicating the state of the output process.
-    - `o_m`: Output logic carrying metadata of type `sv_meta7_t`.
-    - `clk`: Input wire for the clock signal.
-    - `rst`: Input wire for the reset signal.
-- **Logic And Control Flow**:
-    - The module uses two always_ff blocks triggered on the positive edge of the clock signal to manage state transitions and data processing.
-    - The first always_ff block handles the input state machine, transitioning between states based on input signals `i_v` and `i_w`, and assigns values to the multiplication inputs `mul_i_A` and `mul_i_B`.
-    - The second always_ff block manages the output state machine, updating the output metadata `o_mm` and controlling the output signal `o_v` based on the results from the multiplication module.
-    - The module instantiates an `ed25519_mul_modp` submodule, which performs modular multiplication using the inputs `mul_i_A`, `mul_i_B`, and `mul_i_m`, and outputs the result to `mul_o_C`.
-    - The reset signal `rst` is used to initialize or reset the state machines `st_i` and `st_o` to zero.
+    - ``i_r``: An output logic signal indicating the state of the input process.
+    - ``i_w``: An input wire signal used to control the input process.
+    - ``i_v``: An input wire signal used to validate the input process.
+    - ``i_m``: An input wire carrying metadata of type `sv_meta6_t`.
+    - ``o_v``: An output logic signal indicating the state of the output process.
+    - ``o_m``: An output logic signal carrying metadata of type `sv_meta7_t`.
+    - ``clk``: An input wire for the clock signal.
+    - ``rst``: An input wire for the reset signal.
+- **Logic and Control Flow**:
+    - Uses two always_ff blocks triggered on the positive edge of `clk` to manage state transitions and data processing.
+    - The first always_ff block handles the input state `st_i`, initializing multiplication inputs and transitioning states based on `i_v` and `i_w`.
+    - The second always_ff block manages the output state `st_o`, updating output metadata and transitioning states based on `mul_o_v`.
+    - The `ed25519_mul_modp` submodule performs modular multiplication using inputs `mul_i_A`, `mul_i_B`, and `mul_i_m`, and outputs `mul_o_C`, `mul_o_m`, and `mul_o_v`.
+    - Resets `st_i` and `st_o` to 0 when `rst` is high.
 
 
 
