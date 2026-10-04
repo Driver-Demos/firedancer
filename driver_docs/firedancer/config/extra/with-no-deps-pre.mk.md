@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Sets the OPT variable to a nonexistent path.
+The `with-no-deps-pre.mk` file in the `firedancer` codebase sets an option path to a non-existent directory.
 
 # Purpose
-The `OPT` variable is set to the path `/nonexistent`. This configuration is likely used to define a default or placeholder path that does not exist in the file system.
+This file snippet is a Makefile variable assignment, where the variable `OPT` is set to the path `/nonexistent`. This is likely used as a placeholder or default value in a build process, indicating that the path should be replaced or configured with a valid directory path before execution.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
