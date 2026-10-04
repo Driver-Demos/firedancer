@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for UDP socket functionality if hosted.
+The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `udpsock` component, including headers, object files, and a unit test, conditioned on the `FD_HAS_HOSTED` flag.
 
 # Purpose
-The `Makefile` snippet uses conditional directives to manage the build process for a project. If the `FD_HAS_HOSTED` variable is defined, it adds the header file `fd_udpsock.h` and the object files `fd_udpsock` and `fd_waltz` to the build. It also sets up a unit test named `test_udpsock_echo`, which depends on `fd_waltz` and `fd_util`.
+This is a Makefile snippet used for conditional compilation. It checks if the `FD_HAS_HOSTED` variable is defined and, if so, adds headers and object files related to `fd_udpsock` and `fd_waltz` to the build process. Additionally, it sets up a unit test named `test_udpsock_echo` that depends on `fd_waltz` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

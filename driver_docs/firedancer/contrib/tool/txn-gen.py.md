@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A tool for generating and sending Solana transactions with various types and configurations.
+The `txn-gen.py` file in the `firedancer` codebase is a Python script designed to generate and send various types of transactions to specified TPU UDP endpoints, utilizing Solana's blockchain infrastructure and supporting functionalities such as account creation, token transfers, and transaction monitoring.
 
 # Purpose
-The code is a Python script designed to interact with the Solana blockchain, specifically for managing and sending transactions. It imports various modules and libraries to facilitate blockchain operations, including `solana.rpc.api`, `solders`, and `spl.token`. The script defines several functions to perform tasks such as fetching recent block hashes, checking account balances, creating accounts, and sending different types of transactions (e.g., system transfers, token transfers, and nano token transfers). It uses multiprocessing and threading to handle concurrent operations, allowing for efficient transaction processing and monitoring.
+This Python script is designed to facilitate the creation and management of Solana blockchain transactions, specifically focusing on different types of token transfers. It serves as a comprehensive tool for setting up accounts, funding them, and executing transactions across the Solana network. The script is structured to handle various transaction types, including system transfers, token transfers, and nano-token transfers, utilizing the Solana and SPL token libraries. It also incorporates multiprocessing and threading to efficiently manage and send transactions to multiple Transaction Processing Units (TPUs) concurrently.
 
-The script is structured to be executed as a standalone program, as indicated by the `main()` function and the `if __name__ == "__main__":` block. It uses command-line arguments to configure its operation, such as specifying the number of keys, transaction type, and account access distribution. The script sets up UDP connections to send transactions to specified TPU endpoints and includes mechanisms to monitor transaction throughput and fetch recent block hashes continuously. The primary purpose of the script is to automate the process of creating accounts and sending transactions on the Solana blockchain, making it suitable for testing or managing blockchain operations at scale.
+The script begins by parsing command-line arguments to configure the transaction parameters, such as the number of keys, transaction type, and account access distribution. It then initializes key components, including the Solana client, funder account, and network socket for UDP communication. The script defines several functions to create and fund accounts, generate transactions, and send them to the network. It also includes monitoring and fetching mechanisms to track transaction throughput and update recent blockhashes. The main function orchestrates these components, setting up the necessary accounts and launching worker processes to execute transactions in parallel, ensuring high throughput and efficient resource utilization.
 # Imports and Dependencies
 
 ---
@@ -68,536 +68,492 @@ The script is structured to be executed as a standalone program, as indicated by
 
 ---
 ### TXN\_TYPE\_EMPTY
-- **Type**: ``int``
-- **Description**: Represents a transaction type identifier for an empty transaction. It is assigned the integer value `0`. This variable is part of a set of constants that define different transaction types.
-- **Use**: Used to specify the type of transaction as empty in various transaction processing functions.
+- **Type**: `int`
+- **Description**: `TXN_TYPE_EMPTY` is a global integer variable that represents a transaction type with a value of 0. It is used to denote an empty transaction type in the context of the application.
+- **Use**: This variable is used to identify and handle empty transactions within the transaction processing logic.
 
 
 ---
 ### TXN\_TYPE\_SYSTEM\_TRANSFER
-- **Type**: ``int``
-- **Description**: Represents a constant integer value used to identify a specific type of transaction, specifically a system transfer transaction, in the code. It is assigned the value `1`.
-- **Use**: Used to specify the transaction type as a system transfer in various functions and logic throughout the code.
+- **Type**: `int`
+- **Description**: `TXN_TYPE_SYSTEM_TRANSFER` is a global integer variable that represents a specific type of transaction, specifically a system transfer, within the application. It is assigned the value `1`, indicating its unique identifier among other transaction types.
+- **Use**: This variable is used to identify and differentiate system transfer transactions from other types of transactions in the code.
 
 
 ---
 ### TXN\_TYPE\_TOKEN\_TRANSFER
-- **Type**: ``int``
-- **Description**: Represents the transaction type identifier for token transfer operations. It is assigned the integer value `2`, which is used to distinguish token transfer transactions from other types of transactions in the system.
-- **Use**: Used to specify the type of transaction when creating or processing transactions that involve token transfers.
+- **Type**: `int`
+- **Description**: `TXN_TYPE_TOKEN_TRANSFER` is a global integer variable that represents a specific type of transaction, specifically a token transfer transaction, within the system. It is assigned the value `2`, which is used as an identifier for this transaction type.
+- **Use**: This variable is used to specify and identify token transfer transactions in the code, particularly when creating or processing transactions.
 
 
 ---
 ### TXN\_TYPE\_NANO\_TOKEN\_TRANSFER
 - **Type**: `int`
-- **Description**: Represents a constant integer value used to identify a specific type of transaction, specifically a nano token transfer, within the system.
-- **Use**: Used to specify the transaction type as a nano token transfer in various functions and logic throughout the code.
+- **Description**: `TXN_TYPE_NANO_TOKEN_TRANSFER` is a global integer variable set to the value 3. It is used as a constant to represent a specific type of transaction, namely a 'nano token transfer', within the codebase.
+- **Use**: This variable is used to identify and handle nano token transfer transactions in the application logic.
 
 
 ---
 ### ACCT\_ACCESS\_DIST\_REGULAR
-- **Type**: ``int``
-- **Description**: Represents a constant integer value used to define a specific type of account access distribution. It is set to `0`, indicating a regular distribution type.
-- **Use**: Used to specify the type of account access distribution in transaction processing.
+- **Type**: `int`
+- **Description**: `ACCT_ACCESS_DIST_REGULAR` is a global integer variable set to 0. It is used to represent a specific type of account access distribution in the context of transaction processing.
+- **Use**: This variable is used to determine the account access distribution strategy when sending transactions, specifically indicating a regular distribution.
 
 
 ---
 ### ACCT\_ACCESS\_DIST\_POWER
 - **Type**: `int`
-- **Description**: Represents a constant integer value used to specify a type of account access distribution.
-- **Use**: Used to determine the account access distribution type in transaction processing.
+- **Description**: `ACCT_ACCESS_DIST_POWER` is a global integer variable set to the value 1. It is used to represent a specific account access distribution type in the context of transaction processing.
+- **Use**: This variable is used to determine the account access distribution strategy, specifically the 'power' distribution, when sending transactions.
 
 
 ---
 ### NANO\_TOKEN\_ID
-- **Type**: ``Pubkey``
-- **Description**: Represents a public key for a specific token, identified by the string 'GjyKyRCSygSaszrjJFu43jkAshFc1sWs45HqKEDXhvwx'. This public key is used in the context of Solana blockchain operations.
-- **Use**: Used as the owner identifier in various account creation and transaction operations related to the NANO token.
+- **Type**: `Pubkey`
+- **Description**: `NANO_TOKEN_ID` is a global variable that holds a `Pubkey` object, which is initialized using the `from_string` method with a specific string representing a public key. This public key is likely used to identify a specific token or account within the Solana blockchain ecosystem.
+- **Use**: This variable is used as the owner or program ID in various transaction and account creation operations, particularly related to nano token transfers.
 
 
 ---
 ### NOOP\_ID
-- **Type**: ``Pubkey``
-- **Description**: Represents a public key object created from a string that is used as a unique identifier for a 'No Operation' token. This public key is generated using the `from_string` method of the `Pubkey` class with a specific string value.
-- **Use**: Used as a constant identifier for a 'No Operation' token within the application.
+- **Type**: `Pubkey`
+- **Description**: `NOOP_ID` is a global variable that holds a `Pubkey` object created from a specific string identifier, "NoopToken1111111111111111111111111111111111". This identifier is likely used as a placeholder or a default value in the context of Solana transactions or programs.
+- **Use**: This variable is used to represent a public key for a 'No Operation' token, potentially serving as a default or placeholder in transaction operations.
 
 
 ---
 ### seed\_file
 - **Type**: `file object`
-- **Description**: Opens the file located at `../test-ledger/faucet-keypair.json` in read mode. This file is expected to contain JSON data that is used to initialize the `top_seed` variable.
-- **Use**: Used to read JSON data from a file to initialize the `top_seed` variable.
+- **Description**: The `seed_file` variable is a file object that is opened in read mode. It points to the file located at '../test-ledger/faucet-keypair.json'. This file is expected to contain JSON data that is used to initialize the `top_seed` variable.
+- **Use**: This variable is used to read JSON data from a file, which is then converted into bytes and used for cryptographic operations.
 
 
 ---
 ### top\_seed
-- **Type**: ``bytes``
-- **Description**: The `top_seed` variable is a byte sequence that is loaded from a JSON file named `faucet-keypair.json`. This file is opened in read mode, and its contents are parsed using the `json.load` function, which returns a Python object. The object is then converted into a byte sequence using the `bytes` constructor.
-- **Use**: Used as a seed for generating key pairs with specific derivation paths.
+- **Type**: `bytes`
+- **Description**: The `top_seed` variable is a byte sequence obtained by loading JSON data from a file named `seed_file`. This JSON data is then converted into bytes, which are used as a seed for cryptographic operations.
+- **Use**: This variable is used to generate key pairs with specific derivation paths for cryptographic operations.
 
 
 ---
 ### fd\_mint
-- **Type**: ``Keypair``
-- **Description**: Represents a keypair generated from a seed and a derivation path. The `fd_mint` variable is created using the `Keypair.from_seed_and_derivation_path` method, which takes a seed (`top_seed`) and a specific derivation path (`m/44'/45'/30'/99999'`).
-- **Use**: Used to generate a public key for the mint address and to sign transactions related to the minting process.
+- **Type**: `Keypair`
+- **Description**: The `fd_mint` variable is an instance of the `Keypair` class, created using a seed and a specific derivation path. It represents a cryptographic key pair used in the Solana blockchain, specifically for minting tokens.
+- **Use**: This variable is used to generate and manage a public/private key pair for a token minting account in the Solana blockchain.
 
 
 ---
 ### config\_acc
-- **Type**: ``Keypair``
-- **Description**: Represents a keypair object created from bytes loaded from a JSON configuration file. The keypair is initialized using the `Keypair.from_bytes` method, which converts the byte data into a keypair object.
-- **Use**: Used to manage and access the public key and private key for a specific account configuration.
+- **Type**: `Keypair`
+- **Description**: The `config_acc` variable is an instance of the `Keypair` class, created by loading a JSON file located at `../keygrinds/config.json` and converting its contents into bytes. This keypair is used to represent a cryptographic key pair, which includes a public and private key, for authentication and encryption purposes.
+- **Use**: This variable is used to store and manage the cryptographic key pair for the configuration account, which is utilized in various functions for signing transactions and managing account operations.
 
 
 ---
 ### nano\_mint
-- **Type**: ``Keypair``
-- **Description**: Represents a keypair generated from a seed and a specific derivation path. The `nano_mint` variable is created using the `Keypair.from_seed_and_derivation_path` method with a seed (`top_seed`) and a derivation path (`m/44'/45'/30'/99996'`).
-- **Use**: Used to generate a public key for the nano mint address and to sign transactions related to the nano mint account.
+- **Type**: `Keypair`
+- **Description**: The `nano_mint` variable is an instance of the `Keypair` class, created using a seed and a specific derivation path. It represents a cryptographic key pair used in blockchain transactions, specifically for a minting operation in a Solana-based application.
+- **Use**: This variable is used to generate and manage a public/private key pair for minting operations, allowing the application to interact with the blockchain securely.
 
 
 # Functions
 
 ---
 ### get\_recent\_blockhash<!-- {{#callable:firedancer/contrib/tool/txn-gen.get_recent_blockhash}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L63>)
-
-Fetches the most recent blockhash from a Solana RPC endpoint.
+The `get_recent_blockhash` function retrieves the latest blockhash from a Solana RPC endpoint.
 - **Inputs**:
-    - `rpc`: A string representing the URL of the Solana RPC endpoint to query.
-- **Logic and Control Flow**:
-    - Constructs a JSON-RPC request payload to get the latest blockhash with a commitment level of 'processed'.
-    - Sends a POST request to the specified RPC endpoint with the constructed payload.
-    - Parses the JSON response to extract the blockhash value.
-    - Converts the blockhash string into a `Hash` object and returns it.
-- **Output**: A `Hash` object representing the most recent blockhash.
+    - `rpc`: A string representing the URL of the Solana RPC endpoint to query for the latest blockhash.
+- **Control Flow**:
+    - Constructs a JSON-RPC request payload as a string to call the 'getLatestBlockhash' method with 'processed' commitment.
+    - Sends a POST request to the specified RPC endpoint with the constructed JSON-RPC payload and appropriate headers.
+    - Parses the JSON response to extract the 'blockhash' value from the nested 'result' and 'value' fields.
+    - Converts the extracted blockhash string into a Hash object using the `Hash.from_string` method.
+- **Output**: Returns a `Hash` object representing the latest blockhash obtained from the RPC response.
 
 
 ---
 ### get\_balance<!-- {{#callable:firedancer/contrib/tool/txn-gen.get_balance}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L68>)
-
-Fetches the balance of a given account using an RPC endpoint.
+The `get_balance` function retrieves the balance of a given account from a specified RPC endpoint using a JSON-RPC request.
 - **Inputs**:
-    - `rpc`: A string representing the RPC endpoint URL.
-    - `acc`: A `Pubkey` object representing the account for which to fetch the balance.
-- **Logic and Control Flow**:
-    - Convert the `acc` object to a string and store it in `acc_str`.
-    - Create a JSON-RPC request payload as a string, using the `acc_str` and a commitment level of 'confirmed'.
-    - Send a POST request to the `rpc` URL with the JSON-RPC payload and appropriate headers.
-    - Check if the response status code is not 200; if so, return 0.
-    - If the response status code is 200, parse the JSON response to extract and return the balance value from the 'result' field.
-    - If any exception occurs during the process, return 0.
-- **Output**: An integer representing the balance of the account, or 0 if an error occurs.
+    - `rpc`: A string representing the RPC endpoint URL to which the JSON-RPC request will be sent.
+    - `acc`: A `Pubkey` object representing the public key of the account whose balance is to be retrieved.
+- **Control Flow**:
+    - Convert the `acc` (account public key) to a string format.
+    - Construct a JSON-RPC request payload to call the `getBalance` method with the account public key and a commitment level of 'confirmed'.
+    - Send a POST request to the specified `rpc` endpoint with the constructed JSON-RPC payload and appropriate headers.
+    - Check if the response status code is not 200, and if so, return 0 indicating failure to retrieve balance.
+    - If the response is successful, parse the JSON response to extract and return the balance value from the 'result' field.
+    - If any exception occurs during the process, return 0 as a fallback.
+- **Output**: An integer representing the balance of the specified account, or 0 if the balance could not be retrieved.
 
 
 ---
 ### get\_account\_info<!-- {{#callable:firedancer/contrib/tool/txn-gen.get_account_info}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L80>)
-
-Fetches account information from a Solana RPC endpoint and decodes the account data if available.
+The `get_account_info` function retrieves and decodes account information from a specified RPC endpoint using a JSON-RPC request.
 - **Inputs**:
-    - `rpc`: A string representing the URL of the Solana RPC endpoint to send the request to.
-    - `acc`: A string representing the account address for which to fetch information.
-- **Logic and Control Flow**:
-    - Constructs a JSON-RPC request payload to fetch account information for the given account address with specific parameters.
-    - Sends a POST request to the specified RPC endpoint with the constructed payload and appropriate headers.
-    - Checks if the HTTP response status code is not 200, and returns None if true.
-    - Checks if the 'value' field in the JSON response is None, and returns None if true.
-    - Decodes the base64-encoded account data from the JSON response and returns it.
-- **Output**: Returns the decoded account data as bytes if available, otherwise returns None.
+    - `rpc`: A string representing the RPC endpoint URL to which the JSON-RPC request will be sent.
+    - `acc`: A string representing the account identifier for which information is being requested.
+- **Control Flow**:
+    - Constructs a JSON-RPC request payload with the method `getAccountInfo` and the specified account and parameters.
+    - Sends a POST request to the specified RPC endpoint with the constructed JSON-RPC payload.
+    - Checks if the HTTP response status code is not 200, returning `None` if true.
+    - Checks if the `value` field in the JSON response is `None`, returning `None` if true.
+    - If the response is valid and contains data, decodes the base64-encoded account data and returns it.
+- **Output**: The function returns the decoded account data as bytes if successful, or `None` if the request fails or the account data is not available.
 
 
 ---
 ### parse\_args<!-- {{#callable:firedancer/contrib/tool/txn-gen.parse_args}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L90>)
-
-Parses command-line arguments for a script that interacts with Solana transactions.
-- **Inputs**:
-    - `None`: This function does not take any input parameters directly.
-- **Logic and Control Flow**:
-    - Creates an `ArgumentParser` object to handle command-line arguments.
-    - Defines several required arguments with specific types and help descriptions, including `--tpus`, `--rpc`, `--nkeys`, `--seed`, `--funder`, `--workers`, `--txn-type`, and `--acct-access-distr`.
-    - Parses the command-line arguments using `parser.parse_args()`.
-- **Output**: Returns an `argparse.Namespace` object containing the parsed command-line arguments.
+The `parse_args` function parses command-line arguments required for configuring and executing transactions in a Solana-based application.
+- **Inputs**: None
+- **Control Flow**:
+    - An `ArgumentParser` object is created to handle command-line arguments.
+    - Several arguments are added to the parser, each with specific options such as `required`, `type`, and `help` descriptions.
+    - The arguments include `--tpus`, `--rpc`, `--nkeys`, `--seed`, `--funder`, `--workers`, `--txn-type`, and `--acct-access-distr`, all of which are required.
+    - The `parse_args` method of the parser is called to parse the command-line arguments and store them in the `args` variable.
+    - The parsed arguments are returned as an `argparse.Namespace` object.
+- **Output**: The function returns an `argparse.Namespace` object containing the parsed command-line arguments.
 
 
 ---
 ### send\_round\_of\_txs<!-- {{#callable:firedancer/contrib/tool/txn-gen.send_round_of_txs}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L145>)
-
-Sends a batch of transactions to multiple TPU endpoints using a socket.
+The `send_round_of_txs` function sends a batch of transactions to multiple TPU endpoints using a socket.
 - **Inputs**:
-    - `txs`: A list of `Transaction` objects to send.
+    - `txs`: A list of `Transaction` objects to be sent.
     - `sock`: A socket object used to send the transactions.
-    - `tpus`: A list of TPU (Transaction Processing Unit) endpoints to which the transactions are sent.
-- **Logic and Control Flow**:
+    - `tpus`: A list of TPU (Transaction Processing Unit) endpoints to which the transactions will be sent.
+- **Control Flow**:
     - Iterates over each transaction in the `txs` list using a progress bar provided by `tqdm`.
     - Converts each transaction to a byte format using the `to_solders` method.
-    - Iterates over each TPU endpoint in the `tpus` list.
-    - Sends the byte-formatted transaction to each TPU endpoint using the `sendto` method of the `sock` object.
-    - Pauses for 0.001 seconds after sending the transaction to all TPU endpoints.
-- **Output**: No return value; the function sends transactions over the network.
+    - For each TPU endpoint in the `tpus` list, sends the byte-formatted transaction using the `sock.sendto` method.
+    - Pauses for 0.001 seconds after sending each transaction to all TPU endpoints.
+- **Output**: The function does not return any value; it sends transactions over the network.
 
 
 ---
 ### fund\_config\_account<!-- {{#callable:firedancer/contrib/tool/txn-gen.fund_config_account}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L153>)
-
-Creates and signs a Solana transaction to fund a configuration account with specified lamports and range.
+The `fund_config_account` function creates and signs a Solana transaction to fund a configuration account with a specified amount of lamports plus an additional range.
 - **Inputs**:
-    - `funder`: The `Keypair` object representing the account that will fund the transaction.
-    - `lamports`: The number of lamports to transfer to the configuration account.
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `range`: An additional amount to add to the lamports for the transaction.
-- **Logic and Control Flow**:
-    - Creates a `Transaction` object with the given `recent_blockhash`, no fee payer, the funder's public key, and sets compute unit price and limit.
-    - Adds an instruction to create an account with the specified parameters, including the sum of `lamports` and `range`, and assigns it to the `NANO_TOKEN_ID` owner.
-    - Signs the transaction with the `funder` and `config_acc` keypairs.
-    - Returns the signed transaction.
-- **Output**: A signed `Transaction` object ready to be sent to the Solana network.
+    - `funder`: The account (Keypair) that will fund the transaction and sign it.
+    - `lamports`: The base amount of lamports to transfer to the configuration account.
+    - `recent_blockhash`: The recent blockhash to be used in the transaction for ensuring its validity.
+    - `range`: An additional amount of lamports to add to the base amount for the transaction.
+- **Control Flow**:
+    - A new `Transaction` object is created using the provided `recent_blockhash`, the funder's public key, and compute unit settings.
+    - The transaction is augmented by adding an instruction to create a new account with the specified lamports plus range, a space of 16 bytes, and ownership by `NANO_TOKEN_ID`.
+    - The transaction is signed by the funder and the configuration account keypair.
+    - The signed transaction is returned.
+- **Output**: A signed `Transaction` object that can be submitted to the Solana network to fund the configuration account.
 
 
 ---
 ### fund\_config\_account2<!-- {{#callable:firedancer/contrib/tool/txn-gen.fund_config_account2}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L160>)
-
-Creates and signs a Solana transaction to fund a configuration account with specific instructions and returns the transaction.
+The `fund_config_account2` function creates and signs a Solana transaction to fund a configuration account with specific compute unit settings.
 - **Inputs**:
-    - `funder`: The `Keypair` object representing the account that will fund the transaction.
-    - `lamports`: The amount of lamports to transfer.
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `range`: An additional range value to adjust the lamports, though it is not used in this function.
-- **Logic and Control Flow**:
-    - Creates a `Transaction` object with the given `recent_blockhash`, the funder's public key, and sets compute unit price and limit.
-    - Initializes a zero value and converts it to a byte array to use as instruction data.
-    - Defines a list of `AccountMeta` objects representing the accounts involved in the transaction, including the configuration account, system program ID, and funder's public key.
-    - Creates an `Instruction` object with the defined accounts, program ID, and data, and adds it to the transaction.
-    - Signs the transaction with the funder's keypair.
-    - Returns the signed transaction.
-- **Output**: A signed `Transaction` object ready to be sent to the Solana network.
+    - `funder`: The account that will fund the transaction, represented as a Keypair object.
+    - `lamports`: The amount of lamports to be transferred, though not directly used in this function.
+    - `recent_blockhash`: The recent blockhash to be used in the transaction for ensuring its validity.
+    - `range`: An additional parameter, though not directly used in this function.
+- **Control Flow**:
+    - A new Transaction object is created with the provided recent_blockhash, no fee payer, the funder's public key, and specific compute unit settings.
+    - A zero value is converted to a byte array to serve as the instruction data, indicating a 0 discriminator.
+    - A list of AccountMeta objects is created to specify the accounts involved in the transaction, including the configuration account, the system program ID, and the funder's public key.
+    - An Instruction object is created using the accounts list, the NANO_TOKEN_ID as the program ID, and the zero byte array as data.
+    - The instruction is added to the transaction.
+    - The transaction is signed by the funder.
+    - The signed transaction is returned.
+- **Output**: The function returns a signed Transaction object ready to be sent to the Solana network.
 
 
 ---
 ### fund\_nano\_mint\_account2<!-- {{#callable:firedancer/contrib/tool/txn-gen.fund_nano_mint_account2}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L174>)
-
-Creates and signs a transaction to fund a nano mint account with specified lamports and additional range.
+The `fund_nano_mint_account2` function creates and signs a Solana transaction to fund a nano mint account with a specified amount of lamports plus an additional range.
 - **Inputs**:
-    - `funder`: The `Keypair` object representing the account that will fund the transaction.
+    - `funder`: The account (Keypair) that will fund the transaction and sign it.
     - `lamports`: The number of lamports to transfer to the nano mint account.
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `range`: An additional amount of lamports to add to the transfer.
-- **Logic and Control Flow**:
-    - Creates a `Transaction` object with the given `recent_blockhash`, no fee payer, and the funder's public key.
-    - Sets compute unit price to 3 and compute unit limit to 300,000 for the transaction.
-    - Adds an instruction to create an account with the specified lamports plus range, space of 64 bytes, and owner as `NANO_TOKEN_ID`.
-    - Signs the transaction with the funder's and nano mint's keypairs.
-- **Output**: Returns the signed `Transaction` object.
+    - `recent_blockhash`: The recent blockhash to be used for the transaction.
+    - `range`: An additional amount to be added to the lamports for the transaction.
+- **Control Flow**:
+    - A new Transaction object is created with the provided recent_blockhash, no fee payer, the funder's public key, and two compute budget instructions to set the compute unit price and limit.
+    - A create account instruction is added to the transaction to create an account with the funder's public key as the source, the nano mint's public key as the destination, the total lamports (lamports + range), a space of 64 bytes, and the NANO_TOKEN_ID as the owner.
+    - The transaction is signed by the funder and the nano mint keypair.
+    - The signed transaction is returned.
+- **Output**: A signed Transaction object that can be sent to the Solana network to fund the nano mint account.
 
 
 ---
 ### fund\_nano\_mint\_account<!-- {{#callable:firedancer/contrib/tool/txn-gen.fund_nano_mint_account}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L182>)
-
-Creates and signs a transaction to fund a nano mint account with specific parameters.
+The `fund_nano_mint_account` function creates and signs a Solana transaction to fund a nano mint account with specific instructions and account metadata.
 - **Inputs**:
-    - `funder`: The `Keypair` object representing the account that will fund the transaction.
-    - `lamports`: The amount of lamports to transfer.
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `range`: An additional parameter that is not used in the function logic.
-- **Logic and Control Flow**:
-    - Creates a `Transaction` object with the given `recent_blockhash`, no fee payer, the funder's public key, and sets compute unit price and limit.
-    - Initializes data for the transaction by converting integers to bytes and concatenating them with the funder's public key bytes.
-    - Defines a list of `AccountMeta` objects representing the accounts involved in the transaction, specifying their roles as signer or writable.
-    - Creates an `Instruction` object with the defined accounts, program ID, and data, then adds it to the transaction.
-    - Signs the transaction with the funder's keypair.
-    - Returns the signed transaction.
-- **Output**: A signed `Transaction` object ready to be sent to the network.
+    - `funder`: The account (Keypair) that will fund the transaction and sign it.
+    - `lamports`: The amount of lamports to be transferred, though not directly used in this function.
+    - `recent_blockhash`: The recent blockhash to be used in the transaction for ensuring its validity.
+    - `range`: An additional parameter, though not directly used in this function.
+- **Control Flow**:
+    - A new `Transaction` object is created with the provided `recent_blockhash`, the funder's public key, and compute unit settings.
+    - Three data segments are created: a discriminator byte, the funder's public key, and a decimal value, which are concatenated to form the instruction data.
+    - A list of `AccountMeta` objects is created, representing the accounts involved in the transaction, including the nano mint account, configuration account, system program ID, and the funder account.
+    - An `Instruction` object is created using the account metadata, the NANO_TOKEN_ID as the program ID, and the concatenated data.
+    - The instruction is added to the transaction.
+    - The transaction is signed by the funder.
+    - The signed transaction is returned.
+- **Output**: The function returns a signed `Transaction` object ready to be sent to the Solana network.
 
 
 ---
 ### fund\_token\_account<!-- {{#callable:firedancer/contrib/tool/txn-gen.fund_token_account}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L204>)
-
-Creates and signs a transaction to fund a token account with specified lamports and initializes the mint.
+The `fund_token_account` function creates and signs a Solana transaction to fund a token account with specified lamports and initialize a mint with given parameters.
 - **Inputs**:
-    - `funder`: The `Keypair` object representing the account that will fund the token account.
-    - `lamports`: The number of lamports to transfer to the new token account.
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `is_print`: A boolean flag, though it is not used in the function.
-    - `range`: An additional amount to add to the lamports for the account creation.
-- **Logic and Control Flow**:
-    - Creates a `Transaction` object with the given `recent_blockhash`, no fee payer, and the funder's public key.
-    - Sets compute unit price and limit for the transaction using `set_compute_unit_price` and `set_compute_unit_limit`.
-    - Adds an instruction to create a new account with the specified lamports plus the range, using `create_account` with `CreateAccountParams`.
-    - Initializes mint parameters with a fixed decimal value, the mint's public key, the funder's public key as mint authority, and the token program ID.
-    - Adds an instruction to initialize the mint using `initialize_mint` with the specified parameters.
-    - Signs the transaction with the funder's and mint's keypairs.
-- **Output**: Returns the signed `Transaction` object.
+    - `funder`: The account (Keypair) that will fund the token account and sign the transaction.
+    - `lamports`: The amount of lamports to be transferred to the new token account.
+    - `recent_blockhash`: The recent blockhash to be used for the transaction.
+    - `is_print`: A boolean flag, though not used in the function logic.
+    - `range`: An additional amount to be added to the lamports for the transaction.
+- **Control Flow**:
+    - A new `Transaction` object is created with the provided `recent_blockhash`, the funder's public key, and compute unit settings.
+    - A `create_account` instruction is added to the transaction to create a new account with the specified lamports plus the range, using the funder's public key as the source and the `fd_mint` public key as the destination.
+    - An `InitializeMintParams` object is created with specific parameters including decimals, mint, mint authority, and program ID.
+    - An `initialize_mint` instruction is added to the transaction using the `InitializeMintParams`.
+    - The transaction is signed by the funder and the `fd_mint` keypair.
+    - The transaction object is returned.
+- **Output**: A `Transaction` object that represents the signed transaction to fund and initialize a token account.
 
 
 ---
 ### create\_accounts\_tx<!-- {{#callable:firedancer/contrib/tool/txn-gen.create_accounts_tx}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L221>)
-
-Creates a transaction to transfer lamports and optionally set up token accounts based on the transaction type.
+The `create_accounts_tx` function constructs and returns a Solana transaction for transferring lamports and optionally setting up token accounts based on the transaction type.
 - **Inputs**:
-    - `funder`: The account that funds the transaction and signs it.
-    - `lamports`: The amount of lamports to transfer.
+    - `funder`: The account that will fund the transactions and sign them.
+    - `lamports`: The amount of lamports to transfer to each account.
     - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `txn_type`: The type of transaction, which determines the setup of token accounts.
-    - `accs`: A list of accounts to which lamports will be transferred.
-- **Logic and Control Flow**:
-    - Set the compute unit limit to 200,000 by default, or 15,000 if the transaction type is `TXN_TYPE_NANO_TOKEN_TRANSFER`.
-    - Create a new transaction with the given `recent_blockhash`, `funder`'s public key, and compute unit settings.
-    - Iterate over each account in `accs` and add a lamport transfer instruction to the transaction.
-    - If `txn_type` is `TXN_TYPE_TOKEN_TRANSFER`, add instructions to create an associated token account and mint tokens to it.
-    - If `txn_type` is `TXN_TYPE_NANO_TOKEN_TRANSFER`, derive the nano token address, create an associated token account, and add instructions to mint tokens to it.
-    - Sign the transaction with the `funder`'s key.
-- **Output**: A signed `Transaction` object ready to be sent to the network.
+    - `txn_type`: The type of transaction to create, which determines additional actions like token account setup.
+    - `accs`: A list of accounts to which lamports will be transferred and potentially token accounts will be set up.
+- **Control Flow**:
+    - Initialize the compute unit limit to 200,000, but reduce it to 15,000 if the transaction type is `TXN_TYPE_NANO_TOKEN_TRANSFER`.
+    - Create a new transaction with the given recent blockhash, funder's public key, and compute unit settings.
+    - Iterate over each account in `accs` to add a lamport transfer instruction to the transaction.
+    - If the transaction type is `TXN_TYPE_TOKEN_TRANSFER`, add instructions to create an associated token account and mint tokens to it.
+    - If the transaction type is `TXN_TYPE_NANO_TOKEN_TRANSFER`, derive a nano token address, create an instruction to set up the nano token account, and add a mint instruction to the transaction.
+    - Sign the transaction with the funder's key.
+- **Output**: A signed `Transaction` object ready to be sent to the Solana network.
 
 
 ---
 ### get\_balance\_sufficient<!-- {{#callable:firedancer/contrib/tool/txn-gen.get_balance_sufficient}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L283>)
-
-Checks if an account has a sufficient balance for a transaction, considering specific transaction types.
+The `get_balance_sufficient` function checks if an account has a sufficient balance of lamports or a valid nano token account for a specific transaction type.
 - **Inputs**:
-    - `lamports`: The minimum balance required for the transaction.
-    - `rpc`: The RPC endpoint URL to query account information.
-    - `txn_type`: The type of transaction to check, such as nano token transfer.
-    - `acc`: The account object to check the balance for.
-- **Logic and Control Flow**:
-    - If the transaction type is `TXN_TYPE_NANO_TOKEN_TRANSFER`, derive the associated token address using the account's public key and a zero value as seeds.
-    - Call [`get_account_info`](<#get_account_info>) with the derived address to check if the account data exists and is valid.
-    - If the account data does not exist or is invalid, return `None`.
-    - Call [`get_balance`](<#get_balance>) with the account's public key to get the current balance.
+    - `lamports`: The minimum balance required for the account.
+    - `rpc`: The RPC endpoint URL as a string to interact with the Solana blockchain.
+    - `txn_type`: The type of transaction, which determines the specific checks to perform.
+    - `acc`: The account object whose balance is being checked.
+- **Control Flow**:
+    - If the transaction type is `TXN_TYPE_NANO_TOKEN_TRANSFER`, derive the associated token address (ATA) using the account's public key and a zero byte array as seeds.
+    - Retrieve account information for the derived ATA using the [`get_account_info`](#get_account_info) function.
+    - If the account information is not available or the first byte of the data is zero, return `None`.
+    - Retrieve the balance of the account using the [`get_balance`](#get_balance) function.
     - If the balance is available, print the account's public key and balance.
     - If the balance is greater than or equal to the required lamports, return the account object.
-    - If the balance is insufficient, return `None`.
-- **Output**: Returns the account object if the balance is sufficient; otherwise, returns `None`.
-- **Functions Called**:
-    - [`firedancer/contrib/tool/txn-gen.get_account_info`](<#get_account_info>)
-    - [`firedancer/contrib/tool/txn-gen.get_balance`](<#get_balance>)
+    - If none of the conditions for sufficient balance are met, return `None`.
+- **Output**: Returns the account object if the balance is sufficient or the nano token account is valid; otherwise, returns `None`.
+- **Functions called**:
+    - [`firedancer/contrib/tool/txn-gen.get_account_info`](#get_account_info)
+    - [`firedancer/contrib/tool/txn-gen.get_balance`](#get_balance)
 
 
 ---
 ### create\_accounts<!-- {{#callable:firedancer/contrib/tool/txn-gen.create_accounts}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L305>)
-
-Creates multiple accounts and manages their funding and initialization based on transaction type.
+The `create_accounts` function generates a specified number of accounts, funds them with lamports, and handles different transaction types for account creation and funding on the Solana blockchain.
 - **Inputs**:
-    - `funder`: The account that provides the initial funding for the new accounts.
-    - `rpc`: The RPC endpoint URL for blockchain communication.
+    - `funder`: The account that will fund the new accounts with lamports.
+    - `rpc`: The RPC endpoint URL for interacting with the Solana blockchain.
     - `num_accs`: The number of accounts to create.
-    - `lamports`: The amount of lamports to allocate to each account.
-    - `seed`: The seed used to generate keypairs for the accounts.
+    - `lamports`: The amount of lamports to fund each account with.
+    - `seed`: The seed used to derive the keypairs for the accounts.
     - `sock`: The socket used for sending transactions.
     - `tpus`: A list of TPU (Transaction Processing Unit) endpoints to send transactions to.
-    - `txn_type`: The type of transaction to perform, which affects account setup and funding.
-- **Logic and Control Flow**:
-    - Retrieve account information for `nano_mint` and `fd_mint` using [`get_account_info`](<#get_account_info>) and print balances.
-    - Generate keypairs for the specified number of accounts using the provided seed and store them in `accs`.
-    - Divide the accounts into chunks for processing in parallel.
-    - Check and initialize configuration and mint accounts if `txn_type` is `TXN_TYPE_NANO_TOKEN_TRANSFER`.
-    - If `txn_type` is `TXN_TYPE_TOKEN_TRANSFER`, ensure the `fd_mint` account is initialized.
-    - Iterate over remaining accounts to check their balance sufficiency and remove funded accounts from the list.
-    - Create and send transactions to fund remaining accounts in chunks, adjusting chunk size as needed.
+    - `txn_type`: The type of transaction to perform, which determines the account setup and funding logic.
+- **Control Flow**:
+    - Retrieve account information for the nano mint and fd mint accounts using the RPC endpoint.
+    - Print the balance of a specific token account and the NANO_TOKEN_ID account.
+    - Generate keypairs for the specified number of accounts using the provided seed and transaction type.
+    - Divide the generated accounts into chunks for processing in parallel.
+    - Check and create necessary configurations and mint accounts based on the transaction type (e.g., NANO_TOKEN_TRANSFER).
+    - For each account, check if it has sufficient balance and remove it from the remaining accounts if it does.
+    - If there are remaining accounts, create transactions to fund them and send these transactions to the TPU endpoints.
+    - Repeat the funding process until all accounts have been funded or have sufficient balance.
     - Return the list of created accounts.
-- **Output**: A list of created `Keypair` objects representing the new accounts.
-- **Functions Called**:
-    - [`firedancer/contrib/tool/txn-gen.get_account_info`](<#get_account_info>)
-    - [`firedancer/contrib/tool/txn-gen.get_balance`](<#get_balance>)
-    - [`firedancer/contrib/tool/txn-gen.get_recent_blockhash`](<#get_recent_blockhash>)
-    - [`firedancer/contrib/tool/txn-gen.fund_config_account`](<#fund_config_account>)
-    - [`firedancer/contrib/tool/txn-gen.send_round_of_txs`](<#send_round_of_txs>)
-    - [`firedancer/contrib/tool/txn-gen.fund_nano_mint_account`](<#fund_nano_mint_account>)
+- **Output**: A list of created Keypair objects representing the new accounts.
+- **Functions called**:
+    - [`firedancer/contrib/tool/txn-gen.get_account_info`](#get_account_info)
+    - [`firedancer/contrib/tool/txn-gen.get_balance`](#get_balance)
+    - [`firedancer/contrib/tool/txn-gen.get_recent_blockhash`](#get_recent_blockhash)
+    - [`firedancer/contrib/tool/txn-gen.fund_config_account`](#fund_config_account)
+    - [`firedancer/contrib/tool/txn-gen.send_round_of_txs`](#send_round_of_txs)
+    - [`firedancer/contrib/tool/txn-gen.fund_nano_mint_account`](#fund_nano_mint_account)
 
 
 ---
 ### gen\_tx\_empty<!-- {{#callable:firedancer/contrib/tool/txn-gen.gen_tx_empty}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L393>)
-
-Generates an empty transaction with specified compute unit price and limit, signs it, and returns the transaction.
+The `gen_tx_empty` function creates and signs a Solana transaction with specified compute unit price and limit, using a given recent blockhash, key, and account.
 - **Inputs**:
-    - `recent_blockhash`: The recent block hash to use for the transaction.
-    - `key`: The keypair used to sign the transaction.
-    - `acc`: The account public key associated with the transaction.
-    - `cu_price`: The compute unit price to set for the transaction.
-- **Logic and Control Flow**:
-    - Creates a `Transaction` object with the given `recent_blockhash`, `acc`, and instructions to set compute unit price and limit.
-    - Signs the transaction using the provided `key`.
-    - Returns the signed transaction.
-- **Output**: A signed `Transaction` object.
+    - `recent_blockhash`: A recent blockhash used to initialize the transaction, ensuring it is processed in a timely manner.
+    - `key`: A keypair used to sign the transaction, providing the necessary authorization.
+    - `acc`: The account associated with the transaction, which will be used as the fee payer.
+    - `cu_price`: The compute unit price to be set for the transaction, determining the cost of compute resources.
+- **Control Flow**:
+    - A `Transaction` object is created using the provided `recent_blockhash`, `None` for the fee payer, the `acc` as the fee payer, and a list of instructions to set the compute unit price and limit.
+    - The transaction is signed using the provided `key`, which authorizes the transaction.
+    - The signed transaction is returned.
+- **Output**: A signed `Transaction` object ready to be sent to the Solana network.
 
 
 ---
 ### gen\_tx\_system\_transfer<!-- {{#callable:firedancer/contrib/tool/txn-gen.gen_tx_system_transfer}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L398>)
-
-Generates a system transfer transaction with specified parameters and signs it.
+The `gen_tx_system_transfer` function creates and signs a Solana transaction for a system transfer with specified compute unit price and limits.
 - **Inputs**:
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `key`: The keypair used to sign the transaction.
-    - `acc`: The account public key involved in the transaction.
-    - `cu_price`: The compute unit price to set for the transaction.
-- **Logic and Control Flow**:
-    - Creates a `Transaction` object with the given `recent_blockhash`, `acc`, and compute unit settings.
-    - Adds a system transfer instruction to the transaction, transferring 1 lamport from `acc` to `acc`.
-    - Signs the transaction using the provided `key`.
-    - Returns the signed transaction.
-- **Output**: A signed `Transaction` object representing the system transfer.
+    - `recent_blockhash`: A recent blockhash used to ensure the transaction is processed in a timely manner.
+    - `key`: A Keypair object used to sign the transaction.
+    - `acc`: The public key of the account involved in the transaction, used as both the sender and receiver.
+    - `cu_price`: The price per compute unit to be set for the transaction.
+- **Control Flow**:
+    - A Transaction object is created with the provided recent blockhash, account, and compute unit settings.
+    - A transfer instruction is added to the transaction, transferring 1 lamport from the account to itself.
+    - The transaction is signed using the provided keypair.
+- **Output**: The function returns the signed Transaction object.
 
 
 ---
 ### gen\_tx\_token\_transfer<!-- {{#callable:firedancer/contrib/tool/txn-gen.gen_tx_token_transfer}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L405>)
-
-Generates a token transfer transaction on the Solana blockchain.
+The `gen_tx_token_transfer` function generates a Solana transaction for transferring a token from and to the same associated token account.
 - **Inputs**:
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
-    - `key`: The keypair used to sign the transaction.
-    - `acc`: The account from which the transaction is initiated.
-    - `cu_price`: The compute unit price for the transaction.
-- **Logic and Control Flow**:
-    - Create a `Transaction` object with the given `recent_blockhash`, `acc`, and compute unit settings.
-    - Get the associated token address for the given `key` and `fd_mint` public key.
-    - Create `SplTransferParams` with the token program ID, source and destination addresses, owner public key, and amount to transfer.
-    - Add a SPL token transfer instruction to the transaction using the `spl_transfer` function and the created parameters.
-    - Sign the transaction with the provided `key`.
-- **Output**: Returns the signed `Transaction` object.
+    - `recent_blockhash`: A recent blockhash used to ensure the transaction is processed in a timely manner.
+    - `key`: A Keypair object representing the account that will sign the transaction.
+    - `acc`: The public key of the account initiating the transaction.
+    - `cu_price`: The price of compute units to be set for the transaction.
+- **Control Flow**:
+    - A new Transaction object is created with the provided recent blockhash, account, and compute unit settings.
+    - The associated token address (ATA) for the given key and a predefined mint is retrieved.
+    - A SplTransferParams object is created to define the token transfer parameters, including the program ID, source and destination addresses, owner, and amount.
+    - A SPL token transfer instruction is added to the transaction using the transfer parameters.
+    - The transaction is signed using the provided key.
+    - The signed transaction is returned.
+- **Output**: A signed Transaction object ready to be sent to the Solana network for processing a token transfer.
 
 
 ---
 ### gen\_tx\_nano\_token\_transfer<!-- {{#callable:firedancer/contrib/tool/txn-gen.gen_tx_nano_token_transfer}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L417>)
-
-Generates a transaction for transferring a nano token between two accounts.
+The function `gen_tx_nano_token_transfer` generates a transaction for transferring a nano token between two accounts on the Solana blockchain.
 - **Inputs**:
-    - `recent_blockhash`: The recent blockhash to use for the transaction.
+    - `recent_blockhash`: The recent blockhash to be used for the transaction, ensuring it is processed in the current block.
     - `src_key`: The keypair of the source account, used to sign the transaction.
-    - `src_acc`: The public key of the source account.
-    - `src_nano_ata`: The associated token address of the source account for the nano token.
-    - `dst_nano_ata`: The associated token address of the destination account for the nano token.
-    - `cu_price`: The compute unit price to set for the transaction.
-- **Logic and Control Flow**:
-    - Create a `Transaction` object with the given `recent_blockhash`, `src_acc`, and compute unit settings.
-    - Define the instruction data for the token transfer, setting a transfer tag and amount.
-    - Create a list of `AccountMeta` objects representing the source and destination token accounts and the source account as a signer.
-    - Create an `Instruction` object with the nano token program ID, the account metadata, and the instruction data.
-    - Add the instruction to the transaction.
-    - Sign the transaction with the `src_key`.
-- **Output**: Returns the signed `Transaction` object for the nano token transfer.
+    - `src_acc`: The public key of the source account from which the nano token will be transferred.
+    - `src_nano_ata`: The associated token account (ATA) of the source account for the nano token.
+    - `dst_nano_ata`: The associated token account (ATA) of the destination account for the nano token.
+    - `cu_price`: The compute unit price to be set for the transaction.
+- **Control Flow**:
+    - A `Transaction` object is created with the provided `recent_blockhash`, source account, and compute unit settings.
+    - The instruction data for the nano token transfer is constructed, including a transfer tag and amount.
+    - Account metadata is set up for the source and destination nano token ATAs and the source account.
+    - An `Instruction` object is created with the nano token program ID, account metadata, and instruction data.
+    - The instruction is added to the transaction.
+    - The transaction is signed using the source keypair.
+- **Output**: The function returns a signed `Transaction` object ready to be sent to the Solana network for processing the nano token transfer.
 
 
 ---
 ### send\_txs<!-- {{#callable:firedancer/contrib/tool/txn-gen.send_txs}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L442>)
-
-Sends transactions to specified TPU endpoints using provided keypairs and transaction parameters.
+The `send_txs` function sends transactions to specified TPU endpoints using a list of keypairs and transaction types, while monitoring and adjusting compute unit prices based on recent blockhash changes.
 - **Inputs**:
-    - `rpc`: A string representing the RPC endpoint URL.
+    - `rpc`: A string representing the RPC endpoint URL for blockchain interaction.
     - `tpus`: A list of strings representing the TPU UDP endpoints to send transactions to.
-    - `keys`: A list of `Keypair` objects used for signing transactions.
-    - `tx_idx`: A shared multiprocessing value to track the index of transactions.
-    - `mult`: An integer multiplier for transaction processing (not used in the function).
-    - `idx`: An integer index for identifying the worker process.
-    - `stop_event`: A multiprocessing event used to signal when to stop sending transactions.
-    - `rbh`: A byte array representing the recent blockhash.
-    - `txn_type`: An integer representing the type of transaction to send.
-    - `acct_access_distr`: An integer representing the account access distribution type.
-- **Logic and Control Flow**:
-    - Create a UDP socket for sending transactions.
-    - Generate a list of public keys from the provided keypairs.
-    - Derive associated token addresses (ATAs) for each account using the `Pubkey.find_program_address` method.
-    - Initialize the recent blockhash and compute unit price variables.
-    - Determine the number of iterations (`niter`) based on the account access distribution and transaction type.
-    - Enter a loop that continues until the `stop_event` is set.
-    - Update the recent blockhash and adjust the compute unit price if the blockhash has not changed.
-    - For each iteration, select account indices `i` and `j` based on the account access distribution type.
-    - Generate a transaction based on the transaction type using helper functions like [`gen_tx_empty`](<#gen_tx_empty>), [`gen_tx_system_transfer`](<#gen_tx_system_transfer>), etc.
-    - Convert the transaction to bytes and send it to each TPU endpoint using the socket.
-    - Update the transaction index (`tx_idx`) with the number of iterations processed.
-    - Print a stopping message when the loop exits.
-- **Output**: No return value; the function sends transactions over the network and updates the transaction index.
-- **Functions Called**:
-    - [`firedancer/contrib/tool/txn-gen.gen_tx_empty`](<#gen_tx_empty>)
-    - [`firedancer/contrib/tool/txn-gen.gen_tx_system_transfer`](<#gen_tx_system_transfer>)
-    - [`firedancer/contrib/tool/txn-gen.gen_tx_token_transfer`](<#gen_tx_token_transfer>)
-    - [`firedancer/contrib/tool/txn-gen.gen_tx_nano_token_transfer`](<#gen_tx_nano_token_transfer>)
+    - `keys`: A list of Keypair objects representing the accounts involved in the transactions.
+    - `tx_idx`: A shared multiprocessing Value object used to track the number of transactions sent.
+    - `mult`: An integer multiplier used in the transaction sending process (not directly used in the function).
+    - `idx`: An integer index representing the worker's identifier.
+    - `stop_event`: A multiprocessing Event object used to signal when to stop sending transactions.
+    - `rbh`: A shared multiprocessing Array object containing the recent blockhash.
+    - `txn_type`: An integer representing the type of transaction to send (e.g., empty, system transfer, token transfer, nano token transfer).
+    - `acct_access_distr`: An integer representing the account access distribution type (e.g., regular, power).
+- **Control Flow**:
+    - A UDP socket is created for sending transactions.
+    - Public keys are extracted from the provided keypairs and used to derive associated token addresses (nano_atas).
+    - The function enters a loop that continues until the stop_event is set.
+    - Within the loop, the recent blockhash is updated and compared to the previous blockhash to adjust the compute unit price (cu_price).
+    - The number of iterations (niter) is determined based on the account access distribution and transaction type.
+    - For each iteration, indices i and j are determined based on the account access distribution type.
+    - A transaction is generated based on the transaction type and the current compute unit price.
+    - The transaction is serialized and sent to each TPU endpoint using the UDP socket.
+    - The transaction index (tx_idx) is incremented by the number of iterations (niter).
+    - The loop continues until the stop_event is set, at which point the function prints a stopping message with the worker index.
+- **Output**: The function does not return any value; it sends transactions to the specified TPU endpoints and updates the transaction index.
+- **Functions called**:
+    - [`firedancer/contrib/tool/txn-gen.gen_tx_empty`](#gen_tx_empty)
+    - [`firedancer/contrib/tool/txn-gen.gen_tx_system_transfer`](#gen_tx_system_transfer)
+    - [`firedancer/contrib/tool/txn-gen.gen_tx_token_transfer`](#gen_tx_token_transfer)
+    - [`firedancer/contrib/tool/txn-gen.gen_tx_nano_token_transfer`](#gen_tx_nano_token_transfer)
 
 
 ---
 ### monitor\_send\_tps<!-- {{#callable:firedancer/contrib/tool/txn-gen.monitor_send_tps}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L500>)
-
-Monitors and prints the transactions per second (TPS) at regular intervals, adjusting the interval if TPS is zero.
+The `monitor_send_tps` function monitors and prints the transactions per second (TPS) over a specified interval until a stop event is triggered or the interval reaches 10 seconds.
 - **Inputs**:
-    - `tx_idx`: A `SynchronizedBase` object that holds the current transaction index, used to calculate TPS.
-    - `stop_event`: An `Event` object that signals when to stop monitoring.
-    - `interval`: An integer specifying the time interval in seconds between TPS calculations, default is 1.
-- **Logic and Control Flow**:
+    - `tx_idx`: A synchronized shared memory object that holds the current transaction index or count.
+    - `stop_event`: A multiprocessing event object used to signal when the monitoring should stop.
+    - `interval`: An optional integer specifying the time interval in seconds for monitoring TPS, defaulting to 1.
+- **Control Flow**:
     - Initialize `prev_count` to 0 and `prev_time` to the current time.
-    - Enter a loop that continues while `interval` is less than 10 and `stop_event` is not set.
+    - Enter a while loop that continues as long as `interval` is less than 10 and `stop_event` is not set.
     - Sleep for the duration of `interval`.
-    - Acquire a lock on `tx_idx` and read the current transaction count into `current_count`.
-    - Calculate the current time and compute TPS as the difference between `current_count` and `prev_count` divided by `interval`.
+    - Acquire a lock on `tx_idx` to safely read the current transaction count into `current_count`.
+    - Calculate the current time and compute TPS as the difference in transaction count divided by `interval`.
     - Update `prev_count` to `current_count` and calculate the elapsed time since `prev_time`.
     - Print the calculated TPS and elapsed time.
-    - If TPS is zero, increment `interval` by 1.
+    - If TPS is zero, increment the `interval` by 1.
     - Update `prev_time` to the current time.
-- **Output**: No return value; outputs TPS and elapsed time to the console.
+- **Output**: The function does not return any value; it outputs TPS and elapsed time to the console.
 
 
 ---
 ### fetch\_recent\_blockhash<!-- {{#callable:firedancer/contrib/tool/txn-gen.fetch_recent_blockhash}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L516>)
-
-Fetches the most recent blockhash from a Solana RPC server and updates a shared memory array with it.
+The `fetch_recent_blockhash` function continuously updates a shared memory array with the latest blockhash from a Solana RPC endpoint until a stop event is triggered.
 - **Inputs**:
-    - `rbh`: A shared memory array to store the recent blockhash as bytes.
-    - `rpc`: A string representing the RPC server URL to fetch the blockhash from.
-    - `stop_event`: A threading event used to signal when to stop fetching the blockhash.
-- **Logic and Control Flow**:
-    - Initialize `prev_recent_blockhash` with the current blockhash from the RPC server using [`get_recent_blockhash`](<#get_recent_blockhash>) function.
+    - `rbh`: A shared memory array that will be updated with the latest blockhash as bytes.
+    - `rpc`: A string representing the RPC endpoint URL to fetch the recent blockhash from.
+    - `stop_event`: A threading event used to signal when the function should stop executing.
+- **Control Flow**:
+    - Initialize `prev_recent_blockhash` with the current blockhash fetched from the RPC endpoint using [`get_recent_blockhash`](#get_recent_blockhash) function.
     - Enter a loop that continues until `stop_event` is set.
-    - In each iteration, sleep for 0.1 seconds to reduce load on the server.
-    - Try to fetch the current blockhash from the RPC server.
-    - If the fetched blockhash is the same as `prev_recent_blockhash`, continue to the next iteration without updating.
-    - If the fetched blockhash is different, update the `rbh` array with the new blockhash and set `prev_recent_blockhash` to this new value.
-    - Print the new blockhash to the console.
-    - If an exception occurs during fetching, print 'bad RBH' to the console.
-- **Output**: None
-- **Functions Called**:
-    - [`firedancer/contrib/tool/txn-gen.get_recent_blockhash`](<#get_recent_blockhash>)
+    - Inside the loop, sleep for 0.1 seconds to prevent excessive requests.
+    - Try to fetch the latest blockhash from the RPC endpoint.
+    - If the fetched blockhash is different from `prev_recent_blockhash`, update the `rbh` array with the new blockhash and set `prev_recent_blockhash` to this new value.
+    - Print the new blockhash if it is different from the previous one.
+    - If an exception occurs during fetching, print 'bad RBH'.
+- **Output**: The function does not return any value; it updates the `rbh` array in place with the latest blockhash.
+- **Functions called**:
+    - [`firedancer/contrib/tool/txn-gen.get_recent_blockhash`](#get_recent_blockhash)
 
 
 ---
 ### main<!-- {{#callable:firedancer/contrib/tool/txn-gen.main}} -->
-[View Source →](<../../../../contrib/tool/txn-gen.py#L531>)
-
-Initializes and manages the execution of a transaction processing system using multiple worker processes and threads.
+The `main` function initializes and manages the execution of a transaction sending process using multiple worker processes and threads to monitor and fetch recent blockhashes.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Parse command-line arguments using `parse_args()` to get configuration parameters.
-    - Create a `Client` object with the RPC endpoint specified in the arguments.
-    - Open and read the seed and funder key files to initialize the `seed` and `funder` variables.
-    - Create a UDP socket for communication with TPU endpoints.
-    - Parse and convert TPU endpoints from strings to tuples of host and port.
-    - Determine the transaction type and account access distribution based on the arguments, exiting if unknown types are provided.
-    - Call `create_accounts()` to generate accounts needed for transactions.
+- **Control Flow**:
+    - Parse command-line arguments using `parse_args()` to get necessary parameters like RPC endpoint, seed file, funder file, transaction type, and number of workers.
+    - Initialize a `Client` object with the RPC endpoint and read the seed and funder key from the specified files.
+    - Create a UDP socket and parse the TPU endpoints from the arguments.
+    - Determine the transaction type and account access distribution based on the provided arguments, exiting with an error if unknown types are specified.
+    - Call [`create_accounts`](#create_accounts) to generate accounts needed for transactions, using the funder, RPC, number of keys, seed, socket, TPU endpoints, and transaction type.
     - Divide the created accounts into chunks based on the number of workers specified.
-    - Initialize shared memory and synchronization primitives for inter-process communication.
-    - Start a monitoring thread to track transactions per second and a fetching thread to update the recent blockhash.
-    - Create and start worker processes to send transactions using the `send_txs` function.
-    - Enter a loop to keep the main process running, allowing worker processes to execute.
-    - On termination, set the stop event and join all worker processes to ensure clean shutdown.
-- **Output**: No return value; the function orchestrates the setup and execution of transaction processing.
-- **Functions Called**:
-    - [`firedancer/contrib/tool/txn-gen.parse_args`](<#parse_args>)
-    - [`firedancer/contrib/tool/txn-gen.create_accounts`](<#create_accounts>)
+    - Initialize shared memory structures for recent blockhash (`rbh`), a stop event, and a transaction index counter (`tx_idx`).
+    - Start a monitoring thread to track transactions per second and a fetching thread to update the recent blockhash periodically.
+    - Create and start multiple worker processes, each responsible for sending transactions using the `send_txs` function, passing necessary parameters including RPC, TPU endpoints, account chunks, and transaction type.
+    - Enter a loop to keep the main process alive, sleeping briefly in each iteration.
+    - Upon termination (e.g., via a signal), set the stop event to signal all threads and processes to stop, and join all worker processes to ensure clean shutdown.
+- **Output**: The function does not return any value; it orchestrates the setup and execution of transaction sending processes and threads.
+- **Functions called**:
+    - [`firedancer/contrib/tool/txn-gen.parse_args`](#parse_args)
+    - [`firedancer/contrib/tool/txn-gen.create_accounts`](#create_accounts)
 
 
 

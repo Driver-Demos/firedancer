@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Thread-local variables, APIs, Makefile, and tests for scratch memory allocation.
+Thread-local scratch allocation APIs, frame tracking, and unit tests.
 
 
 ## Files
-- **[fd_scratch.c](fd_scratch.c.md)**: Thread-local variables for managing scratch memory allocation and state.
-- **[fd_scratch.h](fd_scratch.h.md)**: APIs for high-performance scratch pad memory allocation, including alignment-aware allocators and safety checks.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_scratch` in the `firedancer` codebase.
-- **[test_scratch.c](test_scratch.c.md)**: Tests the functionality and safety of the scratch memory allocator in various scenarios.
+- **[fd_scratch.c](fd_scratch.c.md)**: Thread-local scratch state and frame tracking variables.
+- **[fd_scratch.h](fd_scratch.h.md)**: Scratch pad allocation APIs, frame management, safety checks, and alloca helpers.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile script that adds headers and objects for `fd_scratch`, creates a unit test for `test_scratch`, and runs the unit test.
+- **[test_scratch.c](test_scratch.c.md)**: The `test_scratch.c` file in the `firedancer` codebase contains a comprehensive test suite for validating the functionality and safety of the scratch memory allocation system, including alignment, allocation, deallocation, and memory safety checks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
