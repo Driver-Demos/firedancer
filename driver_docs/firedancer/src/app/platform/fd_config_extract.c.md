@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_config_extract.c` file in the `firedancer` codebase implements a function to recursively search for and log unrecognized configuration keys in a given pod structure.
+Detects and logs unrecognized configuration keys in a pod structure.
 
 # Purpose
-The provided C code is a utility designed to identify and log unrecognized configuration keys within a hierarchical data structure, referred to as a "pod." This code is part of a larger system, likely a configuration management tool, as indicated by the inclusion of "fd_config_extract.h" and the naming conventions used. The primary function, [`fdctl_pod_find_leftover`](#fdctl_pod_find_leftover), initiates a recursive search through the pod structure to detect keys that do not belong to any recognized subpod. If such keys are found, they are logged as warnings, helping developers or system administrators identify and rectify potential configuration issues.
+The code is a C source file that provides functionality to detect unrecognized configuration keys within a data structure referred to as a "pod." It defines a function [`fdctl_pod_find_leftover`](<#fdctl_pod_find_leftover>) that recursively searches through the pod to identify keys that are not recognized as subpods. If such keys are found, the function logs a warning message. The function returns `0` if it finds any unrecognized keys, otherwise it returns `1`. The code is not thread-safe because it uses a global buffer to store the stack of keys during the recursive search.
 
-The code is structured around two main functions: [`fdctl_pod_find_leftover`](#fdctl_pod_find_leftover) and its helper, [`fdctl_pod_find_leftover_recurse`](#fdctl_pod_find_leftover_recurse). The recursive function traverses the pod structure, maintaining a stack of keys to track the current path within the hierarchy. If a non-subpod key is encountered, it returns the depth of the key, which is then used by the main function to construct a path string representing the unrecognized key. This path is logged as a warning, providing a clear indication of the configuration anomaly. The code is not thread-safe due to its use of static buffers, which suggests it is intended for single-threaded execution or requires external synchronization when used in a multi-threaded context.
+The main technical components include the recursive function [`fdctl_pod_find_leftover_recurse`](<#fdctl_pod_find_leftover_recurse>), which traverses the pod structure, and the [`fdctl_pod_find_leftover`](<#fdctl_pod_find_leftover>) function, which initializes the stack and handles the logging of unrecognized keys. The code uses a static array `stack` to keep track of the current path of keys being examined, and it constructs a string representation of the path to log any unrecognized keys. The code is intended to be part of a larger system, likely related to configuration management, and it does not define any public APIs or external interfaces.
 # Imports and Dependencies
 
 ---
@@ -19,38 +19,44 @@ The code is structured around two main functions: [`fdctl_pod_find_leftover`](#f
 
 ---
 ### fdctl\_pod\_find\_leftover\_recurse<!-- {{#callable:fdctl_pod_find_leftover_recurse}} -->
-The function `fdctl_pod_find_leftover_recurse` recursively searches a pod structure for non-subpod keys and logs a warning if any are found, returning the depth of the leftover key if present.
+[View Source →](<../../../../../src/app/platform/fd_config_extract.c#L16>)
+
+Recursively searches for non-subpod keys in a pod and logs a warning if any are found.
 - **Inputs**:
-    - `pod`: A pointer to the pod structure to be searched for leftover keys.
-    - `stack`: An array of strings used to store the keys encountered during the recursive search.
-    - `depth`: The current depth of recursion, indicating how many nested levels have been traversed.
-- **Control Flow**:
-    - Check if the current depth exceeds the maximum allowed depth (`FDCTL_CFG_MAX_DEPTH`); if so, log a warning and return the current depth.
-    - Initialize an iterator to traverse the pod structure.
-    - For each item in the pod, retrieve its information and store the key in the stack at the current depth.
-    - Increment the depth and check if the current item is a subpod; if it is, recursively call `fdctl_pod_find_leftover_recurse` on the subpod.
-    - If the recursive call returns a non-zero depth, return this depth as it indicates a leftover key was found.
-    - If the current item is not a subpod, return the current depth as it indicates a leftover key was found.
-    - Decrement the depth after processing each item in the pod.
-- **Output**: Returns 0 if no leftover key is found; otherwise, returns a non-zero value representing the depth of the leftover key.
+    - `pod`: A pointer to the pod data structure to search.
+    - `stack`: An array of strings used to store the keys of the current path in the pod.
+    - `depth`: The current depth of recursion, indicating the level of nesting in the pod.
+- **Logic and Control Flow**:
+    - Checks if the current depth plus one exceeds the maximum allowed depth (`FDCTL_CFG_MAX_DEPTH`); if so, logs a warning and returns the current depth.
+    - Initializes an iterator to traverse the pod using `fd_pod_iter_init` and iterates over the pod using a for loop.
+    - For each item in the pod, retrieves the key and value type using `fd_pod_iter_info` and stores the key in the `stack` at the current depth.
+    - Increments the depth and checks if the value type is a subpod (`FD_POD_VAL_TYPE_SUBPOD`).
+    - If the value is a subpod, recursively calls `fdctl_pod_find_leftover_recurse` with the subpod, stack, and incremented depth.
+    - If the recursive call returns a non-zero depth, returns this depth immediately.
+    - If the value is not a subpod, returns the current depth.
+    - Decrements the depth after processing each item in the pod.
+- **Output**: Returns 0 if no leftover key is found; otherwise, returns a non-zero number indicating the depth of the leftover key.
 
 
 ---
 ### fdctl\_pod\_find\_leftover<!-- {{#callable:fdctl_pod_find_leftover}} -->
-The `fdctl_pod_find_leftover` function searches for unrecognized keys in a configuration pod and logs a warning if any are found.
+[View Source →](<../../../../../src/app/platform/fd_config_extract.c#L42>)
+
+Searches for unrecognized keys in a configuration pod and logs a warning if found.
 - **Inputs**:
-    - `pod`: A pointer to an unsigned character array representing the configuration pod to be searched for unrecognized keys.
-- **Control Flow**:
-    - Initialize a static stack to store keys and call [`fdctl_pod_find_leftover_recurse`](#fdctl_pod_find_leftover_recurse) to search for unrecognized keys, storing the depth of the search.
-    - If no unrecognized keys are found (depth is zero), return 1 indicating success.
-    - If unrecognized keys are found, initialize a path string to store the full path of the unrecognized key.
-    - Iterate over the stack to construct the path of the unrecognized key, appending each key to the path string.
-    - If the path string exceeds its maximum length, append '...' to indicate truncation.
-    - Log a warning message with the constructed path of the unrecognized key.
-    - Return 0 to indicate that unrecognized keys were found.
-- **Output**: Returns 1 if no unrecognized keys are found, otherwise returns 0 and logs a warning with the path of the unrecognized key.
-- **Functions called**:
-    - [`fdctl_pod_find_leftover_recurse`](#fdctl_pod_find_leftover_recurse)
+    - `pod`: A pointer to the configuration pod to search for unrecognized keys.
+- **Logic and Control Flow**:
+    - Initialize a static array `stack` to store keys during recursion.
+    - Call [`fdctl_pod_find_leftover_recurse`](<#fdctl_pod_find_leftover_recurse>) to search for non-subpod keys in `pod`, storing the depth of the search.
+    - If no leftover key is found (`depth` is 0), return 1.
+    - If a leftover key is found, initialize a static buffer `path` to construct the key path.
+    - Iterate over the `stack` to append each key to `path`, ensuring the path does not exceed the buffer size.
+    - If the buffer is exceeded, append '...' to indicate truncation.
+    - Log a warning with the constructed key path.
+    - Return 0 to indicate a leftover key was found.
+- **Output**: Returns 1 if no leftover key is found, otherwise returns 0 and logs a warning with the unrecognized key path.
+- **Functions Called**:
+    - [`fdctl_pod_find_leftover_recurse`](<#fdctl_pod_find_leftover_recurse>)
 
 
 

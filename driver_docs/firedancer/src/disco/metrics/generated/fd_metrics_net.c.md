@@ -3,10 +3,25 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated network metric metadata array with counter and gauge entries.
+Defines network metrics as counters and gauges for monitoring network performance.
 
 # Purpose
-Defines the network metrics metadata table `FD_METRICS_NET` for the `fd_metrics_net.h` interface. Each entry uses `DECLARE_METRIC` to map a metric name to its type, such as `COUNTER` or `GAUGE`, for receive, transmit, XDP, XSK, and GRE related events. The file does not contain logic; it only provides the generated list of metric descriptors used by the metrics system.
+This C source file defines an array of network metrics, `FD_METRICS_NET`, which is used to track various network-related statistics. The file is automatically generated and should not be manually edited. Each element in the array is defined using the `DECLARE_METRIC` macro, which specifies the metric's name and type, either `COUNTER` or `GAUGE`. The metrics include counts of received and transmitted packets, bytes, and various error conditions such as route failures and invalid descriptors. The file includes the header `fd_metrics_net.h`, which likely contains necessary declarations and definitions for the metrics system.
+# Imports and Dependencies
+
+---
+- `fd_metrics_net.h`
+
+
+# Global Variables
+
+---
+### FD\_METRICS\_NET
+- **Type**: ``const fd_metrics_meta_t[]``
+- **Description**: An array of `fd_metrics_meta_t` structures that define various network metrics. Each element in the array represents a specific network metric, such as packet counts, byte totals, and error counts, categorized as either a counter or a gauge.
+- **Use**: Used to store and access network-related metrics for monitoring and analysis.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-deepasan.mk` file in the `firedancer` codebase configures build flags for enabling AddressSanitizer and LeakSanitizer with specific compiler and linker options.
+Configuration for enabling AddressSanitizer and LeakSanitizer in the build process.
 
 # Purpose
-This file is a Makefile snippet configuring the build process to enable AddressSanitizer (ASan) and LeakSanitizer for the software project. It sets preprocessor and compiler flags to define macros indicating the presence of ASan and DeepASan, and it adds the necessary flags to `CPPFLAGS`, `CFLAGS`, and `LDFLAGS` to activate address and leak sanitization during compilation and linking.
+The file configures the build environment to enable AddressSanitizer (ASAN) and Deep AddressSanitizer (DEEPASAN) for the project. It sets the `FD_HAS_ASAN` and `FD_HAS_DEEPASAN` flags to `1`, indicating that these sanitizers are active. The `CPPFLAGS` and `CFLAGS` are updated to include the `-DFD_HAS_ASAN=1` and `-DFD_HAS_DEEPASAN=1` definitions, while `CPPFLAGS` and `LDFLAGS` are appended with `-fsanitize=address,leak` and `-fno-omit-frame-pointer` to ensure that the address and leak sanitization features are applied during compilation and linking.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

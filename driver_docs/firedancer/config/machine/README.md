@@ -3,36 +3,36 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile build settings for Linux, FreeBSD, macOS, and CPU-specific Clang and GCC targets.
+Makefiles for configuring build environments with Clang and GCC across various architectures and operating systems.
 
 
 ## Files
-- **[freebsd_clang_noarch128.mk](freebsd_clang_noarch128.mk.md)**: The `freebsd_clang_noarch128.mk` file in the `firedancer` codebase configures build settings for a FreeBSD environment using Clang with specific flags for 128-bit integer support, double precision, and stack allocation.
-- **[linux_clang_haswell.mk](linux_clang_haswell.mk.md)**: The `linux_clang_haswell.mk` file in the `firedancer` codebase is a makefile configuration for building with Clang on Haswell architecture, including various optimizations and feature flags such as AVX and AESNI.
-- **[linux_clang_icelake.mk](linux_clang_icelake.mk.md)**: The `linux_clang_icelake.mk` file in the `firedancer` codebase configures build settings for compiling with Clang on Ice Lake architecture, including various optimizations and feature flags.
-- **[linux_clang_minimal.mk](linux_clang_minimal.mk.md)**: The `linux_clang_minimal.mk` file in the `firedancer` codebase sets up a minimal build configuration for Linux using Clang, including various features such as debugging, security, and optimization, while enabling POSIX style logging for cross-platform development.
-- **[linux_clang_noarch128.mk](linux_clang_noarch128.mk.md)**: The `linux_clang_noarch128.mk` file in the `firedancer` codebase configures the build environment for a Linux system using Clang with specific features such as 128-bit integers, double precision, and stack allocation.
-- **[linux_clang_noarch64.mk](linux_clang_noarch64.mk.md)**: The `linux_clang_noarch64.mk` file in the `firedancer` codebase is a makefile configuration that sets up build options for a Linux environment using Clang on a noarch64 architecture, including flags for debugging, security, optimization, and threading.
-- **[linux_clang_sse.mk](linux_clang_sse.mk.md)**: Clang x86_64 SSE-only build settings with native march flags and feature defines.
-- **[linux_clang_x86_64.mk](linux_clang_x86_64.mk.md)**: The `linux_clang_x86_64.mk` file in the `firedancer` codebase configures the build environment for a Linux x86_64 architecture using Clang, including various optimizations and feature flags.
-- **[linux_clang_zen2.mk](linux_clang_zen2.mk.md)**: The `linux_clang_zen2.mk` file in the `firedancer` codebase configures the build environment for a Zen 2 architecture using Clang, with various optimizations and features enabled such as SSE, AVX, and AESNI.
-- **[linux_clang_zen3.mk](linux_clang_zen3.mk.md)**: Build settings for clang on Zen 3 with x86, AVX, AESNI, and related flags.
-- **[linux_clang_zen4.mk](linux_clang_zen4.mk.md)**: Build settings for Linux Clang on Zen 4 with x86-64, debug, security, and optimization flags.
-- **[linux_clang_zen5.mk](linux_clang_zen5.mk.md)**: Build settings for Linux Clang on Zen 5 with x86-64, debug, security, and SIMD flags.
-- **[linux_gcc_arm_n1.mk](linux_gcc_arm_n1.mk.md)**: The `linux_gcc_arm_n1.mk` file in the `firedancer` codebase is a makefile configuration for building the project on ARMv8.4-A server CPUs, such as Neoverse V1 or AWS Graviton3, with various compilation flags and experimental support.
-- **[linux_gcc_icelake.mk](linux_gcc_icelake.mk.md)**: The `linux_gcc_icelake.mk` file in the `firedancer` codebase configures build settings for the GCC compiler targeting Intel Ice Lake architecture, including various optimizations and feature flags.
-- **[linux_gcc_minimal.mk](linux_gcc_minimal.mk.md)**: The `linux_gcc_minimal.mk` file in the `firedancer` codebase sets up a minimal build configuration for Linux using GCC, including various features such as debugging, security, and optimization, while enabling POSIX style logging for cross-platform development.
-- **[linux_gcc_noarch128.mk](linux_gcc_noarch128.mk.md)**: The `linux_gcc_noarch128.mk` file in the `firedancer` codebase is a makefile configuration that sets up build options for a Linux environment using GCC with support for 128-bit integers, double precision, and stack allocation.
-- **[linux_gcc_noarch64.mk](linux_gcc_noarch64.mk.md)**: The `linux_gcc_noarch64.mk` file in the `firedancer` codebase sets up build configurations for a Linux GCC noarch64 environment, including flags for debugging, security, optimization, and threading.
-- **[linux_gcc_power9.mk](linux_gcc_power9.mk.md)**: The `linux_gcc_power9.mk` file in the `firedancer` codebase is a makefile configuration for building with GCC on Power9 architecture, including cross-compilation settings and various feature flags.
-- **[linux_gcc_riscv.mk](linux_gcc_riscv.mk.md)**: The `linux_gcc_riscv.mk` file in the `firedancer` codebase is a makefile configuration for building with GCC targeting RISC-V architecture, including various flags and settings for cross-compilation, optimization, debugging, and security.
-- **[linux_gcc_x86_64.mk](linux_gcc_x86_64.mk.md)**: The `linux_gcc_x86_64.mk` file in the `firedancer` codebase configures build settings for a Linux environment using GCC on x86_64 architecture, including various optimizations and feature flags.
-- **[linux_gcc_zen2.mk](linux_gcc_zen2.mk.md)**: The `linux_gcc_zen2.mk` file in the `firedancer` codebase configures the build environment for GCC on Zen 2 architecture, including various optimizations and feature flags.
-- **[linux_gcc_zen3.mk](linux_gcc_zen3.mk.md)**: Build settings for Linux GCC Zen 3 with x86, AVX, and AESNI flags.
-- **[linux_gcc_zen4.mk](linux_gcc_zen4.mk.md)**: The `linux_gcc_zen4.mk` file in the `firedancer` codebase configures the build environment for GCC on Zen 4 architecture, specifying compiler flags and feature definitions for various optimizations and security enhancements.
-- **[linux_gcc_zen5.mk](linux_gcc_zen5.mk.md)**: GCC 15+ zen5 build flags and feature defines for x86-64, debug, security, threads, and optimization.
-- **[macos_clang_m1.mk](macos_clang_m1.mk.md)**: The `macos_clang_m1.mk` file in the `firedancer` codebase configures the build environment for macOS using Clang on Apple M1, including specific compiler flags and dependencies.
-- **[native.mk](native.mk.md)**: The `native.mk` file in the `firedancer` codebase configures compiler settings and feature detection for native builds, including support for various CPU features and compatibility with GCC and Clang.
+- **[freebsd_clang_noarch128.mk](freebsd_clang_noarch128.mk.md)**: Makefile for configuring a FreeBSD build with Clang and specific flags for integer, double, and memory allocation support.
+- **[linux_clang_haswell.mk](linux_clang_haswell.mk.md)**: Makefile for configuring a build environment with Clang on Haswell architecture, including optimizations and security features.
+- **[linux_clang_icelake.mk](linux_clang_icelake.mk.md)**: Makefile configuration for building with Clang on Intel Ice Lake architecture, including optimization and security flags.
+- **[linux_clang_minimal.mk](linux_clang_minimal.mk.md)**: Makefile for configuring a minimal Linux build with Clang, including debug, security, and optimization.
+- **[linux_clang_noarch128.mk](linux_clang_noarch128.mk.md)**: Makefile for configuring a build environment with Clang on a 128-bit architecture with various features.
+- **[linux_clang_noarch64.mk](linux_clang_noarch64.mk.md)**: Makefile for configuring a Linux build with Clang for noarch64, including various build options.
+- **[linux_clang_sse.mk](linux_clang_sse.mk.md)**: Makefile for building with Clang on x86_64 with SSE support, including various configuration options.
+- **[linux_clang_x86_64.mk](linux_clang_x86_64.mk.md)**: Makefile for configuring a build environment with Clang on x86_64 Linux, including various optimizations and features.
+- **[linux_clang_zen2.mk](linux_clang_zen2.mk.md)**: Makefile for configuring a build environment with Clang for Zen 2 architecture, including various optimizations and security features.
+- **[linux_clang_zen3.mk](linux_clang_zen3.mk.md)**: Makefile for configuring build settings with Clang on Zen 3 architecture, including optimizations and security.
+- **[linux_clang_zen4.mk](linux_clang_zen4.mk.md)**: Makefile for configuring a build environment with Clang for Zen 4 architecture with various optimizations.
+- **[linux_clang_zen5.mk](linux_clang_zen5.mk.md)**: Makefile for configuring a build environment targeting AMD Zen 5 with Clang and various optimizations.
+- **[linux_gcc_arm_n1.mk](linux_gcc_arm_n1.mk.md)**: Makefile for building Firedancer on ARMv8.4-A CPUs with GCC, including experimental support and optimizations.
+- **[linux_gcc_icelake.mk](linux_gcc_icelake.mk.md)**: Makefile for configuring GCC build settings optimized for Intel Ice Lake architecture in the Firedancer project.
+- **[linux_gcc_minimal.mk](linux_gcc_minimal.mk.md)**: Makefile for configuring a minimal Linux build with GCC, including debugging, security, and optimization.
+- **[linux_gcc_noarch128.mk](linux_gcc_noarch128.mk.md)**: Makefile for configuring a Linux GCC build with specific flags and features for noarch128.
+- **[linux_gcc_noarch64.mk](linux_gcc_noarch64.mk.md)**: Makefile for configuring a Linux GCC noarch64 build with various features and optimizations.
+- **[linux_gcc_power9.mk](linux_gcc_power9.mk.md)**: Makefile for configuring GCC build settings for Power9 architecture in the Firedancer project.
+- **[linux_gcc_riscv.mk](linux_gcc_riscv.mk.md)**: Makefile for configuring RISC-V cross-compilation with GCC, including flags and feature definitions.
+- **[linux_gcc_x86_64.mk](linux_gcc_x86_64.mk.md)**: Makefile for configuring a Linux GCC x86_64 build with various optimizations and features.
+- **[linux_gcc_zen2.mk](linux_gcc_zen2.mk.md)**: Makefile for configuring GCC build settings for Zen 2 architecture with various optimizations and features.
+- **[linux_gcc_zen3.mk](linux_gcc_zen3.mk.md)**: Makefile for configuring GCC build settings optimized for Zen 3 architecture in the Firedancer project.
+- **[linux_gcc_zen4.mk](linux_gcc_zen4.mk.md)**: Makefile for configuring GCC build settings for Zen 4 architecture with various optimizations.
+- **[linux_gcc_zen5.mk](linux_gcc_zen5.mk.md)**: Makefile for configuring GCC 15+ with Zen 5 optimizations and various architecture flags.
+- **[macos_clang_m1.mk](macos_clang_m1.mk.md)**: Makefile for configuring build settings on macOS with Clang for Apple M1 architecture.
+- **[native.mk](native.mk.md)**: Configuration file for setting compiler flags and feature detection based on the native architecture.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

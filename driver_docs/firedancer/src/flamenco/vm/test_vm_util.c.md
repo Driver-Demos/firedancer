@@ -3,10 +3,53 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Minimal VM test context setup and transaction error clearing helpers.
+Functions to generate and clear minimal execution contexts for virtual machine testing.
 
 # Purpose
-This file defines small test helper functions for VM execution context setup. The [`test_vm_minimal_exec_instr_ctx`](<#test_vm_minimal_exec_instr_ctx>) function clears an `fd_exec_instr_ctx_t` and an `fd_exec_txn_ctx_t`, disables all feature flags, enables the `TEST_VM_REJECT_CALLX_R10_FEATURE_PREFIX` feature flag entry with a zero value, sets the transaction slot to `1UL`, and links the instruction context to the transaction context. The [`test_vm_clear_txn_ctx_err`](<#test_vm_clear_txn_ctx_err>) function resets the transaction execution error fields in `fd_exec_txn_ctx_t` to their default state.
+The code provides utility functions for testing a virtual machine (VM) execution context. It includes two main functions: [`test_vm_minimal_exec_instr_ctx`](<#test_vm_minimal_exec_instr_ctx>) and [`test_vm_clear_txn_ctx_err`](<#test_vm_clear_txn_ctx_err>). The [`test_vm_minimal_exec_instr_ctx`](<#test_vm_minimal_exec_instr_ctx>) function initializes a minimal instruction context for the VM by setting up feature flags and associating a transaction context with the instruction context. It uses the `memset` function to zero out the memory for both `fd_exec_instr_ctx_t` and `fd_exec_txn_ctx_t` structures, ensuring a clean state. The function then disables all features and selectively enables a specific feature using `fd_features_set`, identified by `fd_feature_id_query` with the `TEST_VM_REJECT_CALLX_R10_FEATURE_PREFIX` identifier. The transaction context's slot is set to `1UL`, and the instruction context is linked to the transaction context.
+
+The [`test_vm_clear_txn_ctx_err`](<#test_vm_clear_txn_ctx_err>) function resets the error state of a transaction context by setting the `exec_err` to `0` and the `exec_err_kind` to `FD_EXECUTOR_ERR_KIND_NONE`. This function is useful for clearing any execution errors that may have occurred during testing. The code is intended to be used in a testing environment, providing a controlled setup for VM execution contexts and ensuring that any errors can be reset between tests.
+# Imports and Dependencies
+
+---
+- `test_vm_util.h`
+- `../runtime/context/fd_exec_txn_ctx.h`
+
+
+# Functions
+
+---
+### test\_vm\_minimal\_exec\_instr\_ctx<!-- {{#callable:test_vm_minimal_exec_instr_ctx}} -->
+[View Source →](<../../../../../src/flamenco/vm/test_vm_util.c#L6>)
+
+Initializes a minimal execution instruction context and transaction context for a virtual machine test environment.
+- **Inputs**:
+    - `instr_ctx`: A pointer to an `fd_exec_instr_ctx_t` structure that will be initialized.
+    - `txn_ctx`: A pointer to an `fd_exec_txn_ctx_t` structure that will be initialized.
+- **Logic and Control Flow**:
+    - Set all bytes of `instr_ctx` to zero using `memset`.
+    - Set all bytes of `txn_ctx` to zero using `memset`.
+    - Disable all features in `txn_ctx->features` using `fd_features_disable_all`.
+    - Enable a specific feature in `txn_ctx->features` using `fd_features_set` and `fd_feature_id_query` with `TEST_VM_REJECT_CALLX_R10_FEATURE_PREFIX`.
+    - Set `txn_ctx->slot` to `1UL`.
+    - Assign `txn_ctx` to `instr_ctx->txn_ctx`.
+- **Output**: No return value; modifies the structures pointed to by `instr_ctx` and `txn_ctx`.
+
+
+---
+### test\_vm\_clear\_txn\_ctx\_err<!-- {{#callable:test_vm_clear_txn_ctx_err}} -->
+[View Source →](<../../../../../src/flamenco/vm/test_vm_util.c#L21>)
+
+Clears the execution error state in a transaction context.
+- **Inputs**:
+    - `txn_ctx`: A pointer to a `fd_exec_txn_ctx_t` structure that holds the transaction context to clear the error state.
+- **Logic and Control Flow**:
+    - Set the `exec_err` field of `txn_ctx` to 0.
+    - Set the `exec_err_kind` field of `txn_ctx` to `FD_EXECUTOR_ERR_KIND_NONE`.
+    - Return from the function.
+- **Output**: No output is returned.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
