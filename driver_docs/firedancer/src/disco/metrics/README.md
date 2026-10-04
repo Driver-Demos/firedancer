@@ -3,24 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-XML metric generation, Prometheus rendering, shared-memory layouts, and seccomp rules for disco metrics.
+Classes, functions, and policies for metrics parsing, HTTP servers, Prometheus integration, and code generation.
 
 ## Folders
-- **[generate](generate/README.md)**: XML metric type parsing and code and Markdown generation for metric metadata, enums, and tables
-- **[generated](generated/README.md)**: Generated metric metadata, definitions, and seccomp filter files for disco metrics.
+- **[generate](generate/README.md)**: Classes and functions for metrics parsing, C code generation, and Markdown documentation.
+- **[generated](generated/README.md)**: Seccomp filter policies, metrics definitions for various operations, and Makefile rules for `fd_disco`.
 
 ## Files
-- **[fd_metric_tile.c](fd_metric_tile.c.md)**: Prometheus metrics HTTP tile with /metrics endpoint and boot timestamp gauge.
-- **[fd_metric_tile.seccomppolicy](fd_metric_tile.seccomppolicy.md)**: Seccomp rules for logging and HTTP metrics socket operations.
-- **[fd_metrics.c](fd_metrics.c.md)**: The `fd_metrics.c` file in the `firedancer` codebase includes the `fd_metrics.h` header and declares thread-local pointers for metrics data.
-- **[fd_metrics.h](fd_metrics.h.md)**: Shared-memory metrics layout, access macros, and time conversion helpers.
-- **[fd_metrics_base.h](fd_metrics_base.h.md)**: Metric type constants, metadata struct, and helper macros for gauge, counter, and histogram metrics.
-- **[fd_prometheus.c](fd_prometheus.c.md)**: Prometheus text rendering for tile and link metrics over HTTP.
-- **[fd_prometheus.h](fd_prometheus.h.md)**: The `fd_prometheus.h` file in the `firedancer` codebase provides functions to format and render metrics in the Prometheus text-based exposition format for a given topology and individual tiles into an HTTP server's outgoing ring buffer.
-- **[gen_metrics.py](gen_metrics.py.md)**: The `gen_metrics.py` file in the `firedancer` codebase reads and processes metrics from an XML file, then generates code and documentation based on those metrics.
-- **[Local.mk](Local.mk.md)**: Build rules for Prometheus and metrics headers and objects when FD_HAS_ALLOCA is set.
-- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/disco/metrics` directory defines a `metrics` target that runs a Python script named `gen_metrics.py` using Python 3.
-- **[metrics.xml](metrics.xml.md)**: Metrics definitions for Firedancer tiles, enums, counters, gauges, and histograms.
+- **[fd_metric_tile.c](fd_metric_tile.c.md)**: Implements a Prometheus metrics HTTP server with seccomp filtering and connection management.
+- **[fd_metric_tile.seccomppolicy](fd_metric_tile.seccomppolicy.md)**: Defines security policies for logging and serving HTTP metrics using file descriptors.
+- **[fd_metrics.c](fd_metrics.c.md)**: Defines thread-local variables for metrics in the Firedancer codebase.
+- **[fd_metrics.h](fd_metrics.h.md)**: Defines a system for managing and updating shared memory metrics with macros for efficient access.
+- **[fd_metrics_base.h](fd_metrics_base.h.md)**: Defines macros and structures for metric types, converters, and metadata in the Firedancer codebase.
+- **[fd_prometheus.c](fd_prometheus.c.md)**: Renders Prometheus metrics for HTTP servers using topology and metrics data structures.
+- **[fd_prometheus.h](fd_prometheus.h.md)**: Functions to format and render metrics in Prometheus text format for an HTTP server.
+- **[gen_metrics.py](gen_metrics.py.md)**: Generates code and documentation from metrics defined in an XML file.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and objects related to Prometheus and metrics if FD_HAS_ALLOCA is defined.
+- **[Makefile](Makefile.md)**: Makefile to run the `gen_metrics.py` script using Python.
+- **[metrics.xml](metrics.xml.md)**: Defines potential metrics for Firedancer, grouped into categories, with guidelines for maintaining backward compatibility.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
