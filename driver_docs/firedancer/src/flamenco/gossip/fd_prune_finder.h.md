@@ -3,18 +3,43 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-API for tracking gossip duplicates and selecting peers to prune.
+API for tracking gossip messages and determining which peers to prune based on message duplication.
 
 # Purpose
-`fd_prune_finder.h` declares the public API for a gossip prune tracker used to record received messages and decide which peers should be pruned. It defines an opaque `fd_prune_finder_t` type and the functions [`fd_prune_finder_align`](<#fd_prune_finder_align>), [`fd_prune_finder_footprint`](<#fd_prune_finder_footprint>), [`fd_prune_finder_new`](<#fd_prune_finder_new>), and [`fd_prune_finder_join`](<#fd_prune_finder_join>) for shared-memory setup and access. The main operation is [`fd_prune_finder_record`](<#fd_prune_finder_record>), which records a message from an origin and a relayer, along with stake and duplicate count data, so the implementation can track duplicate sources and select low-performing peers for prune messages. The file also documents the fixed-size map structure used to store per-origin relay counts and the periodic pruning behavior.
+This C header file defines an API for managing gossip message propagation in a network by tracking and pruning redundant message paths. The `fd_prune_finder` structure and its associated functions are designed to monitor received gossip messages and identify which peers should be pruned to minimize duplicate message reception. The file includes functions to align and calculate the memory footprint of the `fd_prune_finder` structure, create a new instance, and join an existing one. The [`fd_prune_finder_record`](<#fd_prune_finder_record>) function logs received messages, using the origin and relayer public keys to track message paths and determine which peers are the fastest senders. The system periodically prunes peers with low performance scores to optimize message delivery efficiency.
+# Imports and Dependencies
+
+---
+- `../../util/fd_util.h`
+
+
+# Data Structures
+
+---
+### fd\_prune\_finder\_t
+- **Type**: ``struct``
+- **Members**:
+    - ``fd_prune_finder_private``: A private structure used to define `fd_prune_finder_t`.
+- **Description**: `fd_prune_finder_t` is a typedef for a private structure used in a gossip protocol to track received messages and determine which peers to prune. It maintains a fixed-size map of originating nodes to a map of nodes that send messages from those origins, counting messages from the two fastest senders. The structure helps manage message duplication by pruning less efficient relayers, ensuring efficient message propagation in the network.
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_prune_finder_align`
-- `fd_prune_finder_footprint`
-- `fd_prune_finder_new`
-- `fd_prune_finder_join`
-- `fd_prune_finder_record`
+### fd\_prune\_finder\_record<!-- {{#callable_declaration:fd_prune_finder_record}} -->
+[View Source →](<../../../../../src/flamenco/gossip/fd_prune_finder.h#L80>)
+
+Records a received gossip message from a peer.
+- **Description**: Use this function to log a received gossip message in the prune finder system. It should be called for every message received that is attempted to be inserted into the CRDS. The function tracks the origin and relayer of the message, as well as the number of duplicates received. This information helps in determining which peers to prune based on their performance. The function expects valid public keys for both the origin and relayer, and a non-negative duplicate count. It is important to call this function consistently to maintain accurate tracking of message origins and relayers.
+- **Inputs**:
+    - `pf`: A pointer to an `fd_prune_finder_t` structure. Must not be null. The caller retains ownership.
+    - `origin_pubkey`: A pointer to a 32-byte array representing the public key of the message originator. Must not be null.
+    - `relayer_pubkey`: A pointer to a 32-byte array representing the public key of the node that forwarded the message. Must not be null.
+    - `num_dups`: An unsigned long representing the number of times the message has already been received from other nodes. Must be zero or greater.
+- **Output**: None
+- **See Also**: [`fd_prune_finder_record`](<fd_prune_finder.c.md#fd_prune_finder_record>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

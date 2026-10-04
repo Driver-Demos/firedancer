@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_bmtree headers, objects, unit test, and optional fuzz test.
+Makefile for adding headers, objects, and unit tests, with optional fuzz testing for `fd_bmtree`.
 
 # Purpose
-Build rules add the `fd_bmtree.h` header and the `fd_bmtree` object to the `fd_ballet` target. The file also defines the `test_bmtree` unit test and runs it, and it defines the `fuzz_bmtree` fuzz test only when `FD_HAS_HOSTED` is set.
+This Makefile snippet defines build and test instructions for a software project. It adds the header file `fd_bmtree.h` and object files `fd_bmtree` and `fd_ballet` to the build process. It specifies the creation and execution of a unit test named `test_bmtree`, which depends on `fd_ballet` and `fd_util`. If the `FD_HAS_HOSTED` variable is defined, it also creates a fuzz test named `fuzz_bmtree` with dependencies on `fd_ballet` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

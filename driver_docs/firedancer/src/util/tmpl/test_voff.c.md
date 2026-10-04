@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_voff.c` file in the `firedancer` codebase tests the functionality of versioned offsets (`voff`) with different configurations, ensuring correct version and offset width handling through assertions and random value checks.
+Tests for `my_voff` and `my_voff1` version and offset width functionality using static assertions and random values.
 
 # Purpose
-This C source code file is designed to test the functionality of a version-offset (voff) encoding mechanism. It includes two distinct configurations of the voff mechanism, each defined by different version and offset widths. The file imports a utility header (`fd_util.h`) and a voff implementation file (`fd_voff.c`) twice, each time with different preprocessor definitions to create two separate voff types: `my_voff` and `my_voff1`. The `my_voff` type is configured with a version width of 20 bits and an offset width of 44 bits, while `my_voff1` is configured with a version width of 13 bits and an offset width of 19 bits. The code uses static assertions to ensure that these configurations are correctly set.
+The code is an executable C program that tests the functionality of version-offset (voff) operations defined in the included `fd_voff.c` file. It defines two sets of version-offset operations, `my_voff` and `my_voff1`, with different version and offset widths. The program uses static assertions to verify that the version and offset widths are as expected for both `my_voff` and `my_voff1`. The [`main`](<#main>) function initializes a random number generator and performs a series of tests to ensure that the version and offset values are correctly masked and combined into a version-offset structure, and that these values can be accurately retrieved.
 
-The main function initializes a random number generator and performs extensive testing on both voff types. It verifies that the version and offset values are correctly encoded and decoded, ensuring that the maximum values for each field are respected. The tests involve generating random version and offset values, encoding them into a voff, and then decoding them to check for consistency. The file concludes by cleaning up the random number generator and logging a success message if all tests pass. This code is primarily intended for internal testing and validation of the voff encoding mechanism, rather than providing a public API or external interface.
+The program includes the `fd_util.h` header for utility functions and uses the `fd_rng` functions to generate random numbers for testing. It performs extensive testing by iterating over a large number of random version and offset values, checking that the operations on these values conform to the expected behavior. The tests ensure that the maximum values for version and offset are correctly calculated and that the `my_voff` and `my_voff1` functions behave as intended. The program logs a success message if all tests pass and then halts execution.
 # Imports and Dependencies
 
 ---
@@ -20,20 +20,21 @@ The main function initializes a random number generator and performs extensive t
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, performs tests on version and offset encoding/decoding functions, and logs the results.
+[View Source →](<../../../../../src/util/tmpl/test_voff.c#L17>)
+
+Initializes the environment, performs tests on version and offset functions, and logs the results.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Create and join a random number generator using `fd_rng_new` and `fd_rng_join`.
-    - Perform static assertions to verify version and offset width constants for `my_voff` and `my_voff1`.
-    - Test `my_voff` functions by generating random version and offset values, encoding them, and verifying the decoding matches the original values for 10,000,000 iterations.
-    - Test `my_voff1` functions similarly with different version and offset widths for 10,000,000 iterations.
-    - Delete the random number generator using `fd_rng_delete`.
-    - Log a notice indicating the tests passed using `FD_LOG_NOTICE`.
-    - Halt the program using `fd_halt` and return 0.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Performs tests on `my_voff` functions to verify version and offset calculations for 10,000,000 iterations.
+    - Performs tests on `my_voff1` functions to verify version and offset calculations for 10,000,000 iterations.
+    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
+    - Logs a notice message indicating the tests passed using `FD_LOG_NOTICE`.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 

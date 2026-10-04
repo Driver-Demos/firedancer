@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers and unit test setup for the ELF component, including `fd_elf.h`, `fd_elf64.h`, and the `test_elf` unit test.
+Makefile for adding headers and running unit tests for ELF-related components.
 
 # Purpose
-The file is a Makefile snippet used for automating tasks in a build process. It adds header files `fd_elf.h` and `fd_elf64.h`, defines a unit test named `test_elf` with dependencies on `fd_ballet` and `fd_util`, and executes the `test_elf` unit test.
+The `Makefile` content defines build and test instructions for a software project. It uses the `add-hdrs` function to include header files `fd_elf.h` and `fd_elf64.h`. The `make-unit-test` function creates a unit test named `test_elf`, which depends on the `fd_ballet` and `fd_util` components. The `run-unit-test` function executes the `test_elf` unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
