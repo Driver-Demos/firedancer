@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines constants for the keyguard tile in the Firedancer codebase to minimize its attack surface.
+Keyguard tile constants for bundle crank sizes, offsets, and discriminator bytes.
 
 # Purpose
-This code is a C header file that defines several constants using the `#define` preprocessor directive. These constants are related to the configuration of a "keyguard tile," which is likely a component of a larger system. The file includes size definitions (`FD_BUNDLE_CRANK_2_SZ`, `FD_BUNDLE_CRANK_3_SZ`) and offset definitions (`FD_BUNDLE_CRANK_2_IX1_DISC_OFF`, etc.) for different crank bundles, as well as byte sequences for initialization and change operations (`FD_BUNDLE_CRANK_DISC_INIT_TIP_DISTR`, etc.). The file does not include an include guard, as it only contains `#define` statements, which aligns with the goal of minimizing the attack surface of the keyguard tile.
+This header defines size and offset constants for the `FD_BUNDLE_CRANK_2` and `FD_BUNDLE_CRANK_3` data blocks, along with fixed 8-byte discriminator values used by related bundle operations. The `FD_BUNDLE_CRANK_*_SZ` macros give the total byte size of each block, and the `FD_BUNDLE_CRANK_*_DISC_OFF` macros define the byte positions where each discriminator is stored. The `FD_BUNDLE_CRANK_DISC_INIT_TIP_DISTR`, `FD_BUNDLE_CRANK_DISC_CHANGE_TIP_RCV`, and `FD_BUNDLE_CRANK_DISC_CHANGE_BLK_BLD` macros define the discriminator byte sequences for the supported actions. These definitions let other source files access the correct fields without repeating numeric literals.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
