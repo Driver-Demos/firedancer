@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-AF_XDP tile code, tests, build rules, and seccomp policy files for packet routing and socket I/O.
+Seccomp filter policy, AF_XDP and fd_tango translation, Makefile logic, and seccomp policy rules.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter rules for XDP tile syscalls and argument checks.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for XDP using BPF instructions to control system call access.
 
 ## Files
-- **[fd_xdp_tile.c](fd_xdp_tile.c.md)**: AF_XDP net tile for TX/RX routing, GRE handling, stats, and socket setup.
-- **[fd_xdp_tile.seccomppolicy](fd_xdp_tile.seccomppolicy.md)**: The `xdp.seccomppolicy` file in the `firedancer` codebase defines security policies for file descriptors and system calls related to logging and XDP socket operations, including sendto, recvmsg, and getsockopt, for network and loopback devices.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_xdp_tile and related unit tests when alloca and sandbox are supported.
-- **[test_xdp_tile.c](test_xdp_tile.c.md)**: Tests XDP packet processing for RX, routing, GRE, fragmentation, and TX paths.
-- **[test_xdp_tile1.c](test_xdp_tile1.c.md)**: XDP tile unit test for TX and RX routing, GRE handling, and XSK ring I/O.
+- **[fd_xdp_tile.c](fd_xdp_tile.c.md)**: Translates between AF_XDP and fd_tango traffic, sets up XDP and XSK socket configuration, and manages network packet processing and routing.
+- **[fd_xdp_tile.seccomppolicy](fd_xdp_tile.seccomppolicy.md)**: Defines seccomp policy rules for logging and XDP socket operations in a network application.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing XDP tile components with conditional sandbox support.
+- **[test_xdp_tile.c](test_xdp_tile.c.md)**: Tests for XDP tile packet processing, including setup of network and routing tables, and packet handling logic.
+- **[test_xdp_tile1.c](test_xdp_tile1.c.md)**: A test file for XDP tile functionality, including packet structures, network configuration, and test loops for verifying packet transmission and reception.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
