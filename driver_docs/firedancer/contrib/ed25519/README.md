@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ed25519` folder in the `firedancer` codebase contains the `dalek_target` directory, which includes source code and configuration files for building a Rust library that uses the ed25519_dalek library for cryptographic operations and interfaces with C through FFI.
+Functions for signing and verifying messages using ed25519_dalek, package configuration, and build targets.
 
 ## Folders
-- **[dalek_target](dalek_target/README.md)**: The `dalek_target` folder in the `firedancer` codebase contains the source code and configuration files necessary for building a Rust library that utilizes the ed25519_dalek library for cryptographic operations and interfaces with C through FFI.
+- **[dalek_target](dalek_target/README.md)**: Functions for signing and verifying messages using ed25519_dalek, package configuration, and build targets.
 
 
 ---

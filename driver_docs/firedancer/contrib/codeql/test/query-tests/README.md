@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL tests for metric enum access, nonbinary is-style returns, and trivial memcpy alerts
+Defines metric types, functions, and tests for enum-based metrics, instruction accounts, and `memcpy` operations.
 
 ## Folders
-- **[MetricsEnumAccess](MetricsEnumAccess/README.md)**: CodeQL test files for metric enum access, array bounds, and enum size mismatch diagnostics
-- **[NonBinaryIsFunction](NonBinaryIsFunction/README.md)**: Tests and expected results for nonbinary is-style function return values.
-- **[TrivialMemcpy](TrivialMemcpy/README.md)**: CodeQL test cases and expectations for trivial memcpy alerts and false positives.
+- **[MetricsEnumAccess](MetricsEnumAccess/README.md)**: Defines metric types, converters, and macros for testing enum-based metrics with error detection.
+- **[NonBinaryIsFunction](NonBinaryIsFunction/README.md)**: Defines structures and functions for instruction accounts, expected test outputs, and query references.
+- **[TrivialMemcpy](TrivialMemcpy/README.md)**: Tests and expected outputs for trivial `memcpy` operations and strict aliasing violations.
 
 
 ---
