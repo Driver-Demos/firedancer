@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_stream.h` file in the `firedancer` codebase defines structures and functions for managing QUIC streams, including buffer management, stream state, and linked list operations.
+Defines data structures and functions for managing QUIC streams, including buffers and linked lists.
 
 # Purpose
-This C header file, `fd_quic_stream.h`, is part of a library that provides functionality for managing QUIC protocol streams. The file defines data structures and functions necessary for handling QUIC streams, which are essential components in the QUIC protocol for data transmission. The primary data structure defined is `fd_quic_stream_t`, which represents a QUIC stream and includes fields for managing stream state, flow control, and data buffers. The file also defines a circular buffer structure, `fd_quic_buffer_t`, used for efficient data storage and retrieval within streams. Additionally, the file includes macros for managing stream states and linked list operations, facilitating the organization and manipulation of streams within a connection.
+The code is a C header file that defines structures and functions for managing QUIC streams within a QUIC connection. It provides the necessary data structures and operations to handle the lifecycle and data flow of QUIC streams, which are essential components in the QUIC protocol for data transmission. The file includes definitions for `fd_quic_stream_t`, which represents a QUIC stream, and `fd_quic_buffer_t`, a circular buffer used for managing data transmission within a stream. The header also defines macros for managing stream states and actions, such as checking if a stream requires action or is in a particular state.
 
-The header file provides a public API for creating, deleting, and managing QUIC streams, including functions for storing and loading data in the circular buffer, setting and retrieving user-defined contexts, and initializing streams with specific memory alignments and buffer sizes. The file is designed to be included in other C source files, allowing developers to integrate QUIC stream management into their applications. The use of forward declarations and typedefs ensures that the file can be used in various contexts without requiring full definitions of related structures, promoting modularity and reusability in software development.
+The file provides several functions for stream management, including creating and deleting streams, storing and loading data in the circular buffer, and setting or retrieving user-defined contexts associated with streams. It also includes macros for managing linked lists of streams, which are used to organize and manipulate streams efficiently. The header file is intended to be included in other C source files that implement or utilize QUIC protocol functionality, providing a public API for stream management in a QUIC connection.
 # Imports and Dependencies
 
 ---
@@ -16,211 +16,207 @@ The header file provides a public API for creating, deleting, and managing QUIC 
 - `../../util/fd_util.h`
 
 
-# Global Variables
-
----
-### fd\_quic\_stream\_new
-- **Type**: `function pointer`
-- **Description**: The `fd_quic_stream_new` is a function that returns a pointer to a newly initialized `fd_quic_stream_t` structure. It takes three parameters: a memory pointer `mem` that is aligned and has sufficient size, a pointer to a `fd_quic_conn_t` connection, and a `tx_buf_sz` which specifies the size of the transmit buffer.
-- **Use**: This function is used to create and initialize a new QUIC stream with the specified memory and connection parameters.
-
-
----
-### fd\_quic\_stream\_get\_context
-- **Type**: `function pointer`
-- **Description**: The `fd_quic_stream_get_context` is a function that retrieves the user-defined context associated with a given QUIC stream. It takes a pointer to an `fd_quic_stream_t` structure as an argument and returns a void pointer to the context.
-- **Use**: This function is used to access the user-defined context that has been previously set for a specific QUIC stream, allowing for custom data or state to be associated with the stream.
-
-
 # Data Structures
 
 ---
 ### fd\_quic\_conn\_t
-- **Type**: `typedef struct fd_quic_conn fd_quic_conn_t;`
-- **Members**:
-    - `fd_quic_conn_t`: A forward declaration for a structure representing a QUIC connection.
-- **Description**: The `fd_quic_conn_t` is a forward declaration for a structure that represents a QUIC connection in the codebase. It is used as a placeholder for a more detailed definition that is likely found elsewhere in the code. This structure is integral to managing and maintaining the state and operations of a QUIC connection, which is a protocol designed for fast and reliable internet communication.
+- **Type**: ``fd_quic_conn_t``
+- **Description**: `fd_quic_conn_t` is a forward declaration of a data structure that represents a QUIC connection. The actual definition of this structure is not provided in the given code, indicating that it is likely defined elsewhere. This structure is used as a reference in other structures, such as `fd_quic_stream`, to associate streams with their respective connections.
 
 
 ---
 ### fd\_quic\_stream\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `conn`: Pointer to the associated QUIC connection.
-    - `stream_id`: Unique identifier for the stream, with all 1's indicating an unused stream.
-    - `context`: User-defined context for callbacks.
-    - `tx_buf`: Transmit buffer for the stream.
-    - `tx_ack`: Acknowledgment bits for each byte in the transmit buffer.
-    - `tx_sent`: Offset of the first unsent byte in the transmit buffer.
-    - `stream_flags`: Flags indicating required actions for the stream.
-    - `sentinel`: Indicates if the stream is a sentinel.
-    - `state`: Current state of the stream, represented by a mask of state flags.
-    - `list_memb`: Indicates the list membership status of the stream.
-    - `tx_max_stream_data`: Maximum number of bytes allowed to be sent to the peer on this stream.
-    - `tx_tot_data`: Total number of bytes transmitted on this stream.
-    - `rx_tot_data`: Total number of bytes received on this stream.
-    - `upd_pkt_number`: Packet number for the last transmitted packet with a stream frame.
-    - `next`: Pointer to the next stream in a doubly linked list.
-    - `prev`: Pointer to the previous stream in a doubly linked list.
-- **Description**: The `fd_quic_stream_t` structure represents a QUIC stream within a connection, managing data transmission and reception, flow control, and stream state. It includes a transmit buffer, acknowledgment tracking, and various flags and state indicators to manage the stream's lifecycle and actions. The structure also supports linked list operations for managing multiple streams and includes user-defined context for callback operations.
+    - ``conn``: Pointer to the associated QUIC connection.
+    - ``stream_id``: Identifier for the stream; all 1's indicates an unused stream.
+    - ``context``: User-defined context for callbacks.
+    - ``tx_buf``: Transmit buffer for the stream.
+    - ``tx_ack``: Acknowledgment bits for each byte in the transmit buffer.
+    - ``tx_sent``: Offset of the first unsent byte in the transmit buffer.
+    - ``stream_flags``: Flags indicating actions required for the stream.
+    - ``sentinel``: Indicates if the stream is a sentinel.
+    - ``state``: Current state of the stream, represented by a mask.
+    - ``list_memb``: Membership status in a list.
+    - ``tx_max_stream_data``: Maximum number of bytes allowed to send to the peer.
+    - ``tx_tot_data``: Total number of bytes transmitted on the stream.
+    - ``rx_tot_data``: Total number of bytes received on the stream.
+    - ``upd_pkt_number``: Packet number for the last transmitted packet with a stream frame.
+    - ``next``: Pointer to the next stream in a doubly linked list.
+    - ``prev``: Pointer to the previous stream in a doubly linked list.
+- **Description**: Represents a QUIC stream, managing data transmission and reception, flow control, and state tracking within a QUIC connection. It includes a transmit buffer, acknowledgment tracking, and state flags to manage the stream's lifecycle and actions. The structure also supports linked list operations for stream management and includes user-defined context for callback operations.
 
 
 ---
 ### fd\_quic\_stream\_map\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `stream_id`: The unique identifier for the stream, used as a key in the map.
-    - `hash`: The hash value associated with the stream_id for efficient lookup.
-    - `stream`: A pointer to the fd_quic_stream_t structure, representing the value associated with the stream_id.
-- **Description**: The `fd_quic_stream_map_t` structure is a mapping data structure used to associate a unique stream identifier (`stream_id`) with its corresponding `fd_quic_stream_t` object. It includes a `hash` field to facilitate efficient lookups and a `stream` pointer to the actual stream object. This structure is likely used in dynamic maps to manage and access QUIC streams efficiently within the QUIC protocol implementation.
+    - ``stream_id``: The key for the stream map.
+    - ``hash``: The hash value for the stream map entry.
+    - ``stream``: The value associated with the key, pointing to a `fd_quic_stream_t`.
+- **Description**: Maps a stream ID to its corresponding stream object in a QUIC connection, using a hash for efficient lookup.
 
 
 ---
 ### fd\_quic\_buffer
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `buf`: A pointer to an unsigned character array representing the buffer storage.
-    - `cap`: An unsigned long representing the capacity of the buffer, which must be a power of two.
-    - `head`: An unsigned long indicating the first unused byte of the stream, used as an offset.
-    - `tail`: An unsigned long indicating the first byte of the used range, used as an offset.
-- **Description**: The `fd_quic_buffer` is a circular buffer data structure used in QUIC protocol implementations to manage data streams efficiently. It contains a buffer pointer `buf` for data storage, a `cap` field to denote the buffer's capacity, and `head` and `tail` fields to manage the offsets for reading and writing data within the buffer. The circular nature of the buffer allows for efficient use of memory by reusing space as data is consumed, and the capacity is required to be a power of two to facilitate efficient masking operations for index calculations.
+    - ``buf``: Pointer to the buffer data.
+    - ``cap``: Capacity of the buffer, which must be a power of two.
+    - ``head``: Offset to the first unused byte in the buffer.
+    - ``tail``: Offset to the first byte of the used range in the buffer.
+- **Description**: Defines a circular buffer structure used in QUIC streams, where `buf` is the data storage, `cap` ensures the buffer's capacity is a power of two, and `head` and `tail` manage the buffer's data usage and availability.
 
 
 ---
 ### fd\_quic\_buffer\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `buf`: A pointer to an unsigned character array representing the buffer storage.
-    - `cap`: An unsigned long representing the capacity of the buffer, which must be a power of two.
-    - `head`: An unsigned long indicating the first unused byte of the stream, used as an offset.
-    - `tail`: An unsigned long indicating the first byte of the used range, used as an offset.
-- **Description**: The `fd_quic_buffer_t` is a circular buffer data structure used in the context of QUIC (Quick UDP Internet Connections) protocol implementations. It is designed to efficiently manage data streams by utilizing a buffer with a capacity that is a power of two, allowing for optimized memory usage and access patterns. The structure maintains two offsets, `head` and `tail`, which are used to track the beginning and end of the data stream within the buffer, facilitating operations such as data storage and retrieval. This design supports high-performance network communication by enabling quick access to data and efficient buffer management.
+    - ``buf``: Pointer to the buffer memory.
+    - ``cap``: Capacity of the buffer, which must be a power of two.
+    - ``head``: Offset to the first unused byte in the buffer.
+    - ``tail``: Offset to the first byte of the used range in the buffer.
+- **Description**: A circular buffer structure used to manage a buffer of bytes with a fixed capacity. The `head` and `tail` offsets are used to track the start and end of the data within the buffer, and they must be masked before accessing the buffer data. This structure is used to efficiently manage data streams by reusing buffer space as data is consumed.
 
 
 ---
 ### fd\_quic\_stream
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `conn`: Pointer to the associated QUIC connection.
-    - `stream_id`: Unique identifier for the stream, with all 1's indicating an unused stream.
-    - `context`: User-defined context for callbacks.
-    - `tx_buf`: Transmit buffer for the stream.
-    - `tx_ack`: Acknowledgment bits for each byte in the transmit buffer.
-    - `tx_sent`: Offset of the first unsent byte in the transmit buffer.
-    - `stream_flags`: Flags indicating actions required for the stream.
-    - `sentinel`: Indicates if the stream is a sentinel.
-    - `state`: Current state of the stream, represented by a mask.
-    - `list_memb`: Membership status in a list.
-    - `tx_max_stream_data`: Maximum number of bytes allowed to be sent to the peer.
-    - `tx_tot_data`: Total number of bytes transmitted on the stream.
-    - `rx_tot_data`: Total number of bytes received on the stream.
-    - `upd_pkt_number`: Last packet number with a stream frame referring to this stream.
-    - `next`: Pointer to the next stream in a doubly linked list.
-    - `prev`: Pointer to the previous stream in a doubly linked list.
-- **Description**: The `fd_quic_stream` structure represents a stream in a QUIC connection, managing data transmission and reception, flow control, and state management. It includes a transmit buffer, acknowledgment tracking, and various flags and states to handle stream lifecycle and actions. The structure also supports list operations for managing streams in a linked list, and it maintains context for user-defined callbacks. The stream's state and actions are controlled through defined flags and state masks, allowing for efficient management of stream operations within a QUIC connection.
+    - ``conn``: Pointer to the connection associated with the stream.
+    - ``stream_id``: Identifier for the stream; all 1's indicates an unused stream.
+    - ``context``: User-defined context for callbacks.
+    - ``tx_buf``: Transmit buffer for the stream.
+    - ``tx_ack``: Acknowledgment bits for each byte in the transmit buffer.
+    - ``tx_sent``: Offset of the first unsent byte in the transmit buffer.
+    - ``stream_flags``: Flags indicating actions required for the stream.
+    - ``sentinel``: Indicates if the stream is a sentinel.
+    - ``state``: Current state of the stream, represented by a mask.
+    - ``list_memb``: Membership status in a list.
+    - ``tx_max_stream_data``: Maximum number of bytes allowed to be sent to the peer.
+    - ``tx_tot_data``: Total number of bytes transmitted on the stream.
+    - ``rx_tot_data``: Total number of bytes received on the stream.
+    - ``upd_pkt_number``: Last packet number with a stream frame referring to this stream.
+    - ``next``: Pointer to the next stream in a doubly linked list.
+    - ``prev``: Pointer to the previous stream in a doubly linked list.
+- **Description**: Manages a QUIC stream, including its state, data transmission, and flow control. It contains fields for connection association, stream identification, user context, transmit buffer management, acknowledgment tracking, and stream state flags. The structure also supports flow control with fields for tracking transmitted and received data, and it is part of a doubly linked list for stream management.
 
 
 ---
 ### fd\_quic\_stream\_map
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
     - `stream_id`: A unique identifier for the stream, used as a key.
-    - `hash`: A hash value associated with the stream for quick lookup.
-    - `stream`: A pointer to the fd_quic_stream_t structure, representing the stream's data.
-- **Description**: The `fd_quic_stream_map` structure is designed to facilitate the mapping of QUIC streams within a dynamic map. It contains a unique stream identifier (`stream_id`) that serves as the key, a `hash` for efficient retrieval, and a pointer to the actual stream data (`stream`). This structure is essential for managing and accessing streams in a QUIC connection, allowing for efficient stream lookup and management.
+    - `hash`: A hash value associated with the stream.
+    - `stream`: A pointer to the `fd_quic_stream_t` structure, representing the stream value.
+- **Description**: Maps a unique stream identifier to its corresponding stream object and hash value, facilitating efficient stream management and lookup operations in a QUIC protocol implementation.
 
 
 # Functions
 
 ---
 ### fd\_quic\_stream\_align<!-- {{#callable:fd_quic_stream_align}} -->
-The `fd_quic_stream_align` function returns the alignment requirement for the `fd_quic_stream_t` structure.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L177>)
+
+Returns the alignment requirement for `fd_quic_stream_t`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined as `FD_FN_CONST inline`, indicating it is a constant function that can be inlined by the compiler.
-    - The function takes no arguments and directly returns a constant value.
-    - The constant value returned is `128ul`, representing the alignment requirement.
-- **Output**: The function returns an `ulong` value of `128ul`, which specifies the alignment requirement for the `fd_quic_stream_t` structure.
+- **Logic and Control Flow**:
+    - Returns the constant value `128ul`.
+- **Output**: The function returns an `unsigned long` value of `128ul`, indicating the alignment requirement for `fd_quic_stream_t`.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_quic\_buffer\_store<!-- {{#callable_declaration:fd_quic_buffer_store}} -->
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L159>)
+
 Stores data into a circular buffer.
-- **Description**: This function is used to store a specified amount of data into a circular buffer. It is essential to ensure that there is enough available space in the buffer to accommodate the data before calling this function, as it does not handle cases where the buffer is full. The function will not modify the buffer if the data size exceeds the available space, and it is the caller's responsibility to check for sufficient space using helper functions like `fd_quic_buffer_avail`. This function is typically used in scenarios where data needs to be buffered for later processing or transmission.
+- **Description**: Use this function to add data to a circular buffer. Ensure that there is enough available space in the buffer before calling this function, as it does not handle cases where the buffer is full. The function does not modify the buffer if there is insufficient space for the data. This function is typically used in scenarios where data needs to be buffered for later processing or transmission.
 - **Inputs**:
-    - `buf`: A pointer to an `fd_quic_buffer_t` structure representing the circular buffer where data will be stored. The buffer must be properly initialized and have enough capacity to store the incoming data.
-    - `data`: A pointer to the data to be stored in the buffer. The data must be valid and the caller retains ownership. It must not be null.
-    - `data_sz`: The size of the data to be stored in the buffer, in bytes. It must not exceed the available space in the buffer, which should be checked by the caller beforehand.
+    - `buf`: A pointer to an `fd_quic_buffer_t` structure representing the circular buffer. The buffer must be properly initialized and must not be null.
+    - `data`: A pointer to the data to store in the buffer. The data must not be null.
+    - `data_sz`: The size of the data to store, in bytes. Must be less than or equal to the available space in the buffer.
 - **Output**: None
-- **See also**: [`fd_quic_buffer_store`](fd_quic_stream.c.md#fd_quic_buffer_store)  (Implementation)
+- **See Also**: [`fd_quic_buffer_store`](<fd_quic_stream.c.md#fd_quic_buffer_store>)  (Implementation)
 
 
 ---
 ### fd\_quic\_buffer\_load<!-- {{#callable_declaration:fd_quic_buffer_load}} -->
-Load data from a circular buffer into a provided buffer.
-- **Description**: This function is used to load a specified amount of data from a circular buffer into a user-provided buffer. It should be called when you need to retrieve data from a specific offset within the buffer. The function assumes that the operation is valid, meaning the caller must ensure that the offset and data size are within the bounds of the used portion of the buffer. If the offset is invalid or the operation is not feasible, the function will return without performing any action. This function does not modify the state of the circular buffer.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L170>)
+
+Loads data from a circular buffer.
+- **Description**: Use this function to retrieve data from a specified offset in a circular buffer into a provided data buffer. Ensure that the operation is valid by checking that the offset is within the used range of the buffer and that the data size does not exceed the available data. This function does not handle invalid operations, and the caller must ensure the offset and data size are appropriate.
 - **Inputs**:
-    - `buf`: A pointer to an fd_quic_buffer_t structure representing the circular buffer. The buffer must be properly initialized and must not be null.
-    - `offs`: An unsigned long representing the offset from which to start loading data. It must be within the range of used data in the buffer.
-    - `data`: A pointer to an unsigned char array where the loaded data will be stored. The array must be large enough to hold the specified data size and must not be null.
-    - `data_sz`: An unsigned long indicating the number of bytes to load from the buffer. It must not exceed the available data from the specified offset.
+    - `buf`: A pointer to an `fd_quic_buffer_t` structure representing the circular buffer. The buffer must be properly initialized and must not be null.
+    - `offs`: An unsigned long integer representing the offset from which to start loading data. It must be within the range of used data in the buffer.
+    - `data`: A pointer to an unsigned char array where the loaded data will be stored. The array must have enough space to hold `data_sz` bytes and must not be null.
+    - `data_sz`: An unsigned long integer representing the number of bytes to load from the buffer. It must not exceed the available data from the specified offset.
 - **Output**: None
-- **See also**: [`fd_quic_buffer_load`](fd_quic_stream.c.md#fd_quic_buffer_load)  (Implementation)
+- **See Also**: [`fd_quic_buffer_load`](<fd_quic_stream.c.md#fd_quic_buffer_load>)  (Implementation)
 
 
 ---
 ### fd\_quic\_stream\_footprint<!-- {{#callable_declaration:fd_quic_stream_footprint}} -->
-Calculate the memory footprint required for a QUIC stream.
-- **Description**: This function calculates the total memory footprint required for a QUIC stream, given the size of the transmit buffer. It is useful for determining the amount of memory to allocate when creating a new stream. The function takes into account the alignment requirements and the additional space needed for acknowledgment data. It should be called before allocating memory for a stream to ensure sufficient space is reserved.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L187>)
+
+Calculates the memory footprint required for a QUIC stream.
+- **Description**: Use this function to determine the amount of memory needed to allocate a QUIC stream with a specified transmit buffer size. This is necessary before creating a new stream to ensure that sufficient memory is available. The function computes the total memory requirement by considering the alignment and size of the stream structure, the transmit buffer, and the acknowledgment buffer. Ensure that the transmit buffer size is a valid non-negative value to avoid incorrect memory calculations.
 - **Inputs**:
-    - `tx_buf_sz`: The size of the transmit buffer in bytes. It must be a positive integer, and the function will handle alignment internally. Invalid values, such as zero, may lead to an incorrect footprint calculation.
-- **Output**: The function returns the total memory footprint in bytes required for the stream, including alignment and additional data structures.
-- **See also**: [`fd_quic_stream_footprint`](fd_quic_stream.c.md#fd_quic_stream_footprint)  (Implementation)
+    - `tx_buf_sz`: The size of the transmit buffer in bytes. Must be a non-negative value. If the value is invalid, the function may return an incorrect footprint size.
+- **Output**: Returns the total memory footprint in bytes required to allocate a QUIC stream with the specified transmit buffer size.
+- **See Also**: [`fd_quic_stream_footprint`](<fd_quic_stream.c.md#fd_quic_stream_footprint>)  (Implementation)
 
 
 ---
 ### fd\_quic\_stream\_new<!-- {{#callable_declaration:fd_quic_stream_new}} -->
-Create a new QUIC stream with specified memory and connection.
-- **Description**: This function initializes a new QUIC stream using the provided memory block and associates it with a given connection. It should be called when a new stream is needed, ensuring that the memory block is properly aligned and of sufficient size as determined by `fd_quic_stream_align` and `fd_quic_stream_footprint`. The function sets up internal buffers for transmission and acknowledgment, and initializes the stream's state. It is important to ensure that the memory provided is not null and meets the alignment and size requirements to avoid errors.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L197>)
+
+Creates and initializes a new QUIC stream.
+- **Description**: Use this function to create a new QUIC stream with a specified transmit buffer size. The function requires a memory block that is aligned to the alignment requirements of `fd_quic_stream_t` and is large enough to accommodate the stream's footprint. The function initializes the stream and associates it with a given connection. Ensure that the memory provided is correctly aligned and of sufficient size to avoid errors.
 - **Inputs**:
-    - `mem`: A pointer to a memory block that must be aligned to `fd_quic_stream_align` and have at least `fd_quic_stream_footprint(tx_buf_sz)` bytes. The caller retains ownership and must ensure it is valid and non-null.
-    - `conn`: A pointer to an `fd_quic_conn_t` structure representing the connection to associate with the new stream. Must be valid and non-null.
-    - `tx_buf_sz`: An unsigned long specifying the size of the transmission buffer. It determines the capacity of the stream's transmit buffer and should be a positive value.
-- **Output**: Returns a pointer to the newly initialized `fd_quic_stream_t` structure, or logs an error if the memory size does not match the expected footprint.
-- **See also**: [`fd_quic_stream_new`](fd_quic_stream.c.md#fd_quic_stream_new)  (Implementation)
+    - `mem`: A pointer to a memory block that must be aligned to `fd_quic_stream_align()` and have at least `fd_quic_stream_footprint(tx_buf_sz)` bytes. The caller retains ownership of this memory.
+    - `conn`: A pointer to an `fd_quic_conn_t` structure representing the connection to associate with the new stream. Must not be null.
+    - `tx_buf_sz`: The size of the transmit buffer in bytes. Must be a positive value.
+- **Output**: Returns a pointer to the newly initialized `fd_quic_stream_t` structure. If the memory size does not match the expected footprint, an error is logged.
+- **See Also**: [`fd_quic_stream_new`](<fd_quic_stream.c.md#fd_quic_stream_new>)  (Implementation)
 
 
 ---
 ### fd\_quic\_stream\_delete<!-- {{#callable_declaration:fd_quic_stream_delete}} -->
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L204>)
+
 Removes a QUIC stream from any list it belongs to.
-- **Description**: This function is used to remove a QUIC stream from any list it is currently a member of, effectively isolating it. It should be called when a stream is no longer needed and should be detached from any list it was part of. This function does not free the memory associated with the stream; it only updates the stream's list pointers and membership status. It is important to ensure that the stream is not accessed through any list after this function is called, as it will no longer be part of any list.
+- **Description**: Use this function to remove a QUIC stream from any list it is part of, effectively marking it as not belonging to any list. This function is typically called when a stream is no longer needed and should be cleaned up. It is important to ensure that the `stream` parameter is valid and not null before calling this function. The function does not free the memory associated with the stream; it only updates the stream's list membership status.
 - **Inputs**:
-    - `stream`: A pointer to the fd_quic_stream_t structure representing the stream to be removed from any list. Must not be null. The function assumes the stream is valid and does not perform null checks.
+    - `stream`: A pointer to the `fd_quic_stream_t` structure representing the stream to be removed from any list. Must not be null. The function assumes the stream is valid and does not perform null checks.
 - **Output**: None
-- **See also**: [`fd_quic_stream_delete`](fd_quic_stream.c.md#fd_quic_stream_delete)  (Implementation)
+- **See Also**: [`fd_quic_stream_delete`](<fd_quic_stream.c.md#fd_quic_stream_delete>)  (Implementation)
 
 
 ---
 ### fd\_quic\_stream\_set\_context<!-- {{#callable_declaration:fd_quic_stream_set_context}} -->
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L213>)
+
 Associates a user-defined context with a QUIC stream.
-- **Description**: Use this function to associate a user-defined context with a specific QUIC stream. This is useful for storing additional information or state that is relevant to the stream's operation or lifecycle. The function does not perform any validation on the context pointer, so it is the caller's responsibility to ensure that the context is valid and remains accessible for the duration of its use with the stream. This function should be called whenever you need to set or update the context associated with a stream.
+- **Description**: Use this function to associate a user-defined context with a specific QUIC stream. This can be useful for storing additional information or state related to the stream that can be accessed later. Ensure that the `stream` parameter is a valid and initialized `fd_quic_stream_t` object before calling this function. The function does not perform any validation on the `context` parameter, so it is the caller's responsibility to manage the lifecycle and validity of the context data.
 - **Inputs**:
-    - `stream`: A pointer to the `fd_quic_stream_t` structure representing the stream. Must not be null, and the stream should be properly initialized before calling this function.
-    - `context`: A pointer to the user-defined context to associate with the stream. This can be any pointer type, including null, depending on the user's needs.
+    - `stream`: A pointer to an `fd_quic_stream_t` object. Must not be null and should point to a valid, initialized stream.
+    - `context`: A pointer to user-defined data to associate with the stream. Can be null if no context is needed. The caller retains ownership and is responsible for the context's lifecycle.
 - **Output**: None
-- **See also**: [`fd_quic_stream_set_context`](fd_quic_stream.c.md#fd_quic_stream_set_context)  (Implementation)
+- **See Also**: [`fd_quic_stream_set_context`](<fd_quic_stream.c.md#fd_quic_stream_set_context>)  (Implementation)
 
 
 ---
 ### fd\_quic\_stream\_get\_context<!-- {{#callable_declaration:fd_quic_stream_get_context}} -->
-Retrieve the user-defined context associated with a QUIC stream.
-- **Description**: Use this function to obtain the user-defined context that has been associated with a specific QUIC stream. This is useful when you need to access or manipulate the context data that was previously set for the stream. Ensure that the stream has been properly initialized and that a context has been set using `fd_quic_stream_set_context` before calling this function.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_stream.h#L224>)
+
+Retrieves the user-defined context associated with a QUIC stream.
+- **Description**: Use this function to obtain the context pointer that is associated with a specific QUIC stream. This context is user-defined and can be set using the appropriate function. It is important to ensure that the stream is valid and properly initialized before calling this function. The function does not modify the stream or the context.
 - **Inputs**:
-    - `stream`: A pointer to an `fd_quic_stream_t` structure representing the QUIC stream. Must not be null. The stream should be properly initialized and have a context set.
-- **Output**: Returns a pointer to the user-defined context associated with the stream. If no context has been set, the return value is undefined.
-- **See also**: [`fd_quic_stream_get_context`](fd_quic_stream.c.md#fd_quic_stream_get_context)  (Implementation)
+    - `stream`: A pointer to an `fd_quic_stream_t` structure. This must not be null and should point to a valid and initialized QUIC stream. If the stream is invalid, the behavior is undefined.
+- **Output**: Returns a pointer to the user-defined context associated with the specified stream. The return value can be null if no context has been set.
+- **See Also**: [`fd_quic_stream_get_context`](<fd_quic_stream.c.md#fd_quic_stream_get_context>)  (Implementation)
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Shell template that sets offline replay environment variables and runs the replay script.
+Shell script for setting environment variables and executing an offline replay script in Firedancer.
 
 # Purpose
-This shell script sets environment variables and file paths needed to run an offline replay workflow for Firedancer and Agave. It defines the local repository locations, the Agave ledger tool path, the target network, and the billing project, and it also configures Slack webhook URLs for normal alerts, mismatch alerts, and debug messages. The script then points to the latest bucket slot file and to a separate network parameters file, marks both the parameters file and the offline replay script as executable, and starts the replay by running `$OFFLINE_REPLAY_SCRIPT`.
+This script is a Bash configuration file that sets up environment variables and executes a script for offline replay operations. It defines paths to the Firedancer and Agave repositories, specifying the branch and tool locations. Network-specific parameters such as the network type, billing project ID, and Slack webhook URLs for notifications are also configured. The script includes paths to files necessary for offline replay, such as the latest bucket slot file and network parameters file, and ensures these files are executable. Finally, it runs the offline replay script, which is essential for processing or testing network data in an offline environment.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
