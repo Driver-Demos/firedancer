@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `shared.options` file in the `firedancer` codebase specifies a configuration option for a shared socket with a maximum IP size of 64.
+Defines a shared socket IP with a maximum size of 64.
 
 # Purpose
-The file content specifies a configuration setting for a shared socket, defining the maximum size of the IP address as 64. This likely sets a constraint on the IP address data to ensure it does not exceed the specified size limit.
+The configuration file sets the maximum size of the IP address for the `shared.Socket` to 64. This parameter ensures that the IP address does not exceed the specified length.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

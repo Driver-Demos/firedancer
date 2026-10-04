@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_clang_x86_64.mk` file in the `firedancer` codebase configures the build environment for a Linux x86_64 architecture using Clang, including various optimizations and feature flags.
+Makefile for configuring a build environment with Clang on x86_64 Linux, including various optimizations and features.
 
 # Purpose
-The provided content is from a Makefile, which is used to automate the build process of a software project. The `BUILDDIR` variable specifies the directory structure for the build, indicating that the build is configured for a Linux environment using the Clang compiler on an x86_64 architecture. The file includes several configuration files that tailor the build process with specific features such as debugging, security, optimization, and multithreading. The `CPPFLAGS` are compiler flags that optimize the build for specific CPU architectures (Haswell and Skylake) and enable certain features like 128-bit integers, double precision, and various x86 instruction sets (SSE, AVX). The comments indicate limitations with Clang's optimization capabilities, suggesting that its current use is primarily for code hygiene rather than performance optimization.
+The Makefile content configures the build environment for a software project. It sets the build directory to `linux/clang/x86_64` and includes several configuration files to extend the build setup with additional features such as debugging, security, optimization, and threading. The file also specifies compiler flags using `CPPFLAGS` to optimize the build for specific CPU architectures, such as Haswell and Skylake, and to enable certain features like 128-bit integers, double precision, and various x86 instruction sets. The file notes a limitation with Clang's optimization capabilities, suggesting its use primarily for code hygiene. The defined variables, such as `FD_HAS_INT128` and `FD_HAS_SSE`, indicate the presence of specific features in the build environment.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
