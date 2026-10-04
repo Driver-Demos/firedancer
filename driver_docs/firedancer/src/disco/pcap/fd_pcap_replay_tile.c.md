@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_pcap_replay_tile.c` file in the `firedancer` codebase implements a program that replays PCAP files using various command-line parameters and shared memory resources, with error handling and logging throughout the process.
+A program to replay PCAP files using shared memory and command-line configurations.
 
 # Purpose
-This C source code file is designed to execute a program that replays packet capture (PCAP) data using a specified configuration. The program is structured to run in a hosted environment, as indicated by the `#if FD_HAS_HOSTED` preprocessor directive. The main function initializes the environment, processes command-line arguments to configure various parameters such as CNC (Command and Control), PCAP file, maximum packet size, memory caches, and output sequence files. It then joins shared memory resources and sets up a random number generator for use during execution. The core functionality is provided by the `fd_pcap_replay_tile` function, which handles the actual replay of the PCAP data using the specified configurations and resources.
+The code is an executable C program designed to replay packets from a PCAP file. It uses several command-line arguments to configure its operation, such as `--cnc`, `--pcap`, `--pkt-max`, `--orig`, `--mcache`, `--dcache`, `--out-fseqs`, `--cr-max`, `--lazy`, and `--seed`. These arguments specify the paths to various resources and parameters that control the packet replay process. The program initializes by joining shared memory regions and setting up necessary resources like caches and sequence files. It then creates a random number generator and allocates memory for scratch space required for the replay operation.
 
-The code is a standalone executable, as evidenced by the presence of a [`main`](#main) function, and it does not define any public APIs or external interfaces. It focuses on setting up the environment and resources necessary for replaying PCAP data, including memory allocation and resource management. The program logs its progress and errors using a logging mechanism, ensuring that any issues during execution are reported. The file concludes by releasing allocated resources and halting the environment, ensuring a clean shutdown. The code also includes a fallback [`main`](#main) function for non-hosted environments, which currently only logs a warning and exits, indicating that support for such environments is not yet implemented.
+The main functionality is executed by calling the `fd_pcap_replay_tile` function, which handles the actual packet replay using the provided configurations. The program logs its progress and checks for errors at each step, ensuring that all resources are correctly joined and released. If any step fails, it logs an error and halts execution. The program concludes by releasing all acquired resources and halting the system. The code is structured to support different build targets, but currently, it only implements functionality for hosted environments, as indicated by the `#if FD_HAS_HOSTED` preprocessor directive.
 # Imports and Dependencies
 
 ---
@@ -19,16 +19,18 @@ The code is a standalone executable, as evidenced by the presence of a [`main`](
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, logs a warning about unsupported build targets, and halts the program, returning an error code.
+[View Source →](<../../../../../src/disco/pcap/fd_pcap_replay_tile.c#L90>)
+
+Initializes the environment and logs a warning for unsupported build targets before halting execution.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - `argc`: The count of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Call `fd_boot` to initialize the environment with `argc` and `argv`.
     - Log a warning message indicating that support for the current build target is not implemented.
-    - Call `fd_halt` to terminate the program.
-    - Return an error code of 1.
-- **Output**: The function returns an integer value of 1, indicating an error or unsupported operation.
+    - Call `fd_halt` to stop the program execution.
+    - Return 1 to indicate unsuccessful execution.
+- **Output**: Returns an integer value of 1, indicating unsuccessful execution.
 
 
 

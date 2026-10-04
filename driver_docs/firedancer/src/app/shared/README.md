@@ -3,26 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Boot, commands, config, callbacks, and tile unit tests.
+Bootstrapping, command-line tools, configuration management, callback functions, fuzz testing, and build scripts.
 
 ## Folders
-- **[boot](boot/README.md)**: Bootstraps config, logging, action dispatch, and initialization prototypes for boot setup.
-- **[commands](commands/README.md)**: CLI commands for configure, monitor, run, watch, identity, keys, memory, metrics, network, ready, help, and version.
+- **[boot](boot/README.md)**: Bootstrapping and initialization functions and prototypes for the Firedancer application.
+- **[commands](commands/README.md)**: Command-line argument parsing, monitoring, execution, key management, memory, network configuration, and version commands.
 
 ## Files
-- **[fd_action.h](fd_action.h.md)**: Action definitions and argument unions for command handling.
-- **[fd_config.c](fd_config.c.md)**: Configuration loading, validation, path expansion, and memfd export for Firedancer.
-- **[fd_config.h](fd_config.h.md)**: Configuration structures and load helpers for Firedancer and Frankendancer.
-- **[fd_config_file.h](fd_config_file.h.md)**: Config file name and data buffer structure.
-- **[fd_config_parse.c](fd_config_parse.c.md)**: Parses pod config into Firedancer and Frankendancer structs, with renamed-option checks.
-- **[fd_config_private.h](fd_config_private.h.md)**: The `fd_config_private.h` file in the `firedancer` codebase provides function prototypes for extracting, loading, transforming, and validating configuration data, with error handling that includes logging and process termination on failure.
-- **[fd_obj_callbacks.c](fd_obj_callbacks.c.md)**: Callbacks for topology object sizing, alignment, and initialization.
-- **[fd_tile_unit_test.c](fd_tile_unit_test.c.md)**: Unit test setup for topology config, workspace creation, and tile initialization.
-- **[fd_tile_unit_test.h](fd_tile_unit_test.h.md)**: Template and APIs for single-threaded Firedancer tile unit tests.
-- **[fd_tile_unit_test_tmpl.c](fd_tile_unit_test_tmpl.c.md)**: Template for tile unit test setup, link initialization, callback updates, and test loop execution.
-- **[fuzz_fdctl_config.c](fuzz_fdctl_config.c.md)**: The `fuzz_fdctl_config.c` file implements a fuzzing test for the `firedancer` application, focusing on parsing and extracting configuration data using TOML format.
-- **[Local.mk](Local.mk.md)**: Build rules for fdctl_shared, unit tests, fuzz tests, and command objects.
-- **[test_config_parse.c](test_config_parse.c.md)**: The `test_config_parse.c` file in the `firedancer` codebase tests the parsing and validation of configuration strings using the TOML format, ensuring correct handling of recognized and unrecognized keys, as well as the ability to override specific configuration fields.
+- **[fd_action.h](fd_action.h.md)**: Defines the `fd_action` structure and `fdctl_args` union for managing various application actions.
+- **[fd_config.c](fd_config.c.md)**: Configuration management and validation for the Firedancer application, including TOML parsing and error handling.
+- **[fd_config.h](fd_config.h.md)**: Header file defining configuration structures and functions for loading and handling Firedancer configurations.
+- **[fd_config_file.h](fd_config_file.h.md)**: Defines the `fd_config_file` structure for configuration files with name and data attributes.
+- **[fd_config_parse.c](fd_config_parse.c.md)**: Parses and validates configuration data for the Firedancer application, handling various configuration options and paths.
+- **[fd_config_private.h](fd_config_private.h.md)**: Functions for extracting, loading, transforming, and validating configuration data in a non-thread-safe manner.
+- **[fd_obj_callbacks.c](fd_obj_callbacks.c.md)**: Defines callback functions for various topology objects, including mcache, dcache, fseq, metrics, and more.
+- **[fd_tile_unit_test.c](fd_tile_unit_test.c.md)**: Defines unit tests for Firedancer tiles, including configuration loading and initialization functions.
+- **[fd_tile_unit_test.h](fd_tile_unit_test.h.md)**: Framework for unit testing Firedancer tiles, including initialization, link management, and test execution.
+- **[fd_tile_unit_test_tmpl.c](fd_tile_unit_test_tmpl.c.md)**: Template for unit testing tiles with customizable callbacks and link management in the Firedancer codebase.
+- **[fuzz_fdctl_config.c](fuzz_fdctl_config.c.md)**: Fuzz testing for configuration parsing using LLVM's libFuzzer.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fdctl_shared` library and its components in a Linux environment.
+- **[test_config_parse.c](test_config_parse.c.md)**: Tests for parsing and validating TOML configuration strings in the Firedancer application.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

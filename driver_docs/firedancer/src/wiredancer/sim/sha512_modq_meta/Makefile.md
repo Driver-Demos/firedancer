@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/wiredancer/sim/sha512_modq_meta` directory is configured to simulate a Verilog module named `sha512_modq_meta` using the Questa simulator, with various Verilog source files specified for the simulation.
+Makefile for simulating the `sha512_modq_meta` module using Verilog sources with Questa.
 
 # Purpose
-The provided Makefile is used to automate the simulation process of a hardware design, specifically for a module named "test" using the Questa simulation tool. It sets up various environment variables and paths, such as `RTL_DIR` for the directory containing RTL (Register Transfer Level) source files and `TOPLEVEL` for the top-level module, which is `sha512_modq_meta`. The file lists multiple Verilog source files, including those from the Xilinx Vivado library and custom RTL files, which are necessary for the simulation. The `TOPLEVEL_LANG` is set to Verilog, indicating the language used for the top-level module. Additionally, the Makefile includes another Makefile from the cocotb configuration, which likely provides further simulation-related rules and settings.
+The `Makefile` is used to automate the build process for a simulation environment. It specifies the simulator to use with the `SIM` variable, defaulting to `questa`, and sets the module name with `MODULE`. The `RTL_DIR` variable defines the directory path for RTL (Register Transfer Level) source files, and `TOPLEVEL` specifies the top-level module for the simulation. The `VERILOG_SOURCES` variable lists all the Verilog and SystemVerilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files. The file concludes by including additional makefile configurations from `cocotb`, a coroutine-based co-simulation library for testing VHDL and Verilog.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

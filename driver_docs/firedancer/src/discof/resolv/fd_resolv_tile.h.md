@@ -3,10 +3,34 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Message struct for a replay signal that a root bank can be freed.
+Defines a structure for signaling the completion of processing a root bank in the resolv tile.
 
 # Purpose
-Defines the header guard and public type for the resolv tile exchange message. The file includes `fd_util_base.h` and declares `struct fd_resolv_slot_exchanged`, which contains a single `ulong` field named `bank_idx`. This structure is used by the resolv tile to tell replay that it has finished with a root bank and that replay can free it if needed. The file also defines `fd_resolv_slot_exchanged_t` as a typedef for the structure.
+This code is a C header file that defines a structure and a type alias related to a resolution process in a system. The file includes a utility header, `fd_util_base.h`, which suggests it relies on some base utilities. The structure `fd_resolv_slot_exchanged` contains a single member, `bank_idx`, of type `ulong`, which likely represents an index for a bank in a system. The typedef `fd_resolv_slot_exchanged_t` provides an alias for the structure, facilitating its use in other parts of the program. The header guards prevent multiple inclusions of this file, ensuring that the structure and type alias are defined only once during compilation.
+# Imports and Dependencies
+
+---
+- `../../util/fd_util_base.h`
+
+
+# Data Structures
+
+---
+### fd\_resolv\_slot\_exchanged
+- **Type**: ``struct``
+- **Members**:
+    - ``bank_idx``: An unsigned long integer that identifies the index of a bank.
+- **Description**: Indicates that the resolv tile has completed operations with a specific root bank, allowing replay to free the bank if necessary.
+
+
+---
+### fd\_resolv\_slot\_exchanged\_t
+- **Type**: ``struct``
+- **Members**:
+    - ``bank_idx``: An unsigned long integer that identifies the index of the bank.
+- **Description**: Indicates that the resolv tile has completed operations with a specific root bank, allowing replay to free the bank if necessary.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

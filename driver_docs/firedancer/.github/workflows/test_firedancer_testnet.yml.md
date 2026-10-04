@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for building Firedancer and running testnet tests.
+GitHub Actions workflow for running and testing the Firedancer Testnet with specific environment settings.
 
 # Purpose
-This workflow defines the `Firedancer Testnet` job for GitHub Actions and runs it on demand through `workflow_dispatch` or from another workflow through `workflow_call`. It uses a self-hosted runner in the `fd-public-repo` group, sets `CC` to `gcc`, and limits concurrent runs by workflow and pull request or branch reference. The job checks out the repository with recursive submodules, installs dependencies with `./.github/actions/deps`, configures CPU and huge page settings, and then builds the project with `./contrib/make-j all`. After the build, it raises process limits and runs `./contrib/test/test_firedancer_testnet.sh` to execute the Firedancer testnet test suite.
+The YAML configuration file defines a GitHub Actions workflow named `Firedancer Testnet`. It triggers on `workflow_call` and `workflow_dispatch` events, allowing manual and programmatic execution. The `concurrency` section ensures that only one instance of the workflow runs per pull request or branch, canceling any in-progress runs if a new one starts. The `firedancer-testnet` job runs on a self-hosted runner with specific labels and environment variables, such as `CC` set to `gcc`. The job includes several steps: checking out the repository with submodules, executing custom actions for dependencies, CPU configuration, and huge page allocation, followed by building the project and running tests for the Firedancer testnet.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_set_dynamic.c` file in the `firedancer` codebase provides a template for implementing fast manipulation of index sets that can be shared between processes, optimized for dense sets with a large maximum number of elements.
+Functions for fast manipulation of interprocess shared index sets with a large runtime-bounded number of elements.
 
 # Purpose
-This C source code file provides a template for creating and manipulating dynamic index sets, which are collections of elements that can be efficiently managed and shared across processes. The code is designed to handle dense sets with a large maximum number of elements, potentially in the thousands, and is optimized for performance in such scenarios. The file is intended to be included in other C files, where a specific set name is defined using the `#define SET_NAME` directive. This inclusion will generate a set of functions tailored to the specified set name, allowing for operations such as creation, joining, leaving, and deleting sets, as well as various set operations like insertion, removal, and testing for membership.
+The code provides a template for creating and manipulating dynamic index sets in C. These sets can contain a large number of elements and are designed to be shared between processes. The implementation is optimized for dense sets with a large maximum number of elements. The code is intended to be included in other C files, as indicated by the use of the `#include` directive with a template file path. The template requires the definition of `SET_NAME` to generate a specific set of functions for managing the index set, such as creating, joining, and deleting sets, as well as performing operations like insertion, removal, and iteration over set elements.
 
-The code defines a comprehensive API for managing these sets, including functions for checking the validity of sets and indices, iterating over set elements, and performing set operations such as union, intersection, and difference. It also provides specialized functions for handling ranges of elements within a set, which are optimized for performance. The implementation uses bit manipulation to efficiently manage the presence or absence of elements in the set, and it includes both destructive and non-destructive iterators for traversing set elements. The file is structured to ensure that all operations are performed safely and efficiently, with checks in place to handle invalid inputs when the `FD_TMPL_USE_HANDHOLDING` flag is enabled.
+The code defines a variety of functions for managing the lifecycle and operations of the index sets. These include functions for creating and destroying sets in shared memory, checking the validity of sets and indices, and performing set operations such as union, intersection, and difference. The code also provides both destructive and non-destructive iterators for traversing the elements of a set. Additionally, it includes range-based operations for efficiently manipulating contiguous ranges of elements within a set. The implementation uses bit manipulation to efficiently manage the elements within the set, and it provides both private and public APIs to facilitate these operations.
 # Imports and Dependencies
 
 ---
@@ -22,37 +22,39 @@ The code defines a comprehensive API for managing these sets, including function
 ---
 ### FD\_STATIC\_ASSERT
 - **Type**: `macro`
-- **Description**: `FD_STATIC_ASSERT` is a macro used to perform compile-time assertions in C. It checks if the size of the type `SET_(t)` is equal to 8 bytes, and if not, it triggers a compilation error with the message `unexpected_set_word_type`. This ensures that the type `SET_(t)` is of the expected size, which is crucial for the correct functioning of the code that relies on this type.
-- **Use**: This macro is used to validate the size of a type at compile time, ensuring that the type `SET_(t)` is 8 bytes, which is necessary for the correct operation of the set manipulation functions.
+- **Description**: `FD_STATIC_ASSERT` is a macro used to perform compile-time assertions. It checks that the size of the type `SET_(t)` is equal to 8 bytes, and if not, it triggers a compilation error with the message `unexpected_set_word_type`. This ensures that the type `SET_(t)` is of the expected size for the implementation.
+- **Use**: Used to validate the size of `SET_(t)` at compile time to prevent unexpected behavior due to incorrect type size.
 
 
 ---
 ### SET\_
-- **Type**: `macro`
-- **Description**: The `SET_` macro is used to concatenate the `SET_NAME` with a given suffix, effectively creating a unique identifier for set-related operations. It is part of a template mechanism to generate set manipulation functions based on a user-defined set name.
-- **Use**: This macro is used to generate function names and types specific to a set by concatenating `SET_NAME` with a given suffix.
+- **Type**: ``SET_(t)``
+- **Description**: Represents a type alias for `ulong`, used as an element type in a set data structure. This type is part of a template-based implementation for managing sets of indices.
+- **Use**: Used to define elements within a set data structure, allowing operations on sets of indices.
 
 
 # Functions
 
 ---
 ### SET\_<!-- {{#callable:SET_}} -->
-The `SET_(range_cnt)` function calculates the number of set bits in a specified range within a set.
+[View Source →](<../../../../../src/util/tmpl/fd_set_dynamic.c#L682>)
+
+Counts the number of set bits in a specified range of a bitset.
 - **Inputs**:
-    - `set`: A pointer to a constant set of type `SET_(t)` which represents the set to be analyzed.
-    - `l`: An unsigned long integer representing the lower bound of the range (inclusive) to count set bits.
-    - `h`: An unsigned long integer representing the upper bound of the range (exclusive) to count set bits.
-- **Control Flow**:
-    - If handholding is enabled, the function checks if the range [l, h) is valid within the set's maximum range and logs a critical error if not.
-    - Initializes a counter `cnt` to zero to keep track of the number of set bits.
-    - Calculates the starting word index `word_idx` by right-shifting `l` by 6 (equivalent to dividing by 64).
-    - Handles any mixed leading word by calculating the number of bits to check (`zcnt`) and updates `cnt` with the number of set bits in this word.
-    - Iterates over complete words within the range, updating `cnt` with the number of set bits in each word.
-    - Handles any mixed trailing word by calculating the number of bits to check (`ocnt`) and updates `cnt` with the number of set bits in this word.
-    - Returns the total count of set bits in the specified range.
-- **Output**: The function returns an unsigned long integer representing the count of set bits in the specified range [l, h) within the set.
-- **Functions called**:
-    - [`SET_`](#set_)
+    - `set`: A pointer to a constant `SET_(t)` bitset.
+    - `l`: The lower bound of the range (inclusive).
+    - `h`: The upper bound of the range (exclusive).
+- **Logic and Control Flow**:
+    - If `FD_TMPL_USE_HANDHOLDING` is defined, check if the range [l, h) is valid and log a critical error if not.
+    - Initialize `cnt` to 0 to store the count of set bits.
+    - Calculate `word_idx` as the index of the word containing the lower bound `l`.
+    - Calculate `zcnt` as the offset of `l` within its word and count set bits in the mixed leading word if `zcnt` is non-zero.
+    - Iterate over complete words between `l` and `h`, adding the count of set bits in each word to `cnt`.
+    - Calculate `ocnt` as the offset of `h` within its word and count set bits in the mixed trailing word if `ocnt` is non-zero.
+    - Return the total count of set bits in the specified range.
+- **Output**: The function returns an `ulong` representing the number of set bits in the specified range [l, h) of the bitset.
+- **Functions Called**:
+    - [`SET_`](<#set_>)
 
 
 
