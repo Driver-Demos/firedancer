@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for file descriptors related to logging and archiving in the Firedancer system.
+Seccomp policy for log, shred, request, FEC, peer, and STDERR writes plus logfile fsync.
 
 # Purpose
-The configuration file defines the logging behavior for a software system. It specifies several file descriptors, such as `logfile_fd`, `shreds_fd`, `requests_fd`, `fec_fd`, and `peers_fd`, which are used to manage log files and data streams. Log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above also directed to the `STDERR` pipe. The configuration ensures that the boot process assigns descriptor 2 to `STDERR`. Additionally, the file specifies that the `fsync` operation is performed on the `logfile_fd` to ensure that 'WARNING' level messages and above are immediately synchronized to disk, maintaining data integrity.
+This file defines the file descriptors that the system uses for logging and archiving, and it binds those descriptors to the `write` and `fsync` operations. The `write` rule allows output to `STDERR` for `WARNING` and higher messages, and it also allows writes to `logfile_fd`, `shreds_fd`, `requests_fd`, `fec_fd`, and `peers_fd`. The `fsync` rule limits immediate disk sync to `logfile_fd`, so log data is forced to storage when needed. Comments in the file also describe the role of each descriptor, including the archive file used by the archiver writer tile.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
