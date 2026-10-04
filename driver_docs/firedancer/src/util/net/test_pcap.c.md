@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A unit test for reading and writing pcap files, including command-line argument handling and validation.
+The `test_pcap.c` file in the `firedancer` codebase is a test program for reading and processing packets from a pcap file, with options to stream input and output, and includes unit tests for packet iteration and validation.
 
 # Purpose
-The code is a C program designed to process and analyze packet capture (PCAP) files. It includes functionality to read packets from an input stream, which can be specified via command-line arguments or default to standard input. The program can also write a specified number of packets to an output file if the `--out` and `--max` options are provided. The code uses the `fd_pcap_iter_t` iterator to traverse the packets in the PCAP file, checking for specific conditions such as packet size and type. It logs various notices and warnings during execution, such as when a packet is too small or when the input or output streams are opened or closed.
+This C source code file is designed to process and manipulate packet capture (PCAP) files, providing functionality for reading, iterating, and optionally writing packet data. The code is structured as an executable program, as indicated by the presence of a [`main`](#main) function, and it is intended to be run in a hosted environment, as suggested by the conditional compilation directive `#if FD_HAS_HOSTED`. The program utilizes functions from the `fd_util` and `fd_pcap` libraries to handle PCAP files, including reading packets from an input stream, iterating over them, and writing them to an output stream if specified. The code also includes static assertions to ensure that certain constants related to PCAP iteration types are correctly defined.
 
-The program also includes a test suite that verifies the functionality of the PCAP iterator using a binary PCAP file imported as `simple_pcap`. It checks the correctness of packet headers and payloads by comparing them against expected values. The code is structured to run only if the `FD_HAS_HOSTED` macro is defined, indicating that it is intended to be executed in a hosted environment. If this condition is not met, the program logs a notice and exits. The code is part of a larger system, as indicated by the inclusion of headers like `fd_util.h` and `fd_pcap.h`, and it uses several utility functions for environment setup, logging, and error handling.
+The main functionality of the program involves reading packets from a specified input file or standard input, processing them, and optionally writing them to an output file up to a specified maximum number of packets. The program logs various stages of its execution, such as the source of the input stream and the number of packets processed. Additionally, the code includes a unit test section that verifies the correctness of packet header and payload processing using a simple PCAP file embedded in the binary. This test ensures that the packet iteration and splitting functions work as expected. Overall, the file provides a focused utility for handling PCAP files, with a clear emphasis on reading, processing, and optionally writing packet data.
 # Imports and Dependencies
 
 ---
@@ -21,17 +21,16 @@ The program also includes a test suite that verifies the functionality of the PC
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/net/test_pcap.c#L107>)
-
-Initializes the environment and logs a message indicating that the unit test is skipped due to the absence of `FD_HAS_HOSTED`, then halts the program.
+The `main` function initializes the environment and logs a notice that the unit test is skipped due to the absence of `FD_HAS_HOSTED`, then halts the program.
 - **Inputs**:
-    - `argc`: The count of command-line arguments.
-    - `argv`: The array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with the provided command-line arguments.
-    - Logs a notice message indicating that the unit test is skipped because `FD_HAS_HOSTED` is not defined.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
+    - `argc`: The count of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with the command-line arguments.
+    - Log a notice message indicating that the unit test is skipped because `FD_HAS_HOSTED` is not defined.
+    - Call `fd_halt` to terminate the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

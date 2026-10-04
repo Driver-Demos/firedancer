@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for domain separation, message appending, and scalar challenges in range proofs using Merlin transcripts.
+The `fd_rangeproofs_transcript.h` file in the `firedancer` codebase provides functions for handling domain separation and message appending in range proofs and inner product proofs using the Merlin transcript protocol.
 
 # Purpose
-The code is a C header file that defines functions and macros for managing cryptographic transcripts, specifically for range proofs and inner product proofs. It includes domain separators and functions to append messages and validate points within a cryptographic transcript. The file uses the `fd_merlin` library for transcript operations and the `fd_ristretto255` library for point validation, indicating its focus on cryptographic operations involving the Ristretto255 curve.
+This C header file, `fd_transcript.h`, is part of a larger cryptographic library focused on zero-knowledge proofs, specifically range proofs and inner product proofs. The file provides a set of inline functions that facilitate the manipulation and management of cryptographic transcripts using the Merlin protocol. The primary functionality includes appending domain separators and messages to a transcript, validating and appending cryptographic points, and generating scalar challenges. These operations are crucial for constructing and verifying cryptographic proofs, ensuring that the data integrity and security properties are maintained throughout the proof process.
 
-The header file provides inline functions for appending domain-specific messages and points to a transcript, validating points, and generating scalar challenges. It defines macros for success and error codes (`FD_TRANSCRIPT_SUCCESS` and `FD_TRANSCRIPT_ERROR`) and uses the `FD_MERLIN_LITERAL` macro for handling literal values in the transcript. The functions are designed to be used in the context of zero-knowledge proofs, where maintaining a secure and consistent transcript is crucial for the integrity of the proof process. The file does not define a public API but provides utility functions that can be used by other components in the cryptographic proof system.
+The file includes several key components from other parts of the library, such as `fd_merlin.h` for transcript operations and `fd_ristretto255.h` for handling elliptic curve points. It defines constants for success and error states, as well as a literal for use with the Merlin protocol. The functions provided are designed to be used internally within the library, as indicated by their static inline nature, which suggests they are not intended to be part of a public API but rather serve as utility functions for other components of the cryptographic system. The file's structure and content indicate a focused and specialized role within the broader context of cryptographic proof generation and verification.
 # Imports and Dependencies
 
 ---
@@ -21,97 +21,88 @@ The header file provides inline functions for appending domain-specific messages
 
 ---
 ### fd\_rangeproofs\_transcript\_domsep\_range\_proof<!-- {{#callable:fd_rangeproofs_transcript_domsep_range_proof}} -->
-[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/rangeproofs/fd_rangeproofs_transcript.h#L15>)
-
-Appends a domain separator and a 64-bit unsigned integer to a Merlin transcript for a range proof.
+The function `fd_rangeproofs_transcript_domsep_range_proof` appends a domain separator message and a 64-bit unsigned integer to a Merlin transcript for a range proof.
 - **Inputs**:
-    - ``transcript``: A pointer to an `fd_merlin_transcript_t` structure where the domain separator and integer will be appended.
-    - ``n``: A 64-bit unsigned integer representing the value to append to the transcript.
-- **Logic and Control Flow**:
-    - Call `fd_merlin_transcript_append_message` to append the domain separator message 'range-proof' to the `transcript`.
-    - Call `fd_merlin_transcript_append_u64` to append the 64-bit unsigned integer `n` to the `transcript`.
-- **Output**: No return value; the function modifies the `transcript` in place.
+    - `transcript`: A pointer to an `fd_merlin_transcript_t` structure where the domain separator and integer will be appended.
+    - `n`: A constant unsigned long integer representing a value to be appended to the transcript.
+- **Control Flow**:
+    - The function calls `fd_merlin_transcript_append_message` to append the domain separator message 'range-proof' to the transcript.
+    - It then calls `fd_merlin_transcript_append_u64` to append the unsigned long integer `n` to the transcript.
+- **Output**: The function does not return a value; it modifies the `transcript` in place.
 
 
 ---
 ### fd\_rangeproofs\_transcript\_domsep\_inner\_product<!-- {{#callable:fd_rangeproofs_transcript_domsep_inner_product}} -->
-[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/rangeproofs/fd_rangeproofs_transcript.h#L29>)
-
-Appends a domain separator message and a 64-bit unsigned integer to a Merlin transcript for an inner product proof.
+The function `fd_rangeproofs_transcript_domsep_inner_product` appends a domain separator message and a 64-bit unsigned integer to a Merlin transcript for an inner product proof.
 - **Inputs**:
-    - ``transcript``: A pointer to an `fd_merlin_transcript_t` structure where the domain separator and integer will be appended.
-    - ``n``: A 64-bit unsigned integer representing the value to append to the transcript.
-- **Logic and Control Flow**:
-    - Calls `fd_merlin_transcript_append_message` to append the domain separator message 'inner-product' to the `transcript`.
-    - Calls `fd_merlin_transcript_append_u64` to append the 64-bit unsigned integer `n` to the `transcript`.
-- **Output**: No return value; the function modifies the `transcript` in place.
+    - `transcript`: A pointer to an `fd_merlin_transcript_t` structure where the domain separator and integer will be appended.
+    - `n`: A constant unsigned long integer representing a value to be appended to the transcript.
+- **Control Flow**:
+    - The function calls `fd_merlin_transcript_append_message` to append the domain separator message 'inner-product' to the transcript.
+    - The function then calls `fd_merlin_transcript_append_u64` to append the unsigned long integer `n` to the transcript.
+- **Output**: The function does not return a value; it modifies the `transcript` in place.
 
 
 ---
 ### fd\_rangeproofs\_transcript\_append\_point<!-- {{#callable:fd_rangeproofs_transcript_append_point}} -->
-[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/rangeproofs/fd_rangeproofs_transcript.h#L42>)
-
-Appends a 32-byte point to a Merlin transcript with a specified label.
+The function `fd_rangeproofs_transcript_append_point` appends a 32-byte point to a Merlin transcript with a specified label.
 - **Inputs**:
     - `transcript`: A pointer to an `fd_merlin_transcript_t` structure where the point will be appended.
     - `label`: A constant character pointer representing the label for the point in the transcript.
     - `label_len`: An unsigned integer representing the length of the label.
-    - `point`: A constant 32-byte array representing the point to append to the transcript.
-- **Logic and Control Flow**:
-    - Calls `fd_merlin_transcript_append_message` with the provided `transcript`, `label`, `label_len`, and `point` to append the point to the transcript.
-- **Output**: No output is returned as the function is `void`.
+    - `point`: A constant 32-byte array representing the point to be appended to the transcript.
+- **Control Flow**:
+    - The function calls `fd_merlin_transcript_append_message` with the provided `transcript`, `label`, `label_len`, and `point` as arguments.
+    - The `fd_merlin_transcript_append_message` function appends the point to the transcript with the given label.
+- **Output**: This function does not return any value; it modifies the transcript in place.
 
 
 ---
 ### fd\_rangeproofs\_transcript\_validate\_and\_append\_point<!-- {{#callable:fd_rangeproofs_transcript_validate_and_append_point}} -->
-[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/rangeproofs/fd_rangeproofs_transcript.h#L50>)
-
-Validates a point and appends it to a transcript if valid.
+The function `fd_rangeproofs_transcript_validate_and_append_point` validates a point to ensure it is not the zero point and appends it to a transcript if valid.
 - **Inputs**:
     - `transcript`: A pointer to an `fd_merlin_transcript_t` structure where the point will be appended.
     - `label`: A constant character pointer representing the label associated with the point.
     - `label_len`: An unsigned integer representing the length of the label.
-    - `point`: A constant array of 32 unsigned characters representing the point to validate and append.
-- **Logic and Control Flow**:
-    - Check if the `point` is equal to `fd_ristretto255_compressed_zero` using `fd_memeq` function.
-    - If the `point` is equal to `fd_ristretto255_compressed_zero`, return `FD_TRANSCRIPT_ERROR`.
-    - If the `point` is not equal to `fd_ristretto255_compressed_zero`, call [`fd_rangeproofs_transcript_append_point`](<#fd_rangeproofs_transcript_append_point>) to append the point to the transcript.
+    - `point`: A constant 32-byte array representing the point to be validated and appended.
+- **Control Flow**:
+    - Check if the provided point is equal to the zero point using `fd_memeq` and `fd_ristretto255_compressed_zero`.
+    - If the point is the zero point, return `FD_TRANSCRIPT_ERROR`.
+    - If the point is not the zero point, call [`fd_rangeproofs_transcript_append_point`](#fd_rangeproofs_transcript_append_point) to append the point to the transcript.
     - Return `FD_TRANSCRIPT_SUCCESS` after appending the point.
-- **Output**: Returns `FD_TRANSCRIPT_ERROR` if the point is invalid, otherwise returns `FD_TRANSCRIPT_SUCCESS`.
-- **Functions Called**:
-    - [`fd_rangeproofs_transcript_append_point`](<#fd_rangeproofs_transcript_append_point>)
+- **Output**: Returns `FD_TRANSCRIPT_ERROR` if the point is the zero point, otherwise returns `FD_TRANSCRIPT_SUCCESS` after appending the point to the transcript.
+- **Functions called**:
+    - [`fd_rangeproofs_transcript_append_point`](#fd_rangeproofs_transcript_append_point)
 
 
 ---
 ### fd\_rangeproofs\_transcript\_append\_scalar<!-- {{#callable:fd_rangeproofs_transcript_append_scalar}} -->
-[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/rangeproofs/fd_rangeproofs_transcript.h#L62>)
-
-Appends a scalar value to a Merlin transcript with a specified label.
+The function `fd_rangeproofs_transcript_append_scalar` appends a scalar value to a Merlin transcript with a specified label.
 - **Inputs**:
-    - `transcript`: A pointer to the `fd_merlin_transcript_t` structure where the scalar will be appended.
-    - `label`: A constant character pointer representing the label for the scalar in the transcript.
+    - `transcript`: A pointer to an `fd_merlin_transcript_t` structure where the scalar will be appended.
+    - `label`: A constant character pointer representing the label associated with the scalar in the transcript.
     - `label_len`: An unsigned integer representing the length of the label.
-    - `scalar`: A constant unsigned character array of size 32 representing the scalar value to append.
-- **Logic and Control Flow**:
-    - Calls `fd_merlin_transcript_append_message` with the provided `transcript`, `label`, `label_len`, and `scalar` to append the scalar to the transcript.
-- **Output**: No output is returned as the function is `void`.
+    - `scalar`: A constant unsigned character array of size 32 representing the scalar value to be appended.
+- **Control Flow**:
+    - The function calls `fd_merlin_transcript_append_message` with the provided `transcript`, `label`, `label_len`, and `scalar` as arguments.
+    - The `fd_merlin_transcript_append_message` function appends the scalar to the transcript with the given label.
+- **Output**: The function does not return any value; it modifies the transcript in place.
 
 
 ---
 ### fd\_rangeproofs\_transcript\_challenge\_scalar<!-- {{#callable:fd_rangeproofs_transcript_challenge_scalar}} -->
-[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/rangeproofs/fd_rangeproofs_transcript.h#L74>)
-
-Generates a scalar challenge from a transcript and reduces it using Curve25519.
+The function `fd_rangeproofs_transcript_challenge_scalar` generates a scalar challenge from a transcript and a label, reducing it to fit within a 32-byte scalar.
 - **Inputs**:
-    - `scalar`: A 32-byte array where the reduced scalar will be stored.
-    - `transcript`: A pointer to an `fd_merlin_transcript_t` structure used to generate the challenge.
+    - `scalar`: A 32-byte array where the reduced scalar challenge will be stored.
+    - `transcript`: A pointer to an `fd_merlin_transcript_t` structure, representing the transcript from which the challenge is derived.
     - `label`: A constant character pointer to the label used in the challenge generation.
     - `label_len`: An unsigned integer representing the length of the label.
-- **Logic and Control Flow**:
-    - Declare a 64-byte array `unreduced` to store the challenge bytes.
-    - Call `fd_merlin_transcript_challenge_bytes` with `transcript`, `label`, `label_len`, `unreduced`, and 64 to generate challenge bytes.
-    - Call `fd_curve25519_scalar_reduce` with `scalar` and `unreduced` to reduce the challenge bytes to a scalar.
-- **Output**: Returns a pointer to the reduced 32-byte scalar.
+- **Control Flow**:
+    - Declare a 64-byte array `unreduced` to hold the intermediate challenge bytes.
+    - Call `fd_merlin_transcript_challenge_bytes` with the transcript, label, label length, and `unreduced` array to generate 64 bytes of challenge data.
+    - Call `fd_curve25519_scalar_reduce` to reduce the 64-byte `unreduced` data into a 32-byte scalar, storing the result in the `scalar` array.
+    - Return the pointer to the `scalar` array.
+- **Output**: A pointer to the 32-byte `scalar` array containing the reduced scalar challenge.
 
 
 

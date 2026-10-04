@@ -3,16 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines constants for reward calculation parameters in the Flamenco rewards system.
+Reward calculation constants for lamports, block counts, and stake account storage.
 
 # Purpose
-This C header file defines several constants related to the calculation and distribution of rewards in a blockchain system. The `LAMPORTS_PER_SOL` constant specifies the number of lamports equivalent to one SOL, which is a unit of currency. The `REWARD_CALCULATION_NUM_BLOCKS` constant indicates the number of blocks after which reward distribution to stake accounts begins. The `STAKE_ACCOUNT_STORES_PER_BLOCK` constant defines the number of stake accounts that can be stored in a single block during a partitioned reward interval, targeting 64 rewards per entry or tick. Finally, the `MAX_FACTOR_OF_REWARD_BLOCKS_IN_EPOCH` constant sets the maximum factor of reward blocks within an epoch. These constants are used to configure the reward distribution mechanism in the blockchain system.
-# Imports and Dependencies
-
----
-- `../fd_flamenco_base.h`
-
-
+Defines reward-related constants for the Flamenco rewards subsystem. `LAMPORTS_PER_SOL` sets the base unit conversion used for Solana token values. `REWARD_CALCULATION_NUM_BLOCKS` controls how many blocks are used for reward calculation and vote account storage before stake account rewards begin. `STAKE_ACCOUNT_STORES_PER_BLOCK` sets the number of stake accounts stored in one block during the partitioned reward interval, and `MAX_FACTOR_OF_REWARD_BLOCKS_IN_EPOCH` limits the reward block count as a factor of the epoch size.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

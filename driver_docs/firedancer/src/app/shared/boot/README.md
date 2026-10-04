@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Bootstrapping and initialization functions and prototypes for the Firedancer application.
+Bootstraps config, logging, action dispatch, and initialization prototypes for boot setup.
 
 
 ## Files
-- **[fd_boot.c](fd_boot.c.md)**: Bootstraps the Firedancer application, handling configuration, logging, and command execution.
-- **[fd_boot.h](fd_boot.h.md)**: Function prototypes for initializing and running the Firedancer application with configuration support.
+- **[fd_boot.c](fd_boot.c.md)**: Bootstraps config, logging, and action dispatch for command-line subcommands.
+- **[fd_boot.h](fd_boot.h.md)**: Main entry and initialization prototypes for boot configuration and topology setup.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

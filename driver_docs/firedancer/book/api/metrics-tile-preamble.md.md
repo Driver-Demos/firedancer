@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Documentation for performance counters in QUIC tiles, detailing metric labels and examples.
+The `metrics-tile-preamble.md` file in the `firedancer` codebase explains the structure and labeling of performance counters for QUIC tiles, detailing how metrics are reported per tile with specific labels for identification.
 
 # Purpose
-The content describes the structure and purpose of performance counters for QUIC tiles in a system. Each QUIC tile, representing a CPU core assigned to handle QUIC connections, has its own set of performance counters that are not aggregated across tiles. The metrics are reported with two labels: `kind`, which specifies the tile name, and `kind_id`, which indicates the tile index. This allows for the identification of metrics specific to each tile. The example provided shows counters for the total number of connections created and the number of connections aborted, with separate entries for each tile.
+The provided content is a documentation snippet explaining the structure and purpose of performance counter metrics for QUIC connections in a multi-core system. These metrics are collected per tile, where a tile represents a CPU core assigned to handle QUIC connections. Each metric is reported separately for each tile, identified by two labels: `kind`, which specifies the type of tile (in this case, "quic"), and `kind_id`, which indicates the specific index of the tile. The metrics include counters such as `quic_connections_created` and `quic_connections_aborted`, which track the total number of connections created and aborted, respectively, for each tile. This setup allows for detailed performance monitoring and analysis of QUIC connections across different CPU cores.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
