@@ -3,10 +3,52 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Test program for vote state creation, query, update, stake reset, and removal.
+Tests for the functionality of vote states, including creation, update, query, and removal operations.
 
 # Purpose
-This file is a small C test program for the `fd_vote_states` API. It starts a runtime, parses workspace and memory options from the command line, and then creates or attaches to a workspace with `fd_wksp_attach` or `fd_wksp_new_anonymous`. The program checks the `fd_vote_states` footprint and alignment rules, creates a vote state table, and verifies error cases for invalid `new` and `join` calls. It then inserts two vote accounts, checks stored fields with `fd_vote_states_query`, resets stakes, removes one entry, and confirms that the count and lookup results change as expected before printing `pass` and stopping the runtime.
+The code is an executable C program that manages and tests vote state data structures within a workspace environment. It begins by initializing the runtime environment and parsing command-line arguments to configure workspace parameters such as name, page size, page count, and CPU affinity. The program either attaches to an existing workspace or creates a new anonymous one based on the provided arguments. It then allocates memory for vote states and performs a series of tests to ensure the correct alignment and footprint of the vote states data structure.
+
+The program creates and manipulates vote state elements, which include attributes such as `node_account`, `commission`, `last_vote_timestamp`, `last_vote_slot`, and `stake`. It updates and queries these elements to verify their integrity and functionality. The code also includes tests to reset stakes and remove vote state elements, ensuring that the operations are correctly reflected in the data structure. The program logs its progress and results, and it concludes by halting the runtime environment. This code is primarily focused on testing and validating the functionality of vote state management within a specified runtime environment.
+# Imports and Dependencies
+
+---
+- `fd_vote_states.h`
+- `../runtime/fd_runtime_const.h`
+
+
+# Functions
+
+---
+### main<!-- {{#callable:main}} -->
+[View Source →](<../../../../../src/flamenco/stakes/test_vote_states.c#L4>)
+
+Initializes the environment, processes command-line arguments, manages workspace memory, and performs operations on vote states.
+- **Inputs**:
+    - `argc`: The count of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Extracts command-line arguments for workspace name, page size, page count, near CPU, and workspace tag using `fd_env_strip_cmdline_cstr` and `fd_env_strip_cmdline_ulong`.
+    - Attaches to an existing workspace if a name is provided, otherwise creates a new anonymous workspace with specified parameters.
+    - Allocates memory for vote states in the workspace and verifies alignment and footprint constraints.
+    - Initializes vote states memory and joins the vote states structure.
+    - Creates and updates vote state elements with specific attributes such as node account, commission, last vote timestamp, last vote slot, and stake.
+    - Queries and verifies the vote state elements for correctness.
+    - Resets stakes in vote states and removes specific vote state elements.
+    - Logs a success message and halts the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_vote_states_footprint`](<fd_vote_states.c.md#fd_vote_states_footprint>)
+    - [`fd_vote_states_align`](<fd_vote_states.c.md#fd_vote_states_align>)
+    - [`fd_vote_states_new`](<fd_vote_states.c.md#fd_vote_states_new>)
+    - [`fd_vote_states_join`](<fd_vote_states.c.md#fd_vote_states_join>)
+    - [`fd_vote_states_update`](<fd_vote_states.c.md#fd_vote_states_update>)
+    - [`fd_vote_states_cnt`](<fd_vote_states.c.md#fd_vote_states_cnt>)
+    - [`fd_vote_states_query`](<fd_vote_states.c.md#fd_vote_states_query>)
+    - [`fd_vote_states_reset_stakes`](<fd_vote_states.c.md#fd_vote_states_reset_stakes>)
+    - [`fd_vote_states_remove`](<fd_vote_states.c.md#fd_vote_states_remove>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

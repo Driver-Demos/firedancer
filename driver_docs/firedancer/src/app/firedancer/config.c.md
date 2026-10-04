@@ -3,10 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Embeds default, testnet, devnet, and mainnet TOML config binaries.
+Imports binary configuration files for different network environments in the Firedancer application.
 
 # Purpose
-This source file imports four TOML configuration files as binary data by using `FD_IMPORT_BINARY`. It creates embedded objects for `firedancer_default_config`, `firedancer_testnet_config`, `firedancer_devnet_config`, and `firedancer_mainnet_config`, each linked to a file under `src/app/firedancer/config/`. The code does not define logic or control flow; it only makes these configuration files available to the program at build time.
+This code is a C source file that imports binary configuration files for different network environments using the `FD_IMPORT_BINARY` macro. The file includes configurations for `firedancer_default_config`, `firedancer_testnet_config`, `firedancer_devnet_config`, and `firedancer_mainnet_config`. Each configuration is associated with a specific TOML file located in the `src/app/firedancer/config` directory. The inclusion of `fd_util_base.h` suggests that the file relies on utility functions or macros defined in that header. This setup is likely used to manage and access different configuration settings for various deployment environments in a Firedancer application.
+# Imports and Dependencies
+
+---
+- `../../util/fd_util_base.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

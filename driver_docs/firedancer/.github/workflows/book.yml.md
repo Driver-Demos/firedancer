@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow to build and deploy a VitePress site to GitHub Pages.
+GitHub Actions workflow for deploying a VitePress book site to GitHub Pages.
 
 # Purpose
-This GitHub Actions workflow builds and deploys a VitePress book site to GitHub Pages. It runs on `workflow_call` and `workflow_dispatch`, sets the `GITHUB_TOKEN` permissions needed for Pages deployment, and uses `concurrency` to allow only one Pages deployment at a time. The `build` job checks out the repository, installs dependencies in `./book`, runs the VitePress build, and uploads the generated site from `book/.vitepress/dist` as an artifact. The `deploy` job then publishes that artifact to GitHub Pages and records the deployed site URL in the `github-pages` environment.
+This configuration file defines a GitHub Actions workflow for deploying a VitePress book site to GitHub Pages. The workflow can be triggered manually from the Actions tab using `workflow_dispatch`. It sets permissions for the `GITHUB_TOKEN` to allow reading contents and writing to GitHub Pages. The workflow ensures only one deployment runs at a time by using the `concurrency` setting, which prevents cancellation of in-progress runs. The workflow consists of two main jobs: `build` and `deploy`. The `build` job checks out the repository, sets up the environment, installs dependencies, builds the site with VitePress, and uploads the build artifact. The `deploy` job, which depends on the completion of the `build` job, deploys the site to GitHub Pages.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

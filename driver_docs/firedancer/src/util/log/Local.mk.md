@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_log headers, objects, and the test_log unit test.
+Makefile rules for adding headers, objects, and unit tests for logging utilities.
 
 # Purpose
-This makefile fragment adds the `fd_log.h` header to the build, adds the `fd_log` and `fd_backtrace` object files to the `fd_util` target, and defines the `test_log` unit test target with `test_log` as its source and `fd_util` as its linked dependency.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` function to include the header file `fd_log.h`. The `add-objs` function adds object files `fd_log`, `fd_backtrace`, and `fd_util` to the build process. The `make-unit-test` function creates a unit test named `test_log`, which depends on the `test_log` source and the `fd_util` object file.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
