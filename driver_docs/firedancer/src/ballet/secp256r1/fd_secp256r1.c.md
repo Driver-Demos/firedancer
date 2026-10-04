@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements ECDSA signature verification for the secp256r1 curve using SHA-256 hashing.
+The `fd_secp256r1.c` file in the `firedancer` codebase implements the verification of ECDSA signatures using the secp256r1 curve.
 
 # Purpose
-The code defines a function [`fd_secp256r1_verify`](<#fd_secp256r1_verify>) that performs verification of an ECDSA (Elliptic Curve Digital Signature Algorithm) signature using the secp256r1 curve. This function takes a message, its size, a signature, a public key, and a SHA-256 context as inputs. It returns a success or failure status based on whether the signature is valid for the given message and public key. The function first deserializes the signature and public key, ensuring that the signature components meet specific conditions to prevent malleability. It then hashes the message using SHA-256 and performs the ECDSA verification process by computing scalar multiplications and comparing the result to the expected value.
+The provided C code is a function implementation for verifying ECDSA (Elliptic Curve Digital Signature Algorithm) signatures using the secp256r1 curve, which is a widely used elliptic curve in cryptographic applications. The function [`fd_secp256r1_verify`](#fd_secp256r1_verify) takes a message, its size, a signature, a public key, and a SHA-256 context as inputs. It performs several key operations: deserializing the signature and public key, hashing the message using SHA-256, and executing the ECDSA verification process. The function ensures that the signature components meet specific criteria to prevent signature malleability, a common vulnerability in cryptographic systems. The function returns a success or failure status based on whether the signature is valid.
 
-The function is part of a cryptographic library, as indicated by the inclusion of the header file `fd_secp256r1_private.h`. It uses several helper functions and types, such as `fd_secp256r1_scalar_t` and `fd_secp256r1_point_t`, which are likely defined in the included header. The function is designed to be used in applications that require secure verification of digital signatures, ensuring data integrity and authenticity. The use of specific conditions and operations, such as scalar inversion and multiplication, highlights the function's focus on cryptographic accuracy and security.
+This code is part of a cryptographic library, as indicated by its inclusion of a private header file (`fd_secp256r1_private.h`). It provides a specific functionality focused on signature verification, which is a critical component in ensuring data integrity and authenticity in secure communications. The function does not define a public API or external interface directly but is likely intended to be used internally within a larger cryptographic framework or library. The use of specific data types and functions prefixed with `fd_secp256r1_` suggests a modular design, where this function is part of a broader suite of cryptographic operations related to the secp256r1 curve.
 # Imports and Dependencies
 
 ---
@@ -19,35 +19,33 @@ The function is part of a cryptographic library, as indicated by the inclusion o
 
 ---
 ### fd\_secp256r1\_verify<!-- {{#callable:fd_secp256r1_verify}} -->
-[View Source →](<../../../../../src/ballet/secp256r1/fd_secp256r1.c#L3>)
-
-Verifies an ECDSA signature using the secp256r1 curve.
+The `fd_secp256r1_verify` function verifies an ECDSA signature using the secp256r1 curve by deserializing the signature and public key, hashing the message, and performing elliptic curve operations to check the signature's validity.
 - **Inputs**:
-    - `msg`: The message data to verify, represented as an array of unsigned characters.
+    - `msg`: A pointer to the message data that is being verified.
     - `msg_sz`: The size of the message data in bytes.
-    - `sig`: The ECDSA signature to verify, represented as an array of 64 unsigned characters.
-    - `public_key`: The public key used for verification, represented as an array of 33 unsigned characters.
+    - `sig`: A 64-byte array containing the ECDSA signature to be verified.
+    - `public_key`: A 33-byte array containing the public key used for verification.
     - `sha`: A pointer to an `fd_sha256_t` structure used for SHA-256 hashing operations.
-- **Logic and Control Flow**:
-    - Deserialize the signature components `r` and `s` from the `sig` array, ensuring `0 < r < n` and `0 < s <= (n-1)/2` to prevent signature malleability.
-    - Return `FD_SECP256R1_FAILURE` if deserialization fails or if `r` or `s` is zero.
-    - Deserialize the public key from the `public_key` array and return `FD_SECP256R1_FAILURE` if it fails.
+- **Control Flow**:
+    - Initialize scalar and point variables for signature and public key deserialization.
+    - Deserialize the signature components `r` and `s` from the `sig` array, ensuring they meet specific conditions to prevent signature malleability.
+    - Check if either `r` or `s` is zero, returning failure if true.
+    - Deserialize the public key from the `public_key` array, returning failure if deserialization fails.
     - Hash the message using SHA-256 and convert the hash to a scalar `u1`.
-    - Compute the inverse of `s`, then multiply `u1` by this inverse and `r` by this inverse to get `u1` and `u2` respectively.
-    - Perform a double scalar multiplication to compute `Rcmp` using `u1`, the public key, and `u2`.
-    - Check if the x-coordinate of `Rcmp` equals `r`; if true, return `FD_SECP256R1_SUCCESS`.
-    - Return `FD_SECP256R1_FAILURE` if the verification fails.
-- **Output**: Returns `FD_SECP256R1_SUCCESS` if the signature is valid, otherwise returns `FD_SECP256R1_FAILURE`.
-- **Functions Called**:
-    - [`fd_secp256r1_scalar_frombytes`](<fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_frombytes>)
-    - [`fd_secp256r1_scalar_frombytes_positive`](<fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_frombytes_positive>)
-    - [`fd_secp256r1_scalar_is_zero`](<fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_is_zero>)
-    - [`fd_secp256r1_point_frombytes`](<fd_secp256r1_s2n.c.md#fd_secp256r1_point_frombytes>)
-    - [`fd_secp256r1_scalar_from_digest`](<fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_from_digest>)
-    - [`fd_secp256r1_scalar_inv`](<fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_inv>)
-    - [`fd_secp256r1_scalar_mul`](<fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_mul>)
-    - [`fd_secp256r1_double_scalar_mul_base`](<fd_secp256r1_s2n.c.md#fd_secp256r1_double_scalar_mul_base>)
-    - [`fd_secp256r1_point_eq_x`](<fd_secp256r1_s2n.c.md#fd_secp256r1_point_eq_x>)
+    - Compute the modular inverse of `s`, then calculate `u1` and `u2` by multiplying with the inverse of `s`.
+    - Perform a double scalar multiplication to compute a point `Rcmp` on the elliptic curve.
+    - Check if the x-coordinate of `Rcmp` matches `r`, returning success if they match, otherwise return failure.
+- **Output**: The function returns `FD_SECP256R1_SUCCESS` if the signature is valid and `FD_SECP256R1_FAILURE` if it is not.
+- **Functions called**:
+    - [`fd_secp256r1_scalar_frombytes`](fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_frombytes)
+    - [`fd_secp256r1_scalar_frombytes_positive`](fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_frombytes_positive)
+    - [`fd_secp256r1_scalar_is_zero`](fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_is_zero)
+    - [`fd_secp256r1_point_frombytes`](fd_secp256r1_s2n.c.md#fd_secp256r1_point_frombytes)
+    - [`fd_secp256r1_scalar_from_digest`](fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_from_digest)
+    - [`fd_secp256r1_scalar_inv`](fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_inv)
+    - [`fd_secp256r1_scalar_mul`](fd_secp256r1_s2n.c.md#fd_secp256r1_scalar_mul)
+    - [`fd_secp256r1_double_scalar_mul_base`](fd_secp256r1_s2n.c.md#fd_secp256r1_double_scalar_mul_base)
+    - [`fd_secp256r1_point_eq_x`](fd_secp256r1_s2n.c.md#fd_secp256r1_point_eq_x)
 
 
 

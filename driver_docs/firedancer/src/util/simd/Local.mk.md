@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines headers and unit tests for SSE, AVX, and AVX512 SIMD operations based on availability.
+Build rules for SIMD headers and SSE, AVX, and AVX512 unit tests.
 
 # Purpose
-The provided content is a Makefile script that manages the inclusion of header files and the execution of unit tests for different SIMD (Single Instruction, Multiple Data) instruction sets: SSE, AVX, and AVX512. The script uses conditional statements to check for the presence of specific instruction set support, such as `FD_HAS_SSE`, `FD_HAS_AVX`, and `FD_HAS_AVX512`. If the support is available, it adds the corresponding header files using the `add-hdrs` function and defines unit tests with the `make-unit-test` function. The script then executes these unit tests using the `run-unit-test` function to ensure the functionality of the code associated with each instruction set. This setup helps in maintaining and verifying the code's compatibility with different SIMD instruction sets.
+This Makefile fragment registers header files for the SSE, AVX, and AVX512 vector interfaces by using `add-hdrs`, so the build system can install or track the public headers for each instruction set. It then uses `ifdef` blocks with `FD_HAS_SSE`, `FD_HAS_AVX`, and `FD_HAS_AVX512` to enable unit test targets only when the matching CPU feature is available. The `make-unit-test` calls define test programs and their dependencies, while the `run-unit-test` calls add the commands that execute those tests during the build. One `run-unit` entry for `test_avx_16x16` uses a different macro name, which makes that line part of the test execution setup for the AVX test group.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
