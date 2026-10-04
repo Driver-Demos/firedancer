@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Bash script to load specific modules for Jump's environment, including GCC, Python, and OpenSSL.
+The `activate` file is a Bash script that sets up the environment by loading specific modules such as gcc, Python, and openssl, and checks for the presence of the `module` command.
 
 # Purpose
-This script is a Bash executable intended to configure the environment for a specific software setup. It checks for the presence of the `module` command, which is necessary for managing environment modules, and outputs an error message if the command is not found, indicating that the script is designed to run within Jump's environment. The script purges any currently loaded modules and then loads specific versions of `gcc`, `Python`, and `openssl`, ensuring that the environment is set up with these tools. Finally, it lists the currently loaded modules to confirm the environment configuration.
+This Bash script is designed to configure a specific software environment by loading necessary modules, indicating that it provides narrow functionality tailored to a particular setup. It checks for the presence of the `module` command, which is typically used in environments that utilize the Environment Modules package to manage user environments. If the `module` command is not found, the script outputs an error message and exits, suggesting that it is intended to be run within a specific environment, likely named "Jump." The script purges any currently loaded modules and then loads specific versions of GCC, Python, and OpenSSL, ensuring that the environment is set up with these tools. This script is not an executable or a library but rather a configuration script meant to be sourced in a shell to prepare the environment for subsequent tasks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

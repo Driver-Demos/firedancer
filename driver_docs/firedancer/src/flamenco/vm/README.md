@@ -3,30 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Virtual machine implementation, testing, syscall management, disassembly, and execution tools for sBPF programs.
+sBPF VM execution, disassembly, tracing, syscalls, tests, and build rules
 
 ## Folders
-- **[instr_test](instr_test/README.md)**: Test cases and definitions for bitwise, arithmetic, jump, load, opcode, and shift operations in a VM.
-- **[syscall](syscall/README.md)**: Syscall management and testing for a virtual machine, including cryptographic, hash, and curve operations.
+- **[instr_test](instr_test/README.md)**: Instruction tests for bitwise, integer math, jump, load, opcode, and shift operations.
+- **[syscall](syscall/README.md)**: VM syscall registration, CPI, crypto, hash, PDA, runtime, utility handlers, and tests.
 
 ## Files
-- **[fd_vm.c](fd_vm.c.md)**: Implements error handling, validation, and memory management for a virtual machine in the Firedancer codebase.
-- **[fd_vm.h](fd_vm.h.md)**: Header file defining structures and functions for a virtual machine to execute sBPF programs.
-- **[fd_vm_base.h](fd_vm_base.h.md)**: Defines constants, error codes, and APIs for virtual machine operations, tracing, and syscalls in Firedancer.
-- **[fd_vm_disasm.c](fd_vm_disasm.c.md)**: Disassembles and formats SBPF virtual machine instructions into human-readable assembly code.
-- **[fd_vm_interp.c](fd_vm_interp.c.md)**: Implements virtual machine execution functions with and without tracing capabilities.
-- **[fd_vm_interp_core.c](fd_vm_interp_core.c.md)**: SBPF virtual machine interpreter core for executing instructions, handling faults, and managing VM state.
-- **[fd_vm_interp_jump_table.c](fd_vm_interp_jump_table.c.md)**: Defines the sBPF interpreter jump table for opcode execution and handling invalid opcodes.
-- **[fd_vm_private.h](fd_vm_private.h.md)**: Defines private constants, structures, and functions for virtual memory management and SBPF instruction handling in the Firedancer VM.
-- **[fd_vm_tool.c](fd_vm_tool.c.md)**: Implements a virtual machine tool for disassembling, validating, tracing, and running programs.
-- **[fd_vm_trace.c](fd_vm_trace.c.md)**: Implements functions for managing and processing virtual machine trace events, including memory and execution events.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing components in the Flamenco VM, including unit tests and binaries.
-- **[test_pointer_chase.c](test_pointer_chase.c.md)**: Tests pointer chasing performance with sequential and random memory access patterns.
-- **[test_vm_base.c](test_vm_base.c.md)**: Tests for virtual machine static assertions, error codes, limits, disassembly, and tracing functionality.
-- **[test_vm_instr.c](test_vm_instr.c.md)**: Executes and validates text-based instruction tests for a virtual machine, logging results and errors.
-- **[test_vm_interp.c](test_vm_interp.c.md)**: Tests for a virtual machine interpreter, including arithmetic, bitwise, and syscall operations.
-- **[test_vm_util.c](test_vm_util.c.md)**: Functions to generate and clear minimal execution contexts for virtual machine testing.
-- **[test_vm_util.h](test_vm_util.h.md)**: Defines utilities for testing virtual machine execution contexts and transaction contexts.
+- **[fd_vm.c](fd_vm.c.md)**: Validation, error strings, and VM setup for sBPF execution.
+- **[fd_vm.h](fd_vm.h.md)**: sBPF VM state, memory mapping, validation, and execution APIs.
+- **[fd_vm_base.h](fd_vm_base.h.md)**: VM error codes, limits, disassembly, trace, and syscall registration APIs.
+- **[fd_vm_disasm.c](fd_vm_disasm.c.md)**: The `fd_vm_disasm.c` file in the `firedancer` codebase provides functions for disassembling virtual machine instructions, including pretty-printing single-word instructions and handling various instruction classes such as ALU, JMP, LDX, and STX.
+- **[fd_vm_interp.c](fd_vm_interp.c.md)**: Trace and nontrace VM execution wrappers that include the shared interpreter core.
+- **[fd_vm_interp_core.c](fd_vm_interp_core.c.md)**: SBPF VM interpreter core with instruction execution, memory access, syscalls, and fault handling
+- **[fd_vm_interp_jump_table.c](fd_vm_interp_jump_table.c.md)**: sBPF interpreter jump table with opcode handlers and version-dependent feature gates
+- **[fd_vm_private.h](fd_vm_private.h.md)**: SBPF VM alignment, feature, error, and memory mapping helpers.
+- **[fd_vm_tool.c](fd_vm_tool.c.md)**: CLI for disassembly, validation, tracing, and execution of SBPF programs.
+- **[fd_vm_trace.c](fd_vm_trace.c.md)**: The `fd_vm_trace.c` file in the `firedancer` codebase provides functions for managing and processing virtual machine trace events, including creating, joining, leaving, deleting traces, and handling execution and memory events.
+- **[Local.mk](Local.mk.md)**: Build rules for VM headers, objects, tool, and unit tests under feature guards.
+- **[test_pointer_chase.c](test_pointer_chase.c.md)**: Pointer-chasing benchmark with sequential and random memory patterns.
+- **[test_vm_base.c](test_vm_base.c.md)**: Unit tests for VM constants, disassembly, and trace creation, use, and deletion.
+- **[test_vm_instr.c](test_vm_instr.c.md)**: Parses and runs text-based VM instruction tests, then checks status and register results.
+- **[test_vm_interp.c](test_vm_interp.c.md)**: VM interpreter tests for ALU, jumps, memory, syscalls, and CU exit cases.
+- **[test_vm_util.c](test_vm_util.c.md)**: Minimal VM test context setup and transaction error clearing helpers.
+- **[test_vm_util.h](test_vm_util.h.md)**: Test VM helper macros and prototypes for minimal instruction setup and transaction error clearing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
