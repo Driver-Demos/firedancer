@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `UnsignedGEZero.qll` file defines classes and predicates for implementing the UnsignedGEZero query, which identifies pointless comparisons of unsigned values to zero, and is also utilized by the more general PointlessComparison query to prevent duplicate reporting.
+Classes and predicates for the UnsignedGEZero query, used to avoid duplicate results with PointlessComparison.
 
 # Purpose
-This source code file defines a library for identifying and handling a specific code pattern known as "UnsignedGEZero" within C++ codebases. The primary functionality of this library is to detect instances where an unsigned integer is compared to zero using relational operations like greater than or equal to (>=) or less than or equal to (<=). The library is designed to be used in conjunction with another query, "PointlessComparison," which is a more general query that also identifies the "UnsignedGEZero" pattern among other similar patterns. By using this library, developers can avoid redundant alerts for the same issue when both queries are employed.
+The code defines a library for implementing the `UnsignedGEZero` query, which identifies expressions where an unsigned value is compared to zero. This library is also utilized by the `PointlessComparison` query to prevent duplicate reporting of the same result. The `PointlessComparison` query is a more general query that also detects instances of the `UnsignedGEZero` pattern.
 
-The code is structured around a few key components. It includes a class `ConstantZero` that represents the constant value zero, which is used in comparisons. The `lookForUnsignedAt` predicate is a crucial part of the logic, as it recursively checks if a given relational operation involves an unsigned integer being compared to zero. The `UnsignedGEZero` class extends `ComparisonOperation` and encapsulates the logic for identifying when an unsigned integer is involved in such a comparison. Additionally, the `unsignedGEZero` predicate is defined to generate a message alerting the user to the presence of a "pointless comparison" when an unsigned integer is compared to zero, ensuring that the alert is not triggered by macro invocations or template instantiations.
+The code includes several key components. The `ConstantZero` class extends `Expr` and represents a constant expression with the value "0". The `lookForUnsignedAt` predicate checks if a given relational operation involves an unsigned expression compared to zero, either directly or through type conversions. The `UnsignedGEZero` class extends `ComparisonOperation` and uses the `lookForUnsignedAt` predicate to identify unsigned expressions that are compared to zero. The `unsignedGEZero` predicate generates an alert message for such comparisons, ensuring that the expression is not part of a macro invocation or a template instantiation.
 
-Overall, this file provides a focused and specialized functionality aimed at improving code quality by identifying potentially redundant or unnecessary comparisons in C++ code. It is not a standalone executable but rather a library intended to be integrated into a larger code analysis framework, providing a specific query capability that can be leveraged by other components or queries within the system.
+Overall, the code provides a focused functionality for detecting and reporting potentially pointless comparisons of unsigned values to zero, which can be a source of logical errors in code. It defines a specific query and related predicates to identify these patterns and generate appropriate alerts.
 # Imports and Dependencies
 
 ---
@@ -21,18 +21,18 @@ Overall, this file provides a focused and specialized functionality aimed at imp
 
 ---
 ### ConstantZero
-- **Type**: `class`
+- **Type**: ``class``
 - **Members**:
-    - `ConstantZero`: A class that extends Expr and represents a constant expression with a value of zero.
-- **Description**: The `ConstantZero` class is a specialized data structure that extends the `Expr` class, representing a constant expression with a value of zero. It is used within the context of the `UnsignedGEZero` query to identify expressions that are constant and equal to zero, particularly in scenarios where unsigned comparisons to zero are being analyzed. This class plays a crucial role in ensuring that such comparisons are correctly identified and handled, avoiding redundant alerts in the context of the `PointlessComparison` query.
+    - ``ConstantZero``: Represents an expression that is a constant with the value "0".
+- **Description**: Represents an expression that is a constant with the value "0". It extends the `Expr` class and is used to identify expressions that are constant and equal to zero, particularly in the context of unsigned comparisons.
 
 
 ---
 ### UnsignedGEZero
-- **Type**: `class`
+- **Type**: ``class``
 - **Members**:
-    - `UnsignedGEZero`: A class that extends ComparisonOperation to identify unsigned expressions compared to zero.
-- **Description**: The `UnsignedGEZero` class is a specialized data structure that extends the `ComparisonOperation` class. It is designed to identify expressions where an unsigned integral type is compared to zero using relational operations. The class utilizes a predicate `lookForUnsignedAt` to determine if a given expression is unsigned and involved in a comparison with zero. This data structure is part of a library that helps in identifying and avoiding redundant or pointless comparisons in code, particularly focusing on unsigned values being compared to zero.
+    - ``UnsignedGEZero``: Represents a comparison operation that checks for unsigned expressions greater than or equal to zero.
+- **Description**: The `UnsignedGEZero` class extends `ComparisonOperation` and identifies expressions where an unsigned type is compared to zero using a greater than or equal operation. It uses the `lookForUnsignedAt` predicate to find such expressions and ensures that the underlying type of the expression is unsigned.
 
 
 

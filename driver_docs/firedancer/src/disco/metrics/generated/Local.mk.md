@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase is a makefile script that adds header and object files from the `firedancer/src/disco/metrics/generated` directory to the build process.
+Makefile rules to add header and object files for the `fd_disco` component.
 
 # Purpose
-The provided code is a snippet from a Makefile, which is used to automate the build process in software development. It utilizes the `call` function to dynamically add header files (`*.h`) and object files derived from C source files (`*.c`) located in the directory specified by `MKPATH`. The object files are associated with the target `fd_disco`.
+The `Makefile` content uses the `add-hdrs` and `add-objs` functions to manage header and object files in a build process. The first line adds header files with the `.h` extension from the directory specified by `MKPATH`. The second line adds object files by transforming source files with the `.c` extension into object files, excluding the extension, and associates them with the `fd_disco` target.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

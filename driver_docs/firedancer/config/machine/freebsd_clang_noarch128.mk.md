@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `freebsd_clang_noarch128.mk` file in the `firedancer` codebase configures build settings for a FreeBSD environment using Clang with specific flags for 128-bit integer support, double precision, and stack allocation.
+Makefile for configuring a FreeBSD build with Clang and specific flags for integer, double, and memory allocation support.
 
 # Purpose
-This file is a Makefile used for configuring the build environment for a software project targeting FreeBSD with Clang on a noarch128 architecture. It sets the build directory and includes several configuration files to enable specific features such as Clang support, debugging, brutality, and optimization. Additionally, it defines and appends preprocessor flags to enable certain features like 128-bit integers, double precision, and stack allocation, while also setting environment, I/O, and logging styles to zero, indicating a non-hosted environment.
+The Makefile sets up the build environment for a FreeBSD system using the Clang compiler targeting a `noarch128` architecture. It includes several configuration files to extend the build settings, such as `base.mk`, `with-clang.mk`, `with-debug.mk`, `with-brutality.mk`, and `with-optimization.mk`. The `CPPFLAGS` variable is configured with preprocessor definitions to enable support for 128-bit integers, double precision floating-point numbers, and stack allocation with `alloca`. Additionally, it sets environment, I/O, and logging styles to zero, indicating a non-hosted environment for FreeBSD.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
