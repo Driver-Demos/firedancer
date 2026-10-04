@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, APIs, data structures, and unit tests for CNC in shared memory and high-performance applications.
+The `cnc` folder in the `firedancer` codebase contains source code and configuration files for managing command-and-control structures, including implementation, API definitions, build specifications, and unit tests.
 
 
 ## Files
-- **[fd_cnc.c](fd_cnc.c.md)**: Functions for managing and interacting with a CNC (Command and Control) structure in shared memory.
-- **[fd_cnc.h](fd_cnc.h.md)**: APIs and data structures for managing out-of-band command-and-control signals in high-performance applications.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_cnc` and `fd_tango`.
-- **[test_cnc.c](test_cnc.c.md)**: Unit test for command and control (CNC) functionality, including signal handling and app thread management.
+- **[fd_cnc.c](fd_cnc.c.md)**: The `fd_cnc.c` file in the `firedancer` codebase provides functions for managing and interacting with a command-and-control (CNC) structure, including operations for creating, joining, leaving, deleting, and opening command sessions, as well as handling signals and errors.
+- **[fd_cnc.h](fd_cnc.h.md)**: The `fd_cnc.h` file in the `firedancer` codebase provides APIs for managing out-of-band command-and-control signals for high-performance application threads, including state transitions, signal handling, and memory management for `fd_cnc_t` objects.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_cnc` and `fd_tango` components.
+- **[test_cnc.c](test_cnc.c.md)**: The `test_cnc.c` file in the `firedancer` codebase contains a unit test for the command and control (CNC) system, verifying its functionality through various signal handling and state transitions, including booting, running, and halting states.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile commands to create a library and add headers for `fd_discof`.
+Build rules for the fd_discof library and header file.
 
 # Purpose
-The `Makefile` content defines build instructions for a software library. The `$(call make-lib,fd_discof)` line invokes a function to create a library named `fd_discof`. The `$(call add_hdrs,fd_discof.h)` line adds the header file `fd_discof.h` to the build process, ensuring it is included in the compilation.
+Defines the `fd_discof` library target and adds `fd_discof.h` to the exported header list. These `make` calls register the library for the build and expose its public header for use by other targets.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Command-line argument parsing and execution, configuration management, network device and kernel parameter setup, and hyperthreading checks.
+Configuration stages and system setup for network devices, huge pages, hyperthreads, snapshots, and sysctl settings.
 
 
 ## Files
-- **[configure.c](configure.c.md)**: Implements command-line argument parsing and execution for configuring Firedancer stages.
-- **[configure.h](configure.h.md)**: Header file for configuration commands, stages, and result handling in the Firedancer application.
-- **[ethtool-channels.c](ethtool-channels.c.md)**: Configures network devices using ethtool, focusing on channel settings and XDP compatibility.
-- **[ethtool-loopback.c](ethtool-loopback.c.md)**: Disables "tx-udp-segmentation" offload on loopback interface for compatibility with AF_XDP.
-- **[ethtool-offloads.c](ethtool-offloads.c.md)**: Disables incompatible ethtool features on network interfaces for AF_XDP compatibility.
-- **[fd_ethtool_ioctl.c](fd_ethtool_ioctl.c.md)**: Implements functions for configuring network devices using ethtool ioctls, including setting channels and features.
-- **[fd_ethtool_ioctl.h](fd_ethtool_ioctl.h.md)**: A wrapper for ethtool ioctl commands to manage network device features, channels, RXFH tables, and ntuple rules.
-- **[hugetlbfs.c](hugetlbfs.c.md)**: Manages the configuration and mounting of hugetlbfs filesystems, including permission checks and error handling.
-- **[hyperthreads.c](hyperthreads.c.md)**: Configures and checks hyperthreading settings for CPU tiles, issuing warnings if performance may be reduced.
-- **[snapshots.c](snapshots.c.md)**: Handles the initialization and verification of the snapshots directory configuration.
-- **[sysctl.c](sysctl.c.md)**: Configures and checks kernel parameters in `/proc/sys` for network and file system settings.
+- **[configure.c](configure.c.md)**: Command parsing, stage checks, init and fini execution, and path ownership and mode checks.
+- **[configure.h](configure.h.md)**: Configuration stages, result types, and command helpers for directory and file checks.
+- **[ethtool-channels.c](ethtool-channels.c.md)**: Ettool channel setup, check, and reset logic for XDP network devices and bonded slaves.
+- **[ethtool-loopback.c](ethtool-loopback.c.md)**: Disables and checks loopback tx-udp-segmentation offload for XDP network setup.
+- **[ethtool-offloads.c](ethtool-offloads.c.md)**: Disables and checks GRO and GRE offloads on the main and loopback interfaces for AF_XDP.
+- **[fd_ethtool_ioctl.c](fd_ethtool_ioctl.c.md)**: Ethtool ioctl helpers for channel, RSS, feature, GRO, and ntuple rule control.
+- **[fd_ethtool_ioctl.h](fd_ethtool_ioctl.h.md)**: Ethtool ioctl wrappers for channels, RXFH, features, and ntuple flow steering.
+- **[hugetlbfs.c](hugetlbfs.c.md)**: Configures hugetlbfs mounts and huge page reservations, and checks or removes them.
+- **[hyperthreads.c](hyperthreads.c.md)**: The `hyperthreads.c` file in the `firedancer` codebase is responsible for configuring and checking the status of hyperthread pairs in a CPU topology, issuing warnings if certain conditions that may affect performance are met.
+- **[snapshots.c](snapshots.c.md)**: Creates and checks the snapshots directory for configure stage.
+- **[sysctl.c](sysctl.c.md)**: Sysctl checks and sets kernel parameters for general, XDP, and socket network modes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
