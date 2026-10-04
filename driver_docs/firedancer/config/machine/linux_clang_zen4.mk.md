@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build settings for Linux Clang on Zen 4 with x86-64, debug, security, and optimization flags.
+Makefile for configuring a build environment with Clang for Zen 4 architecture with various optimizations.
 
 # Purpose
-This build configuration selects `linux/clang/zen4` as the default `BUILDDIR` and includes the shared base settings together with the `clang`, `x86-64`, `debug`, `security`, `brutality`, `optimization`, and `threads` option files. It adds compiler flags for the `znver4` target so the build uses the Zen 4 instruction set and tuning settings. The file also defines preprocessor symbols such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, `FD_HAS_ALLOCA`, `FD_HAS_X86`, `FD_HAS_SSE`, `FD_HAS_AVX`, `FD_HAS_SHANI`, `FD_HAS_AESNI`, `FD_HAS_AVX512`, and `FD_HAS_GFNI` to enable code paths for the supported data types and CPU features. These matching `FD_HAS_*` assignments set the same feature values for the build system so later rules can use them consistently.
+The configuration file sets up the build environment for a software project targeting the `zen4` architecture using the Clang compiler on a Linux system. It includes several configuration files that add specific features such as debugging, security, optimization, and threading capabilities. The `CPPFLAGS` variable is configured with compiler flags to optimize the build for the `znver4` architecture and enable various hardware features like SSE, AVX, and AES-NI. Additionally, several preprocessor definitions are set to indicate the presence of specific hardware capabilities, such as `FD_HAS_INT128` and `FD_HAS_AVX512`, which the software can use to optimize its performance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `vm.pb.c` file contains automatically generated nanopb constant definitions for various test structures used in the Firedancer project's Flamenco runtime tests.
+Automatically generated nanopb constant definitions for various test structures in the Firedancer codebase.
 
 # Purpose
-This C source code file is an automatically generated set of constant definitions using the nanopb library, specifically version 0.4.9.1. The file is intended to be used in conjunction with Protocol Buffers (protobuf), as indicated by the inclusion of "vm.pb.h" and the use of the PB_BIND macro. The primary purpose of this file is to define bindings for various data structures related to a virtual machine (VM) testing framework. These structures include contexts, syscall invocations, and validation fixtures, which are essential for simulating and validating the behavior of a VM in a controlled testing environment.
-
-The file is not meant to be executed directly but rather serves as a component within a larger system, likely a testing suite for a virtual machine. The PB_BIND macro is used to associate C data types with their corresponding protobuf message types, facilitating serialization and deserialization processes. This file does not define public APIs or external interfaces directly; instead, it provides the necessary bindings for internal use within the system that utilizes nanopb for handling protobuf messages. The presence of an error directive ensures compatibility with the correct version of the nanopb generator, maintaining consistency and preventing potential mismatches in the generated code.
+This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `vm.pb.h` and checks the `PB_PROTO_HEADER_VERSION` to ensure compatibility with the nanopb generator version 0.4.9.1. The file uses the `PB_BIND` macro to bind various data structures, such as `fd_exec_test_input_data_region_t`, `fd_exec_test_vm_context_t`, and others, to their corresponding protobuf message types. These bindings facilitate the serialization and deserialization of data structures for communication or storage purposes in applications that use Protocol Buffers.
 # Imports and Dependencies
 
 ---
