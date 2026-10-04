@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC TLS functionality, API definitions for QUIC-TLS handshakes, and Makefile rules for `fd_quic_tls` and `fd_quic`.
+QUIC TLS handshake setup, callbacks, state, and build integration.
 
 
 ## Files
-- **[fd_quic_tls.c](fd_quic_tls.c.md)**: Implements QUIC TLS functionality, including message sending, secret handling, and transport parameter management.
-- **[fd_quic_tls.h](fd_quic_tls.h.md)**: Defines an API for managing QUIC-TLS handshakes, including configuration, creation, and data processing.
-- **[Local.mk](Local.mk.md)**: Makefile rules to add headers and objects for `fd_quic_tls` and `fd_quic`.
+- **[fd_quic_tls.c](fd_quic_tls.c.md)**: QUIC TLS handshake setup, processing, callbacks, and handshake data management.
+- **[fd_quic_tls.h](fd_quic_tls.h.md)**: QUIC-TLS API, handshake state, callbacks, and queued handshake data management.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects for the `fd_quic_tls` component in the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

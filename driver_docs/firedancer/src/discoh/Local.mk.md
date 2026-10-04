@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile snippet to build the `fd_discoh` library using a custom `make-lib` function.
+The `Local.mk` file in the `firedancer` codebase is a makefile that includes a call to create the `fd_discoh` library.
 
 # Purpose
-The `$(call make-lib,fd_discoh)` line in a Makefile invokes a function named `make-lib` with the argument `fd_discoh`. This function call is typically used to automate the process of building or managing a library named `fd_discoh` within the build system. The `make-lib` function likely contains predefined rules or commands that handle the compilation, linking, or other necessary steps for the library.
+The file contains a Makefile snippet that uses a macro or function call `make-lib` to build or manage a library named `fd_discoh`. This is part of a build automation process, where `make-lib` is likely a predefined macro or function that encapsulates the necessary steps to compile or link the `fd_discoh` library within the software project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

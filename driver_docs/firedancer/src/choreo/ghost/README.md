@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and tests for managing ghost data structures and Solana's LMD-GHOST fork choice rule.
+LMD-GHOST fork-choice tree, vote tracking, duplicate handling, and unit tests.
 
 
 ## Files
-- **[fd_ghost.c](fd_ghost.c.md)**: Implements functions for managing and manipulating a ghost data structure, including creation, insertion, and validation operations.
-- **[fd_ghost.h](fd_ghost.h.md)**: Implements Solana's LMD-GHOST fork choice rule with data structures and functions for managing and querying fork trees.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fd_ghost` component with optional unit tests.
-- **[test_ghost.c](test_ghost.c.md)**: Tests for the `fd_ghost` module, including scenarios with duplicate nodes, voting, and tree operations.
+- **[fd_ghost.c](fd_ghost.c.md)**: Fork tree management and vote replay logic with duplicate detection and root publishing.
+- **[fd_ghost.h](fd_ghost.h.md)**: LMD-GHOST fork-choice tree, vote tracking, and duplicate-confirmation APIs.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_ghost headers, objects, and unit tests when int128 and hosted support are enabled.
+- **[test_ghost.c](test_ghost.c.md)**: Tests fd_ghost tree, vote, head, and duplicate handling functions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
