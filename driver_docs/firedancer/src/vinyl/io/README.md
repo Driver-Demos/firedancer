@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, headers, and tests for Vinyl I/O operations with LZ4 compression, block device, and memory-mapped I/O.
+I/O API, block-device and memory-mapped bstream helpers, and tests for append, read, commit, and recovery
 
 
 ## Files
-- **[fd_vinyl_io.c](fd_vinyl_io.c.md)**: Functions for managing and appending data blocks in a vinyl I/O stream, with support for LZ4 compression.
-- **[fd_vinyl_io.h](fd_vinyl_io.h.md)**: Header file for asynchronous I/O operations on a bstream, supporting reads, appends, and recovery.
-- **[fd_vinyl_io_bd.c](fd_vinyl_io_bd.c.md)**: Implements block device I/O operations for the Vinyl streaming system, including read, write, append, and sync functionalities.
-- **[fd_vinyl_io_mm.c](fd_vinyl_io_mm.c.md)**: Memory-mapped I/O operations for the Vinyl streaming system, including read, write, and synchronization functions.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for `fd_vinyl_io` components.
-- **[test_vinyl_io_bd.c](test_vinyl_io_bd.c.md)**: Tests for the `fd_vinyl_io_bd` functionality, including initialization, operations, and error handling.
-- **[test_vinyl_io_common.c](test_vinyl_io_common.c.md)**: Tests for the vinyl I/O operations, including append, copy, commit, hint, forget, rewind, sync, and read.
-- **[test_vinyl_io_mm.c](test_vinyl_io_mm.c.md)**: Tests for the `fd_vinyl_io_mm` module, including initialization, accessors, operations, and memory management.
+- **[fd_vinyl_io.c](fd_vinyl_io.c.md)**: I/O append helpers for raw, dead, move, part, and in-place LZ4 pair records.
+- **[fd_vinyl_io.h](fd_vinyl_io.h.md)**: I/O API for bstream reads, appends, commit, recovery, and block-device or memory-backed storage.
+- **[fd_vinyl_io_bd.c](fd_vinyl_io_bd.c.md)**: Block-device I/O for vinyl bstream reads, writes, copy, sync, rewind, and recovery.
+- **[fd_vinyl_io_mm.c](fd_vinyl_io_mm.c.md)**: Memory-mapped bstream I/O with read, append, copy, sync, rewind, and recovery support.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_vinyl_io headers, objects, and unit tests.
+- **[test_vinyl_io_bd.c](test_vinyl_io_bd.c.md)**: Tests block-device vinyl I/O init, accessors, scratch pad, resume, and invalid store cases.
+- **[test_vinyl_io_common.c](test_vinyl_io_common.c.md)**: Randomized tests for vinyl I/O append, copy, read, commit, sync, forget, and rewind.
+- **[test_vinyl_io_mm.c](test_vinyl_io_mm.c.md)**: Tests memory-mapped vinyl I/O init, accessors, operations, scratch pad, resume, and cleanup.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
