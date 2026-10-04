@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the deshredding process by reading, parsing, and verifying shred data from binary archives.
+The `test_deshredder.c` file in the `firedancer` codebase tests the functionality of the deshredder by reading, parsing, and processing shreds from binary archives to verify the integrity and correctness of the deshredded content.
 
 # Purpose
-The code is an executable C program that processes binary data known as "shreds" from archive files. It uses the `fd_deshredder_t` structure to concatenate and process these shreds. The program imports binary data from specific files using the `FD_IMPORT_BINARY` macro and reads them using the `fmemopen` function. It initializes the deshredder with an empty list of shreds and processes each shred one-by-one, although it notes that production code would handle multiple shreds in batches. The program verifies the integrity of the processed data by checking the size of the defragmented batch and the number of shreds, and it compares the deshredded content with expected results using `memcmp`.
+This C source code file is an executable program designed to process and verify data shreds from binary archives. The program imports binary data from specified files using the `FD_IMPORT_BINARY` macro, which suggests that these files contain serialized data shreds. The main functionality of the program revolves around reading these shreds from the archives, deserializing them, and then processing them using a deshredder mechanism. The deshredder, represented by the `fd_deshredder_t` structure, is initialized and used to concatenate and verify the integrity of the shreds. The program performs this operation for multiple sets of shreds, as indicated by the different versions and slots (e.g., "v13 slot 0", "v14 slot 0", "v14 slot 1").
 
-The program includes several key components: it initializes the deshredder, reads shreds from archives, parses them, and refills the deshredder with parsed shreds. It uses the `fd_ar_read_next` function to iterate over the shreds in the archive and checks for errors using `FD_TEST`. The program logs progress and results using `FD_LOG_NOTICE` and ensures that the archive is consumed gracefully by checking for the `ENOENT` error. The main function concludes by halting the program with `fd_halt` and returning 0 to indicate successful execution.
+The code is structured to ensure that the shreds are read correctly and that the deserialized data matches expected values, as evidenced by the various `FD_TEST` assertions. These assertions check the size of the defragmented batch, the number of shreds, and the integrity of the deshredded content against known values. The program logs its progress and results using `FD_LOG_NOTICE`, providing a trace of its operations. This file is a standalone executable, as indicated by the presence of the [`main`](#main) function, and it does not define any public APIs or external interfaces. Its primary purpose is to validate the deserialization and integrity of data shreds from binary archives, likely as part of a larger data processing or validation pipeline.
 # Imports and Dependencies
 
 ---
@@ -22,25 +22,22 @@ The program includes several key components: it initializes the deshredder, read
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/shred/test_deshredder.c#L13>)
-
-Processes and deshreds binary data from multiple archive files, verifying the integrity and size of the resulting batches.
+The `main` function initializes and processes shred data from multiple archive files, verifying the integrity and size of the deserialized batches.
 - **Inputs**:
     - `argc`: The number of command-line arguments.
     - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Opens the first archive file `localnet_shreds_0` for reading and initializes the archive reader.
-    - Initializes a `fd_deshredder_t` structure to manage the deshredding process.
-    - Reads shreds one-by-one from the archive, parses them, and feeds them into the deshredder.
-    - Verifies that the archive reading ends gracefully with `ENOENT`.
-    - Checks the size and content of the deshredded batch against expected values.
-    - Repeats the process for two more archive files: `localnet_v14_shreds_0` and `localnet_v14_shreds_1`.
-    - Logs progress and results using `FD_LOG_NOTICE`.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_shred_parse`](<fd_shred.c.md#fd_shred_parse>)
+- **Control Flow**:
+    - Initialize the application with `fd_boot` using command-line arguments.
+    - Open the first archive file `localnet_shreds_0` for reading and initialize the archive reader.
+    - Initialize a deshredder with an empty list of shreds and a buffer for deserialized data.
+    - Iterate over each shred in the archive, reading and parsing it, then feeding it to the deshredder one by one.
+    - Verify that the archive was fully consumed and check the size and content of the deserialized batch against expected values.
+    - Repeat the process for two more archive files: `localnet_v14_shreds_0` and `localnet_v14_shreds_1`.
+    - Log progress and results at various stages.
+    - Terminate the application with `fd_halt` and return 0.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`fd_shred_parse`](fd_shred.c.md#fd_shred_parse)
 
 
 

@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a static constant array for precomputed Secp256r1 elliptic curve base point multiples.
+The `fd_secp256r1_table.c` file in the Firedancer codebase contains a static array of precomputed hexadecimal values, specifically a table of multiples of the base point for the Secp256r1 elliptic curve, used to optimize elliptic curve cryptography operations by reducing repeated calculations.
 
 # Purpose
-The code defines a `static const` array named `fd_secp256r1_base_point_table`, which stores precomputed multiples of the Secp256r1 elliptic curve base point. This array is used to optimize elliptic curve cryptography operations by speeding up point multiplication, which is important for high-performance cryptographic computations. The array is defined as a sequence of hexadecimal values, indicating that it is intended for data storage rather than executable logic. The `static` and `const` qualifiers ensure that the array is used only within a single translation unit and that its values remain constant. The code does not define any public APIs, functions, or structures, and it is likely part of a larger cryptographic library or application that uses the Secp256r1 curve.
+The provided C code snippet is a static array of precomputed hexadecimal values, specifically designed as a table of multiples of the base point for the Secp256r1 elliptic curve, used in elliptic curve cryptography (ECC). This dataset serves as an internal optimization tool within a larger cryptographic library or application, enhancing performance by reducing the need for repeated calculations during ECC operations, which is crucial in resource-constrained environments. The code is not a standalone executable or library, nor does it define public APIs or external interfaces; instead, it functions as a static data resource, likely included in a broader cryptographic context where the Secp256r1 curve is employed. While the code does not include typical C program components such as functions or control structures, its narrow functionality is focused on optimizing cryptographic computations, and its specific purpose would be clearer when viewed alongside the larger system in which it is integrated.
 # Global Variables
 
 ---
 ### fd\_secp256r1\_base\_point\_table
 - **Type**: ``ulong[]``
-- **Description**: Represents a static constant array of unsigned long integers that defines the base point table for the secp256r1 elliptic curve. This table is used in cryptographic operations related to elliptic curve cryptography (ECC).
-- **Use**: Used to store precomputed values for efficient elliptic curve operations on the secp256r1 curve.
+- **Description**: The `fd_secp256r1_base_point_table` is a static constant array of unsigned long integers. It represents a precomputed table of values used in elliptic curve cryptography, specifically for the secp256r1 curve, which is commonly used in cryptographic applications.
+- **Use**: This variable is used to store precomputed values for efficient elliptic curve operations on the secp256r1 curve.
 
 
 

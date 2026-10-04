@@ -3,18 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for the Vinyl module, including base, IO, and metadata components.
+Includes vinyl base, I/O, and meta headers.
 
 # Purpose
-The code is a C header file that manages the inclusion of other header files related to a module named `vinyl`. It uses include guards to prevent multiple inclusions of the same header file, which can cause compilation errors. The file includes `fd_vinyl_base.h`, `fd_vinyl_io.h`, and `fd_vinyl_meta.h`, which are likely to provide base functionalities, input/output operations, and metadata handling for the `vinyl` module. The commented-out line suggests an optional inclusion of `fd_vinyl_bstream.h`, which might be related to stream operations within the module. This header file serves as a central point for including necessary dependencies for the `vinyl` module.
-# Imports and Dependencies
-
----
-- `fd_vinyl_base.h`
-- `io/fd_vinyl_io.h`
-- `meta/fd_vinyl_meta.h`
-
-
+`fd_vinyl.h` is a header file that groups the main `fd_vinyl` interface includes under one include guard. It includes `fd_vinyl_base.h`, `fd_vinyl_io.h`, and `fd_vinyl_meta.h`, which in turn bring in the lower-level `fd_tango`, `fd_map`, and `fd_vinyl_bstream` dependencies. The file does not define functions, types, or variables; it serves as a single entry point for code that needs the `fd_vinyl` API.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
