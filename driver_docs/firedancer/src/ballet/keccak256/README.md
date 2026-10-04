@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, APIs, core implementation, test vectors, fuzz testing, and build tools for Keccak-256 hashing.
+The `keccak256` folder in the `firedancer` codebase contains source files, headers, test vectors, and build configurations for implementing, testing, and verifying the Keccak-256 cryptographic hash function.
 
 
 ## Files
-- **[fd_keccak256.c](fd_keccak256.c.md)**: Functions for initializing, appending data to, and finalizing a Keccak-256 hash computation.
-- **[fd_keccak256.h](fd_keccak256.h.md)**: APIs for Keccak256 hashing, including initialization, appending data, and finalizing the hash.
-- **[fd_keccak256_private.h](fd_keccak256_private.h.md)**: Implements the core function for the Keccak-256 hash algorithm with constants and transformation steps.
-- **[fd_keccak256_test_vector.c](fd_keccak256_test_vector.c.md)**: Defines test vectors for the Keccak256 hash function using precomputed hashes from OpenSSL.
-- **[fuzz_keccak256.c](fuzz_keccak256.c.md)**: Fuzz testing for the Keccak256 hash function using LLVM's libFuzzer.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing the Keccak256 implementation in the Firedancer codebase.
-- **[test_keccak256.c](test_keccak256.c.md)**: Tests and benchmarks for the Keccak-256 hashing implementation.
+- **[fd_keccak256.c](fd_keccak256.c.md)**: The `fd_keccak256.c` file in the `firedancer` codebase implements functions for initializing, appending data to, and finalizing a Keccak-256 hash computation, as well as managing memory alignment and lifecycle for the hash state.
+- **[fd_keccak256.h](fd_keccak256.h.md)**: The `fd_keccak256.h` file in the `firedancer` codebase provides APIs for performing Keccak256 hashing, including functions for initializing, appending data to, and finalizing a hash calculation.
+- **[fd_keccak256_private.h](fd_keccak256_private.h.md)**: The `fd_keccak256_private.h` file contains a private implementation of the Keccak-256 cryptographic hash function core, including the theta, rho, pi, chi, and iota steps, as derived from the original Keccak specification.
+- **[fd_keccak256_test_vector.c](fd_keccak256_test_vector.c.md)**: The `fd_keccak256_test_vector.c` file in the `firedancer` codebase contains a set of predefined test vectors for verifying the correctness of the Keccak-256 hash function implementation.
+- **[fuzz_keccak256.c](fuzz_keccak256.c.md)**: The `fuzz_keccak256.c` file in the `firedancer` codebase implements a fuzzing test for the Keccak-256 hashing function, ensuring consistency between different hashing methods.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build rules for the `keccak256` module, including header and object file additions, unit test creation and execution, and conditional fuzz test setup.
+- **[test_keccak256.c](test_keccak256.c.md)**: The `test_keccak256.c` file in the `firedancer` codebase contains unit tests and benchmarks for the Keccak-256 hashing implementation, verifying its correctness and performance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
