@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_curve25519.h` file provides the public API for Curve25519 operations, including point manipulation and arithmetic in Extended Twisted Edwards Coordinates, as part of the Firedancer codebase.
+Public API for Curve25519 operations, including point manipulation in Extended Twisted Edwards Coordinates.
 
 # Purpose
-The provided C code is a header file that defines a public API for operations on the Curve25519 elliptic curve, specifically focusing on the Edwards form of the curve, which is commonly used in cryptographic applications such as digital signatures and key exchange protocols. The file includes several inline functions for manipulating points on the curve, such as setting a point to zero (the point at infinity), copying points, converting between different coordinate representations, and performing arithmetic operations like doubling and negation. The code is structured to ensure that operations are performed efficiently, with some functions explicitly marked to avoid certain compiler optimizations (e.g., `FD_FN_NO_ASAN`) that might interfere with performance or security.
+The code defines a public API for operations on the Curve25519 elliptic curve, specifically focusing on the Edwards form of the curve, which is used in cryptographic applications. The file includes several header files that provide foundational mathematical operations and data structures necessary for elliptic curve computations. The primary data structure defined is `fd_curve25519_edwards`, which represents a point on the curve using Extended Twisted Edwards Coordinates. This structure is used to perform various operations such as setting a point to zero, copying points, converting between different coordinate representations, and performing arithmetic operations like doubling and negation.
 
-The file is part of a larger library, as indicated by the inclusion of other headers and source files, and it is intended to be included indirectly through a specific header (`fd_curve25519.h`) to ensure proper compilation and linkage. The code makes use of specific data structures and macros (e.g., [`FD_R43X6_QUAD_DECL`](#fd_r43x6_quad_decl), `FD_R43X6_GE_ZERO`) to handle the mathematical operations on the curve points, which are represented in Extended Twisted Edwards Coordinates. This representation is chosen for its efficiency in performing elliptic curve operations. The file also includes functions for checking point equality and zero status, which are essential for cryptographic protocols that rely on point validation. Overall, this header file provides a focused and efficient interface for working with Curve25519 in cryptographic applications.
+The code provides a set of inline functions that implement these operations, ensuring efficient execution. Functions like [`fd_ed25519_point_set_zero`](<#fd_ed25519_point_set_zero>), [`fd_ed25519_point_set`](<#fd_ed25519_point_set>), and [`fd_ed25519_point_dbln`](<#fd_ed25519_point_dbln>) are used to manipulate points on the curve. The file also includes functions to check for equality between points and to determine if a point is the identity element (point at infinity). The API is designed to be used in cryptographic applications where operations on elliptic curve points are required, and it explicitly notes that most operations are not constant time, which is important for security considerations.
 # Imports and Dependencies
 
 ---
@@ -23,129 +23,146 @@ The file is part of a larger library, as indicated by the inclusion of other hea
 
 ---
 ### fd\_curve25519\_edwards
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `P`: A declaration using FD_R43X6_QUAD_DECL macro, aligned to FD_F25519_ALIGN.
-- **Description**: The `fd_curve25519_edwards` structure represents a point in Extended Twisted Edwards Coordinates, which is a mathematical representation used in elliptic curve cryptography, specifically for the Curve25519. The structure contains a single member `P`, which is declared using a macro `FD_R43X6_QUAD_DECL` and is aligned according to `FD_F25519_ALIGN`. This alignment ensures that the data is stored in memory in a way that is optimal for the processor to access, which is crucial for performance in cryptographic computations.
+    - ``P``: A declaration using `FD_R43X6_QUAD_DECL` that is aligned to `FD_F25519_ALIGN`.
+- **Description**: Represents a point in Extended Twisted Edwards Coordinates, used in cryptographic operations related to Curve25519. The structure is aligned for performance and compatibility with specific mathematical operations on the curve.
 
 
 ---
 ### fd\_curve25519\_edwards\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `P`: Represents the point in Extended Twisted Edwards Coordinates, aligned to FD_F25519_ALIGN.
-- **Description**: The `fd_curve25519_edwards_t` structure is used to represent a point on the Curve25519 elliptic curve using Extended Twisted Edwards Coordinates. This structure is primarily used in cryptographic operations involving the Curve25519, which is known for its efficiency and security in elliptic curve cryptography. The structure contains a single member `P`, which is a declaration of a point in the R43x6 format, ensuring alignment for optimized performance in mathematical operations.
+    - ``P``: A field declared with `FD_R43X6_QUAD_DECL` that is aligned to `FD_F25519_ALIGN`.
+- **Description**: Represents a point in Extended Twisted Edwards Coordinates, which is a mathematical representation used in elliptic curve cryptography, specifically for the Curve25519 curve. The structure contains a single member `P`, which is aligned and declared using macros to facilitate operations on the point in the context of cryptographic computations.
 
 
 # Functions
 
 ---
 ### fd\_ed25519\_point\_set\_zero<!-- {{#callable:fd_ed25519_point_set_zero}} -->
-The function `fd_ed25519_point_set_zero` sets a given point to the point at infinity in the context of elliptic curve operations.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L31>)
+
+Sets the given point to the point at infinity in the Edwards curve.
 - **Inputs**:
-    - `r`: A pointer to an `fd_ed25519_point_t` structure representing the point to be set to zero (point at infinity).
-- **Control Flow**:
-    - The function calls `FD_R43X6_GE_ZERO` with `r->P` to set the point's internal representation to zero, effectively setting it to the point at infinity.
-    - The function then returns the pointer `r`.
-- **Output**: The function returns the pointer to the `fd_ed25519_point_t` structure that was set to zero.
+    - `r`: A pointer to an `fd_ed25519_point_t` structure that will be set to the point at infinity.
+- **Logic and Control Flow**:
+    - Calls the macro `FD_R43X6_GE_ZERO` with `r->P` to set the point to zero.
+    - Returns the pointer `r`.
+- **Output**: Returns the pointer to the `fd_ed25519_point_t` structure that was set to zero.
 
 
 ---
 ### fd\_ed25519\_point\_set<!-- {{#callable:fd_ed25519_point_set}} -->
-The function `fd_ed25519_point_set` copies the values of an Ed25519 point from one structure to another.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L49>)
+
+Copies the values of point `a` into point `r`.
 - **Inputs**:
     - `r`: A pointer to an `fd_ed25519_point_t` structure where the values will be copied to.
     - `a`: A constant pointer to an `fd_ed25519_point_t` structure from which the values will be copied.
-- **Control Flow**:
-    - The function assigns the value of `a->P03` to `r->P03`.
-    - The function assigns the value of `a->P14` to `r->P14`.
-    - The function assigns the value of `a->P25` to `r->P25`.
-    - The function returns the pointer `r`.
-- **Output**: The function returns a pointer to the `fd_ed25519_point_t` structure `r` after copying the values.
+- **Logic and Control Flow**:
+    - Assigns the value of `a->P03` to `r->P03`.
+    - Assigns the value of `a->P14` to `r->P14`.
+    - Assigns the value of `a->P25` to `r->P25`.
+    - Returns the pointer `r`.
+- **Output**: Returns a pointer to the `fd_ed25519_point_t` structure `r`.
 
 
 ---
 ### fd\_ed25519\_point\_to<!-- {{#callable:fd_ed25519_point_to}} -->
-The `fd_ed25519_point_to` function extracts the x, y, z, and t coordinates from an `fd_ed25519_point_t` structure and stores them in separate `fd_f25519_t` structures.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L69>)
+
+Unpacks the elements of an `fd_ed25519_point_t` structure into four `fd_f25519_t` structures representing the x, y, z, and t coordinates.
 - **Inputs**:
     - `x`: A pointer to an `fd_f25519_t` structure where the x-coordinate will be stored.
     - `y`: A pointer to an `fd_f25519_t` structure where the y-coordinate will be stored.
     - `z`: A pointer to an `fd_f25519_t` structure where the z-coordinate will be stored.
     - `t`: A pointer to an `fd_f25519_t` structure where the t-coordinate will be stored.
-    - `a`: A constant pointer to an `fd_ed25519_point_t` structure representing the point from which coordinates are to be extracted.
-- **Control Flow**:
-    - The function calls `FD_R43X6_QUAD_UNPACK`, passing the elements of the x, y, z, and t structures and the P field of the input point `a`.
-- **Output**: The function does not return a value; it modifies the contents of the `fd_f25519_t` structures pointed to by x, y, z, and t.
+    - `a`: A constant pointer to an `fd_ed25519_point_t` structure representing the point to unpack.
+- **Logic and Control Flow**:
+    - Calls the macro `FD_R43X6_QUAD_UNPACK` with the elements of the `fd_f25519_t` structures and the `P` field of the `fd_ed25519_point_t` structure `a`.
+- **Output**: No return value; the function modifies the `x`, `y`, `z`, and `t` structures in place.
 
 
 ---
 ### fd\_ed25519\_point\_dbln<!-- {{#callable:fd_ed25519_point_dbln}} -->
-The function `fd_ed25519_point_dbln` computes the result of doubling an Ed25519 point `a` a total of `2^n` times and stores the result in `r`.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L81>)
+
+Computes the result of doubling an elliptic curve point `n` times and returns the result.
 - **Inputs**:
-    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result of the point doubling will be stored.
+    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result will be stored.
     - `a`: A constant pointer to an `fd_ed25519_point_t` structure representing the point to be doubled.
     - `n`: An integer representing the number of times the point `a` should be doubled.
-- **Control Flow**:
-    - The function begins by doubling the point `a` once and storing the result in `r` using the macro `FD_R43X6_GE_DBL`.
-    - A loop is initiated starting from `i=1` to `i<n`, where in each iteration, the point stored in `r` is doubled again using the same macro `FD_R43X6_GE_DBL`.
-    - The loop continues until the point has been doubled `n` times in total.
-- **Output**: The function returns a pointer to the `fd_ed25519_point_t` structure `r`, which contains the result of the point doubling operation.
+- **Logic and Control Flow**:
+    - Call `FD_R43X6_GE_DBL` to double the point `a` and store the result in `r`.
+    - Iterate from 1 to `n-1`, doubling the point stored in `r` each time using `FD_R43X6_GE_DBL`.
+    - Return the pointer `r` containing the final result.
+- **Output**: Returns a pointer to the `fd_ed25519_point_t` structure `r` containing the result of the operation.
 
 
 ---
 ### fd\_ed25519\_point\_is\_zero<!-- {{#callable:fd_ed25519_point_is_zero}} -->
-The function `fd_ed25519_point_is_zero` checks if a given Ed25519 point is the point at infinity (zero point).
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L110>)
+
+Checks if a given Ed25519 point is the point at infinity (zero point).
 - **Inputs**:
-    - `a`: A pointer to a constant `fd_ed25519_point_t` structure representing the Ed25519 point to be checked.
-- **Control Flow**:
-    - Declare a local variable `zero` of type `fd_ed25519_point_t` to hold the zero point.
-    - Call [`fd_ed25519_point_set_zero`](#fd_ed25519_point_set_zero) to initialize `zero` as the point at infinity.
-    - Use `FD_R43X6_GE_IS_EQ` to compare the point `a` with `zero` and return the result of the comparison.
-- **Output**: Returns 1 if the point `a` is the point at infinity (zero point), otherwise returns 0.
-- **Functions called**:
-    - [`fd_ed25519_point_set_zero`](#fd_ed25519_point_set_zero)
+    - `a`: A pointer to a constant `fd_ed25519_point_t` structure representing the point to check.
+- **Logic and Control Flow**:
+    - Declare a local `fd_ed25519_point_t` array named `zero` with one element.
+    - Call [`fd_ed25519_point_set_zero`](<#fd_ed25519_point_set_zero>) to set the `zero` point to the point at infinity.
+    - Use `FD_R43X6_GE_IS_EQ` to compare the point `a` with the `zero` point.
+    - Return 1 if the points are equal, indicating `a` is the zero point, otherwise return 0.
+- **Output**: Returns an integer: 1 if the point `a` is the zero point, 0 otherwise.
+- **Functions Called**:
+    - [`fd_ed25519_point_set_zero`](<#fd_ed25519_point_set_zero>)
 
 
 ---
 ### fd\_ed25519\_point\_eq<!-- {{#callable:fd_ed25519_point_eq}} -->
-The function `fd_ed25519_point_eq` checks if two Ed25519 points are equal by comparing their internal representations.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L118>)
+
+Compares two `fd_ed25519_point_t` points for equality.
 - **Inputs**:
-    - `a`: A pointer to the first Ed25519 point to be compared.
-    - `b`: A pointer to the second Ed25519 point to be compared.
-- **Control Flow**:
-    - The function calls `FD_R43X6_GE_IS_EQ` with the internal representations of points `a` and `b`.
-    - The result of the comparison is returned directly.
-- **Output**: The function returns an integer, 1 if the points are equal and 0 otherwise.
+    - `a`: A pointer to the first `fd_ed25519_point_t` point to compare.
+    - `b`: A pointer to the second `fd_ed25519_point_t` point to compare.
+- **Logic and Control Flow**:
+    - Calls the function `FD_R43X6_GE_IS_EQ` with the `P` fields of the two input points `a` and `b`.
+    - Returns the result of the equality check from `FD_R43X6_GE_IS_EQ`.
+- **Output**: Returns 1 if the points are equal, otherwise returns 0.
 
 
 ---
 ### fd\_ed25519\_point\_eq\_z1<!-- {{#callable:fd_ed25519_point_eq_z1}} -->
-The function `fd_ed25519_point_eq_z1` checks if two Ed25519 points are equal, assuming the second point has a Z-coordinate of 1.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L126>)
+
+Checks if two `fd_ed25519_point_t` points are equal, assuming the second point has a Z-coordinate of 1.
 - **Inputs**:
-    - `a`: A pointer to the first Ed25519 point to be compared.
-    - `b`: A pointer to the second Ed25519 point, which is assumed to have a Z-coordinate of 1.
-- **Control Flow**:
-    - The function directly calls [`fd_ed25519_point_eq`](#fd_ed25519_point_eq) with the two input points `a` and `b`.
-- **Output**: Returns an integer, 1 if the points are equal and 0 otherwise.
-- **Functions called**:
-    - [`fd_ed25519_point_eq`](#fd_ed25519_point_eq)
+    - `a`: A pointer to the first `fd_ed25519_point_t` point to compare.
+    - `b`: A pointer to the second `fd_ed25519_point_t` point to compare, with the assumption that its Z-coordinate is 1.
+- **Logic and Control Flow**:
+    - Calls the [`fd_ed25519_point_eq`](<#fd_ed25519_point_eq>) function to compare the two points `a` and `b`.
+- **Output**: Returns 1 if the points are equal, otherwise returns 0.
+- **Functions Called**:
+    - [`fd_ed25519_point_eq`](<#fd_ed25519_point_eq>)
 
 
 ---
 ### fd\_curve25519\_into\_precomputed<!-- {{#callable:fd_curve25519_into_precomputed}} -->
-The function `fd_curve25519_into_precomputed` transforms an Ed25519 point into a precomputed format by performing specific arithmetic operations on its coordinates.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519.h#L132>)
+
+Transforms an `fd_ed25519_point_t` point into a precomputed format for optimized operations.
 - **Inputs**:
-    - `r`: A pointer to an `fd_ed25519_point_t` structure representing the point to be transformed.
-- **Control Flow**:
+    - `r`: A pointer to an `fd_ed25519_point_t` structure representing the point to transform.
+- **Logic and Control Flow**:
     - Declare a temporary variable `_ta` for intermediate calculations.
-    - Permute the coordinates of the point `r` to rearrange them into `_ta` as (Y1, X1, Z1, T1).
-    - Subtract X1 from Y1 in `_ta` to get (Y1-X1, X1, Z1, T1).
-    - Add X1 to Y1 in `_ta` to get (Y1-X1, Y1+X1, Z1, T1).
-    - Fold the values in `_ta` into `r->P` to ensure they are unsigned and fit within the required bit-width.
-    - Declare another temporary variable `_1112d` and initialize it with a specific constant value.
-    - Multiply the coordinates in `r->P` by `_1112d` to scale them appropriately.
-    - Fold the scaled values in `r->P` to ensure they are unsigned and fit within the required bit-width.
-- **Output**: The function does not return a value; it modifies the input point `r` in place to transform it into a precomputed format.
+    - Permute the elements of `r->P` to rearrange them into `_ta` as `(Y1, X1, Z1, T1)`.
+    - Subtract `X1` from `Y1` in `_ta` to get `(Y1-X1, X1, Z1, T1)`.
+    - Add `X1` to `Y1` in `_ta` to get `(Y1-X1, Y1+X1, Z1, T1)`.
+    - Fold the values in `_ta` into `r->P` as unsigned integers.
+    - Declare a constant `_1112d` for multiplication.
+    - Multiply `r->P` by `_1112d` for further transformation.
+    - Fold the result into `r->P` as unsigned integers.
+- **Output**: The function modifies the input `fd_ed25519_point_t` structure `r` in place, transforming it into a precomputed format.
 
 
 
