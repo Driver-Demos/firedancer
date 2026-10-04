@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building the fd_choreo library and its unit tests if FD_HAS_INT128 is defined.
+The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally builds the `fd_choreo` library and its associated headers and unit tests if `FD_HAS_INT128` is defined.
 
 # Purpose
-The `Makefile` content conditionally compiles and tests the `fd_choreo` library if the `FD_HAS_INT128` flag is defined. It uses the `make-lib` function to build the `fd_choreo` library and the `add-hdrs` function to include the headers `fd_choreo_base.h` and `fd_choreo.h`. Additionally, it sets up a unit test named `test_choreo_base` that depends on the `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util` components.
+This Makefile snippet is used to conditionally compile and set up the `fd_choreo` library and its associated unit tests if the `FD_HAS_INT128` flag is defined. It includes commands to create the library, add header files `fd_choreo_base.h` and `fd_choreo.h`, and define a unit test `test_choreo_base` that depends on multiple components, including `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

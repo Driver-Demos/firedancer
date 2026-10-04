@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the QUIC TLS handshake process using the `fd_quic_tls` API in a client-server setup.
+The `test_quic_tls_hs.c` file in the `firedancer` codebase tests the QUIC TLS handshake process using the `fd_quic_tls` API, which is a lightweight wrapper over `fd_tls`.
 
 # Purpose
-The code is a test suite for performing a QUIC handshake using the `fd_quic_tls` API, which is a lightweight wrapper over the `fd_tls` API. It includes the necessary headers and defines a set of transport parameters for testing. The code defines a structure `my_quic_tls_t` to hold the state of the handshake, including whether it is a server or client and whether the handshake is complete. The code provides callback functions for handling handshake completion, secret generation, and transport parameters. These callbacks are used to log information and verify the correctness of the handshake process.
+The provided C source code file is a test program designed to perform a handshake using the `fd_quic_tls` API, which is a lightweight wrapper over the `fd_tls` API. This code is primarily focused on testing the QUIC (Quick UDP Internet Connections) protocol's TLS (Transport Layer Security) handshake process. It includes the necessary setup for both client and server sides of a QUIC connection, simulating the exchange of handshake messages and secrets. The code defines a structure `my_quic_tls_t` to maintain the state of the handshake, including whether it is complete and the security level. It also implements callback functions to handle the completion of the handshake, the reception of secrets, and the validation of transport parameters.
 
-The [`main`](<#main>) function initializes the necessary components for the handshake, including a random number generator and a certificate key. It configures the QUIC TLS settings with the defined callbacks and transport parameters. The function then creates client and server handshake contexts and enters a loop to simulate the handshake process. During each iteration, it checks for handshake data to transfer between the client and server, processes the data, and logs the progress. The loop continues until both handshakes are complete and no more data is available for exchange. The code verifies that both the client and server have reached the connected state before cleaning up resources and exiting.
+The main function initializes the necessary components, including random number generation and certificate key generation, and configures the QUIC TLS settings. It then creates and manages the handshake process for both client and server, simulating the exchange of encrypted data and ensuring that both sides reach a connected state. The code is structured to log detailed information about the handshake process, including the secrets exchanged and the transport parameters used. This file is not intended to be a reusable library or a public API but rather a standalone test executable to verify the correct implementation and behavior of the QUIC TLS handshake process.
 # Imports and Dependencies
 
 ---
@@ -21,126 +21,120 @@ The [`main`](<#main>) function initializes the necessary components for the hand
 
 ---
 ### test\_tp
-- **Type**: ``uchar const[]``
-- **Description**: An array of unsigned characters that contains encoded transport parameters for QUIC (Quick UDP Internet Connections). The array is defined as a constant, meaning its contents cannot be modified after initialization.
-- **Use**: Used to store and verify transport parameters during the QUIC handshake process.
+- **Type**: `uchar const[]`
+- **Description**: The `test_tp` variable is a static constant array of unsigned characters (uchar) that holds a sequence of hexadecimal values. These values represent encoded transport parameters used in the QUIC (Quick UDP Internet Connections) protocol for testing purposes.
+- **Use**: This variable is used to store predefined transport parameters that are compared against received parameters during the QUIC handshake process to ensure they match expected values.
 
 
 # Data Structures
 
 ---
 ### my\_quic\_tls\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `is_server`: Indicates if the instance is a server (1) or a client (0).
-    - `is_hs_complete`: Indicates if the handshake process is complete (1) or not (0).
+    - `is_server`: Indicates whether the instance is acting as a server (1) or client (0).
+    - `is_hs_complete`: Indicates whether the handshake process is complete (1) or not (0).
     - `state`: Represents the current state of the TLS connection.
     - `sec_level`: Indicates the security level of the TLS connection.
-- **Description**: Manages the state and configuration of a QUIC TLS connection, including whether it is a server or client, the completion status of the handshake, the current state of the connection, and the security level.
+- **Description**: The `my_quic_tls_t` structure is used to manage the state and configuration of a QUIC TLS connection, specifically indicating whether the instance is a server or client, whether the handshake is complete, and maintaining the state and security level of the connection. This structure is integral to the handshake process and the management of secure communication in a QUIC protocol context.
 
 
 ---
 ### my\_quic\_tls
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `is_server`: Indicates if the instance is a server (1) or a client (0).
-    - `is_hs_complete`: Indicates if the handshake process is complete (1) or not (0).
+    - `is_server`: Indicates whether the instance is acting as a server (1) or client (0).
+    - `is_hs_complete`: Indicates whether the handshake process is complete (1) or not (0).
     - `state`: Represents the current state of the TLS connection.
-    - `sec_level`: Indicates the security level of the TLS connection.
-- **Description**: Represents a structure used in the QUIC TLS handshake process, containing fields to track whether the instance is a server or client, the completion status of the handshake, the current state of the TLS connection, and the security level.
+    - `sec_level`: Specifies the security level of the TLS connection.
+- **Description**: The `my_quic_tls` structure is designed to manage the state and configuration of a QUIC TLS connection. It includes flags to determine if the instance is operating as a server or client, and whether the handshake process has been completed. Additionally, it maintains the current state and security level of the connection, which are crucial for managing the lifecycle and security parameters of the TLS session.
 
 
 # Functions
 
 ---
 ### my\_hs\_complete<!-- {{#callable:my_hs_complete}} -->
-[View Source →](<../../../../../../src/waltz/quic/tests/test_quic_tls_hs.c#L25>)
-
-Marks the handshake as complete by setting the `is_hs_complete` flag in the context.
+The `my_hs_complete` function marks the handshake as complete by setting a flag in the provided context.
 - **Inputs**:
-    - ``hs``: A pointer to `fd_quic_tls_hs_t`, which is not used in this function.
-    - ``context``: A pointer to `my_quic_tls_t` structure, which holds the handshake state.
-- **Logic and Control Flow**:
-    - Logs a debug message indicating the handshake is complete.
-    - Casts the `context` pointer to `my_quic_tls_t` type.
-    - Sets the `is_hs_complete` field of the `my_quic_tls_t` structure to 1, indicating the handshake is complete.
-- **Output**: No return value; the function modifies the `is_hs_complete` field in the provided context.
+    - `hs`: A pointer to an `fd_quic_tls_hs_t` structure, which is not used in this function.
+    - `context`: A pointer to a `my_quic_tls_t` structure, which contains the handshake state information.
+- **Control Flow**:
+    - The function begins by casting the `context` pointer to a `my_quic_tls_t` pointer named `ctx`.
+    - A debug log message is generated to indicate that the handshake is complete.
+    - The `is_hs_complete` field of the `ctx` structure is set to 1, marking the handshake as complete.
+- **Output**: This function does not return any value; it modifies the state of the `my_quic_tls_t` structure pointed to by `context`.
 
 
 ---
 ### my\_secrets<!-- {{#callable:my_secrets}} -->
-[View Source →](<../../../../../../src/waltz/quic/tests/test_quic_tls_hs.c#L36>)
-
-Logs the encryption level and secrets during a QUIC TLS handshake.
+The `my_secrets` function logs information about the encryption secrets used during a QUIC TLS handshake.
 - **Inputs**:
-    - ``hs``: A pointer to an `fd_quic_tls_hs_t` structure, which contains information about the QUIC TLS handshake state.
-    - ``context``: A pointer to a context object, which is not used in this function.
-    - ``secret``: A pointer to a constant `fd_quic_tls_secret_t` structure, which contains the encryption level and the read and write secrets.
-- **Logic and Control Flow**:
-    - The function begins by casting `context` to void to indicate it is unused.
-    - It checks if `secret` is not NULL using `FD_TEST`.
-    - Logs whether the handshake is for a server or client based on `hs->is_server`.
-    - Logs the encryption level from `secret->enc_level`.
-    - Logs the read secret using `FD_LOG_HEXDUMP_INFO`.
-    - Logs the write secret using `FD_LOG_HEXDUMP_INFO`.
-- **Output**: No output is returned as the function is of type `void` and is used for logging purposes.
+    - `hs`: A pointer to an `fd_quic_tls_hs_t` structure representing the QUIC TLS handshake state.
+    - `context`: A void pointer to a context, which is not used in this function.
+    - `secret`: A constant pointer to an `fd_quic_tls_secret_t` structure containing the encryption secrets.
+- **Control Flow**:
+    - The function begins by casting the `context` parameter to void to indicate it is unused.
+    - It asserts that the `secret` pointer is not NULL using `FD_TEST`.
+    - It logs whether the handshake is for a server or client and the encryption level using `FD_LOG_INFO`.
+    - It logs the read and write secrets in hexadecimal format using `FD_LOG_HEXDUMP_INFO`.
+- **Output**: The function does not return any value; it performs logging operations.
 
 
 ---
 ### my\_transport\_params<!-- {{#callable:my_transport_params}} -->
-[View Source →](<../../../../../../src/waltz/quic/tests/test_quic_tls_hs.c#L48>)
-
-Validates that the given QUIC transport parameters match predefined test parameters.
+The `my_transport_params` function verifies that the provided QUIC transport parameters match a predefined set of test parameters.
 - **Inputs**:
-    - `context`: A pointer to user-defined data, not used in this function.
-    - `quic_tp`: A pointer to the QUIC transport parameters to validate.
-    - `quic_tp_sz`: The size of the QUIC transport parameters in bytes.
-- **Logic and Control Flow**:
-    - Ignore the `context` parameter as it is not used.
-    - Check if `quic_tp_sz` is equal to the size of `test_tp` minus one using `FD_TEST`.
-    - Compare the memory content of `quic_tp` with `test_tp` for `quic_tp_sz` bytes using `memcmp` and validate the result with `FD_TEST`.
-- **Output**: No output is returned; the function performs validation checks and may trigger assertions if conditions are not met.
+    - `context`: A void pointer to a context, which is not used in this function.
+    - `quic_tp`: A pointer to an array of unsigned characters representing the QUIC transport parameters to be verified.
+    - `quic_tp_sz`: An unsigned long representing the size of the `quic_tp` array.
+- **Control Flow**:
+    - The function begins by casting the `context` parameter to void to indicate it is unused.
+    - It then checks if the size of the provided transport parameters (`quic_tp_sz`) matches the size of the predefined `test_tp` minus one, using the `FD_TEST` macro for assertion.
+    - Next, it compares the provided transport parameters (`quic_tp`) with the predefined `test_tp` using `memcmp` to ensure they are identical, again using `FD_TEST` for assertion.
+- **Output**: The function does not return any value; it performs assertions to verify the correctness of the input parameters.
 
 
 ---
 ### fd\_quic\_tls\_provide\_data<!-- {{#callable:fd_quic_tls_provide_data}} -->
-[View Source →](<../../../../../../src/waltz/quic/tests/test_quic_tls_hs.c#L57>)
-
-Transfers TLS handshake data to a specified encryption level buffer and processes it.
+The `fd_quic_tls_provide_data` function provides incoming TLS handshake data to a QUIC TLS handshake context and processes it.
 - **Inputs**:
-    - `tls_hs`: A pointer to an `fd_quic_tls_hs_t` structure representing the TLS handshake state.
-    - `enc_level`: An unsigned integer representing the encryption level for the data.
+    - `tls_hs`: A pointer to an `fd_quic_tls_hs_t` structure representing the QUIC TLS handshake context.
+    - `enc_level`: An unsigned integer representing the encryption level of the incoming data.
     - `msg`: A pointer to a constant unsigned character array containing the message data to be provided.
     - `msg_sz`: An unsigned long integer representing the size of the message data.
-- **Logic and Control Flow**:
-    - Check if `msg_sz` is less than or equal to `FD_QUIC_TLS_RX_DATA_SZ` using `FD_TEST` macro.
-    - Set `rx_enc_level` of `tls_hs` to the provided `enc_level` cast to `uchar`.
-    - Set `rx_sz` of `tls_hs` to the provided `msg_sz` cast to `ushort`.
-    - Initialize `rx_off` of `tls_hs` to 0.
-    - Copy `msg_sz` bytes from `msg` to `rx_hs_buf` of `tls_hs` using `fd_memcpy`.
-    - Call `fd_quic_tls_process` with `tls_hs` to process the provided data.
-- **Output**: No direct output; modifies the `tls_hs` structure and processes the data.
+- **Control Flow**:
+    - The function begins by asserting that the size of the message (`msg_sz`) does not exceed `FD_QUIC_TLS_RX_DATA_SZ`.
+    - It sets the `rx_enc_level` field of the `tls_hs` structure to the provided `enc_level`.
+    - It sets the `rx_sz` field of the `tls_hs` structure to the provided `msg_sz`.
+    - It initializes the `rx_off` field of the `tls_hs` structure to 0.
+    - It copies the message data from `msg` to the `rx_hs_buf` buffer within the `tls_hs` structure using `fd_memcpy`.
+    - Finally, it calls `fd_quic_tls_process` to process the provided data within the handshake context.
+- **Output**: The function does not return a value; it modifies the state of the `fd_quic_tls_hs_t` structure pointed to by `tls_hs`.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../../src/waltz/quic/tests/test_quic_tls_hs.c#L70>)
-
-Performs a QUIC TLS handshake simulation between a client and server using the `fd_quic_tls` API.
+The `main` function initializes and performs a QUIC-TLS handshake simulation between a client and server using the fd_quic_tls API.
 - **Inputs**:
     - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Initializes the random number generator and generates a certificate key.
-    - Configures QUIC TLS parameters including callbacks for secrets and handshake completion.
-    - Decodes and dumps transport parameters to standard output.
-    - Creates a new QUIC TLS context and initializes handshake contexts for both client and server.
-    - Enters a loop to simulate the handshake process, transferring data between client and server until handshakes are complete or no more data is available.
-    - Checks if both client and server handshakes are complete and logs the status.
-    - Deletes handshake contexts and cleans up resources before exiting.
-- **Output**: Returns 0 upon successful completion of the handshake simulation.
-- **Functions Called**:
-    - [`fd_quic_tls_provide_data`](<#fd_quic_tls_provide_data>)
+    - `argv`: An array of command-line argument strings.
+- **Control Flow**:
+    - Initialize the environment with `fd_boot` and set up a random number generator `rng`.
+    - Generate a certificate key using `fd_tls_test_sign_ctx` and configure QUIC-TLS parameters in `cfg`.
+    - Decode and dump transport parameters from `test_tp` to `tmp_tp` and output them to `stdout`.
+    - Create a new QUIC-TLS context `quic_tls` with the configuration `cfg`.
+    - Initialize client and server QUIC-TLS handshake contexts `hs_client` and `hs_server` with `fd_quic_tls_hs_new`.
+    - Enter a loop to simulate the handshake process, iterating up to 16 times.
+    - Within the loop, check for handshake data to transfer between client and server, using `fd_quic_tls_get_hs_data` and [`fd_quic_tls_provide_data`](#fd_quic_tls_provide_data).
+    - Log debug information about the handshake data being transferred.
+    - Check if both client and server handshakes are complete and log the status.
+    - If both handshakes are complete and no more data is available, break the loop.
+    - Verify that both client and server are in the connected state using `FD_TEST`.
+    - Delete the handshake contexts and the QUIC-TLS context, and clean up the random number generator.
+    - Log a notice indicating the test passed and halt the program.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`fd_quic_tls_provide_data`](#fd_quic_tls_provide_data)
 
 
 
