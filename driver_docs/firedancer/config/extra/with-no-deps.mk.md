@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Includes a reference to `with-no-deps-pre.mk`.
+The `with-no-deps.mk` file in the `firedancer` codebase references another makefile, `with-no-deps-pre.mk`.
 
 # Purpose
-The comment `# See with-no-deps-pre.mk` serves as a reference or note to the user or developer to consult the `with-no-deps-pre.mk` file for additional information or context. This is typically used in Makefiles or similar build configuration files to indicate that related configurations or instructions can be found in the specified file.
+This file is a Makefile snippet that includes a comment directing the reader to refer to another file, "with-no-deps-pre.mk." It likely serves as a placeholder or a reference point within a larger build system, indicating that additional information or configuration details can be found in the specified file.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

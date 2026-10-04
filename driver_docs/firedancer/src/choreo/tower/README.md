@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, API, and tests for Solana's TowerBFT algorithm and voting tower management.
+TowerBFT vote tower logic, APIs, build rules, and tests.
 
 
 ## Files
-- **[fd_tower.c](fd_tower.c.md)**: Implements functions for managing and verifying voting towers, including serialization, deserialization, and vote simulation.
-- **[fd_tower.h](fd_tower.h.md)**: API and data structures for Solana's TowerBFT algorithm, including vote management and serialization.
-- **[Local.mk](Local.mk.md)**: Makefile configuration for building and testing components with optional SECP256K1 and INT128 support.
-- **[test_tower.c](test_tower.c.md)**: Tests for the `fd_tower` module, including vote management, serialization, and deserialization.
-- **[test_tower.h](test_tower.h.md)**: Header file with static unsigned character arrays for versioning and restoration data.
+- **[fd_tower.c](fd_tower.c.md)**: Vote tower logic, lockout checks, serialization, restore, and vote transaction generation.
+- **[fd_tower.h](fd_tower.h.md)**: TowerBFT vote tower checks, serialization, checkpointing, and restore APIs.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_tower headers, objects, and unit tests when int128 and secp256k1 are enabled.
+- **[test_tower.c](test_tower.c.md)**: Tests tower vote logic and serialize/deserialize behavior.
+- **[test_tower.h](test_tower.h.md)**: Binary test fixtures for tower state restore and current snapshots.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

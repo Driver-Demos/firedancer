@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC test application entry point, build script, Rust package configuration, and compatibility headers.
+Rust QUIC test package with build script, bindings, and interoperability tests for quiche and quinn.
 
 ## Folders
-- **[src](src/README.md)**: Main entry point for a QUIC test application and integration with quiche and Quinn for QUIC protocol handling.
+- **[src](src/README.md)**: QUIC interoperability tests and CLI setup for quiche and quinn with optional PCAP logging.
 
 ## Files
-- **[build.rs](build.rs.md)**: Build script for setting up library paths and generating Rust bindings using bindgen.
-- **[Cargo.toml](Cargo.toml.md)**: Configuration for the `firedancer-rust-quic-test` package with dependencies and build settings.
-- **[wrapper.h](wrapper.h.md)**: Header file defining macros and including network and QUIC-related headers for compatibility.
+- **[build.rs](build.rs.md)**: The `build.rs` file in the `firedancer` codebase sets up the build process for the `agave_compat` module by configuring library paths, linking static libraries, and generating Rust bindings using `bindgen`.
+- **[Cargo.toml](Cargo.toml.md)**: Rust QUIC test package manifest with bindgen, quiche, quinn, rustls, and tokio dependencies.
+- **[wrapper.h](wrapper.h.md)**: The `wrapper.h` file in the `firedancer` codebase defines several feature flags and includes headers related to network utilities, QUIC protocol, and UDP socket functionalities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
