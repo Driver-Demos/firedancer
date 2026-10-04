@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_env.c` file in the `firedancer` codebase provides functions for stripping command-line arguments and environment variables based on specified keys, supporting various data types.
+Implements command-line argument and environment variable parsing for different data types.
 
 # Purpose
-This C source code file provides functionality for processing command-line arguments and environment variables in a POSIX-compliant environment. It defines a macro-based implementation to strip specific command-line arguments and retrieve their values, which can be specified by a key. The code is structured to handle different data types, such as strings, integers, and floating-point numbers, by using a macro `FD_ENV_STRIP_CMDLINE_IMPL` that generates functions for each type. This allows for flexible and type-safe retrieval of command-line argument values or environment variable values, converting them to the appropriate type using helper functions like `fd_cstr_to_##what`.
+The code defines a set of macros and functions for processing command-line arguments and environment variables in a POSIX environment. It uses conditional compilation to ensure that the code is only included when the `FD_ENV_STYLE` is set to 0, which indicates a POSIX environment. The primary functionality is to strip specific command-line arguments and optionally update their values based on environment variables. This is achieved through the macro `FD_ENV_STRIP_CMDLINE_IMPL`, which generates functions for different data types such as `char`, `int`, `float`, and others. These functions take pointers to argument count and argument vector, a key to search for, an environment variable key, and a default value. They update the argument list by removing the specified key and potentially updating the value based on the environment variable.
 
-The file is designed to be included in other C programs, as indicated by the use of include guards and conditional compilation directives. It checks for a specific environment style (`FD_ENV_STYLE`) and defaults to a POSIX style if the host is a hosted environment. The code also includes a function [`fd_env_strip_cmdline_contains`](#fd_env_strip_cmdline_contains) to check for the presence of a specific command-line argument and remove it from the argument list. This file does not define a public API or external interfaces directly but provides utility functions that can be used internally within a larger application to manage command-line and environment configurations efficiently.
+Additionally, the code provides a function [`fd_env_strip_cmdline_contains`](<#fd_env_strip_cmdline_contains>) that checks for the presence of a specific key in the command-line arguments and removes it if found. This function returns a boolean indicating whether the key was present. The code is designed to be part of a larger system where command-line and environment variable management is necessary, and it provides a consistent interface for handling these inputs across different data types. The use of macros allows for the generation of similar functions for various data types, reducing code duplication and maintaining consistency.
 # Imports and Dependencies
 
 ---
@@ -20,20 +20,23 @@ The file is designed to be included in other C programs, as indicated by the use
 
 ---
 ### fd\_env\_strip\_cmdline\_contains<!-- {{#callable:fd_env_strip_cmdline_contains}} -->
-The function `fd_env_strip_cmdline_contains` removes occurrences of a specified key from the command-line arguments and returns whether the key was found.
+[View Source →](<../../../../../src/util/env/fd_env.c#L58>)
+
+Removes occurrences of a specified key from the command line arguments and returns whether the key was found.
 - **Inputs**:
-    - `pargc`: A pointer to an integer representing the number of command-line arguments.
-    - `pargv`: A pointer to an array of strings representing the command-line arguments.
-    - `key`: A constant string representing the key to be removed from the command-line arguments.
-- **Control Flow**:
+    - `pargc`: A pointer to an integer representing the number of command line arguments.
+    - `pargv`: A pointer to an array of strings representing the command line arguments.
+    - `key`: A constant string representing the key to search for in the command line arguments.
+- **Logic and Control Flow**:
     - Initialize `new_argc` to 0 and `found` to 0.
     - Check if `key`, `pargc`, and `pargv` are not NULL.
     - Iterate over each argument in `*pargv` using a for loop.
-    - If the current argument does not match `key`, copy it to the new position in `*pargv` and increment `new_argc`.
-    - If the current argument matches `key`, set `found` to 1.
+    - Compare each argument with `key` using `strcmp`.
+    - If the argument does not match `key`, copy it to the new position in `*pargv` and increment `new_argc`.
+    - If the argument matches `key`, set `found` to 1.
     - After the loop, update `*pargc` to `new_argc` and set `(*pargv)[new_argc]` to NULL to terminate the array.
-    - Return the value of `found` indicating if the key was found.
-- **Output**: An integer indicating whether the key was found in the command-line arguments (1 if found, 0 otherwise).
+    - Return `found` to indicate if the key was found.
+- **Output**: Returns an integer indicating whether the key was found (1 if found, 0 if not).
 
 
 

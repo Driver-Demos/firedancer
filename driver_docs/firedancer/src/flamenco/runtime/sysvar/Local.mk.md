@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for sysvar headers, objects, and unit tests when FD_HAS_INT128 is set.
+Makefile configuration for adding headers and objects related to system variables in the Flamenco runtime.
 
 # Purpose
-This build file registers the `fd_sysvar` headers and object files that belong to the `fd_flamenco` target when `FD_HAS_INT128` is enabled. It adds support for several sysvar modules, including `fd_sysvar_cache`, `fd_sysvar_clock`, `fd_sysvar_epoch_rewards`, `fd_sysvar_epoch_schedule`, `fd_sysvar_instructions`, `fd_sysvar_last_restart_slot`, `fd_sysvar_recent_hashes`, `fd_sysvar_rent`, `fd_sysvar_slot_hashes`, `fd_sysvar_slot_history`, and `fd_sysvar_stake_history`. It also includes the base `fd_sysvar` interfaces and the `fd_sysvar_cache_db` and `fd_sysvar_rent1` objects where needed. When `FD_HAS_HOSTED` is enabled, the file defines and runs the `test_sysvar` unit test for the `fd_flamenco` build.
+The provided content is a Makefile script that manages the compilation and testing of various system variables (`sysvar`) components in a software project. It uses conditional statements to check for the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED` to determine which parts of the script to execute. The script adds header files and object files for different `sysvar` modules, such as `fd_sysvar_base.h`, `fd_sysvar_cache.h`, and others, using the `add-hdrs` and `add-objs` functions. Additionally, if `FD_HAS_HOSTED` is defined, it includes commands to create and run a unit test named `test_sysvar`, which depends on several components like `fd_flamenco`, `fd_funk`, `fd_ballet`, and `fd_util`. This setup ensures that the necessary files are compiled and tested based on the defined conditions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

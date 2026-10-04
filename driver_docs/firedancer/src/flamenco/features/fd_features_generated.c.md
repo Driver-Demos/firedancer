@@ -3,12 +3,44 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated feature ID table and prefix lookup for fd_features_t.
+A generated C file defining feature IDs and their properties for a feature management system, including functions for querying feature IDs and verifying layout offsets.
 
 # Purpose
-This file defines the feature registry for `fd_features_t`. It contains a static table named `ids` that maps each feature field in `fd_features_t` to its feature `id`, text `name`, cleanup state, and flags such as `hardcode_for_fuzzing` or `reverted`. The entries cover many runtime and protocol feature gates, including vote, stake, fee, syscall, BPF loader, and transaction behavior changes. The file is generated code, and the comment at the top states that it must not be edited by hand.
+The code defines a collection of feature identifiers for a software system, likely related to a blockchain or distributed ledger technology. Each feature is represented by a structure `fd_feature_id_t` that includes an index, a unique identifier (`id`), a name, and additional attributes such as `cleaned_up`, `hardcode_for_fuzzing`, and `reverted`. These features are stored in an array `ids`, which is used to manage and query the features based on their unique identifiers.
 
-The file also provides [`fd_feature_id_query`](<#fd_feature_id_query>), which returns the table entry for a feature from a 64-bit prefix value. At the end, a long set of `FD_STATIC_ASSERT` checks verifies that each `fd_features_t` field is at the expected offset and that the structure size matches `FD_FEATURE_ID_CNT`. This makes the file an internal lookup and layout validation unit for feature IDs, not a general-purpose API file.
+The code also includes a function [`fd_feature_id_query`](<#fd_feature_id_query>) that allows querying a feature by its prefix, returning a pointer to the corresponding feature identifier structure. The function uses a switch-case statement to match the prefix with the appropriate feature in the `ids` array. Additionally, the code contains static assertions to verify the correctness of the offset calculations for each feature within the `fd_features_t` structure. This ensures that the features are correctly aligned and accessible within the system.
+# Imports and Dependencies
+
+---
+- `fd_features.h`
+- `stddef.h`
+
+
+# Global Variables
+
+---
+### ids
+- **Type**: ``fd_feature_id_t const[]``
+- **Description**: An array of constant `fd_feature_id_t` structures, each representing a feature with specific attributes such as index, id, name, and other properties. The array is initialized with multiple entries, each corresponding to a different feature in the system.
+- **Use**: Used to store and manage feature identifiers and their associated metadata in a structured format.
+
+
+# Functions
+
+---
+### fd\_feature\_id\_query<!-- {{#callable:fd_feature_id_query}} -->
+[View Source →](<../../../../../src/flamenco/features/fd_features_generated.c#L1685>)
+
+Returns a pointer to a `fd_feature_id_t` structure from the `ids` array based on a given `prefix` value.
+- **Inputs**:
+    - `prefix`: An unsigned long integer representing a specific prefix value to match against predefined cases.
+- **Logic and Control Flow**:
+    - Uses a `switch` statement to compare the `prefix` with predefined case values.
+    - For each case, returns a pointer to a specific element in the `ids` array corresponding to the matched prefix.
+    - If no case matches the `prefix`, the function returns `NULL`.
+- **Output**: A pointer to a `fd_feature_id_t` structure if a match is found, otherwise `NULL`.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

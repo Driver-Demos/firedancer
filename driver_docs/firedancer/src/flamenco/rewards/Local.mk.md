@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for rewards headers, objects, and epoch rewards unit tests.
+Makefile for managing headers, objects, and unit tests related to rewards in the Firedancer project.
 
 # Purpose
-This Makefile fragment adds the reward-related headers `fd_rewards_base.h`, `fd_epoch_rewards.h`, and `fd_rewards.h` to the build, and it adds the `fd_epoch_rewards` and `fd_rewards` objects to the `fd_flamenco` target. It also defines and runs the `test_epoch_rewards` unit test when `FD_HAS_INT128` is set.
+This Makefile script conditionally includes headers and object files, and defines unit tests for a software project. If the macro `FD_HAS_INT128` is defined, it adds the headers `fd_rewards_base.h`, `fd_epoch_rewards.h`, and `fd_rewards.h` to the build process. It also adds the object files `fd_epoch_rewards` and `fd_rewards` with the dependency `fd_flamenco`. Additionally, it creates and runs a unit test named `test_epoch_rewards` with dependencies on `fd_flamenco`, `fd_util`, and `fd_ballet`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

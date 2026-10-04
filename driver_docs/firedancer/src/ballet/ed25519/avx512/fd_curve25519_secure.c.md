@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_curve25519_secure.c` file in the `firedancer` codebase implements secure operations for Curve25519, including constant-time point addition, doubling, conditional selection, and negation, ensuring that sensitive data is protected from side-channel attacks.
+Secure implementations of Ed25519 point addition, doubling, conditional selection, and negation.
 
 # Purpose
-This C source code file provides secure implementations of various operations on points in the Ed25519 elliptic curve, specifically focusing on constant-time execution to prevent side-channel attacks. The file includes functions for securely adding two points (`fd_ed25519_point_add_secure`), doubling a point multiple times (`fd_ed25519_point_dbln_secure`), conditionally selecting between two points ([`fd_ed25519_point_if`](#fd_ed25519_point_if)), and conditionally negating a point (`fd_ed25519_point_neg_if`). These operations are crucial for cryptographic applications where the secrecy of the input data must be preserved, as they ensure that the execution time does not vary based on the input values, thus preventing attackers from inferring secret information through timing analysis.
+The code provides secure arithmetic operations on points in the Ed25519 elliptic curve, specifically designed to maintain constant-time execution to prevent side-channel attacks. It includes functions for point addition (`fd_ed25519_point_add_secure`), point doubling (`fd_ed25519_point_dbln_secure`), conditional point selection ([`fd_ed25519_point_if`](<#fd_ed25519_point_if>)), and conditional point negation (`fd_ed25519_point_neg_if`). These functions are implemented to ensure that sensitive data, such as secret keys, are not leaked through timing attacks. The operations use precomputed tables and temporary variables that are cleared by the caller to maintain security.
 
-The file defines macros and functions that manipulate points in the extended Edwards coordinates, using precomputed tables and temporary variables to maintain security. The use of macros like `FD_R43X6_GE_ADD_TABLE_ALT` and `FD_R43X6_GE_DBL_ALT` highlights the emphasis on efficient and secure arithmetic operations. The code is designed to be small and auditable, with no local variables that need clearing, and it uses specific techniques to clear registers upon function exit. This ensures that sensitive data does not remain in memory longer than necessary, further enhancing security. The file is intended to be part of a larger cryptographic library, providing essential building blocks for secure elliptic curve operations.
+The code defines macros like `FD_R43X6_GE_ADD_TABLE_ALT` and `FD_R43X6_GE_DBL_ALT` to perform specific arithmetic operations on points using extended Edwards coordinates. These macros are optimized for security by reordering instructions and using temporary variables that can be safely cleared. The functions and macros are part of a broader cryptographic library, as indicated by the inclusion of headers like `fd_curve25519.h` and `fd_r43x6_ge.h`. The code is intended to be part of a secure cryptographic module, providing essential operations for cryptographic protocols that use the Ed25519 curve.
 # Imports and Dependencies
 
 ---
@@ -20,16 +20,19 @@ The file defines macros and functions that manipulate points in the extended Edw
 
 ---
 ### fd\_ed25519\_point\_if<!-- {{#callable:fd_ed25519_point_if}} -->
-The `fd_ed25519_point_if` function conditionally assigns one of two given Ed25519 points to a result point based on a secret condition, ensuring constant-time execution.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_curve25519_secure.c#L99>)
+
+Selects between two `fd_ed25519_point_t` points based on a secret condition in constant time.
 - **Inputs**:
     - `r`: A pointer to an `fd_ed25519_point_t` structure where the result will be stored.
-    - `secret_cond`: An unsigned char (uchar) that acts as a boolean condition (0 or 1) to determine which point to assign to `r`.
-    - `a0`: A pointer to a constant `fd_ed25519_point_t` structure representing the first point option.
-    - `a1`: A pointer to a constant `fd_ed25519_point_t` structure representing the second point option.
-- **Control Flow**:
-    - The function uses the `wwl_if` function to conditionally select between the fields of `a0` and `a1` based on the negated `secret_cond` value.
-    - For each field (`P03`, `P14`, `P25`) of the result point `r`, it assigns the corresponding field from `a0` if `secret_cond` is true (1), otherwise it assigns from `a1`.
-- **Output**: The function does not return a value; it modifies the `fd_ed25519_point_t` structure pointed to by `r` in place.
+    - `secret_cond`: An unsigned char (0 or 1) that determines which point to select.
+    - `a0`: A pointer to the first `fd_ed25519_point_t` structure to select if `secret_cond` is true.
+    - `a1`: A pointer to the second `fd_ed25519_point_t` structure to select if `secret_cond` is false.
+- **Logic and Control Flow**:
+    - Use the `wwl_if` function to select between `a0->P03` and `a1->P03` based on `-secret_cond` and assign the result to `r->P03`.
+    - Use the `wwl_if` function to select between `a0->P14` and `a1->P14` based on `-secret_cond` and assign the result to `r->P14`.
+    - Use the `wwl_if` function to select between `a0->P25` and `a1->P25` based on `-secret_cond` and assign the result to `r->P25`.
+- **Output**: The function does not return a value; it modifies the `fd_ed25519_point_t` structure pointed to by `r`.
 
 
 
