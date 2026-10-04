@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and assembly files for the AES module, including conditional additions based on architecture support, and sets up a unit test for the AES functionality.
+Makefile for adding AES-related headers, objects, and assembly files, with conditional X86, AESNI, and GFNI support.
 
 # Purpose
-This file is a Makefile snippet used for building a software project. It defines the inclusion of header files and the compilation of object files related to AES (Advanced Encryption Standard) functionalities, specifically for different implementations and optimizations such as reference, x86, AES-NI, and GFNI. Additionally, it sets up a unit test for the AES components, ensuring they are built and tested within the `fd_ballet` and `fd_util` modules.
+The Makefile content defines build rules for a software project. It uses the `add-hdrs` function to include header files `fd_aes_base.h`, `fd_aes_gcm.h`, and `fd_aes_gcm_ref.h`. The `add-objs` function adds object files `fd_aes_base_ref` and `fd_aes_gcm_ref` to the `fd_ballet` target. Conditional statements check for the presence of `FD_HAS_X86`, `FD_HAS_AESNI`, and `FD_HAS_GFNI` to conditionally add object and assembly files for different architectures and instruction sets. The `make-unit-test` function creates a unit test named `test_aes` using the `fd_ballet` and `fd_util` components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

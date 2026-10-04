@@ -3,12 +3,27 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-sBPF interpreter jump table with opcode handlers and version-dependent feature gates
+Defines the sBPF interpreter jump table for opcode execution and handling invalid opcodes.
 
 # Purpose
-This C file defines the `interp_jump_table` used by the sBPF interpreter. The table maps each opcode value to a label address that the interpreter can jump to during execution. Invalid opcodes map to the `sigill` label, which handles illegal instruction cases. The file uses computed goto style labels and macro helpers such as `OPCODE`, `ALL_ILLEGAL`, `ALL_OPCODE`, and `CONDITIONAL` to build the table.
+The code defines a jump table for an sBPF (Solana Berkeley Packet Filter) interpreter. The jump table is an array where each index corresponds to an opcode that can be executed by the interpreter. The table is structured to handle different versions of sBPF, as indicated by the `FD_SBPF_VERSION_COUNT` dimension. Each opcode is associated with a label that the interpreter can jump to for execution. If an opcode is invalid, the code branches to a `sigill` label, which likely handles illegal instruction exceptions.
 
-The table supports multiple sBPF versions and feature sets through `FD_SBPF_VERSION_COUNT` and several `FD_VM_SBPF_*` feature flags. Some opcodes are always enabled, while others select different interpreter labels or illegal-instruction handling based on version-specific rules and feature availability. The comments in the table document opcode placement and feature-controlled instruction groups such as `LDDW`, `LE`, memory move classes, `PQR`, explicit sign extension, static syscalls, and `CALLX`.
+The code uses macros to define how opcodes are mapped to their corresponding labels. The `ALL_ILLEGAL` macro marks opcodes as illegal, while the `ALL_OPCODE` macro maps valid opcodes to their respective interpreter labels. The `CONDITIONAL` macro is used to handle opcodes that depend on specific conditions or features, such as enabling or disabling certain instructions based on configuration flags. This setup allows the interpreter to efficiently handle a wide range of opcodes and adapt to different sBPF versions and configurations.
+# Imports and Dependencies
+
+---
+- `../../ballet/sbpf/fd_sbpf_loader.h`
+
+
+# Global Variables
+
+---
+### interp\_jump\_table
+- **Type**: `static void const * const`
+- **Description**: Holds the sBPF interpreter jump table, which is an array where each index is an opcode that can be jumped to for execution. Invalid opcodes branch to the `sigill` label.
+- **Use**: Used to map opcodes to their corresponding execution labels in the sBPF interpreter.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
