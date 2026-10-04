@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_wksp_helper.c` file in the `firedancer` codebase provides helper functions for managing shared memory workspaces, including creation, deletion, attachment, detachment, and memory allocation operations.
+Helper functions for managing shared memory workspaces, including creation, deletion, and memory operations.
 
 # Purpose
-This C source code file provides a comprehensive set of functions for managing shared memory workspaces, which are used to facilitate memory allocation and management in a multi-process environment. The file includes functions for creating, deleting, attaching, and detaching named and anonymous workspaces, as well as functions for allocating and freeing memory within these workspaces. The code is structured around the concept of shared memory (shmem) and workspaces (wksp), with a focus on ensuring that memory operations are safe and efficient. The file also includes helper functions for handling C-style strings (cstr) that represent workspace names and global addresses, as well as functions for interacting with a "pod" structure, which appears to be a higher-level abstraction for managing collections of data within a workspace.
+The code is a C source file that provides a set of functions for managing shared memory workspaces. It includes functions for creating, deleting, attaching, and detaching named and anonymous workspaces. The file defines several private helper functions, such as [`fd_wksp_private_join_func`](<#fd_wksp_private_join_func>) and [`fd_wksp_private_leave_func`](<#fd_wksp_private_leave_func>), which are used internally to manage the joining and leaving of shared memory regions. The code also includes functions for handling workspace-related operations, such as allocating and freeing memory within a workspace, and converting between global and local addresses.
 
-The code is designed to be used as part of a larger system, likely a library, that provides shared memory management capabilities. It includes both private and public functions, with the private functions being used internally to manage the lifecycle of workspaces and the public functions providing an API for external use. The file makes extensive use of logging to provide detailed information about the operations being performed, which is useful for debugging and monitoring. The code also includes error handling to ensure that invalid operations are caught and reported. Overall, this file is a critical component of a shared memory management system, providing the necessary functionality to create and manage workspaces in a multi-process environment.
+The file defines public APIs for interacting with workspaces, including [`fd_wksp_new_named`](<#fd_wksp_new_named>), [`fd_wksp_delete_named`](<#fd_wksp_delete_named>), [`fd_wksp_attach`](<#fd_wksp_attach>), and [`fd_wksp_detach`](<#fd_wksp_detach>). These functions allow users to create and manage shared memory regions, providing a mechanism for inter-process communication. Additionally, the code includes functions for working with C-style strings (`cstr`) that represent workspace names and addresses, such as [`fd_wksp_cstr`](<#fd_wksp_cstr>) and `fd_wksp_cstr_parse`. The file also provides helper functions for working with pods, which are data structures stored in shared memory, allowing for the attachment, detachment, mapping, and unmapping of pods.
 # Imports and Dependencies
 
 ---
@@ -20,475 +20,525 @@ The code is designed to be used as part of a larger system, likely a library, th
 
 ---
 ### fd\_wksp\_private\_join\_func<!-- {{#callable:fd_wksp_private_join_func}} -->
-The `fd_wksp_private_join_func` function joins a shared memory workspace using the provided join information.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L7>)
+
+Joins a shared memory region using the provided join information.
 - **Inputs**:
-    - `context`: A void pointer to context data, which is not used in this function.
-    - `info`: A pointer to a constant `fd_shmem_join_info_t` structure containing information needed to join the shared memory.
-- **Control Flow**:
-    - The function explicitly ignores the `context` parameter by casting it to void.
-    - It calls the [`fd_wksp_join`](fd_wksp_admin.c.md#fd_wksp_join) function with the `shmem` field from the `info` structure to join the shared memory workspace.
-    - The function returns the result of the [`fd_wksp_join`](fd_wksp_admin.c.md#fd_wksp_join) call.
-- **Output**: A pointer to the joined shared memory workspace, as returned by [`fd_wksp_join`](fd_wksp_admin.c.md#fd_wksp_join).
-- **Functions called**:
-    - [`fd_wksp_join`](fd_wksp_admin.c.md#fd_wksp_join)
+    - `context`: A pointer to a context, which is not used in this function.
+    - `info`: A pointer to a `fd_shmem_join_info_t` structure containing information about the shared memory to join.
+- **Logic and Control Flow**:
+    - Ignores the `context` parameter as it is not used.
+    - Calls [`fd_wksp_join`](<fd_wksp_admin.c.md#fd_wksp_join>) with the `shmem` field from the `info` structure to join the shared memory region.
+    - Returns the result of the [`fd_wksp_join`](<fd_wksp_admin.c.md#fd_wksp_join>) function call.
+- **Output**: A pointer to the joined shared memory region, as returned by [`fd_wksp_join`](<fd_wksp_admin.c.md#fd_wksp_join>).
+- **Functions Called**:
+    - [`fd_wksp_join`](<fd_wksp_admin.c.md#fd_wksp_join>)
 
 
 ---
 ### fd\_wksp\_private\_leave\_func<!-- {{#callable:fd_wksp_private_leave_func}} -->
-The `fd_wksp_private_leave_func` function facilitates the detachment from a shared memory workspace by invoking the [`fd_wksp_leave`](fd_wksp_admin.c.md#fd_wksp_leave) function with the join information provided.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L14>)
+
+Calls [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>) with the `join` field from the `info` structure to leave a workspace.
 - **Inputs**:
-    - `context`: A void pointer to any context data, which is not used in this function.
-    - `info`: A constant pointer to a `fd_shmem_join_info_t` structure containing join information, specifically the join handle needed for detachment.
-- **Control Flow**:
-    - The function begins by explicitly ignoring the `context` parameter, indicating it is unused.
-    - It then calls the [`fd_wksp_leave`](fd_wksp_admin.c.md#fd_wksp_leave) function, passing `info->join` as the argument, which handles the actual detachment process and logs details.
-- **Output**: The function returns the result of the [`fd_wksp_leave`](fd_wksp_admin.c.md#fd_wksp_leave) function, which is a pointer indicating the status or result of the leave operation.
-- **Functions called**:
-    - [`fd_wksp_leave`](fd_wksp_admin.c.md#fd_wksp_leave)
+    - `context`: A pointer to a context, which is not used in this function.
+    - `info`: A pointer to a `fd_shmem_join_info_t` structure containing information about the shared memory join, specifically the `join` field.
+- **Logic and Control Flow**:
+    - Ignores the `context` parameter by casting it to void.
+    - Calls the [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>) function with `info->join` as the argument.
+    - Returns the result of the [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>) function call.
+- **Output**: Returns a pointer, which is the result of the [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>) function call.
+- **Functions Called**:
+    - [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>)
 
 
 ---
 ### fd\_wksp\_private\_cstr<!-- {{#callable:fd_wksp_private_cstr}} -->
-The `fd_wksp_private_cstr` function constructs a string in the format '[name]:[gaddr]' and stores it in the provided buffer `cstr`.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L25>)
+
+Populates the `cstr` with a formatted string containing the `name` and `gaddr` separated by a colon.
 - **Inputs**:
-    - `name`: A constant character pointer representing the name of the workspace, assumed to be a valid shared memory name.
-    - `gaddr`: An unsigned long integer representing a global address.
-    - `cstr`: A character pointer to a buffer where the resulting string will be stored, assumed to be at least FD_WKSP_CSTR_MAX bytes in size.
-- **Control Flow**:
-    - Initialize the `cstr` buffer using `fd_cstr_init`.
-    - Append the `name` to the `cstr` using `fd_cstr_append_cstr`.
-    - Append a colon ':' character to the `cstr` using `fd_cstr_append_char`.
-    - Append the `gaddr` as a text to the `cstr` using `fd_cstr_append_ulong_as_text`, with the number of digits determined by `fd_ulong_base10_dig_cnt`.
+    - `name`: A constant character pointer representing the workspace shared memory name.
+    - `gaddr`: An unsigned long integer representing the global address.
+    - `cstr`: A character pointer where the formatted string will be stored.
+- **Logic and Control Flow**:
+    - Initialize the `cstr` using `fd_cstr_init`.
+    - Append the `name` to `cstr` using `fd_cstr_append_cstr`.
+    - Append a colon ':' to `cstr` using `fd_cstr_append_char`.
+    - Append the `gaddr` as text to `cstr` using `fd_cstr_append_ulong_as_text`, with the number of digits determined by `fd_ulong_base10_dig_cnt`.
     - Finalize the `cstr` using `fd_cstr_fini`.
-- **Output**: Returns the pointer to the `cstr` buffer containing the formatted string.
+- **Output**: Returns the pointer to the `cstr` containing the formatted string.
 
 
 ---
 ### fd\_wksp\_private\_cstr\_parse<!-- {{#callable:fd_wksp_private_cstr_parse}} -->
-The `fd_wksp_private_cstr_parse` function parses a string in the format '[name]:[gaddr]' to extract the name and gaddr, storing them in provided buffers.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L39>)
+
+Parses a string in the format '[name]:[gaddr]' to extract the name and gaddr components.
 - **Inputs**:
-    - `cstr`: A constant character pointer to the string to be parsed, expected to be in the format '[name]:[gaddr]'.
-    - `name`: A character pointer with space for FD_SHMEM_NAME_MAX bytes, where the extracted name will be stored on success.
-    - `gaddr`: A pointer to an unsigned long where the extracted gaddr will be stored on success.
-- **Control Flow**:
-    - Check if the input string `cstr` is NULL and log a warning if so, returning NULL.
-    - Initialize `len` to 0 and `name_len` to ULONG_MAX, then iterate over `cstr` to find the length of the name and the position of the ':' character.
-    - Calculate `gaddr_len` as the difference between the total length and `name_len`, minus one.
-    - Check for various error conditions such as missing name, missing ':', missing gaddr, or name length exceeding FD_SHMEM_NAME_MAX, logging warnings and returning NULL if any are true.
-    - Copy the name portion of `cstr` into `name`, null-terminate it, and convert the gaddr portion to an unsigned long, storing it in `gaddr`.
-    - Return the `name` pointer on successful parsing.
-- **Output**: Returns the `name` pointer on success, or NULL on failure, logging details of the failure.
+    - `cstr`: A constant character pointer to the string to parse.
+    - `name`: A character pointer with space for `FD_SHMEM_NAME_MAX` bytes, which will hold the extracted name on success.
+    - `gaddr`: A pointer to an unsigned long, which will hold the extracted gaddr on success.
+- **Logic and Control Flow**:
+    - Check if `cstr` is NULL and log a warning if true, then return NULL.
+    - Initialize `len` to 0 and `name_len` to `ULONG_MAX`.
+    - Iterate over `cstr` to find the length of the string and the position of the ':' character, updating `name_len` accordingly.
+    - Calculate `gaddr_len` as the difference between the total length and `name_len` minus one.
+    - Check for various error conditions: missing name, missing ':', missing gaddr, and name length exceeding `FD_SHMEM_NAME_MAX`, logging warnings and returning NULL if any are true.
+    - Copy the name part of `cstr` into `name` and null-terminate it.
+    - Convert the gaddr part of `cstr` to an unsigned long and store it in `gaddr`.
+    - Return `name` on success.
+- **Output**: Returns the `name` on success, or NULL on failure, logging details of the failure.
 
 
 ---
 ### fd\_ulong\_sum\_sat<!-- {{#callable:fd_ulong_sum_sat}} -->
-The `fd_ulong_sum_sat` function calculates the sum of an array of unsigned long integers, saturating at `ULONG_MAX` if an overflow occurs.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L89>)
+
+Computes the sum of an array of unsigned long integers, saturating at `ULONG_MAX` if overflow occurs.
 - **Inputs**:
-    - `cnt`: The number of elements in the array `x` to be summed.
+    - `cnt`: The number of elements in the array `x` to sum.
     - `x`: A pointer to an array of unsigned long integers to be summed.
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Initialize `sum` to 0 and `ovfl` (overflow flag) to 0.
     - Iterate over each element in the array `x` up to `cnt`.
-    - For each element, calculate the temporary sum `tmp` by adding the current element to `sum`.
-    - Check if an overflow occurred by comparing `tmp` with `sum`; if `tmp` is less than `sum`, set the overflow flag `ovfl`.
-    - Update `sum` to `tmp`.
-    - After the loop, return `ULONG_MAX` if an overflow was detected (`ovfl` is true), otherwise return the calculated `sum`.
-- **Output**: The function returns the sum of the array elements, or `ULONG_MAX` if an overflow occurred during the summation.
+    - For each element, add it to `sum` and store the result in `tmp`.
+    - Check if `tmp` is less than `sum` to detect overflow and set `ovfl` accordingly.
+    - Update `sum` with the value of `tmp`.
+    - After the loop, return `ULONG_MAX` if overflow occurred (`ovfl` is true), otherwise return `sum`.
+- **Output**: Returns the sum of the array elements, or `ULONG_MAX` if the sum overflows.
 
 
 ---
 ### fd\_wksp\_new\_named<!-- {{#callable:fd_wksp_new_named}} -->
-The `fd_wksp_new_named` function creates and initializes a new named shared memory workspace with specified parameters.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L102>)
+
+Creates a new named workspace in shared memory with specified parameters and configurations.
 - **Inputs**:
     - `name`: A constant character pointer representing the name of the shared memory region.
-    - `page_sz`: An unsigned long representing the size of each page in the shared memory region.
-    - `sub_cnt`: An unsigned long representing the number of sub-regions within the shared memory region.
-    - `sub_page_cnt`: A constant pointer to an array of unsigned longs, each representing the number of pages in a sub-region.
-    - `sub_cpu_idx`: A constant pointer to an array of unsigned longs, each representing the CPU index for a sub-region.
-    - `mode`: An unsigned long representing the mode for creating the shared memory region.
-    - `seed`: An unsigned integer used as a seed for initializing the workspace.
+    - `page_sz`: An unsigned long representing the size of each page in the shared memory.
+    - `sub_cnt`: An unsigned long representing the number of subregions in the shared memory.
+    - `sub_page_cnt`: A constant unsigned long pointer representing the number of pages in each subregion.
+    - `sub_cpu_idx`: A constant unsigned long pointer representing the CPU indices for each subregion.
+    - `mode`: An unsigned long representing the mode for creating the shared memory.
+    - `seed`: An unsigned integer used as a seed for workspace initialization.
     - `part_max`: An unsigned long representing the maximum number of partitions; if zero, it will be estimated.
-- **Control Flow**:
-    - Check if the input arguments are valid, logging warnings and returning an error code if any are invalid.
-    - Calculate the total number of pages (`page_cnt`) by summing the pages in each sub-region, checking for overflow and returning an error if detected.
-    - Calculate the total memory footprint (`footprint`) by multiplying `page_cnt` by `page_sz`.
-    - Estimate `part_max` if it is zero, logging a warning and returning an error if estimation fails.
-    - Estimate `data_max` based on `footprint` and `part_max`, logging a warning and returning an error if estimation fails.
-    - Create the shared memory region using `fd_shmem_create_multi`, logging details and returning an error if creation fails.
-    - Join the created shared memory region using `fd_shmem_join`, logging details and returning an error if joining fails.
-    - Format the joined memory region as a workspace using [`fd_wksp_new`](fd_wksp_admin.c.md#fd_wksp_new), logging details and returning an error if formatting fails.
+- **Logic and Control Flow**:
+    - Check if the input arguments are valid, logging warnings and returning `FD_WKSP_ERR_INVAL` if any are invalid.
+    - Calculate the total number of pages using [`fd_ulong_sum_sat`](<#fd_ulong_sum_sat>) and check for overflow, logging warnings and returning `FD_WKSP_ERR_INVAL` if invalid.
+    - Calculate the footprint of the workspace and estimate `part_max` if it is zero, logging warnings and returning `FD_WKSP_ERR_INVAL` if estimation fails.
+    - Estimate `data_max` and check if it is valid, logging warnings and returning `FD_WKSP_ERR_INVAL` if invalid.
+    - Create the shared memory region using `fd_shmem_create_multi`, logging details and returning `FD_WKSP_ERR_FAIL` if creation fails.
+    - Join the shared memory region using `fd_shmem_join`, logging details and unlinking the memory if joining fails, returning `FD_WKSP_ERR_FAIL`.
+    - Format the joined memory region as a workspace using [`fd_wksp_new`](<fd_wksp_admin.c.md#fd_wksp_new>), logging details and unlinking and leaving the memory if formatting fails, returning `FD_WKSP_ERR_FAIL`.
     - Leave the shared memory region using `fd_shmem_leave`, logging details.
-- **Output**: Returns `FD_WKSP_SUCCESS` on successful creation and initialization of the workspace, or an error code (`FD_WKSP_ERR_INVAL` or `FD_WKSP_ERR_FAIL`) if any step fails.
-- **Functions called**:
-    - [`fd_ulong_sum_sat`](#fd_ulong_sum_sat)
-    - [`fd_wksp_part_max_est`](fd_wksp_admin.c.md#fd_wksp_part_max_est)
-    - [`fd_wksp_data_max_est`](fd_wksp_admin.c.md#fd_wksp_data_max_est)
-    - [`fd_wksp_new`](fd_wksp_admin.c.md#fd_wksp_new)
+    - Return `FD_WKSP_SUCCESS` if all operations succeed.
+- **Output**: Returns an integer status code: `FD_WKSP_SUCCESS` on success, `FD_WKSP_ERR_INVAL` for invalid input, or `FD_WKSP_ERR_FAIL` for failure in creating or joining the memory region.
+- **Functions Called**:
+    - [`fd_ulong_sum_sat`](<#fd_ulong_sum_sat>)
+    - [`fd_wksp_part_max_est`](<fd_wksp_admin.c.md#fd_wksp_part_max_est>)
+    - [`fd_wksp_data_max_est`](<fd_wksp_admin.c.md#fd_wksp_data_max_est>)
+    - [`fd_wksp_new`](<fd_wksp_admin.c.md#fd_wksp_new>)
 
 
 ---
 ### fd\_wksp\_delete\_named<!-- {{#callable:fd_wksp_delete_named}} -->
-The `fd_wksp_delete_named` function deletes a named shared memory workspace by joining it, deleting the workspace, unlinking the shared memory, and then leaving the workspace.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L169>)
+
+Deletes a named shared memory workspace by joining, deleting, and unlinking it.
 - **Inputs**:
-    - `name`: A constant character pointer representing the name of the shared memory workspace to be deleted.
-- **Control Flow**:
-    - The function attempts to join the shared memory region with the given name in read-write mode, logging details and storing join information in `info`.
-    - If the join fails, the function returns `FD_WKSP_ERR_FAIL`.
-    - The page size of the joined region is retrieved from `info->page_sz`.
-    - The function attempts to delete the workspace using [`fd_wksp_delete`](fd_wksp_admin.c.md#fd_wksp_delete).
-    - If the deletion fails, it leaves the shared memory region and returns `FD_WKSP_ERR_FAIL`.
-    - The function attempts to unlink the shared memory using `fd_shmem_unlink` with the name and page size.
-    - If the unlinking fails, it leaves the shared memory region and returns `FD_WKSP_ERR_FAIL`.
-    - Finally, the function leaves the shared memory region and returns `FD_WKSP_SUCCESS`.
-- **Output**: The function returns `FD_WKSP_SUCCESS` on successful deletion and unlinking of the workspace, or `FD_WKSP_ERR_FAIL` if any step fails.
-- **Functions called**:
-    - [`fd_wksp_delete`](fd_wksp_admin.c.md#fd_wksp_delete)
+    - `name`: A constant character pointer representing the name of the shared memory workspace to delete.
+- **Logic and Control Flow**:
+    - Join the shared memory region using `fd_shmem_join` with read-write mode and retrieve the page size from `info`.
+    - Check if the join operation was successful; if not, return `FD_WKSP_ERR_FAIL`.
+    - Attempt to delete the workspace using [`fd_wksp_delete`](<fd_wksp_admin.c.md#fd_wksp_delete>); if unsuccessful, leave the shared memory and return `FD_WKSP_ERR_FAIL`.
+    - Attempt to unlink the shared memory using `fd_shmem_unlink`; if unsuccessful, leave the shared memory and return `FD_WKSP_ERR_FAIL`.
+    - Leave the shared memory using `fd_shmem_leave` after successful unlinking.
+    - Return `FD_WKSP_SUCCESS` to indicate successful deletion.
+- **Output**: Returns an integer status code: `FD_WKSP_SUCCESS` on success or `FD_WKSP_ERR_FAIL` on failure.
+- **Functions Called**:
+    - [`fd_wksp_delete`](<fd_wksp_admin.c.md#fd_wksp_delete>)
 
 
 ---
 ### fd\_wksp\_new\_anon<!-- {{#callable:fd_wksp_new_anon}} -->
-The `fd_wksp_new_anon` function creates a new anonymous workspace in shared memory with specified parameters and returns a pointer to it.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L195>)
+
+Creates and initializes an anonymous workspace with specified parameters and returns a pointer to it.
 - **Inputs**:
     - `name`: A constant character pointer representing the name of the workspace.
-    - `page_sz`: An unsigned long representing the size of each page in the workspace.
-    - `sub_cnt`: An unsigned long representing the number of subregions in the workspace.
-    - `sub_page_cnt`: A constant unsigned long pointer representing the number of pages in each subregion.
-    - `sub_cpu_idx`: A constant unsigned long pointer representing the CPU indices for each subregion.
-    - `seed`: An unsigned integer used as a seed for randomization or initialization purposes.
-    - `part_max`: An unsigned long representing the maximum number of partitions; if zero, it will be estimated.
-- **Control Flow**:
-    - Check if the input arguments are valid, logging warnings and returning NULL if any are invalid.
-    - Calculate the total number of pages using [`fd_ulong_sum_sat`](#fd_ulong_sum_sat) and check for overflow or zero pages, logging warnings and returning NULL if issues are found.
-    - Calculate the workspace footprint and estimate `part_max` if it is zero, logging warnings and returning NULL if estimation fails.
-    - Estimate `data_max` and log a warning and return NULL if it is zero.
-    - Acquire shared memory pages using `fd_shmem_acquire_multi`, logging details and returning NULL if acquisition fails.
-    - Format the acquired memory as a workspace using [`fd_wksp_new`](fd_wksp_admin.c.md#fd_wksp_new), logging details and releasing memory if formatting fails.
-    - Join the workspace using [`fd_wksp_join`](fd_wksp_admin.c.md#fd_wksp_join), logging details and releasing memory if joining fails.
-    - Register the join with `fd_shmem_join_anonymous`, logging details and releasing memory if registration fails.
-    - Return the pointer to the joined workspace.
-- **Output**: A pointer to the newly created and joined `fd_wksp_t` workspace, or NULL if any step fails.
-- **Functions called**:
-    - [`fd_ulong_sum_sat`](#fd_ulong_sum_sat)
-    - [`fd_wksp_part_max_est`](fd_wksp_admin.c.md#fd_wksp_part_max_est)
-    - [`fd_wksp_data_max_est`](fd_wksp_admin.c.md#fd_wksp_data_max_est)
-    - [`fd_wksp_new`](fd_wksp_admin.c.md#fd_wksp_new)
-    - [`fd_wksp_join`](fd_wksp_admin.c.md#fd_wksp_join)
-    - [`fd_wksp_delete`](fd_wksp_admin.c.md#fd_wksp_delete)
-    - [`fd_wksp_leave`](fd_wksp_admin.c.md#fd_wksp_leave)
+    - `page_sz`: An unsigned long representing the size of each page.
+    - `sub_cnt`: An unsigned long representing the number of sub-pages.
+    - `sub_page_cnt`: A constant unsigned long pointer representing the count of sub-pages for each sub-page.
+    - `sub_cpu_idx`: A constant unsigned long pointer representing the CPU index for each sub-page.
+    - `seed`: An unsigned integer used for seeding the workspace.
+    - `part_max`: An unsigned long representing the maximum number of partitions; if zero, it is estimated.
+- **Logic and Control Flow**:
+    - Checks the validity of input arguments such as `name`, `page_sz`, `sub_cnt`, `sub_page_cnt`, and `sub_cpu_idx` and logs warnings if any are invalid.
+    - Calculates the total number of pages using [`fd_ulong_sum_sat`](<#fd_ulong_sum_sat>) and checks for overflow conditions.
+    - Determines the footprint of the workspace and estimates `part_max` if it is not provided.
+    - Estimates the maximum data size `data_max` and checks if it is valid.
+    - Acquires shared memory pages using `fd_shmem_acquire_multi` and logs details.
+    - Formats the acquired memory as a workspace using [`fd_wksp_new`](<fd_wksp_admin.c.md#fd_wksp_new>) and logs details.
+    - Joins the newly created workspace using [`fd_wksp_join`](<fd_wksp_admin.c.md#fd_wksp_join>) and logs details.
+    - Registers the join with `fd_shmem_join_anonymous` and logs details.
+    - Returns the pointer to the workspace if all operations are successful.
+- **Output**: Returns a pointer to the newly created `fd_wksp_t` workspace, or `NULL` if any step fails.
+- **Functions Called**:
+    - [`fd_ulong_sum_sat`](<#fd_ulong_sum_sat>)
+    - [`fd_wksp_part_max_est`](<fd_wksp_admin.c.md#fd_wksp_part_max_est>)
+    - [`fd_wksp_data_max_est`](<fd_wksp_admin.c.md#fd_wksp_data_max_est>)
+    - [`fd_wksp_new`](<fd_wksp_admin.c.md#fd_wksp_new>)
+    - [`fd_wksp_join`](<fd_wksp_admin.c.md#fd_wksp_join>)
+    - [`fd_wksp_delete`](<fd_wksp_admin.c.md#fd_wksp_delete>)
+    - [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>)
 
 
 ---
 ### fd\_wksp\_delete\_anon<!-- {{#callable:fd_wksp_delete_anon}} -->
-The `fd_wksp_delete_anon` function deletes an anonymous workspace by leaving it and releasing its associated shared memory resources.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L266>)
+
+Deletes an anonymous workspace and releases its associated shared memory resources.
 - **Inputs**:
-    - `wksp`: A pointer to the anonymous workspace (`fd_wksp_t`) to be deleted.
-- **Control Flow**:
-    - Declare a `fd_shmem_join_info_t` array `info` to store join information.
-    - Call `fd_shmem_leave_anonymous` with `wksp` and `info` to leave the anonymous workspace; if this call fails, return immediately.
-    - Call [`fd_wksp_leave`](fd_wksp_admin.c.md#fd_wksp_leave) to leave the workspace and pass its result to [`fd_wksp_delete`](fd_wksp_admin.c.md#fd_wksp_delete) to delete the workspace.
-    - Call `fd_shmem_release` with the result of [`fd_wksp_delete`](fd_wksp_admin.c.md#fd_wksp_delete), `info->page_sz`, and `info->page_cnt` to release the shared memory resources.
-- **Output**: The function does not return a value; it performs its operations for side effects, specifically deleting the workspace and releasing resources.
-- **Functions called**:
-    - [`fd_wksp_delete`](fd_wksp_admin.c.md#fd_wksp_delete)
-    - [`fd_wksp_leave`](fd_wksp_admin.c.md#fd_wksp_leave)
+    - ``wksp``: A pointer to the `fd_wksp_t` structure representing the anonymous workspace to delete.
+- **Logic and Control Flow**:
+    - Declare a `fd_shmem_join_info_t` array named `info` with one element to store shared memory information.
+    - Call `fd_shmem_leave_anonymous` with `wksp` and `info` to leave the anonymous shared memory; if it returns a non-zero value, exit the function.
+    - Call [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>) with `wksp` to leave the workspace and pass its result to [`fd_wksp_delete`](<fd_wksp_admin.c.md#fd_wksp_delete>) to delete the workspace.
+    - Call `fd_shmem_release` with the result of [`fd_wksp_delete`](<fd_wksp_admin.c.md#fd_wksp_delete>), `info->page_sz`, and `info->page_cnt` to release the shared memory resources.
+- **Output**: No return value; the function performs its operations directly on the provided workspace and shared memory resources.
+- **Functions Called**:
+    - [`fd_wksp_delete`](<fd_wksp_admin.c.md#fd_wksp_delete>)
+    - [`fd_wksp_leave`](<fd_wksp_admin.c.md#fd_wksp_leave>)
 
 
 ---
 ### fd\_wksp\_attach<!-- {{#callable:fd_wksp_attach}} -->
-The `fd_wksp_attach` function attaches to a shared memory workspace identified by a given name, allowing read and write access.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L273>)
+
+Attaches to a shared memory workspace with read-write access using a specified name.
 - **Inputs**:
     - `name`: A constant character pointer representing the name of the shared memory workspace to attach to.
-- **Control Flow**:
-    - The function calls `fd_shmem_join` with the provided name, specifying read-write mode and using `fd_wksp_private_join_func` as the join function.
-    - The `fd_shmem_join` function handles the actual joining process and logs details of the operation.
-- **Output**: Returns a pointer to `fd_wksp_t`, which represents the attached workspace, or NULL if the attachment fails.
+- **Logic and Control Flow**:
+    - Calls `fd_shmem_join` with the provided `name`, `FD_SHMEM_JOIN_MODE_READ_WRITE` mode, and `fd_wksp_private_join_func` as the join function.
+    - Returns the result of the `fd_shmem_join` cast to `fd_wksp_t *`.
+- **Output**: A pointer to `fd_wksp_t`, representing the attached workspace, or `NULL` if the attachment fails.
 
 
 ---
 ### fd\_wksp\_detach<!-- {{#callable:fd_wksp_detach}} -->
-The `fd_wksp_detach` function detaches a workspace by leaving the shared memory region associated with it.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L279>)
+
+Detaches a workspace by leaving the shared memory region associated with it.
 - **Inputs**:
-    - `wksp`: A pointer to the `fd_wksp_t` structure representing the workspace to be detached.
-- **Control Flow**:
-    - Check if the `wksp` pointer is NULL; if so, log a warning and return 1.
-    - Call `fd_shmem_leave` with the `wksp`, `fd_wksp_private_leave_func`, and NULL as arguments to leave the shared memory region and log details.
-- **Output**: Returns 1 if the `wksp` is NULL, otherwise returns the result of `fd_shmem_leave`, which typically indicates success or failure of the detach operation.
+    - `wksp`: A pointer to the `fd_wksp_t` workspace to detach.
+- **Logic and Control Flow**:
+    - Checks if the `wksp` pointer is NULL; if so, logs a warning and returns 1.
+    - Calls `fd_shmem_leave` with the `wksp`, `fd_wksp_private_leave_func`, and NULL as arguments to leave the shared memory region.
+    - Returns the result of the `fd_shmem_leave` function call.
+- **Output**: Returns an integer indicating success (0) or failure (1) of the detachment process.
 
 
 ---
 ### fd\_wksp\_containing<!-- {{#callable:fd_wksp_containing}} -->
-The `fd_wksp_containing` function determines the workspace containing a given local address.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L288>)
+
+Finds and returns the workspace containing a given local address.
 - **Inputs**:
-    - `laddr`: A constant pointer to a local address that is being queried to find its containing workspace.
-- **Control Flow**:
-    - Check if the input `laddr` is NULL; if so, return NULL.
-    - Declare an array `info` of type `fd_shmem_join_info_t` to store join information.
-    - Call `fd_shmem_join_query_by_addr` with `laddr`, `1UL`, and `info` to query the join information; if it fails, return NULL.
-    - Cast `info->join` to `fd_wksp_t *` and assign it to `wksp`; if `wksp` is NULL, return NULL.
+    - `laddr`: A constant pointer to a local address to query.
+- **Logic and Control Flow**:
+    - Check if `laddr` is NULL; if so, return NULL.
+    - Call `fd_shmem_join_query_by_addr` with `laddr` to get join information; if it fails, return NULL.
+    - Cast the `join` field of `info` to `fd_wksp_t *` and assign it to `wksp`; if `wksp` is NULL, return NULL.
     - Check if `wksp->magic` is equal to `FD_WKSP_MAGIC`; if not, return NULL.
-    - Return the `wksp` pointer.
-- **Output**: Returns a pointer to the `fd_wksp_t` structure representing the workspace containing the given local address, or NULL if no such workspace is found or if any checks fail.
+    - Return `wksp`.
+- **Output**: A pointer to the `fd_wksp_t` structure representing the workspace containing the given local address, or NULL if not found or invalid.
 
 
 ---
 ### fd\_wksp\_alloc\_laddr<!-- {{#callable:fd_wksp_alloc_laddr}} -->
-The `fd_wksp_alloc_laddr` function allocates memory in a workspace with specified alignment, size, and tag, and returns the local address of the allocated memory.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L303>)
+
+Allocates memory in a workspace and returns its local address.
 - **Inputs**:
-    - `wksp`: A pointer to the workspace (`fd_wksp_t`) where memory is to be allocated.
-    - `align`: The alignment requirement for the memory allocation.
-    - `sz`: The size of the memory to be allocated.
-    - `tag`: A tag associated with the memory allocation for identification or categorization purposes.
-- **Control Flow**:
-    - Call [`fd_wksp_alloc`](fd_wksp.h.md#fd_wksp_alloc) with the provided workspace, alignment, size, and tag to allocate memory and get a global address (`gaddr`).
-    - Check if `gaddr` is zero (indicating allocation failure); if so, return `NULL`.
-    - If allocation is successful, convert the global address to a local address using [`fd_wksp_laddr_fast`](fd_wksp.h.md#fd_wksp_laddr_fast) and return it.
-- **Output**: Returns a pointer to the local address of the allocated memory, or `NULL` if the allocation fails.
-- **Functions called**:
-    - [`fd_wksp_alloc`](fd_wksp.h.md#fd_wksp_alloc)
-    - [`fd_wksp_laddr_fast`](fd_wksp.h.md#fd_wksp_laddr_fast)
+    - ``wksp``: A pointer to the workspace (`fd_wksp_t`) where memory is allocated.
+    - ``align``: The alignment requirement for the memory allocation.
+    - ``sz``: The size of the memory to allocate.
+    - ``tag``: A tag associated with the memory allocation.
+- **Logic and Control Flow**:
+    - Call [`fd_wksp_alloc`](<fd_wksp.h.md#fd_wksp_alloc>) with `wksp`, `align`, `sz`, and `tag` to allocate memory and get a global address (`gaddr`).
+    - Check if `gaddr` is zero, indicating allocation failure, and return `NULL` if so.
+    - Convert the global address `gaddr` to a local address using [`fd_wksp_laddr_fast`](<fd_wksp.h.md#fd_wksp_laddr_fast>) and return it.
+- **Output**: Returns a pointer to the allocated memory's local address, or `NULL` if allocation fails.
+- **Functions Called**:
+    - [`fd_wksp_alloc`](<fd_wksp.h.md#fd_wksp_alloc>)
+    - [`fd_wksp_laddr_fast`](<fd_wksp.h.md#fd_wksp_laddr_fast>)
 
 
 ---
 ### fd\_wksp\_free\_laddr<!-- {{#callable:fd_wksp_free_laddr}} -->
-The `fd_wksp_free_laddr` function frees a local address from a workspace if it is valid and belongs to the workspace.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L313>)
+
+Frees a local address from a workspace if it is valid and belongs to a workspace.
 - **Inputs**:
-    - `laddr`: A pointer to the local address that needs to be freed from the workspace.
-- **Control Flow**:
-    - Check if the `laddr` is NULL; if so, return immediately.
-    - Determine the workspace containing `laddr` using [`fd_wksp_containing`](#fd_wksp_containing); if no workspace is found, log a warning and return.
-    - Calculate the global address `gaddr` corresponding to `laddr` using [`fd_wksp_gaddr_fast`](fd_wksp.h.md#fd_wksp_gaddr_fast).
-    - Verify if `gaddr` is within the valid range of the workspace's global addresses; if not, log a warning and return.
-    - Call [`fd_wksp_free`](fd_wksp_user.c.md#fd_wksp_free) to free the address from the workspace.
-- **Output**: The function does not return any value; it performs the operation of freeing the address if valid.
-- **Functions called**:
-    - [`fd_wksp_containing`](#fd_wksp_containing)
-    - [`fd_wksp_gaddr_fast`](fd_wksp.h.md#fd_wksp_gaddr_fast)
-    - [`fd_wksp_free`](fd_wksp_user.c.md#fd_wksp_free)
+    - `laddr`: A pointer to the local address to be freed.
+- **Logic and Control Flow**:
+    - Check if `laddr` is NULL; if so, return immediately.
+    - Determine the workspace containing `laddr` using [`fd_wksp_containing`](<#fd_wksp_containing>); if no workspace is found, log a warning and return.
+    - Calculate the global address `gaddr` using [`fd_wksp_gaddr_fast`](<fd_wksp.h.md#fd_wksp_gaddr_fast>); if `gaddr` is not within the valid range of the workspace, log a warning and return.
+    - Call [`fd_wksp_free`](<fd_wksp_user.c.md#fd_wksp_free>) to free the address in the workspace.
+- **Output**: No output is returned.
+- **Functions Called**:
+    - [`fd_wksp_containing`](<#fd_wksp_containing>)
+    - [`fd_wksp_gaddr_fast`](<fd_wksp.h.md#fd_wksp_gaddr_fast>)
+    - [`fd_wksp_free`](<fd_wksp_user.c.md#fd_wksp_free>)
 
 
 ---
 ### fd\_wksp\_cstr<!-- {{#callable:fd_wksp_cstr}} -->
-The `fd_wksp_cstr` function generates a string representation of a workspace's name and a global address, ensuring the inputs are valid and within bounds before delegating to a helper function.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L334>)
+
+Converts a workspace and global address into a formatted string representation.
 - **Inputs**:
-    - `wksp`: A pointer to a constant `fd_wksp_t` structure representing the workspace.
-    - `gaddr`: An unsigned long integer representing the global address within the workspace.
-    - `cstr`: A pointer to a character array where the resulting string will be stored.
-- **Control Flow**:
+    - ``wksp``: A pointer to a constant `fd_wksp_t` structure representing the workspace.
+    - ``gaddr``: An unsigned long integer representing the global address within the workspace.
+    - ``cstr``: A pointer to a character array where the resulting string will be stored.
+- **Logic and Control Flow**:
     - Check if `cstr` is NULL; if so, log a warning and return NULL.
     - Check if `wksp` is NULL; if so, log a warning and return NULL.
-    - Verify that `gaddr` is either zero or within the bounds of `wksp->gaddr_lo` and `wksp->gaddr_hi`; if not, log a warning and return NULL.
-    - Call [`fd_wksp_private_cstr`](#fd_wksp_private_cstr) with `wksp->name`, `gaddr`, and `cstr` to populate `cstr` with the formatted string and return it.
-- **Output**: Returns a pointer to the `cstr` containing the formatted string, or NULL if any validation fails.
-- **Functions called**:
-    - [`fd_wksp_private_cstr`](#fd_wksp_private_cstr)
+    - Verify if `gaddr` is either zero or within the range defined by `wksp->gaddr_lo` and `wksp->gaddr_hi`; if not, log a warning and return NULL.
+    - Call [`fd_wksp_private_cstr`](<#fd_wksp_private_cstr>) with `wksp->name`, `gaddr`, and `cstr` to populate `cstr` with the formatted string.
+- **Output**: Returns a pointer to the `cstr` containing the formatted string, or NULL if an error occurs.
+- **Functions Called**:
+    - [`fd_wksp_private_cstr`](<#fd_wksp_private_cstr>)
 
 
 ---
 ### fd\_wksp\_cstr\_laddr<!-- {{#callable:fd_wksp_cstr_laddr}} -->
-The `fd_wksp_cstr_laddr` function converts a local address to a workspace-specific string representation, ensuring the address is valid within the workspace.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L349>)
+
+Converts a local address to a workspace string representation if valid.
 - **Inputs**:
-    - `laddr`: A constant pointer to the local address that needs to be converted to a string representation.
-    - `cstr`: A pointer to a character array where the resulting string representation will be stored.
-- **Control Flow**:
-    - Check if the `cstr` pointer is NULL and log a warning if it is, returning NULL.
-    - Determine the workspace containing the given local address using [`fd_wksp_containing`](#fd_wksp_containing).
-    - If the workspace is not found, log a warning and return NULL.
-    - Calculate the global address corresponding to the local address using [`fd_wksp_gaddr_fast`](fd_wksp.h.md#fd_wksp_gaddr_fast).
-    - Verify that the global address is within the valid range of the workspace's global addresses.
-    - If the global address is not valid, log a warning and return 0UL.
-    - Call [`fd_wksp_private_cstr`](#fd_wksp_private_cstr) to populate `cstr` with the workspace name and global address, and return `cstr`.
-- **Output**: Returns the `cstr` containing the workspace name and global address if successful, or NULL/0UL if an error occurs.
-- **Functions called**:
-    - [`fd_wksp_containing`](#fd_wksp_containing)
-    - [`fd_wksp_gaddr_fast`](fd_wksp.h.md#fd_wksp_gaddr_fast)
-    - [`fd_wksp_private_cstr`](#fd_wksp_private_cstr)
+    - `laddr`: A pointer to the local address to convert.
+    - `cstr`: A pointer to a character array where the resulting string will be stored.
+- **Logic and Control Flow**:
+    - Check if `cstr` is NULL; if so, log a warning and return NULL.
+    - Determine the workspace containing `laddr` using [`fd_wksp_containing`](<#fd_wksp_containing>); if not found, log a warning and return NULL.
+    - Calculate the global address `gaddr` using [`fd_wksp_gaddr_fast`](<fd_wksp.h.md#fd_wksp_gaddr_fast>); if `gaddr` is not within valid range, log a warning and return 0UL.
+    - Call [`fd_wksp_private_cstr`](<#fd_wksp_private_cstr>) to populate `cstr` with the workspace name and `gaddr`, and return `cstr`.
+- **Output**: Returns the `cstr` containing the workspace name and global address, or NULL/0UL on failure.
+- **Functions Called**:
+    - [`fd_wksp_containing`](<#fd_wksp_containing>)
+    - [`fd_wksp_gaddr_fast`](<fd_wksp.h.md#fd_wksp_gaddr_fast>)
+    - [`fd_wksp_private_cstr`](<#fd_wksp_private_cstr>)
 
 
 ---
 ### fd\_wksp\_cstr\_alloc<!-- {{#callable:fd_wksp_cstr_alloc}} -->
-The `fd_wksp_cstr_alloc` function allocates memory in a workspace and returns a string representation of the allocation in the format '[name]:[gaddr]'.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L369>)
+
+Allocates memory in a workspace and returns a C-string representation of the allocation.
 - **Inputs**:
-    - `name`: A constant character pointer representing the name of the workspace to attach to.
-    - `align`: An unsigned long specifying the alignment requirement for the allocation.
-    - `sz`: An unsigned long specifying the size of the memory to allocate.
-    - `tag`: An unsigned long used as a tag for the allocation.
-    - `cstr`: A character pointer where the resulting string representation of the allocation will be stored.
-- **Control Flow**:
-    - Check if the `cstr` pointer is NULL and log a warning if it is, returning NULL.
-    - Attach to the workspace specified by `name` using [`fd_wksp_attach`](#fd_wksp_attach). If this fails, return NULL.
-    - Allocate memory in the workspace with the specified `align`, `sz`, and `tag` using [`fd_wksp_alloc`](fd_wksp.h.md#fd_wksp_alloc). If allocation fails and `sz` is non-zero, detach from the workspace and return NULL.
+    - `name`: The name of the workspace to attach to.
+    - `align`: The alignment requirement for the memory allocation.
+    - `sz`: The size of the memory to allocate.
+    - `tag`: A tag to associate with the allocation.
+    - `cstr`: A pointer to a character array where the C-string representation will be stored.
+- **Logic and Control Flow**:
+    - Check if `cstr` is NULL and log a warning if true, then return NULL.
+    - Attach to the workspace using [`fd_wksp_attach`](<#fd_wksp_attach>) with the given `name`.
+    - If the workspace attachment fails, return NULL.
+    - Allocate memory in the workspace with [`fd_wksp_alloc`](<fd_wksp.h.md#fd_wksp_alloc>) using `align`, `sz`, and `tag`.
+    - If allocation fails and `sz` is non-zero, detach from the workspace and return NULL.
     - Detach from the workspace after allocation.
-    - Use [`fd_wksp_private_cstr`](#fd_wksp_private_cstr) to populate `cstr` with the string representation of the allocation and return `cstr`.
-- **Output**: Returns a character pointer to `cstr` containing the string representation '[name]:[gaddr]' of the allocated memory, or NULL if an error occurs.
-- **Functions called**:
-    - [`fd_wksp_attach`](#fd_wksp_attach)
-    - [`fd_wksp_alloc`](fd_wksp.h.md#fd_wksp_alloc)
-    - [`fd_wksp_detach`](#fd_wksp_detach)
-    - [`fd_wksp_private_cstr`](#fd_wksp_private_cstr)
+    - Return the C-string representation of the allocation using [`fd_wksp_private_cstr`](<#fd_wksp_private_cstr>).
+- **Output**: Returns a pointer to the C-string representation of the allocation, or NULL if an error occurs.
+- **Functions Called**:
+    - [`fd_wksp_attach`](<#fd_wksp_attach>)
+    - [`fd_wksp_alloc`](<fd_wksp.h.md#fd_wksp_alloc>)
+    - [`fd_wksp_detach`](<#fd_wksp_detach>)
+    - [`fd_wksp_private_cstr`](<#fd_wksp_private_cstr>)
 
 
 ---
 ### fd\_wksp\_cstr\_free<!-- {{#callable:fd_wksp_cstr_free}} -->
-The `fd_wksp_cstr_free` function frees a workspace allocation specified by a string containing the workspace name and global address.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L394>)
+
+Frees a workspace resource identified by a C-string containing a name and global address.
 - **Inputs**:
-    - `cstr`: A constant character pointer representing a string in the format '[name]:[gaddr]', where 'name' is the workspace name and 'gaddr' is the global address of the allocation to be freed.
-- **Control Flow**:
-    - Parse the input string `cstr` to extract the workspace name and global address using [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse).
-    - If parsing fails, the function returns immediately without performing any operations.
-    - Attach to the workspace using the extracted name with [`fd_wksp_attach`](#fd_wksp_attach).
-    - If attaching fails, the function returns immediately without performing any operations.
-    - Free the allocation at the specified global address within the workspace using [`fd_wksp_free`](fd_wksp_user.c.md#fd_wksp_free).
-    - Detach from the workspace using [`fd_wksp_detach`](#fd_wksp_detach).
-- **Output**: The function does not return any value; it performs operations to free a workspace allocation and logs details of the operations.
-- **Functions called**:
-    - [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse)
-    - [`fd_wksp_attach`](#fd_wksp_attach)
-    - [`fd_wksp_free`](fd_wksp_user.c.md#fd_wksp_free)
-    - [`fd_wksp_detach`](#fd_wksp_detach)
+    - `cstr`: A constant character pointer representing a C-string in the format '[name]:[gaddr]'.
+- **Logic and Control Flow**:
+    - Parse the input `cstr` to extract the workspace name and global address using [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>).
+    - If parsing fails, exit the function.
+    - Attach to the workspace using the extracted name with [`fd_wksp_attach`](<#fd_wksp_attach>).
+    - If attachment fails, exit the function.
+    - Free the resource at the global address in the workspace using [`fd_wksp_free`](<fd_wksp_user.c.md#fd_wksp_free>).
+    - Detach from the workspace using [`fd_wksp_detach`](<#fd_wksp_detach>).
+- **Output**: No output is returned; the function performs operations to free resources and logs details internally.
+- **Functions Called**:
+    - [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>)
+    - [`fd_wksp_attach`](<#fd_wksp_attach>)
+    - [`fd_wksp_free`](<fd_wksp_user.c.md#fd_wksp_free>)
+    - [`fd_wksp_detach`](<#fd_wksp_detach>)
 
 
 ---
 ### fd\_wksp\_cstr\_tag<!-- {{#callable:fd_wksp_cstr_tag}} -->
-The `fd_wksp_cstr_tag` function retrieves the tag associated with a global address (gaddr) in a workspace identified by a given string representation (cstr).
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L408>)
+
+Extracts a tag from a workspace using a given C-string that encodes a workspace name and global address.
 - **Inputs**:
-    - `cstr`: A constant character pointer representing a string in the format '[name]:[gaddr]', where 'name' is the workspace name and 'gaddr' is the global address.
-- **Control Flow**:
-    - Parse the input string `cstr` to extract the workspace name and global address using [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse).
-    - If parsing fails, return 0UL indicating an error.
-    - Attach to the workspace using the extracted name with [`fd_wksp_attach`](#fd_wksp_attach).
-    - If attachment fails, return 0UL indicating an error.
-    - Retrieve the tag associated with the global address in the workspace using [`fd_wksp_tag`](fd_wksp_user.c.md#fd_wksp_tag).
-    - Detach from the workspace using [`fd_wksp_detach`](#fd_wksp_detach).
+    - `cstr`: A constant character pointer representing a C-string in the format '[name]:[gaddr]' where 'name' is the workspace name and 'gaddr' is the global address.
+- **Logic and Control Flow**:
+    - Declare a character array `name` with size `FD_SHMEM_NAME_MAX` and an unsigned long `gaddr`.
+    - Call [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>) to parse `cstr` into `name` and `gaddr`. If parsing fails, return 0UL.
+    - Attach to the workspace using [`fd_wksp_attach`](<#fd_wksp_attach>) with `name`. If attachment fails, return 0UL.
+    - Retrieve the tag using [`fd_wksp_tag`](<fd_wksp_user.c.md#fd_wksp_tag>) with the attached workspace and `gaddr`.
+    - Detach from the workspace using [`fd_wksp_detach`](<#fd_wksp_detach>).
     - Return the retrieved tag.
-- **Output**: Returns an unsigned long integer representing the tag associated with the specified global address in the workspace, or 0UL if an error occurs during parsing or workspace attachment.
-- **Functions called**:
-    - [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse)
-    - [`fd_wksp_attach`](#fd_wksp_attach)
-    - [`fd_wksp_tag`](fd_wksp_user.c.md#fd_wksp_tag)
-    - [`fd_wksp_detach`](#fd_wksp_detach)
+- **Output**: Returns an unsigned long representing the tag associated with the given workspace and global address, or 0UL if any step fails.
+- **Functions Called**:
+    - [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>)
+    - [`fd_wksp_attach`](<#fd_wksp_attach>)
+    - [`fd_wksp_tag`](<fd_wksp_user.c.md#fd_wksp_tag>)
+    - [`fd_wksp_detach`](<#fd_wksp_detach>)
 
 
 ---
 ### fd\_wksp\_cstr\_memset<!-- {{#callable:fd_wksp_cstr_memset}} -->
-The `fd_wksp_cstr_memset` function sets a memory region in a workspace to a specified value, using a string representation of the workspace and address.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L424>)
+
+Sets a memory region in a workspace to a specified value using a C-string to identify the region.
 - **Inputs**:
-    - `cstr`: A constant character pointer representing the workspace and global address in the format '[name]:[gaddr]'.
-    - `c`: An integer value to set in the specified memory region.
-- **Control Flow**:
-    - Parse the input string `cstr` to extract the workspace name and global address using [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse).
-    - If parsing fails, the function returns immediately.
-    - Attach to the workspace using [`fd_wksp_attach`](#fd_wksp_attach) with the extracted name.
-    - If attachment fails, the function returns immediately.
-    - Call [`fd_wksp_memset`](fd_wksp_user.c.md#fd_wksp_memset) to set the memory at the specified global address to the value `c`.
-    - Detach from the workspace using [`fd_wksp_detach`](#fd_wksp_detach).
-- **Output**: The function does not return any value; it performs operations on the workspace memory and logs details of the operations.
-- **Functions called**:
-    - [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse)
-    - [`fd_wksp_attach`](#fd_wksp_attach)
-    - [`fd_wksp_memset`](fd_wksp_user.c.md#fd_wksp_memset)
-    - [`fd_wksp_detach`](#fd_wksp_detach)
+    - ``cstr``: A constant character string that specifies the workspace name and global address in the format `[name]:[gaddr]`.
+    - ``c``: An integer value to set in the specified memory region.
+- **Logic and Control Flow**:
+    - Parse the `cstr` to extract the workspace name and global address using [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>).
+    - If parsing fails, return immediately.
+    - Attach to the workspace using [`fd_wksp_attach`](<#fd_wksp_attach>) with the parsed name.
+    - If attachment fails, return immediately.
+    - Set the memory region at the global address in the workspace to the value `c` using [`fd_wksp_memset`](<fd_wksp_user.c.md#fd_wksp_memset>).
+    - Detach from the workspace using [`fd_wksp_detach`](<#fd_wksp_detach>).
+- **Output**: No output is returned; the function performs operations directly on the workspace.
+- **Functions Called**:
+    - [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>)
+    - [`fd_wksp_attach`](<#fd_wksp_attach>)
+    - [`fd_wksp_memset`](<fd_wksp_user.c.md#fd_wksp_memset>)
+    - [`fd_wksp_detach`](<#fd_wksp_detach>)
 
 
 ---
 ### fd\_wksp\_map<!-- {{#callable:fd_wksp_map}} -->
-The `fd_wksp_map` function maps a global address from a workspace, specified by a string, to a local address in the process's address space.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L439>)
+
+Maps a workspace global address to a local address using a given string representation of the workspace and address.
 - **Inputs**:
-    - `cstr`: A constant character string representing the workspace name and global address in the format '[name]:[gaddr]'.
-- **Control Flow**:
-    - Parse the input string `cstr` to extract the workspace name and global address using [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse).
+    - `cstr`: A string containing the workspace name and global address in the format '[name]:[gaddr]'.
+- **Logic and Control Flow**:
+    - Parse the input string `cstr` to extract the workspace name and global address using [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>).
     - If parsing fails, return `NULL`.
-    - Attach to the workspace using [`fd_wksp_attach`](#fd_wksp_attach) with the extracted name.
+    - Attach to the workspace using [`fd_wksp_attach`](<#fd_wksp_attach>) with the extracted name.
     - If attachment fails, return `NULL`.
-    - Convert the global address to a local address using [`fd_wksp_laddr`](fd_wksp_user.c.md#fd_wksp_laddr).
-    - If conversion fails, detach from the workspace using [`fd_wksp_detach`](#fd_wksp_detach) and return `NULL`.
+    - Convert the global address to a local address using [`fd_wksp_laddr`](<fd_wksp_user.c.md#fd_wksp_laddr>).
+    - If conversion fails, detach from the workspace using [`fd_wksp_detach`](<#fd_wksp_detach>) and return `NULL`.
     - Return the local address.
 - **Output**: Returns a pointer to the local address corresponding to the global address in the workspace, or `NULL` if any step fails.
-- **Functions called**:
-    - [`fd_wksp_private_cstr_parse`](#fd_wksp_private_cstr_parse)
-    - [`fd_wksp_attach`](#fd_wksp_attach)
-    - [`fd_wksp_laddr`](fd_wksp_user.c.md#fd_wksp_laddr)
-    - [`fd_wksp_detach`](#fd_wksp_detach)
+- **Functions Called**:
+    - [`fd_wksp_private_cstr_parse`](<#fd_wksp_private_cstr_parse>)
+    - [`fd_wksp_attach`](<#fd_wksp_attach>)
+    - [`fd_wksp_laddr`](<fd_wksp_user.c.md#fd_wksp_laddr>)
+    - [`fd_wksp_detach`](<#fd_wksp_detach>)
 
 
 ---
 ### fd\_wksp\_unmap<!-- {{#callable:fd_wksp_unmap}} -->
-The `fd_wksp_unmap` function unmaps a local address from a workspace, ensuring it was previously mapped and logging warnings if any issues are detected.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L460>)
+
+Unmaps a local address from a workspace, detaching it if necessary.
 - **Inputs**:
-    - `laddr`: A constant pointer to the local address that needs to be unmapped from the workspace.
-- **Control Flow**:
-    - Check if `laddr` is NULL; if so, return immediately as NULL might not be an error case.
-    - Query the shared memory join information for the given `laddr` using `fd_shmem_join_query_by_addr`.
-    - If the query fails, log a warning that `laddr` does not seem to be from `fd_wksp_map` and return.
-    - Retrieve the workspace pointer from the join information.
-    - If the workspace pointer is NULL, log a warning indicating a potential misuse of the function and return.
-    - Call [`fd_wksp_detach`](#fd_wksp_detach) to detach the workspace, which logs details of the operation.
-- **Output**: The function does not return any value; it performs operations and logs warnings if necessary.
-- **Functions called**:
-    - [`fd_wksp_detach`](#fd_wksp_detach)
+    - `laddr`: A constant pointer to the local address to unmap.
+- **Logic and Control Flow**:
+    - Checks if `laddr` is NULL and returns immediately if true, as NULL might not be an error case.
+    - Queries the shared memory join information for the given `laddr` using `fd_shmem_join_query_by_addr`.
+    - If the query fails, logs a warning that `laddr` does not seem to be from `fd_wksp_map` and returns.
+    - Casts the join information to a `fd_wksp_t` pointer `wksp`.
+    - If `wksp` is NULL, logs a warning about being called within `fd_wksp_join` or `fd_wksp_leave` and returns.
+    - Calls [`fd_wksp_detach`](<#fd_wksp_detach>) on `wksp` to detach the workspace, logging details.
+- **Output**: No output is returned.
+- **Functions Called**:
+    - [`fd_wksp_detach`](<#fd_wksp_detach>)
 
 
 ---
 ### fd\_wksp\_pod\_attach<!-- {{#callable:fd_wksp_pod_attach}} -->
-The `fd_wksp_pod_attach` function maps a global address to a local address space and joins it to a pod, returning a pointer to the pod.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L485>)
+
+Attaches to a workspace pod using a global address and returns a pointer to the pod.
 - **Inputs**:
-    - `gaddr`: A constant character pointer representing the global address of the pod to be attached.
-- **Control Flow**:
-    - Check if the input `gaddr` is NULL and log an error if it is.
-    - Call [`fd_wksp_map`](#fd_wksp_map) with `gaddr` to map the global address to a local address space, storing the result in `obj`.
-    - Check if `obj` is NULL and log an error if it is.
-    - Call `fd_pod_join` with `obj` to join the mapped object to a pod, storing the result in `pod`.
-    - Check if `pod` is NULL and log an error if it is.
-    - Return the `pod` pointer.
-- **Output**: A constant unsigned character pointer to the joined pod.
-- **Functions called**:
-    - [`fd_wksp_map`](#fd_wksp_map)
+    - `gaddr`: A constant character pointer representing the global address of the pod to attach.
+- **Logic and Control Flow**:
+    - Checks if `gaddr` is NULL and logs an error if true.
+    - Maps the global address `gaddr` to a local object pointer `obj` using [`fd_wksp_map`](<#fd_wksp_map>).
+    - Checks if `obj` is NULL and logs an error if true.
+    - Joins the pod using `fd_pod_join` with the mapped object `obj`.
+    - Checks if the pod pointer `pod` is NULL and logs an error if true.
+    - Returns the pod pointer `pod`.
+- **Output**: Returns a constant unsigned character pointer to the attached pod.
+- **Functions Called**:
+    - [`fd_wksp_map`](<#fd_wksp_map>)
 
 
 ---
 ### fd\_wksp\_pod\_detach<!-- {{#callable:fd_wksp_pod_detach}} -->
-The `fd_wksp_pod_detach` function detaches a POD (Plain Old Data) from a workspace by leaving the POD and unmapping the associated object.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L498>)
+
+Detaches a pod from the workspace by leaving the pod and unmapping the associated object.
 - **Inputs**:
-    - `pod`: A constant pointer to an unsigned character array representing the POD to be detached.
-- **Control Flow**:
-    - Check if the input `pod` is NULL and log an error if it is.
-    - Call `fd_pod_leave` with the `pod` to leave the POD and obtain the associated object.
-    - Check if the object returned by `fd_pod_leave` is NULL and log an error if it is.
-    - Call [`fd_wksp_unmap`](#fd_wksp_unmap) with the object to unmap it from the workspace.
-- **Output**: This function does not return a value; it performs operations to detach and unmap a POD.
-- **Functions called**:
-    - [`fd_wksp_unmap`](#fd_wksp_unmap)
+    - `pod`: A pointer to the pod to detach, which must not be NULL.
+- **Logic and Control Flow**:
+    - Checks if the `pod` is NULL and logs an error if it is.
+    - Calls `fd_pod_leave` to leave the pod and obtain the associated object.
+    - Checks if the object returned by `fd_pod_leave` is NULL and logs an error if it is.
+    - Calls [`fd_wksp_unmap`](<#fd_wksp_unmap>) to unmap the object from the workspace.
+- **Output**: No return value.
+- **Functions Called**:
+    - [`fd_wksp_unmap`](<#fd_wksp_unmap>)
 
 
 ---
 ### fd\_wksp\_pod\_map<!-- {{#callable:fd_wksp_pod_map}} -->
-The `fd_wksp_pod_map` function maps a specified path within a pod to a local address space and returns the mapped object.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L508>)
+
+Maps a specified path within a pod to a local address space and returns the mapped object.
 - **Inputs**:
-    - `pod`: A pointer to the pod from which the path will be queried.
-    - `path`: A string representing the path within the pod to be mapped.
-- **Control Flow**:
-    - Check if the `pod` pointer is NULL and log an error if it is.
-    - Check if the `path` string is NULL and log an error if it is.
-    - Query the pod using `fd_pod_query_cstr` to get the global address (`gaddr`) associated with the given path.
-    - If the `gaddr` is NULL, log an error indicating the path was not found in the pod.
-    - Map the `gaddr` to a local address space using [`fd_wksp_map`](#fd_wksp_map).
+    - `pod`: A pointer to the pod from which to map the path.
+    - `path`: A string representing the path within the pod to map.
+- **Logic and Control Flow**:
+    - Check if `pod` is NULL and log an error if true.
+    - Check if `path` is NULL and log an error if true.
+    - Query the pod for the global address (`gaddr`) corresponding to the `path` using `fd_pod_query_cstr`.
+    - If `gaddr` is NULL, log an error indicating the path was not found in the pod.
+    - Map the `gaddr` to a local address space using [`fd_wksp_map`](<#fd_wksp_map>).
     - If the mapping fails, log an error indicating the failure to map the path into the local address space.
     - Return the mapped object.
 - **Output**: A pointer to the mapped object in the local address space.
-- **Functions called**:
-    - [`fd_wksp_map`](#fd_wksp_map)
+- **Functions Called**:
+    - [`fd_wksp_map`](<#fd_wksp_map>)
 
 
 ---
 ### fd\_wksp\_pod\_unmap<!-- {{#callable:fd_wksp_pod_unmap}} -->
-The `fd_wksp_pod_unmap` function unmaps a previously mapped object from the workspace.
+[View Source →](<../../../../../src/util/wksp/fd_wksp_helper.c#L523>)
+
+Unmaps a previously mapped object from the workspace.
 - **Inputs**:
-    - `obj`: A pointer to the object to be unmapped from the workspace.
-- **Control Flow**:
-    - Check if the input `obj` is NULL and log an error if it is.
-    - Call [`fd_wksp_unmap`](#fd_wksp_unmap) with `obj` to unmap the object from the workspace, which also logs details of the operation.
-- **Output**: The function does not return any value.
-- **Functions called**:
-    - [`fd_wksp_unmap`](#fd_wksp_unmap)
+    - `obj`: A pointer to the object to unmap; must not be NULL.
+- **Logic and Control Flow**:
+    - Checks if the `obj` is NULL and logs an error if it is.
+    - Calls [`fd_wksp_unmap`](<#fd_wksp_unmap>) with `obj` to unmap the object from the workspace.
+- **Output**: No return value.
+- **Functions Called**:
+    - [`fd_wksp_unmap`](<#fd_wksp_unmap>)
 
 
 

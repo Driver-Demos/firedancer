@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `run_agave.h` file declares a function and an external action related to running the Agave command within the `firedancer` codebase.
+Declares the function and action for running the Agave command with specified arguments and configuration.
 
 # Purpose
-This code is a C header file that declares a function and an external variable related to a command execution framework. The function [`run_agave_cmd_fn`](#run_agave_cmd_fn) is declared to take two parameters, `args_t * args` and `config_t * config`, suggesting it is designed to execute a command with specific arguments and configuration settings. Additionally, the file declares an external variable `fd_action_run_agave` of type `action_t`, which likely represents an action or command that can be executed within the framework. The use of include guards ensures that the header file's contents are only included once in a compilation unit, preventing redefinition errors. Overall, this header file is part of a larger application, likely dealing with command execution or management.
+This code is a C header file that declares a function and an external variable related to running a command named `agave`. The function [`run_agave_cmd_fn`](<#run_agave_cmd_fn>) takes two pointers as parameters: `args_t * args` and `config_t * config`, which likely represent command arguments and configuration settings, respectively. The header file also declares an external variable `fd_action_run_agave` of type `action_t`, which suggests it is used to define or reference an action associated with the `agave` command. The inclusion guards prevent multiple inclusions of this header file, ensuring that the declarations are only processed once during compilation.
 # Global Variables
 
 ---
 ### fd\_action\_run\_agave
-- **Type**: `action_t`
-- **Description**: The variable `fd_action_run_agave` is an external global variable of type `action_t`. It is declared in a header file, indicating that it is intended to be used across multiple source files.
-- **Use**: This variable is used to represent an action related to the 'run agave' command, likely as part of a command handling or execution framework.
+- **Type**: ``action_t``
+- **Description**: `fd_action_run_agave` is a global variable of type `action_t` declared with external linkage. It is likely used to represent or store an action related to the 'run agave' command in the application.
+- **Use**: Used to define or reference an action for the 'run agave' command in the application.
 
 
 
