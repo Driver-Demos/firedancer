@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration file for Solana devnet with gossip entrypoints and expected genesis hash.
+Devnet gossip entrypoints and expected genesis hash configuration.
 
 # Purpose
-The configuration file specifies network and consensus settings for a Solana node. Under the `gossip` section, it defines a list of entry points with their respective addresses and ports for connecting to the Solana Devnet. The `consensus` section sets the `expected_genesis_hash`, which is a hash value that the node uses to verify the genesis block of the blockchain.
+This file defines Solana network settings for a devnet cluster. The `gossip` section lists the entrypoint nodes used for peer discovery, and the `consensus` section sets the expected genesis hash that validators use to verify they join the correct network.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

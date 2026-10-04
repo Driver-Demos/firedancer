@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers and objects for various programs in the Firedancer Flamenco runtime.
+Build rules for reusable, precompile, and native program headers and objects.
 
 # Purpose
-The Makefile content defines a build configuration for a software project. It uses conditional statements to include specific headers and object files based on the presence of certain features, such as `FD_HAS_INT128` and `FD_HAS_SECP256K1`. The `add-hdrs` and `add-objs` functions are called to add header files and object files, respectively, to the build process. The configuration is organized into sections for reusable components, precompiled components, and native programs, each specifying the necessary files for compilation. This setup ensures that the build process includes the correct files based on the available features and the intended build targets.
+This build fragment adds header and object targets for the `fd_flamenco` component when `FD_HAS_INT128` is enabled. It groups the entries into reusable code, precompiles, and native programs, and it registers each source unit with `add-hdrs` and `add-objs` so the build system includes the matching headers and compiled objects. The `FD_HAS_SECP256K1` guard controls whether `fd_bpf_loader_program` is added, which ties that program to the secp256k1 feature. The listed targets cover program modules such as `fd_address_lookup_table_program`, `fd_loader_v4_program`, `fd_system_program`, `fd_vote_program`, `fd_zk_elgamal_proof_program`, and `fd_native_cpi`, along with the shared helpers `fd_builtin_programs` and `fd_bpf_loader_serialization`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
