@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for deploying, upgrading, and managing BPF programs and stakes on Solana using RPC clients.
+The `ledgers.rs` file in the `firedancer` codebase provides functions for deploying, upgrading, and managing BPF programs and stakes on the Solana blockchain using the `RpcClient` and `Keypair`.
 
 # Purpose
-The code defines two primary functions, `bpf_loader_ledger` and `stake_ledger`, which interact with the Solana blockchain using the `RpcClient` and `Keypair` from the Solana SDK. The `bpf_loader_ledger` function manages the deployment, upgrade, and closure of programs on the blockchain using the BPF loader. It calls several functions from the `bpf_loader` module to perform these operations in both the same and different slots, indicating a focus on managing program lifecycle events on the blockchain. The function requires a client, an arc-wrapped client, a payer keypair, and vectors of program and account data as inputs.
+This Rust source code file is designed to facilitate operations related to deploying, upgrading, and managing programs on the Solana blockchain using the BPF (Berkeley Packet Filter) loader, as well as handling staking operations. The file imports necessary modules from the Solana SDK and client libraries, indicating its reliance on Solana's infrastructure for blockchain interactions. The primary functionality is encapsulated in two public functions: `bpf_loader_ledger` and `stake_ledger`. The `bpf_loader_ledger` function orchestrates a series of operations that involve deploying, upgrading, and closing BPF programs in both the same and different slots, utilizing the `bpf_loader` module. This suggests a focus on managing program lifecycle events on the blockchain, which is crucial for developers looking to automate or script these processes.
 
-The `stake_ledger` function is responsible for managing staking operations on the blockchain. It uses the `stake` module to move lamports, which are the smallest unit of currency in Solana, from one account to another. The function takes a client and a payer keypair as parameters. The code is structured to be part of a larger system, as indicated by the use of modules like `bpf_loader` and `stake`, which are imported from the same crate. The presence of commented-out code suggests that additional functionality, such as moving stakes, may be implemented or modified in the future.
+The `stake_ledger` function, on the other hand, is concerned with staking operations, specifically moving lamports, which are the smallest unit of currency in Solana. This function references the `stake` module, indicating that it likely contains more detailed staking logic. The presence of commented-out code for moving stakes suggests that the file may be under development or that certain features are conditionally enabled. Overall, this file serves as a utility for developers working with Solana, providing a structured way to manage program deployments and staking operations, and it is likely intended to be part of a larger suite of tools or scripts for blockchain management.
 # Imports and Dependencies
 
 ---
@@ -23,36 +23,36 @@ The `stake_ledger` function is responsible for managing staking operations on th
 
 ---
 ### bpf\_loader\_ledger
-Executes a series of BPF loader operations on a Solana blockchain client.
+The `bpf_loader_ledger` function orchestrates a series of BPF loader operations on a Solana blockchain using a given RPC client, keypair, and data vectors.
 - **Inputs**:
-    - `client`: A reference to an `RpcClient` instance used to interact with the Solana blockchain.
-    - `arc_client`: An `Arc` wrapped reference to an `RpcClient` instance, allowing for shared ownership and thread-safe access.
-    - `payer`: A reference to a `Keypair` used to authorize transactions on the blockchain.
-    - `program_data`: A reference to a vector of bytes representing the program data to be deployed or upgraded.
-    - `account_data`: A reference to a vector of bytes representing the account data associated with the program.
-- **Logic and Control Flow**:
-    - Calls `bpf_loader::deploy_invoke_same_slot` with the provided arguments to deploy the program in the same slot.
-    - Calls `bpf_loader::deploy_invoke_diff_slot` to deploy the program in a different slot.
-    - Calls `bpf_loader::upgrade_invoke_same_slot` to upgrade the program in the same slot.
-    - Calls `bpf_loader::upgrade_invoke_diff_slot` to upgrade the program in a different slot.
-    - Calls `bpf_loader::deploy_close_same_slot` to close the deployment in the same slot.
-    - Calls `bpf_loader::deploy_close_diff_slot` to close the deployment in a different slot.
-    - Calls `bpf_loader::close_invoke_same_slot` to close the invocation in the same slot.
-    - Calls `bpf_loader::close_invoke_diff_slot` to close the invocation in a different slot.
-    - Calls `bpf_loader::close_redeploy_same_slot` to close and redeploy in the same slot.
-    - Calls `bpf_loader::close_redeploy_diff_slot` to close and redeploy in a different slot.
-- **Output**: No return value; the function performs operations on the blockchain client.
+    - `client`: An `RpcClient` reference used to interact with the Solana blockchain.
+    - `arc_client`: An `Arc<RpcClient>` reference, which is a thread-safe reference-counted pointer to an `RpcClient`, used for concurrent access.
+    - `payer`: A `Keypair` reference representing the payer's keypair for transaction fees.
+    - `program_data`: A reference to a `Vec<u8>` containing the program data to be deployed or upgraded.
+    - `account_data`: A reference to a `Vec<u8>` containing the account data associated with the program.
+- **Control Flow**:
+    - Calls `bpf_loader::deploy_invoke_same_slot` with the provided client, arc_client, payer, program_data, and account_data to deploy and invoke a program in the same slot.
+    - Calls `bpf_loader::deploy_invoke_diff_slot` to deploy and invoke a program in different slots.
+    - Calls `bpf_loader::upgrade_invoke_same_slot` to upgrade and invoke a program in the same slot.
+    - Calls `bpf_loader::upgrade_invoke_diff_slot` to upgrade and invoke a program in different slots.
+    - Calls `bpf_loader::deploy_close_same_slot` to deploy and close a program in the same slot.
+    - Calls `bpf_loader::deploy_close_diff_slot` to deploy and close a program in different slots.
+    - Calls `bpf_loader::close_invoke_same_slot` to close and invoke a program in the same slot.
+    - Calls `bpf_loader::close_invoke_diff_slot` to close and invoke a program in different slots.
+    - Calls `bpf_loader::close_redeploy_same_slot` to close and redeploy a program in the same slot.
+    - Calls `bpf_loader::close_redeploy_diff_slot` to close and redeploy a program in different slots.
+- **Output**: The function does not return any value; it performs a series of operations on the blockchain.
 
 
 ---
 ### stake\_ledger
-Transfers lamports using the provided RPC client and payer keypair.
+The `stake_ledger` function interacts with the Solana blockchain to move lamports using a specified client and payer.
 - **Inputs**:
-    - `client`: An `RpcClient` instance used to interact with the Solana blockchain.
-    - `payer`: A `Keypair` representing the payer's credentials for transaction signing.
-- **Logic and Control Flow**:
-    - Calls the `stake::move_lamports` function with the `client` and `payer` arguments.
-- **Output**: No return value.
+    - `client`: An instance of `RpcClient` used to interact with the Solana blockchain.
+    - `payer`: A `Keypair` representing the account that will pay for the transaction fees.
+- **Control Flow**:
+    - The function calls `stake::move_lamports` with the provided `client` and `payer` arguments.
+- **Output**: The function does not return any value.
 
 
 

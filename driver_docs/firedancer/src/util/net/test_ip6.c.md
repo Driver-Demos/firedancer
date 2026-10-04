@@ -3,10 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests IPv6 to IPv4 address mapping and validation functions.
+The `test_ip6.c` file in the `firedancer` codebase tests the functionality of converting and verifying IPv4-mapped IPv6 addresses.
 
 # Purpose
-This code is a C program that tests the functionality of IPv6 and IPv4 address handling utilities. It includes headers `fd_ip6.h`, `fd_ip4.h`, and `fd_util.h` to access necessary functions and macros. The program initializes by calling `fd_boot` and then creates an IPv6 address that is mapped from an IPv4 address using `fd_ip6_addr_ip4_mapped`. It verifies the correctness of this mapping with `FD_TEST` assertions, checking if the IPv6 address is correctly identified as an IPv4-mapped address and if the conversion back to an IPv4 address is accurate. The program also tests the robustness of the mapping by altering bits in the IPv6 address and ensuring it is no longer recognized as an IPv4-mapped address. Upon successful completion of all tests, it logs a notice indicating the tests passed and then halts execution with `fd_halt`.
+This C source code file is an executable program designed to test the functionality of IPv6 and IPv4 address manipulation, specifically focusing on IPv4-mapped IPv6 addresses. The code includes headers for IPv6 and IPv4 utilities, as well as a general utility header, indicating that it relies on external libraries or modules for its operations. The main function initializes the environment, performs a series of tests to verify the correct mapping of an IPv4 address to an IPv6 address, and checks the integrity of this mapping through bitwise operations. It uses a series of assertions (via `FD_TEST`) to ensure that the operations produce the expected results, such as confirming that the IPv6 address is correctly identified as an IPv4-mapped address and that the original IPv4 address can be accurately retrieved from the mapped IPv6 address.
+
+The program is structured to provide a narrow functionality focused on validating the conversion and identification of IPv4-mapped IPv6 addresses. It does not define public APIs or external interfaces but rather serves as a standalone test suite to ensure the correctness of the address conversion utilities. The use of `fd_boot` and `fd_halt` suggests that the program is part of a larger framework or system that requires initialization and cleanup routines. The successful execution of the tests is logged with a notice, indicating that the program's primary purpose is to verify the reliability and accuracy of the address conversion functions provided by the included utility headers.
 # Imports and Dependencies
 
 ---
@@ -19,27 +21,25 @@ This code is a C program that tests the functionality of IPv6 and IPv4 address h
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/net/test_ip6.c#L5>)
-
-Initializes the environment, tests IPv6 to IPv4 address mapping, and logs the result.
+The `main` function initializes the environment, tests IPv6 to IPv4 address mapping functionalities, and logs the results before halting the program.
 - **Inputs**:
-    - `argc`: The count of command-line arguments.
-    - `argv`: The array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Declares an array `ip6_addr` to store a 16-byte IPv6 address.
-    - Maps an IPv4 address to an IPv6 address using [`fd_ip6_addr_ip4_mapped`](<fd_ip6.h.md#fd_ip6_addr_ip4_mapped>).
-    - Verifies the mapping with `fd_memeq` and [`fd_ip6_addr_is_ip4_mapped`](<fd_ip6.h.md#fd_ip6_addr_is_ip4_mapped>).
-    - Iterates over the first 10 bytes of `ip6_addr`, flipping each bit and checking that the address is no longer an IPv4-mapped IPv6 address.
-    - Restores the original bits after each check.
-    - Verifies that the IPv6 address can be converted back to the original IPv4 address using [`fd_ip6_addr_to_ip4`](<fd_ip6.h.md#fd_ip6_addr_to_ip4>).
-    - Logs a success message with `FD_LOG_NOTICE`.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_ip6_addr_ip4_mapped`](<fd_ip6.h.md#fd_ip6_addr_ip4_mapped>)
-    - [`fd_ip6_addr_is_ip4_mapped`](<fd_ip6.h.md#fd_ip6_addr_is_ip4_mapped>)
-    - [`fd_ip6_addr_to_ip4`](<fd_ip6.h.md#fd_ip6_addr_to_ip4>)
+    - `argc`: The count of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - Declare a 16-byte array `ip6_addr` to store an IPv6 address.
+    - Map the IPv4 address 10.1.2.3 to an IPv6 address and store it in `ip6_addr`.
+    - Verify that `ip6_addr` matches the expected IPv6 representation of the IPv4 address using `fd_memeq`.
+    - Check that `ip6_addr` is recognized as an IPv4-mapped IPv6 address using [`fd_ip6_addr_is_ip4_mapped`](fd_ip6.h.md#fd_ip6_addr_is_ip4_mapped).
+    - Iterate over the first 10 bytes of `ip6_addr`, flipping each bit and verifying that the address is no longer recognized as IPv4-mapped, then restore the original bit.
+    - Verify that converting `ip6_addr` back to an IPv4 address yields 10.1.2.3 using [`fd_ip6_addr_to_ip4`](fd_ip6.h.md#fd_ip6_addr_to_ip4).
+    - Log a notice indicating the tests passed.
+    - Call `fd_halt` to clean up and terminate the program.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`fd_ip6_addr_ip4_mapped`](fd_ip6.h.md#fd_ip6_addr_ip4_mapped)
+    - [`fd_ip6_addr_is_ip4_mapped`](fd_ip6.h.md#fd_ip6_addr_is_ip4_mapped)
+    - [`fd_ip6_addr_to_ip4`](fd_ip6.h.md#fd_ip6_addr_to_ip4)
 
 
 

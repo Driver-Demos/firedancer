@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines and manages shared memory for sequence numbers, APIs, a Makefile, and tests for `fd_fseq`.
+The `fseq` folder in the `firedancer` codebase contains source code and tests for managing sequence numbers in shared memory, including implementation files (`fd_fseq.c` and `fd_fseq.h`), a makefile (`Local.mk`), and unit tests (`test_fseq.c`).
 
 
 ## Files
-- **[fd_fseq.c](fd_fseq.c.md)**: Defines and manages a shared memory region for sequence numbers with functions for alignment and lifecycle operations.
-- **[fd_fseq.h](fd_fseq.h.md)**: APIs for managing sequence numbers as persistent shared memory objects for inter-process communication.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_fseq` in the `firedancer` codebase.
-- **[test_fseq.c](test_fseq.c.md)**: Tests the functionality and alignment of the `fd_fseq` sequence management in shared memory.
+- **[fd_fseq.c](fd_fseq.c.md)**: The `fd_fseq.c` file in the `firedancer` codebase implements functions for managing a shared memory region that contains a sequence number, including creating, joining, leaving, and deleting the sequence.
+- **[fd_fseq.h](fd_fseq.h.md)**: The `fd_fseq.h` file in the `firedancer` codebase provides APIs for managing sequence numbers as persistent shared memory objects, primarily for flow control in communications, including functions for creating, joining, leaving, querying, and updating these sequence numbers.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_fseq` and `fd_tango` components, and includes a command to run the `test_fseq` unit test.
+- **[test_fseq.c](test_fseq.c.md)**: The `test_fseq.c` file in the `firedancer` codebase contains a series of unit tests for the `fd_fseq` functionality, including alignment checks, memory allocation, and sequence update operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

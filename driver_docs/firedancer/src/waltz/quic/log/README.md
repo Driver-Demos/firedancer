@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and definitions for QUIC logging, including buffer management, ABI, and high-performance event logging.
+QUIC log buffer management, shared-memory logging ABIs, and build settings.
 
 
 ## Files
-- **[fd_quic_log.c](fd_quic_log.c.md)**: Functions for managing QUIC log buffers, including creation, deletion, and joining for transmission and reception.
-- **[fd_quic_log.h](fd_quic_log.h.md)**: ABI definitions and structures for QUIC shared memory logging, including event IDs and error handling.
-- **[fd_quic_log_tx.h](fd_quic_log_tx.h.md)**: Internal APIs for high-performance logging of events using a custom binary log format.
-- **[fd_quic_log_user.h](fd_quic_log_user.h.md)**: Defines an ABI for extracting high-frequency logs from an `fd_quic` instance without providing log writing APIs.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers and objects, and defining a unit test for QUIC logging.
+- **[fd_quic_log.c](fd_quic_log.c.md)**: The `fd_quic_log.c` file in the `firedancer` codebase implements functions for managing QUIC log buffers, including creating, deleting, and joining transmit and receive logs.
+- **[fd_quic_log.h](fd_quic_log.h.md)**: ABI and event definitions for QUIC shared-memory logging.
+- **[fd_quic_log_tx.h](fd_quic_log_tx.h.md)**: Internal APIs for producer-side QUIC log buffering and message submission.
+- **[fd_quic_log_user.h](fd_quic_log_user.h.md)**: ABI and consumer-side helpers for reading high-frequency QUIC logs from shared memory.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies header and object files for the QUIC log component and includes a commented-out line for a unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

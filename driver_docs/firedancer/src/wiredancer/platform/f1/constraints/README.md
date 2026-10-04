@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines CL-specific constraints for top-level PNR with pblock creation and configuration.
+The `constraints` folder in the `firedancer` codebase contains a file that specifies constraints for the top-level place and route process, including the configuration of partition blocks for various components.
 
 
 ## Files
-- **[cl_pnr_user.xdc](cl_pnr_user.xdc.md)**: Defines CL-specific constraints for top-level PNR by creating and configuring pblocks.
+- **[cl_pnr_user.xdc](cl_pnr_user.xdc.md)**: The `cl_pnr_user.xdc` file in the `firedancer` codebase specifies constraints for the top-level place and route (PNR) process, including the creation and configuration of partition blocks (pblocks) for various components within the design.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
