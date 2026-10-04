@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_hpack.c` file in the `firedancer` codebase contains test cases for HPACK encoding and decoding, including functions to test reading and writing of HPACK headers and variable-length integers.
+Tests for HPACK encoding and decoding, including header field representation and variable-length integer encoding.
 
 # Purpose
-This C source code file is designed to test the functionality of HPACK, a compression format used in HTTP/2 for efficiently encoding and decoding HTTP headers. The file includes several static arrays of binary data (`rfc7541_c31_bin`, `rfc7541_c32_bin`, etc.) and their corresponding decoded header representations (`rfc7541_c31_dec`, `rfc7541_c32_dec`, etc.), which are used as test cases to validate the HPACK decoding process. The [`test_hpack_rd`](#test_hpack_rd) function is a key component that initializes an HPACK reader, iterates through the expected headers, and verifies that the decoded headers match the expected values using a series of assertions. This ensures that the HPACK decoding logic correctly interprets the binary data into structured HTTP/2 headers.
+The code is a test suite for validating the functionality of HPACK, which is a compression format used in HTTP/2 to efficiently encode HTTP headers. The file includes several static arrays of binary data (`rfc7541_c31_bin`, `rfc7541_c32_bin`, etc.) and their corresponding decoded header representations (`rfc7541_c31_dec`, `rfc7541_c32_dec`, etc.). These arrays are used to test the reading and decoding of HPACK-encoded headers. The function [`test_hpack_rd`](<#test_hpack_rd>) is responsible for initializing a reader, iterating over expected header fields, and verifying that the decoded headers match the expected values using assertions.
 
-Additionally, the file defines and tests variable-length integer encoding and decoding, which is a crucial part of the HPACK specification. The [`test_hpack_rd_varint`](#test_hpack_rd_varint) and [`test_hpack_wr_varint`](#test_hpack_wr_varint) functions test the reading and writing of these variable-length integers, respectively, using a set of predefined test cases (`test_hpack_cases`). These functions ensure that the encoding and decoding of integers are performed correctly, which is essential for the proper functioning of HPACK. Overall, this file serves as a comprehensive test suite for verifying the correctness of HPACK encoding and decoding implementations, ensuring compliance with the HTTP/2 specification.
+Additionally, the code defines a structure `test_hpack_case_t` to represent test cases for variable-length integer encoding and decoding, which is a part of the HPACK specification. The functions [`test_hpack_rd_varint`](<#test_hpack_rd_varint>) and [`test_hpack_wr_varint`](<#test_hpack_wr_varint>) test the reading and writing of these variable-length integers, respectively. The [`test_hpack`](<#test_hpack>) function orchestrates the execution of all these tests, ensuring that the HPACK implementation correctly handles both header field encoding/decoding and variable-length integer operations.
 # Imports and Dependencies
 
 ---
@@ -21,190 +21,199 @@ Additionally, the file defines and tests variable-length integer encoding and de
 
 ---
 ### rfc7541\_c31\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c31_bin` is a static constant array of unsigned characters (bytes) that represents a binary encoding of HTTP/2 headers as per RFC 7541, which defines the HPACK compression format. This array contains a sequence of bytes that encode specific HTTP/2 header fields in a compressed form.
-- **Use**: This variable is used in the `test_hpack_rd` function to test the decoding of HPACK-encoded HTTP/2 headers.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters that contains a binary representation of a specific HTTP/2 header set as defined by RFC 7541, section C.3.1. The array includes hexadecimal values that encode the header fields for a request to 'www.example.com'.
+- **Use**: Used in the `test_hpack_rd` function to test the decoding of HTTP/2 headers from a binary format.
 
 
 ---
 ### rfc7541\_c31\_dec
-- **Type**: `fd_h2_hdr_t const[]`
-- **Description**: The `rfc7541_c31_dec` is a static constant array of `fd_h2_hdr_t` structures, which represent HTTP/2 headers. Each element in the array contains a header name, its length, a hint indicating whether the header is indexed, and the header's value along with its length. The array is terminated by a zero-initialized structure.
-- **Use**: This array is used to define a set of HTTP/2 headers for decoding purposes, likely in the context of testing or implementing HPACK, the header compression format for HTTP/2.
+- **Type**: ``fd_h2_hdr_t const[]``
+- **Description**: An array of `fd_h2_hdr_t` structures that represent HTTP/2 headers as defined in RFC 7541, section C.3.1. Each element in the array contains a header name, its length, a hint for indexing, a header value, and its length. The array is terminated by a zero-initialized structure.
+- **Use**: Used to decode and represent a set of predefined HTTP/2 headers for testing HPACK decoding functionality.
 
 
 ---
 ### rfc7541\_c32\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c32_bin` is a static constant array of unsigned characters (bytes) representing a binary encoding of HTTP/2 headers as per RFC 7541, which defines the HPACK compression format. This array contains a sequence of bytes that are used to encode specific HTTP/2 header fields, including method, scheme, path, and cache-control directives.
-- **Use**: This variable is used in the `test_hpack_rd` function to test the decoding of HPACK-encoded HTTP/2 headers.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters that represents a binary encoding of HTTP/2 headers as per RFC 7541. The array contains specific byte values that correspond to encoded header fields.
+- **Use**: Used in the `test_hpack_rd` function to test the decoding of HTTP/2 headers.
 
 
 ---
 ### rfc7541\_c32\_dec
-- **Type**: `array of `fd_h2_hdr_t``
-- **Description**: The `rfc7541_c32_dec` is a static constant array of `fd_h2_hdr_t` structures, representing a set of HTTP/2 headers. Each element in the array contains a header name, its length, a hint for indexing, a header value, and its length. The array is terminated by a zero-initialized structure.
-- **Use**: This variable is used to decode HTTP/2 headers according to the RFC 7541 specification, specifically for a predefined set of headers.
+- **Type**: ``fd_h2_hdr_t const[]``
+- **Description**: An array of `fd_h2_hdr_t` structures that represent HTTP/2 headers as defined by RFC 7541. Each element in the array contains a header name, its length, a hint for indexing, a header value, and its length.
+- **Use**: Used to decode HTTP/2 headers from binary format as part of the HPACK compression mechanism.
 
 
 ---
 ### rfc7541\_c33\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c33_bin` is a static constant array of unsigned characters (bytes) that represents a binary encoding of HTTP/2 headers according to the HPACK compression format specified in RFC 7541. This array contains a sequence of bytes that encode specific HTTP/2 header fields and values, such as ":method", ":scheme", ":path", and custom headers like "custom-key" and "custom-value".
-- **Use**: This variable is used in the `test_hpack_rd` function to test the decoding of HPACK-encoded HTTP/2 headers.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters that represents a binary encoding of HTTP/2 headers as per RFC 7541, section C.3.3. The array contains a sequence of bytes that encode specific header fields and values.
+- **Use**: Used to test the decoding of HTTP/2 headers in the `test_hpack_rd` function.
 
 
 ---
 ### rfc7541\_c33\_dec
-- **Type**: `fd_h2_hdr_t const[]`
-- **Description**: The `rfc7541_c33_dec` is a static constant array of `fd_h2_hdr_t` structures, representing a set of HTTP/2 headers as defined by RFC 7541, section C.3.3. It includes headers such as `:method`, `:scheme`, `:path`, and a custom header `custom-key`, each with associated metadata like name length, value, value length, and hint flags.
-- **Use**: This variable is used to decode and verify HTTP/2 headers against a binary representation in HPACK format, as part of testing the HPACK decoding functionality.
+- **Type**: ``fd_h2_hdr_t const[]``
+- **Description**: An array of `fd_h2_hdr_t` structures that represent HTTP/2 headers as defined in RFC 7541, section C.3.3. Each element in the array contains a header name, its length, a hint for indexing, a header value, and its length. The array is terminated by an element with a `name` field set to `0`.
+- **Use**: Used to decode HTTP/2 headers for a specific test case in the HPACK encoding/decoding process.
 
 
 ---
 ### rfc7541\_c41\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c41_bin` is a static constant array of unsigned characters (bytes) that represents a binary encoding of HTTP/2 headers as per RFC 7541, which defines the HPACK compression format. This array contains a sequence of hexadecimal values that are used in the context of testing HPACK decoding functionality.
-- **Use**: This variable is used in the `test_hpack_rd` function to verify the correct decoding of HPACK-encoded headers.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters that contains a sequence of bytes. These bytes are likely used for encoding or decoding operations related to the HPACK compression format as specified in RFC 7541.
+- **Use**: Used in the `test_hpack_rd` function to test HPACK decoding.
 
 
 ---
 ### rfc7541\_c42\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c42_bin` is a static constant array of unsigned characters (bytes) that represents a binary-encoded sequence, likely used for testing or demonstrating HPACK encoding as per RFC 7541, which is the header compression format for HTTP/2.
-- **Use**: This variable is used in the `test_hpack_rd` function to test the decoding of HPACK-encoded headers.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters that represents a binary encoding related to RFC 7541, which is the HPACK compression format for HTTP/2 headers.
+- **Use**: Used in the `test_hpack_rd` function to test the decoding of HPACK encoded headers.
 
 
 ---
 ### rfc7541\_c43\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c43_bin` is a static constant array of unsigned characters (bytes) that represents a binary encoding of HTTP/2 headers as per RFC 7541, which defines the HPACK compression format. This array contains a sequence of bytes that are used to test the decoding of HTTP/2 headers in the HPACK format.
-- **Use**: This variable is used in the `test_hpack_rd` function to verify the correct decoding of HTTP/2 headers from their binary representation.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters that represents a binary encoding of HTTP/2 headers as per RFC 7541. The array contains a sequence of hexadecimal values that encode specific header fields and values.
+- **Use**: Used in the `test_hpack_rd` function to test the decoding of HTTP/2 headers.
 
 
 ---
 ### rfc7541\_c51\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c51_bin` is a static constant array of unsigned characters (bytes) that represents a binary encoding of HTTP/2 headers as per RFC 7541, which defines HPACK, the header compression format for HTTP/2. This array contains a sequence of bytes that encode specific HTTP/2 header fields and their values.
-- **Use**: This variable is used in the `test_hpack_rd` function to test the decoding of HPACK-encoded HTTP/2 headers.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters that contains binary data representing HTTP/2 headers as per RFC 7541, section C.5.1. This data is used for testing HPACK encoding and decoding.
+- **Use**: Used in the `test_hpack_rd` function to verify the correct decoding of HTTP/2 headers.
 
 
 ---
 ### rfc7541\_c51\_dec
-- **Type**: `array of `fd_h2_hdr_t``
-- **Description**: The `rfc7541_c51_dec` is a static constant array of `fd_h2_hdr_t` structures, representing a set of HTTP/2 headers decoded according to RFC 7541. Each element in the array contains a header name, its length, a hint for indexing, a header value, and its length.
-- **Use**: This array is used to store and reference a predefined set of HTTP/2 headers for decoding purposes in the context of HPACK compression.
+- **Type**: ``fd_h2_hdr_t const[]``
+- **Description**: An array of `fd_h2_hdr_t` structures that represent HTTP/2 headers as defined in RFC 7541, section C.5.1. Each element in the array contains a header name, its length, a hint for indexing, a header value, and its length. The array is terminated by an element with a null name.
+- **Use**: Used to decode and represent a set of HTTP/2 headers for a specific test case in the HPACK encoding/decoding process.
 
 
 ---
 ### rfc7541\_c61\_bin
-- **Type**: `uchar const[]`
-- **Description**: The `rfc7541_c61_bin` is a static constant array of unsigned characters (bytes) that represents a binary encoding of HTTP/2 headers as per RFC 7541, which defines HPACK, a compression format for efficiently representing HTTP/2 header fields. This array contains a sequence of bytes that are used in testing the decoding of HPACK-encoded headers.
-- **Use**: This variable is used in the `test_hpack_rd` function to test the reading and decoding of HPACK-encoded headers.
+- **Type**: ``uchar const[]``
+- **Description**: An array of unsigned characters that contains a sequence of bytes. These bytes are likely used for encoding or decoding operations related to the HPACK compression format as specified in RFC 7541.
+- **Use**: Used as input data for HPACK decoding functions to test the decoding process.
 
 
 ---
 ### test\_hpack\_cases
-- **Type**: `array of `test_hpack_case_t``
-- **Description**: The `test_hpack_cases` variable is a static array of `test_hpack_case_t` structures, each representing a test case for HPACK encoding and decoding. Each element in the array contains fields such as `bits`, `prefix`, `len`, `res`, and optionally `enc`, which are used to define the parameters and expected results for HPACK variable-length integer encoding and decoding tests.
-- **Use**: This variable is used in functions like `test_hpack_rd_varint` and `test_hpack_wr_varint` to validate the correctness of HPACK encoding and decoding operations.
+- **Type**: ``test_hpack_case_t const[]``
+- **Description**: An array of `test_hpack_case_t` structures, each containing fields for `bits`, `prefix`, `len`, `res`, and optionally `enc`. These fields represent test cases for HPACK encoding and decoding, specifically for variable-length integer encoding.
+- **Use**: Used to test the reading and writing of HPACK variable-length integers in the `test_hpack_rd_varint` and `test_hpack_wr_varint` functions.
 
 
 # Data Structures
 
 ---
 ### test\_hpack\_case
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `res`: Stores the result of the HPACK encoding or decoding operation as an unsigned long integer.
-    - `enc`: An array of 8 unsigned characters used to store the encoded data.
-    - `bits`: An unsigned character representing the number of bits used in the encoding.
-    - `prefix`: An unsigned character representing the prefix used in the encoding.
-    - `len`: An unsigned character indicating the length of the encoded data.
-- **Description**: The `test_hpack_case` structure is used to represent test cases for HPACK encoding and decoding operations. It contains fields to store the result of the operation (`res`), the encoded data (`enc`), the number of bits used in the encoding (`bits`), the prefix used (`prefix`), and the length of the encoded data (`len`). This structure is utilized in testing functions to verify the correctness of HPACK variable integer encoding and decoding.
+    - `res`: Stores the result as an unsigned long integer.
+    - `enc`: An array of 8 unsigned characters used for encoding.
+    - `bits`: Stores the number of bits as an unsigned character.
+    - `prefix`: Stores the prefix value as an unsigned character.
+    - `len`: Stores the length as an unsigned character.
+- **Description**: Represents a test case for HPACK encoding and decoding, containing fields for the result, encoding data, bit count, prefix, and length.
 
 
 ---
 ### test\_hpack\_case\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `res`: Stores the result of the HPACK encoding or decoding operation as an unsigned long integer.
-    - `enc`: An array of 8 unsigned characters used to store the encoded bytes.
-    - `bits`: An unsigned character representing the number of bits used in the encoding.
-    - `prefix`: An unsigned character representing the prefix used in the encoding.
-    - `len`: An unsigned character indicating the length of the encoded data.
-- **Description**: The `test_hpack_case_t` structure is used to define test cases for HPACK encoding and decoding operations, specifically for handling variable-length integers. It contains fields to store the result of the operation, the encoded bytes, the number of bits used, the prefix, and the length of the encoded data. This structure is essential for testing the correctness of HPACK encoding and decoding functions by providing predefined cases with expected results.
+    - `res`: Stores the result as an unsigned long integer.
+    - `enc`: Holds an array of 8 unsigned characters for encoding.
+    - `bits`: Represents the number of bits used in the encoding.
+    - `prefix`: Stores the prefix value used in the encoding.
+    - `len`: Indicates the length of the encoded data.
+- **Description**: Defines a structure used for testing HPACK encoding and decoding cases, with fields for storing the result, encoding data, bit count, prefix, and length of the encoded data.
 
 
 # Functions
 
 ---
 ### test\_hpack\_rd<!-- {{#callable:test_hpack_rd}} -->
-The `test_hpack_rd` function tests the decoding of HPACK-encoded binary data into HTTP/2 headers and verifies the correctness of the decoded headers against expected values.
+[View Source →](<../../../../../src/waltz/h2/test_hpack.c#L116>)
+
+Validates the decoding of HPACK-encoded headers against expected header values.
 - **Inputs**:
-    - `bin`: A pointer to the binary data that is HPACK-encoded.
-    - `binsz`: The size of the binary data in bytes.
-    - `dec`: A pointer to an array of expected `fd_h2_hdr_t` structures representing the expected decoded headers.
-- **Control Flow**:
-    - Initialize an `fd_hpack_rd_t` reader with the provided binary data and its size.
+    - ``bin``: A pointer to the binary data representing HPACK-encoded headers.
+    - ``binsz``: The size of the binary data in bytes.
+    - ``dec``: A pointer to an array of `fd_h2_hdr_t` structures representing the expected decoded headers.
+- **Logic and Control Flow**:
+    - Initialize an `fd_hpack_rd_t` structure with the binary data and its size.
     - Iterate over the expected headers until a header with a null name is encountered.
-    - For each expected header, verify that the reader has not finished reading all headers.
-    - Decode the next header from the binary data into a temporary `fd_h2_hdr_t` structure and a buffer for the header's name and value.
-    - Check that the buffer pointer is within the bounds of the buffer array.
-    - Verify that the decoded header's name length, value length, name, value, and hint match the expected header's values.
-    - After all expected headers are processed, verify that the reader has finished reading all headers.
-- **Output**: The function does not return a value; it uses assertions to verify the correctness of the decoding process.
-- **Functions called**:
-    - [`fd_hpack_rd_done`](fd_hpack.h.md#fd_hpack_rd_done)
-    - [`fd_hpack_rd_next`](fd_hpack.c.md#fd_hpack_rd_next)
+    - For each expected header, verify that the reader has not finished reading the data.
+    - Decode the next header from the binary data into an `fd_h2_hdr_t` structure.
+    - Ensure the buffer pointer remains within the buffer limits after decoding.
+    - Compare the decoded header's name length, value length, name, value, and hint with the expected header's values.
+    - After processing all expected headers, verify that the reader has finished reading the data.
+- **Output**: No output is returned; the function uses assertions to validate the decoding process.
+- **Functions Called**:
+    - [`fd_hpack_rd_done`](<fd_hpack.h.md#fd_hpack_rd_done>)
+    - [`fd_hpack_rd_next`](<fd_hpack.c.md#fd_hpack_rd_next>)
 
 
 ---
 ### test\_hpack\_rd\_varint<!-- {{#callable:test_hpack_rd_varint}} -->
-The `test_hpack_rd_varint` function tests the reading of variable-length integers from encoded data using different test cases.
+[View Source →](<../../../../../src/waltz/h2/test_hpack.c#L164>)
+
+Tests the reading of HPACK variable-length integers against predefined test cases.
 - **Inputs**: None
-- **Control Flow**:
-    - Iterates over each test case in `test_hpack_cases` until a case with `bits` equal to zero is encountered.
-    - For each test case, iterates over possible lengths from 0 to 8.
-    - Initializes a `fd_hpack_rd_t` structure with the encoded data and the current length.
-    - Calls [`fd_hpack_rd_varint`](fd_hpack_private.h.md#fd_hpack_rd_varint) to read a variable-length integer from the encoded data.
-    - Checks if the length is less than the expected length in the test case; if so, asserts that the result is `ULONG_MAX`.
-    - Otherwise, asserts that the result matches the expected result in the test case.
-- **Output**: The function does not return a value; it uses assertions to validate the correctness of the variable-length integer reading process.
-- **Functions called**:
-    - [`fd_hpack_rd_varint`](fd_hpack_private.h.md#fd_hpack_rd_varint)
+- **Logic and Control Flow**:
+    - Iterates over each test case in `test_hpack_cases` where `c->bits` is non-zero.
+    - For each test case, iterates over `len` from 0 to 8 inclusive.
+    - Initializes `fd_hpack_rd_t` structure `rd` with `src` set to `c->enc` and `src_end` set to `c->enc + len`.
+    - Calls [`fd_hpack_rd_varint`](<fd_hpack_private.h.md#fd_hpack_rd_varint>) with `rd`, `c->prefix`, and `(1U<<(c->bits))-1U` to read a variable-length integer.
+    - If `len` is less than `c->len`, checks that the result is `ULONG_MAX` using `FD_TEST`.
+    - Otherwise, checks that the result matches `c->res` using `FD_TEST`.
+- **Output**: No output is returned; the function uses assertions to validate behavior.
+- **Functions Called**:
+    - [`fd_hpack_rd_varint`](<fd_hpack_private.h.md#fd_hpack_rd_varint>)
 
 
 ---
 ### test\_hpack\_wr\_varint<!-- {{#callable:test_hpack_wr_varint}} -->
-The function `test_hpack_wr_varint` tests the encoding of variable-length integers using HPACK encoding by comparing the output of [`fd_hpack_wr_varint`](fd_hpack_wr.h.md#fd_hpack_wr_varint) with expected results from predefined test cases.
+[View Source →](<../../../../../src/waltz/h2/test_hpack.c#L179>)
+
+Tests the [`fd_hpack_wr_varint`](<fd_hpack_wr.h.md#fd_hpack_wr_varint>) function by encoding a series of test cases and verifying the results.
 - **Inputs**: None
-- **Control Flow**:
-    - Iterates over each test case in `test_hpack_cases` until a case with `bits` equal to zero is encountered.
-    - For each test case, initializes a buffer `buf` of size 16 to store the encoded integer.
-    - Calculates `addend` as `(1U << c->bits) - 1U` and `prefix` as `c->prefix & ~addend`.
-    - Calls [`fd_hpack_wr_varint`](fd_hpack_wr.h.md#fd_hpack_wr_varint) with `buf`, `prefix`, `addend`, and `c->res` to encode the integer and stores the length of the encoded data in `len`.
-    - Asserts that the length of the encoded data `len` is equal to `c->len + 1`.
-    - Asserts that the first byte of `buf` is equal to `c->prefix`.
-    - Asserts that the remaining bytes of `buf` match the expected encoding `c->enc` for the length `c->len`.
-- **Output**: The function does not return any value; it performs assertions to validate the correctness of the encoding process.
-- **Functions called**:
-    - [`fd_hpack_wr_varint`](fd_hpack_wr.h.md#fd_hpack_wr_varint)
+- **Logic and Control Flow**:
+    - Iterates over each test case in `test_hpack_cases`.
+    - For each test case, initializes a buffer `buf` of size 16.
+    - Calculates `addend` as `(1U << c->bits) - 1U`.
+    - Calculates `prefix` by masking `c->prefix` with the bitwise NOT of `addend`.
+    - Calls [`fd_hpack_wr_varint`](<fd_hpack_wr.h.md#fd_hpack_wr_varint>) with `buf`, `prefix`, `addend`, and `c->res` to encode the integer.
+    - Verifies that the length returned by [`fd_hpack_wr_varint`](<fd_hpack_wr.h.md#fd_hpack_wr_varint>) is equal to `c->len + 1`.
+    - Checks that the first byte of `buf` matches `c->prefix`.
+    - Verifies that the encoded bytes in `buf` match `c->enc` for `c->len` bytes.
+- **Output**: No direct output; uses `FD_TEST` to assert conditions.
+- **Functions Called**:
+    - [`fd_hpack_wr_varint`](<fd_hpack_wr.h.md#fd_hpack_wr_varint>)
 
 
 ---
 ### test\_hpack<!-- {{#callable:test_hpack}} -->
-The `test_hpack` function tests the HPACK encoding and decoding functionality by invoking various test cases for reading and writing HPACK headers and variable integers.
+[View Source →](<../../../../../src/waltz/h2/test_hpack.c#L192>)
+
+Executes a series of tests for HPACK encoding and decoding using predefined binary and header data.
 - **Inputs**: None
-- **Control Flow**:
-    - The function calls [`test_hpack_rd`](#test_hpack_rd) multiple times with different binary data and expected decoded header arrays to test the reading of HPACK headers.
-    - It then calls [`test_hpack_rd_varint`](#test_hpack_rd_varint) to test the reading of HPACK variable integers using predefined test cases.
-    - Finally, it calls [`test_hpack_wr_varint`](#test_hpack_wr_varint) to test the writing of HPACK variable integers using the same set of test cases.
-- **Output**: The function does not return any value; it performs tests and likely logs results or assertions internally.
-- **Functions called**:
-    - [`test_hpack_rd`](#test_hpack_rd)
-    - [`test_hpack_rd_varint`](#test_hpack_rd_varint)
-    - [`test_hpack_wr_varint`](#test_hpack_wr_varint)
+- **Logic and Control Flow**:
+    - Calls [`test_hpack_rd`](<#test_hpack_rd>) with various binary data and expected header data to test HPACK decoding.
+    - Invokes [`test_hpack_rd_varint`](<#test_hpack_rd_varint>) to test the reading of variable-length integers in HPACK.
+    - Calls [`test_hpack_wr_varint`](<#test_hpack_wr_varint>) to test the writing of variable-length integers in HPACK.
+- **Output**: No output is returned as the function is void and primarily used for testing purposes.
+- **Functions Called**:
+    - [`test_hpack_rd`](<#test_hpack_rd>)
+    - [`test_hpack_rd_varint`](<#test_hpack_rd_varint>)
+    - [`test_hpack_wr_varint`](<#test_hpack_wr_varint>)
 
 
 

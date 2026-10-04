@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README_cavp.md` file in the `firedancer` codebase provides information about the inclusion of NIST Cryptographic Algorithm Validation Program (CAVP) test vectors for validating implementations of SHA-2 family hash functions, along with their SHA-256 checksums for verification.
+Contains unmodified NIST CAVP test vectors for SHA-2 hash functions with verification checksums.
 
 # Purpose
-The provided content is a documentation snippet for a module that includes test vectors from the NIST Cryptographic Algorithm Validation Program (CAVP). These test vectors are used to validate implementations of cryptographic algorithms recommended by NIST, specifically focusing on the SHA-2 family of hash functions, such as SHA-256 and SHA-512, as outlined in FIPS 180-4. The document lists the SHA-256 checksums for each test vector file, ensuring the integrity and authenticity of the files by allowing users to verify that the content has not been altered. Additionally, it provides references to official NIST resources for further information and usage guidelines, such as the Secure Hash Algorithm Validation System (SHAVS) documentation. This ensures that developers and cryptographers can reliably test and validate their cryptographic implementations against standardized benchmarks.
+The document provides information about the NIST Cryptographic Algorithm Validation Program (CAVP) and includes test vectors for validating implementations of NIST-recommended cryptographic algorithms. It contains unmodified copies of test vectors for the SHA-2 family of hash functions, such as SHA-256 and SHA-512, as specified in FIPS 180-4. The document lists the SHA-256 checksums for each test vector file to verify their integrity. It also provides links to the source of the test vectors and additional documentation for usage, such as the Secure Hash Algorithm Validation System (SHAVS). The table included specifies the file names, their locations, and their corresponding SHA-256 checksums.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
