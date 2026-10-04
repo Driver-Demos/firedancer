@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Expected CodeQL diagnostics for array access metric enum mismatches and size errors.
+Expected output for array access issues in `MetricsEnumAccess.c`, highlighting mismatches and potential errors.
 
 # Purpose
-This file lists static analysis findings for array access in `MetricsEnumAccess.c`. Each entry identifies a source range, the rule category `access to array`, and a message that describes a mismatch between an index macro value, an enum name, or an array size. The findings point to cases where the `IDX` and `CNT` values do not match the declared array length, which can cause under-read or over-read and under-write or over-write conditions. The repeated enum-name mismatch messages show that the index macro and count macro are not aligned with the array definition.
+The content documents potential issues related to array access in the `MetricsEnumAccess.c` file. It identifies specific lines of code where the index (`IDX`) and count (`CNT`) values used in macros do not align with the actual array sizes, which could lead to under-reads, over-reads, under-writes, or over-writes. Each entry specifies the exact location in the code, the type of access issue, and a description of the mismatch between the expected and actual values. This information is crucial for developers to identify and correct array access errors, ensuring that the code operates safely and as intended.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

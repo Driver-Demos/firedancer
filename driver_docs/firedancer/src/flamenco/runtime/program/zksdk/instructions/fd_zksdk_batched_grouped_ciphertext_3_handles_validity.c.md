@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c` file in the `firedancer` codebase implements functions to initialize a transcript and verify the validity of a proof for batched grouped ciphertexts with three handles using cryptographic operations.
+Functions for initializing and verifying the validity of batched grouped ciphertexts with three handles.
 
 # Purpose
-This C source code file is part of a cryptographic library, specifically dealing with the verification of proofs related to the validity of batched grouped ciphertexts using three handles. The file defines functions that initialize and verify cryptographic transcripts, which are essential for ensuring the integrity and authenticity of cryptographic operations. The primary function, [`fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity`](#fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity), performs a series of cryptographic operations to validate a proof against given public keys, commitments, and handles. It uses elliptic curve operations, specifically on the Ristretto255 curve, to perform multi-scalar multiplications and point decompressions, which are critical for the verification process. The function also handles both batched and non-batched scenarios, adjusting its operations accordingly.
+The code provides functionality for verifying the validity of a proof related to batched grouped ciphertexts with three handles. It is part of a cryptographic library and is intended to be used as a verification mechanism for zero-knowledge proofs. The code defines two main functions: [`batched_grouped_ciphertext_validity_transcript_init`](<#batched_grouped_ciphertext_validity_transcript_init>) and [`fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity`](<#fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity>). The first function initializes a transcript for the verification process, appending public keys and messages related to the grouped ciphertexts. The second function performs the actual verification by validating inputs, computing necessary scalars, and performing a multi-scalar multiplication to check if the computed result matches the expected value.
 
-The file is not a standalone executable but rather a component of a larger cryptographic system, likely intended to be used as part of a library. It provides a specific functionality focused on zero-knowledge proof verification, which is a narrow but crucial aspect of cryptographic protocols. The code includes detailed validation steps to ensure the correctness of the inputs and the integrity of the cryptographic operations. The use of static inline functions and the inclusion of a private header file suggest that this code is designed for internal use within the library, rather than as a public API. The functions defined here are integral to maintaining the security properties of the cryptographic system by ensuring that only valid proofs are accepted.
+The code is structured to handle both batched and non-batched scenarios, with specific logic to compute additional values when the `batched` flag is true. It uses cryptographic operations such as scalar multiplication and point decompression on the Ristretto255 curve, which is a prime-order group based on Curve25519. The code also includes a function [`fd_zksdk_instr_verify_proof_batched_grouped_ciphertext_3_handles_validity`](<#fd_zksdk_instr_verify_proof_batched_grouped_ciphertext_3_handles_validity>), which acts as an interface to initialize the transcript and call the verification function with the appropriate context and proof data. This code is part of a larger system that deals with cryptographic proofs and is designed to be integrated into applications requiring secure verification of complex cryptographic statements.
 # Imports and Dependencies
 
 ---
@@ -19,25 +19,29 @@ The file is not a standalone executable but rather a component of a larger crypt
 
 ---
 ### batched\_grouped\_ciphertext\_validity\_transcript\_init<!-- {{#callable:batched_grouped_ciphertext_validity_transcript_init}} -->
-The function `batched_grouped_ciphertext_validity_transcript_init` initializes a transcript for verifying the validity of a batched grouped ciphertext with three handles by appending public keys and ciphertext data to the transcript.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/instructions/fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c#L3>)
+
+Initializes a transcript for batched grouped ciphertext validity with three public keys and two grouped ciphertexts.
 - **Inputs**:
-    - `transcript`: A pointer to an `fd_zksdk_transcript_t` structure where the transcript will be initialized and data will be appended.
-    - `context`: A pointer to a constant `fd_zksdk_batched_grp_ciph_3h_val_context_t` structure containing the public keys and grouped ciphertext data needed for the transcript.
-- **Control Flow**:
-    - Call `fd_zksdk_transcript_init` to initialize the transcript with a specific literal indicating the operation type.
-    - Append the first public key from the context to the transcript using `fd_zksdk_transcript_append_pubkey`.
-    - Append the second public key from the context to the transcript using `fd_zksdk_transcript_append_pubkey`.
-    - Append the third public key from the context to the transcript using `fd_zksdk_transcript_append_pubkey`.
-    - Append the low part of the grouped ciphertext from the context to the transcript using `fd_zksdk_transcript_append_message`.
-    - Append the high part of the grouped ciphertext from the context to the transcript using `fd_zksdk_transcript_append_message`.
-- **Output**: The function does not return a value; it modifies the `transcript` in place by appending the necessary data.
+    - `transcript`: A pointer to an `fd_zksdk_transcript_t` structure that will be initialized.
+    - `context`: A pointer to a constant `fd_zksdk_batched_grp_ciph_3h_val_context_t` structure containing public keys and grouped ciphertexts.
+- **Logic and Control Flow**:
+    - Call `fd_zksdk_transcript_init` to initialize the `transcript` with a specific literal string.
+    - Append the first public key from `context->pubkey1` to the `transcript` using `fd_zksdk_transcript_append_pubkey`.
+    - Append the second public key from `context->pubkey2` to the `transcript`.
+    - Append the third public key from `context->pubkey3` to the `transcript`.
+    - Append the low grouped ciphertext from `context->grouped_ciphertext_lo` to the `transcript` using `fd_zksdk_transcript_append_message`.
+    - Append the high grouped ciphertext from `context->grouped_ciphertext_hi` to the `transcript`.
+- **Output**: The function does not return a value; it modifies the `transcript` in place.
 
 
 ---
 ### fd\_zksdk\_verify\_proof\_batched\_grouped\_ciphertext\_3\_handles\_validity<!-- {{#callable:fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity}} -->
-The function `fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity` verifies the validity of a batched grouped ciphertext proof with three handles using elliptic curve operations and a transcript for challenge extraction.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/instructions/fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c#L15>)
+
+Verifies the validity of a batched grouped ciphertext proof with three handles using Ristretto255 points and scalars.
 - **Inputs**:
-    - `proof`: A pointer to a `fd_zksdk_grp_ciph_3h_val_proof_t` structure containing the proof data to be verified.
+    - `proof`: A pointer to a `fd_zksdk_grp_ciph_3h_val_proof_t` structure containing the proof data.
     - `pubkey1`: A 32-byte array representing the first public key.
     - `pubkey2`: A 32-byte array representing the second public key.
     - `pubkey3`: A 32-byte array representing the third public key.
@@ -45,40 +49,43 @@ The function `fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validit
     - `handle1`: A 32-byte array representing the first handle.
     - `handle2`: A 32-byte array representing the second handle.
     - `handle3`: A 32-byte array representing the third handle.
-    - `comm_hi`: A 32-byte array representing the high commitment, used if batched is true.
-    - `handle1_hi`: A 32-byte array representing the first high handle, used if batched is true.
-    - `handle2_hi`: A 32-byte array representing the second high handle, used if batched is true.
-    - `handle3_hi`: A 32-byte array representing the third high handle, used if batched is true.
-    - `batched`: A boolean indicating whether the proof is batched.
-    - `transcript`: A pointer to a `fd_zksdk_transcript_t` structure used for managing the transcript of the proof verification process.
-- **Control Flow**:
-    - Initialize arrays for scalars and points, and validate the input scalars `zr` and `zx` from the proof.
-    - Set base points `G` and `H` and decompress the proof's `y0` point and other points from the input arrays into the `points` array.
-    - If `batched` is true, decompress additional high commitment and handle points into the `points` array.
-    - Initialize the transcript with domain separation and append points from the proof to the transcript, extracting challenges `c` and `w`.
-    - Compute the scalar values for the multi-scalar multiplication (MSM) based on the challenges and proof data.
-    - Perform the MSM operation using the computed scalars and points, storing the result in `res`.
-    - Compare the result `res` with the decompressed `y0` point to determine the validity of the proof.
-    - Return success if the points match, otherwise return an error.
-- **Output**: The function returns an integer indicating success (`FD_EXECUTOR_INSTR_SUCCESS`) if the proof is valid, or an error code (`FD_ZKSDK_VERIFY_PROOF_ERROR`) if the proof is invalid.
+    - `comm_hi`: A 32-byte array representing the high commitment, used if `batched` is true.
+    - `handle1_hi`: A 32-byte array representing the high first handle, used if `batched` is true.
+    - `handle2_hi`: A 32-byte array representing the high second handle, used if `batched` is true.
+    - `handle3_hi`: A 32-byte array representing the high third handle, used if `batched` is true.
+    - `batched`: A boolean indicating if the proof is batched.
+    - `transcript`: A pointer to a `fd_zksdk_transcript_t` structure used for the transcript of the proof.
+- **Logic and Control Flow**:
+    - Initialize arrays for scalars and points, and set base points `G` and `H`.
+    - Validate the scalars `zr` and `zx` from the proof; return error if invalid.
+    - Decompress and validate the points `y0`, `comm`, `pubkey1`, `y1`, `handle1`, `pubkey2`, `y2`, `handle2`, `pubkey3`, `y3`, and `handle3`; return error if any decompression fails.
+    - If `batched` is true, decompress and validate `comm_hi`, `handle1_hi`, `handle2_hi`, and `handle3_hi`; return error if any decompression fails.
+    - Initialize the transcript with domain separation for batched or non-batched proofs.
+    - Append and validate points `Y_0`, `Y_1`, and `Y_2` to the transcript; return error if validation fails.
+    - Append point `Y_3` to the transcript without validation.
+    - Extract challenge scalars `c` and `w` from the transcript.
+    - Compute the scalar values for the multi-scalar multiplication (MSM) based on the proof and challenges.
+    - Perform the MSM with the computed scalars and points.
+    - Check if the result of the MSM equals `y0`; return success if true, otherwise return error.
+- **Output**: Returns `FD_EXECUTOR_INSTR_SUCCESS` if the proof is valid, otherwise returns `FD_ZKSDK_VERIFY_PROOF_ERROR`.
 
 
 ---
 ### fd\_zksdk\_instr\_verify\_proof\_batched\_grouped\_ciphertext\_3\_handles\_validity<!-- {{#callable:fd_zksdk_instr_verify_proof_batched_grouped_ciphertext_3_handles_validity}} -->
-The function `fd_zksdk_instr_verify_proof_batched_grouped_ciphertext_3_handles_validity` initializes a transcript and verifies the validity of a batched grouped ciphertext proof using three handles.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/instructions/fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c#L178>)
+
+Verifies the validity of a batched grouped ciphertext proof using three handles.
 - **Inputs**:
-    - `_context`: A pointer to a `fd_zksdk_batched_grp_ciph_3h_val_context_t` structure containing the context for the proof verification, including public keys and grouped ciphertexts.
-    - `_proof`: A pointer to a `fd_zksdk_batched_grp_ciph_3h_val_proof_t` structure containing the proof data to be verified.
-- **Control Flow**:
-    - Initialize a `fd_zksdk_transcript_t` object to store the transcript data.
-    - Cast the `_context` and `_proof` pointers to their respective types for easier access to their fields.
-    - Call [`batched_grouped_ciphertext_validity_transcript_init`](#batched_grouped_ciphertext_validity_transcript_init) to initialize the transcript with the context data, including public keys and grouped ciphertexts.
-    - Invoke [`fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity`](#fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity) with the proof, context data, and the initialized transcript to perform the actual proof verification.
+    - `_context`: A pointer to a `fd_zksdk_batched_grp_ciph_3h_val_context_t` structure containing public keys and grouped ciphertext data.
+    - `_proof`: A pointer to a `fd_zksdk_batched_grp_ciph_3h_val_proof_t` structure containing the proof data to verify.
+- **Logic and Control Flow**:
+    - Initialize a `fd_zksdk_transcript_t` object using [`batched_grouped_ciphertext_validity_transcript_init`](<#batched_grouped_ciphertext_validity_transcript_init>) with the provided context.
+    - Call [`fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity`](<#fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity>) with the proof, public keys, commitments, handles, and the initialized transcript to verify the proof.
     - Return the result of the verification function, which indicates success or failure of the proof verification.
-- **Output**: The function returns an integer indicating the success or failure of the proof verification, typically `FD_EXECUTOR_INSTR_SUCCESS` for success or `FD_ZKSDK_VERIFY_PROOF_ERROR` for failure.
-- **Functions called**:
-    - [`batched_grouped_ciphertext_validity_transcript_init`](#batched_grouped_ciphertext_validity_transcript_init)
-    - [`fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity`](#fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity)
+- **Output**: An integer indicating the success or failure of the proof verification process.
+- **Functions Called**:
+    - [`batched_grouped_ciphertext_validity_transcript_init`](<#batched_grouped_ciphertext_validity_transcript_init>)
+    - [`fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity`](<#fd_zksdk_verify_proof_batched_grouped_ciphertext_3_handles_validity>)
 
 
 

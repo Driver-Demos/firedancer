@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_bundle_tile.h` file defines a bundle client tile for the Firedancer project, utilizing HTTP/2 over TLS with OpenSSL and Firedancer's fd_h2 and fd_grpc for network communication.
+Provides a bundle client tile using HTTP/2 over TLS with TCP sockets and OpenSSL for I/O and security.
 
 # Purpose
-This code is a C header file that defines the interface for a "bundle client tile" within a larger software system, likely related to network communication. It specifies the use of HTTP/2 over TLS connections, utilizing TCP sockets and OpenSSL for secure communication, and integrates with Firedancer's libraries for HTTP/2 and gRPC logic. The header file includes a reference to another header, `fd_topo.h`, and declares a structure `fd_bundle_tile` and a typedef `fd_bundle_tile_t` for it, along with an external declaration of `fd_tile_bundle`, which is presumably a function or variable related to the tile's operation. The file is designed for environments where busy polling is acceptable, indicating a focus on performance over power efficiency.
+The `fd_bundle_tile.h` file is a C header file that defines a bundle client tile for network communication. It specifies the use of HTTP/2 over TLS connections, utilizing TCP sockets and OpenSSL for secure socket I/O, including handshake and record layers. The file includes the `fd_topo.h` header, indicating a dependency on the topology-related functionalities. It declares a structure `fd_bundle_tile` and its corresponding typedef `fd_bundle_tile_t`, as well as an external variable `fd_tile_bundle` of type `fd_topo_run_tile_t`. The header is part of a system that uses Firedancer's `fd_h2` and `fd_grpc` for handling HTTP/2 and gRPC logic, and it operates with busy polling, which does not include power-saving features.
 # Imports and Dependencies
 
 ---
@@ -17,8 +17,10 @@ This code is a C header file that defines the interface for a "bundle client til
 
 ---
 ### fd\_bundle\_tile\_t
-- **Type**: `typedef struct fd_bundle_tile fd_bundle_tile_t;`
-- **Description**: The `fd_bundle_tile_t` is a typedef for a forward-declared structure `fd_bundle_tile`, which is part of a system that requires HTTP/2 over TLS connections, utilizing TCP sockets and OpenSSL for secure communication. It is associated with Firedancer's HTTP/2 and gRPC logic, and is designed for environments where busy polling is acceptable, as it does not include power-saving features. The actual structure definition is not provided in the given code, indicating that it is likely defined elsewhere in the codebase.
+- **Type**: ``struct``
+- **Members**:
+    - ``fd_bundle_tile``: A forward declaration of the `fd_bundle_tile` structure.
+- **Description**: The `fd_bundle_tile_t` is a typedef for the `fd_bundle_tile` structure, which is forward declared in the provided code. This structure is part of a system that requires HTTP/2 over TLS connections, uses TCP sockets, and employs OpenSSL for socket I/O and security layers. It integrates with Firedancer's `fd_h2` and `fd_grpc` for HTTP/2 and gRPC logic, and operates with busy polling, indicating no power-saving features.
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_sse.h` file in the `firedancer` codebase provides a thin wrapper around Intel's SSE intrinsics, offering a robust API for writing vectorized C/C++ code with support for various data types and operations, while facilitating portability to non-Intel architectures.
+An API for vectorized C/C++ code using SSE intrinsics with support for various data types and operations.
 
 # Purpose
-This C header file, `fd_sse.h`, provides an API for writing vectorized code using Intel's Streaming SIMD Extensions (SSE) intrinsics. It is designed to facilitate the development of high-performance applications by offering vectorized operations for various data types, such as 32-bit integers and floats, and 64-bit doubles and longs, among others. The file acts as a thin wrapper around Intel's SSE intrinsics, providing a more robust and type-safe interface that simplifies the conversion of scalar code to vectorized implementations. Additionally, it includes mechanisms to handle cross-lane data motion and transitions between scalar and vector code, making it easier to optimize code for platforms with SSE support. The API also aids in porting SSE-optimized code to non-Intel architectures by allowing developers to implement equivalent wrappers for other platforms.
+The code is a C header file that provides an API for writing vectorized C/C++ code using Intel's SSE (Streaming SIMD Extensions) intrinsics. It supports operations on 4-wide 32-bit integers, unsigned integers, and floats, as well as 2-wide 64-bit doubles, longs, and unsigned longs. The API offers vectorized equivalents for standard C/C++ operations, enabling efficient computation through single assembly instructions. It also includes utilities for transitioning between scalar and vector code and handling cross-lane data motion. The header file acts as a thin wrapper around SSE intrinsics, providing a consistent type system and semantics for mixed-type and mixed-width vectorized code. It facilitates porting SSE-optimized code to non-Intel architectures by implementing the wrappers for the target platform. The file includes several other headers that provide specific support for different data types and operations.
 # Imports and Dependencies
 
 ---

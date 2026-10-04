@@ -3,23 +3,77 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-NUMA and private shared-memory helpers, plus path formatting and random mapping.
+Header file for private shared memory utilities, including NUMA operations and thread synchronization.
 
 # Purpose
-This header declares private helpers for the shared-memory subsystem in `fd_shmem`. It defines path buffer limits, thread-safe lock macros, and internal state used to build private shared-memory file paths. The file also declares NUMA helper functions that wrap Linux memory and page-placement syscalls such as `mlock(2)`, `munlock(2)`, `get_mempolicy(2)`, `set_mempolicy(2)`, `mbind(2)`, and `move_pages(2)`. It ends with an internal mapping helper, [`fd_shmem_private_map_rand`](<#fd_shmem_private_map_rand>), which maps anonymous pages at a random virtual address with a requested size, alignment, and protection mode.
+The code is a C header file that provides private utilities for shared memory management, specifically focusing on NUMA (Non-Uniform Memory Access) operations. It defines several functions that interact with the system's NUMA configuration and memory policies, wrapping Linux system calls such as `mlock`, `munlock`, `get_mempolicy`, `set_mempolicy`, `mbind`, and `move_pages`. These functions are used to manage memory allocation and locking in a NUMA-aware manner, which is crucial for optimizing performance on systems with multiple memory nodes.
+
+The file also includes macros and function prototypes for handling shared memory paths and synchronization. It defines constants for buffer sizes and provides a function [`fd_shmem_private_path`](<#fd_shmem_private_path>) to construct file paths for shared memory segments. Additionally, it includes thread synchronization mechanisms using `pthread` locks, conditional on whether threading is enabled (`FD_HAS_THREADS`). The file is intended to be included in other C source files that require these shared memory and NUMA functionalities, and it does not define a public API or external interfaces directly.
+# Imports and Dependencies
+
+---
+- `fd_shmem.h`
+- `pthread.h`
+
+
+# Global Variables
+
+---
+### fd\_shmem\_private\_lock
+- **Type**: `pthread_mutex_t`
+- **Description**: A mutex lock used to synchronize access to shared memory resources in a multi-threaded environment. It is defined as an array with one element, indicating it is used as a single mutex lock.
+- **Use**: Used to ensure thread-safe operations on shared memory by locking and unlocking access with `FD_SHMEM_LOCK` and `FD_SHMEM_UNLOCK` macros.
+
+
+---
+### fd\_shmem\_private\_base
+- **Type**: `char`
+- **Description**: A character array that serves as a base path for shared memory operations. It is initialized to an empty string at the start of a thread group and is set during the boot process.
+- **Use**: Used to construct file paths for shared memory operations.
+
+
+---
+### fd\_shmem\_private\_base\_len
+- **Type**: `ulong`
+- **Description**: `fd_shmem_private_base_len` is a global variable of type `ulong` that represents the length of the shared memory private base path. It is initialized to 0UL at boot time.
+- **Use**: Used to store the length of the shared memory private base path for internal operations.
+
+
+# Functions
+
+---
+### fd\_shmem\_private\_path<!-- {{#callable:fd_shmem_private_path}} -->
+[View Source →](<../../../../../src/util/shmem/fd_shmem_private.h#L135>)
+
+Generates a private shared memory path string based on the given name and page size.
+- **Inputs**:
+    - `name`: A valid name for the shared memory path.
+    - `page_sz`: A valid page size, which can be normal, huge, or gigantic.
+    - `buf`: A non-NULL buffer with at least `FD_SHMEM_PRIVATE_PATH_BUF_MAX` bytes to store the resulting path.
+- **Logic and Control Flow**:
+    - Calls `fd_cstr_printf` to format a string into `buf` using the base path `fd_shmem_private_base`, the string representation of `page_sz` obtained from `fd_shmem_page_sz_to_cstr(page_sz)`, and the `name`.
+    - The formatted string follows the pattern: `<base>/.<page_size>/<name>`.
+- **Output**: Returns the `buf` pointer, which contains the formatted shared memory path string.
+- **Functions Called**:
+    - [`fd_shmem_page_sz_to_cstr`](<fd_shmem_admin.c.md#fd_shmem_page_sz_to_cstr>)
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_numa_node_cnt`
-- `fd_numa_cpu_cnt`
-- `fd_numa_node_idx`
-- `fd_numa_mlock`
-- `fd_numa_munlock`
-- `fd_numa_get_mempolicy`
-- `fd_numa_set_mempolicy`
-- `fd_numa_mbind`
-- `fd_numa_move_pages`
-- `fd_shmem_private_map_rand`
+### fd\_shmem\_private\_map\_rand<!-- {{#callable_declaration:fd_shmem_private_map_rand}} -->
+[View Source →](<../../../../../src/util/shmem/fd_shmem_private.h#L149>)
+
+Maps private anonymous pages at a random virtual address.
+- **Description**: Use this function to map a specified number of private and anonymous memory pages at a random virtual address. The function attempts to find a suitable address with the specified alignment and protection settings. It is useful when you need memory mapping with specific alignment and protection requirements. The function will try up to 1000 times to find a suitable address and will log an error if it fails.
+- **Inputs**:
+    - `size`: Specifies the minimum number of bytes to map. Must be a positive value.
+    - `align`: Specifies the minimum alignment of the first byte to map. Must be a power of two.
+    - `prot`: Specifies the desired memory protection of the mapped pages. Uses the same flags as the `mmap` system call (e.g., `PROT_READ`, `PROT_WRITE`).
+- **Output**: Returns a pointer to the mapped virtual address on success, or `MAP_FAILED` on failure.
+- **See Also**: [`fd_shmem_private_map_rand`](<fd_shmem_user.c.md#fd_shmem_private_map_rand>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
