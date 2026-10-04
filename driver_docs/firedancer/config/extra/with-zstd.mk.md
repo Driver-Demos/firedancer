@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration to check for zstd library and set flags if available.
+The `with-zstd.mk` file in the `firedancer` codebase checks for the presence of the `libzstd.a` library and sets compilation flags accordingly, or issues a warning if the library is not installed.
 
 # Purpose
-The `Makefile` snippet checks for the presence of the `libzstd.a` library in the specified `$(OPT)/lib` directory. If the library exists, it sets the `FD_HAS_ZSTD` variable to 1, adds a preprocessor definition `-DFD_HAS_ZSTD=1` to `CFLAGS`, and appends the library path to `LDFLAGS`. If the library is not found, it issues a warning message indicating that `zstd` is not installed and will be skipped.
+This Makefile snippet checks for the presence of the `libzstd.a` library in a specified directory (`$(OPT)/lib`). If the library is found, it sets a flag (`FD_HAS_ZSTD`) and updates the compiler (`CFLAGS`) and linker (`LDFLAGS`) flags to include support for Zstandard compression. If the library is not found, it issues a warning indicating that Zstandard is not installed and will be skipped.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
