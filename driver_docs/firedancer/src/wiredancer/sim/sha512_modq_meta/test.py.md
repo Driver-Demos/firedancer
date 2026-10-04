@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test.py` file in the `firedancer` codebase is a cocotb-based test script for simulating and verifying the SHA-512 modulo Q metadata processing in a hardware design.
+Tests the SHA-512 modulo Q metadata processing using the cocotb framework.
 
 # Purpose
-This Python file is a test script designed to verify the functionality of a digital design using the Cocotb framework, which is a coroutine-based co-simulation library for testing VHDL and Verilog designs. The script is structured to perform a series of operations on a device under test (DUT), which is likely a hardware module with specific input and output signals. The test is defined as an asynchronous function, `test(dut)`, which is decorated with `@cocotb.test()`, indicating that it is a test case to be executed by the Cocotb framework.
+This code is a test suite for a digital design verification environment using the Cocotb framework. It defines an asynchronous test function [`test`](<#test>) that interacts with a device under test (DUT) through a series of operations. The test initializes the DUT's input and output signals and sets up a clock signal using the `Clock` class from Cocotb. It also uses utility functions from the `wd_cocotil` module to manage reset toggling and random signal toggling, as well as to monitor and generate test transactions.
 
-The script initializes several signals and parameters of the DUT, such as `i_v`, `o_r`, and `max_pending`, and sets up a clock signal using the `Clock` class from Cocotb. It utilizes utility functions from an imported module `wd_cocotil` to perform tasks like toggling reset signals, generating random toggles, and monitoring metadata. The test involves generating random transactions with varying metadata lengths and sending them to the DUT while handling backpressure conditions. The transactions are constructed using helper functions from `wd_cocotil`, and the script ensures that the DUT processes these transactions correctly by checking the output metadata against expected values. This test script is a crucial component in a verification environment, ensuring that the DUT behaves as expected under various conditions.
+The test function simulates a sequence of operations on the DUT by generating random transactions and sending them to the DUT's input interface. It uses the `RisingEdge` trigger to synchronize operations with the clock edges. The test also manages backpressure conditions by checking the DUT's input and output readiness signals. The transactions are constructed using random parameters and are stored in a queue for verification purposes. The test continues until all transactions are processed, ensuring that the DUT behaves as expected under various conditions.
 # Imports and Dependencies
 
 ---
@@ -26,25 +26,29 @@ The script initializes several signals and parameters of the DUT, such as `i_v`,
 
 ---
 ### test<!-- {{#callable:firedancer/src/wiredancer/sim/sha512_modq_meta/test.test}} -->
-The `test` function is a cocotb test that simulates a hardware design by generating and processing random transactions with backpressure handling.
+[View Source →](<../../../../../../src/wiredancer/sim/sha512_modq_meta/test.py#L11>)
+
+Simulates a testbench for a digital design using the cocotb framework.
 - **Decorators**: `@cocotb.test`
 - **Inputs**:
-    - `dut`: The device under test (DUT) which is a hardware module being simulated.
-- **Control Flow**:
-    - Initialize DUT signals `i_v`, `o_r`, and `max_pending`.
-    - Create empty lists and dictionaries for input and output SHA modq metadata.
-    - Start the clock and various asynchronous processes for reset toggling, random toggling, and monitoring using cocotb and wd_cocotil utilities.
-    - Convert `META_W` from the DUT to an integer `M`.
+    - `dut`: The device under test (DUT) which is an object representing the digital design to be tested.
+- **Logic and Control Flow**:
+    - Initialize DUT signals `i_v`, `o_r`, and `max_pending` to 0, 0, and 100 respectively.
+    - Create empty lists `q_i_sha_modq_meta` and `q_o_sha_modq_meta` to store transaction metadata.
+    - Start the clock and various asynchronous processes using `cocotb.start()` to manage reset, random toggling, and monitoring of the DUT.
+    - Convert `dut.META_W` to an integer `M` for use in metadata operations.
     - Wait for 2048 clock cycles to allow for post-reset and key-store initialization.
-    - Initialize transaction ID `tid` with a random 64-bit integer.
-    - Loop for `max_l * 2` iterations to generate and process transactions.
-    - Handle backpressure by waiting for `i_r` to be '1' when `i_v` is '1'.
-    - Introduce random gaps by setting `i_v` to 0 based on a random condition.
-    - Select a random message length `mlen` from a range and remove it from the list.
-    - Generate a random transaction `tr` and append it to input and output metadata queues.
-    - Build blocks from the transaction and iterate over them to set DUT inputs and wait for a clock edge.
-    - Continue looping until the output metadata queue is empty, waiting for a clock edge each time.
-- **Output**: The function does not return a value; it performs a simulation of the DUT by processing transactions and handling backpressure.
+    - Initialize `min_l`, `max_l`, and `mlens` for managing message lengths.
+    - Generate a random transaction ID `tid` using `wd_cocotil.random_int(64)`.
+    - Iterate over a range of `max_l * 2` to simulate transactions.
+    - Check for backpressure by waiting for `dut.i_r` to be '1' when `dut.i_v` is '1'.
+    - Introduce random gaps by setting `dut.i_v` to 0 based on a random condition.
+    - Select a random message length `mlen` from `mlens`, remove it from the list, and create a transaction `tr`.
+    - Append the transaction `tr` to `q_i_sha_modq_meta` and store it in `q_o_sha_modq_meta` with `tid` as the key.
+    - Build blocks `blks` from the transaction using `wd_cocotil.build_sha_modq_meta_i(tr)` and iterate over them.
+    - For each block, check for backpressure and set DUT input signals `i_v`, `i_f`, `i_l`, `i_c`, `i_t`, `i_m`, and `i_d` accordingly.
+    - Continue the simulation until `q_o_sha_modq_meta` is empty, indicating all transactions are processed.
+- **Output**: No explicit return value; the function operates as a testbench to simulate and verify the behavior of the DUT.
 
 
 
