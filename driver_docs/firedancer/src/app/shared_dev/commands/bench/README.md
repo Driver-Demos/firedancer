@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Benchmarking commands, topology configuration, transaction generation, RPC client interactions, and QUIC protocol performance.
+Benchmark topology, transaction generation, RPC, and QUIC/UDP performance tools.
 
 
 ## Files
-- **[bench.c](bench.c.md)**: Defines and manages the benchmarking topology and execution for the Firedancer application.
-- **[bench.h](bench.h.md)**: Function prototypes for benchmarking commands and topology configuration in the Firedancer application.
-- **[fd_benchg.c](fd_benchg.c.md)**: Implements a benchmarking tool for transaction generation with different modes and configurations.
-- **[fd_bencho.c](fd_bencho.c.md)**: Implements a benchmarking tool for RPC client interactions, including block hash and transaction count services.
-- **[fd_benchs.c](fd_benchs.c.md)**: Benchmarks QUIC and UDP performance using asynchronous I/O and socket operations.
+- **[bench.c](bench.c.md)**: Benchmark topology setup and command flow for development runs, including affinity checks and tile launch.
+- **[bench.h](bench.h.md)**: The `bench.h` file in the `firedancer` codebase declares functions and structures for configuring and executing benchmarking commands and topologies.
+- **[fd_benchg.c](fd_benchg.c.md)**: The `fd_benchg.c` file in the `firedancer` codebase implements a benchmarking tool for transaction generation, supporting different transaction modes and handling transaction signing and blockhash management.
+- **[fd_bencho.c](fd_bencho.c.md)**: RPC benchmark logic that fetches block hashes and transaction counts and prints TPS.
+- **[fd_benchs.c](fd_benchs.c.md)**: QUIC and UDP benchmark tile with socket setup, packet forwarding, and AIO TX handling.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
