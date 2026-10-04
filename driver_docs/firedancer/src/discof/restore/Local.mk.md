@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for conditional compilation and testing of components in the `fd_discof` module.
+Build rules for restore tiles, utilities, unit tests, and fuzz tests.
 
 # Purpose
-The Makefile content defines build rules and conditions for compiling and testing various components of a software project. It uses conditional statements to include headers and object files based on the presence of specific features, such as `FD_HAS_SSE`, `FD_HAS_ZSTD`, `FD_HAS_INT128`, and `FD_HAS_HOSTED`. The `add-hdrs` and `add-objs` functions are used to add header and object files to the build process, respectively. The file also specifies unit tests and fuzz tests to be created and executed, using `make-unit-test`, `run-unit-test`, and `make-fuzz-test` functions, ensuring that different components are tested under various conditions. This configuration allows for a modular and conditional build process, adapting to the available features and ensuring comprehensive testing.
+This Makefile fragment controls which `fd_discof` source files, headers, and tests are built under specific feature flags. It adds snapshot tile objects and the `fd_snapct_tile.h` header only when `FD_HAS_SSE` is enabled, and it adds `fd_snapdc_tile` and `fd_snapin_tile` only when `FD_HAS_ZSTD` and `FD_HAS_INT128` are also enabled. When `FD_HAS_INT128` is set, it includes several utility objects such as `fd_ssparse`, `fd_ssmanifest_parser`, `fd_ssload`, `fd_ssping`, `fd_http_resolver`, and `fd_slot_delta_parser`, and it defines unit tests for manifest, slot delta, and peer selection logic. Under `FD_HAS_HOSTED`, it also defines fuzz tests for snapshot, manifest, archive, and slot delta parsers. The final lines add shared snapshot-related objects, including `fd_ssresolve`, `fd_sshttp`, `fd_ssarchive`, and `fd_sspeer_selector`, to the `fd_discof` build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

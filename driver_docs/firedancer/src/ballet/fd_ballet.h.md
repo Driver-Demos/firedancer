@@ -3,19 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for cryptographic functions and data structures including Ed25519, Shred, Bmtree, and Blake3.
+Includes ed25519, shred, bmtree, and blake3 headers.
 
 # Purpose
-This code is a C header file that serves as an inclusion guard and organizes the inclusion of several other header files related to cryptographic operations. The file uses preprocessor directives to prevent multiple inclusions, which can cause compilation errors. It includes headers for cryptographic algorithms and data structures, such as `fd_ed25519.h` for Ed25519 digital signatures, `fd_shred.h` for data shredding, `fd_bmtree.h` for binary Merkle trees, and `fd_blake3.h` for the BLAKE3 hash function. The commented-out includes suggest dependencies on utility functions and other cryptographic components like SHA-256 and SHA-512, which are indirectly included through other headers.
-# Imports and Dependencies
-
----
-- `ed25519/fd_ed25519.h`
-- `shred/fd_shred.h`
-- `bmtree/fd_bmtree.h`
-- `blake3/fd_blake3.h`
-
-
+This header file acts as an aggregation point for the `fd_ballet` code group. It uses include guards to prevent multiple inclusion and then includes the main public headers for `ed25519`, `shred`, `bmtree`, and `blake3`. The commented-out include lines show earlier or indirect dependencies for `fd_ballet_base`, `sha256`, and `sha512`, but they are not active in this file.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

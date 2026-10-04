@@ -3,39 +3,36 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements an ED25519 signature verification module with clock domain crossing and metadata handling.
+The `ed25519_sigverify_1.sv` file in the `firedancer` codebase implements a module for verifying Ed25519 signatures, utilizing a DSDP pipeline and key storage to manage metadata and timing closure.
 
 # Purpose
-The `ed25519_sigverify_1` module is a hardware description for a digital signature verification process using the Ed25519 algorithm. This module is part of a larger system that verifies digital signatures, ensuring data integrity and authenticity. The module interfaces with input and output signals, including clock and reset signals, and processes metadata and key information. It uses parameters such as `MUL_T`, `MUL_D`, `DSDP_WS`, and `KEY_D` to configure the operation of the signature verification process.
+The provided Verilog code defines a module named `ed25519_sigverify_1`, which is part of a digital signature verification system using the Ed25519 algorithm. This module is designed to handle the verification process by interfacing with a key storage component and a digital signal processing (DSP) unit, specifically tailored for Ed25519 signature verification. The module includes parameters for configuring multiplication timing (`MUL_T`), delay (`MUL_D`), and key dimensions (`KEY_D`), which are crucial for the performance and accuracy of the signature verification process. The module's architecture is structured to manage data flow through clock domain crossings (CDC) using FIFO buffers, ensuring reliable data transfer between different clock domains.
 
-The module includes two main components: a `key_store` and an `ed25519_sigverify_dsdp_mul`. The `key_store` manages key storage and retrieval, while the `ed25519_sigverify_dsdp_mul` performs the core mathematical operations required for signature verification. The design uses clock domain crossing (CDC) FIFOs and registers to manage data flow and timing across different clock domains, ensuring reliable operation. The module is designed to operate with a slightly higher clock rate for the DSDP (Digital Signal Data Path) to maintain throughput and assist with timing closure. The use of metadata storage helps to optimize the data path by avoiding the transmission of wide metadata into the DSDP pipeline.
+The module integrates several key components, including a key storage instance (`key_store`) and a DSP multiplication unit (`ed25519_sigverify_dsdp_mul`). These components work together to process input signals, manage metadata, and produce output signals that indicate the verification status. The design also incorporates mechanisms for handling reset conditions and clock synchronization, which are essential for maintaining the integrity and reliability of the verification process. The use of separate SLR (Super Logic Region) for the DSP unit and the strategic placement of registers before and after SLR crossings are intended to optimize placement, routing, and timing closure, thereby enhancing the overall performance of the signature verification system.
 # Modules
 
 ---
 ### ed25519\_sigverify\_1
-Implements a signature verification process using the Ed25519 algorithm. Integrates key storage and a DSDP multiplication module for cryptographic operations.
+The `ed25519_sigverify_1` module is designed to verify Ed25519 signatures by interfacing with a key store and a DSDP multiplication module. It processes input signals and metadata, and outputs verification results and metadata.
 - **Constants**:
-    - ``MUL_T``: Defines the multiplication time constant for the DSDP multiplication module.
-    - ``MUL_D``: Specifies the multiplication depth for the DSDP multiplication module.
-    - ``DSDP_WS``: Sets the workspace size for the DSDP multiplication module.
-    - ``KEY_D``: Defines the key depth for the key storage.
-    - ``KEY_D_L``: Calculates the logarithmic value of `KEY_D` for internal logic sizing.
+    - `MUL_T`: A 32-bit logic parameter representing the multiplication time constant, set to 0x007F_CCC2.
+    - `MUL_D`: An integer parameter representing the multiplication depth, set to 15.
+    - `DSDP_WS`: An integer parameter representing the DSDP workspace size, set to 2.
+    - `KEY_D`: An integer parameter representing the key depth, set to 512.
+    - `KEY_D_L`: An integer parameter representing the logarithmic key depth, calculated as $clog2(KEY_D).
 - **Ports**:
-    - ``i_r``: Output signal indicating the readiness of the module.
-    - ``i_w``: Input signal for write enable.
-    - ``i_v``: Input signal for valid data indication.
-    - ``i_m``: Input signal carrying metadata of type `sv_meta5_t`.
-    - ``o_v``: Output signal indicating valid output data.
-    - ``o_m``: Output signal carrying metadata of type `sv_meta6_t`.
-    - ``clk``: Clock input signal for synchronous operations.
-    - ``rst``: Reset input signal to initialize the module.
-- **Logic and Control Flow**:
-    - Assigns `i_r` as a logical AND of `i_rr[0]`, `i_rr[1]`, and the negation of `i_w`.
-    - Assigns `i_mm` to `i_m` and `o_m` to `o_mm`.
-    - In the `always_ff` block, updates `o_v` and `o_mm` fields on the rising edge of `clk`.
-    - Resets `o_v` to 0 when `rst` is active.
-    - Instantiates `key_store` module to manage key storage and retrieval.
-    - Instantiates `ed25519_sigverify_dsdp_mul` module for DSDP multiplication operations.
+    - `i_r`: Output logic port for the result of the input read operation.
+    - `i_w`: Input wire port for the write enable signal.
+    - `i_v`: Input wire port for the valid signal.
+    - `i_m`: Input wire port for the metadata signal, with a width based on sv_meta5_t.
+    - `o_v`: Output logic port for the valid signal.
+    - `o_m`: Output logic port for the metadata signal, with a width based on sv_meta6_t.
+    - `clk`: Input wire port for the clock signal.
+    - `rst`: Input wire port for the reset signal.
+- **Logic And Control Flow**:
+    - The module uses an always_ff block triggered on the positive edge of the clock to update the output valid signal and metadata based on the DSDP outputs, and resets the valid signal if the reset is active.
+    - The `key_store` instance is used to manage key storage and retrieval, interfacing with the input and output signals for key and metadata handling.
+    - The `ed25519_sigverify_dsdp_mul` instance performs DSDP multiplication operations, interfacing with various input signals and producing outputs that are used to update the module's state.
 
 
 

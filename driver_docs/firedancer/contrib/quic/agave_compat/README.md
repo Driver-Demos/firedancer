@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for QUIC data transmission and testing, build scripts, package configuration, and integration test documentation.
+QUIC interop test and benchmark commands, plus a random-batch sender and build scripts.
 
 ## Folders
-- **[src](src/README.md)**: Functions for sending data via QUIC and testing QUIC protocol interactions with Solana.
+- **[src](src/README.md)**: QUIC interop test and benchmark commands, plus a sender for random-sized data batches.
 
 ## Files
-- **[build.rs](build.rs.md)**: Build script for setting up library paths, linking static libraries, and generating Rust bindings.
-- **[Cargo.toml](Cargo.toml.md)**: Configuration for the `firedancer-agave-quic-test` package with dependencies and build settings.
-- **[README.md](README.md.md)**: Integration test for fd_quic and solana-streamer with setup and usage instructions.
-- **[wrapper.h](wrapper.h.md)**: Header file with macro definitions and includes for network and QUIC functionalities.
+- **[build.rs](build.rs.md)**: The `build.rs` file in the `firedancer` codebase sets up the build process for the `agave_compat` module by configuring library paths, linking static libraries, and generating Rust bindings using `bindgen`.
+- **[Cargo.toml](Cargo.toml.md)**: The `Cargo.toml` file in the `firedancer` codebase specifies the package configuration and dependencies for the `firedancer-agave-quic-test` project, including build dependencies and various Solana-related libraries.
+- **[README.md](README.md.md)**: The `README.md` file provides instructions for setting up and running an integration test for `fd_quic` and `solana-streamer` within the `firedancer` codebase.
+- **[wrapper.h](wrapper.h.md)**: The `wrapper.h` file in the `firedancer` codebase defines several feature flags and includes headers related to network utilities, QUIC protocol, and UDP socket functionalities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

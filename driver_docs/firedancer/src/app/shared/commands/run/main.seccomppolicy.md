@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp policy for the boot process that creates a PID namespace and supervises a child process.
+The `main.seccomppolicy` file defines the security policy for the boot process of Firedancer, which involves creating a PID namespace, supervising the child process, and handling logging and process termination.
 
 # Purpose
-The configuration file defines policies for the boot process of Firedancer, focusing on process management and logging. It specifies that the boot process creates a child process within a PID namespace and acts as a supervisor, waiting for the child to exit. The file includes configurations for logging, where log messages are written to a file or pipe, with 'WARNING' and above messages also sent to STDERR. The boot process ensures that specific file descriptors are used for STDERR and the logfile. Additionally, it includes instructions for synchronizing log files to disk and handling process termination signals, ensuring that the child process is terminated cleanly before the main process exits. The configuration ensures that the supervisor exits when the child process exits, maintaining orderly process management.
+The provided content outlines a configuration policy for the boot process of a software system called Firedancer, which involves managing process namespaces and logging. The primary role of this boot process is to create a child process within a PID namespace and then act as a supervisor, monitoring the child process's lifecycle. The configuration specifies logging behavior, ensuring that all log messages are written to a designated file, with warnings and higher severity messages also directed to STDERR. It also details the synchronization of log files to disk and the conditions under which the supervisor process waits for the child process to exit, as well as how it handles termination signals to cleanly shut down the child process. This setup ensures that the boot process can effectively manage and terminate the child process, maintaining system stability and logging integrity.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
