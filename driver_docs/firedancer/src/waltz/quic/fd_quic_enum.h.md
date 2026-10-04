@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC constants for stream types, packet types, limits, errors, and timing.
+Defines constants and macros for QUIC stream types, error codes, packet types, and configuration parameters.
 
 # Purpose
-Defines a set of QUIC protocol constants used by the `fd_quic` implementation. It assigns values for stream types, connection roles, packet types, notification codes, and error codes, so the codebase can use fixed symbolic names instead of raw numbers. It also sets protocol limits and sizes, such as MTU-based payload limits, alignment, secret sizes, token limits, and timing values for scheduling and RTT handling. These definitions support compile-time checks and keep QUIC behavior consistent across the code that creates, sends, receives, and tracks streams and packets.
+This C header file defines a collection of macros and constants for use in a QUIC (Quick UDP Internet Connections) protocol implementation. It includes definitions for stream types, error codes, packet types, and various configuration parameters such as alignment, MTU size, and payload sizes. The file also specifies roles for QUIC entities (client or server) and provides error codes for stream send failures. Additionally, it defines parameters related to packet handling, such as coalescing limits and cryptographic secret sizes. These definitions facilitate the configuration and operation of a QUIC protocol stack by providing standardized values and identifiers.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

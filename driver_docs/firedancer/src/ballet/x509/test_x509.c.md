@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_x509.c` file in the `firedancer` codebase contains tests for verifying the functionality of X.509 certificate handling, including public key extraction and certificate integrity checks.
+Tests for X.509 certificate mock functions, including public key extraction and certificate validation.
 
 # Purpose
-This C source code file is a test program designed to validate the functionality of a mock X.509 certificate handling library. The program includes the header file `fd_x509_mock.h`, which likely contains the declarations for functions related to mock X.509 certificate operations, and `fd_util.h`, which might provide utility functions such as logging and random number generation. The main function initializes a random number generator and performs a series of tests on mock X.509 certificates. It tests the extraction of public keys from predefined certificate data and verifies the integrity of the extraction process by comparing the extracted keys with expected values.
+The code is a C program designed to test the functionality of X.509 certificate handling, specifically focusing on the mock generation and validation of public keys from certificates. It includes the main function, which initializes a random number generator and performs a series of tests on predefined certificate data. The program uses the `fd_x509_mock_pubkey` function to extract public keys from mock certificates and verifies the correctness of these extractions through assertions. It also tests the robustness of the extraction process by introducing controlled corruption into the certificate data and checking if the extraction fails as expected.
 
-The program also generates random public keys, creates mock certificates using these keys, and verifies that the public key extraction from these certificates is consistent. Additionally, it tests the robustness of the extraction process by intentionally corrupting parts of the certificate data and ensuring that the extraction fails when expected. The use of `FD_TEST` macros suggests a testing framework that checks conditions and likely logs failures. The program concludes by cleaning up resources and logging a success message if all tests pass. This file is primarily focused on testing and validating the mock X.509 certificate functionalities, rather than providing a broad API or library for external use.
+The program is structured to test both version 1 and version 2 certificates. It includes static arrays representing mock certificates and uses a loop to generate random public keys, create corresponding certificates, and verify the integrity of the public key extraction process. The code also tests boundary conditions by attempting to extract public keys from certificates with varying sizes. The program concludes by cleaning up resources and logging a success message if all tests pass. This code is intended to be executed as a standalone test suite for validating the behavior of the X.509 mock certificate functions.
 # Imports and Dependencies
 
 ---
@@ -20,23 +20,25 @@ The program also generates random public keys, creates mock certificates using t
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a random number generator, tests the extraction of public keys from mock X.509 certificates, and verifies the integrity of these certificates under various conditions.
+[View Source →](<../../../../../src/ballet/x509/test_x509.c#L4>)
+
+Initializes the environment, tests certificate and public key extraction, and verifies integrity through random corruption and validation.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program environment with `fd_boot` using the command-line arguments.
-    - Create and join a random number generator instance.
-    - Define two static arrays representing mock X.509 certificates (`cert_v1_1` and `cert_v1_2`).
-    - Extract public keys from these certificates using [`fd_x509_mock_pubkey`](fd_x509_mock.c.md#fd_x509_mock_pubkey) and verify their correctness with `FD_TEST`.
-    - Test the extraction of public keys from `cert_v1_2` with varying sizes to check for out-of-bounds errors.
-    - Run a loop 100,000 times to generate random public keys, create mock certificates, and verify the integrity of the certificates and extracted keys.
-    - Within the loop, corrupt random bytes in the certificate and verify that the extraction fails if the corruption affects the template.
-    - Delete the random number generator instance and log a success message before halting the program.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_x509_mock_pubkey`](fd_x509_mock.c.md#fd_x509_mock_pubkey)
-    - [`fd_x509_mock_cert`](fd_x509_mock.c.md#fd_x509_mock_cert)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Tests certificate version 1 by extracting the public key from `cert_v1_1` and `cert_v1_2` using [`fd_x509_mock_pubkey`](<fd_x509_mock.c.md#fd_x509_mock_pubkey>) and verifies the extraction with `FD_TEST`.
+    - Checks out-of-bounds key extraction by iterating over a range and verifying that extraction fails for certain offsets.
+    - Tests certificate version 2 by generating random public keys, creating certificates with [`fd_x509_mock_cert`](<fd_x509_mock.c.md#fd_x509_mock_cert>), and verifying the integrity of the extracted public key against the original.
+    - Corrupts random bytes in the certificate and verifies that extraction fails when corruption occurs in specific regions.
+    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
+    - Logs a success message with `FD_LOG_NOTICE` and halts the program with `fd_halt`.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_x509_mock_pubkey`](<fd_x509_mock.c.md#fd_x509_mock_pubkey>)
+    - [`fd_x509_mock_cert`](<fd_x509_mock.c.md#fd_x509_mock_cert>)
 
 
 
