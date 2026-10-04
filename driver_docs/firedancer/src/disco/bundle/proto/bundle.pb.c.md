@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Automatically generated nanopb constant definitions for bundle_Bundle and bundle_BundleUuid.
+The `bundle.pb.c` file contains automatically generated nanopb constant definitions for the `firedancer` codebase, specifically for the `bundle` protocol buffer.
 
 # Purpose
-This code is an automatically generated C source file containing constant definitions for Protocol Buffers using the nanopb library. It includes the header file `bundle.pb.h`, which is expected to define the structures and functions related to Protocol Buffers for a bundle. The code checks if the `PB_PROTO_HEADER_VERSION` is equal to 40, and if not, it triggers a compilation error instructing the user to regenerate the file with the current version of the nanopb generator. The `PB_BIND` macro is used to bind the Protocol Buffer message types `bundle_Bundle` and `bundle_BundleUuid` with their respective structures, using the `AUTO` option to automatically handle field encoding and decoding.
+This code is an automatically generated C header file for use with the nanopb library, which is a small code-size Protocol Buffers implementation in C. The file includes the header "bundle.pb.h" and contains preprocessor directives to ensure compatibility with a specific version of the nanopb generator, indicated by the `PB_PROTO_HEADER_VERSION` check. The `PB_BIND` macros are used to bind Protocol Buffer message types, `bundle_Bundle` and `bundle_BundleUuid`, to their respective C structures, facilitating serialization and deserialization operations. This file is part of a larger system that uses Protocol Buffers for data interchange, ensuring that the generated code is synchronized with the Protocol Buffers definitions.
 # Imports and Dependencies
 
 ---
