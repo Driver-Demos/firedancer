@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile settings for enabling or disabling optimization flags in C++ and Rust builds.
+The `with-optimization.mk` file in the `firedancer` codebase configures compiler optimization flags for C++ and Rust, enabling high optimization unless explicitly disabled.
 
 # Purpose
-This Makefile configuration controls the optimization settings for compiling C++ code. If the `FD_DISABLE_OPTIMIZATION` variable is not set, the `CPPFLAGS` are configured to include optimization flags `-O3`, `-ffast-math`, `-fno-associative-math`, and `-fno-reciprocal-math`, and defines `FD_HAS_OPTIMIZATION` as 1. If `FD_DISABLE_OPTIMIZATION` is set, the optimization level is set to `-O0` while retaining the same math flags. Additionally, the `RUST_PROFILE` is set to `release-with-debug`, indicating the Rust build profile to use.
+This Makefile snippet conditionally sets compiler flags for C++ code based on the presence of the `FD_DISABLE_OPTIMIZATION` variable. If the variable is not set, it enables optimization with flags like `-O3` and defines `FD_HAS_OPTIMIZATION` as 1. If the variable is set, it disables optimization with `-O0`. Additionally, it sets the Rust build profile to `release-with-debug`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

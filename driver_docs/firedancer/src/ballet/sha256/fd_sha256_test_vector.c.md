@@ -3,55 +3,55 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Test vectors for SHA-256 computed using OpenSSL on randomly generated text strings.
+The `fd_sha256_test_vector.c` file in the `firedancer` codebase contains a set of predefined SHA-256 test vectors, which were generated using OpenSSL on various randomly generated text strings.
 
 # Purpose
-The code defines a set of test vectors for the SHA-256 hashing algorithm. These test vectors are used to verify the correctness of SHA-256 implementations by providing known input strings and their corresponding hash outputs. The `fd_sha256_test_vector` structure is used to store each test vector, which includes a message (`msg`), the size of the message (`sz`), and the expected SHA-256 hash (`hash`). The test vectors are stored in a constant array `fd_sha256_test_vector`, which can be used in testing environments to ensure that a SHA-256 implementation produces the correct hash for given inputs.
+This C source code file is designed to provide a set of test vectors for verifying the correctness of SHA-256 hash implementations. The file contains a static array of structures, each representing a test vector with a message, its size, and the corresponding SHA-256 hash. These test vectors were precomputed using the OpenSSL SHA-256 implementation on a Red Hat Enterprise Linux 8 system. The file is not intended to be compiled directly; instead, it serves as a reference or a data source for testing purposes in other programs or libraries that implement SHA-256 hashing.
 
-The code also includes a commented-out section that describes how the input test strings were generated using a random number generator and the OpenSSL SHA-256 binary. This section is not meant to be compiled directly, as indicated by the preprocessor directive `#if 0`. The test vectors cover a range of input sizes and content, providing a comprehensive set of cases for testing the SHA-256 algorithm. The array is terminated with a vector containing a `NULL` message and a hash of zeroes, indicating the end of the test vectors.
+The primary technical component of this file is the `fd_sha256_test_vector_t` structure, which holds the message, its length, and the expected hash value. The array `fd_sha256_test_vector` is populated with multiple test cases, each containing a different message and its corresponding hash. The file also includes a commented-out section that describes how the input test strings were generated, although this code is not active. This file does not define any public APIs or external interfaces; it is a standalone data file meant to be included in other projects for testing the accuracy of SHA-256 hash functions.
 # Global Variables
 
 ---
 ### \_sz
 - **Type**: `double`
-- **Description**: A global variable that is initialized to 0.0.
-- **Use**: Used in a loop to generate test strings for OpenSSL.
+- **Description**: The variable `_sz` is a global variable of type `double` initialized to `0.f`. It is used in a loop to generate test strings for OpenSSL by incrementally increasing its value until it reaches 4096.
+- **Use**: `_sz` is used to determine the size of the test strings generated in the loop.
 
 
 ---
 ### fac
 - **Type**: `double`
-- **Description**: The `fac` variable is a global variable of type `double` that is initialized to the square root of the square root of 2. This value is approximately 1.189207115.
-- **Use**: The `fac` variable is used in a loop to increment the `_sz` variable by multiplying it with `fac` until `_sz` reaches 4096.
+- **Description**: The variable `fac` is a global variable of type `double` that is initialized to the square root of the square root of 2. This value is approximately 1.189207115002721.
+- **Use**: It is used as a factor to increment the size `_sz` in a loop that generates test strings for OpenSSL.
 
 
 ---
 ### fd\_sha256\_test\_vector
-- **Type**: ``fd_sha256_test_vector_t const[]``
-- **Description**: An array of `fd_sha256_test_vector_t` structures, each containing a message string, its size, and the corresponding SHA-256 hash. The array is used to store test vectors for verifying SHA-256 hash computations.
-- **Use**: Used to store and access predefined SHA-256 test vectors for validation purposes.
+- **Type**: `fd_sha256_test_vector_t const[]`
+- **Description**: The `fd_sha256_test_vector` is a static constant array of `fd_sha256_test_vector_t` structures. Each element in the array represents a test vector for SHA-256 hashing, containing a message string, its length, and the corresponding SHA-256 hash value. The array is terminated with a null message and a zero-length entry to indicate the end of the test vectors.
+- **Use**: This variable is used to store predefined test vectors for verifying the correctness of SHA-256 hash implementations.
 
 
 # Data Structures
 
 ---
 ### fd\_sha256\_test\_vector
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `msg`: Pointer to a constant character array representing the message.
-    - `sz`: Unsigned long integer representing the size of the message.
-    - `hash`: Array of 32 unsigned characters representing the SHA-256 hash of the message.
-- **Description**: Defines a test vector for SHA-256 hashing, containing a message, its size, and the corresponding SHA-256 hash. This structure is used to store precomputed hash values for various messages, facilitating the testing of SHA-256 implementations.
+    - `msg`: A pointer to a constant character string representing the message to be hashed.
+    - `sz`: An unsigned long integer representing the size of the message.
+    - `hash`: An array of 32 unsigned characters representing the SHA-256 hash of the message.
+- **Description**: The `fd_sha256_test_vector` structure is designed to hold test vectors for SHA-256 hashing. It contains a message, its size, and the corresponding SHA-256 hash. This structure is used to verify the correctness of SHA-256 implementations by comparing the computed hash of the message with the expected hash stored in the structure.
 
 
 ---
 ### fd\_sha256\_test\_vector\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `msg`: Pointer to a constant character string representing the message.
-    - `sz`: Unsigned long integer representing the size of the message.
-    - `hash`: Array of 32 unsigned characters representing the SHA-256 hash of the message.
-- **Description**: Defines a test vector for SHA-256 hashing, containing a message, its size, and the corresponding SHA-256 hash. This structure is used to store precomputed hash values for various messages, facilitating the verification of SHA-256 implementations.
+    - `msg`: A pointer to a constant character string representing the message to be hashed.
+    - `sz`: An unsigned long integer representing the size of the message in bytes.
+    - `hash`: An array of 32 unsigned characters representing the SHA-256 hash of the message.
+- **Description**: The `fd_sha256_test_vector_t` structure is designed to hold test vectors for SHA-256 hashing. It contains a message, its size, and the corresponding SHA-256 hash. This structure is used to verify the correctness of SHA-256 implementations by comparing the computed hash of the message with the precomputed hash stored in the structure.
 
 
 

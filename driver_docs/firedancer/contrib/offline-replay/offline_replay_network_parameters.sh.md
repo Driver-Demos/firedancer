@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Sets environment variables for different Solana network configurations based on the provided network parameter.
+Sets offline replay environment variables for mainnet, testnet, and devnet.
 
 # Purpose
-This script is a Bash configuration file that sets environment variables based on the specified Solana network. It requires a network parameter, which can be `mainnet`, `testnet`, or `devnet`. Depending on the network selected, the script exports various environment variables such as `BUCKET_ENDPOINT`, `GENESIS_FILE`, `HEAP_SIZE`, and others, which are necessary for configuring the environment for that specific network. If an unknown network is provided, the script outputs an error message and returns a non-zero status. This script is intended to be sourced in a shell session to apply the environment settings.
+This shell script sets environment variables for a selected Solana network. It requires one argument, `mainnet`, `testnet`, or `devnet`, and it stops with a usage message if no network name is given. For each network, it exports values such as `BUCKET_ENDPOINT`, `GENESIS_FILE`, `HEAP_SIZE`, `BACKTEST_FUNK_PAGES`, `INDEX_MAX`, `PAGES`, `AGAVE_TAG`, and `FD_CLUSTER_VERSION` so other scripts can use the correct cluster-specific settings. If the network name does not match one of the supported values, the script prints an error and returns a failure status.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

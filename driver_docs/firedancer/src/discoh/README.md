@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures, functions, and Makefiles for transaction processing, PoH, resolution, and storage.
+Transaction processing, PoH scheduling, resolution, and storage helpers with fd_discoh build rules.
 
 ## Folders
-- **[bank](bank/README.md)**: Data structures, functions, and a Makefile for processing transactions and handling ABI in Firedancer.
-- **[poh](poh/README.md)**: Implementation of a Proof of History (PoH) tile and Makefile logic for object inclusion based on `FD_HAS_ALLOCA`.
-- **[resolv](resolv/README.md)**: Implements a transaction resolution system and Makefile logic for conditional object addition.
-- **[store](store/README.md)**: Implements a store tile for data fragments and Makefile logic for conditional object addition.
+- **[bank](bank/README.md)**: ABI helpers and tile logic for transaction layout, lookup resolution, execution, and commit.
+- **[poh](poh/README.md)**: Proof-of-history leader scheduling, hashing, tick and microblock publishing, and handoff logic.
+- **[resolv](resolv/README.md)**: Transaction resolution tile and build rules for fd_discoh.
+- **[store](store/README.md)**: Storage context initialization and blockstore fragment insertion, with conditional build rules.
 
 ## Files
-- **[Local.mk](Local.mk.md)**: Makefile snippet to build the `fd_discoh` library using a custom `make-lib` function.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that includes a call to create the `fd_discoh` library.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

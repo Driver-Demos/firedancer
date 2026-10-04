@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines an external action `fd_action_dev1` with configuration inclusion.
+The `dev1.h` file in the `firedancer` codebase declares an external action, `fd_action_dev1`, and includes a shared configuration header.
 
 # Purpose
-This code is a C header file that provides an interface for a specific device-related action. It includes a shared configuration header file, `fd_config.h`, which likely contains common configuration settings or definitions used across multiple files. The header file declares an external variable, `fd_action_dev1`, of type `action_t`, which suggests that it represents a specific action or operation related to the device. The use of include guards, `HEADER_fd_src_app_fddev_dev1_h`, prevents multiple inclusions of this header file, ensuring that the declarations within are only processed once during compilation.
+This code is a simple C header file designed to declare an external variable and manage include dependencies. It uses include guards to prevent multiple inclusions, which is a common practice to avoid redefinition errors in C projects. The file includes another header, `fd_config.h`, from a shared directory, indicating that it relies on configurations or definitions provided there. The `extern` keyword declares `fd_action_dev1` as an external variable of type `action_t`, suggesting that its definition is located elsewhere, likely in a corresponding source file. This header is part of a modular codebase, facilitating the separation of declarations and definitions for better code organization and reusability.
 # Imports and Dependencies
 
 ---
@@ -17,9 +17,9 @@ This code is a C header file that provides an interface for a specific device-re
 
 ---
 ### fd\_action\_dev1
-- **Type**: ``action_t``
-- **Description**: `fd_action_dev1` is a global variable of type `action_t` declared with external linkage. It is defined in a header file, indicating it is used across multiple source files.
-- **Use**: Used to reference an action or operation related to device 1 in the application.
+- **Type**: `action_t`
+- **Description**: The variable `fd_action_dev1` is a global variable of type `action_t`, which is declared as an external variable. This suggests that its definition is located in another source file, and it is intended to be used across multiple files within the application.
+- **Use**: This variable is used to represent or store an action related to device 1, allowing for shared access and manipulation across different parts of the program.
 
 
 
