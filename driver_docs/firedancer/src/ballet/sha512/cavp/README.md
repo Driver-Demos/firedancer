@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SHA-384 and SHA-512 short message and Monte Carlo test vectors for byte-oriented implementations.
+SHA-384 and SHA-512 CAVP test vectors for short messages and Monte tests.
 
 
 ## Files
-- **[SHA384ShortMsg.rsp](SHA384ShortMsg.rsp.md)**: Test vectors for SHA-384 short message hashing, generated for byte-oriented implementations.
-- **[SHA512Monte.rsp](SHA512Monte.rsp.md)**: SHA-512 Monte Carlo test vectors for byte-oriented implementations.
-- **[SHA512ShortMsg.rsp](SHA512ShortMsg.rsp.md)**: Test vectors for SHA-512 short message hashing, configured for byte-oriented implementations.
+- **[SHA384ShortMsg.rsp](SHA384ShortMsg.rsp.md)**: The `SHA384ShortMsg.rsp` file in the `firedancer` codebase contains test vectors for the SHA-384 hash function, specifically for short messages, as part of the CAVP (Cryptographic Algorithm Validation Program) testing suite.
+- **[SHA512Monte.rsp](SHA512Monte.rsp.md)**: The `SHA512Monte.rsp` file in the `firedancer` codebase contains test vectors for the "SHA-512 Monte" test, which is part of the CAVS 11.1 suite, providing a series of message digests generated from a given seed for byte-oriented SHA-512 implementations.
+- **[SHA512ShortMsg.rsp](SHA512ShortMsg.rsp.md)**: The `SHA512ShortMsg.rsp` file in the `firedancer` codebase contains test vectors for the SHA-512 hash function, specifically for short messages, as part of the CAVP (Cryptographic Algorithm Validation Program) testing suite.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
