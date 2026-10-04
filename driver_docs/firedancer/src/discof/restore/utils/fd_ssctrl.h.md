@@ -3,36 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines state machine constants and control message structures for synchronizing snapshot processing tiles.
+Snapshot control states, message codes, and init/meta message structs for snapshot pipeline synchronization.
 
 # Purpose
-This C header file defines constants, data structures, and control flow for managing the state of snapshot processing in a distributed system. It includes state definitions for snapshot tiles, such as `FD_SNAPSHOT_STATE_IDLE`, `FD_SNAPSHOT_STATE_PROCESSING`, and `FD_SNAPSHOT_STATE_ERROR`, which represent different stages of the snapshot lifecycle. The file also defines message types like `FD_SNAPSHOT_MSG_CTRL_INIT_FULL` and `FD_SNAPSHOT_MSG_CTRL_FAIL` to control the flow of snapshot processing and error handling. Additionally, it declares two structures, `fd_ssctrl_init_t` and `fd_ssctrl_meta_t`, which are used for initializing snapshot loading and communicating metadata about snapshots, respectively. The header ensures synchronization across tiles in the system to maintain a consistent state during snapshot operations.
-# Imports and Dependencies
-
----
-- `../../../util/net/fd_net_headers.h`
-
-
-# Data Structures
-
----
-### fd\_ssctrl\_init\_t
-- **Type**: ``struct``
-- **Members**:
-    - `file`: An integer that specifies the file descriptor.
-    - `addr`: A `fd_ip4_port_t` type that specifies the IP address and port.
-- **Description**: Defines the initialization parameters for a control message, specifying a file descriptor and an IP address with a port for network communication.
-
-
----
-### fd\_ssctrl\_meta\_t
-- **Type**: ``struct``
-- **Members**:
-    - `total_sz`: The total size of the snapshot in bytes.
-    - `name`: The name of the snapshot, stored as a character array with a maximum length defined by `PATH_MAX`.
-- **Description**: Contains metadata about a downloaded snapshot, including its total size and name.
-
-
+This header file defines the control protocol used by the snapshot pipeline. It declares the snapshot states in `FD_SNAPSHOT_STATE_IDLE`, `FD_SNAPSHOT_STATE_PROCESSING`, `FD_SNAPSHOT_STATE_FINISHING`, `FD_SNAPSHOT_STATE_ERROR`, and `FD_SNAPSHOT_STATE_SHUTDOWN`, and it defines the message kinds in `FD_SNAPSHOT_MSG_DATA`, `FD_SNAPSHOT_MSG_META`, and the control messages such as `FD_SNAPSHOT_MSG_CTRL_INIT_FULL`, `FD_SNAPSHOT_MSG_CTRL_FAIL`, `FD_SNAPSHOT_MSG_CTRL_DONE`, and `FD_SNAPSHOT_MSG_CTRL_SHUTDOWN`. The comments describe how `snapct` keeps all tiles in lockstep so that a failure or completion event is propagated through the whole pipeline before a new attempt starts. The file also defines `fd_ssctrl_init_t`, which carries the source of a snapshot request, and `fd_ssctrl_meta_t`, which carries snapshot metadata such as `total_sz` and `name`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

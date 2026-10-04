@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header and source files for QUIC tracing, parsing, logging, and passive decryption in Firedancer.
+QUIC trace context, frame parsing, log output, packet decryption, and build rules.
 
 
 ## Files
-- **[fd_quic_trace.h](fd_quic_trace.h.md)**: Header file for QUIC tracing, defining data structures, macros, and functions for tracing QUIC connections.
-- **[fd_quic_trace_frame.c](fd_quic_trace_frame.c.md)**: Implements functions for tracing and parsing QUIC frames in a network context.
-- **[fd_quic_trace_log_tile.c](fd_quic_trace_log_tile.c.md)**: Processes QUIC trace logs by defining callback functions for handling fragments and logging connection close events.
-- **[fd_quic_trace_main.c](fd_quic_trace_main.c.md)**: Glue code for the 'fddev quic-trace' subcommand to tap QUIC traffic by joining remote target tile objects.
-- **[fd_quic_trace_rx_tile.c](fd_quic_trace_rx_tile.c.md)**: Passive decryption of incoming QUIC packets with a mock setup and run loop for fd_quic_tile.
-- **[Local.mk](Local.mk.md)**: Makefile for adding QUIC trace-related objects if `FD_HAS_ALLOCA` is defined.
+- **[fd_quic_trace.h](fd_quic_trace.h.md)**: QUIC trace context, peer connection map, and trace function declarations.
+- **[fd_quic_trace_frame.c](fd_quic_trace_frame.c.md)**: The `fd_quic_trace_frame.c` file in the `firedancer` codebase implements functions for tracing and parsing various QUIC protocol frames, including handling specific frame types and logging relevant information.
+- **[fd_quic_trace_log_tile.c](fd_quic_trace_log_tile.c.md)**: Prints QUIC close event details from trace fragments.
+- **[fd_quic_trace_main.c](fd_quic_trace_main.c.md)**: Glue code for fddev quic-trace, joining remote tile state and dumping QUIC config and connections.
+- **[fd_quic_trace_rx_tile.c](fd_quic_trace_rx_tile.c.md)**: Passive QUIC packet decryption and trace parsing for Initial, Handshake, and 1-RTT packets.
+- **[Local.mk](Local.mk.md)**: Build rules for QUIC trace objects when FD_HAS_ALLOCA is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
