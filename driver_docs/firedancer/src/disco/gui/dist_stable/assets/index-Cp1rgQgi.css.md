@@ -3,10 +3,32 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Provides Radix Themes tokens, component styles, and responsive utility classes.
+Defines custom properties and styles for a web application, supporting theming, responsiveness, and UI components.
 
 # Purpose
-This stylesheet defines the visual system for a Radix Themes user interface by setting font faces, color tokens, spacing, typography, radius, shadow, and component variables. It defines light and dark theme values with CSS custom properties, and it maps accent colors, gray scales, surface colors, shadows, and contrast colors so the application can switch theme styles in a consistent way. It also uses `@supports`, `@media`, `data-accent-color`, `data-gray-color`, and theme classes such as `.light`, `.dark`, and `.radix-themes` to apply the correct token set and responsive behavior. The file also includes style rules and utility classes for many UI parts and layout needs, which keeps presentation, interaction states, and page structure consistent across the codebase.
+The CSS file defines a comprehensive set of custom properties and styles for a web application, managing the visual presentation and ensuring a consistent look and feel across different devices and screen sizes. It includes variables for colors, fonts, spacing, and other design elements, allowing for easy customization and maintenance. The file supports dynamic theming with light and dark modes, and includes media queries to ensure responsive design. Styles are defined for various UI components such as buttons, forms, tables, and interactive elements, with specific classes for different screen sizes. Additionally, the stylesheet incorporates animations and transitions to enhance user interaction, making it integral to the application's user interface.
+# Content Summary
+The CSS file is a configuration document that defines a comprehensive set of styles and variables for a web application's theme system. It manages the visual presentation, layout, and responsiveness of the application across different devices and screen sizes. The file uses CSS custom properties (variables) to allow for flexible theming and styling across various components.
+
+Key technical details include:
+
+1. **Font Definitions and Typography**: The file includes `@font-face` rules to define custom fonts such as "Inter Tight" and "Roboto Mono," specifying styles, weights, and source URLs. It also defines typography-related variables, including font sizes, weights, line heights, and letter spacing for different text elements like headings, code, strong, and emphasized text.
+
+2. **Color Variables and Theming**: The file defines a wide range of color variables for different themes and color schemes, including base colors and their variations (e.g., `--gray-1` to `--gray-12`). It supports both light and dark themes, using media queries and feature queries to adjust colors based on the user's display capabilities. Accent colors can be dynamically set using data attributes.
+
+3. **Responsive Design and Layout**: The stylesheet uses media queries to apply different styles based on screen width, ensuring the application is responsive. It defines breakpoints for various screen sizes and includes variables for spacing and container widths to ensure consistent layout and responsive design.
+
+4. **Component Styles and State Management**: Styles are defined for various UI components such as buttons, cards, checkboxes, and menus. Each component has size variants and state-based styles (e.g., hover, active, disabled). The file uses pseudo-classes to manage component states, ensuring visual feedback on user interactions.
+
+5. **Animations and Transitions**: Keyframe animations are defined for transitions such as fade-in, fade-out, and sliding effects, enhancing the user experience with smooth visual transitions.
+
+6. **Accessibility and Interaction**: The file includes cursor styles for interactive elements and outlines for focus states to enhance accessibility. It uses properties like `user-select` to control text selection behavior.
+
+7. **Grid and Flexbox Layouts**: The stylesheet defines classes for grid and flexbox layouts, allowing elements to be placed and aligned within their containers. This includes positioning elements and aligning content using flexbox and grid properties.
+
+8. **Shadow and Effects**: Shadow definitions are included for various UI components to provide depth and visual hierarchy.
+
+Overall, this CSS file is essential for maintaining a consistent and adaptable design system across a web application, allowing developers to easily manage and update the visual appearance of the application.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
