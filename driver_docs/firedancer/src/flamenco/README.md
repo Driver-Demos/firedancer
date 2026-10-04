@@ -3,31 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Account, capture, feature, genesis, gossip, leader, log, program cache, reward, runtime, stake, txn, type, and VM code with lock headers and tests
+Tools, data structures, and tests for Solana data management, protocol logic, and sBPF execution.
 
 ## Folders
-- **[accdb](accdb/README.md)**: Account database admin, user, sync, and reference APIs with transaction tests
-- **[capture](capture/README.md)**: Solana capture protobufs, readers, writers, diff, import, YAML, and build rules.
-- **[features](features/README.md)**: Feature activation helpers, generated IDs, map data, and build rules for Flamenco.
-- **[genesis](genesis/README.md)**: The `genesis` folder in the `firedancer` codebase contains files related to the creation and testing of Solana genesis blocks, including implementation, header, build instructions, and test files.
-- **[gossip](gossip/README.md)**: Gossip protocol state, message handling, peer tracking, tests, and build rules.
-- **[leaders](leaders/README.md)**: Epoch leader schedule APIs, sampling, multi-epoch lookup, and tests.
-- **[log_collector](log_collector/README.md)**: Header files, build rules, and tests for log collection and stable log helpers.
-- **[progcache](progcache/README.md)**: Solana program loading, cache records, admin, user APIs, and tests.
-- **[rewards](rewards/README.md)**: Epoch reward calculation, distribution, storage, and tests for stake and vote accounts.
-- **[runtime](runtime/README.md)**: Context, program, sysvar, and transaction runtime code with tests and build rules
-- **[stakes](stakes/README.md)**: Stake delegation and vote state caches, stake update logic, and unit tests.
-- **[txn](txn/README.md)**: The `txn` folder in the `firedancer` codebase contains files for generating and managing transaction metadata and payloads, including utility methods and build configurations related to transaction processing.
-- **[types](types/README.md)**: Tools, types, reflection, YAML, fuzzing, Protobuf, and tests for Solana data.
-- **[vm](vm/README.md)**: sBPF VM execution, disassembly, tracing, syscalls, tests, and build rules
+- **[accdb](accdb/README.md)**: Functions, structures, and tests for account database management, user access, and transaction integrity.
+- **[capture](capture/README.md)**: Tools and programs for capturing, comparing, and processing Solana blockchain data using Protobuf and YAML.
+- **[features](features/README.md)**: Functions, macros, and generated code for feature management, with Makefiles and a JSON feature map.
+- **[genesis](genesis/README.md)**: Creates and tests Solana genesis blocks with configurable options and includes a Makefile for building.
+- **[gossip](gossip/README.md)**: Gossip protocol implementation and management with data structures, message handling, and build configuration.
+- **[leaders](leaders/README.md)**: Functions, APIs, and tests for Solana epoch and multi-epoch leader schedules with build support.
+- **[log_collector](log_collector/README.md)**: Header files and tests for a log collector system with serialization, debugging, and 128-bit integer support.
+- **[progcache](progcache/README.md)**: Functions, APIs, and tests for managing Solana program caches, versions, and transactions in Firedancer.
+- **[rewards](rewards/README.md)**: Functions, constants, and structures for blockchain reward calculations and Makefile logic for 128-bit support.
+- **[runtime](runtime/README.md)**: Runtime helpers, account and transaction management, hash and cache logic, sysvars, and tests.
+- **[stakes](stakes/README.md)**: Functions and structures for managing stake accounts, delegations, vote states, and a Makefile for building `fd_stakes`.
+- **[txn](txn/README.md)**: Functions for transaction metadata and payloads, utility methods for transaction templates, and a Makefile.
+- **[types](types/README.md)**: Data structures, functions, and tests for encoding, decoding, and managing Solana and Firedancer types.
+- **[vm](vm/README.md)**: Virtual machine implementation, testing, syscall management, disassembly, and execution tools for sBPF programs.
 
 ## Files
-- **[fd_flamenco.h](fd_flamenco.h.md)**: Header guard and include for `fd_flamenco_base.h`.
-- **[fd_flamenco_base.h](fd_flamenco_base.h.md)**: Constants, type declarations, and base58 address formatting helpers for Flamenco.
-- **[fd_rwlock.h](fd_rwlock.h.md)**: Simple read-write spin lock with inline read, write, and unlock operations.
-- **[fd_rwlock_recursive.h](fd_rwlock_recursive.h.md)**: Recursive read-write spin lock with nested read and write locking support.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_flamenco and headers, with optional test_flamenco unit test.
-- **[test_flamenco.c](test_flamenco.c.md)**: Base58 encoding tests for 32-byte and 64-byte buffers, including NULL handling.
+- **[fd_flamenco.h](fd_flamenco.h.md)**: Header file for including `fd_flamenco_base.h` in the Firedancer Flamenco module.
+- **[fd_flamenco_base.h](fd_flamenco_base.h.md)**: Defines constants, macros, and data structures for encoding and managing transactions in a Solana-based system.
+- **[fd_rwlock.h](fd_rwlock.h.md)**: A simple read-write spin lock implementation with functions for locking and unlocking in read and write modes.
+- **[fd_rwlock_recursive.h](fd_rwlock_recursive.h.md)**: A recursive/reentrant read-write spin lock implementation with support for nested locking up to 32 levels.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the fd_flamenco library with conditional unit tests.
+- **[test_flamenco.c](test_flamenco.c.md)**: Tests Base58 encoding functionality in the Firedancer codebase using predefined byte arrays.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

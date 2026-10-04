@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for gRPC codec and client headers, objects, unit tests, and fuzz tests.
+Makefile for building and testing gRPC components, including unit and fuzz tests, with OpenSSL support.
 
 # Purpose
-This build file section registers the `fd_grpc_codec.h` and `fd_grpc_client.h` headers and adds the `fd_grpc_codec` and `fd_grpc_client` objects to the `fd_waltz` target set. It also defines unit tests for `test_grpc_codec` and `test_grpc_client`, then schedules both tests to run, with `test_grpc_client` linked against `$(OPENSSL_LIBS)`. When `FD_HAS_HOSTED` is defined, the file also enables fuzz tests for `fuzz_grpc_codec`, `fuzz_grpc_h2_gen_req_hdr`, and `fuzz_grpc_client`, which use the same `fd_waltz`, `fd_ballet`, and `fd_util` dependencies, with OpenSSL linked for the client fuzz test.
+The content is a Makefile script used to automate the build and testing process for a software project. It defines rules to add header files and object files for components such as `fd_grpc_codec` and `fd_grpc_client`. The script also specifies unit tests for these components, using `make-unit-test` and `run-unit-test` calls to compile and execute tests like `test_grpc_codec` and `test_grpc_client`. Additionally, if the `FD_HAS_HOSTED` variable is defined, the script includes rules to create fuzz tests for components, enhancing the testing coverage by generating random inputs to test the robustness of the code. The use of `$(OPENSSL_LIBS)` indicates that some tests require OpenSSL libraries for execution.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

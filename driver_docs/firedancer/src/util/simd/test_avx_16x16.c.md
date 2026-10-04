@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_avx_16x16.c` file in the `firedancer` codebase contains tests for AVX SIMD operations on 16-element vectors of short and unsigned short integers, including arithmetic, bitwise, and logical operations.
+Tests for AVX 16x16 SIMD operations, including arithmetic, bit, and logical operations on short and ushort data types.
 
 # Purpose
-This C source code file is a test suite designed to validate the functionality of SIMD (Single Instruction, Multiple Data) operations using AVX (Advanced Vector Extensions) instructions. The code is structured to test various arithmetic, bitwise, and logical operations on vectors of short integers (`ws_t`) and unsigned short integers (`wh_t`). The file includes a main function that initializes a random number generator and iteratively tests a series of operations, such as addition, subtraction, multiplication, and bitwise shifts, on randomly generated data. The tests are performed by comparing the results of these operations against expected outcomes, which are calculated using standard C operations and macros.
+The code is a C program designed to test various operations on SIMD (Single Instruction, Multiple Data) vector types, specifically `ws_t` and `wh_t`, which are likely vector types for short and unsigned short integers, respectively. The program includes a [`main`](<#main>) function that initializes a random number generator and performs a series of tests on these vector types. It tests constructors, arithmetic operations, bit operations, and logical operations. The tests are conducted by generating random data, applying operations, and verifying the results using the `FD_TEST` macro.
 
-The code is organized into two main sections: one for testing operations on signed short vectors (`ws_t`) and another for unsigned short vectors (`wh_t`). Each section includes tests for constructors, arithmetic operations, bit operations, and logical operations. The file uses macros to simplify repetitive tasks, such as initializing test data and expanding vector indices. The test results are verified using the `FD_TEST` macro, which likely checks the correctness of each operation. The file is intended to be executed as a standalone program, as indicated by the presence of the [`main`](#main) function, and it relies on external utilities and headers, such as `fd_util.h` and `fd_avx.h`, for additional functionality and definitions.
+The program is structured to perform exhaustive testing by iterating over a large number of test cases (65536 iterations) for each operation. It uses macros to simplify the expansion of vector elements and to define operations like shifts and rotations. The code includes placeholders for future improvements, such as proper typing and generalization of certain operations. The program is intended to be executed as a standalone test suite, as indicated by the presence of the [`main`](<#main>) function and the use of logging and halting functions (`FD_LOG_NOTICE` and `fd_halt`).
 # Imports and Dependencies
 
 ---
@@ -20,72 +20,77 @@ The code is organized into two main sections: one for testing operations on sign
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a random number generator and performs extensive testing of various arithmetic, bitwise, and logical operations on 16-element vectors of short and unsigned short integers using SIMD-like operations.
+[View Source →](<../../../../../src/util/simd/test_avx_16x16.c#L10>)
+
+Initializes random number generation, performs a series of tests on wide SIMD operations for both signed and unsigned short integers, and logs the results.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the random number generator using `fd_rng_new` and `fd_rng_join`.
-    - Define macros for generating random short and unsigned short integers within specific ranges.
-    - Define macros for expanding indices to facilitate SIMD-like operations on vectors.
-    - Initialize a 16-element short integer array `si` and test zero and one vector operations using [`ws_test`](test_avx_common.c.md#ws_test).
-    - Iterate 65536 times to perform tests on randomly generated vectors `xi` and `yi`.
-    - For each iteration, initialize vectors `xi` and `yi` with random values using the `srand` macro.
-    - Test various constructors and arithmetic operations (negation, absolute value, min, max, addition, subtraction, multiplication) on vectors using [`ws_test`](test_avx_common.c.md#ws_test).
-    - Test bitwise operations (not, shift left, shift right, rotate left, rotate right) on vectors using [`ws_test`](test_avx_common.c.md#ws_test).
-    - Test logical operations (equality, inequality) on vectors using [`ws_test`](test_avx_common.c.md#ws_test).
-    - Repeat similar tests for unsigned short vectors using [`wh_test`](test_avx_common.c.md#wh_test).
-    - Log a notice indicating the tests passed and halt the program.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`ws_test`](test_avx_common.c.md#ws_test)
-    - [`ws_rol_variable`](fd_avx_ws.h.md#ws_rol_variable)
-    - [`ws_ror_variable`](fd_avx_ws.h.md#ws_ror_variable)
-    - [`wh_test`](test_avx_common.c.md#wh_test)
-    - [`wh_rol_variable`](fd_avx_wh.h.md#wh_rol_variable)
-    - [`wh_ror_variable`](fd_avx_wh.h.md#wh_ror_variable)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Defines macros for random number generation and index expansion.
+    - Initializes a random number generator `rng`.
+    - Defines and initializes arrays `si` and `hj` for storing test results.
+    - Performs tests on wide SIMD operations for signed short integers (`ws_t`) using loops and macros.
+    - Performs tests on wide SIMD operations for unsigned short integers (`wh_t`) using loops and macros.
+    - Logs a notice message indicating the tests passed.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`ws_test`](<test_avx_common.c.md#ws_test>)
+    - [`ws_rol_variable`](<fd_avx_ws.h.md#ws_rol_variable>)
+    - [`ws_ror_variable`](<fd_avx_ws.h.md#ws_ror_variable>)
+    - [`wh_test`](<test_avx_common.c.md#wh_test>)
+    - [`wh_rol_variable`](<fd_avx_wh.h.md#wh_rol_variable>)
+    - [`wh_ror_variable`](<fd_avx_wh.h.md#wh_ror_variable>)
 
 
 # Function Declarations (Public API)
 
 ---
 ### wc\_test<!-- {{#callable_declaration:wc_test}} -->
-Tests the correctness of various operations on a wc_t type.
-- **Description**: This function is used to verify the correctness of operations on a wc_t type, which is a vector of 8 boolean values. It checks if the packing, unpacking, extraction, insertion, and memory operations on the wc_t type produce the expected results based on the provided boolean values. This function is typically used in testing environments to ensure that the operations on wc_t are functioning as intended. It returns a non-zero value if all tests pass, and zero if any test fails.
+[View Source →](<../../../../../src/util/simd/test_avx_16x16.c#L6>)
+
+Tests the correctness of various operations on a `wc_t` type.
+- **Description**: Use this function to verify that operations on a `wc_t` type produce expected results. It checks the packing, unpacking, extraction, insertion, and memory operations for correctness. This function is useful for testing and validation purposes in environments where `wc_t` operations are critical. Ensure that the input parameters are correctly set to represent the desired test conditions.
 - **Inputs**:
-    - `c`: A wc_t type representing a vector of 8 boolean values. The caller must ensure that this is a valid wc_t object.
-    - `c0`: An integer representing the first boolean value in the vector. It is expected to be either 0 or 1.
-    - `c1`: An integer representing the second boolean value in the vector. It is expected to be either 0 or 1.
-    - `c2`: An integer representing the third boolean value in the vector. It is expected to be either 0 or 1.
-    - `c3`: An integer representing the fourth boolean value in the vector. It is expected to be either 0 or 1.
-    - `c4`: An integer representing the fifth boolean value in the vector. It is expected to be either 0 or 1.
-    - `c5`: An integer representing the sixth boolean value in the vector. It is expected to be either 0 or 1.
-    - `c6`: An integer representing the seventh boolean value in the vector. It is expected to be either 0 or 1.
-    - `c7`: An integer representing the eighth boolean value in the vector. It is expected to be either 0 or 1.
+    - `c`: A `wc_t` type representing the input condition to test. Must be a valid `wc_t` object.
+    - `c0`: An integer representing the first bit to test. Must be 0 or 1.
+    - `c1`: An integer representing the second bit to test. Must be 0 or 1.
+    - `c2`: An integer representing the third bit to test. Must be 0 or 1.
+    - `c3`: An integer representing the fourth bit to test. Must be 0 or 1.
+    - `c4`: An integer representing the fifth bit to test. Must be 0 or 1.
+    - `c5`: An integer representing the sixth bit to test. Must be 0 or 1.
+    - `c6`: An integer representing the seventh bit to test. Must be 0 or 1.
+    - `c7`: An integer representing the eighth bit to test. Must be 0 or 1.
 - **Output**: Returns 1 if all tests pass, otherwise returns 0.
-- **See also**: [`wc_test`](test_avx_common.c.md#wc_test)  (Implementation)
+- **See Also**: [`wc_test`](<test_avx_common.c.md#wc_test>)  (Implementation)
 
 
 ---
 ### ws\_test<!-- {{#callable_declaration:ws_test}} -->
-Tests if a SIMD vector matches a given array of short integers.
-- **Description**: Use this function to verify that a 256-bit SIMD vector of short integers matches a specified array of 16 short integers. It checks each element of the vector against the corresponding element in the array and performs various operations to ensure the vector's integrity. This function is useful for validating SIMD operations and ensuring data consistency. It assumes that the input array has at least 16 elements and that the SIMD vector is properly initialized.
+[View Source →](<../../../../../src/util/simd/test_avx_16x16.c#L7>)
+
+Validates a `ws_t` vector against a reference array of shorts.
+- **Description**: Use this function to verify that a `ws_t` vector matches a given reference array of 16 short integers. It checks each element of the vector against the corresponding element in the array. If all elements match, the function returns a success indicator. This function is useful for testing and validation purposes, ensuring that vector operations produce the expected results. The function assumes that the input array has at least 16 elements.
 - **Inputs**:
-    - `s`: A 256-bit SIMD vector of short integers to be tested. The vector should be initialized and contain 16 short integers.
-    - `si`: A pointer to an array of at least 16 short integers. The array must not be null, and it provides the expected values for comparison with the SIMD vector.
-- **Output**: Returns 1 if the SIMD vector matches the array of short integers; otherwise, returns 0.
-- **See also**: [`ws_test`](test_avx_common.c.md#ws_test)  (Implementation)
+    - `s`: A `ws_t` vector to validate. The function checks each element of this vector against the reference array.
+    - `si`: A pointer to an array of 16 short integers. This array serves as the reference for validation. The function assumes the array has at least 16 elements and does not check for null pointers.
+- **Output**: Returns 1 if the vector matches the reference array, otherwise returns 0.
+- **See Also**: [`ws_test`](<test_avx_common.c.md#ws_test>)  (Implementation)
 
 
 ---
 ### wh\_test<!-- {{#callable_declaration:wh_test}} -->
-Tests if a vector matches a given array of unsigned shorts.
-- **Description**: Use this function to verify if the elements extracted from a vector match a specified array of unsigned shorts. It is useful for validating that a vector has been correctly constructed or manipulated to match expected values. The function checks each element of the vector against the corresponding element in the array and returns a result indicating whether they match. Ensure that the array contains at least 16 elements, as the function will access indices 0 through 15.
+[View Source →](<../../../../../src/util/simd/test_avx_16x16.c#L8>)
+
+Validates a `wh_t` object against an array of `ushort` values.
+- **Description**: Use this function to verify that a `wh_t` object matches a given sequence of `ushort` values. It checks if the elements extracted from the `wh_t` object correspond to the values in the provided array. This function is useful for testing or validation purposes where the integrity of the `wh_t` object against expected values is critical. Ensure that the `ushort` array has at least 16 elements, as the function will access indices 0 through 15. The function returns an integer indicating success or failure of the validation.
 - **Inputs**:
-    - `h`: A vector of type `wh_t` to be tested against the array. The caller retains ownership.
-    - `hj`: A pointer to an array of at least 16 unsigned shorts. The array must not be null, and it should contain the expected values to compare against the vector.
-- **Output**: Returns 1 if the vector matches the array, otherwise returns 0.
-- **See also**: [`wh_test`](test_avx_common.c.md#wh_test)  (Implementation)
+    - `h`: A `wh_t` object to validate. The function expects this object to be initialized and contain data that can be compared against the `ushort` array.
+    - `hj`: A pointer to an array of `ushort` values. The array must have at least 16 elements. The function will compare these values against the contents of the `wh_t` object. Passing a null pointer or an array with fewer than 16 elements will lead to undefined behavior.
+- **Output**: Returns 1 if the `wh_t` object matches the `ushort` array, otherwise returns 0.
+- **See Also**: [`wh_test`](<test_avx_common.c.md#wh_test>)  (Implementation)
 
 
 
