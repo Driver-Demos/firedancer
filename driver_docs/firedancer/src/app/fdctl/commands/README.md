@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Starts Agave validator boot, argument setup, CPU affinity, and sandboxed clone execution.
+Starts and declares functions for the Agave component of a Firedancer validator.
 
 
 ## Files
-- **[run_agave.c](run_agave.c.md)**: Starts Agave validator boot, argument setup, CPU affinity, and sandboxed clone execution.
-- **[run_agave.h](run_agave.h.md)**: The `run_agave.h` file declares a function and an external action related to running the Agave command within the `firedancer` codebase.
+- **[run_agave.c](run_agave.c.md)**: Implements the "run-agave" command to start the Agave component of a Firedancer validator.
+- **[run_agave.h](run_agave.h.md)**: Declares the function and action for running the Agave command with specified arguments and configuration.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
