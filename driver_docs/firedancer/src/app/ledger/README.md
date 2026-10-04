@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build conditions and command-line ledger workspace management with RocksDB minify logic.
+Makefile logic and main function for building and executing the `firedancer` ledger application.
 
 
 ## Files
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies build conditions for the `fd_ledger` tool, contingent on the presence of `ROCKSDB` and `SECP256K1` libraries.
-- **[main.c](main.c.md)**: Command-line setup and RocksDB minify logic for ledger workspace management.
+- **[Local.mk](Local.mk.md)**: Makefile logic for building the fd_ledger tool with dependencies on RocksDB and secp256k1.
+- **[main.c](main.c.md)**: Main function for a ledger application that processes RocksDB data, including setup and minification.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
