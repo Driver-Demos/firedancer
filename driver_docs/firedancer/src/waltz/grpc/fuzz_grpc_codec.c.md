@@ -3,58 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fuzz testing for gRPC codec response headers with initialization and validation logic.
+Fuzzer for gRPC response header decoding and validation.
 
 # Purpose
-The code is a fuzz testing module designed for use with LLVM's libFuzzer. It tests the functionality of gRPC response header parsing within a specific environment. The module includes two main functions: [`LLVMFuzzerInitialize`](<#llvmfuzzerinitialize>) and [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>). The [`LLVMFuzzerInitialize`](<#llvmfuzzerinitialize>) function sets up the environment by disabling backtraces, initializing the application with `fd_boot`, registering `fd_halt` to be called at program exit, and setting the log level. This setup is necessary for the proper execution of the fuzz tests.
-
-The [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>) function is the core of the fuzz testing process. It takes a data buffer and its size as input, simulating gRPC response headers. The function initializes a header matcher and attempts to read the response headers using `fd_grpc_h2_read_response_hdrs`. It verifies that the function returns either a success or a protocol error, which are the only acceptable outcomes. If the parsing is successful, it further checks that the gRPC status and message length are within valid ranges. This ensures that the header parsing logic can handle various inputs robustly and correctly.
-# Imports and Dependencies
-
----
-- `stdlib.h`
-- `fd_grpc_codec.h`
-
-
-# Functions
-
----
-### LLVMFuzzerInitialize<!-- {{#callable:LLVMFuzzerInitialize}} -->
-[View Source →](<../../../../../src/waltz/grpc/fuzz_grpc_codec.c#L9>)
-
-Initializes the environment for fuzz testing by setting environment variables, booting the system, registering an exit function, and setting the log level.
-- **Inputs**:
-    - `argc`: A pointer to the argument count, typically from the command line.
-    - `argv`: A pointer to the argument vector, typically from the command line.
-- **Logic and Control Flow**:
-    - Set the environment variable `FD_LOG_BACKTRACE` to `0` using `putenv` to disable backtracing in logs.
-    - Call `fd_boot` with `argc` and `argv` to initialize the system or application environment.
-    - Register the `fd_halt` function to be called at program exit using `atexit`.
-    - Set the core log level to `4` using `fd_log_level_core_set`.
-    - Return `0` to indicate successful initialization.
-- **Output**: Returns `0` to indicate successful initialization.
-
-
----
-### LLVMFuzzerTestOneInput<!-- {{#callable:LLVMFuzzerTestOneInput}} -->
-[View Source →](<../../../../../src/waltz/grpc/fuzz_grpc_codec.c#L19>)
-
-Processes input data to test gRPC response headers for validity and protocol compliance.
-- **Inputs**:
-    - ``data``: A pointer to the input data to be tested, represented as an array of unsigned characters.
-    - ``size``: The size of the input data in bytes, represented as an unsigned long integer.
-- **Logic and Control Flow**:
-    - Initialize a `fd_grpc_resp_hdrs_t` structure `resp_hdrs` and set its `h2_status` to 0.
-    - Declare a `fd_h2_hdr_matcher_t` array `matcher` with one element.
-    - Initialize the `matcher` using `fd_h2_hdr_matcher_init` and verify the initialization with `FD_TEST`.
-    - Call [`fd_grpc_h2_read_response_hdrs`](<fd_grpc_codec.c.md#fd_grpc_h2_read_response_hdrs>) to read and parse the gRPC response headers from `data` into `resp_hdrs`, using `matcher`.
-    - Verify that the return code `rc` is either `FD_H2_SUCCESS` or `FD_H2_ERR_PROTOCOL` using `FD_TEST`.
-    - If `rc` is `FD_H2_SUCCESS`, check that `resp_hdrs.grpc_status` is within valid range and `resp_hdrs.grpc_msg_len` does not exceed the size of `resp_hdrs.grpc_msg`.
-- **Output**: Always returns 0, indicating the function completes without error.
-- **Functions Called**:
-    - [`fd_grpc_h2_read_response_hdrs`](<fd_grpc_codec.c.md#fd_grpc_h2_read_response_hdrs>)
-
-
+This file defines a libFuzzer entry point for `fd_grpc_codec` response-header parsing. [`LLVMFuzzerInitialize`](<#llvmfuzzerinitialize>) sets up the runtime with `fd_boot`, disables backtrace logging with `FD_LOG_BACKTRACE=0`, registers `fd_halt` with `atexit`, and sets the core log level. [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>) builds a header matcher, calls `fd_grpc_h2_read_response_hdrs` on the input data, and checks that the function returns only `FD_H2_SUCCESS` or `FD_H2_ERR_PROTOCOL`. When parsing succeeds, it also verifies that `resp_hdrs.grpc_status` and `resp_hdrs.grpc_msg_len` stay within valid limits.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
