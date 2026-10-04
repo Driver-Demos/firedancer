@@ -3,167 +3,180 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `helper.h` file in the `firedancer` codebase provides a set of utility functions for formatted and color-coded terminal output, including functions for printing ages, heartbeats, signals, error conditions, sequences, rates, and percentages, as well as a non-blocking character read from stdin.
+Header file for terminal text formatting and diagnostic printing functions with color coding.
 
 # Purpose
-This C header file, `monitor_helper.h`, provides a collection of utility functions and macros designed for terminal output formatting and diagnostics in a monitoring application. It includes macros for terminal text manipulation, such as hiding and showing the cursor, erasing lines, and applying color codes to text for enhanced readability. The file defines several `printf_*` functions that format and print various types of diagnostic information, such as time intervals, heartbeats, signals, error conditions, sequence numbers, and rates, all with specific width and color coding for clarity. Additionally, it includes a function for non-blocking character input from the standard input stream. The header is intended to facilitate quick and visually distinct output in terminal-based monitoring tools, though it acknowledges the need for more robust solutions in the future.
+This C header file defines a set of macros and function prototypes for terminal output formatting and diagnostic printing. It includes color codes for terminal text manipulation, such as hiding and showing the cursor, erasing lines, and changing text color. The file provides function prototypes for printing various diagnostic information to standard output, including time intervals ([`printf_age`](<#printf_age>)), heartbeat status ([`printf_heart`](<#printf_heart>)), signal changes ([`printf_sig`](<#printf_sig>)), error conditions ([`printf_err_bool`](<#printf_err_bool>)), sequence numbers ([`printf_seq`](<#printf_seq>)), and rates ([`printf_rate`](<#printf_rate>)). These functions are designed to format output with specific width constraints and color coding for better readability. Additionally, the file includes a function [`fd_getchar`](<#fd_getchar>) for non-blocking reading of a single byte from standard input.
 # Imports and Dependencies
 
 ---
 - `../../../../util/fd_util.h`
 
 
-# Global Variables
-
----
-### sig\_color
-- **Type**: `function`
-- **Description**: The `sig_color` function is a global function that takes an unsigned long integer `sig` as an argument and returns a constant character pointer. This function is likely used to determine the color representation of a signal based on its value, as suggested by its name and the context of the surrounding code, which involves color-coded output.
-- **Use**: This function is used to obtain a color code string for a given signal value, which can be used in color-coded terminal output.
-
-
 # Function Declarations (Public API)
 
 ---
 ### printf\_age<!-- {{#callable_declaration:printf_age}} -->
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L22>)
+
 Prints a formatted representation of a time duration to stdout.
-- **Description**: This function is used to print a time duration, specified in nanoseconds, to the standard output in a human-readable format. The output is always exactly 10 characters wide, ensuring consistent alignment in text displays. The function handles various time units, from nanoseconds to weeks, and rounds the duration towards zero when necessary. It is important to note that negative durations are considered invalid and will result in the output 'invalid'. This function is useful for displaying time intervals in a clear and concise manner, especially in monitoring or logging applications.
+- **Description**: Use this function to print a time duration, given in nanoseconds, in a human-readable format to the standard output. The output will always be exactly 10 characters wide, ensuring consistent alignment in text displays. The function handles negative durations by printing 'invalid' and zero durations by printing '0s'. For positive durations, it formats the time into appropriate units, ranging from nanoseconds to weeks, rounding towards zero when necessary. This function is useful for displaying time intervals in a concise and standardized manner.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer pointer, which is not used in this function. The caller retains ownership.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer, which is not used in this function. The caller retains ownership.
-    - `_dt`: A long integer representing the time duration in nanoseconds. Must be non-negative; negative values are treated as invalid and result in the output 'invalid'.
+    - ``buf``: A pointer to a character buffer pointer. The function does not use this parameter, so it can be null.
+    - ``buf_sz``: A pointer to an unsigned long representing the size of the buffer. The function does not use this parameter, so it can be null.
+    - ``_dt``: A long integer representing the time duration in nanoseconds. Must be non-negative for valid output. Negative values result in 'invalid' being printed.
 - **Output**: None
-- **See also**: [`printf_age`](helper.c.md#printf_age)  (Implementation)
+- **See Also**: [`printf_age`](<helper.c.md#printf_age>)  (Implementation)
 
 
 ---
 ### printf\_stale<!-- {{#callable_declaration:printf_stale}} -->
-Prints the age in a color-coded format if it exceeds a specified expiration threshold.
-- **Description**: Use this function to conditionally print an age value in a visually distinct format when it exceeds a given expiration threshold. This is useful for monitoring scenarios where only significant age values should be highlighted to reduce visual clutter. The function outputs a 10-character wide, color-coded string to standard output, using yellow for ages exceeding the threshold and green for those that do not. Ensure that the buffer and its size are correctly managed by the caller, as they are passed by reference.
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L30>)
+
+Prints the age if it exceeds the expiration threshold, with color coding.
+- **Description**: Use this function to print an age value to the standard output if it exceeds a specified expiration threshold. The output is color-coded: yellow for ages that exceed the threshold and green for those that do not. This function helps reduce visual clutter by suppressing the display of ages that are less than or equal to the expiration threshold. Ensure that the buffer and its size are correctly managed before calling this function.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer where the formatted output may be stored. The caller retains ownership and must ensure it is valid.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. The caller retains ownership and must ensure it is valid.
-    - `age`: A long integer representing the age to be printed. It is compared against the expiration threshold.
-    - `expire`: A long integer representing the expiration threshold. If the age exceeds this value, it will be printed in a highlighted format.
+    - `buf`: A pointer to a character buffer where the formatted output will be stored. Must not be null. The caller retains ownership.
+    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. Must not be null. The caller retains ownership.
+    - `age`: A long integer representing the age in nanoseconds. There are no specific constraints on its value.
+    - `expire`: A long integer representing the expiration threshold in nanoseconds. There are no specific constraints on its value.
 - **Output**: None
-- **See also**: [`printf_stale`](helper.c.md#printf_stale)  (Implementation)
+- **See Also**: [`printf_stale`](<helper.c.md#printf_stale>)  (Implementation)
 
 
 ---
 ### printf\_heart<!-- {{#callable_declaration:printf_heart}} -->
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L38>)
+
 Prints a color-coded heartbeat status to stdout.
-- **Description**: This function is used to print a visual representation of a heartbeat status to the standard output. It determines whether a heartbeat is detected, not detected, or reset by comparing two heartbeat timestamps. The output is exactly 5 characters wide and uses color coding to indicate the status: green for detected, red for none, and blue for reset. This function is useful for monitoring applications where visual feedback on heartbeat status is required. It does not modify the input parameters or return any value.
+- **Description**: Use this function to display the status of a heartbeat by comparing two heartbeat timestamps. The output is color-coded and exactly 5 characters wide, indicating whether the heartbeat is ongoing, absent, or has reset. This function is useful for monitoring applications where visual feedback on heartbeat status is required. Ensure that the function is called with valid heartbeat timestamps to avoid incorrect status display.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer, which is not used in this function. The caller retains ownership and it can be null.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer, which is not used in this function. The caller retains ownership and it can be null.
-    - `hb_now`: A long integer representing the current heartbeat timestamp. It is used to determine the heartbeat status.
-    - `hb_then`: A long integer representing the previous heartbeat timestamp. It is used to determine the heartbeat status.
+    - `buf`: A pointer to a character buffer. The function does not use this parameter, so its value is irrelevant.
+    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. The function does not use this parameter, so its value is irrelevant.
+    - `hb_now`: A long integer representing the current heartbeat timestamp. Must be a valid timestamp.
+    - `hb_then`: A long integer representing the previous heartbeat timestamp. Must be a valid timestamp.
 - **Output**: None
-- **See also**: [`printf_heart`](helper.c.md#printf_heart)  (Implementation)
+- **See Also**: [`printf_heart`](<helper.c.md#printf_heart>)  (Implementation)
 
 
 ---
 ### sig\_color<!-- {{#callable_declaration:sig_color}} -->
-Returns a terminal color code string based on the signal value.
-- **Description**: Use this function to obtain a terminal color code string that corresponds to a specific signal value, which can be used for color-coding terminal output. The function maps predefined signal constants to specific color codes, providing a visual representation of different signal states. If the signal value does not match any known signal, a default normal text color code is returned. This function is useful for applications that need to visually differentiate between various operational states using terminal colors.
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L44>)
+
+Returns a color code string based on the signal value.
+- **Description**: Use this function to get a terminal color code string that corresponds to a specific signal value. This is useful for color-coding terminal output based on different signal states. The function maps specific signal values to predefined color codes, and returns a default color code if the signal is not recognized. It is important to ensure that the signal value corresponds to one of the expected signal constants to receive a meaningful color code.
 - **Inputs**:
-    - `sig`: An unsigned long integer representing the signal value. It should correspond to one of the predefined signal constants (e.g., FD_CNC_SIGNAL_BOOT, FD_CNC_SIGNAL_HALT, FD_CNC_SIGNAL_RUN, FD_CNC_SIGNAL_FAIL). If the value does not match any known signal, the function returns a normal text color code.
-- **Output**: A constant character pointer to a string representing the terminal color code associated with the given signal. If the signal is unknown, it returns the normal text color code.
-- **See also**: [`sig_color`](helper.c.md#sig_color)  (Implementation)
+    - `sig`: An unsigned long integer representing the signal value. Valid values are specific constants like `FD_CNC_SIGNAL_BOOT`, `FD_CNC_SIGNAL_HALT`, `FD_CNC_SIGNAL_RUN`, and `FD_CNC_SIGNAL_FAIL`. If the value does not match any of these, the function returns a default color code.
+- **Output**: A constant character pointer to a string representing the terminal color code. Returns specific color codes for known signals and a default color code for unknown signals.
+- **See Also**: [`sig_color`](<helper.c.md#sig_color>)  (Implementation)
 
 
 ---
 ### printf\_sig<!-- {{#callable_declaration:printf_sig}} -->
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L49>)
+
 Prints the current and previous CNC signal values to stdout.
-- **Description**: This function is used to display the current and previous values of a CNC signal in a color-coded format, ensuring that the output is exactly 10 characters wide. It is useful for monitoring changes in signal values over time. The function does not modify the input parameters or return any value, and it is expected to be called when the signal values need to be logged or displayed for diagnostic purposes.
+- **Description**: Use this function to display the current and previous values of a CNC signal in a color-coded format. The output is exactly 10 characters wide and is printed to the standard output. This function is useful for monitoring changes in signal values over time. Ensure that the `sig_now` and `sig_then` parameters represent valid signal values. The function does not modify the input parameters or return any value.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer pointer, which is not used or modified by this function. The caller retains ownership.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer, which is not used or modified by this function. The caller retains ownership.
-    - `sig_now`: An unsigned long representing the current signal value. It must be a valid signal value for proper color coding.
-    - `sig_then`: An unsigned long representing the previous signal value. It must be a valid signal value for proper color coding.
+    - `buf`: A pointer to a character buffer. The function does not use or modify this parameter.
+    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. The function does not use or modify this parameter.
+    - `sig_now`: An unsigned long representing the current signal value. Must be a valid signal value.
+    - `sig_then`: An unsigned long representing the previous signal value. Must be a valid signal value.
 - **Output**: None
-- **See also**: [`printf_sig`](helper.c.md#printf_sig)  (Implementation)
+- **See Also**: [`printf_sig`](<helper.c.md#printf_sig>)  (Implementation)
 
 
 ---
 ### printf\_err\_bool<!-- {{#callable_declaration:printf_err_bool}} -->
-Prints a color-coded error status comparison to stdout.
-- **Description**: This function is used to display a boolean error status for two different time points, 'now' and 'then', in a color-coded format. It prints a 12-character wide output to the standard output, where each status is represented as 'err' in red if an error is present, or '-' in green if no error is detected. This function is useful for monitoring and debugging purposes, providing a quick visual indication of error states over time. It should be called when you need to compare and display the error status at two different instances.
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L58>)
+
+Prints a color-coded error status to stdout.
+- **Description**: Use this function to display the current and previous error status in a color-coded format on the standard output. The output is exactly 12 characters wide, with 'err' displayed in red if an error is present, and '-' in green if no error is detected. This function is useful for monitoring error conditions over time. It does not modify the input parameters or return any value.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer, which is not used in this function. The caller retains ownership.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer, which is not used in this function. The caller retains ownership.
-    - `err_now`: An unsigned long representing the current error status. A non-zero value indicates an error, while zero indicates no error.
-    - `err_then`: An unsigned long representing the previous error status. A non-zero value indicates an error, while zero indicates no error.
+    - `buf`: A pointer to a character buffer. The function does not use or modify this parameter.
+    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. The function does not use or modify this parameter.
+    - `err_now`: An unsigned long indicating the current error status. A non-zero value indicates an error, while zero indicates no error.
+    - `err_then`: An unsigned long indicating the previous error status. A non-zero value indicates an error, while zero indicates no error.
 - **Output**: None
-- **See also**: [`printf_err_bool`](helper.c.md#printf_err_bool)  (Implementation)
+- **See Also**: [`printf_err_bool`](<helper.c.md#printf_err_bool>)  (Implementation)
 
 
 ---
 ### printf\_err\_cnt<!-- {{#callable_declaration:printf_err_cnt}} -->
-Prints the current and previous error counts with color-coded changes.
-- **Description**: Use this function to display the current and previous error counts in a color-coded format to indicate changes. It is useful for monitoring error count trends over time. The function prints the current count and the difference between the current and previous counts, using different colors to represent no change, an increase, a decrease, or a reset in the error count. This function is intended for use in environments where visual feedback on error trends is beneficial.
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L64>)
+
+Prints the change in error count to stdout with color coding.
+- **Description**: Use this function to display the difference between two error counts, `cnt_now` and `cnt_then`, with color-coded output to indicate the nature of the change. The output is printed to stdout and is exactly 10 characters wide. The function uses different colors to represent no change, an increase, a decrease, or a reset in error counts. This function is useful for monitoring error count changes in a visually distinct manner.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer, which is not used in this function. The caller retains ownership.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer, which is not used in this function. The caller retains ownership.
-    - `cnt_now`: The current error count as an unsigned long. It represents the latest error count to be displayed.
-    - `cnt_then`: The previous error count as an unsigned long. It represents the error count from a prior time to compare against the current count.
+    - `buf`: A pointer to a buffer that can be used for temporary storage. The function does not modify this buffer, and it can be null.
+    - `buf_sz`: A pointer to the size of the buffer. The function does not modify this value, and it can be null.
+    - `cnt_now`: The current error count. Must be a valid unsigned long integer.
+    - `cnt_then`: The previous error count. Must be a valid unsigned long integer.
 - **Output**: None
-- **See also**: [`printf_err_cnt`](helper.c.md#printf_err_cnt)  (Implementation)
+- **See Also**: [`printf_err_cnt`](<helper.c.md#printf_err_cnt>)  (Implementation)
 
 
 ---
 ### printf\_seq<!-- {{#callable_declaration:printf_seq}} -->
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L73>)
+
 Prints a 64-bit sequence number and its change to stdout.
-- **Description**: This function is used to display a 64-bit sequence number and the difference between its current and previous values, formatted to be exactly 25 characters wide and color-coded for easy visual interpretation. It is useful for monitoring sequence number changes in applications where such tracking is necessary. The function should be called with valid sequence numbers, and it will handle cases where the sequence number has not changed, has increased, decreased, or reset, by using different colors to indicate each state.
+- **Description**: Use this function to display a 64-bit sequence number and the difference between its current and previous values. The output is color-coded to indicate the nature of the change: yellow for no change, green for an increase, red for a decrease, and blue for a reset. The printed output is exactly 25 characters wide. This function is useful for monitoring sequence number changes in a visually distinct manner. Ensure that the buffer parameters are correctly initialized before calling this function.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer pointer, which is not used in this function. The caller retains ownership.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer, which is not used in this function. The caller retains ownership.
-    - `seq_now`: The current sequence number as an unsigned long. It should be a valid 64-bit sequence number.
-    - `seq_then`: The previous sequence number as an unsigned long. It should be a valid 64-bit sequence number.
+    - `buf`: A pointer to a character buffer. The function does not modify this buffer, but it must be valid and initialized.
+    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. The function does not modify this value, but it must be valid and initialized.
+    - `seq_now`: The current sequence number as an unsigned long. It represents the latest state of the sequence.
+    - `seq_then`: The previous sequence number as an unsigned long. It represents the state of the sequence at an earlier time.
 - **Output**: None
-- **See also**: [`printf_seq`](helper.c.md#printf_seq)  (Implementation)
+- **See Also**: [`printf_seq`](<helper.c.md#printf_seq>)  (Implementation)
 
 
 ---
 ### printf\_rate<!-- {{#callable_declaration:printf_rate}} -->
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L91>)
+
 Prints a calculated rate to stdout with engineering suffixes.
-- **Description**: This function calculates a rate based on the provided conversion factor, overhead, and count differences over a time interval, and prints it to stdout using engineering notation with appropriate suffixes (e.g., K, M, G). It is intended for diagnostic purposes where a wide dynamic range is needed. The function expects valid input values, such as a positive conversion factor and time interval, and a non-negative overhead. If the input values are invalid or result in an overflow, the function will print an error message and return without performing further operations.
+- **Description**: Use this function to print a rate calculated from the given parameters to the standard output. The function computes the rate using the formula `cvt * ((overhead + (cnt_now - cnt_then)) / dt)`. It prints the result in a format that is exactly 8 characters wide, right-justified, with an aligned decimal point. The output uses standard engineering base 10 suffixes (e.g., K, M, G) to represent large numbers. The function expects valid input values; if the inputs are invalid, it prints an error message and returns without printing a rate. This function is useful for diagnostics where a wide dynamic range of rates needs to be displayed.
 - **Inputs**:
-    - `buf`: A pointer to a buffer pointer, which is not used in this function. The caller retains ownership.
-    - `buf_sz`: A pointer to a buffer size, which is not used in this function. The caller retains ownership.
-    - `cvt`: A double representing the conversion factor. Must be greater than 0 and less than or equal to DBL_MAX. Invalid values will cause the function to print an error and return.
-    - `overhead`: A double representing the overhead. Must be non-negative and less than or equal to DBL_MAX. Invalid values will cause the function to print an error and return.
-    - `cnt_now`: An unsigned long representing the current count. Must be greater than or equal to cnt_then. Invalid values will cause the function to print an error and return.
-    - `cnt_then`: An unsigned long representing the previous count. Must be less than or equal to cnt_now.
-    - `dt`: A long representing the time interval. Must be positive. Invalid values will cause the function to print an error and return.
+    - `buf`: A pointer to a character buffer. The function does not use this parameter, and it can be null.
+    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. The function does not use this parameter, and it can be null.
+    - `cvt`: A double representing the conversion factor. Must be greater than 0 and less than or equal to `DBL_MAX`. If invalid, the function prints an error and returns.
+    - `overhead`: A double representing the overhead. Must be greater than or equal to 0 and less than or equal to `DBL_MAX`. If invalid, the function prints an error and returns.
+    - `cnt_now`: An unsigned long representing the current count. Must be greater than or equal to `cnt_then`. If invalid, the function prints an error and returns.
+    - `cnt_then`: An unsigned long representing the previous count. Must be less than or equal to `cnt_now`.
+    - `dt`: A long representing the time difference. Must be greater than 0. If invalid, the function prints an error and returns.
 - **Output**: None
-- **See also**: [`printf_rate`](helper.c.md#printf_rate)  (Implementation)
+- **See Also**: [`printf_rate`](<helper.c.md#printf_rate>)  (Implementation)
 
 
 ---
 ### printf\_pct<!-- {{#callable_declaration:printf_pct}} -->
-Prints the percentage change between two values to stdout.
-- **Description**: This function calculates and prints the percentage change between two sets of values, `num_now` and `num_then` for the numerator, and `den_now` and `den_then` for the denominator, to the standard output. It is used when you need to display the percentage change in a formatted manner. The function checks for valid input ranges and handles potential overflow conditions. If the percentage is valid and within the range of 0 to 999.999, it prints the percentage with three decimal places; otherwise, it prints '>999.999'. The function does not modify the input parameters or return any value.
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L100>)
+
+Prints the percentage change between two sets of values to stdout.
+- **Description**: Use this function to calculate and print the percentage change between two sets of numerator and denominator values. It is important to ensure that the current values are not less than the previous values, and that the L'Hôpital's rule numerators and denominators are within valid double precision ranges. The function will print an error message if these conditions are not met or if the calculated percentage is out of range. The output is formatted to a maximum of three decimal places, and values exceeding 999.999 are capped.
 - **Inputs**:
-    - `buf`: A pointer to a character buffer. This parameter is not used in the function, but it is part of the function signature. The caller retains ownership.
-    - `buf_sz`: A pointer to an unsigned long representing the size of the buffer. This parameter is not used in the function, but it is part of the function signature. The caller retains ownership.
-    - `num_now`: An unsigned long representing the current numerator value. Must be greater than or equal to `num_then`.
-    - `num_then`: An unsigned long representing the previous numerator value. Used to calculate the change in the numerator.
-    - `lhopital_num`: A double representing an adjustment to the numerator. Must be between 0 and DBL_MAX inclusive.
-    - `den_now`: An unsigned long representing the current denominator value. Must be greater than or equal to `den_then`.
-    - `den_then`: An unsigned long representing the previous denominator value. Used to calculate the change in the denominator.
-    - `lhopital_den`: A double representing an adjustment to the denominator. Must be greater than 0 and less than or equal to DBL_MAX.
+    - `buf`: A pointer to a character buffer. The function does not use this parameter, and it can be null.
+    - `buf_sz`: A pointer to an unsigned long representing the buffer size. The function does not use this parameter, and it can be null.
+    - `num_now`: The current numerator value. Must be greater than or equal to `num_then`.
+    - `num_then`: The previous numerator value. Must be less than or equal to `num_now`.
+    - `lhopital_num`: A double representing the L'Hôpital's rule numerator adjustment. Must be between 0 and `DBL_MAX`, inclusive.
+    - `den_now`: The current denominator value. Must be greater than or equal to `den_then`.
+    - `den_then`: The previous denominator value. Must be less than or equal to `den_now`.
+    - `lhopital_den`: A double representing the L'Hôpital's rule denominator adjustment. Must be greater than 0 and less than or equal to `DBL_MAX`.
 - **Output**: None
-- **See also**: [`printf_pct`](helper.c.md#printf_pct)  (Implementation)
+- **See Also**: [`printf_pct`](<helper.c.md#printf_pct>)  (Implementation)
 
 
 ---
 ### fd\_getchar<!-- {{#callable_declaration:fd_getchar}} -->
-Perform a non-blocking read of one byte from stdin.
-- **Description**: Use this function to attempt reading a single byte from the standard input without blocking the execution. It is useful in scenarios where you need to check for user input availability without pausing the program flow. The function should be called when you want to handle input asynchronously or in a non-blocking manner. It returns a value indicating the result of the read operation, which can be used to determine if input was available or if the read was unsuccessful.
+[View Source →](<../../../../../../../src/app/shared/commands/monitor/helper.h#L113>)
+
+Performs a non-blocking read of one byte from standard input.
+- **Description**: Use this function to read a single byte from standard input without blocking the execution of the program. It is useful in scenarios where you need to check for input availability without pausing the program flow. The function returns a value in the range [1, 256) if a byte is successfully read. If no input is available or a null byte is read, it returns 0. This function does not block, so it can be used in event-driven or real-time applications where responsiveness is critical.
 - **Inputs**: None
-- **Output**: Returns an integer representing the byte read from stdin in the range [1, 256) if successful. Returns 0 if stdin is not ready for reading or if a null byte is read.
-- **See also**: [`fd_getchar`](helper.c.md#fd_getchar)  (Implementation)
+- **Output**: Returns an integer representing the byte read from standard input, or 0 if no input is available or a null byte is read.
+- **See Also**: [`fd_getchar`](<helper.c.md#fd_getchar>)  (Implementation)
 
 
 

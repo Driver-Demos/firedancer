@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_frame_handler_decl.h` file defines a macro for declaring a function to handle QUIC frames within the Firedancer project.
+Defines a macro for handling QUIC frames with a customizable context and data structure.
 
 # Purpose
-This code is a C header file that defines a macro for beginning the declaration of a static function, specifically for handling QUIC (Quick UDP Internet Connections) protocol frames. It uses conditional compilation to define a default type for `FD_TEMPL_FRAME_CTX` if it is not already defined, defaulting to `void`. The macro `FD_TEMPL_DEF_STRUCT_BEGIN` is designed to generate a function prototype for handling a specific QUIC frame type, where `NAME` is a placeholder for the frame type, and it takes a context, data structure, and a pointer to a buffer with its size as parameters. The inclusion of `"fd_quic_dft.h"` suggests that this file is part of a larger framework or library dealing with QUIC protocol operations, and it likely relies on definitions or declarations provided in the included header.
+This code is a C header file that defines a macro for creating function prototypes related to handling QUIC (Quick UDP Internet Connections) frames. It first checks if `FD_TEMPL_FRAME_CTX` is defined; if not, it defines it as `void`. The macro `FD_TEMPL_DEF_STRUCT_BEGIN(NAME)` is then defined to generate a static function prototype named `fd_quic_handle_##NAME`. This function takes a pointer to `FD_TEMPL_FRAME_CTX`, a pointer to a data structure `fd_quic_##NAME##_t`, a constant pointer to an unsigned character array `p`, and an unsigned long `p_sz`. The file includes another header file, `fd_quic_dft.h`, which likely contains additional definitions or declarations related to QUIC.
 # Imports and Dependencies
 
 ---

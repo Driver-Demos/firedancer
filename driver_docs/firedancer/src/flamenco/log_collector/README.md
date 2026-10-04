@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header files, build rules, and tests for log collection and stable log helpers.
+Header files and tests for a log collector system with serialization, debugging, and 128-bit integer support.
 
 
 ## Files
-- **[fd_log_collector.h](fd_log_collector.h.md)**: Log collector and stable log helpers for instruction, program, and debug messages.
-- **[fd_log_collector_base.h](fd_log_collector_base.h.md)**: The `fd_log_collector_base.h` file defines the base structure and constants for a log collector in the Firedancer codebase, including buffer size limits and serialization details.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build instructions for the `log_collector` component, including header file addition and unit test creation, conditional on the presence of 128-bit integer support.
-- **[test_log_collector.c](test_log_collector.c.md)**: The `test_log_collector.c` file contains various test functions for the `fd_log_collector` component, focusing on different scenarios such as message byte limits, single log limits, and message equivalences, to ensure proper logging behavior and handling of log truncation.
+- **[fd_log_collector.h](fd_log_collector.h.md)**: Header file for a log collector system, including functions for logging, message serialization, and debugging.
+- **[fd_log_collector_base.h](fd_log_collector_base.h.md)**: Defines the base structure and constants for a log collector with serialization and truncation features.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and unit tests for the log collector if 128-bit integers are available.
+- **[test_log_collector.c](test_log_collector.c.md)**: Tests for log collector functionality, including message limits and behavior under various conditions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
