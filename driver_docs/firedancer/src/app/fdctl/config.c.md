@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `config.c` file in the `firedancer` codebase imports a default configuration from a TOML file using the `FD_IMPORT_BINARY` macro.
+Imports a default configuration from a TOML file for the fdctl application.
 
 # Purpose
-This code is a C source file that imports a binary configuration file using a macro from an included utility header, `fd_util.h`. The `FD_IMPORT_BINARY` macro is used to embed the contents of a TOML configuration file, `default.toml`, located in the `src/app/fdctl/config/` directory, into the binary at compile time. This approach allows the application to access default configuration settings directly from the binary, eliminating the need to read the configuration from an external file at runtime. The inclusion of `fd_util.h` suggests that this file is part of a larger project that utilizes utility functions or macros defined in that header.
+This code is a C source file that includes a utility header file `fd_util.h` from a relative path. It uses the macro `FD_IMPORT_BINARY` to import a binary configuration file named `default.toml` located in the `src/app/fdctl/config` directory. The purpose of this code is to make the contents of the `default.toml` file available as a binary resource within the program, likely for configuration purposes. The `fdctl_default_config` symbol is used to reference this imported configuration data in the application.
 # Imports and Dependencies
 
 ---

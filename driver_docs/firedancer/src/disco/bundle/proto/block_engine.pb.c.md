@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `block_engine.pb.c` file contains automatically generated nanopb constant definitions for various request and response message bindings related to block engine operations in the `firedancer` codebase.
+Nanopb-generated constant definitions for block engine protocol buffers.
 
 # Purpose
-This C source code file is an automatically generated set of constant definitions for use with the nanopb library, specifically version 0.4.9.1. It includes bindings for several protocol buffer message types related to a "block engine," such as `SubscribePacketsRequest`, `SubscribePacketsResponse`, `SubscribeBundlesRequest`, `SubscribeBundlesResponse`, `BlockBuilderFeeInfoRequest`, and `BlockBuilderFeeInfoResponse`. The file ensures compatibility with a specific version of the nanopb protocol header, indicated by a preprocessor directive that triggers an error if the version does not match. The `PB_BIND` macro is used to associate each protocol buffer message type with its corresponding C structure, facilitating serialization and deserialization operations.
+This C source code file contains automatically generated constant definitions for Protocol Buffers (protobuf) using the nanopb library, version 0.4.9.1. It includes the header file `block_engine.pb.h` and checks if the `PB_PROTO_HEADER_VERSION` is 40, issuing an error if it is not, to ensure compatibility with the current nanopb generator version. The file uses the `PB_BIND` macro to bind several protobuf message types, such as `block_engine_SubscribePacketsRequest`, `block_engine_SubscribePacketsResponse`, `block_engine_SubscribeBundlesRequest`, `block_engine_SubscribeBundlesResponse`, `block_engine_BlockBuilderFeeInfoRequest`, and `block_engine_BlockBuilderFeeInfoResponse`, with automatic field handling. This setup facilitates the serialization and deserialization of these message types in applications using nanopb.
 # Imports and Dependencies
 
 ---

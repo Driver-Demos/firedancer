@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build settings for Linux Clang on Zen 5 with x86-64, debug, security, and SIMD flags.
+Makefile for configuring a build environment targeting AMD Zen 5 with Clang and various optimizations.
 
 # Purpose
-This Makefile fragment defines a build target for `linux/clang/zen5` and includes the base build rules plus extra settings for Clang, x86-64, debug, security, brutality, optimization, and threads. It adds compiler flags for the `znver5` architecture and tuning level, and it defines preprocessor symbols that enable support for `int128`, `double`, `alloca`, and several x86 instruction sets such as `SSE`, `AVX`, `AVX512`, `AESNI`, `SHANI`, and `GFNI`. The same feature set is also assigned to `FD_HAS_*` variables so the build system can use these values during compilation and configuration.
+The Makefile configuration specifies the build directory and includes several configuration files to set up the build environment for a software project. The `BUILDDIR` variable is set to `linux/clang/zen5`, indicating the target directory for the build output. The file includes multiple configuration files, such as `config/base.mk` and various `config/extra/*.mk` files, which add specific build options like debugging, security, optimization, and threading. The `CPPFLAGS` variable is augmented with flags for the compiler, specifying architecture-specific optimizations for the Zen 5 architecture, such as `-march=znver5` and `-mtune=znver5`. Additionally, several preprocessor definitions are set to enable features like 128-bit integers, double precision, and various x86 instruction set extensions, including SSE, AVX, and AVX512.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

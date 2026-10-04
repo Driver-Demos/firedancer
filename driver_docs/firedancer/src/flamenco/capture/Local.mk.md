@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for solcap headers, objects, and binaries, with a stub when hosted support is absent.
+Makefile rules for building binaries and objects related to Solcap in the Firedancer project.
 
 # Purpose
-This Makefile fragment adds the `fd_solcap_proto.h`, `fd_solcap_writer.h`, and `fd_solcap_reader.h` headers to the build. When `FD_HAS_INT128` and `FD_HAS_HOSTED` are set, it adds the `fd_solcap_writer`, `fd_solcap_reader`, and `fd_solcap.pb` objects to `fd_flamenco` and defines the `fd_solcap_diff`, `fd_solcap_import`, and `fd_solcap_yaml` binaries with their required libraries; when hosted support is not present, it adds the `fd_solcap_writer_stub` object instead.
+This Makefile script manages the build process for a software project. It uses conditional logic to include headers and compile object files based on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED` flags. If both flags are set, it compiles the `fd_solcap_writer`, `fd_solcap_reader`, and `fd_solcap.pb` objects and creates binaries `fd_solcap_diff`, `fd_solcap_import`, and `fd_solcap_yaml` with dependencies on `fd_flamenco`, `fd_ballet`, and `fd_util`. If `FD_HAS_HOSTED` is not set, it compiles a stub version of `fd_solcap_writer`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
