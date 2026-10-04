@@ -3,10 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines gRPC services for validators to subscribe to packet and bundle streams and retrieve fee info.
+The `block_engine.proto` file defines the protocol buffer messages and services for subscribing to packet and bundle streams, as well as retrieving block builder fee information, within the `block_engine` package of the `firedancer` codebase.
 
 # Purpose
-The file defines a Protocol Buffers (`proto3`) schema for a service named `BlockEngineValidator` within the `block_engine` package. It specifies messages and remote procedure calls (RPCs) that facilitate communication between validators and block engines. The `SubscribePacketsRequest` and `SubscribePacketsResponse` messages enable validators to subscribe to a stream of packets, while the `SubscribeBundlesRequest` and `SubscribeBundlesResponse` messages allow subscription to a stream of simulated and profitable bundles. Additionally, the `BlockBuilderFeeInfoRequest` and `BlockBuilderFeeInfoResponse` messages provide a mechanism for block builders to retrieve fee information, including a public key and commission rate. The service includes three RPC methods: `SubscribePackets`, `SubscribeBundles`, and `GetBlockBuilderFeeInfo`, each designed to handle specific interactions between validators and the block engine.
+This code is a Protocol Buffers (proto) file, which defines the structure of messages and services for a block engine system, specifically for communication between validators and block engines. It provides a narrow functionality focused on defining the data exchange format and RPC (Remote Procedure Call) services for subscribing to packet and bundle streams, as well as retrieving block builder fee information. The file imports other proto files, indicating dependencies on shared message structures defined elsewhere, and it defines several message types and a service named `BlockEngineValidator`. This service allows validators to subscribe to streams of packets and bundles and to query fee information, facilitating efficient and structured communication in a blockchain or distributed ledger context.
+# Imports and Dependencies
+
+---
+- `packet.proto`
+- `shared.proto`
+- `bundle.proto`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

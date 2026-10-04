@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for generating and cleaning Protocol Buffers files using a custom nanopb generator.
+Build rules for nanopb-generated .pb.h and .pb.c files from fd_solcap.proto, with clean support.
 
 # Purpose
-This Makefile automates the generation and cleanup of Protocol Buffers (protobuf) source files using the `nanopb_generator.py` script. The `generate` target creates `.pb.h` and `.pb.c` files from `.proto` files listed in the `PROTOS` variable, applying a specific `sed` command to modify the include path in the generated header files. The `clean` target removes the generated `.pb.h` and `.pb.c` files, ensuring a clean state. The `.PHONY` directive marks `generate` and `clean` as phony targets, indicating they do not correspond to actual files.
+This Makefile defines a `generate` target that runs `nanopb_generator.py` to create `*.pb.h` and `*.pb.c` files from the `fd_solcap.proto` schema, then updates the generated header to include `../../ballet/nanopb/pb_firedancer.h` instead of `pb.h`. It also defines a `clean` target that removes the generated `*.pb.h` and `*.pb.c` files for the listed `PROTOS`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
