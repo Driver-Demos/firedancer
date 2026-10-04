@@ -3,33 +3,33 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-API, functions, utilities, and tests for managing NUMA-aware shared memory workspaces in Firedancer.
+The `wksp` folder in the `firedancer` codebase contains a comprehensive set of files for managing and testing NUMA-aware and TLB-efficient workspaces, including APIs, utilities, checkpointing, restoration, and various test programs to ensure robust memory management and inter-process communication.
 
 
 ## Files
-- **[fd_wksp.h](fd_wksp.h.md)**: API for creating and managing NUMA-aware, TLB-efficient shared memory workspaces for inter-thread and inter-process communication.
-- **[fd_wksp_admin.c](fd_wksp_admin.c.md)**: Functions for managing and manipulating a workspace, including locking, unlocking, and memory protection.
-- **[fd_wksp_checkpt_v1.c](fd_wksp_checkpt_v1.c.md)**: Functions for writing, preparing, publishing, and canceling workspace checkpoints in a buffered output stream.
-- **[fd_wksp_checkpt_v2.c](fd_wksp_checkpt_v2.c.md)**: Implements a function for creating a checkpoint of a workspace with load-balanced cgroups and error handling.
-- **[fd_wksp_ctl.c](fd_wksp_ctl.c.md)**: A command-line utility for managing and querying workspace states, including allocation, deletion, and metadata integrity checks.
-- **[fd_wksp_ctl_help](fd_wksp_ctl_help.md)**: Command-line tool for managing workspace allocations, including creation, deletion, allocation, and checkpointing.
-- **[fd_wksp_free_treap.c](fd_wksp_free_treap.c.md)**: Functions for querying, inserting, and removing nodes in a free treap data structure.
-- **[fd_wksp_helper.c](fd_wksp_helper.c.md)**: Helper functions for managing shared memory workspaces, including creation, deletion, and memory operations.
-- **[fd_wksp_io.c](fd_wksp_io.c.md)**: Functions for reading, previewing, checkpointing, restoring, and printing workspace checkpoint data.
-- **[fd_wksp_private.h](fd_wksp_private.h.md)**: Defines internal structures and functions for managing workspace partitions, including idle stack and treap operations, in the Firedancer codebase.
-- **[fd_wksp_restore_v1.c](fd_wksp_restore_v1.c.md)**: Functions for restoring and printing version 1 workspace checkpoints from a buffered input stream.
-- **[fd_wksp_restore_v2.c](fd_wksp_restore_v2.c.md)**: Functions and macros for restoring workspace checkpoints in version 2, including handling headers, info, footers, and cgroups.
-- **[fd_wksp_used_treap.c](fd_wksp_used_treap.c.md)**: Implements functions for querying, inserting, and removing nodes in a workspace treap data structure.
-- **[fd_wksp_user.c](fd_wksp_user.c.md)**: Functions for managing workspace partitions, including splitting, merging, allocating, and freeing memory.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing workspace components and utilities in the Firedancer project.
-- **[test_wksp.c](test_wksp.c.md)**: A torture test for same-thread memory allocation and deallocation in a workspace environment.
-- **[test_wksp_admin.c](test_wksp_admin.c.md)**: Tests for workspace administration functions, including footprint, alignment, and error handling.
-- **[test_wksp_ctl](test_wksp_ctl.md)**: A Bash script for testing various operations of the `fd_wksp_ctl` utility in the Firedancer codebase.
-- **[test_wksp_free_treap.c](test_wksp_free_treap.c.md)**: Tests the functionality of workspace free treap operations with random partition manipulations.
-- **[test_wksp_helper.c](test_wksp_helper.c.md)**: Tests for workspace creation, attachment, allocation, and deletion functions in the Firedancer codebase.
-- **[test_wksp_tpool.c](test_wksp_tpool.c.md)**: Tests the functionality of workspace allocation, initialization, checkpointing, and restoration using a thread pool.
-- **[test_wksp_used_treap.c](test_wksp_used_treap.c.md)**: Tests the functionality of workspace used treap operations with random partition manipulations.
-- **[test_wksp_user.c](test_wksp_user.c.md)**: Tests for workspace memory management functions in the Firedancer codebase.
+- **[fd_wksp.h](fd_wksp.h.md)**: The `fd_wksp.h` file in the `firedancer` codebase provides an API for creating and managing NUMA-aware and TLB-efficient workspaces, facilitating complex inter-thread and inter-process shared memory communication patterns.
+- **[fd_wksp_admin.c](fd_wksp_admin.c.md)**: The `fd_wksp_admin.c` file in the `firedancer` codebase provides functions for managing workspace memory, including locking, unlocking, creating, joining, leaving, deleting, verifying, rebuilding, and protecting memory regions.
+- **[fd_wksp_checkpt_v1.c](fd_wksp_checkpt_v1.c.md)**: The `fd_wksp_checkpt_v1.c` file in the `firedancer` codebase implements functions for creating a checkpoint of a workspace, including writing, preparing, publishing, and canceling operations, as well as handling errors and workspace corruption.
+- **[fd_wksp_checkpt_v2.c](fd_wksp_checkpt_v2.c.md)**: The `fd_wksp_checkpt_v2.c` file in the `firedancer` codebase implements a function to create a checkpoint of a workspace, organizing data into compressed frames and handling errors during the process.
+- **[fd_wksp_ctl.c](fd_wksp_ctl.c.md)**: The `fd_wksp_ctl.c` file in the `firedancer` codebase implements a command-line utility for managing and querying workspace allocations, including operations such as creating, deleting, allocating, and querying workspaces, as well as handling various workspace-related commands.
+- **[fd_wksp_ctl_help](fd_wksp_ctl_help.md)**: The `fd_wksp_ctl_help` file in the `firedancer` codebase provides detailed command-line usage instructions for managing workspaces, including creating, deleting, allocating, freeing, and checkpointing operations.
+- **[fd_wksp_free_treap.c](fd_wksp_free_treap.c.md)**: The `fd_wksp_free_treap.c` file in the `firedancer` codebase implements functions for managing a free treap data structure, including querying, inserting, and removing nodes within a workspace.
+- **[fd_wksp_helper.c](fd_wksp_helper.c.md)**: The `fd_wksp_helper.c` file in the `firedancer` codebase provides helper functions for managing shared memory workspaces, including creation, deletion, attachment, detachment, and memory allocation operations.
+- **[fd_wksp_io.c](fd_wksp_io.c.md)**: The `fd_wksp_io.c` file in the `firedancer` codebase provides functions for reading, previewing, checkpointing, restoring, and printing information about workspace checkpoints, supporting multiple styles and handling errors.
+- **[fd_wksp_private.h](fd_wksp_private.h.md)**: The `fd_wksp_private.h` file in the `firedancer` codebase defines the internal structures and functions for managing workspace partitions, including handling idle stacks, used and free treaps, and checkpointing/restoring operations.
+- **[fd_wksp_restore_v1.c](fd_wksp_restore_v1.c.md)**: The `fd_wksp_restore_v1.c` file in the `firedancer` codebase provides functions to restore workspace data from a checkpoint file, handling both the restoration of unsigned long integers and variable-length buffers, and includes error handling for I/O and format issues.
+- **[fd_wksp_restore_v2.c](fd_wksp_restore_v2.c.md)**: The `fd_wksp_restore_v2.c` file in the `firedancer` codebase implements functions for restoring workspace checkpoints, including handling headers, info, and footers, as well as managing memory-mapped and streaming input/output operations.
+- **[fd_wksp_used_treap.c](fd_wksp_used_treap.c.md)**: The `fd_wksp_used_treap.c` file in the `firedancer` codebase implements functions for querying, inserting, and removing nodes in a treap data structure used to manage workspace partitions.
+- **[fd_wksp_user.c](fd_wksp_user.c.md)**: The `fd_wksp_user.c` file in the `firedancer` codebase provides functions for managing workspace partitions, including splitting, merging, allocating, freeing, and querying memory partitions within a workspace.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, binaries, and unit tests related to the workspace utilities, with conditional compilation and testing for hosted environments.
+- **[test_wksp.c](test_wksp.c.md)**: The `test_wksp.c` file in the `firedancer` codebase implements a torture test for same-thread memory allocation and deallocation using a workspace, including validation of memory usage and alignment.
+- **[test_wksp_admin.c](test_wksp_admin.c.md)**: The `test_wksp_admin.c` file in the `firedancer` codebase contains a suite of tests for workspace administration functions, including tests for footprint estimation, alignment, creation, joining, and error handling.
+- **[test_wksp_ctl](test_wksp_ctl.md)**: The `test_wksp_ctl` file is a Bash script that performs a series of tests on the `fd_wksp_ctl` utility, including operations like creating, allocating, tagging, and deleting workspaces, as well as testing various commands and error handling scenarios.
+- **[test_wksp_free_treap.c](test_wksp_free_treap.c.md)**: The `test_wksp_free_treap.c` file in the `firedancer` codebase is a test program for validating the functionality of workspace free treap operations, including partition creation, random treap operations, and integrity checks.
+- **[test_wksp_helper.c](test_wksp_helper.c.md)**: The `test_wksp_helper.c` file in the `firedancer` codebase contains a comprehensive set of tests for workspace management functions, including named and anonymous workspace creation, attachment, allocation, mapping, and deletion.
+- **[test_wksp_tpool.c](test_wksp_tpool.c.md)**: The `test_wksp_tpool.c` file in the `firedancer` codebase is a test program that verifies the functionality of a workspace allocation system using a thread pool, including operations such as allocation, initialization, checkpointing, zeroing, and restoration of memory regions.
+- **[test_wksp_used_treap.c](test_wksp_used_treap.c.md)**: The `test_wksp_used_treap.c` file in the `firedancer` codebase is a test program that performs various operations on a workspace treap, including querying, inserting, and removing partitions, while validating the integrity of these operations.
+- **[test_wksp_user.c](test_wksp_user.c.md)**: The `test_wksp_user.c` file in the `firedancer` codebase contains a comprehensive test suite for workspace management functions, including allocation, tagging, freeing, and memory setting operations, with various edge case tests and random operations to ensure robustness.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,16 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Discussion on defining custom integer types in Firedancer instead of using `stdint.h`, focusing on developer expectations and platform behavior.
+The `integer-types.md` file discusses the rationale behind defining custom integer types in the `firedancer` codebase instead of using `stdint.h`, emphasizing developer expectations, platform consistency, and reducing code complexity and errors.
 
 # Purpose
-This document provides a rationale for defining custom integer types instead of using the standard `stdint.h` in a software codebase. It explains that while `stdint.h` offers lexical regularity and type aliases, it is not integrated into the core language and can lead to issues with format strings and implicit conversions. The document argues that developers often behave as though standard integer types like `int` are equivalent to `int32_t`, which can lead to errors and inefficiencies. The approach taken by the codebase is to ensure that integer types behave as developers expect, rejecting platforms that do not conform to these expectations. This reduces code complexity, minimizes bugs, and simplifies debugging and logging. The document concludes that while `stdint.h` can be useful for readability, it is unnecessary if the environment guarantees equivalence between custom and standard types.
+The provided content appears to be a markdown file, which is typically used for documentation purposes within a software codebase. This file contains a discussion on the rationale behind defining custom integer types instead of using the standard `stdint.h` types in C/C++. The content is focused on a specific technical decision, providing a detailed explanation of the trade-offs and reasoning behind this choice. The discussion highlights issues with `stdint.h`, such as its late introduction, compatibility problems, and the challenges it poses in terms of code readability and maintenance. The file serves as a documentation piece to inform developers about the design philosophy and practices adopted in the codebase, ensuring that integer types behave predictably and align with developer expectations. This documentation is crucial for maintaining consistency and understanding the underlying principles guiding the codebase's development practices.
 # Content Summary
-The provided content is a discussion about the rationale for defining custom integer types instead of using the standard `stdint.h` in a software project. The author, identified as "kbowers," explains that while `stdint.h` provides standardized integer types, it was introduced late in the development of C/C++ and is not integrated into the core language. This results in additional complexity, such as the need for extra includes and issues with format strings.
+This document appears to be a markdown file containing a discussion on the rationale behind defining custom integer types instead of using the standard `stdint.h` types in a C/C++ codebase. The author, identified as "kbowers," provides a detailed explanation of the reasoning and historical context behind this decision.
 
-The author argues that developers often assume equivalence between types like `int` and `int32_t`, which can lead to errors. The author suggests that if the language had started with something similar to `stdint.h`, it would have been more beneficial. However, given the current state of developer practices and legacy issues, the project adopts a "principle of least surprise" approach. This approach ensures that integer types behave as developers expect, rejecting platforms that do not conform to these expectations.
+The key points highlighted in the document include:
 
-The author shares personal experiences of dealing with code that improperly uses format specifiers, leading to difficult-to-diagnose bugs. Despite initially advocating for the use of `stdint.h`, the author found it impractical to enforce its use due to the friction it causes in development and testing. The author concludes that the project should guarantee that core types behave predictably and avoid the complexities introduced by `stdint.h`, while still allowing its use if it provides readability benefits without compromising type safety.
+1. **Historical Context and Developer Behavior**: The author notes that `stdint.h` and `inttypes.h` were introduced late in the development of C/C++, making them less integrated into the core language. As a result, developers often treat standard integer types like `int` as equivalent to `int32_t`, leading to potential issues.
+
+2. **Principle of Least Surprise**: The document emphasizes the importance of ensuring that integer types behave in a way that aligns with developers' expectations. This approach is intended to avoid surprises and ensure safety and productivity in real-world applications.
+
+3. **Challenges with `stdint.h`**: The author describes the difficulties associated with using `stdint.h`, such as verbosity in format strings and the potential for subtle bugs due to implicit conversions. These challenges can lead to code that is difficult to maintain and debug.
+
+4. **FD's Approach**: The document outlines the approach taken by the FD project, which involves guaranteeing that core types behave as expected by developers. This approach reduces code complexity, enhances predictability, and minimizes the risk of bugs.
+
+5. **Avoidance of `stdint.h` in Interfaces**: The author argues against the use of `stdint.h` in exposed interfaces, suggesting that it is unnecessary if the environment guarantees equivalence between custom types and standard types like `uint32_t` and `uint`.
+
+Overall, the document provides a comprehensive argument for defining custom integer types to improve code reliability and maintainability, while acknowledging the limitations and challenges of the standard `stdint.h` types.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
