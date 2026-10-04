@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and tests for CPU affinity, thread management, and tile-based parallel processing on Linux.
+The `tile` folder in the `firedancer` codebase contains source files and tests for managing CPU affinity, task dispatching, and tile execution with and without threading support, along with a makefile for compilation and testing.
 
 
 ## Files
-- **[fd_tile.c](fd_tile.c.md)**: Functions to get and set CPU affinity for a process on Linux systems.
-- **[fd_tile.h](fd_tile.h.md)**: Header file for managing task dispatching and execution within a thread group using tiles.
-- **[fd_tile_nothreads.cxx](fd_tile_nothreads.cxx.md)**: Implements non-threaded tile management functions, including boot, halt, and execution handling.
-- **[fd_tile_private.h](fd_tile_private.h.md)**: Internal utilities for managing CPU sets and thread affinity in the fd_tile module.
-- **[fd_tile_threads.cxx](fd_tile_threads.cxx.md)**: Manages CPU configuration, stack allocation, and thread management for tile-based parallel processing.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests with conditional threading support.
-- **[test_cpuset.c](test_cpuset.c.md)**: Tests for `fd_cpuset_t` compatibility with `cpu_set_t` API, including operations like insert, remove, and set.
-- **[test_tile.c](test_tile.c.md)**: Tests for tile stack operations and tile-to-tile dispatch functionality in the Firedancer codebase.
+- **[fd_tile.c](fd_tile.c.md)**: The `fd_tile.c` file in the `firedancer` codebase provides functions to get and set CPU affinity for a process on Linux systems, with a fallback to return an error on unsupported platforms.
+- **[fd_tile.h](fd_tile.h.md)**: The `fd_tile.h` file in the `firedancer` codebase provides an interface for fast task dispatching within a thread group, including functions for managing tile execution, stack diagnostics, and retrieving tile-specific information.
+- **[fd_tile_nothreads.cxx](fd_tile_nothreads.cxx.md)**: The `fd_tile_nothreads.cxx` file in the `firedancer` codebase provides an implementation for managing tile execution without threading, including functions for booting and halting tiles, as well as handling tile execution tasks and their associated metadata.
+- **[fd_tile_private.h](fd_tile_private.h.md)**: The `fd_tile_private.h` file in the `firedancer` codebase provides internal utilities for managing CPU sets and thread affinity, including replacements for libc's `cpu_set_t` to address stability issues, specifically for use within the `fd_tile` module.
+- **[fd_tile_threads.cxx](fd_tile_threads.cxx.md)**: The `fd_tile_threads.cxx` file in the `firedancer` codebase provides functionality for managing and executing tasks on CPU tiles, including configuring CPU priorities, creating and managing stacks, and handling thread affinity and execution states.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile script that manages the inclusion of headers and objects, and conditionally compiles and runs unit tests for `fd_tile` based on the presence of threading support.
+- **[test_cpuset.c](test_cpuset.c.md)**: The `test_cpuset.c` file in the `firedancer` codebase tests the `fd_cpuset_t` type as a replacement for the `cpu_set_t` API, ensuring compatibility and correct behavior with POSIX functions.
+- **[test_tile.c](test_tile.c.md)**: The `test_tile.c` file in the `firedancer` codebase contains tests for tile stack operations and tile execution management, including dispatching tasks to different tiles and verifying their execution.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

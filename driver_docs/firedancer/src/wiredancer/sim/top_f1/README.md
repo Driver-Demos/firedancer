@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for Verilog simulation and cocotb test for PCIe and ED25519 in firedancer.
+The `top_f1` folder in the `firedancer` codebase contains a `Makefile` for configuring and building a Verilog simulation environment with Questa, and a `test.py` file for simulating and verifying hardware design behavior using cocotb.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: Makefile for simulating Verilog sources with Questa and Cocotb in the firedancer project.
-- **[test.py](test.py.md)**: A cocotb-based test for simulating and verifying PCIe transactions and ED25519 signature operations.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/top_f1` directory is used to configure and build a simulation environment for a Verilog project using the Questa simulator, specifying various Verilog source files and compilation arguments.
+- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase contains a cocotb-based test for simulating and verifying the behavior of a hardware design, including PCIe transactions and Ed25519 signature verification.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
