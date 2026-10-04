@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build script for generating and cleaning Protocol Buffers files using Nanopb in the Firedancer project.
+The `Makefile` in the `firedancer/src/disco/bundle/proto` directory automates the generation and cleanup of protocol buffer source files using `nanopb_generator.py` for a set of specified proto files.
 
 # Purpose
-This Makefile automates the generation of Protocol Buffers (protobuf) source files using the `nanopb_generator.py` script. It defines a list of protobuf files (`auth`, `block_engine`, `bundle`, `packet`, `shared`, `timestamp`) that need to be processed. The `generate` target creates `.pb.h` and `.pb.c` files for each protobuf file by invoking the `nanopb_generator.py` with specific options, including support for proto3 optional fields. The Makefile also modifies the generated header files to include a custom header file path. The `clean` target removes all generated `.pb.h` and `.pb.c` files, ensuring a clean state for regeneration.
+The provided content is a Makefile, which is used to automate the build process for generating C source and header files from Protocol Buffer (.proto) definitions using the Nanopb generator. The `NANOPB_GEN` variable specifies the script `nanopb_generator.py` as the tool for this task. The `PROTOS` variable lists the base names of the .proto files that need to be processed. The `generate` target, marked as `.PHONY` to indicate it is not a file, uses these base names to create corresponding `.pb.h` and `.pb.c` files by invoking the Nanopb generator with specific options. Additionally, a `sed` command is used to modify the generated header files to include a custom header path. The `clean` target, also marked as `.PHONY`, is responsible for removing the generated files, ensuring a clean state for subsequent builds.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

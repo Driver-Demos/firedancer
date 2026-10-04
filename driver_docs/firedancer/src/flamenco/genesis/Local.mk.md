@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components in the firedancer genesis module.
+The `Local.mk` file in the `firedancer` codebase specifies build instructions and conditional unit test execution for the `fd_genesis_create` and `fd_flamenco` components, contingent on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED` flags.
 
 # Purpose
-The `Makefile` content defines build and test instructions for a software project. If the `FD_HAS_INT128` flag is set, it adds the header file `fd_genesis_create.h` and the object files `fd_genesis_create` and `fd_flamenco` to the build process. If the `FD_HAS_HOSTED` flag is also set, it creates and runs a unit test named `test_genesis_create`, which depends on the components `fd_flamenco`, `fd_funk`, `fd_ballet`, and `fd_util`.
+This file is a Makefile snippet used for conditional compilation and testing in a software build process. It checks for the presence of the `FD_HAS_INT128` flag to include headers and objects related to `fd_genesis_create` and `fd_flamenco`. If the `FD_HAS_HOSTED` flag is also set, it defines and runs a unit test for `test_genesis_create` using specified dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
