@@ -3,62 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for accessing account metadata in a read-only manner and error handling in the Firedancer runtime.
+Readonly account metadata lookup and error string mapping.
 
 # Purpose
-The code provides functionality for managing account metadata in a system that interacts with Solana transactions. It includes two main functions: [`fd_funk_get_acc_meta_readonly`](<#fd_funk_get_acc_meta_readonly>) and [`fd_acc_mgr_strerror`](<#fd_acc_mgr_strerror>). The [`fd_funk_get_acc_meta_readonly`](<#fd_funk_get_acc_meta_readonly>) function retrieves account metadata in a read-only manner. It takes several parameters, including a pointer to a `fd_funk_t` structure, a transaction ID, a public key, and optional pointers for output records and error codes. The function uses a loop to query the global record and checks if the account is writable or read-only, ensuring safe access through read-write locks held by the Solana transaction. If the account is found, it returns the metadata; otherwise, it sets an error code and returns `NULL`.
+This C file implements account metadata access helpers for the account manager layer. The function [`fd_funk_get_acc_meta_readonly`](<#fd_funk_get_acc_meta_readonly>) looks up an account record in `fd_funk` by public key, returns a read-only pointer to the account metadata, and can also return the matched record, the transaction XID, and an error code. It uses `fd_funk_rec_query_try_global` to search for the record, reports `FD_ACC_MGR_ERR_UNKNOWN_ACCOUNT` when the account does not exist, and returns `FD_ACC_MGR_SUCCESS` on success. The comments in the function explain that the caller can use the returned metadata without copying when the account is read-only in the Solana transaction.
 
-The [`fd_acc_mgr_strerror`](<#fd_acc_mgr_strerror>) function provides a string representation of error codes related to account management. It uses a switch statement to map error codes to human-readable strings, such as "success" or "unknown account." This function aids in debugging and error handling by translating numeric error codes into descriptive messages. The code is part of a broader system, likely a library, that deals with account management and transaction processing, and it interfaces with other components through included headers like `fd_acc_mgr.h` and `fd_funk.h`.
-# Imports and Dependencies
-
----
-- `fd_acc_mgr.h`
-- `../../funk/fd_funk.h`
-
-
-# Functions
-
----
-### fd\_funk\_get\_acc\_meta\_readonly<!-- {{#callable:fd_funk_get_acc_meta_readonly}} -->
-[View Source →](<../../../../../src/flamenco/runtime/fd_acc_mgr.c#L4>)
-
-Retrieves read-only account metadata for a given public key in a transaction context.
-- **Inputs**:
-    - ``funk``: A pointer to the `fd_funk_t` structure representing the transaction context.
-    - ``xid``: A pointer to the `fd_funk_txn_xid_t` structure representing the transaction ID.
-    - ``pubkey``: A pointer to the `fd_pubkey_t` structure representing the public key of the account.
-    - ``orec``: An optional pointer to store the record if found.
-    - ``opt_err``: An optional pointer to an integer to store error codes.
-    - ``out_xid``: A pointer to store the transaction ID of the record found.
-- **Logic and Control Flow**:
-    - Generate a record key `id` using the public key `pubkey`.
-    - Enter an infinite loop to query the global record using `fd_funk_rec_query_try_global`.
-    - If the record is not found, store the error code `FD_ACC_MGR_ERR_UNKNOWN_ACCOUNT` in `opt_err` if it is not NULL, and return NULL.
-    - If `orec` is not NULL, store the found record in `orec`.
-    - Retrieve the raw data from the record using `fd_funk_val`.
-    - Convert the raw data to `fd_account_meta_t` type using `fd_type_pun_const`.
-    - Store the success code `FD_ACC_MGR_SUCCESS` in `opt_err` if it is not NULL.
-    - Return the metadata.
-- **Output**: A pointer to `fd_account_meta_t` containing the account metadata, or NULL if the account is not found.
-- **Functions Called**:
-    - [`fd_funk_rec_key_t::fd_funk_acc_key`](<fd_acc_mgr.h.md#fd_funk_rec_key_tfd_funk_acc_key>)
-
-
----
-### fd\_acc\_mgr\_strerror<!-- {{#callable:fd_acc_mgr_strerror}} -->
-[View Source →](<../../../../../src/flamenco/runtime/fd_acc_mgr.c#L41>)
-
-Maps error codes to their corresponding error message strings.
-- **Inputs**:
-    - `err`: An integer representing the error code to be translated into a string message.
-- **Logic and Control Flow**:
-    - Use a switch statement to evaluate the value of `err`.
-    - If `err` is `FD_ACC_MGR_SUCCESS`, return the string "success".
-    - If `err` is `FD_ACC_MGR_ERR_UNKNOWN_ACCOUNT`, return the string "unknown account".
-    - For any other value of `err`, return the string "unknown".
-- **Output**: A constant character pointer to the error message string corresponding to the input error code.
-
-
+The file also defines [`fd_acc_mgr_strerror`](<#fd_acc_mgr_strerror>), which maps account manager error codes to short text strings. This function provides the external error text for `FD_ACC_MGR_SUCCESS` and `FD_ACC_MGR_ERR_UNKNOWN_ACCOUNT`, and returns `"unknown"` for any other value.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

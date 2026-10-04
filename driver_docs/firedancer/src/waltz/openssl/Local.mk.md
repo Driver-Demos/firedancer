@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding OpenSSL headers and objects conditionally based on FD_HAS_OPENSSL.
+The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects related to OpenSSL, conditional on the presence of `FD_HAS_OPENSSL`.
 
 # Purpose
-The `Makefile` content defines build instructions for a project that uses OpenSSL. It uses a function `add-hdrs` to include the header file `fd_openssl.h`. If the `FD_HAS_OPENSSL` variable is defined, it adds the object files `fd_openssl` and `fd_waltz` to the build process using the `add-objs` function.
+This is a Makefile snippet used for conditional compilation. It adds the header file `fd_openssl.h` and, if the `FD_HAS_OPENSSL` flag is defined, it includes the object files `fd_openssl` and `fd_waltz` in the build process. This setup is typically used to manage dependencies and compile options based on the presence of OpenSSL support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

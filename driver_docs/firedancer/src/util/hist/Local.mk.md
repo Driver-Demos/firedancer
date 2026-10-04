@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers and running unit tests for `fd_histf`.
+The `Local.mk` file in the `firedancer` codebase specifies the inclusion of the `fd_histf.h` header and defines a unit test named `test_histf` for the `fd_util` component.
 
 # Purpose
-The `Makefile` content defines build and test instructions for a software project. It adds the header file `fd_histf.h` to the build process using the `add-hdrs` function. It then sets up a unit test named `test_histf` with dependencies on `fd_util` using the `make-unit-test` function. Finally, it executes the unit test `test_histf` using the `run-unit-test` function.
+The file is a Makefile snippet used for building and testing a software component. It adds the header file `fd_histf.h` to the build process, defines a unit test named `test_histf` that depends on the `fd_util` library, and specifies the execution of the `test_histf` unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
