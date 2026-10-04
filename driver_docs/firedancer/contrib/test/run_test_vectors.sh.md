@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Runs test vectors from a local Git checkout with configurable processes and logging.
+A shell script to run test vectors with parallelism and manage repository setup for the Firedancer project.
 
 # Purpose
-This Bash script runs a Solana compatibility test against a fixed set of test vectors. It prepares a local checkout of the `test-vectors` repository at the commit named in `contrib/test/test-vectors-commit-sha.txt`, or at `GIT_REF` if that variable is set, and it creates or refreshes the log directory in `LOG_PATH`. The script then starts `unit-test/test_sol_compat` from `OBJDIR` with a tile CPU range based on `NUM_PROCESSES`, and it passes several fixture directories from `dump/test-vectors` to cover block, syscall, VM interpreter, transaction, ELF loader, and instruction cases. Its scope is narrow: it is a test runner and environment setup script, not a general application entry point or library file.
+This script is a Bash shell script used to automate the setup and execution of a testing environment for a software project. It begins by setting up the working directory and defining several environment variables, such as `OBJDIR`, `NUM_PROCESSES`, `PAGE_SZ`, and `PAGE_CNT`, which control the build configuration and parallel processing parameters. The script checks if a `LOG_PATH` is specified, creating a temporary directory if not, and ensures the existence of a `dump` directory. It then clones or updates a Git repository containing test vectors, using a specific commit reference stored in a file. The script sets up the environment for running compatibility tests using the `SOL_COMPAT` array, which includes the path to the test executable and CPU allocation settings. Finally, it executes the tests on various fixture directories and logs the results, indicating success upon completion.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

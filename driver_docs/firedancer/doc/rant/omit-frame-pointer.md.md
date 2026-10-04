@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `omit-frame-pointer.md` file discusses the historical and current relevance of the `-fomit-frame-pointer` compile flag, particularly in the context of x86 and x86_64 architectures on Linux.
+Discussion on the historical and current relevance of the `-fomit-frame-pointer` compile flag.
 
 # Purpose
-The provided content appears to be a markdown file that serves as a documentation or commentary on the historical and technical implications of the `-fomit-frame-pointer` compiler flag. Authored by "kbowers" on March 15, 2023, the document explains how this flag was historically used to optimize performance on x86 architectures by freeing up an additional register, which was crucial due to the limited number of general-purpose registers available. It also discusses the trade-offs involved, such as the increased difficulty in debugging, and how advancements in debugging tools and changes in architecture, like the transition to x86_64, have altered the flag's relevance. The document concludes by suggesting that the utility of `-fomit-frame-pointer` is now more context-dependent, varying with different platforms and architectures, and is no longer a necessity in modern environments.
+The metadata content provides historical and technical context for the `-fomit-frame-pointer` compile flag, particularly in relation to its use on x86 and x86_64 architectures. The flag was originally used to optimize performance by freeing up an additional register in the register-limited x86 architecture, which improved real-world performance by reducing the need for stack spills. However, this optimization came at the cost of making debugging more difficult, as it complicated stack inspection. Over time, improvements in debugging tools and the introduction of x86_64 with a larger register file have reduced both the benefits and drawbacks of using this flag. The content suggests that the utility of `-fomit-frame-pointer` is now more context-dependent, varying with different architectures and operating systems, and is not considered essential for modern Linux/x86_64 systems.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
