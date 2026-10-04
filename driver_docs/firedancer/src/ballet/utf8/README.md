@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-UTF-8 validation code and tests.
+UTF-8 validation functions, Makefile for build configuration, and tests for UTF-8 validation.
 
 
 ## Files
-- **[fd_utf8.c](fd_utf8.c.md)**: The `fd_utf8.c` file in the `firedancer` codebase provides a basic UTF-8 validation function, originally imported from Rust, to verify the validity of UTF-8 encoded strings.
-- **[fd_utf8.h](fd_utf8.h.md)**: The `fd_utf8.h` file in the `firedancer` codebase provides a function to verify whether a byte array contains valid UTF-8 according to the validation rules of Rust's `std::str::from_utf8`.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests related to UTF-8 functionality, including the execution of a unit test named `test_utf8`.
-- **[test_utf8.c](test_utf8.c.md)**: UTF-8 verification tests for single glyphs, combined glyphs, and out-of-bounds reads.
+- **[fd_utf8.c](fd_utf8.c.md)**: A basic UTF-8 validator imported from Rust, with a function to verify UTF-8 string validity.
+- **[fd_utf8.h](fd_utf8.h.md)**: Function to verify if a byte array contains valid UTF-8 according to Rust's validation rules.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for UTF-8 functionality.
+- **[test_utf8.c](test_utf8.c.md)**: Tests for UTF-8 validation using predefined test vectors and edge cases.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

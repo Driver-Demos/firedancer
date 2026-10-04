@@ -3,59 +3,63 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `generate_recover.py` file in the `firedancer` codebase generates C source files for Reed-Solomon error recovery functions, tailored for different numbers of shreds and maximum shreds.
+Generates C code for Reed-Solomon erasure recovery functions with variable parameters.
 
 # Purpose
-This Python script is designed to generate C source files that implement functions for data recovery using Reed-Solomon error correction codes. The script defines a function [`make_recover_var`](#make_recover_var) that takes two parameters: `n`, which specifies the number of data elements, and `max_shreds`, which indicates the maximum number of shreds (or fragments) that can be processed. The script uses a helper function [`cprint`](#cprint) to manage indentation and formatting of the generated C code. The generated C functions are responsible for recovering data from a set of shreds, some of which may be missing or corrupted, by leveraging the mathematical properties of Reed-Solomon codes.
+The code is a Python script that generates C source files for Reed-Solomon error correction functions. The primary function, [`make_recover_var`](<#make_recover_var>), creates a C file for a specific number of shreds (`n`) and a maximum number of shreds (`max_shreds`). The generated C function, `fd_reedsol_private_recover_var_{n}`, is responsible for recovering data from a set of shreds, which are parts of data that can be used to reconstruct the original data even if some parts are missing or corrupted. The function uses Reed-Solomon error correction techniques, including inverse fast Fourier transform (IFFT) and fast Fourier transform (FFT), to regenerate missing data and verify the integrity of the recovered data.
 
-The script generates multiple C files, each corresponding to a different value of `n`, by calling [`make_recover_var`](#make_recover_var) with various parameters. The generated C code includes logic for loading data shreds, checking for missing data, and performing mathematical operations such as inverse fast Fourier transforms (IFFT) and finite field arithmetic to reconstruct the original data. The script is structured to handle different cases of data erasure and corruption, ensuring that the recovered data is accurate. This Python script is a utility for automating the creation of specialized C functions that are part of a larger system for data integrity and recovery, likely used in storage systems or communication protocols where data reliability is critical.
+The script uses a helper function [`cprint`](<#cprint>) to manage indentation and formatting of the generated C code. It handles the logic for loading shreds, checking for erased data, and performing mathematical operations on the data using Galois Field arithmetic. The script generates multiple C files for different values of `n`, specifically for 16, 32, 64, 128, and 256 shreds, each with a maximum of 134 shreds. The generated C functions include error checking to ensure that the data recovery process is successful and that no corruption is detected in the regenerated data.
 # Global Variables
 
 ---
 ### indent
-- **Type**: `int`
-- **Description**: The `indent` variable is a global integer that tracks the current level of indentation for formatted output. It is used to adjust the indentation level when printing strings, particularly in the context of code generation or structured text output.
-- **Use**: This variable is used to manage and adjust the indentation level dynamically as strings are printed, increasing or decreasing based on the presence of certain characters ('{' and '}').
+- **Type**: ``int``
+- **Description**: The `indent` variable is an integer that represents the current level of indentation for formatted output. It is used to control the number of spaces to prepend to a string when printing.
+- **Use**: Used in the `cprint` function to adjust the indentation level based on the presence of '{' and '}' characters in the input string.
 
 
 # Functions
 
 ---
 ### cprint<!-- {{#callable:firedancer/src/ballet/reedsol/generate_recover.cprint}} -->
-The `cprint` function prints a string to a global output file with indentation based on the presence of curly braces in the string.
+[View Source →](<../../../../../src/ballet/reedsol/generate_recover.py#L2>)
+
+Prints a string with indentation based on the presence of curly braces.
 - **Inputs**:
-    - `string`: The string to be printed, which may contain indentation control characters ('{' and '}').
-- **Control Flow**:
-    - Check if the input string is empty or contains only whitespace; if so, print a blank line to the output file and return.
-    - If the string contains a closing brace '}', decrease the global indentation level by one.
-    - Print the string to the output file, prefixed by spaces corresponding to the current indentation level.
-    - If the string contains an opening brace '{', increase the global indentation level by one.
-- **Output**: The function does not return any value; it outputs the formatted string to a global file object `outf`.
+    - `string`: The string to print, which may contain indentation markers ('{' or '}').
+- **Logic and Control Flow**:
+    - Checks if the input `string` is empty or contains only whitespace; if true, prints a blank line and returns.
+    - Decreases the global `indent` by 1 if the `string` contains a closing curly brace '}'.
+    - Prints the `string` with indentation determined by the current value of `indent`.
+    - Increases the global `indent` by 1 if the `string` contains an opening curly brace '{'.
+- **Output**: Prints the formatted string to the file object `outf`.
 
 
 ---
 ### make\_recover\_var<!-- {{#callable:firedancer/src/ballet/reedsol/generate_recover.make_recover_var}} -->
-The `make_recover_var` function generates C code for a Reed-Solomon recovery function that handles variable numbers of data and parity shreds.
+[View Source →](<../../../../../src/ballet/reedsol/generate_recover.py#L14>)
+
+Generates a C source file to implement a variable recovery function for Reed-Solomon error correction.
 - **Inputs**:
-    - `n`: The number of shreds to be processed, which determines the size of arrays and the function name.
-    - `max_shreds`: The maximum number of shreds that can be processed, used to determine loop bounds and conditional logic.
-- **Control Flow**:
-    - Opens a file named 'fd_reedsol_recover_{n}.c' for writing, where {n} is the input parameter.
-    - Writes C code to the file, starting with includes and a function declaration for a Reed-Solomon recovery function.
-    - Initializes arrays `_erased` and `pi` with size `n` and calculates `shred_cnt` as the sum of `data_shred_cnt` and `parity_shred_cnt`.
-    - Iterates over `n` to determine which shreds are loaded based on the `erased` array and updates `_erased` and `loaded_cnt`.
+    - `n`: The number of shreds to process.
+    - `max_shreds`: The maximum number of shreds to handle.
+- **Logic and Control Flow**:
+    - Opens a file named `fd_reedsol_recover_{n}.c` for writing.
+    - Writes C code to the file, including necessary headers and function definitions.
+    - Defines a function `fd_reedsol_private_recover_var_{n}` with parameters for shred size, shred data, data shred count, parity shred count, and erased status.
+    - Initializes arrays `_erased` and `pi` with size `n` and calculates `shred_cnt` as the sum of data and parity shred counts.
+    - Iterates over `n` to determine which shreds to load based on the `erased` array and updates `_erased` and `loaded_cnt`.
     - Checks if `loaded_cnt` is less than `data_shred_cnt` and returns an error if true.
-    - Generates a permutation index `pi` using a function call specific to `n`.
+    - Generates a permutation index `pi` using `fd_reedsol_private_gen_pi_{n}`.
     - Initializes a variable `diff` to track differences in regenerated shreds.
-    - Iterates over `shred_sz` to process each shred position, loading data into vectors and performing operations like IFFT, FDERIV, and FFT.
-    - Handles different cases for storing, comparing, and reloading shreds based on their erased status using macros.
-    - If `max_shreds` is greater than `n`, processes remaining shreds in chunks, updating `shreds_remaining` and using IFFT and FFT operations.
-    - Checks for any differences in regenerated shreds and returns an error if any are found.
-    - Updates `shred_pos` and ensures it does not exceed `shred_sz`.
+    - Iterates over shred positions to load and process shreds, applying mathematical operations like IFFT and FFT.
+    - Handles different cases for storing, comparing, and reloading shreds based on their erased status.
+    - Checks for any corruption in the shreds and returns an error if detected.
+    - Advances the shred position and adjusts it if necessary.
     - Returns success if all operations complete without errors.
-- **Output**: The function outputs C code to a file that implements a Reed-Solomon recovery function for the specified number of shreds.
-- **Functions called**:
-    - [`firedancer/src/ballet/reedsol/generate_recover.cprint`](#cprint)
+- **Output**: A C source file implementing a function for Reed-Solomon error correction with variable recovery.
+- **Functions Called**:
+    - [`firedancer/src/ballet/reedsol/generate_recover.cprint`](<#cprint>)
 
 
 

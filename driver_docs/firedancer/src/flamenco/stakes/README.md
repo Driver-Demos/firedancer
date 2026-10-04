@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Stake delegation and vote state caches, stake update logic, and unit tests.
+Functions and structures for managing stake accounts, delegations, vote states, and a Makefile for building `fd_stakes`.
 
 
 ## Files
-- **[fd_stake_delegations.c](fd_stake_delegations.c.md)**: Stake delegation pool and map management with update, remove, refresh, query, and iteration functions.
-- **[fd_stake_delegations.h](fd_stake_delegations.h.md)**: Stake delegation cache API with update, remove, query, refresh, and iteration functions.
-- **[fd_stakes.c](fd_stakes.c.md)**: Stake and vote account update logic for epoch activation and delegation refresh.
-- **[fd_stakes.h](fd_stakes.h.md)**: Stake weight, epoch activation, and stake or vote state update function declarations.
-- **[fd_vote_states.c](fd_vote_states.c.md)**: Vote state pool and map management, with update, remove, query, reset, and iteration helpers.
-- **[fd_vote_states.h](fd_vote_states.h.md)**: Vote account cache with stake, vote, commission, and iterator APIs.
-- **[Local.mk](Local.mk.md)**: Build rules for stake, delegation, and vote state headers, objects, and unit tests.
-- **[test_stake_delegations.c](test_stake_delegations.c.md)**: Tests stake delegation update, query, remove, tombstone, and workspace lifecycle functions.
-- **[test_vote_states.c](test_vote_states.c.md)**: Test program for vote state creation, query, update, stake reset, and removal.
+- **[fd_stake_delegations.c](fd_stake_delegations.c.md)**: Manages stake delegations with functions for creation, updating, querying, and iteration.
+- **[fd_stake_delegations.h](fd_stake_delegations.h.md)**: Defines a hash map-based cache for managing stake delegations, including functions for creation, update, and iteration.
+- **[fd_stakes.c](fd_stakes.c.md)**: Functions for managing stake weights, refreshing vote accounts, activating epochs, and updating stake and vote states in a bank system.
+- **[fd_stakes.h](fd_stakes.h.md)**: Functions and macros for managing stake weights, activation, history, and vote state updates.
+- **[fd_vote_states.c](fd_vote_states.c.md)**: Manages vote state pools and maps, including creation, updating, querying, and iteration of vote states.
+- **[fd_vote_states.h](fd_vote_states.h.md)**: Defines a thread-safe cache for vote accounts, mapping public keys to vote account details, with functions for managing and querying vote states.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for stakes, delegations, and vote states.
+- **[test_stake_delegations.c](test_stake_delegations.c.md)**: Tests for stake delegation functionalities, including creation, update, query, and removal operations.
+- **[test_vote_states.c](test_vote_states.c.md)**: Tests for the functionality of vote states, including creation, update, query, and removal operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
