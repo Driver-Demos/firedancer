@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `version.h` file in the `firedancer` codebase declares the `version_cmd_fn` function and the `fd_action_version` action for handling version-related commands.
+Defines the version command function and action for the Firedancer application.
 
 # Purpose
-This code is a C header file that defines the interface for a version command within an application. It includes a function prototype for [`version_cmd_fn`](#version_cmd_fn), which likely handles the execution of the version command, taking arguments and configuration data as parameters. The file also declares an external variable `fd_action_version`, which is presumably used to represent or trigger the version action within the application. The inclusion of `fd_config.h` suggests that this header relies on configuration settings defined elsewhere. The use of include guards ensures that the file's contents are only included once during compilation, preventing redefinition errors.
+This C header file defines the interface for a version command within an application. It includes the necessary configuration header `fd_config.h` and declares the function [`version_cmd_fn`](<#version_cmd_fn>), which takes pointers to `args_t` and `config_t` structures as parameters. The file also declares an external variable `fd_action_version` of type `action_t`. The use of include guards ensures that the file's contents are only included once during compilation, preventing redefinition errors.
 # Imports and Dependencies
 
 ---
@@ -17,9 +17,9 @@ This code is a C header file that defines the interface for a version command wi
 
 ---
 ### fd\_action\_version
-- **Type**: `action_t`
-- **Description**: The `fd_action_version` is a global variable of type `action_t`, which is likely a custom data type defined elsewhere in the codebase. It is declared as an external variable, indicating that it is defined in another source file and is accessible from this header file.
-- **Use**: This variable is used to represent a specific action related to versioning, potentially as part of a command or operation in the application.
+- **Type**: ``action_t``
+- **Description**: `fd_action_version` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is likely in another source file.
+- **Use**: Used to represent a specific action related to versioning in the application.
 
 
 

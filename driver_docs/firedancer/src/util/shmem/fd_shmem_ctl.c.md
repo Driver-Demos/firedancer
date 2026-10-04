@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_shmem_ctl.c` file in the `firedancer` codebase implements a command-line utility for managing shared memory, including commands for querying, creating, and unlinking shared memory segments, as well as retrieving CPU and NUMA information.
+A command-line utility for shared memory control, supporting operations like create, unlink, and query.
 
 # Purpose
-This C source code file implements a command-line utility for managing shared memory segments, specifically designed to operate in a hosted environment. The program provides a variety of commands to interact with shared memory, such as querying the number of CPUs and NUMA nodes, creating and unlinking shared memory segments, and querying information about existing segments. The utility is structured to handle different commands passed as arguments, with each command performing specific operations related to shared memory management. The code includes error handling and logging to ensure that operations are executed correctly and any issues are reported to the user.
+The code is an executable C program designed to manage shared memory operations. It provides a command-line interface for various shared memory management tasks, such as querying system information and creating or unlinking shared memory segments. The program includes commands like `help`, `cpu-cnt`, `numa-cnt`, `cpu-idx`, `numa-idx`, `create`, `unlink`, and `query`, each performing specific operations related to shared memory. For example, the `create` command allows the creation of shared memory segments with specified parameters, while the `unlink` command removes shared memory segments. The program uses functions like `fd_shmem_create_multi` and `fd_shmem_unlink` to perform these operations.
 
-The file is an executable C program, as indicated by the presence of the [`main`](#main) function, which serves as the entry point. It imports necessary utilities and definitions from other files, such as `fd_util.h`, and uses a series of helper functions to perform its tasks. The program defines a public interface through its command-line arguments, allowing users to execute commands like "help", "cpu-cnt", "numa-cnt", "create", "unlink", and "query". Each command is processed in a loop, with the program shifting through the arguments and executing the corresponding functionality. The code is designed to be robust, with checks for argument validity and appropriate error messages to guide users in case of incorrect usage.
+The program begins by initializing the environment with `fd_boot` and processes command-line arguments to execute the appropriate shared memory operations. It uses a series of conditional checks to determine which command to execute and logs the success or failure of each operation. The program also includes error handling to manage incorrect or insufficient arguments. The use of `FD_IMPORT_CSTR` and other macros indicates that the program relies on external definitions and utilities, likely provided by the `fd_util.h` header and related files. The code is structured to run on hosted platforms, with a fallback for unsupported platforms that logs an error message.
 # Imports and Dependencies
 
 ---
@@ -22,20 +22,19 @@ The file is an executable C program, as indicated by the presence of the [`main`
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the program, processes command-line arguments to execute shared memory control commands, and logs the results.
+[View Source →](<../../../../../src/util/shmem/fd_shmem_ctl.c#L162>)
+
+Initializes the environment, checks the number of command-line arguments, logs a notice, and halts the program.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
+    - `argc`: The count of command-line arguments passed to the program.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - The function starts by calling `fd_boot` to initialize the program environment with the command-line arguments.
-    - It checks if the number of arguments is less than 1, logging an error if true.
-    - The first argument is stored as `bin`, and the argument list is shifted to process subsequent commands.
-    - A loop iterates over the remaining arguments, interpreting each as a command and executing the corresponding logic.
-    - For each recognized command ('help', 'cpu-cnt', 'numa-cnt', 'cpu-idx', 'numa-idx', 'create', 'unlink', 'query'), the function performs specific operations, such as printing information or modifying shared memory settings.
-    - If an unrecognized command is encountered, an error is logged.
-    - After processing all commands, the function logs the number of processed commands.
-    - Finally, `fd_halt` is called to clean up, and the function returns 0.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Checks if `argc` is less than 1 and logs an error if true.
+    - Checks if `argc` is greater than 1 and logs an error if true, indicating unsupported platform.
+    - Logs a notice indicating that 0 commands were processed.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 
