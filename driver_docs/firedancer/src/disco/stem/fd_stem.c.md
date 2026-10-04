@@ -3,12 +3,43 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Multiplexes input fragments to outputs with flow control, callbacks, housekeeping, and metrics.
+Multiplexes input streams and presents them to consumers, supporting various callback functions for customization.
 
 # Purpose
-`fd_stem` is a template implementation for a tile run loop that multiplexes input fragments from multiple upstream links and publishes fragments to downstream links. It is designed for use in a tile-based runtime and builds a `stem_run`-style function from compile-time macros such as `STEM_BURST`, `STEM_CALLBACK_CONTEXT_TYPE`, and optional callback hooks. The file sets up input stream state, output flow control state, housekeeping timing, and metrics tracking, then runs a loop that polls inputs, handles backpressure, and updates credits for reliable consumers.
+The code in this file is a C module that provides functionality for multiplexing multiple streams of input fragments and presenting them to both reliable and unreliable consumers. It simulates the behavior of multiple multi-stream producers. The module defines a `stem_run` function, which acts as a main run loop for a tile, and supports various callback functions to customize its behavior. These callbacks include `SHOULD_SHUTDOWN`, `DURING_HOUSEKEEPING`, `METRICS_WRITE`, `BEFORE_CREDIT`, `AFTER_CREDIT`, `BEFORE_FRAG`, `DURING_FRAG`, `RETURNABLE_FRAG`, `AFTER_FRAG`, and `AFTER_POLL_OVERRUN`. Each callback serves a specific purpose, such as determining when to shut down, performing housekeeping tasks, writing metrics, and handling fragments at different stages of processing.
 
-The main part of the file defines the `run1` loop and the wrapper `run` function that connects the tile to the topology data in `fd_topo_t`. The loop supports callback points for shutdown, housekeeping, metrics publication, credit handling, fragment filtering, fragment processing, returnable fragments, and overrun handling. It also manages flow control with `fd_fseq` and `mcache` objects, tracks per-link and tile metrics, and randomizes polling order to reduce starvation effects.
+The module is designed to be included in other C programs and requires certain macros to be defined, such as `STEM_BURST`, `STEM_CALLBACK_CONTEXT_TYPE`, and `STEM_CALLBACK_CONTEXT_ALIGN`. It also includes error checks to ensure that necessary conditions are met, such as the presence of `alloca` support. The code manages input and output fragment streams, flow control, and housekeeping tasks, while also maintaining performance metrics. It uses a combination of inline functions and macros to handle memory alignment and layout, and it provides mechanisms for handling backpressure and flow control in a multi-stream environment.
+# Imports and Dependencies
+
+---
+- `fd_stem.h`
+- `../topo/fd_topo.h`
+- `../metrics/fd_metrics.h`
+- `../../tango/fd_tango.h`
+
+
+# Functions
+
+---
+### STEM\_<!-- {{#callable:STEM_}} -->
+[View Source →](<../../../../../src/disco/stem/fd_stem.c#L725>)
+
+Executes a run loop for a tile in a topology, managing input and output fragment streams, and handling reliable consumer links.
+- **Inputs**:
+    - ``topo``: A pointer to a `fd_topo_t` structure representing the topology of the system.
+    - ``tile``: A pointer to a `fd_topo_tile_t` structure representing the tile to run.
+- **Logic and Control Flow**:
+    - Initialize arrays for input and output fragment caches and sequence numbers.
+    - Iterate over input links of the tile, checking if they should be polled, and populate `in_mcache` and `in_fseq` arrays.
+    - Iterate over output links of the tile to populate `out_mcache` array.
+    - Identify reliable consumer links and populate `cons_out` and `cons_fseq` arrays.
+    - Initialize a random number generator `rng`.
+    - Align and initialize the callback context `ctx`.
+    - Call `STEM_(run1)` with initialized parameters to execute the main run loop.
+    - If `tile->allow_shutdown` is true, iterate over input links to update sequence numbers for reliable consumer links to indicate shutdown.
+- **Output**: No return value; the function operates as a side effect on the provided topology and tile structures.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data race detector and fuzzer for shared-memory concurrent algorithms on x86 TSO.
+Race condition detection and handling utilities with asynchronous context management, testing, and documentation.
 
 
 ## Files
-- **[fd_racesan.c](fd_racesan.c.md)**: Race-sanitizer hook registration and dispatch with a global active context.
-- **[fd_racesan.h](fd_racesan.h.md)**: Test utils for deterministic data race simulation and callback injection.
-- **[fd_racesan_async.c](fd_racesan_async.c.md)**: Async context switching for racesan hooks and stepwise execution.
-- **[fd_racesan_async.h](fd_racesan_async.h.md)**: Async race-sanitizer context type and function prototypes for create, step, reset, and delete.
-- **[fd_racesan_base.h](fd_racesan_base.h.md)**: 64-bit FNV-1a string hash and racesan feature macros.
-- **[fd_racesan_target.h](fd_racesan_target.h.md)**: Macros and thread-local state for racesan instrumentation of shared-memory concurrent algorithms.
-- **[fd_racesan_weave.c](fd_racesan_weave.c.md)**: Randomly steps async tasks until completion or step_max is reached.
-- **[fd_racesan_weave.h](fd_racesan_weave.h.md)**: Tests interleavings of concurrent algorithms.
-- **[Local.mk](Local.mk.md)**: Build rules for racesan headers, objects, and a unit test.
-- **[README.md](README.md.md)**: Data race detector and fuzzer for shared-memory concurrent algorithms on x86 TSO.
-- **[test_racesan.c](test_racesan.c.md)**: Unit tests for race sanitizer async, weave, and injection behavior.
+- **[fd_racesan.c](fd_racesan.c.md)**: Implements a race condition sanitizer with hook management and context handling functions.
+- **[fd_racesan.h](fd_racesan.h.md)**: Test utilities for simulating data races with callback injection in instrumented code.
+- **[fd_racesan_async.c](fd_racesan_async.c.md)**: Implements asynchronous context switching and race condition detection functions.
+- **[fd_racesan_async.h](fd_racesan_async.h.md)**: Defines structures and functions for asynchronous race condition detection using context switching.
+- **[fd_racesan_base.h](fd_racesan_base.h.md)**: Header file for race condition detection utilities, including a 64-bit FNV-1a string hashing function.
+- **[fd_racesan_target.h](fd_racesan_target.h.md)**: Macros to instrument shared memory concurrent algorithms with racesan, with zero cost if disabled.
+- **[fd_racesan_weave.c](fd_racesan_weave.c.md)**: Implements functions for managing and executing asynchronous operations in a race condition sanitizer.
+- **[fd_racesan_weave.h](fd_racesan_weave.h.md)**: Tests interleavings of concurrent algorithms with structures and functions for managing async tasks.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests related to `fd_racesan` in the `firedancer` codebase.
+- **[README.md](README.md.md)**: Documentation for racesan, a fuzzer for testing shared memory concurrent algorithms in Firedancer.
+- **[test_racesan.c](test_racesan.c.md)**: Tests for race condition detection and handling using the RaceSan library in asynchronous and interleaved contexts.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

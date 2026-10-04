@@ -3,94 +3,93 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `setup_fd_cluster.sh` file is a shell script for setting up a Solana test cluster, including generating keypairs, fetching necessary programs, running the genesis process, and starting a bootstrap validator.
+Shell script to set up a Solana test cluster with key generation, program fetching, and validator start.
 
 # Purpose
-This Bash script is designed to set up and start a Solana blockchain validator node, providing a narrow but essential functionality for blockchain network operations. It begins by configuring the environment and generating necessary cryptographic key pairs for minting, staking, and validating operations. The script then fetches and prepares various Solana programs, ensuring they are available for the genesis process. It proceeds to create a genesis block for the blockchain, setting up initial parameters and configurations for the network. Finally, the script starts the bootstrap validator, configuring it with specific network and operational parameters, such as RPC and gossip ports, to integrate it into the Solana network. This script is intended to be executed directly, serving as an automation tool for setting up a Solana validator environment.
+This Bash script is designed to set up and start a Solana blockchain test environment. It begins by configuring the environment, including setting the primary IP address and defining the RPC URL. The script creates necessary key pairs for minting, staking, and validating, and stores them in a designated directory. It then fetches and prepares various Solana programs, such as token and memo programs, for inclusion in the genesis block. The script generates the genesis block with specified parameters and starts a bootstrap validator using the generated keys and configuration. This setup is intended for testing and development purposes within a Solana network environment.
 # Global Variables
 
 ---
 ### PRIMARY\_IP
 - **Type**: `string`
-- **Description**: The `PRIMARY_IP` variable is a string that stores the primary IPv4 address of the machine on which the script is running. It is extracted using the `ip` command to show global scope addresses, filtered to get the first address, and then formatted to remove the subnet mask.
-- **Use**: This variable is used to dynamically set the RPC URL and the gossip host for the Solana validator, ensuring that the services bind to the correct network interface.
+- **Description**: The `PRIMARY_IP` variable stores the primary IPv4 address of the machine on which the script is running. It is obtained by executing a shell command that lists all global IPv4 addresses and extracts the first one using `awk` and `cut` commands.
+- **Use**: Used to configure network-related settings such as the RPC URL and gossip host for the Solana validator.
 
 
 ---
 ### RPC\_URL
 - **Type**: `string`
-- **Description**: The `RPC_URL` variable is a string that constructs a URL for accessing the RPC (Remote Procedure Call) interface of a Solana node. It is dynamically generated using the primary IP address of the machine, combined with a fixed port number, 8899, which is commonly used for RPC services in Solana.
-- **Use**: This variable is used to specify the endpoint for RPC communication with the Solana node, allowing other components or scripts to interact with the node's services.
+- **Description**: Contains the URL for the RPC (Remote Procedure Call) endpoint. It is constructed using the primary IP address of the machine and a fixed port number, 8899.
+- **Use**: Used to specify the RPC endpoint URL for network communication.
 
 
 ---
 ### AGAVE\_PATH
 - **Type**: `string`
-- **Description**: `AGAVE_PATH` is a global variable that holds the file path to the Agave software's release binaries. It defaults to './agave/target/release' if not set externally. This path is used to execute various Solana-related commands, such as generating key pairs and running the validator.
-- **Use**: `AGAVE_PATH` is used to specify the location of the Agave binaries for executing Solana commands in the script.
+- **Description**: Specifies the file path to the Agave executable directory. It defaults to './agave/target/release' if not set by the user.
+- **Use**: Used to execute various Solana-related commands by referencing the Agave executable path.
 
 
 ---
 ### upgradeableLoader
 - **Type**: `string`
-- **Description**: The `upgradeableLoader` variable is a string that holds the identifier for the BPF (Berkeley Packet Filter) Loader that supports upgradeable programs on the Solana blockchain. This identifier is used to specify the loader type when deploying or interacting with upgradeable programs.
-- **Use**: This variable is used to determine if a program should be deployed as an upgradeable program by comparing it with the loader type in the `fetch_program` function.
+- **Description**: A string that represents the identifier for the upgradeable BPF loader in the Solana blockchain environment. This identifier is used to specify the loader type when deploying or managing upgradeable programs on the blockchain.
+- **Use**: Used in the `fetch_program` function to determine if a program should be deployed as an upgradeable program.
 
 
 ---
 ### genesis\_args
 - **Type**: `array`
-- **Description**: The `genesis_args` variable is an array that accumulates command-line arguments for the Solana genesis process. It is used to specify various programs and their configurations that need to be included in the genesis block of the Solana blockchain. The array is populated by the `fetch_program` function, which appends arguments based on the type of program loader and the program's address.
-- **Use**: This variable is used to store and pass command-line arguments to the Solana genesis command, defining the programs to be included in the genesis block.
+- **Description**: The `genesis_args` variable is an array that stores command-line arguments for the Solana genesis process. These arguments include options for loading programs into the genesis block, such as specifying whether a program is upgradeable or not, along with the program's address, loader, and shared object file.
+- **Use**: Used to accumulate and pass command-line arguments to the Solana genesis command for program initialization.
 
 
 ---
 ### GENESIS\_OUTPUT
-- **Type**: `string`
-- **Description**: `GENESIS_OUTPUT` is a string variable that captures the output of the `solana-genesis` command. This command is responsible for generating the genesis block for a Solana blockchain network, which includes setting up the initial state and configuration for the network. The output contains important information such as the genesis hash and shred version, which are used for further configuration of the network.
-- **Use**: This variable is used to store the output of the genesis block creation process, which is then parsed to extract the genesis hash and shred version for starting the bootstrap validator.
+- **Type**: ``string``
+- **Description**: Contains the output of the `solana-genesis` command, which is executed to generate the genesis block for a Solana blockchain network. This output includes important information such as the genesis hash and shred version, which are used to configure the bootstrap validator.
+- **Use**: Stores the result of the `solana-genesis` command for further processing and configuration of the blockchain network.
 
 
 ---
 ### GENESIS\_HASH
-- **Type**: `string`
-- **Description**: The `GENESIS_HASH` variable is a string that stores the hash of the genesis block generated during the setup of a Solana blockchain test ledger. It is extracted from the output of the `solana-genesis` command, which initializes the blockchain with specified parameters.
-- **Use**: This variable is used to configure the expected genesis hash for the bootstrap validator, ensuring it matches the genesis block of the test ledger.
+- **Type**: ``string``
+- **Description**: Extracts the genesis hash from the `GENESIS_OUTPUT` variable. The genesis hash is a unique identifier for the initial state of the blockchain ledger.
+- **Use**: Used to set the expected genesis hash for the bootstrap validator.
 
 
 ---
 ### SHRED\_VERSION
-- **Type**: `string`
-- **Description**: The `SHRED_VERSION` variable is a string that captures the shred version extracted from the output of the `solana-genesis` command. It is used to ensure compatibility between the validator and the ledger by matching the expected shred version.
-- **Use**: This variable is used to set the `--expected-shred-version` parameter when starting the Agave validator, ensuring it matches the shred version of the genesis block.
+- **Type**: ``string``
+- **Description**: The `SHRED_VERSION` variable is a string that stores the shred version extracted from the `GENESIS_OUTPUT`. The shred version is a part of the output generated by the `solana-genesis` command, which is used to initialize the Solana blockchain ledger.
+- **Use**: Used to set the `--expected-shred-version` parameter when starting the Solana validator.
 
 
 ---
 ### \_PRIMARY\_INTERFACE
-- **Type**: `string`
-- **Description**: The `_PRIMARY_INTERFACE` variable is a global variable that stores the name of the primary network interface used for the default route on the system. It is determined by parsing the output of the `ip route show default` command and extracting the interface name from the line containing the default route.
-- **Use**: This variable is used to identify the primary network interface for network operations in the script.
+- **Type**: ``string``
+- **Description**: The `_PRIMARY_INTERFACE` variable stores the name of the network interface used for the default route. It is determined by parsing the output of the `ip route show default` command and extracting the fifth field using `awk`. This variable is used to identify the primary network interface for network operations.
+- **Use**: Used to identify the primary network interface for network operations.
 
 
 # Functions
 
 ---
 ### fetch\_program
-The `fetch_program` function downloads and prepares a Solana program for inclusion in the genesis configuration, handling both upgradeable and non-upgradeable programs.
+Downloads and prepares a Solana program for inclusion in the genesis configuration.
 - **Inputs**:
     - `name`: The name of the Solana program to fetch.
     - `version`: The version of the Solana program to fetch.
     - `address`: The address of the Solana program.
-    - `loader`: The loader type for the Solana program, which determines if the program is upgradeable or not.
-- **Control Flow**:
-    - Declare local variables for the program name, version, address, and loader.
-    - Construct the shared object file name using the program name and version.
-    - Check if the loader is the upgradeable loader and append the appropriate genesis arguments.
-    - Check if the shared object file already exists locally; if so, return immediately.
-    - Check if the shared object file exists in the cache directory; if so, copy it to the current directory.
-    - If the shared object file is not found locally or in the cache, download it from the Solana program library releases on GitHub.
-    - Create the cache directory if it doesn't exist and copy the downloaded file to the cache.
-- **Output**: The function does not return a value but modifies the `genesis_args` array and ensures the specified program's shared object file is available locally.
+    - `loader`: The loader type for the Solana program, which determines if the program is upgradeable.
+- **Logic and Control Flow**:
+    - Declare the program's shared object file name using the `name` and `version` inputs.
+    - Check if the `loader` is equal to `upgradeableLoader`; if true, append upgradeable program arguments to `genesis_args`, otherwise append BPF program arguments.
+    - Check if the shared object file (`so`) is readable; if true, return from the function.
+    - Check if the shared object file exists in the cache directory (`~/.cache/solana-spl/`); if true, copy it to the current directory.
+    - If the shared object file is not in the cache, download it from the Solana program library releases on GitHub, retrying up to 5 times if necessary.
+    - Create the cache directory if it does not exist and copy the downloaded shared object file to the cache.
+- **Output**: None; the function modifies the `genesis_args` array and ensures the program's shared object file is available in the current directory.
 
 
 
