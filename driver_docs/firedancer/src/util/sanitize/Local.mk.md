@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase is a makefile that manages the inclusion of headers, creation of a library, and conditional compilation flags for sanitization utilities.
+Makefile for adding headers, creating a library, and setting flags for sanitization and fuzzing.
 
 # Purpose
-This is a Makefile snippet used for building a software project. It defines build rules and dependencies by adding header files and object files, and conditionally appends preprocessor flags and additional object files if the `FD_HAS_DEEPASAN_WATCH` variable is set. The `add-hdrs`, `make-lib`, and `add-objs` functions are invoked to manage these build components.
+This Makefile snippet defines build rules and configurations for a software project. It uses the `add-hdrs` function to include header files `fd_asan.h`, `fd_msan.h`, and `fd_sanitize.h`. The `make-lib` function creates a library named `fd_fuzz_stub`, and the `add-objs` function adds the object file `fd_fuzz_stub` to the build. If the `FD_HAS_DEEPASAN_WATCH` variable is defined, the `CPPFLAGS` are updated to define `FD_HAS_DEEPASAN_WATCH` with a value of 1, and additional object files `fd_asan` and `fd_backtrace` are added to the `fd_util` library.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
