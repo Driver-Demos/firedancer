@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_send_tile to fd_discof when FD_HAS_INT128 is set.
+Conditional object file addition for `fd_send_tile` and `fd_discof` based on `FD_HAS_INT128`.
 
 # Purpose
-This makefile fragment adds `fd_send_tile` to the object list for `fd_discof` only when `FD_HAS_INT128` is defined. The `ifdef` guard limits the build step to targets that support 128-bit integer types.
+The `Makefile` snippet conditionally adds object files to the build process. If the macro `FD_HAS_INT128` is defined, it calls the function `add-objs` to include `fd_send_tile` and `fd_discof` in the list of object files to compile. This conditional inclusion allows the build process to adapt based on the availability of 128-bit integer support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

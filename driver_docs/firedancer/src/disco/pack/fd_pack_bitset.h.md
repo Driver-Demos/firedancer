@@ -3,10 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Macros for a fixed-size bitset interface with fd_set, AVX, or AVX512 back ends.
+Header file implementing a hybrid bitset/hashset for transaction conflict detection using AVX or fd_set.
 
 # Purpose
-This header defines a small bitset interface for `fd_pack` conflict checks between transactions. It selects one of three implementations with `FD_PACK_BITSET_MODE`: a `fd_set` based version, an AVX version, or an AVX-512 version, and it maps common operations such as clear, set, clear bit, union, copy, null test, and a four-set intersection test to the chosen backend. The bitset is used as a fixed-size compressed set for account references, with a limited number of tracked accounts and a defined slow path when the set is full. The file also documents the design rule that the representation may miss some conflicts, but it does not report false conflicts unless the overflow-bit approach is used.
+The code is a C header file that defines a bitset implementation for managing transaction conflicts in a system. The primary purpose of this code is to determine if a given transaction conflicts with another transaction or a group of transactions by using a set intersection approach. The code is designed to handle the non-uniform distribution of account references in transactions, which often follow a power law distribution. This means that certain accounts are referenced more frequently than others, and the code uses a hybrid bitset/hashset representation to efficiently manage these references.
+
+The header file defines several macros and types to facilitate the creation, manipulation, and querying of bitsets. It includes different implementations based on the availability of AVX or AVX512 instructions, which are SIMD (Single Instruction, Multiple Data) instruction sets that can optimize the performance of bitset operations. The macros defined in the file allow for operations such as declaring a bitset, setting and clearing bits, performing union and intersection operations, and checking if a bitset is empty. The code also includes mechanisms to handle cases where the bitset is full and cannot accommodate additional accounts, with a focus on minimizing incorrect conflict detection.
+# Imports and Dependencies
+
+---
+- `../../util/tmpl/fd_set.c`
+- `../../util/simd/fd_avx.h`
+- `../../util/simd/fd_avx512.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
