@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers, object files, and unit tests for the `fd_fib4` and `fd_fib4_netlink` components, with conditional logic for Linux environments.
+Makefile for adding headers, objects, and unit tests for fd_fib4 and fd_fib4_netlink in fd_waltz.
 
 # Purpose
-The file is a Makefile script used for building and testing components of a software project. It defines rules to add header files and object files, conditionally includes additional object files and unit tests if the `FD_HAS_LINUX` flag is set, and specifies commands to create and run unit tests for `test_fib4_netlink` and `test_fib4`.
+The Makefile content defines build and test instructions for a software project. It adds header files and object files using the `add-hdrs` and `add-objs` functions, respectively. If the `FD_HAS_LINUX` condition is true, it includes additional object files and creates a unit test for `test_fib4_netlink`, which it then runs. Regardless of the condition, it creates and runs a unit test for `test_fib4`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

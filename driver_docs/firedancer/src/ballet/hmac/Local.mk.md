@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase defines build and test configurations for the HMAC component, including header and object file additions, unit test creation, and conditional fuzz test setup.
+Makefile for building and testing HMAC components with unit and fuzz tests.
 
 # Purpose
-This file is a Makefile script used for building and testing components related to HMAC (Hash-based Message Authentication Code) functionality. It defines rules to add header files and object files, create and run a unit test named `test_hmac`, and conditionally create a fuzz test named `fuzz_hmac` if the `FD_HAS_HOSTED` environment variable is set.
+This Makefile script is used to manage the build process for a software project. It adds headers and object files using the `add-hdrs` and `add-objs` functions, respectively, for the `fd_hmac` and `fd_ballet` components. It also defines a unit test named `test_hmac` and specifies its dependencies on `fd_ballet` and `fd_util`. The script includes a conditional statement that, if `FD_HAS_HOSTED` is defined, creates a fuzz test named `fuzz_hmac` with dependencies on `fd_ballet` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

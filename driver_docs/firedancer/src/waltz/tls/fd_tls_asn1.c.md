@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_tls_asn1.c` file in the `firedancer` codebase provides functionality for extracting an Ed25519 public key from ASN.1 encoded data by verifying a specific prefix.
+Parses Ed25519 public keys from ASN.1 encoded data with a specific prefix.
 
 # Purpose
-The provided C code is a specialized utility for handling Ed25519 public keys encoded in ASN.1 (Abstract Syntax Notation One) format. It defines a constant byte array, `fd_asn1_ed25519_pubkey_prefix`, which represents the ASN.1 prefix for an Ed25519 public key. This prefix includes a sequence of bytes that identify the key type and structure according to the ASN.1 encoding rules. The code also includes a function, [`fd_ed25519_public_key_from_asn1`](#fd_ed25519_public_key_from_asn1), which is designed to extract the raw Ed25519 public key from a buffer that contains an ASN.1 encoded key. The function checks if the buffer size matches the expected size of the prefix plus the 32-byte Ed25519 key and verifies that the buffer starts with the correct ASN.1 prefix. If these conditions are met, it returns a pointer to the start of the actual public key within the buffer; otherwise, it returns `NULL`.
+The code defines a function for processing Ed25519 public keys encoded in ASN.1 format. It includes a constant array, `fd_asn1_ed25519_pubkey_prefix`, which represents the ASN.1 prefix for an Ed25519 public key. This prefix is used to identify and validate the format of the public key data. The function [`fd_ed25519_public_key_from_asn1`](<#fd_ed25519_public_key_from_asn1>) takes a buffer and its size as input parameters. It checks if the buffer contains the correct ASN.1 prefix followed by a 32-byte Ed25519 public key. If the buffer matches the expected format, the function returns a pointer to the start of the public key within the buffer. If the format is incorrect, the function returns `NULL`.
 
-This code provides narrow functionality focused on processing ASN.1 encoded Ed25519 public keys, making it a utility likely intended for use within a larger cryptographic library or application that requires handling of such keys. The inclusion of the header file `fd_tls_asn1.h` suggests that this code is part of a broader system dealing with TLS (Transport Layer Security) or similar cryptographic protocols. The function does not define a public API or external interface by itself but is likely intended to be used internally within a library or application that deals with cryptographic operations involving Ed25519 keys.
+This code is part of a library or module that deals with cryptographic operations, specifically handling Ed25519 public keys in ASN.1 format. It provides a narrow functionality focused on validating and extracting Ed25519 public keys from a given buffer. The code does not define a public API or external interface but rather provides a utility function that can be used internally within a larger cryptographic system. The inclusion of the header file `fd_tls_asn1.h` suggests that this code is part of a broader system dealing with ASN.1 encoding and decoding, possibly related to TLS or other security protocols.
 # Imports and Dependencies
 
 ---
@@ -19,27 +19,27 @@ This code provides narrow functionality focused on processing ASN.1 encoded Ed25
 
 ---
 ### fd\_asn1\_ed25519\_pubkey\_prefix
-- **Type**: `const uchar[]`
-- **Description**: The `fd_asn1_ed25519_pubkey_prefix` is a constant array of unsigned characters that represents the ASN.1 encoding prefix for an Ed25519 public key. It includes a sequence of bytes that define the structure and object identifier for the Ed25519 algorithm, followed by a bit string placeholder.
-- **Use**: This variable is used to verify the prefix of a buffer containing an Ed25519 public key in ASN.1 format.
+- **Type**: ``const uchar[]``
+- **Description**: A constant array of unsigned characters that represents the ASN.1 prefix for an Ed25519 public key. The prefix includes a sequence of bytes that define the structure of the ASN.1 encoding, including a sequence, an object identifier, and a bit string.
+- **Use**: Used to verify the ASN.1 encoding of an Ed25519 public key in the `fd_ed25519_public_key_from_asn1` function.
 
 
 # Functions
 
 ---
 ### fd\_ed25519\_public\_key\_from\_asn1<!-- {{#callable:fd_ed25519_public_key_from_asn1}} -->
-The function `fd_ed25519_public_key_from_asn1` extracts an Ed25519 public key from an ASN.1 encoded buffer if it matches a specific prefix.
+[View Source →](<../../../../../src/waltz/tls/fd_tls_asn1.c#L16>)
+
+Extracts an Ed25519 public key from an ASN.1 encoded buffer if it matches the expected prefix and size.
 - **Inputs**:
-    - `buf`: A pointer to a buffer containing the ASN.1 encoded data.
+    - `buf`: A pointer to the buffer containing the ASN.1 encoded data.
     - `sz`: The size of the buffer in bytes.
-- **Control Flow**:
-    - Initialize a pointer to the expected ASN.1 prefix and determine its size.
-    - Check if the size of the buffer is equal to the size of the prefix plus 32 bytes (the size of an Ed25519 public key).
-    - If the size does not match, return NULL.
-    - Compare the beginning of the buffer with the expected prefix using `memcmp`.
-    - If the prefix does not match, return NULL.
-    - If both checks pass, return a pointer to the location in the buffer immediately following the prefix.
-- **Output**: A pointer to the start of the Ed25519 public key within the buffer if the prefix matches and the size is correct, otherwise NULL.
+- **Logic and Control Flow**:
+    - Define `prefix` as the expected ASN.1 prefix for an Ed25519 public key and `prefix_sz` as its size.
+    - Check if the size `sz` is equal to the sum of `prefix_sz` and 32 bytes; if not, return `NULL`.
+    - Compare the beginning of `buf` with `prefix` using `memcmp`; if they do not match, return `NULL`.
+    - Return a pointer to the position in `buf` immediately after the prefix.
+- **Output**: A pointer to the start of the Ed25519 public key within the buffer, or `NULL` if the buffer does not match the expected format.
 
 
 

@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Proof-of-history state, tile logic, generated seccomp policy, and conditional build rules.
+Implementation of the Proof of History (PoH) state machine, tile, and Makefile logic with security policies.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only on fd 2 or logfile_fd.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
 
 ## Files
-- **[fd_poh.c](fd_poh.c.md)**: PoH state machine, reset, hashing, tick, and microblock publish logic.
-- **[fd_poh.h](fd_poh.h.md)**: Proof-of-history state, constants, and APIs for reset, leader advance, and transaction mixin.
-- **[fd_poh_tile.c](fd_poh_tile.c.md)**: PoH tile logic for replay, pack, and bank inputs, with ordered microblock processing and output links.
-- **[fd_poh_tile.h](fd_poh_tile.h.md)**: PoH reset and leader-start message structs.
-- **[fd_poh_tile.seccomppolicy](fd_poh_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
-- **[Local.mk](Local.mk.md)**: Build rules that add fd_poh_tile and fd_poh objects when FD_HAS_ALLOCA is set.
+- **[fd_poh.c](fd_poh.c.md)**: Implements a Proof of History (PoH) state machine with functions for state transitions, hashing, and microblock management.
+- **[fd_poh.h](fd_poh.h.md)**: Header file for the Firedancer Proof of History (PoH) implementation, detailing structures, constants, and functions for managing leader slots, hashing, and microblock processing.
+- **[fd_poh_tile.c](fd_poh_tile.c.md)**: Implements a Proof of History (PoH) tile for transaction ordering and processing in a distributed system.
+- **[fd_poh_tile.h](fd_poh_tile.h.md)**: Defines data structures for PoH reset and leader beginning in the Firedancer codebase.
+- **[fd_poh_tile.seccomppolicy](fd_poh_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
+- **[Local.mk](Local.mk.md)**: Makefile logic to add objects `fd_poh_tile` and `fd_poh` if `FD_HAS_ALLOCA` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
