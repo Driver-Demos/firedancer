@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for bit manipulation functions across various data types, including uchar, ushort, uint, ulong, and int128.
+The `test_bits_tg.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various bit manipulation functions across different data types, including uchar, ushort, uint, ulong, and conditional tests for int128 if available.
 
 # Purpose
-The code is a C program designed to test various bit manipulation functions for different data types, including `uchar`, `ushort`, `uint`, `ulong`, and potentially `uint128` and `int128` if the platform supports 128-bit integers. The program includes a main function that initializes a random number generator and then performs a series of tests on each data type. These tests verify the correctness of functions such as `fd_is_pow2`, `fd_mask_bit`, `fd_clear_bit`, `fd_set_bit`, `fd_flip_bit`, `fd_insert_bit`, and others, which are used to manipulate bits within these data types.
+This C source code file is a comprehensive test suite designed to validate the functionality of various bit manipulation operations across different data types, including `uchar`, `ushort`, `uint`, `ulong`, and potentially `uint128` if the platform supports 128-bit integers. The code is structured as a standalone executable with a [`main`](#main) function that initializes a random number generator and systematically tests a wide range of bit manipulation functions. These functions include operations for checking power of two, bit masking, setting, clearing, flipping, extracting, and inserting bits, as well as operations for counting bits, finding least and most significant bits, and performing bitwise shifts and rotations.
 
-The program is structured to test each data type in sequence, logging the start of each test with `FD_LOG_NOTICE`. It uses a series of loops and conditional checks to ensure that each bit manipulation function behaves as expected. The tests cover a wide range of operations, including checking if a number is a power of two, setting and clearing specific bits, flipping bits, and performing bitwise shifts and rotations. The program also includes tests for signed data types like `schar`, `short`, `int`, and `long`, verifying operations such as absolute value calculation and conditional swaps. The program concludes by cleaning up the random number generator and logging a "pass" message if all tests are successful.
+The test suite is organized into sections, each dedicated to a specific data type, and employs a series of assertions to ensure that each bit manipulation function behaves as expected. The code uses macros and functions from an external utility library (`fd_util.h`) to perform these operations, indicating that the file is part of a larger codebase. The tests are extensive, covering edge cases and random scenarios to ensure robustness. The file does not define public APIs or external interfaces but rather serves as an internal validation tool to verify the correctness of bit manipulation utilities within the project.
 # Imports and Dependencies
 
 ---
@@ -19,19 +19,20 @@ The program is structured to test each data type in sequence, logging the start 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/bits/test_bits_tg.c#L6>)
-
-Executes a series of tests on various data types to validate bit manipulation functions.
+The `main` function initializes a random number generator and performs extensive bit manipulation tests on various data types, including uchar, ushort, uint, ulong, and others, to verify the correctness of bit manipulation functions.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Initializes the environment with `fd_boot` and sets up a random number generator `rng`.
-    - Performs tests on `uchar`, `ushort`, `uint`, `ulong`, and `uint128` (if available) data types, checking bit manipulation functions like `fd_is_pow2`, `fd_mask_bit`, `fd_clear_bit`, `fd_set_bit`, `fd_flip_bit`, `fd_insert_bit`, `fd_mask_lsb`, `fd_clear_lsb`, `fd_set_lsb`, `fd_flip_lsb`, `fd_insert_lsb`, `fd_popcnt`, `fd_find_lsb`, `fd_find_msb`, `fd_pow2_up`, `fd_pow2_dn`, `fd_bswap`, `fd_is_aligned`, `fd_alignment`, `fd_align_dn`, `fd_align_up`, `fd_blend`, `fd_if`, `fd_abs`, `fd_min`, `fd_max`, `fd_store_if`, `fd_swap`, `fd_swap_if`, `fd_shift_left`, `fd_shift_right`, `fd_rotate_left`, and `fd_rotate_right`.
-    - Logs the start of each test with `FD_LOG_NOTICE`.
-    - Uses `FD_TEST` to assert the correctness of each function's output.
-    - Cleans up by deleting the random number generator with `fd_rng_delete` and halts the program with `fd_halt`.
-- **Output**: Returns 0 upon successful completion of all tests.
+    - `argc`: An integer representing the number of command-line arguments.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program with `fd_boot` using command-line arguments.
+    - Create and join a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Perform bit manipulation tests for `uchar`, `ushort`, `uint`, `ulong`, and other types, including checking power of two, bit masking, setting, clearing, flipping, inserting, and extracting bits.
+    - Test least significant bit (LSB) and most significant bit (MSB) operations, including finding, setting, clearing, flipping, and extracting LSBs and MSBs.
+    - Test bitwise operations like blending, conditional selection (`fd_if`), absolute value, minimum, maximum, and swapping values.
+    - Test bit shifting and rotating operations for various data types.
+    - Delete the random number generator using `fd_rng_delete` and `fd_rng_leave`.
+    - Log a success message and halt the program with `fd_halt`.
+- **Output**: The function returns an integer, 0, indicating successful execution.
 
 
 

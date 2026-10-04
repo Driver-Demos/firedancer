@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Automates version incrementing and tagging in a Git repository based on version.mk and branch name.
+The `tag-release.py` file in the `firedancer` codebase automates the process of incrementing the patch version in a version file, verifying branch naming conventions, and creating a corresponding git commit and tag.
 
 # Purpose
-The code is a script designed to manage versioning for a software project. It reads version information from a file named `version.mk`, which is expected to contain `VERSION_MAJOR`, `VERSION_MINOR`, and `VERSION_PATCH` definitions. The script verifies that these version components are correctly formatted and present. It also checks the current Git branch name to ensure it follows a specific naming convention (`v0.x`) and that the minor version in the branch name matches the one in `version.mk`.
+This Python script is designed to automate the process of version management and tagging in a software project. It reads version information from a file named `version.mk`, which is expected to contain major, minor, and patch version numbers. The script verifies the format of the version file and ensures that the current Git branch name matches the expected versioning pattern. It then increments the patch version number, checks that it does not exceed a predefined limit, and retrieves the Solana version from a Cargo package to include in the versioning process. The script updates the `version.mk` file with the new version number, commits the changes to the Git repository, and creates a new Git tag with the updated version information.
 
-After validation, the script increments the patch version number, ensuring it does not exceed a predefined limit. It retrieves the Solana version from a Cargo package and formats it for use in version tagging. The script updates the `version.mk` file with the new version information, commits the changes to the Git repository, and creates a new Git tag with the updated version. This process helps maintain consistent version control and ensures that version increments are properly documented and tagged in the repository.
+The script is a standalone utility intended to be executed directly, as indicated by the `if __name__ == '__main__':` construct. It leverages subprocess calls to interact with Git and Cargo, ensuring that the versioning process is tightly integrated with the project's source control and dependency management systems. The script enforces a specific versioning scheme and branch naming convention, which helps maintain consistency and traceability in the project's development lifecycle. This utility is particularly useful in environments where maintaining a strict versioning policy is crucial for deployment and release management.
 # Imports and Dependencies
 
 ---
@@ -19,24 +19,20 @@ After validation, the script increments the patch version number, ensuring it do
 
 ---
 ### main<!-- {{#callable:firedancer/contrib/tag-release.main}} -->
-[View Source →](<../../../contrib/tag-release.py#L1>)
-
-Reads, updates, and commits version information from a file and the current git branch.
+The `main` function reads and updates version information from a file, validates the current git branch, increments the patch version, and commits the changes with a new git tag.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Open the file `src/app/fdctl/version.mk` and read its lines.
-    - Initialize `version_major`, `version_minor`, and `version_patch` to `None`.
-    - Iterate over each line in the file to extract version numbers; exit with an error if the format is incorrect.
-    - Check if any version number is `None` and exit with an error if true.
-    - Retrieve the current git branch name using `git rev-parse --abbrev-ref HEAD`.
-    - Verify the branch name starts with 'v0.'; exit with an error if not.
-    - Extract the minor version from the branch name and compare it with `version_minor`; exit with an error if they do not match.
-    - Increment `version_patch` by 1 and check if it is less than 100; exit with an error if not.
-    - Retrieve the Solana version using `cargo pkgid` and parse its major, minor, and patch numbers.
-    - Format the Solana version into a string `solana_version`.
-    - Write the updated version numbers back to `src/app/fdctl/version.mk`.
+- **Control Flow**:
+    - Open the 'src/app/fdctl/version.mk' file and read its lines.
+    - Initialize version variables (major, minor, patch) to None.
+    - Iterate over each line in the file to extract and set the version numbers.
+    - Check if any version number is None and exit with an error if so.
+    - Retrieve the current git branch name using a subprocess call.
+    - Validate the branch name format and ensure it matches the minor version from the file.
+    - Increment the patch version and check if it exceeds 99, exiting with an error if so.
+    - Retrieve the Solana version using a subprocess call and format it appropriately.
+    - Write the updated version numbers back to the 'version.mk' file.
     - Create a git commit and tag with the new version information.
-- **Output**: No return value; performs file operations and git commands as side effects.
+- **Output**: The function does not return any value; it performs file I/O operations, subprocess calls, and git operations to update versioning information and create a commit and tag.
 
 
 
