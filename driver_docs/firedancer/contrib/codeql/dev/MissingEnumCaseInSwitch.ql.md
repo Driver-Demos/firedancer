@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `MissingEnumCaseInSwitch.ql` file defines a CodeQL query that identifies switch statements over enum types that are missing cases for some enum constants and lack a default case, potentially leading to logic errors.
+Detects switch statements over enum types that lack cases for some enum constants and have no default case.
 
 # Purpose
-This code is a part of a static analysis tool designed to identify potential issues in C++ code, specifically focusing on switch statements that handle enum types. The primary functionality of this code is to detect switch statements that are missing cases for some enum constants and do not include a default case. This situation can lead to logic errors, as not all possible enum values are accounted for, potentially causing unexpected behavior in the program.
+This code defines a query to identify potential issues in C++ code where a switch statement over an enum type is missing a case for some enum constants and does not include a default case. The absence of these cases can lead to logic errors, as not all possible enum values are handled. The query is categorized as a problem with a severity level of "warning" and a precision level of "medium". It is tagged with reliability, correctness, and an external reference to CWE-478, which relates to missing default cases in switch statements.
 
-The code defines a problem detection rule with a medium precision level and a warning severity. It uses a query to filter and select switch statements that meet specific criteria: they lack a default case, have missing enum cases, and the proportion of missing cases is less than 30% of the total cases. The code then identifies and selects these problematic switch statements, providing a warning message that specifies which enum case is missing. This functionality is tagged with reliability and correctness, and it is associated with the Common Weakness Enumeration (CWE) identifier CWE-478, which relates to missing default cases in switch statements.
+The query uses the `cpp` and `filter` modules to analyze C++ code. It specifically looks for instances of `EnumSwitch` where there is no default case and calculates the proportion of missing cases relative to the total number of cases. If the proportion of missing cases is less than 30%, the query identifies this as a potential issue. The query then selects the switch statement and the missing enum case, providing a message that indicates the switch statement does not have a case for a specific enum constant.
 
-Overall, this code is a part of a broader static analysis framework, likely intended to be used as a library or module within a larger system. It does not define public APIs or external interfaces but rather contributes to the internal logic of the analysis tool by providing a specific rule for detecting a common programming oversight in C++ switch statements.
+This code is intended to be part of a static analysis tool that helps developers identify and correct potential logic errors in their C++ code. It does not define public APIs or external interfaces but rather serves as an internal mechanism to enhance code reliability and correctness by flagging incomplete switch statements.
 # Imports and Dependencies
 
 ---

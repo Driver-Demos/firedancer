@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Multiplexes input fragments to outputs with flow control, callbacks, housekeeping, and metrics.
+Multiplexes input streams and defines data structures for managing and publishing fragments.
 
 
 ## Files
-- **[fd_stem.c](fd_stem.c.md)**: Multiplexes input fragments to outputs with flow control, callbacks, housekeeping, and metrics.
-- **[fd_stem.h](fd_stem.h.md)**: Flow-control context and inline publish and advance helpers for fragment caches.
+- **[fd_stem.c](fd_stem.c.md)**: Multiplexes input streams and presents them to consumers, supporting various callback functions for customization.
+- **[fd_stem.h](fd_stem.h.md)**: Defines data structures and functions for managing and publishing fragments in a distributed system.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

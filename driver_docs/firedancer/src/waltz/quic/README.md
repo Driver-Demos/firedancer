@@ -3,46 +3,46 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC protocol code, crypto, TLS, logging, tests, and packet, stream, and connection handling.
+QUIC protocol, TLS, crypto, logging, streams, retry, tests, and tools.
 
 ## Folders
-- **[crypto](crypto/README.md)**: The `crypto` folder in the `firedancer` codebase contains implementation and configuration files for cryptographic operations related to the QUIC protocol, including key management and packet encryption/decryption.
-- **[log](log/README.md)**: QUIC log buffer management, shared-memory logging ABIs, and build settings.
-- **[templ](templ/README.md)**: QUIC template, frame, parser, encoder, transport parameter, test, and fuzz support files.
-- **[tests](tests/README.md)**: QUIC test helpers, fuzz targets, unit tests, and transaction scripts.
-- **[tls](tls/README.md)**: QUIC TLS handshake setup, callbacks, state, and build integration.
+- **[crypto](crypto/README.md)**: Cryptographic operations and definitions for QUIC, with Makefile rules for headers and objects.
+- **[log](log/README.md)**: Functions and definitions for QUIC logging, including buffer management, ABI, and high-performance event logging.
+- **[templ](templ/README.md)**: Template macros, data structures, functions, and tests for QUIC protocol implementation in Firedancer.
+- **[tests](tests/README.md)**: Scripts and files for testing QUIC protocol features, including transaction transmissions, fuzz testing, and various QUIC functionalities like stream management, cryptographic operations, and connection handling.
+- **[tls](tls/README.md)**: QUIC TLS functionality, API definitions for QUIC-TLS handshakes, and Makefile rules for `fd_quic_tls` and `fd_quic`.
 
 ## Files
-- **[fd_quic.c](fd_quic.c.md)**: QUIC connection, packet, stream, TLS, and service logic.
-- **[fd_quic.h](fd_quic.h.md)**: QUIC API with config, callbacks, metrics, lifecycle, connection, stream, and packet functions.
-- **[fd_quic_ack_tx.c](fd_quic_ack_tx.c.md)**: ACK queue management and ACK frame generation for QUIC packets.
-- **[fd_quic_ack_tx.h](fd_quic_ack_tx.h.md)**: APIs for generating QUIC ACK frames and managing queued ACK ranges.
-- **[fd_quic_common.h](fd_quic_common.h.md)**: QUIC constants, forward declarations, and a 16-byte aligned range type.
-- **[fd_quic_conn.c](fd_quic_conn.c.md)**: QUIC connection allocation, initialization, context access, reason names, and validation init.
-- **[fd_quic_conn.h](fd_quic_conn.h.md)**: QUIC connection state, limits, keys, streams, and helper APIs.
-- **[fd_quic_conn_id.h](fd_quic_conn_id.h.md)**: QUIC connection ID and network endpoint definitions, plus helpers for creation, randomization, and comparison.
-- **[fd_quic_conn_map.h](fd_quic_conn_map.h.md)**: The `fd_quic_conn_map.h` file defines a structure and associated macros for managing a map of QUIC connections in the Firedancer project.
-- **[fd_quic_enum.h](fd_quic_enum.h.md)**: QUIC constants for stream types, packet types, limits, errors, and timing.
-- **[fd_quic_pcap_main.c](fd_quic_pcap_main.c.md)**: The `fd_quic_pcap_main.c` file in the `firedancer` codebase provides a tool for analyzing Solana network QUIC traffic captures, supporting both pcap and pcap-ng file formats, and includes functionality for handling TLS keys and QUIC packet decryption.
-- **[fd_quic_pkt_meta.c](fd_quic_pkt_meta.c.md)**: QUIC packet metadata treap initialization, insertion, removal, minimum lookup, and clear functions.
-- **[fd_quic_pkt_meta.h](fd_quic_pkt_meta.h.md)**: QUIC packet metadata tracking types and treap-backed operations for sent frame ACK tracking.
-- **[fd_quic_pretty_print.c](fd_quic_pretty_print.c.md)**: QUIC packet and frame pretty-printing to JSON-like text, with header parsing and frame decoding.
-- **[fd_quic_pretty_print.h](fd_quic_pretty_print.h.md)**: QUIC packet pretty-print context and packet formatting function declaration.
-- **[fd_quic_private.h](fd_quic_private.h.md)**: Private QUIC state, packet handling, callbacks, and helper functions.
-- **[fd_quic_proto.c](fd_quic_proto.c.md)**: The `fd_quic_proto.c` file in the `firedancer` codebase implements the structures and functions for the QUIC protocol, including an optimized encoder for stream headers.
-- **[fd_quic_proto.h](fd_quic_proto.h.md)**: The `fd_quic_proto.h` file in the `firedancer` codebase provides functions for encoding and decoding IPv4 and UDP headers for QUIC protocol operations.
-- **[fd_quic_proto_structs.h](fd_quic_proto_structs.h.md)**: The `fd_quic_proto_structs.h` file is a header file in the `firedancer` codebase that includes common definitions and templates related to QUIC protocol structures.
-- **[fd_quic_retry.c](fd_quic_retry.c.md)**: QUIC Retry packet creation and verification with token and integrity tag handling.
-- **[fd_quic_retry.h](fd_quic_retry.h.md)**: QUIC Retry integrity tag, token, and packet create and verify APIs.
-- **[fd_quic_retry_private.h](fd_quic_retry_private.h.md)**: The `fd_quic_retry_private.h` file defines constants and a function related to the encoding and handling of QUIC Retry packets in the Firedancer project.
-- **[fd_quic_stream.c](fd_quic_stream.c.md)**: QUIC stream buffer helpers, allocation, deletion, and context accessors.
-- **[fd_quic_stream.h](fd_quic_stream.h.md)**: The `fd_quic_stream.h` file in the `firedancer` codebase defines structures and functions for managing QUIC streams, including buffer management, stream state, and linked list operations.
-- **[fd_quic_stream_pool.c](fd_quic_stream_pool.c.md)**: QUIC stream pool footprint, initialization, allocation, and free functions.
-- **[fd_quic_stream_pool.h](fd_quic_stream_pool.h.md)**: QUIC stream pool API for alignment, footprint, init, alloc, free, and available count.
-- **[fd_quic_svc_q.c](fd_quic_svc_q.c.md)**: Timer queue management for QUIC service events, with instant and dynamic scheduling.
-- **[fd_quic_svc_q.h](fd_quic_svc_q.h.md)**: QUIC service timer queue types and timer management functions.
-- **[fd_quic_types.h](fd_quic_types.h.md)**: Integer typedef macros used by the templ macros.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_quic headers, objects, and fd_quic_pcap binary
+- **[fd_quic.c](fd_quic.c.md)**: Implementation of the QUIC protocol, including connection management, packet processing, and cryptographic operations.
+- **[fd_quic.h](fd_quic.h.md)**: Partial implementation of the QUIC protocol with non-blocking, single-threaded API, memory management, and lifecycle functions.
+- **[fd_quic_ack_tx.c](fd_quic_ack_tx.c.md)**: Implements functions for generating and managing QUIC acknowledgment frames and ranges.
+- **[fd_quic_ack_tx.h](fd_quic_ack_tx.h.md)**: APIs for generating and managing delayed ACK packets in QUIC, including structures and functions for ACK frame creation and processing.
+- **[fd_quic_common.h](fd_quic_common.h.md)**: Defines data structures and constants for QUIC protocol handling in the Firedancer project.
+- **[fd_quic_conn.c](fd_quic_conn.c.md)**: Defines and manages QUIC connection structures, including stream mapping, initialization, and context handling.
+- **[fd_quic_conn.h](fd_quic_conn.h.md)**: Header file defining structures, constants, and functions for managing QUIC connections.
+- **[fd_quic_conn_id.h](fd_quic_conn_id.h.md)**: Defines structures and functions for handling QUIC connection IDs and network endpoints.
+- **[fd_quic_conn_map.h](fd_quic_conn_map.h.md)**: Defines a structure and macros for a QUIC connection map with dynamic mapping capabilities.
+- **[fd_quic_enum.h](fd_quic_enum.h.md)**: Defines constants and macros for QUIC stream types, error codes, packet types, and configuration parameters.
+- **[fd_quic_pcap_main.c](fd_quic_pcap_main.c.md)**: A tool for analyzing Solana network QUIC traffic captures from pcap and pcap-ng files.
+- **[fd_quic_pkt_meta.c](fd_quic_pkt_meta.c.md)**: Functions for initializing, inserting, removing, and managing QUIC packet metadata in a treap data structure.
+- **[fd_quic_pkt_meta.h](fd_quic_pkt_meta.h.md)**: Defines data structures and functions for tracking QUIC packet metadata, including insertion, removal, and iteration.
+- **[fd_quic_pretty_print.c](fd_quic_pretty_print.c.md)**: Functions for pretty-printing QUIC frames and headers in JSON format.
+- **[fd_quic_pretty_print.h](fd_quic_pretty_print.h.md)**: Defines a structure and function for pretty-printing QUIC packet information.
+- **[fd_quic_private.h](fd_quic_private.h.md)**: Header file for internal QUIC protocol implementation, including state management, connection handling, and callbacks.
+- **[fd_quic_proto.c](fd_quic_proto.c.md)**: Instantiates structures and functions for the QUIC protocol, including an optimized stream frame encoder.
+- **[fd_quic_proto.h](fd_quic_proto.h.md)**: Header file for encoding and decoding IPv4 and UDP headers in the QUIC protocol.
+- **[fd_quic_proto_structs.h](fd_quic_proto_structs.h.md)**: Header file for including common QUIC protocol structures and templates in the Firedancer project.
+- **[fd_quic_retry.c](fd_quic_retry.c.md)**: Functions for creating, verifying, and handling QUIC retry packets with cryptographic integrity checks.
+- **[fd_quic_retry.h](fd_quic_retry.h.md)**: APIs for QUIC v1 Retry mechanism, Retry Integrity Tag, and a non-standard retry token scheme.
+- **[fd_quic_retry_private.h](fd_quic_retry_private.h.md)**: Defines constants and a function for handling QUIC Retry packet encoding and pseudo-header generation.
+- **[fd_quic_stream.c](fd_quic_stream.c.md)**: Functions for managing QUIC streams, including buffer operations, stream creation, and context handling.
+- **[fd_quic_stream.h](fd_quic_stream.h.md)**: Defines data structures and functions for managing QUIC streams, including buffers and linked lists.
+- **[fd_quic_stream_pool.c](fd_quic_stream_pool.c.md)**: Manages a pool of QUIC streams, including initialization, allocation, and deallocation functions.
+- **[fd_quic_stream_pool.h](fd_quic_stream_pool.h.md)**: Defines a stream pool for managing QUIC streams, including functions for allocation and deallocation.
+- **[fd_quic_svc_q.c](fd_quic_svc_q.c.md)**: Implements service queue and timer management for QUIC connections, including scheduling and validation.
+- **[fd_quic_svc_q.h](fd_quic_svc_q.h.md)**: Defines data structures and functions for managing QUIC service queues and connection timers.
+- **[fd_quic_types.h](fd_quic_types.h.md)**: Integer typedefs and a connection ID type definition for QUIC in the Firedancer project.
+- **[Local.mk](Local.mk.md)**: Makefile for building the `fd_quic` library and related binaries with specified headers and objects.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
