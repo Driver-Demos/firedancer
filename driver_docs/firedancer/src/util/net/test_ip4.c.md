@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_ip4.c` file in the `firedancer` codebase contains unit tests for various IPv4 address and header functionalities, including conversion from string to IP address, checking if an IP address is public, and verifying multicast and broadcast address properties.
+Unit tests for IPv4 address conversion, public/private address checks, and header field assertions.
 
 # Purpose
-This C source code file is designed to perform unit testing for IPv4 address manipulation and validation functions. It includes static assertions to verify the correctness of various constants related to IPv4 headers, such as type of service, fragment offsets, and protocol identifiers. The file defines two static functions, [`test_cstr_to_ip4_addr`](#test_cstr_to_ip4_addr) and [`test_ip4_addr_is_public`](#test_ip4_addr_is_public), which test the conversion of string representations of IP addresses to their numeric form and the classification of IP addresses as public or private, respectively. These tests ensure that the functions behave as expected under various input conditions, including edge cases.
+The code is a C test suite designed to validate various functionalities related to IPv4 addresses and headers. It includes static assertions to verify the correctness of predefined constants related to IPv4 header fields, such as type of service, fragment offset flags, and protocol identifiers. These assertions ensure that the constants match expected values, which are critical for correct network packet processing.
 
-The file also contains a [`main`](#main) function that initializes the testing environment, performs additional tests on the structure and alignment of the `fd_ip4_hdr_t` type, and checks the functionality of multicast and broadcast address detection. The use of `FD_TEST` macros indicates a framework for automated testing, and the presence of `FD_LOG_NOTICE` calls suggests logging of test results. The code is structured to be part of a larger test suite, likely integrated into a build system for continuous integration or development purposes. The file does not define public APIs or external interfaces but rather focuses on internal validation of IPv4-related utilities.
+The test suite contains functions that test the conversion of string representations of IP addresses to their numeric form and verify whether an IP address is public or private. The [`main`](<#main>) function initializes the test environment, performs alignment and offset checks on the `fd_ip4_hdr_t` structure, and tests the classification of IP addresses as unicast, multicast, or broadcast. The code uses the `FD_TEST` macro to assert expected outcomes, and it logs the results of the tests. The suite is intended to be executed as a standalone program, as indicated by the presence of the [`main`](<#main>) function, and it relies on external utilities and definitions from included headers.
 # Imports and Dependencies
 
 ---
@@ -20,54 +20,61 @@ The file also contains a [`main`](#main) function that initializes the testing e
 
 ---
 ### test\_cstr\_to\_ip4\_addr<!-- {{#callable:test_cstr_to_ip4_addr}} -->
-The function `test_cstr_to_ip4_addr` tests the conversion of various string representations of IPv4 addresses to their numeric form using the [`fd_cstr_to_ip4_addr`](fd_ip4.c.md#fd_cstr_to_ip4_addr) function.
+[View Source →](<../../../../../src/util/net/test_ip4.c#L24>)
+
+Tests the conversion of C-style string representations of IPv4 addresses to their numeric form and verifies the correctness of the conversion.
 - **Inputs**: None
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Declare a variable `ip` of type `uint` to store the converted IP address.
-    - Call [`fd_cstr_to_ip4_addr`](fd_ip4.c.md#fd_cstr_to_ip4_addr) with different string inputs representing IPv4 addresses and check if the conversion is successful using `FD_TEST`.
-    - For valid IP addresses, verify that the conversion result matches the expected numeric value.
-    - Test various invalid IP address strings to ensure the conversion function returns 0, indicating failure.
-- **Output**: The function does not return any value; it performs assertions to validate the behavior of [`fd_cstr_to_ip4_addr`](fd_ip4.c.md#fd_cstr_to_ip4_addr).
-- **Functions called**:
-    - [`fd_cstr_to_ip4_addr`](fd_ip4.c.md#fd_cstr_to_ip4_addr)
+    - Call [`fd_cstr_to_ip4_addr`](<fd_ip4.c.md#fd_cstr_to_ip4_addr>) with various string inputs representing IPv4 addresses and check if the conversion is successful using `FD_TEST`.
+    - Verify that valid IP address strings like "0.0.0.0", "127.0.0.1", and "255.255.255.255" are correctly converted to their numeric forms and return 1.
+    - Check that invalid IP address strings like "256.255.255.255" and "36893488147419103232.0.0.0" do not convert successfully and return 0.
+    - Use `FD_TEST` to assert that the numeric value of `ip` matches the expected value for valid conversions.
+- **Output**: No output is returned as this function is a test function that uses assertions to validate behavior.
+- **Functions Called**:
+    - [`fd_cstr_to_ip4_addr`](<fd_ip4.c.md#fd_cstr_to_ip4_addr>)
 
 
 ---
 ### test\_ip4\_addr\_is\_public<!-- {{#callable:test_ip4_addr_is_public}} -->
-The function `test_ip4_addr_is_public` tests the [`fd_ip4_addr_is_public`](fd_ip4.h.md#fd_ip4_addr_is_public) function to ensure it correctly identifies public and private IPv4 addresses.
+[View Source →](<../../../../../src/util/net/test_ip4.c#L42>)
+
+Tests the [`fd_ip4_addr_is_public`](<fd_ip4.h.md#fd_ip4_addr_is_public>) function to verify if given IP addresses are public or private.
 - **Inputs**: None
-- **Control Flow**:
-    - The function calls [`fd_ip4_addr_is_public`](fd_ip4.h.md#fd_ip4_addr_is_public) with various public IP addresses and uses `FD_TEST` to assert that the return value is 1, indicating they are public.
-    - It then calls [`fd_ip4_addr_is_public`](fd_ip4.h.md#fd_ip4_addr_is_public) with various private IP addresses and uses `FD_TEST` to assert that the return value is 0, indicating they are private.
-    - The function also tests a loopback address to ensure it is correctly identified as non-public.
-    - Additional tests are performed on a range of private IP addresses to ensure comprehensive coverage.
-- **Output**: The function does not return a value; it uses assertions to validate the behavior of [`fd_ip4_addr_is_public`](fd_ip4.h.md#fd_ip4_addr_is_public).
-- **Functions called**:
-    - [`fd_ip4_addr_is_public`](fd_ip4.h.md#fd_ip4_addr_is_public)
+- **Logic and Control Flow**:
+    - Calls [`fd_ip4_addr_is_public`](<fd_ip4.h.md#fd_ip4_addr_is_public>) with various IP addresses to check if they are public.
+    - Uses `FD_TEST` to assert that public IP addresses return 1 from [`fd_ip4_addr_is_public`](<fd_ip4.h.md#fd_ip4_addr_is_public>).
+    - Uses `FD_TEST` to assert that private and loopback IP addresses return 0 from [`fd_ip4_addr_is_public`](<fd_ip4.h.md#fd_ip4_addr_is_public>).
+    - Tests include well-known public IPs, private IP ranges, and the loopback address.
+- **Output**: No direct output; the function uses assertions to validate the behavior of [`fd_ip4_addr_is_public`](<fd_ip4.h.md#fd_ip4_addr_is_public>).
+- **Functions Called**:
+    - [`fd_ip4_addr_is_public`](<fd_ip4.h.md#fd_ip4_addr_is_public>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, performs a series of tests on IP header fields and IP addresses, and logs the results.
+[View Source →](<../../../../../src/util/net/test_ip4.c#L67>)
+
+Initializes the environment, performs various tests on IP4 header fields and addresses, and logs the results before halting.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Perform a series of `FD_TEST` assertions to verify the offsets of various fields in the `fd_ip4_hdr_t` structure.
-    - Define and test three IP addresses (unicast, multicast, and broadcast) using `FD_IP4_ADDR` macro and `FD_TEST` assertions to verify their correctness.
-    - Log the formatted unicast IP address using `FD_LOG_NOTICE`.
-    - Test the multicast and broadcast status of the defined IP addresses using [`fd_ip4_addr_is_mcast`](fd_ip4.h.md#fd_ip4_addr_is_mcast) and [`fd_ip4_addr_is_bcast`](fd_ip4.h.md#fd_ip4_addr_is_bcast) functions with `FD_TEST` assertions.
-    - Call [`test_cstr_to_ip4_addr`](#test_cstr_to_ip4_addr) to test string to IP address conversion functionality.
-    - Call [`test_ip4_addr_is_public`](#test_ip4_addr_is_public) to test the public/private status of various IP addresses.
-    - Log a 'pass' message using `FD_LOG_NOTICE`.
-    - Call `fd_halt` to clean up and terminate the program.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Performs a series of tests using `FD_TEST` to verify the offsets of various fields in the `fd_ip4_hdr_t` structure.
+    - Defines and tests three IP4 addresses (unicast, multicast, and broadcast) using `FD_IP4_ADDR` and `FD_TEST`.
+    - Logs the formatted unicast IP4 address using `FD_LOG_NOTICE`.
+    - Tests whether the defined IP4 addresses are multicast or broadcast using [`fd_ip4_addr_is_mcast`](<fd_ip4.h.md#fd_ip4_addr_is_mcast>) and [`fd_ip4_addr_is_bcast`](<fd_ip4.h.md#fd_ip4_addr_is_bcast>).
+    - Calls [`test_cstr_to_ip4_addr`](<#test_cstr_to_ip4_addr>) to test string to IP4 address conversion.
+    - Calls [`test_ip4_addr_is_public`](<#test_ip4_addr_is_public>) to test if IP4 addresses are public.
+    - Logs a 'pass' message using `FD_LOG_NOTICE`.
+    - Calls `fd_halt` to terminate the program.
 - **Output**: Returns 0 to indicate successful execution.
-- **Functions called**:
-    - [`fd_ip4_addr_is_mcast`](fd_ip4.h.md#fd_ip4_addr_is_mcast)
-    - [`fd_ip4_addr_is_bcast`](fd_ip4.h.md#fd_ip4_addr_is_bcast)
-    - [`test_cstr_to_ip4_addr`](#test_cstr_to_ip4_addr)
-    - [`test_ip4_addr_is_public`](#test_ip4_addr_is_public)
+- **Functions Called**:
+    - [`fd_ip4_addr_is_mcast`](<fd_ip4.h.md#fd_ip4_addr_is_mcast>)
+    - [`fd_ip4_addr_is_bcast`](<fd_ip4.h.md#fd_ip4_addr_is_bcast>)
+    - [`test_cstr_to_ip4_addr`](<#test_cstr_to_ip4_addr>)
+    - [`test_ip4_addr_is_public`](<#test_ip4_addr_is_public>)
 
 
 

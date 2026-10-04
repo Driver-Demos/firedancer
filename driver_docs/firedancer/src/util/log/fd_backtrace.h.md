@@ -3,14 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints a simple backtrace to stderr from an address list.
+Function to print a simple backtrace to stderr.
 
 # Purpose
-This header file declares the [`fd_backtrace_log`](<#fd_backtrace_log>) function, which writes a simple backtrace to `stderr`. It includes the base utility header `fd_util_base.h` for shared type definitions such as `ulong`. The function takes an array of return addresses in `addrs` and the number of entries in `addrs_cnt`, then uses that data to print the backtrace. The include guard `HEADER_fd_src_util_log_fd_backtrace_h` prevents multiple inclusion of the header.
+This C header file defines the interface for a function that logs a backtrace. The function [`fd_backtrace_log`](<#fd_backtrace_log>) takes two parameters: a pointer to an array of addresses (`void ** addrs`) and the count of addresses (`ulong addrs_cnt`). It prints a simple backtrace to the standard error output (`stderr`). The header file includes a dependency on `fd_util_base.h`, which is likely necessary for the function's implementation or related utilities. The use of include guards prevents multiple inclusions of this header file in a single compilation unit.
+# Imports and Dependencies
+
+---
+- `../fd_util_base.h`
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_backtrace_log`
+### fd\_backtrace\_log<!-- {{#callable_declaration:fd_backtrace_log}} -->
+[View Source →](<../../../../../src/util/log/fd_backtrace.h#L8>)
+
+Prints a simple backtrace to standard error.
+- **Description**: Use this function to print a backtrace of addresses to standard error. It is useful for debugging purposes to trace the call stack. The function iterates over the provided addresses and attempts to resolve them to symbol names and file names. If successful, it prints the resolved information; otherwise, it prints the raw address. Ensure that the `addrs` array is properly initialized and contains valid addresses before calling this function.
+- **Inputs**:
+    - `addrs`: An array of pointers representing addresses in the call stack. The array must be initialized and contain valid addresses. The caller retains ownership of the array.
+    - `addrs_cnt`: The number of addresses in the `addrs` array. It must be a non-negative value.
+- **Output**: None
+- **See Also**: [`fd_backtrace_log`](<fd_backtrace.c.md#fd_backtrace_log>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
