@@ -3,30 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Shred processing, FEC, stake-based destination logic, tests, and seccomp policy.
+FEC, shred destination, stake, and tile processing with tests and seccomp policy.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only on the logfile fd.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
 
 ## Files
-- **[fd_fec_resolver.c](fd_fec_resolver.c.md)**: FEC shred validation, reconstruction, and completion logic with Merkle and Reed-Solomon checks.
-- **[fd_fec_resolver.h](fd_fec_resolver.h.md)**: FEC set resolver APIs for adding shreds, querying, and forcing completion.
-- **[fd_shred_batch.h](fd_shred_batch.h.md)**: Batch and block size constants with static checks for shred FEC set buffering.
-- **[fd_shred_dest.c](fd_shred_dest.c.md)**: Shred destination selection and Turbine tree sampling for staked and unstaked validators.
-- **[fd_shred_dest.h](fd_shred_dest.h.md)**: Stake-weighted shred destination selection and Turbine tree computation.
-- **[fd_shred_tile.c](fd_shred_tile.c.md)**: Shred processing, FEC resolution, retransmit, store insertion, and gossip contact updates.
-- **[fd_shred_tile.h](fd_shred_tile.h.md)**: Shred tile context structure and related forward declarations.
-- **[fd_shred_tile.seccomppolicy](fd_shred_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
-- **[fd_shredder.c](fd_shredder.c.md)**: Creates Solana shreds from entry batches, with FEC, Merkle proofs, and signatures.
-- **[fd_shredder.h](fd_shredder.h.md)**: Shredder API and FEC set size calculations for entry batches.
-- **[fd_stake_ci.c](fd_stake_ci.c.md)**: Stake and contact-info management for shred destinations and leader schedules.
-- **[fd_stake_ci.h](fd_stake_ci.h.md)**: Epoch-specific stake contact info, leader schedule, and shred destination management APIs.
-- **[Local.mk](Local.mk.md)**: Build rules and unit test targets for shred components, gated by int128, sandbox, and hosted support.
-- **[test_fec_resolver.c](test_fec_resolver.c.md)**: Tests shred FEC resolution, signing, Merkle roots, rolloff, and chained shred formats.
-- **[test_shred_dest.c](test_shred_dest.c.md)**: Tests shred destination selection, batching, contact changes, and performance.
-- **[test_shred_tile.c](test_shred_tile.c.md)**: Tile unit test skeleton for shred tile initialization and unprivileged_init.
-- **[test_shredder.c](test_shredder.c.md)**: Tests shredder counts, chained Merkle shreds, skip logic, and performance.
-- **[test_stake_ci.c](test_stake_ci.c.md)**: Tests stake and destination updates, ordering, limits, identity changes, and removals.
+- **[fd_fec_resolver.c](fd_fec_resolver.c.md)**: Implements a Forward Error Correction (FEC) resolver for managing and processing shreds, including functions for adding, querying, and completing FEC sets.
+- **[fd_fec_resolver.h](fd_fec_resolver.h.md)**: Defines methods for building and validating FEC sets from received shreds, with memory management.
+- **[fd_shred_batch.h](fd_shred_batch.h.md)**: Header file for partitioning blocks into batches of microblocks and fixed-size FEC sets with data and parity shreds.
+- **[fd_shred_dest.c](fd_shred_dest.c.md)**: Implements functions for managing and computing shred destinations using public keys and random sampling.
+- **[fd_shred_dest.h](fd_shred_dest.h.md)**: Defines methods and data structures for computing shred destinations using stake weights and Turbine tree logic.
+- **[fd_shred_tile.c](fd_shred_tile.c.md)**: Handles shreds from microblocks and network, managing memory and flow control for processing and distribution.
+- **[fd_shred_tile.h](fd_shred_tile.h.md)**: Defines the `fd_shred_ctx_t` structure for managing shred tile contexts in the Firedancer codebase.
+- **[fd_shred_tile.seccomppolicy](fd_shred_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
+- **[fd_shredder.c](fd_shredder.c.md)**: Functions for initializing, joining, leaving, deleting, and processing batches with a shredder object.
+- **[fd_shredder.h](fd_shredder.h.md)**: Header file for the Firedancer shredder, defining data structures and functions for processing shreds.
+- **[fd_stake_ci.c](fd_stake_ci.c.md)**: Implements functions for managing and updating stake and shred destination information in a distributed system.
+- **[fd_stake_ci.h](fd_stake_ci.h.md)**: Handles leader schedules and shred destinations across epoch boundaries, with APIs for stake updates.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing components in the `firedancer` codebase with conditional compilation.
+- **[test_fec_resolver.c](test_fec_resolver.c.md)**: Tests for the FEC resolver and shredder functionalities, including performance and various edge cases.
+- **[test_shred_dest.c](test_shred_dest.c.md)**: Tests for the `fd_shred_dest` functionality, including performance, conformance, and error handling.
+- **[test_shred_tile.c](test_shred_tile.c.md)**: A unit test for the `fd_shred_tile` component with configuration and initialization logic.
+- **[test_shredder.c](test_shredder.c.md)**: Tests for the `fd_shredder` functionality, including performance and batch processing tests.
+- **[test_stake_ci.c](test_stake_ci.c.md)**: Tests for stake and destination management functions in the Firedancer codebase, including transitions, updates, and removals.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
