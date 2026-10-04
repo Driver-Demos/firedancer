@@ -3,18 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Automatically generated nanopb constant definitions for various test structures in the Firedancer runtime.
+Nanopb bindings for generated test protobuf messages.
 
 # Purpose
-This code is a C source file that contains automatically generated constant definitions for use with the nanopb library, version 0.4.9.1. The file includes the header `context.pb.h` and checks the protocol buffer header version to ensure compatibility. If the version does not match, it prompts the user to regenerate the file with the current version of the nanopb generator. The primary functionality of this file is to bind several protocol buffer message types to their corresponding C structures using the `PB_BIND` macro. These message types include `FD_EXEC_TEST_FEATURE_SET`, `FD_EXEC_TEST_ACCT_STATE`, `FD_EXEC_TEST_VOTE_ACCOUNT`, `FD_EXEC_TEST_INFLATION`, `FD_EXEC_TEST_FEE_RATE_GOVERNOR`, `FD_EXEC_TEST_EPOCH_CONTEXT`, and `FD_EXEC_TEST_SLOT_CONTEXT`.
-
-The file also contains a static assertion to ensure that the size of the `double` data type is 8 bytes, which is necessary for encoding and decoding operations on platforms where `double` might be equivalent to `float`. This assertion is relevant for platforms like AVR, where special handling might be required. The file does not define public APIs or external interfaces directly but serves as a support file for the nanopb library, facilitating the serialization and deserialization of protocol buffer messages in C applications.
-# Imports and Dependencies
-
----
-- `context.pb.h`
-
-
+This file defines nanopb binding constants for several protocol buffer message types used by `context.pb.h`. It includes `PB_BIND` entries for `FD_EXEC_TEST_FEATURE_SET`, `FD_EXEC_TEST_ACCT_STATE`, `FD_EXEC_TEST_VOTE_ACCOUNT`, `FD_EXEC_TEST_INFLATION`, `FD_EXEC_TEST_FEE_RATE_GOVERNOR`, `FD_EXEC_TEST_EPOCH_CONTEXT`, and `FD_EXEC_TEST_SLOT_CONTEXT`, which connect each message descriptor to its generated C type. The file also checks that the `context.pb.h` header version matches the expected nanopb generator version and stops compilation if it does not. At the end, it enforces that `double` is 8 bytes unless `PB_CONVERT_DOUBLE_FLOAT` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

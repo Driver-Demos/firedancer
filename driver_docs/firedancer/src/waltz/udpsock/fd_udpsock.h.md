@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-An unprivileged UDP socket driver for debugging with single-threaded operation and aio abstraction.
+The `fd_udpsock.h` file defines an unprivileged, single-threaded UDP socket driver for debugging purposes, implementing the `fd_aio` abstraction and providing functions for managing UDP socket operations in the `firedancer` codebase.
 
 # Purpose
-The code is a C header file that defines an interface for a UDP socket driver named `fd_udpsock`. This driver is designed for unprivileged applications and operates using `AF_INET` `SOCK_DGRAM` UDP sockets in non-blocking mode. It provides functions to manage memory allocation and deallocation for `fd_udpsock_t` objects, join and leave operations for socket management, and set or get asynchronous I/O (AIO) callbacks for packet handling. The driver is intended for debugging purposes over the localhost interface and is not suitable for production use due to its low performance and single-threaded operation. The file also includes constants and function prototypes related to the alignment and footprint of the socket objects, as well as functions to manage the Ethernet and IP layers.
+This C header file defines an interface for a UDP socket driver, `fd_udpsock`, which is designed for debugging purposes rather than production use. The driver operates over localhost using AF_INET SOCK_DGRAM UDP sockets in non-blocking mode and implements the `fd_aio` abstraction, simulating Ethernet and IP headers. The file provides function prototypes for creating, joining, leaving, and deleting `fd_udpsock` objects, as well as setting and retrieving asynchronous I/O callbacks and handling packet transmission and reception. It also includes utility functions for managing memory alignment and footprint, and for configuring the network layer used by the socket. The implementation is noted to be single-threaded, low-performance, and hacky, making it suitable for development and testing rather than deployment.
 # Imports and Dependencies
 
 ---
@@ -14,167 +14,185 @@ The code is a C header file that defines an interface for a UDP socket driver na
 - `../aio/fd_aio.h`
 
 
+# Global Variables
+
+---
+### fd\_udpsock\_new
+- **Type**: `function pointer`
+- **Description**: The `fd_udpsock_new` function is a constructor for creating a new UDP socket memory region with the specified alignment and footprint. It takes a shared memory pointer, maximum transmission unit (MTU), and packet counts for both receiving and transmitting as parameters. The function returns the shared memory pointer on success or NULL on failure.
+- **Use**: This function is used to allocate and prepare a memory region for storing an `fd_udpsock_t` object, which is essential for setting up a UDP socket in the application.
+
+
+---
+### fd\_udpsock\_join
+- **Type**: `function pointer`
+- **Description**: The `fd_udpsock_join` is a function that joins the caller to a given initialized memory region using a specified UDP socket file descriptor. It returns a pointer to an `fd_udpsock_t` structure, which represents the joined UDP socket context.
+- **Use**: This function is used to associate a UDP socket file descriptor with a memory region, effectively joining the caller to the UDP socket context for further operations.
+
+
+---
+### fd\_udpsock\_leave
+- **Type**: `function pointer`
+- **Description**: The `fd_udpsock_leave` is a function that undoes a local join to the `fd_udpsock_t` object, effectively leaving the UDP socket context that was previously joined. It takes a pointer to an `fd_udpsock_t` structure as its parameter and returns a void pointer.
+- **Use**: This function is used to leave or detach from a previously joined `fd_udpsock_t` object, cleaning up any local state associated with the join.
+
+
+---
+### fd\_udpsock\_delete
+- **Type**: `function pointer`
+- **Description**: The `fd_udpsock_delete` is a function that releases ownership of a memory region back to the caller. It is part of the `fd_udpsock` module, which is a sockets-based driver for UDP applications.
+- **Use**: This function is used to clean up and release resources associated with a UDP socket memory region.
+
+
+---
+### fd\_udpsock\_get\_tx
+- **Type**: `fd_aio_t const *`
+- **Description**: The `fd_udpsock_get_tx` function returns a constant pointer to an `fd_aio_t` structure, which is associated with the transmission (tx) operations of a UDP socket. This function is part of the `fd_udpsock` module, which provides a sockets-based driver for UDP applications.
+- **Use**: This function is used to retrieve the asynchronous I/O (AIO) interface for handling transmission requests on a given UDP socket.
+
+
+---
+### fd\_udpsock\_set\_layer
+- **Type**: `function pointer`
+- **Description**: The `fd_udpsock_set_layer` is a function that sets the layer type for a UDP socket, which can be either Ethernet or IP, as indicated by the `layer` parameter. It takes a pointer to an `fd_udpsock_t` structure and a `uint` representing the layer type, and returns a pointer to the `fd_udpsock_t` structure.
+- **Use**: This function is used to configure the layer type of a UDP socket within the `fd_udpsock` framework.
+
+
 # Data Structures
 
 ---
 ### fd\_udpsock\_t
-- **Type**: ``struct``
-- **Members**:
-    - `fd_udpsock_t`: An alias for the `struct fd_udpsock`, representing an unprivileged sockets-based driver for UDP applications.
-- **Description**: Provides an abstraction for UDP socket operations using AF_INET SOCK_DGRAM sockets in non-blocking mode. It implements the `fd_aio` abstraction and simulates Ethernet and IP headers for localhost operations. The structure is designed for debugging purposes and is compatible with the loopback interface, but it is not suitable for production use due to its low performance and single-threaded operation limitations.
+- **Type**: `typedef struct fd_udpsock fd_udpsock_t;`
+- **Description**: The `fd_udpsock_t` is a typedef for a structure `fd_udpsock` that represents an unprivileged sockets-based driver for UDP applications. It uses AF_INET SOCK_DGRAM UDP sockets in non-blocking mode and implements the `fd_aio` abstraction, mocking Ethernet and IP headers to operate over localhost. This structure is designed for debugging purposes, compatible with the loopback interface, and supports only single-threaded operation. It is not suitable for production use due to its hacky and low-performance nature.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_udpsock\_align<!-- {{#callable_declaration:fd_udpsock_align}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L22>)
-
-Returns the alignment requirement for a UDP socket structure.
-- **Description**: Use this function to obtain the alignment requirement for the `fd_udpsock_t` structure. This is necessary when allocating memory for a UDP socket to ensure proper alignment. The function is a constant expression and does not depend on any input parameters.
+Returns the alignment requirement for an fd_udpsock_t object.
+- **Description**: Use this function to determine the memory alignment requirement for an fd_udpsock_t object. This is useful when allocating memory for such objects to ensure proper alignment, which is necessary for correct operation and performance. The function is a constant expression and can be used in compile-time calculations.
 - **Inputs**: None
-- **Output**: The function returns an `ulong` representing the alignment requirement for the `fd_udpsock_t` structure.
-- **See Also**: [`fd_udpsock_align`](<fd_udpsock.c.md#fd_udpsock_align>)  (Implementation)
+- **Output**: The function returns an unsigned long integer representing the alignment requirement in bytes for an fd_udpsock_t object.
+- **See also**: [`fd_udpsock_align`](fd_udpsock.c.md#fd_udpsock_align)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_footprint<!-- {{#callable_declaration:fd_udpsock_footprint}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L27>)
-
-Calculates the memory footprint for a UDP socket configuration.
-- **Description**: Use this function to determine the memory size needed for a UDP socket configuration based on the specified maximum transmission unit (MTU), and the number of receive and transmit packets. This function is useful when preparing memory allocation for UDP socket operations. It returns zero if any of the input parameters are zero or if the MTU is less than or equal to the defined headroom, indicating an invalid configuration.
+Calculate the memory footprint required for a UDP socket.
+- **Description**: This function calculates the memory footprint needed to store a UDP socket object, including its associated packet buffers and metadata, based on the specified maximum transmission unit (MTU) and the number of receive and transmit packets. It should be used when determining the size of the memory region to allocate for a UDP socket. The function returns zero if any of the input parameters are invalid, such as when the MTU is zero or less than the required headroom, or when the packet counts are zero.
 - **Inputs**:
-    - `mtu`: The maximum transmission unit size in bytes. Must be greater than zero and greater than `FD_UDPSOCK_HEADROOM`. If not, the function returns zero.
-    - `rx_pkt_cnt`: The number of receive packets. Must be greater than zero. If zero, the function returns zero.
-    - `tx_pkt_cnt`: The number of transmit packets. Must be greater than zero. If zero, the function returns zero.
-- **Output**: Returns the calculated memory footprint in bytes for the given configuration, or zero if the configuration is invalid.
-- **See Also**: [`fd_udpsock_footprint`](<fd_udpsock.c.md#fd_udpsock_footprint>)  (Implementation)
+    - `mtu`: The maximum transmission unit size in bytes. Must be greater than zero and exceed the defined headroom. If invalid, the function returns zero.
+    - `rx_pkt_cnt`: The number of receive packets. Must be greater than zero. If invalid, the function returns zero.
+    - `tx_pkt_cnt`: The number of transmit packets. Must be greater than zero. If invalid, the function returns zero.
+- **Output**: Returns the calculated memory footprint in bytes, or zero if any input parameters are invalid.
+- **See also**: [`fd_udpsock_footprint`](fd_udpsock.c.md#fd_udpsock_footprint)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_new<!-- {{#callable_declaration:fd_udpsock_new}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L36>)
-
-Prepares a new memory region for a UDP socket object.
-- **Description**: Use this function to allocate and initialize a memory region for storing a `fd_udpsock_t` object. The function requires a memory region (`shmem`) that is correctly aligned and has sufficient size to accommodate the UDP socket object and its associated data structures. The function returns the `shmem` pointer on success, or `NULL` if the input parameters are invalid or the memory region is misaligned. This function does not join the caller to the socket object, and it is intended for single-threaded operation only.
+Prepares a new memory region for an fd_udpsock_t object.
+- **Description**: This function initializes a memory region to store an fd_udpsock_t object, ensuring the region is properly aligned and has the correct footprint based on the specified parameters. It should be called when setting up a new UDP socket driver instance. The function returns the original memory pointer on success, or NULL if the memory is misaligned, the footprint is invalid, or the memory pointer is NULL. This function does not join the caller to the socket; it only prepares the memory.
 - **Inputs**:
-    - `shmem`: Pointer to a memory region where the UDP socket object will be stored. Must not be null and must be aligned according to `fd_udpsock_align()`. Caller retains ownership.
-    - `mtu`: Maximum transmission unit size for the UDP socket. Must be a positive integer.
-    - `rx_pkt_cnt`: Number of receive packets the socket can handle. Must be a positive integer.
-    - `tx_pkt_cnt`: Number of transmit packets the socket can handle. Must be a positive integer.
-- **Output**: Returns the `shmem` pointer on success, or `NULL` if the input parameters are invalid or the memory region is misaligned.
-- **See Also**: [`fd_udpsock_new`](<fd_udpsock.c.md#fd_udpsock_new>)  (Implementation)
+    - `shmem`: A pointer to the memory region to be initialized. Must not be NULL and must be aligned according to fd_udpsock_align(). The caller retains ownership.
+    - `mtu`: The maximum transmission unit size for the socket. Must be a positive value.
+    - `rx_pkt_cnt`: The number of receive packets the socket should handle. Must be a non-negative value.
+    - `tx_pkt_cnt`: The number of transmit packets the socket should handle. Must be a non-negative value.
+- **Output**: Returns the original shmem pointer on success, or NULL if any input validation fails.
+- **See also**: [`fd_udpsock_new`](fd_udpsock.c.md#fd_udpsock_new)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_join<!-- {{#callable_declaration:fd_udpsock_join}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L45>)
-
-Joins a caller to a UDP socket using a memory region and file descriptor.
-- **Description**: Use this function to join a caller to a previously initialized memory region that represents a UDP socket. This function requires a valid memory region pointer and a UDP socket file descriptor. It is important to ensure that the memory region is properly initialized before calling this function. The function will return a pointer to the `fd_udpsock_t` object on success, or `NULL` if the memory region pointer is `NULL`, the file descriptor is invalid, or if the socket is not an IPv4 address. This function is intended for single-threaded operation and is not suitable for production use.
+Joins a caller to an initialized memory region using a UDP socket file descriptor.
+- **Description**: This function is used to associate a caller with a pre-initialized memory region that represents a UDP socket, using a specified file descriptor. It is essential to ensure that the memory region pointed to by `shsock` is properly initialized before calling this function. The function will configure the socket with the provided file descriptor and extract the socket's address information. It is important to note that the function only supports IPv4 addresses and will return NULL if the address is not IPv4 or if any errors occur during the process. This function is intended for single-threaded operation and is not suitable for production use due to its hacky and low-performance nature.
 - **Inputs**:
-    - `shsock`: A pointer to an initialized memory region representing a UDP socket. Must not be `NULL`. The caller retains ownership.
-    - `fd`: A file descriptor for a UDP socket. Must be valid and associated with an IPv4 address. Invalid file descriptors or non-IPv4 addresses will result in a `NULL` return.
-- **Output**: Returns a pointer to the `fd_udpsock_t` object on success, or `NULL` on failure.
-- **See Also**: [`fd_udpsock_join`](<fd_udpsock.c.md#fd_udpsock_join>)  (Implementation)
+    - `shsock`: A pointer to an initialized memory region representing a UDP socket. Must not be null. The caller retains ownership.
+    - `fd`: A file descriptor for a UDP socket. Must be valid and associated with an IPv4 address. Invalid or non-IPv4 file descriptors will result in a NULL return.
+- **Output**: Returns a pointer to the `fd_udpsock_t` object on success, or NULL on failure.
+- **See also**: [`fd_udpsock_join`](fd_udpsock.c.md#fd_udpsock_join)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_leave<!-- {{#callable_declaration:fd_udpsock_leave}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L51>)
-
-Undoes a local join to a UDP socket object.
-- **Description**: Use this function to leave a previously joined `fd_udpsock_t` object. This function is typically called when the user no longer needs to interact with the UDP socket and wants to clean up resources. It is important to ensure that the `sock` parameter is not null before calling this function, as passing a null pointer will result in a warning and the function will return null. After calling this function, the file descriptor within the `fd_udpsock_t` object is set to -1, indicating that the socket is no longer active.
+Undo a local join to a UDP socket object.
+- **Description**: This function is used to leave or undo a local join to a `fd_udpsock_t` object, effectively marking the socket as inactive by setting its file descriptor to -1. It should be called when the user no longer needs to interact with the UDP socket object, ensuring that resources are properly released. The function must be called with a valid `fd_udpsock_t` pointer that was previously joined. If the provided pointer is null, the function logs a warning and returns null, indicating that no action was taken.
 - **Inputs**:
-    - `sock`: A pointer to an `fd_udpsock_t` object that the caller has previously joined. Must not be null. If null, the function logs a warning and returns null.
+    - `sock`: A pointer to a `fd_udpsock_t` object representing the UDP socket to leave. Must not be null. If null, the function logs a warning and returns null.
 - **Output**: Returns a pointer to the `fd_udpsock_t` object if successful, or null if the input was null.
-- **See Also**: [`fd_udpsock_leave`](<fd_udpsock.c.md#fd_udpsock_leave>)  (Implementation)
+- **See also**: [`fd_udpsock_leave`](fd_udpsock.c.md#fd_udpsock_leave)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_delete<!-- {{#callable_declaration:fd_udpsock_delete}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L57>)
-
 Releases ownership of a memory region back to the caller.
-- **Description**: Use this function to release a memory region that was previously allocated for a UDP socket driver. This function is typically called when the memory region is no longer needed, and the caller wants to reclaim the resources. It is important to ensure that the memory region is valid and was previously allocated by the corresponding `fd_udpsock_new` function. If the input is null, the function logs a warning and returns null.
+- **Description**: This function is used to release ownership of a memory region that was previously allocated for an fd_udpsock_t object. It should be called when the memory region is no longer needed, allowing the caller to reclaim the memory. The function expects a valid pointer to the shared memory region; if a null pointer is provided, it logs a warning and returns null. This function is part of the cleanup process and should be used to ensure proper memory management in applications using the fd_udpsock API.
 - **Inputs**:
-    - `shsock`: A pointer to the memory region to release. Must not be null. If null, the function logs a warning and returns null. The caller retains ownership of the memory.
-- **Output**: Returns the input pointer if it is valid, or null if the input is null.
-- **See Also**: [`fd_udpsock_delete`](<fd_udpsock.c.md#fd_udpsock_delete>)  (Implementation)
+    - `shsock`: A pointer to the shared memory region to be released. Must not be null. If null, the function logs a warning and returns null.
+- **Output**: Returns the same pointer passed in if it is valid, or null if the input was null.
+- **See also**: [`fd_udpsock_delete`](fd_udpsock.c.md#fd_udpsock_delete)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_set\_rx<!-- {{#callable_declaration:fd_udpsock_set_rx}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L60>)
-
 Sets the asynchronous I/O handler for receiving data on a UDP socket.
-- **Description**: Use this function to assign an asynchronous I/O handler to a UDP socket for handling incoming data. This function is typically called after initializing the UDP socket and before starting any operations that involve receiving data. It is important to ensure that the `sock` parameter is a valid and initialized UDP socket object. The function does not perform any validation on the `aio` parameter, so it is the caller's responsibility to provide a valid asynchronous I/O handler. This function does not return a value and does not modify the state of the socket beyond setting the handler.
+- **Description**: Use this function to assign an asynchronous I/O handler to a UDP socket for handling incoming data. This function should be called after the socket has been properly initialized and joined. It allows the socket to process incoming data using the specified asynchronous I/O handler. The function does not perform any validation on the input parameters, so it is the caller's responsibility to ensure that the provided socket and handler are valid and properly configured.
 - **Inputs**:
-    - `sock`: A pointer to a `fd_udpsock_t` object representing the UDP socket. Must not be null and must point to a valid, initialized socket object.
-    - `aio`: A pointer to a `fd_aio_t` object representing the asynchronous I/O handler for receiving data. The caller must ensure this is a valid handler, as the function does not perform validation.
+    - `sock`: A pointer to an initialized `fd_udpsock_t` structure representing the UDP socket. The socket must be valid and properly configured before calling this function. The caller retains ownership of the socket.
+    - `aio`: A pointer to a constant `fd_aio_t` structure representing the asynchronous I/O handler for receiving data. This handler must be valid and properly configured. The caller retains ownership of the handler.
 - **Output**: None
-- **See Also**: [`fd_udpsock_set_rx`](<fd_udpsock.c.md#fd_udpsock_set_rx>)  (Implementation)
+- **See also**: [`fd_udpsock_set_rx`](fd_udpsock.c.md#fd_udpsock_set_rx)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_get\_tx<!-- {{#callable_declaration:fd_udpsock_get_tx}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L64>)
-
-Retrieves the transmit `fd_aio_t` object from a UDP socket.
-- **Description**: Use this function to obtain the `fd_aio_t` object associated with the transmit operations of a UDP socket. This is useful when you need to interact with or inspect the asynchronous I/O operations related to transmission. Ensure that the `fd_udpsock_t` object is properly initialized and joined before calling this function. The function does not modify the state of the socket or the `fd_aio_t` object.
+Retrieve the transmit asynchronous I/O interface from a UDP socket.
+- **Description**: Use this function to obtain a constant pointer to the transmit asynchronous I/O (AIO) interface associated with a given UDP socket. This is useful when you need to interact with or inspect the transmit AIO operations of the socket. The function expects a valid, non-null pointer to an `fd_udpsock_t` structure that has been properly initialized and joined. It is important to ensure that the socket is in a valid state before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `sock`: A pointer to an `fd_udpsock_t` object. Must not be null. The socket should be initialized and joined before use.
-- **Output**: A pointer to a constant `fd_aio_t` object associated with the transmit operations of the given socket.
-- **See Also**: [`fd_udpsock_get_tx`](<fd_udpsock.c.md#fd_udpsock_get_tx>)  (Implementation)
+    - `sock`: A pointer to an `fd_udpsock_t` structure representing the UDP socket. This pointer must not be null and should point to a valid, initialized socket object. The caller retains ownership of the socket.
+- **Output**: Returns a constant pointer to an `fd_aio_t` structure representing the transmit AIO interface of the specified UDP socket.
+- **See also**: [`fd_udpsock_get_tx`](fd_udpsock.c.md#fd_udpsock_get_tx)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_service<!-- {{#callable_declaration:fd_udpsock_service}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L70>)
-
 Services asynchronous I/O callbacks for incoming UDP packets.
-- **Description**: Use this function to process incoming UDP packets and handle asynchronous I/O callbacks. It is designed for use with the `fd_udpsock_t` structure, which represents a UDP socket in non-blocking mode. This function should be called in a single-threaded context, as the underlying implementation does not support multi-threading. It processes packets received on the socket and prepares them for further handling by the application. Ensure that the socket is properly initialized and joined before calling this function. The function does not block and will return immediately if no packets are available.
+- **Description**: This function processes incoming UDP packets for the specified socket, creating mock Ethernet and IP headers for each packet, and dispatches them to the associated asynchronous I/O handler. It is designed for use in single-threaded applications and should be called regularly to handle incoming network traffic. The function operates in non-blocking mode and will return immediately if no packets are available. It is not suitable for production use due to its low performance and hacky implementation, but it is useful for debugging purposes, especially when working with the loopback interface.
 - **Inputs**:
-    - `sock`: A pointer to an `fd_udpsock_t` structure representing the UDP socket. Must not be null. The socket should be initialized and joined before calling this function. Invalid or null pointers will result in undefined behavior.
+    - `sock`: A pointer to an initialized `fd_udpsock_t` structure representing the UDP socket to be serviced. Must not be null. The socket should be properly configured and joined before calling this function. Invalid or uninitialized sockets may lead to undefined behavior.
 - **Output**: None
-- **See Also**: [`fd_udpsock_service`](<fd_udpsock.c.md#fd_udpsock_service>)  (Implementation)
+- **See also**: [`fd_udpsock_service`](fd_udpsock.c.md#fd_udpsock_service)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_get\_ip4\_address<!-- {{#callable_declaration:fd_udpsock_get_ip4_address}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L73>)
-
-Retrieves the IPv4 address of the UDP socket.
-- **Description**: Use this function to obtain the IPv4 address associated with a given UDP socket. This function is useful when you need to know the local IP address that the socket is using. It is a pure function, meaning it does not modify any state and will consistently return the same result for the same input. Ensure that the `sock` parameter is a valid pointer to an `fd_udpsock_t` object before calling this function.
+Retrieve the IPv4 address associated with a UDP socket.
+- **Description**: Use this function to obtain the IPv4 address of a UDP socket represented by the `fd_udpsock_t` structure. This function is useful when you need to know the local IP address that the socket is bound to. It is a pure function, meaning it does not modify the state of the socket or any other system state, and it can be called at any time after the socket has been properly initialized and joined.
 - **Inputs**:
-    - `sock`: A pointer to a constant `fd_udpsock_t` object. This must not be null and must point to a valid UDP socket structure. The function does not modify the object.
-- **Output**: Returns the IPv4 address of the UDP socket as an unsigned integer.
-- **See Also**: [`fd_udpsock_get_ip4_address`](<fd_udpsock.c.md#fd_udpsock_get_ip4_address>)  (Implementation)
+    - `sock`: A pointer to a constant `fd_udpsock_t` structure representing the UDP socket. This pointer must not be null, and the socket must be properly initialized and joined before calling this function. If the pointer is invalid, the behavior is undefined.
+- **Output**: Returns the IPv4 address as an unsigned integer, representing the local address the socket is bound to.
+- **See also**: [`fd_udpsock_get_ip4_address`](fd_udpsock.c.md#fd_udpsock_get_ip4_address)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_get\_listen\_port<!-- {{#callable_declaration:fd_udpsock_get_listen_port}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L76>)
-
-Retrieves the listening port number of a UDP socket.
-- **Description**: Use this function to obtain the port number on which a UDP socket is listening. This is useful for applications that need to know the specific port assigned to a socket, especially when the port is dynamically allocated. Ensure that the `sock` parameter is a valid pointer to an initialized `fd_udpsock_t` object before calling this function.
+Retrieve the UDP listening port of the specified socket.
+- **Description**: Use this function to obtain the UDP port number on which the specified socket is configured to listen. This is useful for applications that need to verify or log the port number being used for incoming UDP traffic. The function requires a valid pointer to an initialized `fd_udpsock_t` object. It is a pure function, meaning it does not modify any state and will consistently return the same result when called with the same input.
 - **Inputs**:
-    - `sock`: A pointer to a constant `fd_udpsock_t` object. Must not be null and should point to a valid, initialized UDP socket structure. If the pointer is invalid, the behavior is undefined.
-- **Output**: Returns the port number as an unsigned integer on which the UDP socket is listening.
-- **See Also**: [`fd_udpsock_get_listen_port`](<fd_udpsock.c.md#fd_udpsock_get_listen_port>)  (Implementation)
+    - `sock`: A pointer to a constant `fd_udpsock_t` object representing the UDP socket. This pointer must not be null and should point to a valid, initialized socket structure. Passing an invalid or null pointer results in undefined behavior.
+- **Output**: Returns the UDP port number as an unsigned integer on which the socket is listening.
+- **See also**: [`fd_udpsock_get_listen_port`](fd_udpsock.c.md#fd_udpsock_get_listen_port)  (Implementation)
 
 
 ---
 ### fd\_udpsock\_set\_layer<!-- {{#callable_declaration:fd_udpsock_set_layer}} -->
-[View Source →](<../../../../../src/waltz/udpsock/fd_udpsock.h#L84>)
-
 Sets the header size for a UDP socket based on the specified network layer.
-- **Description**: Use this function to configure the header size of a UDP socket according to the specified network layer. This function is useful when you need to adjust the socket's header size to match either the Ethernet or IP layer. It must be called with a valid `fd_udpsock_t` object and a valid layer identifier. If the layer is not recognized, the function logs a warning and returns `NULL`. Ensure that the socket is properly initialized before calling this function.
+- **Description**: This function configures the header size of a UDP socket by setting it according to the specified network layer. It should be used when you need to adjust the socket's header size to match either the Ethernet or IP layer. The function must be called with a valid socket object and a valid layer identifier. If an invalid layer is provided, the function logs a warning and returns NULL. This function is intended for use in debugging environments and is not suitable for production use.
 - **Inputs**:
-    - `sock`: A pointer to an `fd_udpsock_t` object. This must not be null and should be a valid, initialized UDP socket object. The function modifies this object to set the appropriate header size.
-    - `layer`: An unsigned integer representing the network layer. Valid values are `FD_UDPSOCK_LAYER_ETH` for the Ethernet layer and `FD_UDPSOCK_LAYER_IP` for the IP layer. If an invalid value is provided, the function logs a warning and returns `NULL`.
-- **Output**: Returns the modified `fd_udpsock_t` object with the updated header size if the layer is valid, or `NULL` if the layer is invalid.
-- **See Also**: [`fd_udpsock_set_layer`](<fd_udpsock.c.md#fd_udpsock_set_layer>)  (Implementation)
+    - `sock`: A pointer to an fd_udpsock_t object representing the UDP socket. Must not be null, and the socket should be properly initialized before calling this function.
+    - `layer`: An unsigned integer specifying the network layer. Valid values are FD_UDPSOCK_LAYER_ETH for the Ethernet layer and FD_UDPSOCK_LAYER_IP for the IP layer. If an invalid value is provided, the function logs a warning and returns NULL.
+- **Output**: Returns the updated fd_udpsock_t pointer on success, or NULL if an invalid layer is specified.
+- **See also**: [`fd_udpsock_set_layer`](fd_udpsock.c.md#fd_udpsock_set_layer)  (Implementation)
 
 
 
