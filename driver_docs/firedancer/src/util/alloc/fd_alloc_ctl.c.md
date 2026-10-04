@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Command-line utility for memory allocation control, supporting operations like new, delete, malloc, free, and query.
+The `fd_alloc_ctl.c` file in the `firedancer` codebase implements a command-line utility for managing memory allocation workspaces, supporting operations such as creating, deleting, allocating, freeing, compacting, and querying memory allocations.
 
 # Purpose
-The code is an executable C program that provides a command-line interface for managing memory allocation within a workspace. It includes functionality for creating, deleting, allocating, freeing, and querying memory allocations. The program uses a series of commands such as `help`, `tag`, `new`, `delete`, `malloc`, `free`, `compact`, and `query` to perform these operations. Each command is processed in sequence, and the program logs the success or failure of each operation. The code relies on several external functions and macros, such as `fd_wksp_attach`, `fd_alloc_new`, and `fd_alloc_malloc`, which are likely defined in the included headers `fd_util.h` and `fd_wksp_private.h`.
+This C source code file implements a command-line utility for managing memory allocation within a workspace environment. The program is designed to handle various commands related to memory allocation, such as creating new allocations, deleting them, allocating and freeing memory, compacting memory, and querying the state of allocations. The code is structured to parse command-line arguments and execute corresponding operations, providing feedback and logging for each command processed. The utility is built to work in a hosted environment, as indicated by the `FD_HAS_HOSTED` preprocessor directive, and it includes error handling to ensure robust operation.
 
-The program begins by initializing the environment with `fd_boot` and processes command-line arguments to execute the specified commands. It uses a series of conditional checks to determine which command to execute and performs the corresponding memory management operation. The program also includes error handling to log errors if commands are used incorrectly or if operations fail. The [`main`](<#main>) function is defined twice, with one version executing if the `FD_HAS_HOSTED` macro is defined, indicating that the program is running in a hosted environment. The other version provides a minimal implementation for non-hosted environments, logging an error if more than one argument is provided.
+The main technical components of this code include functions for attaching to and detaching from workspaces, allocating and freeing memory, and querying allocation properties. The code leverages a set of utility functions and macros, such as `fd_wksp_attach`, `fd_alloc_new`, and [`fd_alloc_fprintf`](#fd_alloc_fprintf), to perform these operations. The program defines a public API through its command-line interface, allowing users to interact with the memory allocation system by issuing commands like "new", "delete", "malloc", "free", "compact", and "query". Each command is associated with specific parameters and expected behaviors, which are validated and executed within the main function. The code also includes a help command to guide users on how to use the utility effectively.
 # Imports and Dependencies
 
 ---
@@ -21,34 +21,31 @@ The program begins by initializing the environment with `fd_boot` and processes 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/alloc/fd_alloc_ctl.c#L222>)
-
-Initializes the environment, checks command-line arguments, logs a notice, and halts the program.
+The `main` function initializes the environment, checks for valid command-line arguments, and logs an error if the arguments are not supported on the current platform.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
+    - `argc`: An integer representing the number of command-line arguments passed to the program.
     - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
-    - Checks if `argc` is less than 1 and logs an error if true.
-    - Checks if `argc` is greater than 1 and logs an error if true, indicating unsupported platform.
-    - Logs a notice indicating that 0 commands were processed.
-    - Calls `fd_halt` to halt the program.
-- **Output**: Returns 0, indicating successful execution.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with the command-line arguments.
+    - Check if `argc` is less than 1, and log an error if true.
+    - Check if `argc` is greater than 1, and log an error if true, indicating that `fd_alloc_ctl` is not supported on this platform.
+    - Log a notice indicating that 0 commands were processed.
+    - Call `fd_halt` to clean up and terminate the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_alloc\_fprintf<!-- {{#callable_declaration:fd_alloc_fprintf}} -->
-[View Source →](<../../../../../src/util/alloc/fd_alloc_ctl.c#L10>)
-
-Prints allocation details to a specified stream.
-- **Description**: Use this function to print detailed information about memory allocations associated with a given `fd_alloc_t` object to a specified output stream. This function is useful for debugging and monitoring memory usage. It requires a valid `fd_alloc_t` pointer and a non-null `FILE` stream. If the `stream` is null, the function returns immediately with a value of 0, indicating no output was produced. The function returns the number of characters printed to the stream.
+Prints diagnostic information about a memory allocator to a specified stream.
+- **Description**: Use this function to output detailed diagnostic information about a memory allocator associated with a given join object to a specified output stream. This function is useful for debugging and monitoring the state of memory allocations. It must be called with a valid join object and a non-null output stream. If the stream is null, the function will return immediately without printing anything. The function provides a summary of allocation statistics and details about each size class and large allocations.
 - **Inputs**:
-    - `join`: A pointer to an `fd_alloc_t` object representing the memory allocation context. Must not be null.
-    - `stream`: A pointer to a `FILE` object where the allocation details will be printed. Must not be null. If null, the function returns 0 immediately.
-- **Output**: Returns the number of characters printed to the stream. If the stream is null, returns 0.
-- **See Also**: [`fd_alloc_fprintf`](<fd_alloc.c.md#fd_alloc_fprintf>)  (Implementation)
+    - `join`: A pointer to an fd_alloc_t object representing the memory allocator to be diagnosed. The caller retains ownership and must ensure it is a valid join object.
+    - `stream`: A pointer to a FILE object where the diagnostic information will be printed. Must not be null. If null, the function returns 0 without performing any operations.
+- **Output**: Returns an integer indicating the number of diagnostic entries printed. If the stream is null, returns 0.
+- **See also**: [`fd_alloc_fprintf`](fd_alloc.c.md#fd_alloc_fprintf)  (Implementation)
 
 
 
