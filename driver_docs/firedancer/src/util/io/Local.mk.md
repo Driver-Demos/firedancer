@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for `fd_io` and `fd_util`.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_io` and `fd_util` components, and includes a command to run the `test_io` unit test.
 
 # Purpose
-The Makefile content defines build and test instructions for a software project. It uses a series of `$(call ...)` functions to add headers and objects, create a unit test, and run the unit test. Specifically, it adds the header `fd_io.h`, includes the objects `fd_io` and `fd_util`, and sets up a unit test named `test_io` that depends on `fd_util`. Finally, it runs the `test_io` unit test.
+The file is a Makefile snippet used for building and testing a software component. It defines build rules by adding headers and object files, specifically `fd_io.h` and `fd_io`, `fd_util` respectively. It also specifies the creation and execution of a unit test named `test_io`, which depends on `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

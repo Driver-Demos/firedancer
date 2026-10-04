@@ -3,26 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for a Grafana dashboard with panels for monitoring uptime, bundles per second, and RTT.
+Grafana dashboard for bundle uptime, throughput, and edge RTT.
 
 # Purpose
-This JSON file configures a Grafana dashboard, which is a tool for visualizing and monitoring data. The file defines various components of the dashboard, including annotations, panels, and data sources. The `annotations` section specifies settings for built-in annotations and alerts, while the `panels` section contains configurations for different visual elements, such as status history and time series graphs. Each panel is linked to a Prometheus data source, with specific queries and visualization options defined. The file also includes settings for the dashboard's time range, timezone, and other metadata like the dashboard's title and unique identifier (`uid`). This configuration is essential for setting up the visual representation and data queries that the Grafana dashboard will use to display real-time data insights.
-# Content Summary
-This JSON configuration file defines a Grafana dashboard titled "Firedancer Bundles." The dashboard is identified by the unique ID `4222` and UID `demqj0f568zk0f`. It is editable and set to use the timezone "America/Chicago." The dashboard's time range is configured to display data from the last hour up to the current time.
-
-The dashboard includes annotations and alerts, with a built-in annotation named "Annotations & Alerts" that is enabled and hidden by default. The annotation uses the Grafana datasource.
-
-The dashboard contains three panels, each configured to use a Prometheus datasource with the UID `becngladj4cn4d`. The panels are as follows:
-
-1. **Uptime Panel**: This panel is a "status-history" type and is transparent. It displays data using a Prometheus query that calculates the minimum over time for a specific metric. The panel's grid position is set to span the full width of the dashboard, and it has a height of 3 units. The panel's tooltip is configured to show a single mode without sorting.
-
-2. **Bundles Per Second Panel**: This panel is a "timeseries" type and displays data using two Prometheus queries. The first query calculates the rate of packets received, and the second query calculates the rate of bundles received. The panel's grid position is set to a width of 12 units and a height of 10 units. The legend is displayed at the bottom, and the tooltip is configured similarly to the Uptime panel.
-
-3. **Bundle Edge RTT Panel**: This panel is also a "timeseries" type and uses two Prometheus queries to display smoothed and latest sample round-trip time (RTT) data. The panel includes an override to change the color of the "Latest Sample" series. The grid position is set to a width of 12 units and a height of 10 units, adjacent to the Bundles Per Second panel.
-
-The dashboard includes a templating variable named "instance," which is a query type variable that retrieves label values for the `bundle_bundle_received` metric. The variable is set to refresh on time range change.
-
-The dashboard's schema version is 39, and it is currently at version 12. The configuration does not include any tags or links, and the fiscal year starts in January. The graph tooltip mode is set to 0, indicating a default setting.
+This JSON file defines a Grafana dashboard named `Firedancer Bundles` for monitoring bundle activity from a Prometheus data source. It uses the `instance` variable to filter metrics and shows three panels: `Uptime`, `Bundles Per Second`, and `Bundle Edge RTT`. The `Uptime` panel tracks the `bundle_connected` metric over time, while the other panels display bundle and transaction rates and compare smoothed RTT values with the latest sample. The file also sets dashboard metadata such as time range, timezone, annotations, and panel layout, so the dashboard can be loaded and used as part of the application monitoring setup.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-UDP echo server implementation with packet mirroring and configuration functions.
+UDP echo server command and tile for packet mirroring and connectivity testing
 
 
 ## Files
-- **[fd_udpecho_tile.c](fd_udpecho_tile.c.md)**: Mirrors incoming UDP packets back to the source for connectivity testing, with potential risks in production.
-- **[udpecho.c](udpecho.c.md)**: Implements a UDP echo server with configuration and topology setup functions.
+- **[fd_udpecho_tile.c](fd_udpecho_tile.c.md)**: Mirrors incoming UDP packets back to the source for connectivity testing.
+- **[udpecho.c](udpecho.c.md)**: UDP echo server command that builds topology, sets ports, and starts the process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

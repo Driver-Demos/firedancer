@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and running unit tests for bn254 and poseidon in firedancer.
+Build rules for bn254 and Poseidon headers, objects, and unit tests.
 
 # Purpose
-This Makefile script automates the process of adding headers and object files, and creating and running unit tests for specific components. The `add-hdrs` function includes header files `fd_bn254.h`, `fd_bn254_scalar.h`, and `fd_poseidon.h`. The `add-objs` function specifies object files `fd_bn254`, `fd_poseidon`, and `fd_ballet`. The `make-unit-test` function defines unit tests `test_bn254` and `test_poseidon`, associating them with the `fd_ballet` and `fd_util` components. The `run-unit-test` function executes the unit tests `test_bn254` and `test_poseidon`.
+This Makefile fragment adds the `fd_bn254.h`, `fd_bn254_scalar.h`, and `fd_poseidon.h` header files, builds the `fd_bn254` and `fd_poseidon` objects into `fd_ballet`, and defines unit test targets for `test_bn254` and `test_poseidon` with `fd_ballet` and `fd_util` as dependencies. It also sets both unit tests to run as part of the test build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
