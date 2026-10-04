@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Protobuf and gRPC definitions for authentication, block engine, bundle processing, packets, relayers, and shared data.
+The `protos` folder in the `firedancer` codebase contains protocol buffer definitions for various components such as authentication, block engine systems, bundles, network packets, relayers, and shared structures, facilitating communication and data handling within the bundle-test-server.
 
 
 ## Files
-- **[auth.proto](auth.proto.md)**: Defines protobuf messages and services for generating and refreshing authentication tokens.
-- **[block_engine.proto](block_engine.proto.md)**: Defines gRPC services and messages for block engine validators and relayers to manage packets and bundles.
-- **[bundle.proto](bundle.proto.md)**: Defines protocol buffer messages for handling bundle processing results, including acceptance, rejection, and status updates.
-- **[packet.proto](packet.proto.md)**: Defines Protocol Buffers messages for handling packet batches, packets, metadata, and packet flags.
-- **[relayer.proto](relayer.proto.md)**: Defines gRPC services for Solana validators to fetch TPU configurations and subscribe to packet streams.
-- **[shared.proto](shared.proto.md)**: Defines protobuf messages for Header, Heartbeat, and Socket with timestamp, count, IP, and port.
+- **[auth.proto](auth.proto.md)**: The `auth.proto` file defines the protocol buffer messages and service for generating and refreshing authentication tokens in the `firedancer` codebase.
+- **[block_engine.proto](block_engine.proto.md)**: The `block_engine.proto` file defines the protocol buffer messages and services for a block engine system, including functionality for subscribing to packet and bundle streams, managing accounts and programs of interest, and handling expiring packet batches and heartbeats.
+- **[bundle.proto](bundle.proto.md)**: The `bundle.proto` file defines the protocol buffer messages and structures for handling bundles, including their acceptance, rejection, and processing results, within the `firedancer` codebase.
+- **[packet.proto](packet.proto.md)**: The `packet.proto` file defines the structure of network packets and their metadata, including flags and sender information, for use in the `firedancer` project's bundle-test-server.
+- **[relayer.proto](relayer.proto.md)**: The `relayer.proto` file defines the protocol buffer messages and services for a relayer that provides TPU and TPU forward proxy configurations and packet subscription capabilities for Solana validators.
+- **[shared.proto](shared.proto.md)**: The `shared.proto` file defines protocol buffer messages for a `Header` with a timestamp, a `Heartbeat` with a count, and a `Socket` with an IP and port.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

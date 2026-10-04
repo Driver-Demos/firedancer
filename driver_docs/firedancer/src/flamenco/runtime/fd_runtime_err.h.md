@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines runtime execution success and transaction error codes for the Firedancer Flamenco runtime.
+Transaction and execution error codes for runtime processing.
 
 # Purpose
-This C header file defines a set of constants representing error codes related to transaction processing in a runtime environment. The file includes a success code, `FD_RUNTIME_EXECUTE_SUCCESS`, which indicates successful execution, and a series of negative integer constants that represent various transaction errors. These error codes cover a range of issues, such as account-related errors, insufficient funds, invalid operations, and system limitations. Each error code is associated with a specific condition, such as `FD_RUNTIME_TXN_ERR_ACCOUNT_IN_USE` for an account that is already in use, or `FD_RUNTIME_TXN_ERR_INSUFFICIENT_FUNDS_FOR_FEE` for insufficient funds to cover a transaction fee. This file is used to standardize error reporting and handling within the runtime system.
+This header file defines the error code values used by the runtime when it executes a transaction slot. It assigns `0` to `FD_RUNTIME_EXECUTE_SUCCESS` and uses negative values for transaction failure cases such as account lookup errors, signature failures, instruction errors, cost limit violations, and address lookup table problems. The constants give the codebase a shared set of named results for reporting and handling runtime execution outcomes. The include guard `HEADER_fd_src_flamenco_runtime_fd_runtime_err_h` prevents the header from being included more than once during compilation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building the fd_tango library, binaries, unit tests, and adding test scripts.
+The `Local.mk` file in the `firedancer` codebase defines build rules for the `fd_tango` library, its binaries, unit tests, and test scripts.
 
 # Purpose
-The Makefile content defines build instructions for a software project. It uses custom functions to streamline the process of compiling libraries, binaries, and unit tests. The `make-lib` function creates a library named `fd_tango`, while `add-hdrs` adds header files `fd_tango_base.h` and `fd_tango.h` to the build. The `make-bin` function compiles an executable named `fd_tango_ctl` with dependencies on `fd_tango` and `fd_util`. Several `make-unit-test` calls define unit tests for different components, such as `test_tango_base`, `test_meta_tx`, and `test_frag_rx`, each with dependencies on `fd_tango` and `fd_util`. Finally, `add-test-scripts` specifies additional test scripts to be included in the testing process.
+The provided content is from a Makefile, which is a build automation tool used to manage the build process of a software project. This Makefile uses custom functions, such as `make-lib`, `add-hdrs`, `make-bin`, and `make-unit-test`, to streamline the compilation and linking of various components within the project. The `make-lib` function is used to create a library named `fd_tango`, while `add-hdrs` adds header files `fd_tango_base.h` and `fd_tango.h` to the build process. The `make-bin` function compiles and links the binary `fd_tango_ctl` with dependencies on `fd_tango` and `fd_util`. Several unit tests, such as `test_tango_base`, `test_meta_tx`, and others, are defined using `make-unit-test`, each with specific dependencies. Finally, `add-test-scripts` lists test scripts that are likely used to validate the functionality of the software components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
