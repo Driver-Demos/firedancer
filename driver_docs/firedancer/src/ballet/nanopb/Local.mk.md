@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile rules to add headers and objects for nanopb in the fd_ballet module.
+The `Local.mk` file in the `firedancer` codebase specifies header and object files for the `fd_ballet` component, including `pb_firedancer.h`, `pb_common.h`, `pb_decode.h`, `pb_encode.h`, and `pb.h`.
 
 # Purpose
-The `Makefile` content defines build rules for a project. It uses the `add-hdrs` and `add-objs` functions to specify header files and object files, respectively, for the `fd_ballet` target. The header files listed are `pb_firedancer.h`, `pb_common.h`, `pb_decode.h`, `pb_encode.h`, and `pb.h`, while the object files are `pb_common`, `pb_decode`, and `pb_encode`.
+The file is a Makefile snippet used in a build system to manage dependencies and compilation targets. It defines two calls to a macro `add-hdrs` and `add-objs`, which respectively add header files (`pb_firedancer.h`, `pb_common.h`, `pb_decode.h`, `pb_encode.h`, `pb.h`) and object files (`pb_common`, `pb_decode`, `pb_encode`) to the `fd_ballet` target, facilitating the organization and compilation of these components within the project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

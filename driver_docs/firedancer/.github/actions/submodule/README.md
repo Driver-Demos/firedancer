@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a GitHub Action for caching the agave submodule with machine and compiler options.
+The `submodule` folder in the `firedancer` codebase contains a GitHub Action configuration file, `action.yml`, which is used for caching the agave submodule with various configurable inputs.
 
 
 ## Files
-- **[action.yml](action.yml.md)**: Defines a GitHub Action for caching the agave submodule with configurable machine and compiler options.
+- **[action.yml](action.yml.md)**: The `action.yml` file in the `firedancer` codebase defines a GitHub Action for caching the agave submodule, with configurable inputs for machine type, C compiler, compiler version, and action type.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
