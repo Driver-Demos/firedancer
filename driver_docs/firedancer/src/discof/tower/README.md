@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Vote tower tile state update, seccomp policy, and build rules.
+Seccomp filter policy, `fd_tower_tile` structures and functions, security policies, and Makefile logic.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp BPF filter for selected FDs allowing read, write, fstat, and fsync.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall access control based on architecture and syscall numbers.
 
 ## Files
-- **[fd_tower_tile.c](fd_tower_tile.c.md)**: Processes genesis, snapshot, and replay input to update tower state and emit vote transactions.
-- **[fd_tower_tile.h](fd_tower_tile.h.md)**: Slot-done update struct and tower tile declaration for vote, root, and reset state.
-- **[fd_tower_tile.seccomppolicy](fd_tower_tile.seccomppolicy.md)**: Seccomp policy for tower file logging, checkpoint, restore, and fsync file descriptors.
-- **[Local.mk](Local.mk.md)**: Build rule that adds fd_tower_tile objects to fd_discof when FD_HAS_INT128 is set.
+- **[fd_tower_tile.c](fd_tower_tile.c.md)**: Implements the `fd_tower_tile` structure and related functions for managing voting and replay processes in a distributed system.
+- **[fd_tower_tile.h](fd_tower_tile.h.md)**: Defines the `fd_tower_slot_done` structure for managing vote state updates and root advancement in a tower tile.
+- **[fd_tower_tile.seccomppolicy](fd_tower_tile.seccomppolicy.md)**: Defines security policies for file descriptor operations in the Firedancer tower component.
+- **[Local.mk](Local.mk.md)**: Makefile logic to add objects for `fd_tower_tile` and `fd_discof` if `FD_HAS_INT128` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

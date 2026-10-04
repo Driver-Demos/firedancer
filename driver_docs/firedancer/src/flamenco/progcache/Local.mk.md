@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for progcache public APIs, unit test, and internal object files.
+Makefile for managing headers, objects, and unit tests in the `firedancer` codebase.
 
 # Purpose
-This Makefile fragment controls which program-loading and program-cache components are built when `FD_HAS_INT128` is defined. It adds the public headers `fd_prog_load.h` and `fd_progcache_admin.h`, and it links the matching objects into `fd_flamenco`. When `FD_HAS_SECP256K1` is also defined, it adds `fd_progcache_user.h`, builds the `test_progcache` unit test, runs that test, and includes the internal object `fd_progcache_rec`. The nested `ifdef` blocks ensure that each header, object, and test is included only when the required build features are available.
+The content is a Makefile script that manages the build process for a software project. It uses conditional statements to check for the presence of certain features, such as `FD_HAS_INT128` and `FD_HAS_SECP256K1`, to determine which components to include in the build. The script adds header files and object files to the build process using the `add-hdrs` and `add-objs` functions. It also defines and runs unit tests for the `test_progcache` component, ensuring that the build includes necessary dependencies like `fd_flamenco`, `fd_funk`, `fd_ballet`, and `fd_util`. The script organizes both public APIs and internal components, facilitating a modular build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
