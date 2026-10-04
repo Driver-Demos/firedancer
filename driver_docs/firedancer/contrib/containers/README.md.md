@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Docker build and run instructions for GCC 8, 9, and 10 containers.
+Instructions for building and running GCC containers using Dockerfiles in the Firedancer repository.
 
 # Purpose
-This file defines how to build and use Docker containers with GCC 8, GCC 9, and GCC 10 for the project. It gives the `podman build` command for creating a container image from `gcc-8.dockerfile`, and it shows how to run the container with the repository mounted at `/data/firedancer`. It also lists the cleanup steps needed before switching compilers, including `./deps.sh nuke` and `make -j distclean`, and it warns that these commands affect files on the host because the repository is mounted into the container. The file ends with the dependency install and build commands, which use `FD_AUTO_INSTALL_PACKAGES=1 ./deps.sh +dev fetch check install` and `make -j all fdctl fddev` to compile the target binaries.
+The document provides instructions for building and running Docker containers with different versions of the GCC compiler (GCC 8, GCC 9, and GCC 10). It includes commands to build the container using `podman` and specifies how to run the container with the repository's top directory mounted at `/data/firedancer`. The document also outlines steps to build binaries within the container, emphasizing the need to clean up existing files when switching compilers. A warning is included to highlight that cleanup operations inside the container will affect files on the host system, suggesting the use of a fresh clone of the repository to prevent unwanted data loss. Finally, it provides commands to install dependencies and compile the desired targets.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
