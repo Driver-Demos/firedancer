@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `fd_eqvoc` component, including header and object files, and conditional unit test setup based on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED`.
+Makefile for adding headers, objects, and unit tests based on configuration flags.
 
 # Purpose
-This file is a Makefile snippet used for conditional compilation. It checks if the `FD_HAS_INT128` flag is defined, and if so, it adds headers and objects related to `fd_eqvoc` and `fd_choreo`. Additionally, if the `FD_HAS_HOSTED` flag is also defined, it sets up a unit test for `test_eqvoc` with dependencies on `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util`.
+The `Makefile` content defines conditional compilation rules for a software project. If the macro `FD_HAS_INT128` is defined, it adds the header file `fd_eqvoc.h` and the object files `fd_eqvoc` and `fd_choreo` to the build process. Additionally, if the macro `FD_HAS_HOSTED` is also defined, it creates a unit test named `test_eqvoc` that depends on the object files `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
