@@ -3,31 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, structures, and tests for verifying zero-knowledge proofs, ciphertext validity, and equality in the Firedancer ZK-SDK.
+Zero-knowledge proof instructions for ciphertext, range, percentage, and public key validity.
 
 
 ## Files
-- **[fd_zksdk_batched_grouped_ciphertext_2_handles_validity.c](fd_zksdk_batched_grouped_ciphertext_2_handles_validity.c.md)**: Functions for verifying the validity of batched grouped ciphertexts with two handles in a zero-knowledge proof system.
-- **[fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c](fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c.md)**: Functions for initializing and verifying the validity of batched grouped ciphertexts with three handles.
-- **[fd_zksdk_batched_grouped_ciphertext_validity.h](fd_zksdk_batched_grouped_ciphertext_validity.h.md)**: Defines structures and functions for verifying batched grouped ciphertext validity proofs.
-- **[fd_zksdk_batched_range_proof_u128.c](fd_zksdk_batched_range_proof_u128.c.md)**: Implements functions to verify batched range proofs for 128-bit unsigned integers.
-- **[fd_zksdk_batched_range_proof_u256.c](fd_zksdk_batched_range_proof_u256.c.md)**: Implements functions to verify batched range proofs for 256-bit unsigned integers.
-- **[fd_zksdk_batched_range_proof_u64.c](fd_zksdk_batched_range_proof_u64.c.md)**: Implements functions to verify batched range proofs for 64-bit unsigned integers.
-- **[fd_zksdk_batched_range_proofs.h](fd_zksdk_batched_range_proofs.h.md)**: Defines structures and functions for batched range proofs in zero-knowledge proofs.
-- **[fd_zksdk_ciphertext_ciphertext_equality.c](fd_zksdk_ciphertext_ciphertext_equality.c.md)**: Implements functions to verify ciphertext equality proofs using zero-knowledge protocols.
-- **[fd_zksdk_ciphertext_ciphertext_equality.h](fd_zksdk_ciphertext_ciphertext_equality.h.md)**: Defines data structures for ciphertext equality proofs and contexts in the Firedancer codebase.
-- **[fd_zksdk_ciphertext_commitment_equality.c](fd_zksdk_ciphertext_commitment_equality.c.md)**: Implements functions to verify proofs of ciphertext-commitment equality using zero-knowledge protocols.
-- **[fd_zksdk_ciphertext_commitment_equality.h](fd_zksdk_ciphertext_commitment_equality.h.md)**: Defines data structures and a function to verify ciphertext and commitment equality proofs.
-- **[fd_zksdk_grouped_ciphertext_2_handles_validity.c](fd_zksdk_grouped_ciphertext_2_handles_validity.c.md)**: Verifies the validity of grouped ciphertext with two handles using a transcript-based approach.
-- **[fd_zksdk_grouped_ciphertext_3_handles_validity.c](fd_zksdk_grouped_ciphertext_3_handles_validity.c.md)**: Functions for initializing and verifying the validity of grouped ciphertext with three handles.
-- **[fd_zksdk_percentage_with_cap.c](fd_zksdk_percentage_with_cap.c.md)**: Implements functions to initialize and verify zero-knowledge proofs for percentage with cap instructions.
-- **[fd_zksdk_percentage_with_cap.h](fd_zksdk_percentage_with_cap.h.md)**: Defines data structures for percentage proofs with a cap in the Firedancer Flamenco runtime.
-- **[fd_zksdk_pubkey_validity.c](fd_zksdk_pubkey_validity.c.md)**: Implements functions to verify the validity of public key proofs using zero-knowledge protocols.
-- **[fd_zksdk_pubkey_validity.h](fd_zksdk_pubkey_validity.h.md)**: Defines structures for public key validity proof and context in the Firedancer ZK-SDK.
-- **[fd_zksdk_zero_ciphertext.c](fd_zksdk_zero_ciphertext.c.md)**: Implements functions to initialize and verify zero-ciphertext proofs in a zk-SDK context.
-- **[fd_zksdk_zero_ciphertext.h](fd_zksdk_zero_ciphertext.h.md)**: Defines packed structures for zero-knowledge proof and context in the Firedancer ZK-SDK.
-- **[Local.mk](Local.mk.md)**: Makefile instructions for adding object files related to ZK-SDK functionalities if 128-bit integers are supported.
-- **[test_fd_zksdk_pubkey_validity.h](test_fd_zksdk_pubkey_validity.h.md)**: Header file for testing public key validity in the ZK-SDK with predefined transaction data.
+- **[fd_zksdk_batched_grouped_ciphertext_2_handles_validity.c](fd_zksdk_batched_grouped_ciphertext_2_handles_validity.c.md)**: The `fd_zksdk_batched_grouped_ciphertext_2_handles_validity.c` file in the `firedancer` codebase implements functions to verify the validity of batched grouped ciphertexts with two handles using zero-knowledge proofs.
+- **[fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c](fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c.md)**: The `fd_zksdk_batched_grouped_ciphertext_3_handles_validity.c` file in the `firedancer` codebase implements functions to initialize a transcript and verify the validity of a proof for batched grouped ciphertexts with three handles using cryptographic operations.
+- **[fd_zksdk_batched_grouped_ciphertext_validity.h](fd_zksdk_batched_grouped_ciphertext_validity.h.md)**: The `fd_zksdk_batched_grouped_ciphertext_validity.h` file defines structures and functions for verifying the validity of batched grouped ciphertexts with two or three handles in the Firedancer codebase.
+- **[fd_zksdk_batched_range_proof_u128.c](fd_zksdk_batched_range_proof_u128.c.md)**: The `fd_zksdk_batched_range_proof_u128.c` file in the `firedancer` codebase implements functions to verify batched range proofs for 128-bit unsigned integers using zero-knowledge proofs.
+- **[fd_zksdk_batched_range_proof_u256.c](fd_zksdk_batched_range_proof_u256.c.md)**: The `fd_zksdk_batched_range_proof_u256.c` file implements functions to verify batched range proofs for 256-bit unsigned integers within the Firedancer codebase.
+- **[fd_zksdk_batched_range_proof_u64.c](fd_zksdk_batched_range_proof_u64.c.md)**: The `fd_zksdk_batched_range_proof_u64.c` file implements functions to verify batched range proofs for 64-bit unsigned integers within the Firedancer codebase.
+- **[fd_zksdk_batched_range_proofs.h](fd_zksdk_batched_range_proofs.h.md)**: The `fd_zksdk_batched_range_proofs.h` file in the `firedancer` codebase defines structures and functions for handling batched range proofs, including initialization and validation of proof contexts and transcripts.
+- **[fd_zksdk_ciphertext_ciphertext_equality.c](fd_zksdk_ciphertext_ciphertext_equality.c.md)**: The `fd_zksdk_ciphertext_ciphertext_equality.c` file in the `firedancer` codebase implements functions to initialize a transcript and verify proofs for ciphertext-ciphertext equality using zero-knowledge proofs.
+- **[fd_zksdk_ciphertext_ciphertext_equality.h](fd_zksdk_ciphertext_ciphertext_equality.h.md)**: The `fd_zksdk_ciphertext_ciphertext_equality.h` file defines data structures for proofs and contexts related to ciphertext equality checks in the Firedancer codebase.
+- **[fd_zksdk_ciphertext_commitment_equality.c](fd_zksdk_ciphertext_commitment_equality.c.md)**: The `fd_zksdk_ciphertext_commitment_equality.c` file in the `firedancer` codebase implements functions to initialize a transcript and verify proofs for ciphertext-commitment equality using multi-scalar multiplication and point decompression.
+- **[fd_zksdk_ciphertext_commitment_equality.h](fd_zksdk_ciphertext_commitment_equality.h.md)**: The `fd_zksdk_ciphertext_commitment_equality.h` file defines structures and a function for verifying the equality of ciphertext and commitment proofs in the Firedancer codebase.
+- **[fd_zksdk_grouped_ciphertext_2_handles_validity.c](fd_zksdk_grouped_ciphertext_2_handles_validity.c.md)**: The `fd_zksdk_grouped_ciphertext_2_handles_validity.c` file in the `firedancer` codebase implements functionality to initialize a transcript and verify the validity of a proof for grouped ciphertext with two handles.
+- **[fd_zksdk_grouped_ciphertext_3_handles_validity.c](fd_zksdk_grouped_ciphertext_3_handles_validity.c.md)**: The `fd_zksdk_grouped_ciphertext_3_handles_validity.c` file in the `firedancer` codebase implements functionality to initialize a transcript and verify the validity of a proof for grouped ciphertext with three handles.
+- **[fd_zksdk_percentage_with_cap.c](fd_zksdk_percentage_with_cap.c.md)**: Verifies a percentage-with-cap zero-knowledge proof using a Merlin transcript and Ristretto MSM.
+- **[fd_zksdk_percentage_with_cap.h](fd_zksdk_percentage_with_cap.h.md)**: The `fd_zksdk_percentage_with_cap.h` file defines data structures for handling percentage proofs with a cap in the Firedancer codebase, including maximum and equality proofs and their associated contexts.
+- **[fd_zksdk_pubkey_validity.c](fd_zksdk_pubkey_validity.c.md)**: The `fd_zksdk_pubkey_validity.c` file in the `firedancer` codebase implements functions to verify the validity of a public key using zero-knowledge proofs.
+- **[fd_zksdk_pubkey_validity.h](fd_zksdk_pubkey_validity.h.md)**: The `fd_zksdk_pubkey_validity.h` file defines structures for handling public key validity proofs and contexts in the Firedancer project.
+- **[fd_zksdk_zero_ciphertext.c](fd_zksdk_zero_ciphertext.c.md)**: The `fd_zksdk_zero_ciphertext.c` file in the `firedancer` codebase implements functions to initialize a transcript and verify a zero-ciphertext proof using multi-scalar multiplication and point decompression.
+- **[fd_zksdk_zero_ciphertext.h](fd_zksdk_zero_ciphertext.h.md)**: The `fd_zksdk_zero_ciphertext.h` file defines data structures for zero-knowledge proof and context related to zero ciphertext operations in the Firedancer project.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of various object files related to zero-knowledge SDK instructions, contingent on the presence of 128-bit integer support.
+- **[test_fd_zksdk_pubkey_validity.h](test_fd_zksdk_pubkey_validity.h.md)**: The `test_fd_zksdk_pubkey_validity.h` file in the `firedancer` codebase defines a static array of strings representing test data for verifying the validity of public keys in the ZK-SDK context.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CSS styles for table metrics and JavaScript for importing and exporting the default VitePress theme.
+The `theme` folder in the `firedancer` codebase contains files for setting up and styling a VitePress site's theme, including a `custom.css` for defining table metrics styles and an `index.js` for configuring the default theme and importing custom styles.
 
 
 ## Files
-- **[custom.css](custom.css.md)**: CSS styles for table metrics, including font sizes, colors, and layout adjustments for dark and light themes.
-- **[index.js](index.js.md)**: Imports and exports the default VitePress theme with custom CSS.
+- **[custom.css](custom.css.md)**: The `custom.css` file in the `firedancer` codebase defines styles for table metrics, including font sizes, padding, and color schemes for both dark and light modes.
+- **[index.js](index.js.md)**: The `index.js` file in the `firedancer` codebase sets up the default theme for a VitePress site and imports custom CSS styling.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

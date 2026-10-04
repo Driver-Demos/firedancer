@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Automatically generated nanopb constant definitions for shared_Header, shared_Heartbeat, and shared_Socket.
+The `shared.pb.c` file contains automatically generated nanopb constant definitions for protocol buffer bindings in the `firedancer` codebase.
 
 # Purpose
-This code is a C source file that contains automatically generated constant definitions for Protocol Buffers using the nanopb library, version 0.4.9.1. It includes the header file `shared.pb.h` and checks if the `PB_PROTO_HEADER_VERSION` is 40, issuing an error if it is not, to ensure compatibility with the current nanopb generator version. The file uses the `PB_BIND` macro to bind Protocol Buffer message types `shared_Header`, `shared_Heartbeat`, and `shared_Socket` with automatic field handling. This setup facilitates the serialization and deserialization of these message types in a C environment.
+This C source code file is an automatically generated configuration file for the nanopb library, specifically version 0.4.9.1. It includes the header file "shared.pb.h" and contains preprocessor directives to ensure compatibility with the correct version of the nanopb protocol buffer header. The file uses the `PB_BIND` macro to bind protocol buffer message types (`shared_Header`, `shared_Heartbeat`, and `shared_Socket`) to their respective C structures, facilitating serialization and deserialization of these messages. This file is part of a system that uses protocol buffers for efficient data interchange, and it ensures that the generated code is synchronized with the protocol definitions.
 # Imports and Dependencies
 
 ---

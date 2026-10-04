@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for creating and managing TAR archive files, including writing headers and file data.
+The `fd_tar_writer.c` file in the `firedancer` codebase provides functionality for creating and managing tar archives, including writing file headers, data, and handling file alignment and checksums.
 
 # Purpose
-The code is a C module that provides functionality for writing tar archives. It defines a set of functions to create, manage, and finalize tar files using a file descriptor. The module includes functions to initialize a new tar writer ([`fd_tar_writer_new`](<#fd_tar_writer_new>)), delete a tar writer ([`fd_tar_writer_delete`](<#fd_tar_writer_delete>)), create a new file within the tar archive ([`fd_tar_writer_new_file`](<#fd_tar_writer_new_file>)), write data to a file in the archive ([`fd_tar_writer_write_file_data`](<#fd_tar_writer_write_file_data>)), and finalize the file writing process ([`fd_tar_writer_fini_file`](<#fd_tar_writer_fini_file>)). Additionally, it provides functions to manage space within the tar file ([`fd_tar_writer_make_space`](<#fd_tar_writer_make_space>) and [`fd_tar_writer_fill_space`](<#fd_tar_writer_fill_space>)).
+This C source code file provides functionality for creating and managing tar archives, specifically focusing on writing files into a tarball. The code defines a set of functions that handle the creation of a new tar writer, adding new files to the archive, writing file data, finalizing files, and managing space within the tar archive. The primary technical components include functions for initializing a tar writer ([`fd_tar_writer_new`](#fd_tar_writer_new)), adding new files ([`fd_tar_writer_new_file`](#fd_tar_writer_new_file)), writing file data ([`fd_tar_writer_write_file_data`](#fd_tar_writer_write_file_data)), and finalizing the file entries ([`fd_tar_writer_fini_file`](#fd_tar_writer_fini_file)). The code also includes utility functions for managing space within the tar file ([`fd_tar_writer_make_space`](#fd_tar_writer_make_space) and [`fd_tar_writer_fill_space`](#fd_tar_writer_fill_space)). These functions ensure that the tar archive adheres to the tar format specifications, such as aligning data to 512-byte blocks and calculating checksums for file headers.
 
-The module uses a structure `fd_tar_writer_t` to maintain the state of the tar writing process, including the file descriptor, header position, data size, and write-back position. It ensures that the tar archive adheres to the tar format by writing headers, data, and padding as necessary. The code also includes error handling to manage issues such as invalid file descriptors, alignment problems, and write failures. The module is designed to be used as part of a larger system, likely involving other components that handle file I/O and memory management.
+The file is intended to be part of a larger library or application, as indicated by the inclusion of custom headers like "fd_tar.h" and "../fd_util.h". It does not define a main function, suggesting that it is not an executable but rather a component to be integrated into a larger system. The code is structured to handle errors robustly, with extensive use of logging to report issues. The functions defined in this file are likely part of a public API for managing tar archives, providing a programmatic interface for creating and manipulating tar files. The code is designed to be extendable, with comments indicating potential areas for future enhancements, such as making file permissions configurable and optimizing space allocation.
 # Imports and Dependencies
 
 ---
@@ -24,146 +24,133 @@ The module uses a structure `fd_tar_writer_t` to maintain the state of the tar w
 
 ---
 ### null\_tar\_block
-- **Type**: ``char` array`
-- **Description**: A static `char` array named `null_tar_block` is initialized with zeros and has a size defined by `FD_TAR_BLOCK_SZ`. This array is used to represent a block of zeroed bytes, typically used in TAR file operations.
-- **Use**: Used to write zero-filled blocks to a TAR file, marking the end of the archive or padding to meet alignment requirements.
+- **Type**: `char array`
+- **Description**: The `null_tar_block` is a static character array initialized with zeros, with a size defined by `FD_TAR_BLOCK_SZ`. It serves as a block of zeroed bytes, typically used to pad or mark the end of a tar archive.
+- **Use**: This variable is used to write zero-filled blocks to a file descriptor, ensuring proper tar archive formatting and alignment.
 
 
 # Functions
 
 ---
 ### fd\_tar\_writer\_new<!-- {{#callable:fd_tar_writer_new}} -->
-[View Source →](<../../../../../src/util/archive/fd_tar_writer.c#L15>)
-
-Initializes a new `fd_tar_writer_t` structure using provided memory and file descriptor, ensuring alignment and truncating the file.
+The `fd_tar_writer_new` function initializes a new TAR writer object using provided memory and a file descriptor, ensuring proper alignment and truncating the file if it already exists.
 - **Inputs**:
-    - `mem`: A pointer to the memory location where the `fd_tar_writer_t` structure will be initialized.
-    - `fd`: An integer representing the file descriptor for the tar file to be written.
-- **Logic and Control Flow**:
-    - Check if `mem` is NULL; if so, log a warning and return NULL.
-    - Check if `mem` is properly aligned using [`fd_tar_writer_align`](<fd_tar.h.md#fd_tar_writer_align>); if not, log a warning and return NULL.
-    - Cast `mem` to `fd_tar_writer_t *` and assign it to `writer`.
-    - Check if `fd` is less than or equal to 0; if so, log a warning and return NULL.
-    - Attempt to truncate the file associated with `fd` to zero length; if it fails, log a warning and return NULL.
-    - Initialize `writer` fields: `fd` with the provided file descriptor, `header_pos`, `data_sz`, and `wb_pos` with `ULONG_MAX`.
-    - Return the initialized `writer`.
-- **Output**: A pointer to the initialized `fd_tar_writer_t` structure, or NULL if an error occurs.
-- **Functions Called**:
-    - [`fd_tar_writer_align`](<fd_tar.h.md#fd_tar_writer_align>)
+    - `mem`: A pointer to the memory location where the TAR writer object will be initialized.
+    - `fd`: An integer representing the file descriptor for the TAR file to be written.
+- **Control Flow**:
+    - Check if the provided memory pointer is NULL and log a warning if so, returning NULL.
+    - Verify if the memory is properly aligned using `fd_tar_writer_align()` and log a warning if not, returning NULL.
+    - Cast the memory pointer to a `fd_tar_writer_t` pointer for further operations.
+    - Check if the file descriptor is valid (greater than 0) and log a warning if not, returning NULL.
+    - Attempt to truncate the file associated with the file descriptor to zero length and log a warning if it fails, returning NULL.
+    - Initialize the `fd_tar_writer_t` structure fields `fd`, `header_pos`, `data_sz`, and `wb_pos` to the file descriptor and `ULONG_MAX` respectively.
+    - Return the initialized `fd_tar_writer_t` pointer.
+- **Output**: A pointer to the initialized `fd_tar_writer_t` structure, or NULL if an error occurs during initialization.
+- **Functions called**:
+    - [`fd_tar_writer_align`](fd_tar.h.md#fd_tar_writer_align)
 
 
 ---
 ### fd\_tar\_writer\_delete<!-- {{#callable:fd_tar_writer_delete}} -->
-[View Source →](<../../../../../src/util/archive/fd_tar_writer.c#L55>)
-
-Writes two 512-byte zero-filled blocks to mark the end of a tar archive and returns the writer object.
+The `fd_tar_writer_delete` function finalizes a tar archive by writing two 512-byte blocks of zeros to mark the end of the archive and returns the writer object.
 - **Inputs**:
-    - `writer`: A pointer to an `fd_tar_writer_t` structure representing the tar writer.
-- **Logic and Control Flow**:
-    - Initialize `out_sz` to 0.
-    - Call `fd_io_write` to write the first 512-byte zero-filled block to the file descriptor in `writer`.
-    - Check if the write operation failed using `FD_UNLIKELY`; if it failed, log a warning and return `NULL`.
-    - Call `fd_io_write` again to write the second 512-byte zero-filled block to the file descriptor in `writer`.
-    - Check if the second write operation failed using `FD_UNLIKELY`; if it failed, log a warning and return `NULL`.
-    - Return the `writer` cast to a `void*`.
-- **Output**: Returns a `void*` pointing to the `writer` if successful, or `NULL` if an error occurs during writing.
+    - `writer`: A pointer to an `fd_tar_writer_t` structure representing the tar writer object.
+- **Control Flow**:
+    - Initialize `out_sz` to 0 and attempt to write a 512-byte block of zeros to the file descriptor in `writer` using `fd_io_write`.
+    - Check if the write operation failed using `FD_UNLIKELY`; if it did, log a warning and return `NULL`.
+    - Repeat the write operation for a second 512-byte block of zeros.
+    - Check again for failure of the second write operation; if it failed, log a warning and return `NULL`.
+    - If both writes succeed, return the `writer` object cast to a `void*`.
+- **Output**: Returns a `void*` pointing to the `writer` object if successful, or `NULL` if an error occurs during the write operations.
 
 
 ---
 ### fd\_tar\_writer\_new\_file<!-- {{#callable:fd_tar_writer_new_file}} -->
-[View Source →](<../../../../../src/util/archive/fd_tar_writer.c#L76>)
-
-Initializes a new file entry in a tar archive by writing a header with basic metadata.
+The `fd_tar_writer_new_file` function initializes a new file entry in a tar archive by writing a header with basic metadata to the file descriptor associated with the tar writer.
 - **Inputs**:
-    - `writer`: A pointer to an `fd_tar_writer_t` structure that manages the tar writing process.
-    - `file_name`: A constant character pointer to the name of the file to be added to the tar archive.
-- **Logic and Control Flow**:
-    - Get the current file position using `lseek` and store it in `header_pos`.
-    - Check if `header_pos` is valid and aligned to `FD_TAR_BLOCK_SZ`; if not, log a warning and return -1.
-    - Initialize a `fd_tar_meta_t` structure to zero and copy the `file_name` into the `name` field of the structure.
-    - Copy the default mode `0644`, magic version, and default checksum into the respective fields of the `fd_tar_meta_t` structure.
-    - Write the `fd_tar_meta_t` structure to the file using `fd_io_write` and check for errors; if any, log a warning and return -1.
-    - Verify that the written size matches `FD_TAR_BLOCK_SZ`; if not, log a warning and return -1.
-    - Reset the `data_sz` field of the `writer` to 0 to prepare for writing file data.
-- **Output**: Returns 0 on success, or -1 if an error occurs during the process.
+    - `writer`: A pointer to an `fd_tar_writer_t` structure, which manages the state of the tar writing process.
+    - `file_name`: A constant character pointer representing the name of the file to be added to the tar archive.
+- **Control Flow**:
+    - The function begins by obtaining the current file position using `lseek` and checks for errors.
+    - It verifies that the current position is aligned to the tar block size, logging a warning and returning -1 if not.
+    - A `fd_tar_meta_t` structure is initialized to zero, and the file name is copied into its `name` field.
+    - The file mode is set to a default value of 0644, and the tar magic version is copied into the `magic` field.
+    - A default checksum value is set in the `chksum` field, as required by the tar format.
+    - The header is written to the file using `fd_io_write`, and the function checks for errors and correct write size.
+    - If successful, the function resets the `data_sz` field of the writer to prepare for writing the file's data.
+- **Output**: Returns 0 on success, or -1 if any error occurs during the process, such as file position errors, alignment issues, or write failures.
 
 
 ---
 ### fd\_tar\_writer\_write\_file\_data<!-- {{#callable:fd_tar_writer_write_file_data}} -->
-[View Source →](<../../../../../src/util/archive/fd_tar_writer.c#L143>)
-
-Writes data to a tar file and updates the data size in the writer structure.
+The `fd_tar_writer_write_file_data` function writes a specified amount of data to a file descriptor associated with a tar writer and updates the data size field.
 - **Inputs**:
-    - ``writer``: A pointer to an `fd_tar_writer_t` structure that manages the tar writing process.
-    - ``data``: A pointer to the data to be written to the tar file.
-    - ``data_sz``: The size of the data to be written, in bytes.
-- **Logic and Control Flow**:
-    - Check if `writer->header_pos` is `ULONG_MAX`, indicating no tar header is available, and log a warning if true, then return -1.
-    - Call `fd_io_write` to write the data to the file descriptor in `writer`, and store the result in `out_sz`.
-    - If `fd_io_write` returns an error, log a warning with the error details and return -1.
-    - Check if `out_sz` is not equal to `data_sz`, log a warning if true, and return -1.
-    - Update `writer->data_sz` by adding `data_sz` to it.
+    - `writer`: A pointer to an `fd_tar_writer_t` structure, which contains information about the tar file being written.
+    - `data`: A pointer to the data to be written to the tar file.
+    - `data_sz`: The size of the data to be written, in bytes.
+- **Control Flow**:
+    - Check if the `header_pos` in the writer is set to `ULONG_MAX`, indicating no corresponding tar header, and log a warning if true, returning -1.
+    - Attempt to write the data to the file descriptor using `fd_io_write`, capturing the output size in `out_sz`.
+    - If the write operation fails, log a warning with the error details and return -1.
+    - Check if the actual written size `out_sz` does not match the expected `data_sz`, log a warning, and return -1 if they differ.
+    - Update the `data_sz` field in the writer by adding the size of the data written.
     - Return 0 to indicate success.
-- **Output**: Returns 0 on success, or -1 if an error occurs during the write operation.
+- **Output**: Returns 0 on successful data write, or -1 if an error occurs during the write operation or if there is no corresponding tar header.
 
 
 ---
 ### fd\_tar\_writer\_fini\_file<!-- {{#callable:fd_tar_writer_fini_file}} -->
-[View Source →](<../../../../../src/util/archive/fd_tar_writer.c#L171>)
-
-Finalizes the current file in a tar archive by padding it to the required alignment, updating the header with the file size and checksum, and resetting the writer state.
+The `fd_tar_writer_fini_file` function finalizes the writing of a file to a tar archive by padding it to the required alignment, updating the header with the file size and checksum, and resetting the writer state.
 - **Inputs**:
-    - `writer`: A pointer to an `fd_tar_writer_t` structure that manages the tar writing process.
-- **Logic and Control Flow**:
-    - Calculate the padding size needed to align the file to the tar block size (512 bytes).
-    - Write the padding to the file to meet the alignment requirement.
-    - Seek to the header position in the file to update the header information.
-    - Read the current header from the file into a `fd_tar_meta_t` structure.
-    - Update the header with the correct file size using [`fd_tar_meta_set_size`](<fd_tar.h.md#fd_tar_meta_set_size>).
-    - Calculate the checksum for the header and update the checksum field in the header.
-    - Write the updated header back to the file.
-    - Seek to the end of the file to prepare for the next file write.
-    - Reset the `header_pos` and `data_sz` fields in the `writer` structure to indicate no outstanding writes.
-- **Output**: Returns 0 on success, or -1 if an error occurs during any of the file operations.
-- **Functions Called**:
-    - [`fd_tar_meta_set_size`](<fd_tar.h.md#fd_tar_meta_set_size>)
+    - `writer`: A pointer to an `fd_tar_writer_t` structure representing the tar writer context, which includes file descriptor and metadata for the current file being written.
+- **Control Flow**:
+    - Calculate the padding needed to align the file size to the tar block size (512 bytes) and write this padding to the file.
+    - Check for errors during the padding write operation and log warnings if any occur.
+    - Seek to the header position of the file in the tar archive and read the existing header data into a `fd_tar_meta_t` structure.
+    - Verify the read operation and log warnings if it fails.
+    - Seek back to the header position to prepare for updating the header.
+    - Update the file size in the header using [`fd_tar_meta_set_size`](fd_tar.h.md#fd_tar_meta_set_size).
+    - Calculate the checksum for the header and update the checksum field in the header structure.
+    - Write the updated header back to the file and check for errors, logging warnings if necessary.
+    - Seek to the end of the file to prepare for writing the next file.
+    - Reset the `header_pos` and `data_sz` fields in the writer structure to indicate no outstanding writes.
+- **Output**: Returns 0 on success, or -1 if any error occurs during the process, with warnings logged for specific failures.
+- **Functions called**:
+    - [`fd_tar_meta_set_size`](fd_tar.h.md#fd_tar_meta_set_size)
 
 
 ---
 ### fd\_tar\_writer\_make\_space<!-- {{#callable:fd_tar_writer_make_space}} -->
-[View Source →](<../../../../../src/util/archive/fd_tar_writer.c#L268>)
-
-Ensures there is enough space in a tar file for additional data by extending the file size.
+The `fd_tar_writer_make_space` function extends the size of a tarball file to accommodate additional data by updating the file size and setting the write-back position.
 - **Inputs**:
-    - `writer`: A pointer to an `fd_tar_writer_t` structure that manages the tar file writing process.
-    - `data_sz`: The size of the data in bytes that needs to be accommodated in the tar file.
-- **Logic and Control Flow**:
-    - Checks if there is an outstanding write back position by verifying if `writer->wb_pos` is not `ULONG_MAX`; if so, logs a warning and returns -1.
-    - Uses `lseek` to find the current end of the file and stores it in `file_sz`; if `lseek` fails, logs a warning and returns -1.
-    - Attempts to extend the file size by `data_sz` using `ftruncate`; if it fails, logs a warning with error details and returns -1.
-    - Seeks to the new end of the file to verify the extension was successful; if the new size does not match the expected size, logs a warning and returns -1.
-    - Updates `writer->data_sz` with `data_sz` and `writer->wb_pos` with the original file size.
+    - `writer`: A pointer to an `fd_tar_writer_t` structure representing the tar writer context.
+    - `data_sz`: The size of the data (in bytes) for which space needs to be made in the tarball.
+- **Control Flow**:
+    - Check if there is an outstanding write-back position in the writer; if so, log a warning and return -1.
+    - Use `lseek` to find the current end of the file and store it in `file_sz`; if it fails, log a warning and return -1.
+    - Call `ftruncate` to extend the file size by `data_sz`; if it fails, log a warning and return -1.
+    - Use `lseek` again to verify the new end of the file matches the expected size; if not, log a warning and return -1.
+    - Update the writer's `data_sz` to `data_sz` and `wb_pos` to the original file size.
+    - Return 0 to indicate success.
 - **Output**: Returns 0 on success, or -1 if an error occurs during the process.
 
 
 ---
 ### fd\_tar\_writer\_fill\_space<!-- {{#callable:fd_tar_writer_fill_space}} -->
-[View Source →](<../../../../../src/util/archive/fd_tar_writer.c#L306>)
-
-Writes data to a specified position in a file and updates the write-back position.
+The `fd_tar_writer_fill_space` function writes data to a specified position in a file, ensuring the file pointer is correctly managed before and after the operation.
 - **Inputs**:
-    - ``writer``: A pointer to an `fd_tar_writer_t` structure that contains file descriptor and write-back position information.
-    - ``data``: A pointer to the data to be written to the file.
-    - ``data_sz``: The size of the data to be written, in bytes.
-- **Logic and Control Flow**:
-    - Check if `writer->wb_pos` is `ULONG_MAX`, indicating no outstanding write-back position, and return -1 if true.
-    - Seek to the end of the file to get the current end-of-file position (`eof_pos`).
-    - Seek to the write-back position (`writer->wb_pos`) in the file.
-    - Write the specified data to the file at the write-back position.
-    - Check if the write operation was successful and if the written size matches `data_sz`; return -1 if not.
-    - Reset `writer->wb_pos` to `ULONG_MAX` to indicate no outstanding write-back position.
-    - Seek back to the end of the file to ensure the file pointer is correctly positioned.
-- **Output**: Returns 0 on success, or -1 if an error occurs during any of the operations.
+    - `writer`: A pointer to an `fd_tar_writer_t` structure, which contains information about the file descriptor and write-back position.
+    - `data`: A constant pointer to the data to be written into the file.
+    - `data_sz`: The size of the data to be written, in bytes.
+- **Control Flow**:
+    - Check if there is an outstanding write-back position in the writer; if not, log a warning and return -1.
+    - Seek to the end of the file to get the current end-of-file position; if this fails, log a warning and return -1.
+    - Seek to the write-back position specified in the writer; if this fails, log a warning and return -1.
+    - Attempt to write the specified data to the file at the write-back position; if this fails or the written size does not match the data size, log a warning and return -1.
+    - Reset the write-back position in the writer to `ULONG_MAX` to indicate no outstanding write-back position.
+    - Seek to the end of the file again to ensure the file pointer is correctly positioned; if this fails, log a warning and return -1.
+    - Return 0 to indicate success.
+- **Output**: Returns 0 on success, or -1 on failure, with warnings logged for any errors encountered.
 
 
 
