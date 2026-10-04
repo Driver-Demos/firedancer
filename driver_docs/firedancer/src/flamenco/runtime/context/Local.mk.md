@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile directives for adding headers and objects related to transaction, instruction, and capture contexts.
+Build rules for fd_exec_txn_ctx, fd_exec_instr_ctx, and fd_capture_ctx when FD_HAS_INT128 is set.
 
 # Purpose
-This Makefile snippet conditionally includes headers and object files for compilation if the `FD_HAS_INT128` macro is defined. It uses the `add-hdrs` and `add-objs` functions to add the headers `fd_exec_txn_ctx.h`, `fd_exec_instr_ctx.h`, and `fd_capture_ctx.h`, and their corresponding object files `fd_exec_txn_ctx`, `fd_exec_instr_ctx`, and `fd_capture_ctx` to the `fd_flamenco` target. This setup ensures that these components are only included when the system supports 128-bit integers.
+This Makefile fragment adds header files and object files for `fd_exec_txn_ctx`, `fd_exec_instr_ctx`, and `fd_capture_ctx` to the `fd_flamenco` build when `FD_HAS_INT128` is defined. It uses `add-hdrs` and `add-objs` to include the related source artifacts only under that build condition.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

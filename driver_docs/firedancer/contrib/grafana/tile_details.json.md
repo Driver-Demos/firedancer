@@ -3,30 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for a Grafana dashboard displaying Firedancer tile details with Prometheus data sources.
+Grafana dashboard JSON for tile busy percentage by regime.
 
 # Purpose
-This JSON file configures a Grafana dashboard, which is a tool for visualizing and monitoring data. The file defines various components of the dashboard, including annotations, panels, and templating variables. Annotations are used to mark specific events on the dashboard, and the file specifies that these annotations are built-in and linked to a Grafana datasource. The panels section configures a timeseries panel that uses Prometheus as a datasource, with detailed settings for field configurations, grid positions, and data transformations. The templating section defines variables that allow dynamic querying of Prometheus data, enabling users to filter and customize the displayed data based on specific criteria such as `instance`, `tile`, and `tile_idx`. The file also includes metadata such as the dashboard's title, timezone, and unique identifier, which are essential for managing and displaying the dashboard within Grafana.
-# Content Summary
-This JSON configuration file is for a Grafana dashboard titled "Firedancer Tile Details." It contains several key components that define the dashboard's structure and functionality.
-
-1. **Annotations**: The file includes a built-in annotation for "Annotations & Alerts" with a Grafana datasource. This annotation is enabled and hidden, with a specified icon color.
-
-2. **Dashboard Properties**: The dashboard is editable, with a fiscal year starting in January (month 0). The graph tooltip mode is set to 0, and the dashboard has an ID of 4261. The schema version is 39, and the dashboard is set to refresh automatically.
-
-3. **Panels**: There is a single panel of type "timeseries" with the title "Tile Avg Busy %." The panel uses a Prometheus datasource and includes detailed field configurations such as color mode, axis settings, and thresholds. The panel's grid position is defined, and it includes options for legend display and tooltip mode.
-
-4. **Targets**: The panel targets a Prometheus datasource with a specific query expression to calculate the rate of "tile_regime_duration_nanos." The query uses variables for instance, kind, and kind_id, and the results are formatted with a legend.
-
-5. **Transformations**: The panel applies a transformation to filter fields by name, including specific fields like "Time" and various "backpressure" and "processing" metrics.
-
-6. **Templating**: The dashboard includes several template variables for dynamic querying. These variables are linked to a Prometheus datasource and include "datasource," "instance," "tile," and "tile_idx." Each variable has a query definition and refresh settings.
-
-7. **Time Settings**: The dashboard's time range is set from "now-6h" to "now," and the timezone is specified as "America/Chicago."
-
-8. **Metadata**: The dashboard has a unique identifier (uid) of "ceohdkvph4jcwf" and is at version 10. There are no tags or links specified.
-
-This configuration file provides a comprehensive setup for a Grafana dashboard, allowing for dynamic data visualization and interaction with Prometheus data sources.
+This JSON file defines a Grafana dashboard named `Firedancer Tile Details` for monitoring Prometheus metrics over time. It uses template variables such as `datasource`, `instance`, `tile`, and `tile_idx` to let the user select a target system and a specific tile before the panel query runs. The main time series panel, `Tile Avg Busy %`, calculates the share of `tile_regime_duration_nanos` spent in each tile regime and displays the result as a percent unit with a legend for regimes such as `backpressure_housekeeping`, `processing_prefrag`, and `processing_postfrag`. The dashboard also sets the default time range to the last 6 hours, enables annotations, and stores display settings such as legend placement, tooltip mode, and field formatting for consistent visualization.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

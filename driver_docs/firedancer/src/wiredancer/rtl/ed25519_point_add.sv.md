@@ -3,51 +3,48 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements an ED25519 point addition module using modular arithmetic operations in SystemVerilog.
+The `ed25519_point_add.sv` file implements a hardware module for performing point addition on the Ed25519 elliptic curve using modular arithmetic operations in the Firedancer codebase.
 
 # Purpose
-The `ed25519_point_add` module implements point addition for the Ed25519 elliptic curve, which is commonly used in cryptographic applications. This module takes two points on the curve, represented by their coordinates (`in0_x`, `in0_y`, `in0_z`, `in0_t` and `in1_x`, `in1_y`, `in1_z`, `in1_t`), and computes their sum, outputting the resulting point's coordinates (`out0_x`, `out0_y`, `out0_z`, `out0_t`). The module uses modular arithmetic operations such as addition, subtraction, and multiplication, which are defined using macros (`ADD`, `SUB`, `MUL`) for operations over a 255-bit field. The module also employs pipelining (`PIP`) to manage data flow and improve performance.
+The provided Verilog code defines a module named `ed25519_point_add`, which is designed to perform point addition on elliptic curves using the Ed25519 algorithm. This module is a specialized component that implements arithmetic operations over a finite field, specifically tailored for the Ed25519 curve, which is widely used in cryptographic applications for its high security and performance. The module takes in two points on the curve, represented by their coordinates (x, y, z, t), and outputs the result of their addition. The operations are performed using modular arithmetic, with the help of parameterized submodules for addition, subtraction, and multiplication, as well as pipelining for efficient data processing.
 
-The module is parameterized with several constants, such as `T`, `D_M`, `D_A`, `D_S`, and `M`, which control various aspects of the computation, including timing and data width. The use of pipelining and modular arithmetic operations suggests that the module is designed for efficient hardware implementation, likely targeting FPGA or ASIC platforms. The `ed25519_point_add` module is a specialized component that fits into a larger cryptographic system, providing the specific functionality of point addition on the Ed25519 curve.
+The code utilizes macros to define and instantiate these arithmetic operations, ensuring that the operations are modular and reusable. The use of parameters such as `T`, `D_M`, `D_A`, and `D_S` allows for flexibility in configuring the module's behavior, particularly in terms of timing and resource usage. The module is structured to maintain a clear hierarchy, as indicated by the `keep_hierarchy` attribute, which aids in synthesis and optimization processes. Overall, this code provides a focused implementation of a cryptographic primitive, serving as a building block for higher-level cryptographic protocols and systems that require secure and efficient elliptic curve operations.
 # Modules
 
 ---
 ### ed25519\_point\_add
-Performs point addition on the Ed25519 elliptic curve using modular arithmetic operations. The module takes two input points and produces an output point as a result of the addition.
+The `ed25519_point_add` module performs point addition on the Ed25519 elliptic curve, using modular arithmetic operations. It takes two input points and produces an output point, utilizing pipelined operations for efficiency.
 - **Constants**:
-    - ``T``: A 32-bit constant used in the module, with a default value of `32'h007F_CCC2`.
-    - ``D_M``: A constant parameter with a value of 15, used in pipelining operations.
-    - ``D_A``: A constant parameter with a value of 4, used in pipelining operations.
-    - ``D_S``: A constant parameter with a value of 2, used in pipelining operations.
-    - ``CT``: A 4-bit slice of `T`, used in the module.
-    - ``ST``: A shifted version of `T`, used in the module.
-    - ``R_I``: A constant parameter with a value of 0, used in the module.
-    - ``M``: A constant parameter with a value of 128, used for the width of certain input and output ports.
+    - `T`: A 32-bit constant used for configuration, set to 32'h007F_CCC2.
+    - `D_M`: A constant parameter set to 15, used in pipelining depth calculations.
+    - `D_A`: A constant parameter set to 4, used in pipelining depth calculations.
+    - `D_S`: A constant parameter set to 2, used in pipelining depth calculations.
+    - `CT`: A 4-bit slice of T, used for configuration.
+    - `ST`: A shifted version of T, used for configuration.
+    - `R_I`: A constant parameter set to 0, possibly used for reset or initialization.
+    - `M`: A constant parameter set to 128, used for the width of certain input and output ports.
 - **Ports**:
-    - ``clk``: Clock signal input for synchronization.
-    - ``rst``: Reset signal input to initialize the module.
-    - ``in0_x``: X-coordinate of the first input point.
-    - ``in0_y``: Y-coordinate of the first input point.
-    - ``in0_z``: Z-coordinate of the first input point.
-    - ``in0_t``: T-coordinate of the first input point.
-    - ``in1_x``: X-coordinate of the second input point.
-    - ``in1_y``: Y-coordinate of the second input point.
-    - ``in1_z``: Z-coordinate of the second input point.
-    - ``in1_t``: T-coordinate of the second input point.
-    - ``out0_x``: X-coordinate of the output point.
-    - ``out0_y``: Y-coordinate of the output point.
-    - ``out0_z``: Z-coordinate of the output point.
-    - ``out0_t``: T-coordinate of the output point.
-    - ``m_i``: Input mask of width `M`.
-    - ``m_o``: Output mask of width `M`.
-- **Logic and Control Flow**:
-    - Defines intermediate logic variables for storing results of arithmetic operations.
-    - Uses macros `ADD`, `SUB`, `MUL`, and `PIP` to perform modular addition, subtraction, multiplication, and pipelining respectively.
-    - Calculates intermediate results such as `R1_s`, `R2_s`, `R3_a`, `R4_a` using subtraction and addition of input coordinates.
-    - Performs multiplication on intermediate results to compute `R5_sm`, `R6_am`, `R7_m`, `R8_m`, and `R9_mm`.
-    - Applies pipelining to intermediate results using the `PIP` macro to manage data flow and timing.
-    - Computes final output coordinates `out0_x`, `out0_y`, `out0_z`, and `out0_t` using modular multiplication of pipelined results.
-    - Processes the input mask `m_i` through pipelining to produce the output mask `m_o`.
+    - `clk`: Clock input for synchronizing operations.
+    - `rst`: Reset input to initialize or reset the module.
+    - `in0_x`: X-coordinate of the first input point.
+    - `in0_y`: Y-coordinate of the first input point.
+    - `in0_z`: Z-coordinate of the first input point.
+    - `in0_t`: T-coordinate of the first input point.
+    - `in1_x`: X-coordinate of the second input point.
+    - `in1_y`: Y-coordinate of the second input point.
+    - `in1_z`: Z-coordinate of the second input point.
+    - `in1_t`: T-coordinate of the second input point.
+    - `out0_x`: X-coordinate of the output point.
+    - `out0_y`: Y-coordinate of the output point.
+    - `out0_z`: Z-coordinate of the output point.
+    - `out0_t`: T-coordinate of the output point.
+    - `m_i`: Input for additional modular arithmetic operations, width M.
+    - `m_o`: Output for additional modular arithmetic operations, width M.
+- **Logic And Control Flow**:
+    - The module uses macros `ADD`, `SUB`, `MUL`, and `PIP` to perform modular addition, subtraction, multiplication, and pipelining, respectively.
+    - Intermediate results are stored in logic variables such as R1_s, R2_s, R3_a, etc., which are used in subsequent operations.
+    - The module performs a series of arithmetic operations to compute the output coordinates of the resulting point from the input points.
+    - Pipelining is used to manage data flow and ensure efficient processing of operations, with specific depth calculations based on constants D_M, D_A, and D_S.
 
 
 

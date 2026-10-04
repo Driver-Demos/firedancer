@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for `fd_scratch` in the `firedancer` codebase.
+The `Local.mk` file in the `firedancer` codebase is a makefile script that adds headers and objects for `fd_scratch`, creates a unit test for `test_scratch`, and runs the unit test.
 
 # Purpose
-The `Makefile` content defines build and test instructions for a software project. It adds the header file `fd_scratch.h` and object files `fd_scratch` and `fd_util` to the build process. It also specifies a unit test named `test_scratch`, which depends on `fd_util`, and includes a command to run this unit test.
+The file is a Makefile snippet used for building and testing a software component. It adds the header file `fd_scratch.h` and object files `fd_scratch` and `fd_util` to the build process. It also defines and executes a unit test named `test_scratch`, which depends on `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

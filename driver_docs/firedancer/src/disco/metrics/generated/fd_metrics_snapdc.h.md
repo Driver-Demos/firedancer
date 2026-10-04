@@ -3,26 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines gauge metrics for monitoring the state and byte counts of snapshot files in the SnapDC system.
+Generated metric definitions for snapdc state and snapshot byte-read gauges.
 
 # Purpose
-This C header file defines a set of metrics related to the state and data processing of a system component referred to as "snapdc." The file is automatically generated and should not be manually edited. It includes definitions for several gauge metrics, each with an associated offset, name, type, description, and conversion type. These metrics track various states and data read operations, such as the state of a tile and the number of bytes read from compressed and decompressed snapshot files. The file also declares an external array `FD_METRICS_SNAPDC` that holds metadata for these metrics, with a total count defined by `FD_METRICS_SNAPDC_TOTAL`. The header includes other necessary headers, `fd_metrics_base.h` and `fd_metrics_enums.h`, to support these definitions.
-# Imports and Dependencies
-
----
-- `../fd_metrics_base.h`
-- `fd_metrics_enums.h`
-
-
-# Global Variables
-
----
-### FD\_METRICS\_SNAPDC
-- **Type**: ``fd_metrics_meta_t[]``
-- **Description**: An array of `fd_metrics_meta_t` structures that contains metadata for various metrics related to the snapshot decompression process. Each element in the array corresponds to a specific metric, such as the state of the tile or the number of bytes read from snapshot files.
-- **Use**: Used to store and provide access to metadata for snapshot decompression metrics.
-
-
+This generated header defines metric metadata for the `snapdc` component and exposes it as compile-time constants for use by the metrics system. Each `FD_METRICS_GAUGE_*` macro gives the metric offset, name, type, description, and converter for one gauge, including `snapdc_state` and byte counters for full and incremental snapshot reads. The file also declares `FD_METRICS_SNAPDC` as an external array of `fd_metrics_meta_t` entries and sets `FD_METRICS_SNAPDC_TOTAL` to the number of metrics in the group. Its role in the codebase is to provide a fixed, generated description of snapshot download and decode metrics so other code can register, read, and report them in a consistent way.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
