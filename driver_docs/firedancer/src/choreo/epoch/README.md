@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and structures for epoch management, and Makefile logic for 128-bit integer support.
+Epoch lifecycle, voter map layout, and conditional build settings.
 
 
 ## Files
-- **[fd_epoch.c](fd_epoch.c.md)**: Functions for managing epoch data structures, including creation, joining, leaving, deletion, initialization, and finalization.
-- **[fd_epoch.h](fd_epoch.h.md)**: Defines structures and functions for managing epochs, including memory management and voter handling.
-- **[Local.mk](Local.mk.md)**: Makefile logic to add headers and objects if 128-bit integer support is available.
+- **[fd_epoch.c](fd_epoch.c.md)**: Epoch lifecycle and voter initialization functions with workspace and alignment checks.
+- **[fd_epoch.h](fd_epoch.h.md)**: Epoch state and voter map layout, lifecycle, and access helpers.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and objects related to `fd_epoch` and `fd_choreo` based on the presence of 128-bit integer support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
