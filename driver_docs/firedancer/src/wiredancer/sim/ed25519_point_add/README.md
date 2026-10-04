@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile and Cocotb-based test for simulating and verifying ED25519 point addition in hardware.
+The `ed25519_point_add` folder in the `firedancer` codebase contains a `Makefile` for simulating the ED25519 point addition module using Verilog and Questa, and a `test.py` script for verifying the module's functionality with cocotb.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: Makefile for simulating the `ed25519_point_add` module using Verilog sources and Cocotb.
-- **[test.py](test.py.md)**: A cocotb-based test for verifying the ED25519 point addition implementation in a hardware design.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/ed25519_point_add` directory is configured to simulate the `ed25519_point_add` module using Verilog sources and the Questa simulator.
+- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase is a cocotb-based test script for verifying the functionality of an ED25519 point addition module by comparing hardware outputs with reference software calculations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

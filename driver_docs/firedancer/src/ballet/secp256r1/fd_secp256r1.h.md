@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-APIs for SECP256r1 signature verification, including a function to verify signatures.
+The `fd_secp256r1.h` file provides APIs for verifying secp256r1 signatures, including a function to verify a signature using a message, signature, public key, and SHA-256 context.
 
 # Purpose
-This C header file defines the interface for verifying SECP256r1 signatures. It includes necessary dependencies from `fd_ballet_base.h` and `fd_sha256.h` to support its functionality. The file defines two macros, `FD_SECP256R1_SUCCESS` and `FD_SECP256R1_FAILURE`, to indicate the result of the signature verification process. The primary function declared is [`fd_secp256r1_verify`](<#fd_secp256r1_verify>), which takes a message, its size, a signature, a public key, and a SHA-256 context as inputs to verify the signature. The use of `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` suggests a structured approach to function declarations within the file.
+This code is a C header file that defines an interface for verifying digital signatures using the SECP256r1 elliptic curve. It includes necessary dependencies, such as a base header and a SHA-256 hashing module, which are likely used in the signature verification process. The file defines two macros, `FD_SECP256R1_SUCCESS` and `FD_SECP256R1_FAILURE`, to indicate the outcome of the verification process. The primary function declared is [`fd_secp256r1_verify`](#fd_secp256r1_verify), which takes a message, its size, a signature, a public key, and a SHA-256 context as parameters, and returns an integer indicating success or failure. This header is part of a larger cryptographic library, providing a specific API for SECP256r1 signature verification.
 # Imports and Dependencies
 
 ---
@@ -18,18 +18,16 @@ This C header file defines the interface for verifying SECP256r1 signatures. It 
 
 ---
 ### fd\_secp256r1\_verify<!-- {{#callable_declaration:fd_secp256r1_verify}} -->
-[View Source →](<../../../../../src/ballet/secp256r1/fd_secp256r1.h#L12>)
-
-Verifies a SECP256r1 signature.
-- **Description**: Use this function to verify a digital signature using the SECP256r1 elliptic curve. It requires the message, its size, the signature, the public key, and a SHA-256 context. Ensure that the signature and public key are correctly formatted and that the SHA-256 context is initialized. The function returns a success or failure code based on the validity of the signature.
+Verify a SECP256r1 signature for a given message.
+- **Description**: Use this function to verify the authenticity of a message using the SECP256r1 elliptic curve digital signature algorithm. It requires the message, its size, the signature, the public key, and a SHA-256 context. The function checks the validity of the signature against the provided public key and message, returning a success or failure code. Ensure that the signature and public key are correctly formatted and that the SHA-256 context is properly initialized before calling this function.
 - **Inputs**:
-    - `msg`: Pointer to the message data to verify. The caller retains ownership and must ensure it is not null.
-    - `msg_sz`: Size of the message in bytes. Must accurately represent the length of the message data.
-    - `sig`: Pointer to a 64-byte array containing the signature. Must not be null and must be correctly formatted.
-    - `public_key`: Pointer to a 33-byte array containing the public key. Must not be null and must be correctly formatted.
-    - `sha`: Pointer to an initialized SHA-256 context. Must not be null and should be prepared for hashing operations.
-- **Output**: Returns `FD_SECP256R1_SUCCESS` if the signature is valid, otherwise returns `FD_SECP256R1_FAILURE`.
-- **See Also**: [`fd_secp256r1_verify`](<fd_secp256r1.c.md#fd_secp256r1_verify>)  (Implementation)
+    - `msg`: A pointer to the message data to be verified. The caller retains ownership and it must not be null.
+    - `msg_sz`: The size of the message in bytes. It must accurately reflect the length of the message data.
+    - `sig`: A 64-byte array containing the signature to verify. It must be a valid signature for the message and public key.
+    - `public_key`: A 33-byte array containing the public key used for verification. It must be a valid SECP256r1 public key.
+    - `sha`: A pointer to an fd_sha256_t structure used for SHA-256 operations. It must be initialized before calling this function.
+- **Output**: Returns FD_SECP256R1_SUCCESS (1) if the signature is valid, or FD_SECP256R1_FAILURE (0) if it is not.
+- **See also**: [`fd_secp256r1_verify`](fd_secp256r1.c.md#fd_secp256r1_verify)  (Implementation)
 
 
 
