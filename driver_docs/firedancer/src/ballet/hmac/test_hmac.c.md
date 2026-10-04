@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_hmac.c` file in the `firedancer` codebase contains test cases for verifying the correctness of HMAC implementations using SHA-256, SHA-384, and SHA-512 algorithms against predefined test vectors.
+Tests HMAC implementations using SHA-256, SHA-384, and SHA-512 with predefined test vectors.
 
 # Purpose
-This C source code file is an executable program designed to test the implementation of HMAC (Hash-based Message Authentication Code) using SHA-256, SHA-384, and SHA-512 hash functions. The file includes necessary headers for HMAC and SHA implementations and defines a structure `fd_hmac_test_vector` to hold test vectors, which consist of keys, messages, and expected hash outputs. The test vectors are based on RFC 2104, a standard for HMAC, and are used to verify the correctness of the HMAC implementations for each SHA variant.
+The code is a C program designed to test the implementation of HMAC (Hash-based Message Authentication Code) using SHA-256, SHA-384, and SHA-512 hash functions. It includes test vectors defined according to RFC 2104, which are used to verify the correctness of the HMAC functions. The program imports necessary headers for HMAC and SHA functions and defines a structure `fd_hmac_test_vector_t` to store test vectors, including keys, messages, and expected hash outputs.
 
-The main function iterates over predefined test vectors for each SHA variant, computes the HMAC for each vector, and compares the computed hash with the expected hash. If the computed hash does not match the expected hash, an error is logged. The program uses macros for logging and testing, such as `FD_TEST`, `FD_LOG_ERR`, and `FD_LOG_INFO`, to provide feedback on the test results. The file is structured to ensure that each HMAC variant is tested independently, and it logs a success message if all tests pass. This file is crucial for validating the integrity and correctness of the HMAC implementations in the broader software system.
+The [`main`](<#main>) function initializes the test environment and iterates over predefined test vectors for each HMAC variant (SHA-256, SHA-384, and SHA-512). For each test vector, it computes the HMAC of the message using the specified key and compares the result with the expected hash. If the computed hash does not match the expected hash, an error is logged. The program logs success messages for each HMAC variant if all tests pass and concludes with a notice indicating that all tests have passed. The program is structured to be executed as a standalone application, with the primary purpose of validating the HMAC implementations.
 # Imports and Dependencies
 
 ---
@@ -22,74 +22,72 @@ The main function iterates over predefined test vectors for each SHA variant, co
 ---
 ### fd\_hmac\_sha256\_test\_vector
 - **Type**: ``fd_hmac_test_vector_t const[]``
-- **Description**: The `fd_hmac_sha256_test_vector` is a static constant array of `fd_hmac_test_vector_t` structures, each containing test vectors for HMAC-SHA256 as defined in RFC 2104. Each element in the array includes a key, a message, and the expected hash result for the HMAC-SHA256 operation.
-- **Use**: This variable is used to store predefined test vectors for validating the correctness of the HMAC-SHA256 implementation.
+- **Description**: An array of HMAC test vectors for SHA-256, defined as a constant array of `fd_hmac_test_vector_t` structures. Each element in the array contains a key, a message, and the expected hash result, based on RFC 2104 test vectors.
+- **Use**: Used to verify the correctness of the HMAC-SHA256 implementation by comparing computed hashes against expected values.
 
 
 ---
 ### fd\_hmac\_sha384\_test\_vector
-- **Type**: `fd_hmac_test_vector_t const[]`
-- **Description**: The `fd_hmac_sha384_test_vector` is an array of `fd_hmac_test_vector_t` structures, each containing test vectors for HMAC-SHA384 as specified in RFC 2104. Each element in the array includes a key, message, and the expected hash result for the HMAC-SHA384 operation.
-- **Use**: This variable is used to validate the correctness of the HMAC-SHA384 implementation by comparing computed hash results against expected values.
+- **Type**: ``fd_hmac_test_vector_t` array`
+- **Description**: Contains test vectors for HMAC-SHA384, defined as an array of `fd_hmac_test_vector_t` structures. Each element in the array includes a key, message, and expected hash value, which are used to verify the correctness of the HMAC-SHA384 implementation.
+- **Use**: Used to validate the HMAC-SHA384 function by comparing computed hash values against expected results.
 
 
 ---
 ### fd\_hmac\_sha512\_test\_vector
 - **Type**: ``fd_hmac_test_vector_t const[]``
-- **Description**: The `fd_hmac_sha512_test_vector` is an array of `fd_hmac_test_vector_t` structures, each containing test vectors for HMAC-SHA512 as defined by RFC 2104. Each element in the array includes a key, message, and the expected hash result for the HMAC-SHA512 operation. The array is terminated by a zero-initialized structure to indicate the end of the test vectors.
-- **Use**: This variable is used to provide test vectors for validating the correctness of the HMAC-SHA512 implementation.
+- **Description**: An array of HMAC test vectors for the SHA-512 algorithm, each containing a key, message, and expected hash result. The test vectors are based on RFC 2104 and are used to verify the correctness of the HMAC-SHA512 implementation.
+- **Use**: Used to validate the HMAC-SHA512 function by comparing computed hashes against expected values.
 
 
 # Data Structures
 
 ---
 ### fd\_hmac\_test\_vector
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `key`: A pointer to a constant character array representing the HMAC key.
-    - `key_sz`: An unsigned long representing the size of the HMAC key.
-    - `msg`: A pointer to a constant character array representing the message to be hashed.
-    - `msg_sz`: An unsigned long representing the size of the message.
-    - `hash`: An array of unsigned characters storing the resulting hash, with a fixed size of 64 bytes.
-- **Description**: The `fd_hmac_test_vector` structure is designed to hold test vectors for HMAC (Hash-based Message Authentication Code) operations. It contains fields for the key and message, along with their respective sizes, and a buffer to store the resulting hash. This structure is used to verify the correctness of HMAC implementations by comparing computed hashes against expected values.
+    - `key`: Pointer to a constant character array representing the HMAC key.
+    - `key_sz`: Size of the HMAC key in bytes.
+    - `msg`: Pointer to a constant character array representing the message to hash.
+    - `msg_sz`: Size of the message in bytes.
+    - `hash`: Array of unsigned characters storing the resulting hash, with a fixed size of 64 bytes.
+- **Description**: Defines a structure for storing test vectors used in HMAC (Hash-based Message Authentication Code) operations, including the key, message, and expected hash result.
 
 
 ---
 ### fd\_hmac\_test\_vector\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `key`: A pointer to a constant character array representing the HMAC key.
-    - `key_sz`: An unsigned long integer representing the size of the HMAC key.
-    - `msg`: A pointer to a constant character array representing the message to be hashed.
-    - `msg_sz`: An unsigned long integer representing the size of the message.
-    - `hash`: An array of unsigned characters storing the resulting hash, with a fixed size of 64 bytes.
-- **Description**: The `fd_hmac_test_vector_t` structure is designed to hold test vectors for HMAC (Hash-based Message Authentication Code) operations. It contains fields for the key and message, along with their respective sizes, and a field for the expected hash result. This structure is used to verify the correctness of HMAC implementations by comparing computed hashes against known expected values.
+    - `key`: Pointer to a constant character array representing the HMAC key.
+    - `key_sz`: Size of the HMAC key in bytes.
+    - `msg`: Pointer to a constant character array representing the message to hash.
+    - `msg_sz`: Size of the message in bytes.
+    - `hash`: Array of unsigned characters storing the resulting hash value.
+- **Description**: Defines a structure for storing test vectors used in HMAC (Hash-based Message Authentication Code) operations, including the key, message, and expected hash result. This structure is used to verify the correctness of HMAC implementations by comparing computed hash values against known test vectors.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, performs HMAC-SHA256, HMAC-SHA384, and HMAC-SHA512 tests using predefined test vectors, and logs the results.
+[View Source →](<../../../../../src/ballet/hmac/test_hmac.c#L80>)
+
+Executes HMAC-SHA256, HMAC-SHA384, and HMAC-SHA512 tests using predefined test vectors and logs the results.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Declare a 64-byte aligned array `hash` to store the computed hash values.
-    - Iterate over `fd_hmac_sha256_test_vector` to perform HMAC-SHA256 tests:
-    -   - Extract key, key size, message, message size, and expected hash from the test vector.
-    -   - Compute the HMAC-SHA256 hash using `fd_hmac_sha256` and compare it with the expected hash.
-    -   - Log an error if the computed hash does not match the expected hash.
-    - Log success message for HMAC-SHA256 tests if all tests pass.
-    - Iterate over `fd_hmac_sha384_test_vector` to perform HMAC-SHA384 tests following similar steps as HMAC-SHA256.
-    - Log success message for HMAC-SHA384 tests if all tests pass.
-    - Iterate over `fd_hmac_sha512_test_vector` to perform HMAC-SHA512 tests following similar steps as HMAC-SHA256.
-    - Log success message for HMAC-SHA512 tests if all tests pass.
-    - Log a notice indicating all tests passed.
-    - Call `fd_halt` to clean up and terminate the program.
-    - Return 0 to indicate successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Declares a 64-byte aligned array `hash` to store the computed hash values.
+    - Iterates over `fd_hmac_sha256_test_vector`, `fd_hmac_sha384_test_vector`, and `fd_hmac_sha512_test_vector` to perform HMAC tests for SHA-256, SHA-384, and SHA-512 respectively.
+    - For each test vector, extracts the key, message, and expected hash values.
+    - Computes the HMAC using `fd_hmac_sha256`, `fd_hmac_sha384`, or `fd_hmac_sha512` and stores the result in `hash`.
+    - Compares the computed hash with the expected hash using `memcmp`.
+    - Logs an error message and exits if the computed hash does not match the expected hash.
+    - Logs a success message for each hash type if all tests pass.
+    - Logs a final notice message indicating all tests passed.
+    - Calls `fd_halt` to clean up and terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 

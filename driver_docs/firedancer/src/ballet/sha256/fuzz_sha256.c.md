@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fuzz_sha256.c` file in the `firedancer` codebase implements a fuzz testing framework for the SHA-256 hashing algorithm, supporting both single message and batch hashing operations.
+Fuzz testing for SHA-256 hashing functions with single and batch message processing.
 
 # Purpose
-This C source code file is designed to perform fuzz testing on the SHA-256 hashing functionality. It is structured to be used with a fuzzing framework, as indicated by the presence of the [`LLVMFuzzerInitialize`](#llvmfuzzerinitialize) and [`LLVMFuzzerTestOneInput`](#llvmfuzzertestoneinput) functions, which are standard entry points for fuzz testing in LLVM's libFuzzer. The code includes functionality for both single message hashing and batch message hashing using the SHA-256 algorithm. It initializes the necessary data structures and performs hashing operations, ensuring that the computed hashes match expected results. The code also includes assertions to verify the correctness of the hashing process, which helps in identifying any discrepancies during fuzz testing.
+This code is a fuzz testing suite for the SHA-256 hashing algorithm. It is designed to test the robustness and correctness of the SHA-256 implementation by using fuzzing techniques. The code includes the necessary headers and checks for the `FD_HAS_HOSTED` macro to ensure that the target environment supports hosted execution. It initializes the fuzzing environment with [`LLVMFuzzerInitialize`](<#llvmfuzzerinitialize>), which sets up the logging and signal handling environment, and registers a cleanup function to be called at program exit.
 
-The file imports several utility headers and defines constants and static variables to manage the hashing process. It uses the `fd_sha256` and `fd_sha256_batch` functions from the `fd_sha256.h` header to perform the hashing operations. The code is not intended to be a standalone executable but rather a component of a larger testing framework. It does not define public APIs or external interfaces but instead focuses on internal testing of the SHA-256 implementation. The use of assertions and the `FD_FUZZ_MUST_BE_COVERED` macro suggests a focus on ensuring code coverage and robustness during fuzz testing.
+The main function, [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>), processes input data by hashing it using the SHA-256 algorithm. It performs both single message hashing and batch message hashing. For single message hashing, it initializes a SHA-256 context, appends the input data, and finalizes the hash, ensuring that the computed hash matches the expected result. For batch hashing, the input data is divided into multiple messages, each hashed separately, and the results are verified against reference hashes. The code uses assertions to validate the correctness of each step, and it includes macros like `FD_FUZZ_MUST_BE_COVERED` to ensure that all code paths are exercised during fuzz testing.
 # Imports and Dependencies
 
 ---
@@ -24,100 +24,102 @@ The file imports several utility headers and defines constants and static variab
 
 ---
 ### batch\_sha
-- **Type**: `fd_sha256_batch_t[1]`
-- **Description**: The `batch_sha` variable is a static array of type `fd_sha256_batch_t` with a single element. It is used to manage the state of a batch SHA-256 hashing operation.
-- **Use**: This variable is used to initialize, add messages to, and finalize a batch SHA-256 hashing process.
+- **Type**: ``fd_sha256_batch_t` array`
+- **Description**: `batch_sha` is a static array of type `fd_sha256_batch_t` with a size of 1. It is used to store the state for batch processing of SHA-256 hashes.
+- **Use**: Used to initialize, add messages to, and finalize a batch of SHA-256 hash computations.
 
 
 ---
 ### hash1
-- **Type**: `uchar array`
-- **Description**: The `hash1` variable is a static array of unsigned characters with a size defined by `FD_SHA256_HASH_SZ`, which represents the size of a SHA-256 hash. It is used to store the result of a SHA-256 hash operation.
-- **Use**: `hash1` is used to store the hash result of a single message processed by the `fd_sha256_fini` function.
+- **Type**: ``uchar` array`
+- **Description**: `hash1` is a static array of unsigned characters with a size defined by `FD_SHA256_HASH_SZ`. It stores the result of a SHA-256 hash operation.
+- **Use**: Used to store the hash output of a single message processed by the `fd_sha256_fini` function.
 
 
 ---
 ### hash2
-- **Type**: `uchar array`
-- **Description**: `hash2` is a static array of unsigned characters with a size defined by `FD_SHA256_HASH_SZ`, which represents the size of a SHA-256 hash. It is used to store the result of a SHA-256 hash operation.
-- **Use**: `hash2` is used to store the hash result of a single message processed by the `fd_sha256_hash` function.
+- **Type**: ``uchar` array`
+- **Description**: An array of unsigned characters with a size defined by `FD_SHA256_HASH_SZ`. It is used to store the result of a SHA-256 hash operation.
+- **Use**: Stores the SHA-256 hash of input data for comparison and verification purposes.
 
 
 ---
 ### ref\_hash
-- **Type**: `uchar array`
-- **Description**: The `ref_hash` is a static array of unsigned characters with a size defined by `FD_SHA256_HASH_SZ`, which represents the size of a SHA-256 hash. It is used to store a reference hash value for comparison purposes during the batch hashing process.
-- **Use**: `ref_hash` is used to store the result of a SHA-256 hash computation for comparison against batch hash results to ensure correctness.
+- **Type**: ``uchar` array`
+- **Description**: An array of unsigned characters with a size defined by `FD_SHA256_HASH_SZ`. It is used to store a reference hash value for comparison purposes.
+- **Use**: Used to store the reference hash value for verifying the correctness of batch hash computations.
 
 
 ---
 ### hash\_mem
-- **Type**: `uchar array`
-- **Description**: The `hash_mem` variable is a static array of unsigned characters (uchar) with a size determined by the product of `FD_SHA256_HASH_SZ` and `BATCH_CNT`. It is used to store the hash outputs for a batch of messages processed by the SHA-256 hashing function.
-- **Use**: `hash_mem` is used to allocate memory for storing the hash results of multiple messages in a batch processing operation.
+- **Type**: ``uchar` array`
+- **Description**: An array of unsigned characters (`uchar`) with a size of `FD_SHA256_HASH_SZ * BATCH_CNT`. It is used to store hash values for batch processing.
+- **Use**: Stores hash values for each batch entry during SHA-256 batch hashing operations.
 
 
 ---
 ### hashes
 - **Type**: `uchar *`
-- **Description**: The `hashes` variable is an array of pointers to unsigned characters, with a size defined by the constant `BATCH_CNT`. Each element in the array is intended to point to a memory location where a SHA-256 hash result is stored.
-- **Use**: This variable is used to store the results of batch SHA-256 hash computations, with each pointer in the array pointing to a specific hash result in memory.
+- **Description**: An array of pointers to unsigned characters, where each pointer in the array corresponds to a hash output for a batch of messages.
+- **Use**: Used to store the hash results of each message in a batch during the batch hashing process.
 
 
 ---
 ### messages
-- **Type**: `char const *[BATCH_CNT]`
-- **Description**: The `messages` variable is a static array of constant character pointers, with a size defined by the macro `BATCH_CNT`. It is used to store pointers to segments of input data for batch processing.
-- **Use**: This variable is used to hold pointers to individual message segments for batch SHA-256 hashing operations.
+- **Type**: ``char const *` array`
+- **Description**: An array of constant character pointers, `messages` holds pointers to the start of each message in a batch of data to be hashed. The size of the array is defined by the constant `BATCH_CNT`, which is set to 32.
+- **Use**: Used to store pointers to message data for batch processing in SHA-256 hashing operations.
 
 
 ---
 ### msg\_sizes
-- **Type**: `ulong array`
-- **Description**: The `msg_sizes` variable is a static array of unsigned long integers with a size defined by the constant `BATCH_CNT`, which is set to 32. This array is used to store the sizes of individual messages when performing batch SHA-256 hashing operations.
-- **Use**: `msg_sizes` is used to keep track of the size of each message in a batch during the batch hashing process.
+- **Type**: ``ulong` array`
+- **Description**: An array of unsigned long integers that stores the sizes of individual messages in a batch for SHA-256 hashing.
+- **Use**: Used to keep track of the size of each message in a batch during the batch hashing process.
 
 
 # Functions
 
 ---
 ### LLVMFuzzerInitialize<!-- {{#callable:LLVMFuzzerInitialize}} -->
-The `LLVMFuzzerInitialize` function initializes the environment for fuzz testing by setting environment variables, bootstrapping the system, registering a cleanup function, and configuring logging behavior.
+[View Source →](<../../../../../src/ballet/sha256/fuzz_sha256.c#L24>)
+
+Initializes the fuzzer environment by setting environment variables, booting the system, registering an exit function, and setting the log level.
 - **Inputs**:
-    - `argc`: A pointer to an integer representing the number of command-line arguments.
-    - `argv`: A pointer to an array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Set the environment variable 'FD_LOG_BACKTRACE' to '0' to disable backtraces in logs.
-    - Call `fd_boot` with `argc` and `argv` to perform system-specific initialization.
+    - `argc`: A pointer to the argument count, typically passed from the main function.
+    - `argv`: A pointer to the argument vector, typically passed from the main function.
+- **Logic and Control Flow**:
+    - Set the environment variable `FD_LOG_BACKTRACE` to `0` to disable backtrace logging.
+    - Call `fd_boot` with `argc` and `argv` to initialize the system.
     - Register `fd_halt` to be called on program exit using `atexit`.
-    - Set the core logging level to 3 using `fd_log_level_core_set`, which will cause the program to crash on warning logs.
-    - Return 0 to indicate successful initialization.
-- **Output**: The function returns an integer value of 0, indicating successful initialization.
+    - Set the core log level to `3` using `fd_log_level_core_set`, which will cause the program to crash on a warning log.
+- **Output**: Returns `0` to indicate successful initialization.
 
 
 ---
 ### LLVMFuzzerTestOneInput<!-- {{#callable:LLVMFuzzerTestOneInput}} -->
-The function `LLVMFuzzerTestOneInput` performs SHA-256 hashing on input data, both as a single message and in batches, to verify the consistency of the hashing process.
+[View Source →](<../../../../../src/ballet/sha256/fuzz_sha256.c#L35>)
+
+Processes input data by computing SHA-256 hashes for both single and batch messages, verifying consistency between them.
 - **Inputs**:
-    - `fuzz_data`: A pointer to the input data to be hashed, represented as an array of unsigned characters.
-    - `fuzz_sz`: The size of the input data in bytes, represented as an unsigned long integer.
-- **Control Flow**:
-    - The function begins by casting the input data to a character pointer for single message hashing.
-    - It initializes a SHA-256 context and processes the input data to produce a hash, storing the result in `hash1`.
-    - The function then directly hashes the input data again using a different method, storing the result in `hash2`, and asserts that both hashes are identical.
-    - If the input size is greater than or equal to `BATCH_CNT`, the function proceeds to batch hashing.
-    - It initializes a batch SHA-256 context and divides the input data into `BATCH_CNT` segments, each of which is hashed individually.
-    - Each segment's hash is stored in a pre-allocated memory space, and the function asserts that each batch hash matches the reference hash computed separately.
-    - If the input size is less than `BATCH_CNT`, the function simply marks the code path as covered without performing batch hashing.
-    - The function returns 0 to indicate successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution without errors.
-- **Functions called**:
-    - [`fd_sha256_init`](fd_sha256.c.md#fd_sha256_init)
-    - [`fd_sha256_append`](fd_sha256.c.md#fd_sha256_append)
-    - [`fd_sha256_fini`](fd_sha256.c.md#fd_sha256_fini)
-    - [`fd_sha256_hash`](fd_sha256.c.md#fd_sha256_hash)
-    - [`fd_sha256_batch_add`](fd_sha256.h.md#fd_sha256_batch_add)
-    - [`fd_sha256_batch_fini`](fd_sha256.h.md#fd_sha256_batch_fini)
+    - `fuzz_data`: A pointer to the input data to be hashed.
+    - `fuzz_sz`: The size of the input data in bytes.
+- **Logic and Control Flow**:
+    - Casts `fuzz_data` to a `char` pointer `msg`.
+    - Initializes a SHA-256 context `sha` and appends `msg` to it, finalizing the hash into `hash1`.
+    - Computes a direct SHA-256 hash of `fuzz_data` into `hash2` and verifies that `hash1` and `hash2` are identical.
+    - Checks if `fuzz_sz` is greater than or equal to `BATCH_CNT` to decide on batch processing.
+    - If batch processing is applicable, initializes a batch SHA-256 context `batch_sha`.
+    - Divides `fuzz_data` into `BATCH_CNT` segments, computes hashes for each segment, and stores them in `hashes`.
+    - Finalizes the batch hash and verifies each segment's hash against a reference hash `ref_hash`.
+    - If batch processing is not applicable, executes a placeholder `FD_FUZZ_MUST_BE_COVERED`.
+- **Output**: Returns 0 to indicate successful processing.
+- **Functions Called**:
+    - [`fd_sha256_init`](<fd_sha256.c.md#fd_sha256_init>)
+    - [`fd_sha256_append`](<fd_sha256.c.md#fd_sha256_append>)
+    - [`fd_sha256_fini`](<fd_sha256.c.md#fd_sha256_fini>)
+    - [`fd_sha256_hash`](<fd_sha256.c.md#fd_sha256_hash>)
+    - [`fd_sha256_batch_add`](<fd_sha256.h.md#fd_sha256_batch_add>)
 
 
 

@@ -3,26 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Replay scheduling, execution, vote tracking, tests, and generated seccomp policy files.
+Epoch fork management, execution slice parsing, microblock replay, seccomp policies, and build configuration.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only on a given logfile fd.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
 
 ## Files
-- **[fd_exec.h](fd_exec.h.md)**: Task message and done message types for replay and exec tiles.
-- **[fd_rdisp.c](fd_rdisp.c.md)**: Transaction replay scheduler with account-conflict DAGs, staging lanes, and EMA-based scoring
-- **[fd_rdisp.h](fd_rdisp.h.md)**: Transaction DAG dispatch and block staging APIs for replay scheduling.
-- **[fd_rdisp_simple.c](fd_rdisp_simple.c.md)**: Transaction and block dispatch management with staging lanes, pools, maps, and transaction queues.
-- **[fd_replay_tile.c](fd_replay_tile.c.md)**: Replay tile state machine for blocks, votes, roots, leader slots, and FEC set processing.
-- **[fd_replay_tile.h](fd_replay_tile.h.md)**: Replay message types and slot-completion data for Tower, root advance, reset, and leader events.
-- **[fd_replay_tile.seccomppolicy](fd_replay_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
-- **[fd_sched.c](fd_sched.c.md)**: Scheduler for replaying FEC sets, parsing transactions, and managing staged fork blocks.
-- **[fd_sched.h](fd_sched.h.md)**: Replay transaction scheduling state machine and task APIs for blocks, forks, and execution.
-- **[fd_vote_tracker.c](fd_vote_tracker.c.md)**: Tracks vote signatures with a deque and hash map for insert and query.
-- **[fd_vote_tracker.h](fd_vote_tracker.h.md)**: Vote tracker prototypes for alignment, allocation, join, insert, and signature query.
-- **[Local.mk](Local.mk.md)**: Build rules for replay objects, headers, and unit tests, with zstd-gated replay support.
-- **[rdisp_format_block_for_test.py](rdisp_format_block_for_test.py.md)**: Formats block JSON into binary transaction records for replay tests.
-- **[test_rdisp.c](test_rdisp.c.md)**: Tests replay dispatcher block, transaction, and scheduling behavior.
+- **[fd_exec.h](fd_exec.h.md)**: Defines task types and message structures for transaction execution and signature verification in exec tiles.
+- **[fd_rdisp.c](fd_rdisp.c.md)**: Implements a system for managing account-conflict graphs in a transaction processing environment, using data structures and algorithms to handle graph traversal, memory optimization, and transaction scheduling.
+- **[fd_rdisp.h](fd_rdisp.h.md)**: Defines methods for building and executing a DAG of transactions with maximum parallelism.
+- **[fd_rdisp_simple.c](fd_rdisp_simple.c.md)**: Implements a dispatcher for managing transaction blocks with staging lanes, pools, and maps.
+- **[fd_replay_tile.c](fd_replay_tile.c.md)**: Implements a replay tile for processing blockchain data, managing transactions, and coordinating with other components in a distributed system.
+- **[fd_replay_tile.h](fd_replay_tile.h.md)**: Defines data structures and constants for replay tile operations, including slot completion and voting.
+- **[fd_replay_tile.seccomppolicy](fd_replay_tile.seccomppolicy.md)**: Defines security policies for logging behavior, including file descriptor management and log synchronization.
+- **[fd_sched.c](fd_sched.c.md)**: Implements a scheduling system for transaction processing, including block management and task dispatching.
+- **[fd_sched.h](fd_sched.h.md)**: Header file for a transaction scheduler that manages lane-based scheduling, state transitions, and task prioritization for replay execution.
+- **[fd_vote_tracker.c](fd_vote_tracker.c.md)**: Implements a vote tracker with a deque and map for managing and querying vote signatures.
+- **[fd_vote_tracker.h](fd_vote_tracker.h.md)**: Defines the `fd_vote_tracker` structure and functions for creating, joining, inserting, and querying vote signatures.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests with conditional logic for `fd_discof`.
+- **[rdisp_format_block_for_test.py](rdisp_format_block_for_test.py.md)**: Formats Solana block data for testing by processing transactions and writing binary output.
+- **[test_rdisp.c](test_rdisp.c.md)**: Tests for the `fd_rdisp` dispatcher, including transaction addition, scheduling, and block management.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

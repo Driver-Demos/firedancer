@@ -3,38 +3,51 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.md` file in the `firedancer/src/wiredancer` directory provides detailed instructions and information on building, using, and understanding the WireDancer functionalities, including its asynchronous API, SigVerify process, and pipeline design for AWS-F1 series platforms.
+Documentation for building, using, and running WireDancer on AWS-F1, including SigVerify API and design details.
 
 # Purpose
-The provided content is a comprehensive documentation for configuring and utilizing the WireDancer (WD) functionalities within a software system, specifically targeting AWS-F1 series FPGA instances. This file serves a broad purpose, detailing the setup, building, and execution processes for integrating WD with the FD (presumably a larger framework or application). It includes specific instructions for initializing and freeing PCIe resources, building and running the WD on AWS-F1 instances, and configuring the FD system to support WD functionalities. A significant portion of the document is dedicated to the WD.SigVerify component, which is a hardware-accelerated solution for ED25519 signature verification, designed to achieve high throughput using FPGA technology. The document outlines the asynchronous API used by WD, the design principles behind WD.SigVerify, and the detailed pipeline architecture that enables efficient parallel processing without batching. This file is crucial for developers working with the WireDancer system, providing them with the necessary steps and technical details to effectively deploy and utilize the hardware acceleration capabilities offered by WD on AWS infrastructure.
+The document provides detailed instructions and information for building, configuring, and running the WireDancer (WD) functionalities on AWS-F1 series EC2 instances. It outlines the necessary steps to set up the environment, including cloning the AWS-FPGA repository and configuring the FPGA with the WD image. The document also describes the asynchronous API used by WD, which involves pushing requests and receiving results through a mechanism called `tango.mcache`. Additionally, it explains the SigVerify function, which uses hardware acceleration to perform ED25519 signature verification at high throughput. The document includes technical details about the pipeline design and the steps involved in the ED25519 verification process, emphasizing the use of pipelining and parallelism to achieve high throughput while maintaining reasonable latency.
 # Content Summary
-The provided document is a comprehensive guide for developers working with the WireDancer (WD) functionalities, specifically focusing on its integration with the FPGA-based AWS-F1 series and the SigVerify process. The document is structured into several sections, each detailing critical aspects of building, running, and utilizing WD within the FD (presumably a larger framework or system).
+The provided content is a detailed technical documentation for the WireDancer (WD) functionalities within a software codebase, specifically focusing on its integration with the AWS-F1 series platform and its SigVerify function. Below is a summary of the key functional details:
 
-### Key Components and Functionalities:
+### Overview
+- **WireDancer (WD)**: This directory contains resources for building and using WireDancer functionalities, which are designed to work with AWS-F1 series platforms.
+- **Supported Platforms**: The primary supported platform is the AWS-F1 series.
+- **Available Functions**: The main function available is SigVerify, which is used for signature verification.
 
-1. **Supported Platforms and Functions:**
-   - The document specifies that the WireDancer functionalities are designed for the AWS-F1 series, a type of FPGA-enabled EC2 instance.
-   - It highlights the availability of the SigVerify function, which is crucial for signature verification processes.
+### Using WireDancer (WD) Inside FD
+- **Asynchronous API**: WD uses an asynchronous API, leveraging the Tango mcache mechanism to publish results back into FD. Requests are sent using a push model, and results are returned in the same manner.
 
-2. **WD API:**
-   - The API section outlines functions for initializing and freeing PCIe resources, which are essential for interfacing with FPGA cards. The `wd_init_pci` function allows for the initialization of multiple cards, while `wd_free_pci` is used to release these resources.
+### WD API Functions
+- **`wd_init_pci(wd_wksp_t*, uint64_t slots)`**: Initializes PCIe interfacing with FPGA cards, allowing multiple cards to be specified via the `slots` argument.
+- **`wd_free_pci(wd_wksp_t*)`**: Frees PCIe resources.
 
-3. **Building and Running WD:**
-   - Detailed instructions are provided for building WD on AWS-F1 series instances. This involves cloning the AWS-FPGA repository, replacing specific files, and rebuilding the project.
-   - Running WD requires setting up an EC2 F1 machine, installing the necessary SDK, loading the WD image onto the FPGA, and configuring the FD system. The document provides step-by-step commands for these processes, ensuring that developers can replicate the setup accurately.
+### Building and Running WD
+- **Building for AWS-F1**: Requires an EC2 build machine. The process involves cloning the AWS-FPGA repository, replacing specific files, and rebuilding the project.
+- **Running on AWS-F1**: Involves setting up an EC2 F1 machine, cloning the AWS-FPGA repository, installing the SDK, loading the WD image, and configuring and running various components of the FD system.
 
-4. **WD-SigVerify:**
-   - SigVerify is a critical component for verifying ED25519 signatures, a computationally intensive task. The document explains how WD uses hardware acceleration to achieve high throughput (1 million verifications per second) with a single FPGA, compared to traditional CPU architectures.
-   - The SigVerify API is asynchronous, allowing for efficient request and response handling between software and the accelerator.
+### WD-SigVerify
+- **Purpose**: SigVerify is used for ED25519 signature verification, a computationally intensive task. WD.SigVerify uses hardware acceleration to achieve high throughput with a single FPGA.
+- **Throughput**: The AWS-F1 architecture achieves 1000 Kps with one core, compared to 30 Kps on a Skylake 2.4GHz architecture requiring 33 cores.
+- **API Functions**:
+  - **`wd_ed25519_verify_init_req`**: Initializes the request API, allowing configuration of response handling.
+  - **`wd_ed25519_verify_init_resp`**: Initializes the response API.
+  - **`wd_ed25519_verify_req`**: Submits a new verification request to the accelerator.
 
-5. **Design and Optimization:**
-   - The design of WD.SigVerify focuses on maximizing throughput while managing area and latency constraints. The document describes a pipeline design that leverages batchless parallelism, allowing independent processing of requests without batching.
-   - A credit-based chain link system is used to manage pipeline throughput and latency, ensuring efficient data flow and processing.
+### Design and Implementation
+- **Pipeline Design**: The design maximizes throughput by using pipelining and parallelism, compensating for the lower clock speed of FPGAs compared to CPUs.
+- **Batchless Parallelism**: Transactions are processed independently and in parallel, without requiring batching.
+- **Pipeline Steps**: The verification process is broken into four steps (SHA, SV0, SV1, SV2), each optimized for performance and throughput.
 
-6. **Algorithmic Details:**
-   - The document provides a pseudocode breakdown of the ED25519 verification process, detailing each step from SHA-512 hashing to point equality checks. Each step is optimized for FPGA implementation, with specific latency and throughput metrics provided.
+### Pipeline and Algorithm Details
+- **Pipeline Design**: Utilizes a credit-based chain link system to manage different latency and throughput across pipeline stages.
+- **Algorithm Steps**:
+  - **SHA**: Performs SHA-512 hashing and modular reduction.
+  - **SV0**: Handles point decompression and sanity checks.
+  - **SV1**: Executes optimized double-scalar double-point multiplication.
+  - **SV2**: Conducts point equality checks using modular multiplications.
 
-Overall, the document serves as a technical manual for developers looking to integrate and optimize WireDancer functionalities within their systems, particularly focusing on the high-performance requirements of signature verification using FPGA technology.
+This documentation provides a comprehensive guide for developers to build, run, and understand the WireDancer functionalities, particularly focusing on the SigVerify process and its integration with AWS-F1 platforms.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
