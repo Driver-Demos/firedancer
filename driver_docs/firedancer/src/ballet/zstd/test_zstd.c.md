@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_zstd.c` file in the `firedancer` codebase contains tests for Zstandard decompression functionality, including alignment checks, decompression of test vectors, and validation of the decompression stream's behavior.
+Tests for Zstandard decompression functionality using predefined test vectors and validation checks.
 
 # Purpose
-This C source code file is designed to test the functionality of Zstandard (ZSTD) decompression within a specific framework. It includes necessary headers for Zstandard operations and utility functions, and it checks for the presence of Zstandard support at compile time. The file defines a static function [`test_decompress`](#test_decompress) that performs various decompression tests using predefined compressed data arrays (`test_zstd_comp_0` and `test_zstd_comp_1`). These tests validate the alignment and memory footprint of the decompression stream, ensure successful decompression of data, and handle different scenarios such as byte-by-byte decompression and partial decompression resets. The file also includes a [`main`](#main) function that initializes the environment, performs a series of decompression tests, and logs the estimated size of Zstandard compression contexts for different levels.
+The code is a C program that tests the functionality of Zstandard (ZSTD) decompression using a custom implementation. It includes headers for Zstandard and utility functions, and it checks for the presence of Zstandard support. The program defines static test vectors, which are compressed data samples, and uses these to verify the decompression process. The [`test_decompress`](<#test_decompress>) function is a key component that performs various decompression tests, including successful decompression, byte-by-byte decompression, and handling of partial compressions. It uses assertions to ensure that the decompression results match expected outputs.
 
-The code is structured to ensure that the Zstandard decompression functionality is robust and reliable. It uses assertions to verify the correctness of decompression operations and memory management. The file is not intended to be a library or a header file for external use but rather a standalone executable for testing purposes. It does not define public APIs or external interfaces but instead focuses on internal testing of the decompression process, ensuring that the Zstandard integration within the framework operates as expected.
+The [`main`](<#main>) function initializes the environment, performs a series of tests on the Zstandard decompression stream, and logs the results. It includes a loop to estimate the size of the compression context for different compression levels, demonstrating the use of Zstandard's API. The program concludes by logging a success message and halting the execution. This code is intended to be an executable test suite for verifying the correctness and performance of Zstandard decompression in a controlled environment.
 # Imports and Dependencies
 
 ---
@@ -24,62 +24,65 @@ The code is structured to ensure that the Zstandard decompression functionality 
 
 ---
 ### test\_zstd\_comp\_0
-- **Type**: ``static uchar const[]``
-- **Description**: The `test_zstd_comp_0` variable is a static constant array of unsigned characters that represents a Zstandard compressed data block. It contains the compressed representation of the string "AAAA" using the Zstandard compression algorithm.
-- **Use**: This variable is used as a test vector for verifying the decompression functionality of the Zstandard decompression stream in the `test_decompress` function.
+- **Type**: ``uchar const[]``
+- **Description**: An array of unsigned characters that contains the Zstandard compressed data for the string "AAAA".
+- **Use**: Used as a test vector for decompression functions in the code.
 
 
 ---
 ### test\_zstd\_comp\_1
-- **Type**: ``static uchar const[]``
-- **Description**: The `test_zstd_comp_1` variable is a static constant array of unsigned characters that represents a compressed data block using the Zstandard (zstd) compression algorithm. The array contains the compressed form of the string "ABCD".
-- **Use**: This variable is used as a test vector for verifying the correctness of Zstandard decompression functionality in the `test_decompress` function.
+- **Type**: ``uchar const[]``
+- **Description**: An array of unsigned characters that contains the Zstandard compressed data of the string "ABCD". The array is initialized with specific hexadecimal values representing the compressed form of the input string.
+- **Use**: Used as a test vector for decompression functions to verify the correctness of Zstandard decompression.
 
 
 # Functions
 
 ---
 ### test\_decompress<!-- {{#callable:test_decompress}} -->
-The `test_decompress` function tests the decompression capabilities of a Zstandard decompression stream by verifying the decompression of predefined compressed data and checking the integrity of the decompressed output.
+[View Source →](<../../../../../src/ballet/zstd/test_zstd.c#L28>)
+
+Tests the decompression functionality of a Zstandard decompression stream using predefined compressed data.
 - **Inputs**: None
-- **Control Flow**:
-    - The function begins by asserting that the alignment of the decompression stream matches the expected alignment constant.
-    - It calculates the memory size required for the decompression stream based on a predefined window size and allocates memory accordingly.
-    - A new decompression stream is created using the allocated memory, and its properties are verified to ensure correct initialization.
-    - The function tests successful decompression by reading from a predefined compressed input (`test_zstd_comp_0`) and verifying the output matches the expected decompressed data ('AAAAAAAA').
-    - It then tests decompression by reading input and output byte by byte, cycling over the input message (`test_zstd_comp_1`) and verifying the output matches the expected decompressed data ('ABCDABCD').
-    - The function further tests decompression by reading input byte by byte and output byte by byte separately, ensuring the output matches the expected results ('ABCDABCD' and 'ABCD', respectively).
-    - A partial decompression is tested and aborted, followed by a reset of the decompression stream, and a subsequent decompression is verified to match expected results ('AAAA').
-    - Finally, the function deletes the decompression stream and verifies that the memory is correctly released and the stream's magic number is reset.
-- **Output**: The function does not return any value; it uses assertions to verify the correctness of the decompression process and outputs test results through these assertions.
-- **Functions called**:
-    - [`fd_zstd_dstream_align`](fd_zstd.c.md#fd_zstd_dstream_align)
-    - [`fd_zstd_dstream_footprint`](fd_zstd.c.md#fd_zstd_dstream_footprint)
-    - [`fd_zstd_dstream_new`](fd_zstd.c.md#fd_zstd_dstream_new)
-    - [`fd_zstd_dstream_read`](fd_zstd.c.md#fd_zstd_dstream_read)
-    - [`fd_zstd_dstream_reset`](fd_zstd.c.md#fd_zstd_dstream_reset)
-    - [`fd_zstd_dstream_delete`](fd_zstd.c.md#fd_zstd_dstream_delete)
+- **Logic and Control Flow**:
+    - Verify the alignment of the decompression stream using `FD_TEST` and [`fd_zstd_dstream_align`](<fd_zstd.c.md#fd_zstd_dstream_align>).
+    - Calculate the memory size required for the decompression stream using [`fd_zstd_dstream_footprint`](<fd_zstd.c.md#fd_zstd_dstream_footprint>) and allocate memory accordingly.
+    - Create a new decompression stream with [`fd_zstd_dstream_new`](<fd_zstd.c.md#fd_zstd_dstream_new>) and verify its creation and properties using `FD_TEST`.
+    - Perform a successful decompression test by reading from `test_zstd_comp_0` and verifying the output matches "AAAAAAAA".
+    - Test decompression by reading input and output byte by byte from `test_zstd_comp_1`, verifying the output matches "ABCDABCD".
+    - Repeat the byte-by-byte decompression test to ensure consistency.
+    - Test decompression by reading output byte by byte, verifying the output matches "ABCD".
+    - Test aborting a partial decompression, resetting the stream, and verifying the output matches "AAAA" after reset.
+    - Delete the decompression stream with [`fd_zstd_dstream_delete`](<fd_zstd.c.md#fd_zstd_dstream_delete>) and verify the memory is released.
+- **Output**: No output is returned as this function is a test function that uses assertions to verify decompression behavior.
+- **Functions Called**:
+    - [`fd_zstd_dstream_align`](<fd_zstd.c.md#fd_zstd_dstream_align>)
+    - [`fd_zstd_dstream_footprint`](<fd_zstd.c.md#fd_zstd_dstream_footprint>)
+    - [`fd_zstd_dstream_new`](<fd_zstd.c.md#fd_zstd_dstream_new>)
+    - [`fd_zstd_dstream_read`](<fd_zstd.c.md#fd_zstd_dstream_read>)
+    - [`fd_zstd_dstream_reset`](<fd_zstd.c.md#fd_zstd_dstream_reset>)
+    - [`fd_zstd_dstream_delete`](<fd_zstd.c.md#fd_zstd_dstream_delete>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, tests Zstandard compression and decompression functionalities, and logs the results.
+[View Source →](<../../../../../src/ballet/zstd/test_zstd.c#L136>)
+
+Initializes the environment, tests Zstandard compression and decompression, logs context size estimates, and terminates the program.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Declare a `fd_zstd_peek_t` array `_peek` for testing purposes.
-    - Test [`fd_zstd_peek`](fd_zstd.h.md#fd_zstd_peek) with `NULL` input and small sizes of `test_zstd_comp_0`, expecting `NULL` results.
-    - For larger sizes of `test_zstd_comp_0`, test [`fd_zstd_peek`](fd_zstd.h.md#fd_zstd_peek) and verify the properties of `_peek`.
-    - Call [`test_decompress`](#test_decompress) to perform decompression tests on predefined test vectors.
-    - Iterate over compression levels from 0 to 19, logging the estimated context size for each level using `ZSTD_estimateCCtxSize`.
-    - Log a notice indicating the tests passed.
-    - Call `fd_halt` to clean up and terminate the program.
-- **Output**: The function returns an integer `0`, indicating successful execution.
-- **Functions called**:
-    - [`fd_zstd_peek`](fd_zstd.h.md#fd_zstd_peek)
-    - [`test_decompress`](#test_decompress)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Initializes a `fd_zstd_peek_t` structure and tests [`fd_zstd_peek`](<fd_zstd.h.md#fd_zstd_peek>) with various input sizes, checking for expected results.
+    - Calls [`test_decompress`](<#test_decompress>) to perform decompression tests on predefined test vectors.
+    - Iterates over compression levels from 0 to 19, logging the estimated context size for each level using `ZSTD_estimateCCtxSize`.
+    - Logs a notice message indicating the tests passed.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_zstd_peek`](<fd_zstd.h.md#fd_zstd_peek>)
+    - [`test_decompress`](<#test_decompress>)
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_crds and its unit test.
+Makefile for adding headers, objects, and running unit tests for CRDS in the Firedancer project.
 
 # Purpose
-Build rules add the `fd_crds.h` header and the `fd_crds` object to the `fd_flamenco` target. The file also defines the `test_crds` unit test, links it with `fd_flamenco`, `fd_ballet`, and `fd_util`, and runs that test.
+The `Makefile` content defines build and test instructions for a software project. It uses the `add-hdrs` and `add-objs` functions to include the header file `fd_crds.h` and object files `fd_crds` and `fd_flamenco` in the build process. It also specifies a unit test named `test_crds`, which depends on the `fd_flamenco`, `fd_ballet`, and `fd_util` components, and includes instructions to run this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
