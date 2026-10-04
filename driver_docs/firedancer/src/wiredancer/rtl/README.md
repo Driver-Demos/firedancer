@@ -3,45 +3,45 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-ED25519, SHA-512, PCIe, FIFO, RAM, CPU, and reset RTL modules.
+SystemVerilog modules for PCIe, DMA, FIFOs, SHA-512, Ed25519, and scheduler logic.
 
 
 ## Files
-- **[areset_sync.sv](areset_sync.sv.md)**: Implements an asynchronous reset synchronizer module using Xilinx Parameterized Macros.
-- **[dma_result.sv](dma_result.sv.md)**: Implements a DMA result module for PCIe data handling with various input and output signals.
-- **[dual_clock_showahead_fifo.sv](dual_clock_showahead_fifo.sv.md)**: Implements a dual-clock show-ahead FIFO module with configurable parameters and asynchronous FIFO instantiation.
-- **[ed25519_add_modp.sv](ed25519_add_modp.sv.md)**: Implements a module for modular addition of ED25519 numbers using piped adders.
-- **[ed25519_mul_modp.sv](ed25519_mul_modp.sv.md)**: Implements a hardware module for modular multiplication using the Ed25519 curve in SystemVerilog.
-- **[ed25519_point_add.sv](ed25519_point_add.sv.md)**: Implements an ED25519 point addition module using modular arithmetic operations in SystemVerilog.
-- **[ed25519_point_dbl.sv](ed25519_point_dbl.sv.md)**: Implements the ED25519 point doubling operation using modular arithmetic in Verilog.
-- **[ed25519_sigverify_0.sv](ed25519_sigverify_0.sv.md)**: Implements a module for dispatching, processing, and merging ED25519 signature verification tasks using a round-robin policy.
-- **[ed25519_sigverify_1.sv](ed25519_sigverify_1.sv.md)**: Implements an ED25519 signature verification module with clock domain crossing and metadata handling.
-- **[ed25519_sigverify_2.sv](ed25519_sigverify_2.sv.md)**: Implements an ED25519 signature verification module with state management and modular multiplication.
-- **[ed25519_sigverify_dsdp_mul.sv](ed25519_sigverify_dsdp_mul.sv.md)**: Implements a Verilog module for Ed25519 signature verification using double-scalar multiplication.
-- **[ed25519_sigverify_ecc.sv](ed25519_sigverify_ecc.sv.md)**: Implements a multi-stage pipeline for ECC operations on Ed25519 signatures with various arithmetic operations.
-- **[ed25519_sub_modp.sv](ed25519_sub_modp.sv.md)**: Implements a module for subtraction modulo a prime number in the Ed25519 signature scheme.
-- **[key_store.sv](key_store.sv.md)**: Implements a key store module with FIFO and dual-port RAM for data storage and retrieval.
-- **[mul_const_ED25519_L0_133.svh](mul_const_ED25519_L0_133.svh.md)**: Implements logic for constant multiplication in the ED25519 algorithm using shift-add operations.
-- **[mul_const_ED25519_L0_260.svh](mul_const_ED25519_L0_260.svh.md)**: Implements logic for multiplying constants in the ED25519 algorithm using shift-add operations.
-- **[mul_const_ED25519_L0_6.svh](mul_const_ED25519_L0_6.svh.md)**: Implements logic for ED25519 constant multiplication with shift and add operations.
-- **[mul_wide.sv](mul_wide.sv.md)**: Implements a parameterized wide multiplier module with various multiplication strategies in SystemVerilog.
-- **[mul_wide_17nx26_dsp48e2.svh](mul_wide_17nx26_dsp48e2.svh.md)**: Implements a wide multiplier using DSP48E2 blocks for 17x26-bit multiplication in Verilog.
-- **[pcie_inorder.sv](pcie_inorder.sv.md)**: Implements a PCIe inorder module with dual-port RAM for data handling and address matching.
-- **[pcie_tr_ext.sv](pcie_tr_ext.sv.md)**: Implements a PCIe transaction extension module with buffering and signal verification.
-- **[schl_cpu.sv](schl_cpu.sv.md)**: Implements a simplified N-thread RISC CPU architecture for scheduling the Solana SigVerify algorithm on a Xilinx Virtex UltraScale+ FPGA.
-- **[schl_cpu_instr_rom.sv](schl_cpu_instr_rom.sv.md)**: Implements a dual-port instruction ROM module with parameterized width and depth.
-- **[sha512_block.sv](sha512_block.sv.md)**: Implements a SHA-512 hashing block in SystemVerilog, following RFC6234 specifications.
-- **[sha512_modq.sv](sha512_modq.sv.md)**: Implements a SHA-512 module with modular reduction for cryptographic operations in Verilog.
-- **[sha512_modq_meta.sv](sha512_modq_meta.sv.md)**: Implements a SystemVerilog module for SHA-512 with modular arithmetic and metadata handling.
-- **[sha512_msgseq.sv](sha512_msgseq.sv.md)**: Implements SHA-512 message scheduling logic using auxiliary round modules for data processing.
-- **[sha512_pre.sv](sha512_pre.sv.md)**: Implements a SHA-512 preprocessing module with input/output logic and state management.
-- **[sha512_round.sv](sha512_round.sv.md)**: Implements a SHA-512 round module in SystemVerilog for cryptographic hash computation.
-- **[sha512_sch.sv](sha512_sch.sv.md)**: Implements a SHA-512 scheduler module in SystemVerilog with input/output logic and RAM management.
-- **[showahead_fifo.sv](showahead_fifo.sv.md)**: Implements a parameterized show-ahead FIFO module with synchronous read/write operations and error handling.
-- **[simple_dual_port_ram.sv](simple_dual_port_ram.sv.md)**: Implements a simple dual-port RAM module with configurable parameters for address and data width.
-- **[tid_inorder.sv](tid_inorder.sv.md)**: Implements a module to ensure in-order transaction processing with timestamp-based reordering and RAM storage.
-- **[top_f1.sv](top_f1.sv.md)**: Implements the `top_f1` module for handling PCIe, DMA, and DDR interfaces with various signal processing and verification stages.
-- **[wd_pkg.sv](wd_pkg.sv.md)**: Defines parameters, data structures, and modules for signature verification and pipelined operations in a hardware design.
+- **[areset_sync.sv](areset_sync.sv.md)**: The `areset_sync.sv` file in the `firedancer` codebase implements an asynchronous reset synchronizer module using Xilinx Parameterized Macros to synchronize an asynchronous reset signal to a destination clock domain.
+- **[dma_result.sv](dma_result.sv.md)**: The `dma_result.sv` file in the `firedancer` codebase implements a SystemVerilog module for handling DMA results, including interfacing with PCIe and managing data flow through various logic and FIFO structures.
+- **[dual_clock_showahead_fifo.sv](dual_clock_showahead_fifo.sv.md)**: The `dual_clock_showahead_fifo.sv` file in the `firedancer` codebase implements a dual-clock FIFO module with show-ahead capability, supporting both Xilinx and Exablaze libraries for asynchronous FIFO configurations.
+- **[ed25519_add_modp.sv](ed25519_add_modp.sv.md)**: The `ed25519_add_modp.sv` file implements a hardware module for performing modular addition of two 255-bit numbers using the Ed25519 prime, with pipelined adders and support for clock and reset signals.
+- **[ed25519_mul_modp.sv](ed25519_mul_modp.sv.md)**: The `ed25519_mul_modp.sv` file in the `firedancer` codebase implements a hardware module for performing modular multiplication operations as part of the Ed25519 signature verification process.
+- **[ed25519_point_add.sv](ed25519_point_add.sv.md)**: The `ed25519_point_add.sv` file implements a hardware module for performing point addition on the Ed25519 elliptic curve using modular arithmetic operations in the Firedancer codebase.
+- **[ed25519_point_dbl.sv](ed25519_point_dbl.sv.md)**: The `ed25519_point_dbl.sv` file in the `firedancer` codebase implements a hardware module for doubling points on the Ed25519 elliptic curve using modular arithmetic operations.
+- **[ed25519_sigverify_0.sv](ed25519_sigverify_0.sv.md)**: The `ed25519_sigverify_0.sv` file implements a module for dispatching and merging signature verification jobs using a round-robin policy, with reassembly of results and metadata management in the `firedancer` codebase.
+- **[ed25519_sigverify_1.sv](ed25519_sigverify_1.sv.md)**: The `ed25519_sigverify_1.sv` file in the `firedancer` codebase implements a module for verifying Ed25519 signatures, utilizing a DSDP pipeline and key storage to manage metadata and timing closure.
+- **[ed25519_sigverify_2.sv](ed25519_sigverify_2.sv.md)**: The `ed25519_sigverify_2.sv` file implements a module for verifying Ed25519 signatures using modular multiplication within the Firedancer codebase.
+- **[ed25519_sigverify_dsdp_mul.sv](ed25519_sigverify_dsdp_mul.sv.md)**: The `ed25519_sigverify_dsdp_mul.sv` file in the `firedancer` codebase implements a hardware module for performing Ed25519 signature verification using double-scalar multiplication and point addition operations.
+- **[ed25519_sigverify_ecc.sv](ed25519_sigverify_ecc.sv.md)**: The `ed25519_sigverify_ecc.sv` file implements a hardware module for verifying Ed25519 signatures using a multi-stage pipeline that performs various arithmetic operations, including addition, subtraction, and modular multiplication.
+- **[ed25519_sub_modp.sv](ed25519_sub_modp.sv.md)**: The `ed25519_sub_modp.sv` file implements a hardware module for performing subtraction modulo a prime number in the context of the Ed25519 signature verification process.
+- **[key_store.sv](key_store.sv.md)**: The `key_store.sv` file implements a SystemVerilog module for a key-value store with FIFO indexing and dual-port RAM for data storage, supporting push and pop operations.
+- **[mul_const_ED25519_L0_133.svh](mul_const_ED25519_L0_133.svh.md)**: The `mul_const_ED25519_L0_133.svh` file in the `firedancer` codebase implements logic for performing constant multiplication operations related to the ED25519 algorithm, utilizing shift-add operations and sequential logic.
+- **[mul_const_ED25519_L0_260.svh](mul_const_ED25519_L0_260.svh.md)**: The `mul_const_ED25519_L0_260.svh` file in the `firedancer` codebase defines logic for performing constant multiplication operations related to the ED25519 algorithm, utilizing shift-add operations and sequential logic to compute outputs.
+- **[mul_const_ED25519_L0_6.svh](mul_const_ED25519_L0_6.svh.md)**: The `mul_const_ED25519_L0_6.svh` file in the `firedancer` codebase defines logic for performing constant multiplication operations related to the ED25519 algorithm, utilizing shift-add operations and sequential logic.
+- **[mul_wide.sv](mul_wide.sv.md)**: The `mul_wide.sv` file in the `firedancer` codebase implements a parameterized hardware module for wide multiplication with various configurations and techniques, including native, naive, Karatsuba, and cascaded DSP methods.
+- **[mul_wide_17nx26_dsp48e2.svh](mul_wide_17nx26_dsp48e2.svh.md)**: The `mul_wide_17nx26_dsp48e2.svh` file in the `firedancer` codebase implements a wide multiplier using the DSP48E2 block for handling 17x26 bit multiplication with cascading support.
+- **[pcie_inorder.sv](pcie_inorder.sv.md)**: The `pcie_inorder.sv` file in the `firedancer` codebase implements a SystemVerilog module for handling in-order PCIe transactions with dual-port RAM for data storage and retrieval.
+- **[pcie_tr_ext.sv](pcie_tr_ext.sv.md)**: The `pcie_tr_ext.sv` file in the `firedancer` codebase implements a SystemVerilog module for handling PCIe transactions, including buffering and processing of PCIe data streams with metadata extraction and FIFO management.
+- **[schl_cpu.sv](schl_cpu.sv.md)**: SigVerify scheduler CPU with tag state machines, ROM fetch, and scratchpad memory.
+- **[schl_cpu_instr_rom.sv](schl_cpu_instr_rom.sv.md)**: The `schl_cpu_instr_rom.sv` file defines a SystemVerilog module for a dual-port instruction ROM with parameterized width and depth, used in the `firedancer` codebase.
+- **[sha512_block.sv](sha512_block.sv.md)**: SHA-512 block pipeline with message sequencing, round logic, RAM, and metadata FIFO.
+- **[sha512_modq.sv](sha512_modq.sv.md)**: The `sha512_modq.sv` file in the `firedancer` codebase implements a hardware module for processing SHA-512 hashes and performing modular arithmetic operations with the Ed25519 curve's order.
+- **[sha512_modq_meta.sv](sha512_modq_meta.sv.md)**: The `sha512_modq_meta.sv` file defines a SystemVerilog module for handling SHA-512 operations with modular arithmetic, including key storage and metadata processing, within the Firedancer codebase.
+- **[sha512_msgseq.sv](sha512_msgseq.sv.md)**: The `sha512_msgseq.sv` file in the `firedancer` codebase implements a SHA-512 message scheduling module, which processes input data into a sequence of words for each round of the SHA-512 algorithm.
+- **[sha512_pre.sv](sha512_pre.sv.md)**: The `sha512_pre.sv` file in the `firedancer` codebase implements a SystemVerilog module for preprocessing data blocks for SHA-512 hashing, handling input and output signals, and managing internal state transitions.
+- **[sha512_round.sv](sha512_round.sv.md)**: The `sha512_round.sv` file implements a single round of the SHA-512 hashing algorithm in SystemVerilog, processing input hash, word, and constant values to produce an updated hash output.
+- **[sha512_sch.sv](sha512_sch.sv.md)**: The `sha512_sch.sv` file in the `firedancer` codebase implements a SystemVerilog module for managing SHA-512 block scheduling, including input and output block handling, cycle management, and memory operations.
+- **[showahead_fifo.sv](showahead_fifo.sv.md)**: The `showahead_fifo.sv` file in the `firedancer` codebase provides a SystemVerilog implementation of a show-ahead FIFO module with configurable parameters for width, depth, and full threshold, including support for synchronous FIFO operations and advanced features like error correction and programmable thresholds.
+- **[simple_dual_port_ram.sv](simple_dual_port_ram.sv.md)**: The `simple_dual_port_ram.sv` file in the `firedancer` codebase implements a simple dual-port RAM module using Xilinx Parameterized Macros (XPM) with configurable parameters for address width, data width, clocking mode, and memory primitive type.
+- **[tid_inorder.sv](tid_inorder.sv.md)**: The `tid_inorder.sv` file implements a SystemVerilog module that ensures transactions are published in the same order they were invoked, using a timestamp-based mechanism to manage transaction ordering and reordering in RAM.
+- **[top_f1.sv](top_f1.sv.md)**: The `top_f1.sv` file in the `firedancer` codebase defines a SystemVerilog module for a top-level hardware design that includes various components for processing and verifying data, such as PCIe interfaces, DMA handling, and signature verification, with extensive parameterization and debugging capabilities.
+- **[wd_pkg.sv](wd_pkg.sv.md)**: The `wd_pkg.sv` file in the `firedancer` codebase defines a package for signature verification, including local parameters for cryptographic constants, data structures for PCIe metadata, and various modules for pipelined operations and data handling.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
