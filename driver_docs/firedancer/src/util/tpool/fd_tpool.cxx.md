@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_tpool.cxx` file in the `firedancer` codebase implements a thread pool with support for managing worker threads, executing tasks, and handling synchronization using pthreads when available.
+Implementation of a thread pool with worker management and task execution capabilities.
 
 # Purpose
-This C++ source code file is part of a thread pool implementation, designed to manage and execute tasks concurrently across multiple threads. The code provides a comprehensive set of functionalities for initializing, managing, and executing tasks within a thread pool. It includes functions for initializing ([`fd_tpool_init`](#fd_tpool_init)) and finalizing ([`fd_tpool_fini`](#fd_tpool_fini)) the thread pool, as well as adding ([`fd_tpool_worker_push`](#fd_tpool_worker_push)) and removing ([`fd_tpool_worker_pop`](#fd_tpool_worker_pop)) worker threads. The code is structured to handle both single-threaded and multi-threaded environments, as indicated by the conditional compilation directives checking for `FD_HAS_THREADS`.
+The code defines a thread pool implementation in C++ that manages worker threads for executing tasks concurrently. It includes functions for initializing and finalizing a thread pool ([`fd_tpool_init`](<#fd_tpool_init>) and [`fd_tpool_fini`](<#fd_tpool_fini>)), adding and removing worker threads ([`fd_tpool_worker_push`](<#fd_tpool_worker_push>) and [`fd_tpool_worker_pop`](<#fd_tpool_worker_pop>)), and executing tasks across multiple threads. The code uses conditional compilation to include thread-related functionality only if threading is supported (`FD_HAS_THREADS`). The [`fd_tpool_private_worker`](<#fd_tpool_private_worker>) function is a key component that represents the worker thread's main loop, handling task execution and state transitions between idle, executing, and halting states.
 
-The core functionality revolves around managing worker threads that execute tasks in parallel, with synchronization mechanisms such as mutexes and condition variables used to manage thread states and transitions. The file defines several task execution strategies, such as round-robin, block, task queue, batch, and raw execution, which are implemented through macros and functions. These strategies allow for flexible task distribution and execution within the thread pool. The code is intended to be part of a larger system, likely a library, that can be imported and used to facilitate parallel processing in applications. It provides a public API for managing the lifecycle of the thread pool and executing tasks, making it a critical component for applications requiring efficient multi-threading capabilities.
+The code also defines several task execution strategies, such as round-robin, block, task queue, batch, and raw, which are implemented using macros (`FD_TPOOL_EXEC_ALL_IMPL_HDR` and `FD_TPOOL_EXEC_ALL_IMPL_FTR`). These strategies determine how tasks are distributed and executed across the worker threads. The code uses synchronization primitives like mutexes and condition variables to manage thread states and ensure safe concurrent execution. The thread pool is designed to be flexible, allowing for different task execution patterns and supporting both single-threaded and multi-threaded environments.
 # Imports and Dependencies
 
 ---
@@ -21,207 +21,234 @@ The core functionality revolves around managing worker threads that execute task
 ---
 ### m\_stride
 - **Type**: `ulong`
-- **Description**: The variable `m_stride` is a global variable of type `ulong` that represents the difference between two time points, `t1` and `t0`. It is used to calculate the stride or step size for iterating over a range of tasks in a thread pool execution context.
-- **Use**: `m_stride` is used to determine the step size for task execution in a round-robin scheduling strategy within a thread pool.
+- **Description**: `m_stride` is a global variable of type `ulong` that represents the difference between two time points, `t1` and `t0`. It is used to calculate the stride for task execution in a thread pool.
+- **Use**: Used to determine the stride for task execution in the `fd_tpool_private_exec_all_rrobin_node` function.
 
 
 ---
 ### m
 - **Type**: `ulong`
-- **Description**: The variable `m` is an unsigned long integer that is initialized to a value calculated by adding `l0` to the minimum of `node_t0-t0` and `ULONG_MAX-l0`. This calculation is designed to be robust against overflow.
-- **Use**: `m` is used as a loop counter in a while loop to iterate over a range from `l0` to `l1`, ensuring that the loop continues as long as `m` is less than `l1`.
+- **Description**: `m` is a variable of type `ulong` that is initialized with a value calculated to be robust against overflow. It is computed as the sum of `l0` and the minimum of `node_t0-t0` and `ULONG_MAX-l0`. This ensures that the value of `m` does not exceed the maximum value for an unsigned long integer.
+- **Use**: `m` is used in a loop to iterate over a range from `l0` to `l1`, incrementing by a stride that is also robust against overflow.
 
 
 ---
 ### FD\_TPOOL\_EXEC\_ALL\_IMPL\_HDR
-- **Type**: `Macro`
-- **Description**: `FD_TPOOL_EXEC_ALL_IMPL_HDR` is a macro that defines a function template for executing tasks across a thread pool in different styles, such as round-robin, block, task queue, and batch. It is used to set up the function header and initial logic for task execution in a thread pool environment.
-- **Use**: This macro is used to define the header and initial setup for task execution functions in a thread pool, allowing for different execution styles.
+- **Type**: `macro`
+- **Description**: Defines a macro that generates a function to execute tasks across a thread pool in a specified style. The macro takes a parameter `style` and creates a function `fd_tpool_private_exec_all_##style##_node` that manages task execution and synchronization within a thread pool.
+- **Use**: Used to create functions for executing tasks in a thread pool with different execution styles, such as 'rrobin', 'block', 'taskq', and 'batch'.
 
 
 ---
 ### m0
 - **Type**: `ulong`
-- **Description**: The variable `m0` is a global variable of type `ulong` (unsigned long integer). It is used in the context of a task execution framework, likely related to partitioning work across multiple threads or nodes.
-- **Use**: `m0` is used as a parameter in task execution functions to define a range or partition of work to be processed.
+- **Description**: `m0` is a global variable of type `ulong` used in the `FD_TPOOL_PARTITION` macro to partition a range of tasks for execution.
+- **Use**: Used to define the start of a task range in the `FD_TPOOL_PARTITION` macro.
 
 
 ---
 ### m1
 - **Type**: `ulong`
-- **Description**: The variable `m1` is a global variable of type `ulong` (unsigned long integer) used in the context of a task execution framework. It is defined alongside `m0` and is used in the `FD_TPOOL_PARTITION` macro to determine a partition of work for a task.
-- **Use**: `m1` is used to specify the upper bound of a partition of work in a task execution framework, facilitating parallel processing.
+- **Description**: `m1` is a global variable of type `ulong`.
+- **Use**: Used in the `FD_TPOOL_PARTITION` macro to define a partition range for task execution.
 
 
 ---
 ### tpool
-- **Type**: `void*`
-- **Description**: The `tpool` variable is a global pointer of type `void*` that is initialized to point to the second element of the `l_next` array. It is used within a loop in the `taskq` implementation of the thread pool execution model.
-- **Use**: This variable is used to store a reference to a thread pool or related data structure, facilitating task execution in a multi-threaded environment.
+- **Type**: `void *`
+- **Description**: A global variable that is a pointer to a memory location, initialized with the value of `l_next[1]`. It is used in the context of a task queue implementation within a thread pool.
+- **Use**: Used to store a reference to a task pool in a multi-threaded environment.
 
 
 # Data Structures
 
 ---
 ### fd\_tpool\_private\_worker\_cfg<!-- {{#data_structure:fd_tpool_private_worker_cfg}} -->
-- **Type**: `struct`
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L7>)
+
+- **Type**: ``struct``
 - **Members**:
-    - `tpool`: A pointer to an fd_tpool_t structure, representing the thread pool associated with the worker.
-    - `tile_idx`: An unsigned long integer representing the index of the tile (or worker) within the thread pool.
-- **Description**: The `fd_tpool_private_worker_cfg` structure is used to configure a private worker within a thread pool. It contains a pointer to the thread pool (`tpool`) and an index (`tile_idx`) that identifies the specific worker or tile within that pool. This configuration is essential for managing and executing tasks across multiple threads in a parallel computing environment.
+    - ``tpool``: A pointer to a `fd_tpool_t` object, representing the thread pool associated with the worker.
+    - ``tile_idx``: An unsigned long integer representing the index of the tile associated with the worker.
+- **Description**: Defines the configuration for a private worker in a thread pool, containing a pointer to the thread pool and an index for the tile associated with the worker.
 
 
 ---
 ### fd\_tpool\_private\_worker\_cfg\_t<!-- {{#data_structure:fd_tpool_private_worker_cfg_t}} -->
-- **Type**: `struct`
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L12>)
+
+- **Type**: ``struct``
 - **Members**:
-    - `tpool`: A pointer to an fd_tpool_t structure, representing the thread pool associated with the worker.
-    - `tile_idx`: An unsigned long integer representing the index of the tile (or thread) within the thread pool.
-- **Description**: The `fd_tpool_private_worker_cfg_t` structure is used to configure a worker within a thread pool. It contains a pointer to the thread pool (`tpool`) and an index (`tile_idx`) that identifies the specific tile or thread within that pool. This configuration is essential for managing and executing tasks across multiple threads in a parallel computing environment.
+    - ``tpool``: A pointer to an `fd_tpool_t` object.
+    - ``tile_idx``: An unsigned long integer representing the tile index.
+- **Description**: Defines a configuration for a private worker in a thread pool, containing a pointer to the thread pool and an index for the tile.
 
 
 # Functions
 
 ---
 ### fd\_tpool\_private\_worker<!-- {{#callable:fd_tpool_private_worker}} -->
-The [`fd_tpool_private_worker`](fd_tpool.h.md#fd_tpool_private_worker) function initializes and manages a worker thread in a thread pool, executing tasks and handling synchronization.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L14>)
+
+Executes tasks in a thread pool worker, handling task execution, idle waiting, and cleanup.
 - **Inputs**:
-    - `argc`: An integer representing the index of the worker in the thread pool.
-    - `argv`: A pointer to an array of character pointers, which is cast to a `fd_tpool_private_worker_cfg_t` structure containing configuration for the worker.
-- **Control Flow**:
-    - The function begins by casting `argc` to `worker_idx` and `argv` to a configuration structure `cfg` to extract the thread pool and tile index.
-    - A `fd_tpool_private_worker_t` structure is initialized to zero and configured with the tile index.
-    - If threading is enabled, it checks if the worker should sleep based on the thread pool options and initializes mutex and condition variables if necessary.
-    - The worker is registered in the thread pool's worker array at the index `worker_idx`.
-    - The function enters an infinite loop where it waits for tasks to execute, checking if the worker is idle or should halt.
-    - If a task is available, it executes the task using either `fd_tpool_task_t` or `fd_tpool_task_v2_t` based on the argument count.
-    - After task execution, it updates the worker's sequence number to indicate task completion.
-    - If the worker is set to halt, it breaks the loop and proceeds to clean up resources.
-    - If threading is enabled, it destroys the mutex and condition variables before returning.
-- **Output**: The function returns an integer, always 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_tpool_private_worker`](fd_tpool.h.md#fd_tpool_private_worker)
+    - `argc`: The index of the worker, cast to an integer.
+    - `argv`: A pointer to a configuration structure `fd_tpool_private_worker_cfg_t` containing the thread pool and tile index.
+- **Logic and Control Flow**:
+    - Initialize `worker_idx` and `cfg` from `argc` and `argv` respectively.
+    - Retrieve `tpool` and `tile_idx` from `cfg`.
+    - Initialize a `fd_tpool_private_worker_t` structure `worker` and set its `tile_idx`.
+    - If threading is enabled, initialize mutex and condition variables if the thread pool option includes sleep.
+    - Assign the `worker` to the thread pool's worker array at `worker_idx`.
+    - Enter an infinite loop to check the worker's task status.
+    - If the worker is idle, pause and continue the loop.
+    - If the worker has no task, break the loop to halt.
+    - Execute the task based on the task type (`fd_tpool_task_t` or `fd_tpool_task_v2_t`).
+    - Catch any exceptions during task execution and log a warning.
+    - Update the worker's sequence number to indicate task completion.
+    - If threading is enabled, clean up mutex and condition variables before returning.
+- **Output**: Returns 0 to indicate successful execution and termination of the worker.
+- **Functions Called**:
+    - [`fd_tpool_private_worker`](<fd_tpool.h.md#fd_tpool_private_worker>)
 
 
 ---
 ### fd\_tpool\_private\_wake<!-- {{#callable:fd_tpool_private_wake}} -->
-The `fd_tpool_private_wake` function signals a condition variable to wake up a worker thread in a thread pool.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L127>)
+
+Signals a condition variable to wake a worker thread in a thread pool.
 - **Inputs**:
-    - `worker`: A pointer to an `fd_tpool_private_worker_t` structure representing the worker to be woken up.
-- **Control Flow**:
-    - Retrieve the mutex lock and condition variable from the worker structure.
+    - ``worker``: A pointer to an `fd_tpool_private_worker_t` structure representing the worker to wake.
+- **Logic and Control Flow**:
+    - Cast the `lock` and `wake` members of the `worker` structure to `pthread_mutex_t` and `pthread_cond_t` pointers, respectively.
     - Attempt to lock the mutex using `pthread_mutex_lock`; log a warning if it fails.
     - Signal the condition variable using `pthread_cond_signal`; log a warning if it fails.
     - Unlock the mutex using `pthread_mutex_unlock`; log a warning if it fails.
-- **Output**: This function does not return any value.
+- **Output**: None (void function).
 
 
 ---
 ### fd\_tpool\_align<!-- {{#callable:fd_tpool_align}} -->
-The `fd_tpool_align` function returns the alignment requirement for a thread pool.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L137>)
+
+Returns the alignment requirement for a thread pool.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the macro `FD_TPOOL_ALIGN`.
-- **Output**: The function returns an `ulong` representing the alignment requirement for a thread pool.
+- **Logic and Control Flow**:
+    - Returns the value of the macro `FD_TPOOL_ALIGN`.
+- **Output**: The alignment requirement for a thread pool as an unsigned long integer (`ulong`).
 
 
 ---
 ### fd\_tpool\_footprint<!-- {{#callable:fd_tpool_footprint}} -->
-The `fd_tpool_footprint` function calculates the memory footprint required for a thread pool with a specified maximum number of workers, ensuring alignment.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L142>)
+
+Calculates the memory footprint required for a thread pool with a specified maximum number of workers.
 - **Inputs**:
-    - `worker_max`: The maximum number of workers that the thread pool can accommodate, represented as an unsigned long integer.
-- **Control Flow**:
-    - Check if `worker_max` is within the valid range (1 to `FD_TILE_MAX`); if not, return 0.
-    - Calculate the total memory size required for the thread pool, including the size of the `fd_tpool_private_worker_t` structure, the `fd_tpool_t` structure, and an array of pointers to `fd_tpool_private_worker_t` structures, all aligned to `FD_TPOOL_ALIGN`.
-    - Return the aligned memory size.
-- **Output**: The function returns the aligned memory size required for the thread pool as an unsigned long integer, or 0 if the input is invalid.
+    - ``worker_max``: The maximum number of workers in the thread pool, which must be between 1 and `FD_TILE_MAX` inclusive.
+- **Logic and Control Flow**:
+    - Checks if `worker_max` is within the valid range (1 to `FD_TILE_MAX`).
+    - If `worker_max` is not valid, returns 0.
+    - Calculates the total memory size needed for the thread pool, including the size of `fd_tpool_private_worker_t`, `fd_tpool_t`, and an array of worker pointers, aligned to `FD_TPOOL_ALIGN`.
+    - Returns the aligned memory size.
+- **Output**: The aligned memory size required for the thread pool, or 0 if `worker_max` is invalid.
 
 
 ---
 ### fd\_tpool\_init<!-- {{#callable:fd_tpool_init}} -->
-The `fd_tpool_init` function initializes a thread pool structure in a given memory region, setting up the initial worker and configuration parameters.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L149>)
+
+Initializes a thread pool with a specified memory block, maximum number of workers, and options.
 - **Inputs**:
-    - `mem`: A pointer to the memory region where the thread pool will be initialized.
-    - `worker_max`: The maximum number of workers that the thread pool can support.
-    - `opt`: Options for configuring the thread pool, such as whether workers should sleep when idle.
-- **Control Flow**:
-    - The function begins by ensuring memory ordering with `FD_COMPILER_MFENCE()`.
-    - It checks if the `mem` pointer is NULL and logs a warning if so, returning NULL.
-    - It verifies that the `mem` pointer is properly aligned using `fd_ulong_is_aligned` and logs a warning if not, returning NULL.
-    - It calculates the memory footprint required for the thread pool using [`fd_tpool_footprint`](#fd_tpool_footprint) and logs a warning if the footprint is zero, returning NULL.
-    - The memory region is zeroed out using `fd_memset`.
-    - A worker structure is initialized at the start of the memory region, setting `seq0` to 1 and `seq1` to 0.
-    - The thread pool structure is initialized immediately after the worker structure, setting `opt`, `worker_max`, and `worker_cnt`.
-    - Memory ordering is ensured again with `FD_COMPILER_MFENCE()`, and the initial worker is assigned to the thread pool.
-    - The function returns a pointer to the initialized thread pool.
-- **Output**: A pointer to the initialized `fd_tpool_t` structure, or NULL if initialization fails due to invalid inputs or alignment issues.
-- **Functions called**:
-    - [`fd_tpool_align`](#fd_tpool_align)
-    - [`fd_tpool_footprint`](#fd_tpool_footprint)
-    - [`fd_tpool_private_worker`](#fd_tpool_private_worker)
+    - ``mem``: A pointer to a memory block where the thread pool will be initialized.
+    - ``worker_max``: The maximum number of workers that the thread pool can support.
+    - ``opt``: Options for configuring the thread pool.
+- **Logic and Control Flow**:
+    - Performs a memory fence operation to ensure memory ordering.
+    - Checks if `mem` is NULL and logs a warning if true, then returns NULL.
+    - Checks if `mem` is properly aligned using `fd_tpool_align()` and logs a warning if not, then returns NULL.
+    - Calculates the memory footprint required for the thread pool using `fd_tpool_footprint(worker_max)` and logs a warning if the footprint is zero, then returns NULL.
+    - Initializes the memory block to zero using `fd_memset()`.
+    - Sets up the first worker (`worker0`) in the memory block and initializes its sequence numbers.
+    - Initializes the thread pool structure (`tpool`) immediately after `worker0` in memory.
+    - Sets the options, maximum number of workers, and current worker count in the thread pool structure.
+    - Performs another memory fence operation to ensure memory ordering.
+    - Assigns `worker0` to the first position in the thread pool's worker array.
+    - Performs a final memory fence operation to ensure memory ordering.
+    - Returns a pointer to the initialized thread pool.
+- **Output**: A pointer to the initialized `fd_tpool_t` structure, or NULL if initialization fails.
+- **Functions Called**:
+    - [`fd_tpool_align`](<#fd_tpool_align>)
+    - [`fd_tpool_footprint`](<#fd_tpool_footprint>)
+    - [`fd_tpool_private_worker`](<fd_tpool.h.md#fd_tpool_private_worker>)
 
 
 ---
 ### fd\_tpool\_fini<!-- {{#callable:fd_tpool_fini}} -->
-The `fd_tpool_fini` function finalizes a thread pool by ensuring all but one worker are removed and returns a pointer to the first worker.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L192>)
+
+Finalizes a thread pool by ensuring all workers except the primary one are removed and returns a pointer to the primary worker.
 - **Inputs**:
-    - `tpool`: A pointer to the thread pool (`fd_tpool_t`) to be finalized.
-- **Control Flow**:
-    - The function begins by enforcing a memory fence with `FD_COMPILER_MFENCE()` to ensure memory operations are completed in order.
-    - It checks if the `tpool` is NULL using `FD_UNLIKELY`, logs a warning if true, and returns NULL.
-    - A loop runs while the worker count in the pool is greater than one, attempting to pop workers using [`fd_tpool_worker_pop`](#fd_tpool_worker_pop).
-    - If [`fd_tpool_worker_pop`](#fd_tpool_worker_pop) fails, a warning is logged and the function returns NULL.
-    - Finally, the function returns a pointer to the first worker in the pool using `fd_tpool_private_worker0`.
-- **Output**: A pointer to the first worker in the thread pool, or NULL if an error occurs.
-- **Functions called**:
-    - [`fd_tpool_worker_cnt`](fd_tpool.h.md#fd_tpool_worker_cnt)
-    - [`fd_tpool_worker_pop`](#fd_tpool_worker_pop)
+    - ``tpool``: A pointer to the `fd_tpool_t` thread pool to finalize.
+- **Logic and Control Flow**:
+    - Executes a memory fence to ensure memory operations are completed before proceeding.
+    - Checks if `tpool` is `NULL` and logs a warning if true, then returns `NULL`.
+    - Enters a loop to remove workers from the pool until only one remains.
+    - In each iteration, calls [`fd_tpool_worker_pop`](<#fd_tpool_worker_pop>) to remove a worker and logs a warning if it fails, then returns `NULL`.
+    - After the loop, returns a pointer to the primary worker using `fd_tpool_private_worker0`.
+- **Output**: A `void*` pointer to the primary worker of the thread pool, or `NULL` if an error occurs.
+- **Functions Called**:
+    - [`fd_tpool_worker_cnt`](<fd_tpool.h.md#fd_tpool_worker_cnt>)
+    - [`fd_tpool_worker_pop`](<#fd_tpool_worker_pop>)
 
 
 ---
 ### fd\_tpool\_worker\_push<!-- {{#callable:fd_tpool_worker_push}} -->
-The `fd_tpool_worker_push` function adds a new worker to a thread pool, ensuring the worker is valid and not already present, and initializes it for execution.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L212>)
+
+Adds a new worker to the thread pool if the conditions are met.
 - **Inputs**:
-    - `tpool`: A pointer to the thread pool (`fd_tpool_t`) to which a new worker is to be added.
-    - `tile_idx`: An unsigned long integer representing the index of the tile (worker) to be added to the thread pool.
-- **Control Flow**:
-    - The function begins by ensuring memory ordering with `FD_COMPILER_MFENCE()`.
-    - It checks if `tpool` is NULL and logs a warning if so, returning NULL.
-    - It checks if `tile_idx` is zero, logs a warning, and returns NULL if true.
-    - It checks if `tile_idx` is the same as the current tile index, logs a warning, and returns NULL if true.
-    - It checks if `tile_idx` is greater than or equal to the total tile count, logs a warning, and returns NULL if true.
-    - It retrieves the current worker list and count from the thread pool.
-    - It checks if the current worker count exceeds the maximum allowed, logs a warning, and returns NULL if true.
-    - It iterates over existing workers to check if `tile_idx` is already present, logs a warning, and returns NULL if true.
-    - It prepares a configuration for the new worker and sets up arguments for execution.
-    - It sets the new worker slot to NULL and ensures memory ordering with `FD_COMPILER_MFENCE()`.
-    - It attempts to create a new execution context for the worker with `fd_tile_exec_new`, logs a warning, and returns NULL if it fails.
-    - It waits in a loop until the new worker is initialized, using `FD_SPIN_PAUSE()` for efficient waiting.
-    - Finally, it increments the worker count in the thread pool and returns the updated thread pool.
-- **Output**: Returns a pointer to the updated thread pool (`fd_tpool_t *`) if successful, or NULL if any error occurs during the process.
-- **Functions called**:
-    - [`fd_tpool_private_worker`](#fd_tpool_private_worker)
+    - ``tpool``: A pointer to the thread pool (`fd_tpool_t`) to which the worker will be added.
+    - ``tile_idx``: An unsigned long integer representing the index of the tile to be added as a worker.
+- **Logic and Control Flow**:
+    - Performs a memory fence operation with `FD_COMPILER_MFENCE()` to ensure memory ordering.
+    - Checks if `tpool` is NULL and logs a warning if true, then returns NULL.
+    - Checks if `tile_idx` is zero and logs a warning if true, then returns NULL.
+    - Checks if `tile_idx` is equal to the current tile index (`fd_tile_idx()`) and logs a warning if true, then returns NULL.
+    - Checks if `tile_idx` is greater than or equal to the total number of tiles (`fd_tile_cnt()`) and logs a warning if true, then returns NULL.
+    - Retrieves the current worker count and checks if it exceeds the maximum allowed workers (`tpool->worker_max`), logging a warning and returning NULL if true.
+    - Iterates over existing workers to check if `tile_idx` is already present, logging a warning and returning NULL if true.
+    - Configures a new worker with the given `tpool` and `tile_idx`.
+    - Sets up arguments for the new worker and performs a memory fence operation.
+    - Attempts to create a new tile execution context with `fd_tile_exec_new()`, logging a warning and returning NULL if it fails.
+    - Waits for the new worker to be initialized using a spin-wait loop.
+    - Increments the worker count in the thread pool and returns the updated `tpool`.
+- **Output**: A pointer to the updated thread pool (`fd_tpool_t`) if successful, or NULL if any checks fail.
+- **Functions Called**:
+    - [`fd_tpool_private_worker`](<fd_tpool.h.md#fd_tpool_private_worker>)
 
 
 ---
 ### fd\_tpool\_worker\_pop<!-- {{#callable:fd_tpool_worker_pop}} -->
-The `fd_tpool_worker_pop` function removes the last worker from a thread pool if it is idle and properly shuts it down.
+[View Source →](<../../../../../src/util/tpool/fd_tpool.cxx#L275>)
+
+Removes the last worker from the thread pool if it is idle and returns the updated thread pool.
 - **Inputs**:
-    - `tpool`: A pointer to the thread pool (`fd_tpool_t`) from which a worker is to be removed.
-- **Control Flow**:
-    - The function begins by ensuring memory ordering with `FD_COMPILER_MFENCE()`.
-    - It checks if the `tpool` is NULL and logs a warning if so, returning NULL.
-    - It retrieves the current worker count from the `tpool` and checks if there is more than one worker; if not, it logs a warning and returns NULL.
-    - It checks if the last worker is idle using [`fd_tpool_worker_idle`](fd_tpool.h.md#fd_tpool_worker_idle); if not, it logs a warning and returns NULL.
-    - The function sends a HALT signal to the worker by setting its task to 0 and updating its sequence number, ensuring memory ordering with `FD_COMPILER_MFENCE()`.
-    - If the thread pool is configured to sleep, it wakes the worker using [`fd_tpool_private_wake`](#fd_tpool_private_wake).
-    - It waits for the worker to shut down by calling `fd_tile_exec_delete` and logs any errors or unexpected return values.
-    - Finally, it decrements the worker count in the `tpool` and returns the updated `tpool`.
-- **Output**: A pointer to the updated thread pool (`fd_tpool_t`) with one less worker, or NULL if an error occurred.
-- **Functions called**:
-    - [`fd_tpool_worker_idle`](fd_tpool.h.md#fd_tpool_worker_idle)
-    - [`fd_tpool_private_worker`](#fd_tpool_private_worker)
-    - [`fd_tpool_private_wake`](#fd_tpool_private_wake)
+    - ``tpool``: A pointer to the thread pool (`fd_tpool_t *`) from which to pop a worker.
+- **Logic and Control Flow**:
+    - Ensure memory fence with `FD_COMPILER_MFENCE()` to prevent reordering of operations.
+    - Check if `tpool` is `NULL` and log a warning if true, then return `NULL`.
+    - Retrieve the current worker count from `tpool` and check if it is less than or equal to 1; if true, log a warning and return `NULL`.
+    - Check if the last worker is idle using [`fd_tpool_worker_idle`](<fd_tpool.h.md#fd_tpool_worker_idle>); if not idle, log a warning and return `NULL`.
+    - Retrieve the last worker and increment its `seq0` to signal a halt.
+    - Set the worker's task to `0UL` and update `seq0` with memory fences to ensure order.
+    - If the thread pool option `FD_TPOOL_OPT_SLEEP` is set, wake the worker using [`fd_tpool_private_wake`](<fd_tpool.h.md#fd_tpool_private_wake>).
+    - Delete the worker's execution context using `fd_tile_exec_delete` and log any errors or unexpected return values.
+    - Decrement the worker count in `tpool` and return the updated `tpool`.
+- **Output**: A pointer to the updated thread pool (`fd_tpool_t *`) or `NULL` if an error occurs.
+- **Functions Called**:
+    - [`fd_tpool_worker_idle`](<fd_tpool.h.md#fd_tpool_worker_idle>)
+    - [`fd_tpool_private_worker`](<fd_tpool.h.md#fd_tpool_private_worker>)
+    - [`fd_tpool_private_wake`](<fd_tpool.h.md#fd_tpool_private_wake>)
 
 
 

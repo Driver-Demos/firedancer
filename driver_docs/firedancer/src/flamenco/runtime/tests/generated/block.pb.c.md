@@ -3,10 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Nanopb constant bindings for block test protobuf messages.
+Automatically generated nanopb constant definitions for various test structures in the Firedancer codebase.
 
 # Purpose
-This file defines nanopb binding constants for several Protocol Buffer message types declared in `block.pb.h`. It includes a version check with `PB_PROTO_HEADER_VERSION` to ensure that the generated code matches the installed nanopb generator version. The `PB_BIND` entries connect message descriptors such as `FD_EXEC_TEST_COST_TRACKER`, `FD_EXEC_TEST_BLOCK_CONTEXT`, `FD_EXEC_TEST_LEADER_SCHEDULE_EFFECTS`, `FD_EXEC_TEST_BLOCK_EFFECTS`, and `FD_EXEC_TEST_BLOCK_FIXTURE` to their C types and field settings.
+This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `block.pb.h` and checks the version of the protobuf header to ensure compatibility, issuing an error if the version does not match the expected `40`. The file uses the `PB_BIND` macro to bind several data structures, such as `fd_exec_test_cost_tracker_t`, `fd_exec_test_block_context_t`, `fd_exec_test_leader_schedule_effects_t`, `fd_exec_test_block_effects_t`, and `fd_exec_test_block_fixture_t`, to their corresponding protobuf message types. The `PB_BIND` macro facilitates the serialization and deserialization of these structures, with some bindings using the `AUTO` option for automatic field numbering, while others specify a specific field number.
+# Imports and Dependencies
+
+---
+- `block.pb.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
