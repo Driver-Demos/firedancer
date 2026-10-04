@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Boot, setup, and sandbox execution code with seccomp policies and generated syscall allowlists.
+Seccomp filter policies, syscall handling rules, and Firedancer application initialization and execution.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp BPF filter headers for run command syscall allowlists.
+- **[generated](generated/README.md)**: Seccomp filter policies and rules for syscall handling and process isolation with architecture-specific checks.
 
 ## Files
-- **[main.seccomppolicy](main.seccomppolicy.md)**: The `main.seccomppolicy` file defines the security policy for the boot process of Firedancer, which involves creating a PID namespace, supervising the child process, and handling logging and process termination.
-- **[pidns.seccomppolicy](pidns.seccomppolicy.md)**: The `pidns.seccomppolicy` file defines the security policy for the child process in a PID namespace responsible for launching and managing Firedancer tiles, including logging and process supervision.
-- **[pidns_arm64.seccomppolicy](pidns_arm64.seccomppolicy.md)**: The `pidns_arm64.seccomppolicy` file defines a seccomp policy for the child process in a PID namespace on arm64 architecture, ensuring proper logging and process termination behavior for the Firedancer application.
-- **[run.c](run.c.md)**: Boots Firedancer, creates workspaces and stacks, and manages child processes with sandboxing and seccomp.
-- **[run.h](run.h.md)**: Run command prototypes for clone, setup, initialization, and execution.
-- **[run1.c](run1.c.md)**: Runs a tile in a cloned process, with argument parsing, CPU affinity, and optional pipe PID output.
+- **[main.seccomppolicy](main.seccomppolicy.md)**: Defines a seccomp policy for the boot process that creates a PID namespace and supervises a child process.
+- **[pidns.seccomppolicy](pidns.seccomppolicy.md)**: Defines a seccomp policy for managing and logging Firedancer child processes within a PID namespace.
+- **[pidns_arm64.seccomppolicy](pidns_arm64.seccomppolicy.md)**: Seccomp policy for managing logging and process supervision in a PID namespace on arm64.
+- **[run.c](run.c.md)**: Implements the main execution logic for the Firedancer application, including process management, permissions, and configuration checks.
+- **[run.h](run.h.md)**: Function prototypes and external action declarations for initializing and running Firedancer commands.
+- **[run1.c](run1.c.md)**: Defines and implements functions to parse command-line arguments and execute a tile in a sandboxed environment.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

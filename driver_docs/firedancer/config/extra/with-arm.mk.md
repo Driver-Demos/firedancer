@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Arm cross-compilation settings and Arm-specific build flags, with extra includes for native builds.
+Makefile for cross-compiling with Arm architecture support, setting flags and toolchain options.
 
 # Purpose
-This Makefile fragment selects build settings for Arm targets and enables cross compilation when the host machine is not `aarch64` or `arm64`. In cross compile mode, it clears default `CPPFLAGS`, sets `LDFLAGS` to `-lm`, assigns `TARGET` to `aarch64-linux-gnu`, and rewrites `LD`, `CC`, and `CXX` to use the cross toolchain names when `FD_USING_GCC` or `FD_USING_CLANG` is set. When the build runs on an Arm host, it includes extra feature files such as `with-ucontext.mk`, `with-secp256k1.mk`, `with-zstd.mk`, `with-lz4.mk`, `with-openssl.mk`, and `with-rocksdb.mk` to add platform-specific dependencies and options. The file also sets `FD_ARCH_SUPPORTS_SANDBOX:=1`, defines `FD_HAS_ARM:=1`, and adds `-DFD_HAS_ARM=1` to `CPPFLAGS` so the build can enable Arm-specific source paths and compile-time checks.
+This Makefile script is used to configure the build process for a software project, specifically addressing cross-compilation for Arm architectures. It checks the machine architecture using `uname -m` and sets the `CROSS` variable to 1 if the architecture is neither `aarch64` nor `arm64`, indicating a cross-compilation scenario. When cross-compiling, it adjusts the compiler and linker flags, setting `CPPFLAGS` and `LDFLAGS` appropriately, and defines the target architecture with the `TARGET` variable. The script also includes conditional logic to configure the compiler settings based on whether GCC or Clang is used, appending necessary flags. If cross-compilation is not required, it includes additional configuration files for various libraries and features. The script sets `FD_ARCH_SUPPORTS_SANDBOX` and `FD_HAS_ARM` to indicate support for Arm architecture and sandboxing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

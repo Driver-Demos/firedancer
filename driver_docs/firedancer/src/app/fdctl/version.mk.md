@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `version.mk` file in the `firedancer` codebase specifies the major, minor, and patch version numbers for the `fdctl` application.
+Makefile variables for major, minor, and patch version numbers.
 
 # Purpose
-This file defines versioning information for a software project using three variables: `VERSION_MAJOR`, `VERSION_MINOR`, and `VERSION_PATCH`. These variables indicate the major, minor, and patch levels of the software version, respectively, and are set to 0, 1, and 1, suggesting an early development stage.
+The file defines versioning information for a software project. It specifies the major version as `0`, the minor version as `1`, and the patch version as `1`. This versioning scheme helps in tracking changes and updates to the software.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

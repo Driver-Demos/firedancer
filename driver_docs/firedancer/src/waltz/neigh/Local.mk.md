@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers and object files for the `fd_neigh4_map` and conditionally for `fd_neigh4_netlink` and `fd_neigh4_probe` if `FD_HAS_LINUX` is defined, as well as a unit test for `test_neigh4_netlink`.
+Makefile for adding headers, objects, and unit tests related to `fd_neigh4` in the `firedancer` project.
 
 # Purpose
-This file is a Makefile snippet used for building a software project. It defines rules to add header files and object files to the build process, specifically for components related to "fd_neigh4_map" and "fd_waltz". Additionally, it includes conditional logic to add more headers, objects, and a unit test for "fd_neigh4_netlink" and "fd_neigh4_probe" if the "FD_HAS_LINUX" flag is set, indicating platform-specific build instructions for Linux.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` and `add-objs` functions to include header files and object files, respectively, such as `fd_neigh4_map.h` and `fd_neigh4_map`. The conditional block `ifdef FD_HAS_LINUX` checks if the `FD_HAS_LINUX` variable is defined, and if so, it adds additional headers and objects related to `fd_neigh4_netlink` and `fd_neigh4_probe`. It also specifies a unit test target `test_neigh4_netlink` that depends on `fd_waltz` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
