@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Detects and warns about variables used in their own initializers, which can cause undefined behavior.
+The `UseInOwnInitializer.ql` file in the `firedancer` codebase defines a CodeQL query to identify instances where a variable is used in its own initializer, which can lead to undefined behavior, and flags these occurrences with a warning for maintainability and correctness.
 
 # Purpose
-This code defines a static analysis rule for identifying a specific problem in C++ code: the use of a variable within its own initializer. This can lead to undefined behavior, which is a critical issue for code maintainability and correctness. The rule is implemented as a class `VariableAccessInInitializer`, which extends the `VariableAccess` class. The class includes a constructor and a predicate function to determine if a variable is initialized with itself.
+This source code file defines a static analysis rule for identifying a specific type of potential issue in C++ code: the use of a variable within its own initializer. The file is structured as a class definition that extends a base class `VariableAccess`, indicating that it is part of a larger framework for analyzing variable usage patterns. The primary purpose of this code is to detect and flag instances where a variable is being initialized using its own value, which can lead to undefined behavior in C++.
 
-The `VariableAccessInInitializer` class contains two main components: a `Variable` and an `Initializer`. The constructor uses a pragma directive to ensure that the initialization logic is not optimized away by the compiler. The predicate `initializesItself` checks if a given variable and initializer are the same as those stored in the class instance, indicating that the variable is used in its own initialization.
+The code is organized around the `VariableAccessInInitializer` class, which encapsulates the logic for identifying problematic initializations. It includes a constructor with a `pragma[nomagic]` directive, suggesting that the constructor is intended to be used without additional implicit behavior from the framework. The class defines a predicate `initializesItself` to determine if a variable is used in its own initializer. The logic for detection is implemented in a query that checks various conditions, such as whether the variable undergoes an LValue-to-RValue conversion, is part of an assignment, or is involved in a crement operation, while ensuring that the variable is not constant and not part of a macro expansion.
 
-The code also includes a query that selects instances where a variable is used in its own initializer. It checks several conditions, such as whether the variable undergoes an LValue-to-RValue conversion, is part of an assignment, or is used in a crement operation. The query excludes cases where the variable is constant, unevaluated, or part of a macro expansion. If these conditions are met, the code selects the variable access instance and generates a warning message indicating the issue.
+This file is part of a static analysis tool, likely used to improve code maintainability and correctness by warning developers about potential issues. It does not define a public API or external interface but rather contributes to the internal logic of a larger analysis framework. The code is tagged with metadata such as `@kind problem` and `@problem.severity warning`, which suggests that it integrates with a system that categorizes and prioritizes code issues for developers.
 # Imports and Dependencies
 
 ---
@@ -22,11 +22,11 @@ The code also includes a query that selects instances where a variable is used i
 
 ---
 ### VariableAccessInInitializer
-- **Type**: ``class``
+- **Type**: `class`
 - **Members**:
-    - ``var``: A `Variable` object that represents the variable being initialized.
-    - ``init``: An `Initializer` object that represents the initializer of the variable.
-- **Description**: Represents a scenario where a variable is used in its own initializer, which can lead to undefined behavior. The class extends `VariableAccess` and includes a constructor that checks if the initializer's declaration matches the variable and if the initializer's expression has a child that is the current instance. It also includes a predicate `initializesItself` to verify if a variable is initialized by itself.
+    - `var`: Represents the variable being initialized.
+    - `init`: Represents the initializer of the variable.
+- **Description**: The `VariableAccessInInitializer` class is a specialized data structure that extends `VariableAccess` to identify instances where a variable is used within its own initializer, which can lead to undefined behavior. It contains two main members: `var`, which represents the variable being initialized, and `init`, which represents the initializer. The class includes a constructor that sets up conditions to detect self-initialization and a predicate `initializesItself` to verify if a variable is initialized by itself. This data structure is used to flag potential issues in code where a variable might be improperly initialized using its own value, thus ensuring code maintainability and correctness.
 
 
 

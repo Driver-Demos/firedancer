@@ -3,24 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL queries and configuration files for analyzing C++ code, including error handling, function consistency, and network topology visualization.
+CodeQL queries and pack config for dead code, errors, enums, joins, and topology visualization.
 
 
 ## Files
-- **[codeql-pack.lock.yml](codeql-pack.lock.yml.md)**: Specifies dependencies and their versions for a CodeQL pack.
-- **[DeadCodeAfterTerminatingLog.ql](DeadCodeAfterTerminatingLog.ql.md)**: Identifies dead code following a terminating log function call in C++ code.
-- **[ErrorDiscard.ql](ErrorDiscard.ql.md)**: Detects instances where a function's error code return value is discarded without handling.
-- **[ImplicitVoidPromotion.ql](ImplicitVoidPromotion.ql.md)**: Detects implicit conversions from `void*` to typed pointers in C++ code, recommending against it.
-- **[InconsistentCallOnResult.ql](InconsistentCallOnResult.ql.md)**: Detects inconsistent operations on function return values in C++ code, potentially causing resource leaks.
-- **[JoinCheck.ql](JoinCheck.ql.md)**: A CodeQL query that checks for suspicious `fd_*_join` calls with mismatched argument types.
-- **[MacroCmpLiteral.ql](MacroCmpLiteral.ql.md)**: Identifies functions that return a constant integer and compare it to a literal value at invocation.
-- **[MaybeWrongConstPure.ql](MaybeWrongConstPure.ql.md)**: Checks for calls to non-const/non-pure functions from functions marked as const or pure in C++ code.
-- **[MissingEnumCaseInSwitch.ql](MissingEnumCaseInSwitch.ql.md)**: Detects switch statements over enum types that lack cases for some enum constants and have no default case.
-- **[MissingPoolFreeCheck.ql](MissingPoolFreeCheck.ql.md)**: Detects missing free calls before pool acquire calls in `fd_pool.c`, issuing warnings for potential issues.
-- **[NonSpecificErrorCodes.ql](NonSpecificErrorCodes.ql.md)**: Identifies functions with mixed return values of constants and literals, providing a development hint.
-- **[qlpack.yml](qlpack.yml.md)**: Configuration for a CodeQL query pack with C++ extractor and specific dependencies.
-- **[ScratchLayoutMismatch.ql](ScratchLayoutMismatch.ql.md)**: A CodeQL query to detect mismatches between FD_LAYOUT and FD_SCRATCH macros in C++ code.
-- **[VisualizeTopology.ql](VisualizeTopology.ql.md)**: Defines classes and functions to visualize network topology using JSON and Mermaid representations.
+- **[codeql-pack.lock.yml](codeql-pack.lock.yml.md)**: CodeQL pack lock file listing dependency versions.
+- **[DeadCodeAfterTerminatingLog.ql](DeadCodeAfterTerminatingLog.ql.md)**: The `DeadCodeAfterTerminatingLog.ql` file in the `firedancer` codebase defines a CodeQL query to identify and warn about dead code that appears after a terminating log function call, such as `FD_LOG_ERR`.
+- **[ErrorDiscard.ql](ErrorDiscard.ql.md)**: The `ErrorDiscard.ql` file defines a CodeQL query to identify instances where a function returning an error code is called, but its return value is discarded, flagging it as a warning with low precision.
+- **[ImplicitVoidPromotion.ql](ImplicitVoidPromotion.ql.md)**: CodeQL query for implicit void* to typed pointer promotion, excluding fd_types.c and macros.
+- **[InconsistentCallOnResult.ql](InconsistentCallOnResult.ql.md)**: The `InconsistentCallOnResult.ql` file in the `firedancer` codebase defines a CodeQL query to identify cases where a function's return value is usually followed by a specific operation (like free, delete, or close), but in some instances, this operation is missing, potentially indicating a misuse of the API and leading to resource leaks.
+- **[JoinCheck.ql](JoinCheck.ql.md)**: Checks for fd_*_join calls with mismatched argument types.
+- **[MacroCmpLiteral.ql](MacroCmpLiteral.ql.md)**: The `MacroCmpLiteral.ql` file in the `firedancer` codebase identifies functions that return a defined integer constant and compare it to a literal value at invocation, flagging it as a maintainability and readability warning.
+- **[MaybeWrongConstPure.ql](MaybeWrongConstPure.ql.md)**: CodeQL query that flags functions called by const or pure functions in src/.
+- **[MissingEnumCaseInSwitch.ql](MissingEnumCaseInSwitch.ql.md)**: The `MissingEnumCaseInSwitch.ql` file defines a CodeQL query that identifies switch statements over enum types that are missing cases for some enum constants and lack a default case, potentially leading to logic errors.
+- **[MissingPoolFreeCheck.ql](MissingPoolFreeCheck.ql.md)**: CodeQL query for pool acquire calls missing a preceding free on all paths.
+- **[NonSpecificErrorCodes.ql](NonSpecificErrorCodes.ql.md)**: The `NonSpecificErrorCodes.ql` file is a CodeQL query that identifies functions returning a defined constant on one path and a literal number on another, serving as a low-precision hint during development in the `firedancer` codebase.
+- **[qlpack.yml](qlpack.yml.md)**: The `qlpack.yml` file specifies the configuration for a CodeQL query pack named `asymmetric-research/fd-dev-queries`, including its version, extractor type, and dependencies.
+- **[ScratchLayoutMismatch.ql](ScratchLayoutMismatch.ql.md)**: The `ScratchLayoutMismatch.ql` file in the `firedancer` codebase defines a CodeQL query to identify potential mismatches between `FD_LAYOUT_*` and `FD_SCRATCH_ALLOC_*` macros, issuing warnings for detected discrepancies.
+- **[VisualizeTopology.ql](VisualizeTopology.ql.md)**: CodeQL query that builds Mermaid flowchart output for Firedancer topology tiles and links.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
