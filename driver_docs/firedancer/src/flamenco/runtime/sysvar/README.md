@@ -3,51 +3,51 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Sysvar account update, cache, and test code for clock, rent, hashes, history, rewards, and schedule.
+Functions, constants, and tests for managing system variables like clock, epoch rewards, and rent in the Firedancer runtime.
 
 
 ## Files
-- **[fd_sysvar.c](fd_sysvar.c.md)**: Updates sysvar accounts and checks instruction account keys.
-- **[fd_sysvar.h](fd_sysvar.h.md)**: Sysvar account update and instruction account check declarations with rent constants.
-- **[fd_sysvar_base.h](fd_sysvar_base.h.md)**: Sysvar size and alignment constants for clock, rent, hashes, history, and rewards.
-- **[fd_sysvar_cache.c](fd_sysvar_cache.c.md)**: Sysvar cache init, join, query, restore, and typed accessors.
-- **[fd_sysvar_cache.h](fd_sysvar_cache.h.md)**: Read-only cache and accessors for Solana sysvar accounts.
-- **[fd_sysvar_cache_db.c](fd_sysvar_cache_db.c.md)**: Database restore logic for sysvar cache entries from account records.
-- **[fd_sysvar_cache_private.h](fd_sysvar_cache_private.h.md)**: Sysvar cache lookup tables, offsets, and restore helper declarations.
-- **[fd_sysvar_clock.c](fd_sysvar_clock.c.md)**: Clock sysvar read, write, init, and update logic with stake-weighted timestamp estimation.
-- **[fd_sysvar_clock.h](fd_sysvar_clock.h.md)**: Clock sysvar init, update, write, and read functions plus related constants and types.
-- **[fd_sysvar_epoch_rewards.c](fd_sysvar_epoch_rewards.c.md)**: Epoch rewards sysvar read, update, deactivate, and initialization logic.
-- **[fd_sysvar_epoch_rewards.h](fd_sysvar_epoch_rewards.h.md)**: EpochRewards sysvar read, init, distribute, and deactivate functions.
-- **[fd_sysvar_epoch_schedule.c](fd_sysvar_epoch_schedule.c.md)**: Epoch schedule derivation, serialization, deserialization, and slot-to-epoch mapping functions.
-- **[fd_sysvar_epoch_schedule.h](fd_sysvar_epoch_schedule.h.md)**: Epoch schedule sysvar constants and functions for slot-to-epoch calculations.
-- **[fd_sysvar_instructions.c](fd_sysvar_instructions.c.md)**: Serializes instruction data into the instructions sysvar account and updates the current instruction index.
-- **[fd_sysvar_instructions.h](fd_sysvar_instructions.h.md)**: Prototypes for serializing instruction sysvar accounts and updating the current instruction index.
-- **[fd_sysvar_last_restart_slot.c](fd_sysvar_last_restart_slot.c.md)**: Sysvar read, write, init, derive, and update logic for the last restart slot.
-- **[fd_sysvar_last_restart_slot.h](fd_sysvar_last_restart_slot.h.md)**: Declarations for init, write, update, read, and derive of the last restart slot sysvar.
-- **[fd_sysvar_recent_hashes.c](fd_sysvar_recent_hashes.c.md)**: Serializes, updates, and reads the recent blockhashes sysvar from the bank queue.
-- **[fd_sysvar_recent_hashes.h](fd_sysvar_recent_hashes.h.md)**: Recent block hashes sysvar account init, update, and read functions with a 150-entry cap.
-- **[fd_sysvar_rent.c](fd_sysvar_rent.c.md)**: Sysvar rent account encode, update, and read helpers.
-- **[fd_sysvar_rent.h](fd_sysvar_rent.h.md)**: Rent sysvar init, write, read, and rent-exempt minimum balance functions.
-- **[fd_sysvar_rent1.c](fd_sysvar_rent1.c.md)**: The `fd_sysvar_rent1.c` file calculates the minimum balance required for rent exemption based on data length and rent parameters, minimizing dependencies on `fd_funk`.
-- **[fd_sysvar_slot_hashes.c](fd_sysvar_slot_hashes.c.md)**: Sysvar slot-hash account read, update, encode, and memory management functions.
-- **[fd_sysvar_slot_hashes.h](fd_sysvar_slot_hashes.h.md)**: Slot hashes sysvar API for footprint, create, join, update, write, read, and delete operations.
-- **[fd_sysvar_slot_history.c](fd_sysvar_slot_history.c.md)**: Slot history sysvar init, update, read, and slot lookup logic.
-- **[fd_sysvar_slot_history.h](fd_sysvar_slot_history.h.md)**: Slot history sysvar init, update, read, and slot lookup functions.
-- **[fd_sysvar_stake_history.c](fd_sysvar_stake_history.c.md)**: Stake history sysvar read, init, update, and account encoding logic.
-- **[fd_sysvar_stake_history.h](fd_sysvar_stake_history.h.md)**: Stake history sysvar init, read, and epoch-boundary update functions.
-- **[Local.mk](Local.mk.md)**: Build rules for sysvar headers, objects, and unit tests when FD_HAS_INT128 is set.
-- **[test_sysvar.c](test_sysvar.c.md)**: Runs sysvar tests in a temporary workspace and shared memory.
-- **[test_sysvar_cache.c](test_sysvar_cache.c.md)**: Unit tests for sysvar map lookup, cache lifecycle, and sysvar read and restore logic.
-- **[test_sysvar_cache_util.h](test_sysvar_cache_util.h.md)**: Test helpers for creating and destroying a sysvar cache environment with a database.
-- **[test_sysvar_clock.c](test_sysvar_clock.c.md)**: Tests clock sysvar decode footprint, size, and alignment bounds.
-- **[test_sysvar_epoch_rewards.c](test_sysvar_epoch_rewards.c.md)**: Tests epoch rewards sysvar decode size and alignment bounds.
-- **[test_sysvar_epoch_schedule.c](test_sysvar_epoch_schedule.c.md)**: Tests epoch schedule decode, derive, and slot-to-epoch conversion logic.
-- **[test_sysvar_last_restart_slot.c](test_sysvar_last_restart_slot.c.md)**: Tests decode footprint and alignment for the last restart slot sysvar.
-- **[test_sysvar_recent_hashes.c](test_sysvar_recent_hashes.c.md)**: Tests recent blockhash sysvar bounds, init, update, and queue contents.
-- **[test_sysvar_rent.c](test_sysvar_rent.c.md)**: Tests rent sysvar decode bounds and minimum balance calculations.
-- **[test_sysvar_slot_hashes.c](test_sysvar_slot_hashes.c.md)**: Tests slot hashes bincode size, footprint, and alignment bounds.
-- **[test_sysvar_slot_history.c](test_sysvar_slot_history.c.md)**: Tests slot history sysvar binary size, footprint, and alignment bounds.
-- **[test_sysvar_stake_history.c](test_sysvar_stake_history.c.md)**: Tests stake history bincode bounds and sysvar cache update behavior.
+- **[fd_sysvar.c](fd_sysvar.c.md)**: Functions for updating system variable accounts and checking instruction account validity in a bank system.
+- **[fd_sysvar.h](fd_sysvar.h.md)**: Defines constants and functions for updating and checking sysvar accounts in the Firedancer runtime.
+- **[fd_sysvar_base.h](fd_sysvar_base.h.md)**: Defines constants for system variable alignment, size, and footprint in the Firedancer runtime.
+- **[fd_sysvar_cache.c](fd_sysvar_cache.c.md)**: Functions for managing and accessing a system variable cache, including creation, joining, and querying.
+- **[fd_sysvar_cache.h](fd_sysvar_cache.h.md)**: Read-only cache for sysvar accounts, with functions for creation, access, and restoration.
+- **[fd_sysvar_cache_db.c](fd_sysvar_cache_db.c.md)**: Database interactions between the sysvar cache and the account database.
+- **[fd_sysvar_cache_private.h](fd_sysvar_cache_private.h.md)**: Defines internal structures and functions for managing a sysvar cache, including perfect hashing and serialization.
+- **[fd_sysvar_clock.c](fd_sysvar_clock.c.md)**: Implements functions for managing and updating system variable clocks, including timestamp estimation and epoch calculations.
+- **[fd_sysvar_clock.h](fd_sysvar_clock.h.md)**: Defines and manages the clock sysvar for network time approximation, including initialization, updating, and reading functions.
+- **[fd_sysvar_epoch_rewards.c](fd_sysvar_epoch_rewards.c.md)**: Manages epoch rewards sysvar operations, including initialization, reading, writing, and distribution.
+- **[fd_sysvar_epoch_rewards.h](fd_sysvar_epoch_rewards.h.md)**: Functions for reading, distributing, setting inactive, and initializing the EpochRewards sysvar.
+- **[fd_sysvar_epoch_schedule.c](fd_sysvar_epoch_schedule.c.md)**: Functions for managing and calculating epoch schedules in a distributed system.
+- **[fd_sysvar_epoch_schedule.h](fd_sysvar_epoch_schedule.h.md)**: Methods and constants for managing epoch schedules in the Solana runtime, including initialization, reading, writing, and deriving epoch configurations.
+- **[fd_sysvar_instructions.c](fd_sysvar_instructions.c.md)**: Functions for serializing and updating sysvar instruction accounts in a transaction context.
+- **[fd_sysvar_instructions.h](fd_sysvar_instructions.h.md)**: Functions for serializing account instructions and updating the current instruction index.
+- **[fd_sysvar_last_restart_slot.c](fd_sysvar_last_restart_slot.c.md)**: Functions for managing the last restart slot system variable in a bank's account database.
+- **[fd_sysvar_last_restart_slot.h](fd_sysvar_last_restart_slot.h.md)**: Functions for managing the "last restart slot" sysvar in a bank's state, including initialization, writing, updating, reading, and deriving.
+- **[fd_sysvar_recent_hashes.c](fd_sysvar_recent_hashes.c.md)**: Handles serialization and management of recent blockhashes for the sysvar account in the Firedancer runtime.
+- **[fd_sysvar_recent_hashes.h](fd_sysvar_recent_hashes.h.md)**: Manages the "recent block hashes" sysvar account with functions to initialize, update, and read it.
+- **[fd_sysvar_rent.c](fd_sysvar_rent.c.md)**: Functions for initializing, writing, and reading rent system variables in a bank transaction context.
+- **[fd_sysvar_rent.h](fd_sysvar_rent.h.md)**: Functions for managing rent system variables, including initialization, reading, writing, and balance checks.
+- **[fd_sysvar_rent1.c](fd_sysvar_rent1.c.md)**: Calculates the minimum balance for rent exemption based on data length and rent parameters.
+- **[fd_sysvar_slot_hashes.c](fd_sysvar_slot_hashes.c.md)**: Functions for managing slot hashes in a bank system, including creation, update, and deletion operations.
+- **[fd_sysvar_slot_hashes.h](fd_sysvar_slot_hashes.h.md)**: Defines functions and constants for managing and updating slot hashes sysvar in the Firedancer runtime.
+- **[fd_sysvar_slot_history.c](fd_sysvar_slot_history.c.md)**: Manages slot history for a system, including setting, writing, updating, reading, and finding slots.
+- **[fd_sysvar_slot_history.h](fd_sysvar_slot_history.h.md)**: Functions and definitions for managing and querying slot history in the current epoch.
+- **[fd_sysvar_stake_history.c](fd_sysvar_stake_history.c.md)**: Functions for initializing, reading, writing, and updating the stake history sysvar in a bank system.
+- **[fd_sysvar_stake_history.h](fd_sysvar_stake_history.h.md)**: Functions and definitions for managing the stake history sysvar, including initialization, reading, and updating.
+- **[Local.mk](Local.mk.md)**: Makefile configuration for adding headers and objects related to system variables in the Flamenco runtime.
+- **[test_sysvar.c](test_sysvar.c.md)**: Tests various system variables in the Firedancer runtime environment.
+- **[test_sysvar_cache.c](test_sysvar_cache.c.md)**: Tests for the sysvar cache functionality, including environment setup, cache operations, and data validation.
+- **[test_sysvar_cache_util.h](test_sysvar_cache_util.h.md)**: APIs to set up and tear down a sysvar cache environment with a database in a test context.
+- **[test_sysvar_clock.c](test_sysvar_clock.c.md)**: Tests for the sysvar clock functionality, including data size and alignment checks.
+- **[test_sysvar_epoch_rewards.c](test_sysvar_epoch_rewards.c.md)**: Tests for the sysvar epoch rewards functionality, including data size and alignment checks.
+- **[test_sysvar_epoch_schedule.c](test_sysvar_epoch_schedule.c.md)**: Tests for the `fd_epoch_schedule_t` structure, including boundary, edge cases, and test vectors.
+- **[test_sysvar_last_restart_slot.c](test_sysvar_last_restart_slot.c.md)**: Tests for the sysvar last restart slot functionality in the Firedancer runtime.
+- **[test_sysvar_recent_hashes.c](test_sysvar_recent_hashes.c.md)**: Tests for the recent hashes system variable, including initialization, updating, and validation.
+- **[test_sysvar_rent.c](test_sysvar_rent.c.md)**: Tests for the sysvar rent functionality, including boundary checks and exemption calculations.
+- **[test_sysvar_slot_hashes.c](test_sysvar_slot_hashes.c.md)**: Tests for sysvar slot hashes, including boundary checks and decoding footprint validation.
+- **[test_sysvar_slot_history.c](test_sysvar_slot_history.c.md)**: Tests for the sysvar slot history functionality, including boundary checks and decoding footprint.
+- **[test_sysvar_stake_history.c](test_sysvar_stake_history.c.md)**: Tests for the sysvar stake history functionality, including boundary checks and update operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
