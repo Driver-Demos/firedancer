@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Gossip tile logic, filters, headers, seccomp policies, and build rules.
+Gossip networking protocol implementation, seccomp filter policy, and Makefile logic for SSE support.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filters for logfile_fd and fd 2 write and fsync permissions.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
 
 ## Files
-- **[fd_gossip_tile.c](fd_gossip_tile.c.md)**: Gossip tile logic for packet handling, signing, metrics, and contact info updates.
-- **[fd_gossip_tile.h](fd_gossip_tile.h.md)**: Gossip tile context, ping request and update types, and signature helper functions.
-- **[fd_gossip_tile.seccomppolicy](fd_gossip_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
-- **[fd_gossvf_tile.c](fd_gossvf_tile.c.md)**: Gossip message filtering, signature checks, peer and ping tracking, and metrics for the gossvf tile.
-- **[fd_gossvf_tile.seccomppolicy](fd_gossvf_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
-- **[Local.mk](Local.mk.md)**: Build rules that add gossip tile objects when FD_HAS_INT128 is defined.
+- **[fd_gossip_tile.c](fd_gossip_tile.c.md)**: Implements a gossip protocol tile for network communication, including message handling, signing, and metrics tracking.
+- **[fd_gossip_tile.h](fd_gossip_tile.h.md)**: Defines data structures and functions for managing gossip protocol contexts and operations.
+- **[fd_gossip_tile.seccomppolicy](fd_gossip_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
+- **[fd_gossvf_tile.c](fd_gossvf_tile.c.md)**: Implements a gossip protocol tile with peer, ping, and stake management, including message parsing and verification.
+- **[fd_gossvf_tile.seccomppolicy](fd_gossvf_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
+- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects for gossip tiles if 128-bit integers are available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
