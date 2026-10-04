@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for setting compiler and linker flags with platform-specific options.
+The `with-hosted.mk` file in the `firedancer` codebase sets compilation and linking flags for a hosted environment, including platform-specific settings for Linux.
 
 # Purpose
-The `Makefile` content sets compilation and linking flags for building a software project. The `CPPFLAGS` variable includes preprocessor definitions such as `_XOPEN_SOURCE=700` and `FD_HAS_HOSTED=1`, which control feature test macros and indicate a hosted environment. The `LDFLAGS` variable specifies linker options, including `-z noexecstack` to prevent executable stacks and `-lrt` to link with the real-time library. The `FD_HAS_HOSTED` variable is set to `1`, indicating a hosted environment. The script checks the operating system using the `uname` command, and if it is Linux, it sets the `FD_HAS_LINUX` variable to `1`.
+This is a Makefile snippet used for compiling a software project. It sets preprocessor flags (`CPPFLAGS`) to define macros for conditional compilation and linker flags (`LDFLAGS`) to enhance security and link the real-time library. The file also conditionally sets a variable `FD_HAS_LINUX` if the operating system is detected as Linux, allowing for platform-specific compilation adjustments.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
