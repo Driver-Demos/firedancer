@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for simulating Verilog sources with Questa and Cocotb in the Firedancer project.
+The `Makefile` in the `firedancer/src/wiredancer/sim/schl_cpu` directory is configured to simulate a Verilog-based CPU module using Questa, specifying various Verilog source files and compilation arguments.
 
 # Purpose
-The `Makefile` is used to automate the build process for a hardware simulation project. It defines several variables and paths necessary for the simulation, such as `SIM`, which specifies the simulator to use, and `MODULE`, which indicates the test module. The `RTL_DIR` variable points to the directory containing the RTL (Register Transfer Level) source files. The `TOPLEVEL` variable specifies the top-level module for the simulation, and `TOPLEVEL_LANG` sets the language to Verilog. The `VERILOG_SOURCES` variable lists all the Verilog and SystemVerilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files. The `COMPILE_ARGS` variable includes additional compilation arguments, such as the path to the instruction ROM MIF file. The file concludes by including a makefile from the `cocotb` configuration to integrate with the `cocotb` testing framework.
+The provided Makefile is used to automate the process of compiling and simulating a hardware design using a simulator, likely Questa, with the Cocotb framework. It specifies various configuration variables such as the simulator to use (`SIM`), the module name (`MODULE`), and the top-level module (`TOPLEVEL`). The file lists the source files required for the simulation, which include Verilog and SystemVerilog files located in both the Xilinx Vivado library and a specified RTL directory. Additionally, it sets compilation arguments, such as the path to a memory initialization file (`COMPILE_ARGS`). The Makefile concludes by including another Makefile from the Cocotb configuration, which likely contains additional rules and settings necessary for the simulation process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

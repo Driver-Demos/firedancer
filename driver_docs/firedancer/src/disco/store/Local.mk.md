@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components in the `firedancer` codebase with conditional checks.
+Build rules for fd_store headers, objects, and unit tests when int128 and hosted support are enabled.
 
 # Purpose
-This Makefile script conditionally includes headers and object files based on the presence of the `FD_HAS_INT128` flag. If `FD_HAS_INT128` is defined, it adds `fd_store.h` to the headers and `fd_store` and `fd_disco` to the object files. Additionally, if `FD_HAS_HOSTED` is defined, it creates and runs a unit test named `test_store` with dependencies on `fd_disco`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.
+Build rules add `fd_store.h` to the header list and `fd_disco` to the object list when `FD_HAS_INT128` is defined. When `FD_HAS_HOSTED` is also defined, the file defines the `test_store` unit test target, links it with `fd_disco`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`, and then runs that test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
