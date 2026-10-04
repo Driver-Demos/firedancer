@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for the layout and size of `fd_microblock_hdr_t` in the `firedancer` codebase.
+The `test_microblock.c` file contains tests to verify the layout and offsets of the `fd_microblock_hdr_t` structure in the `firedancer` codebase.
 
 # Purpose
-This code is a C program that performs static assertions to verify the layout of the `fd_microblock_hdr_t` structure. It includes the header file `fd_microblock.h` and uses `FD_STATIC_ASSERT` to check that the size of `fd_microblock_hdr_t` is 48 bytes and that specific fields within the structure have expected offsets. The [`main`](<#main>) function initializes the program with `fd_boot`, logs a notice indicating a successful pass, and then terminates with `fd_halt`. The program is designed to ensure that the memory layout of the `fd_microblock_hdr_t` structure meets predefined specifications, which is critical for maintaining data integrity and compatibility.
+This C source code file is a simple validation script designed to perform static assertions on the layout of a data structure, specifically `fd_microblock_hdr_t`, which is presumably defined in the included header file "fd_microblock.h". The static assertions ensure that the size of the structure is exactly 48 bytes (0x30UL) and that specific fields within the structure, such as `hash_cnt`, `hash`, and `txn_cnt`, are located at precise offsets. The [`main`](#main) function initializes the environment with `fd_boot`, logs a "pass" message if the assertions hold, and then gracefully shuts down with `fd_halt`. This script is likely used during development to verify that the memory layout of the structure matches expected specifications, which is crucial for ensuring compatibility and correctness in systems where binary data formats are involved.
 # Imports and Dependencies
 
 ---
@@ -18,18 +18,16 @@ This code is a C program that performs static assertions to verify the layout of
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/block/test_microblock.c#L9>)
-
-Initializes the program, logs a notice, and halts execution.
+The `main` function initializes the program, logs a notice, and then halts execution.
 - **Inputs**:
     - `argc`: The count of command-line arguments passed to the program.
     - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` with pointers to `argc` and `argv` to initialize the program environment.
-    - Logs a notice message 'pass' using `FD_LOG_NOTICE`.
-    - Calls `fd_halt` to terminate the program execution.
-    - Returns 0 to indicate successful execution.
-- **Output**: Returns an integer 0, indicating successful execution.
+- **Control Flow**:
+    - Call `fd_boot` with pointers to `argc` and `argv` to perform initial setup.
+    - Log a notice message 'pass' using `FD_LOG_NOTICE`.
+    - Call `fd_halt` to terminate the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines the software license as "Apache-2.0".
+The `fd_xdp_license.h` file defines the software license for the Firedancer project as "Apache-2.0".
 
 # Purpose
-The code defines a preprocessor macro `FD_LICENSE` with the value `"Apache-2.0"`. This macro is likely used to specify the software license type for the associated source code or project. By defining this macro, the code can programmatically reference the license type, ensuring consistency and ease of maintenance across the codebase. This is a common practice in software projects to manage licensing information efficiently.
+This code is a simple C preprocessor directive that defines a macro named `FD_LICENSE` with the value `"Apache-2.0"`. It is likely part of a larger codebase where licensing information needs to be consistently referenced or displayed. By defining this macro, the code ensures that the license type can be easily updated or checked throughout the project without having to manually change multiple instances. This approach is useful for maintaining clarity and consistency regarding the software's licensing terms.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

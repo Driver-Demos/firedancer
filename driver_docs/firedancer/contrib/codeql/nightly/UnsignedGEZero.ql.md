@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Detects redundant unsigned comparisons to zero in C++ code, which may indicate a potential bug.
+The `UnsignedGEZero.ql` file in the `firedancer` codebase defines a CodeQL query that identifies redundant comparisons of unsigned values to zero, which may indicate a potential bug, and flags them with a warning for maintainability and readability.
 
 # Purpose
-This code is a query for a static analysis tool that identifies instances where an unsigned value is compared to zero in C++ code. The comparison is redundant because unsigned values are always non-negative, which can indicate a potential bug or a misunderstanding in the code logic. The query imports necessary modules and uses a filter to select occurrences of this pattern, providing a warning with very high precision. The purpose is to improve code maintainability and readability by highlighting these unnecessary comparisons.
+This code appears to be a part of a static analysis tool or a code quality checker, specifically designed to identify and warn about redundant comparisons of unsigned values to zero in C++ code. It is not an executable or a library file but rather a rule or a script that defines a specific problem pattern to be detected. The functionality is narrow, focusing solely on the issue of comparing unsigned values to zero, which is always true and may indicate a logical error or oversight in the code. The file includes metadata such as severity, precision, and tags, which suggest that it is part of a larger system for maintaining code quality by flagging potential maintainability and readability issues.
 # Imports and Dependencies
 
 ---
