@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for genesis file management, key pair generation, process termination, and network namespace configuration.
+Genesis, key file, process kill, and network namespace configuration tools.
 
 
 ## Files
-- **[genesis.c](genesis.c.md)**: Implements functions for creating and managing a genesis configuration, including feature enabling and PoH rate estimation.
-- **[keys.c](keys.c.md)**: Implements key generation and directory setup for identity, vote account, faucet, and stake configurations.
-- **[kill.c](kill.c.md)**: Implements a process termination utility that kills specific processes based on command-line criteria.
-- **[netns.c](netns.c.md)**: Configures and manages network namespaces, including creation, deletion, and verification of interfaces.
+- **[genesis.c](genesis.c.md)**: Creates, verifies, and removes genesis.bin for bootstrap configuration.
+- **[keys.c](keys.c.md)**: Creates and checks identity, vote, faucet, and stake key files.
+- **[kill.c](kill.c.md)**: Kills matching fddev, fdctl, firedancer, and firedancer-dev processes by scanning /proc.
+- **[netns.c](netns.c.md)**: Network namespace setup and teardown for veth links, addresses, and ethtool settings.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

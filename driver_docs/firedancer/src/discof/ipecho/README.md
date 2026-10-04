@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-IP echo client and server implementations, seccomp filter policy, fuzz testing, and build rules.
+Nonblocking IP echo client, server, tile logic, tests, fuzzing, and seccomp policy.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall control with architecture checks.
+- **[generated](generated/README.md)**: Generated seccomp filter policy for allowed syscalls and argument checks.
 
 ## Files
-- **[fd_ipecho_client.c](fd_ipecho_client.c.md)**: Implements a client for IP echo services, handling socket connections and response parsing.
-- **[fd_ipecho_client.h](fd_ipecho_client.h.md)**: Defines the interface for an IP echo client, including initialization and polling functions.
-- **[fd_ipecho_client_private.h](fd_ipecho_client_private.h.md)**: Defines structures and functions for managing ipecho client peers and parsing responses.
-- **[fd_ipecho_server.c](fd_ipecho_server.c.md)**: An IPv4 echo server implementation with connection management and metrics tracking.
-- **[fd_ipecho_server.h](fd_ipecho_server.h.md)**: Defines structures and functions for an IP echo server, including metrics and server management.
-- **[fd_ipecho_tile.c](fd_ipecho_tile.c.md)**: Implements the ipecho tile for network communication, including client-server setup and metrics handling.
-- **[fd_ipecho_tile.seccomppolicy](fd_ipecho_tile.seccomppolicy.md)**: Defines security policies for logging, connection handling, and message transmission in a server-client setup.
-- **[fuzz_ipecho_client.c](fuzz_ipecho_client.c.md)**: Fuzz testing for the `fd_ipecho_client_parse_response` function using LLVM's libFuzzer.
-- **[Local.mk](Local.mk.md)**: Makefile rules for building and testing `fd_ipecho` components with optional fuzz testing.
-- **[test_ipecho_client.c](test_ipecho_client.c.md)**: A test client for the `fd_ipecho_client` that initializes and polls an IP echo server.
+- **[fd_ipecho_client.c](fd_ipecho_client.c.md)**: Nonblocking TCP client that sends an echo request and parses the shred version from the response.
+- **[fd_ipecho_client.h](fd_ipecho_client.h.md)**: API for an IP echo client with shared-memory setup, polling, and pollfd access.
+- **[fd_ipecho_client_private.h](fd_ipecho_client_private.h.md)**: Private client state and response parsing for ipecho, with pollfd and peer tracking.
+- **[fd_ipecho_server.c](fd_ipecho_server.c.md)**: Nonblocking IPv4 echo server with poll-based accept, read, write, and connection metrics.
+- **[fd_ipecho_server.h](fd_ipecho_server.h.md)**: API for an IP echo server with metrics, initialization, polling, and socket access.
+- **[fd_ipecho_tile.c](fd_ipecho_tile.c.md)**: Tile logic for retrieving shred version, running an echo server, and publishing metrics.
+- **[fd_ipecho_tile.seccomppolicy](fd_ipecho_tile.seccomppolicy.md)**: Seccomp policy for logging, socket I/O, polling, and file descriptor limits.
+- **[fuzz_ipecho_client.c](fuzz_ipecho_client.c.md)**: Fuzzer harness for parsing ipecho client responses.
+- **[Local.mk](Local.mk.md)**: Build rules for ipecho objects, unit test, and fuzz test.
+- **[test_ipecho_client.c](test_ipecho_client.c.md)**: Test program that initializes an ipecho client, polls for a shred version, and logs the result.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

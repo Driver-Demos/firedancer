@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Macros for defining and printing QUIC structure data in various formats.
+The `fd_quic_templ_dump.h` file defines macros for generating functions to print the contents of QUIC-related data structures in a formatted manner.
 
 # Purpose
-This code is a C header file that defines a set of macros for generating functions to print the contents of structures related to QUIC (Quick UDP Internet Connections) protocol data. The macros, such as `FD_TEMPL_DEF_STRUCT_BEGIN` and `FD_TEMPL_DEF_STRUCT_END`, are used to define the start and end of a function that prints the fields of a structure. Other macros like `FD_TEMPL_MBR_ELEM`, `FD_TEMPL_MBR_ELEM_VAR`, and `FD_TEMPL_MBR_ELEM_RAW` are used to format and print different types of data fields within these structures, including fixed-size elements, variable-length elements, and raw byte arrays. The file includes format specifiers for different data types, such as `FD_QUIC_FMT_uchar` and `FD_QUIC_HEX_FMT_ulong`, to ensure the correct formatting of output. The inclusion of `fd_quic_dft.h` suggests that this file relies on additional definitions or declarations provided in that header.
+This C source code file is a collection of macros designed to facilitate the structured output of data from QUIC protocol structures. It defines a series of macros for formatting and printing various data types, such as unsigned integers and hexadecimal values, which are commonly used in network protocol debugging and analysis. The macros are used to generate functions that print the contents of structures, specifically those related to the QUIC protocol, in a human-readable format. The file includes macros for handling different types of data members, including fixed-size elements, variable-length arrays, and raw byte sequences. The inclusion of "fd_quic_dft.h" suggests that this file is part of a larger framework or library for handling QUIC protocol data structures.
 # Imports and Dependencies
 
 ---
