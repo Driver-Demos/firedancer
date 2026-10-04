@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile logic to conditionally add headers and objects if 128-bit integer support is available.
+Build rules that add fd_instr_info header and object files when FD_HAS_INT128 is set.
 
 # Purpose
-The `Makefile` snippet uses a conditional directive to check if the macro `FD_HAS_INT128` is defined. If it is defined, the script calls the `add-hdrs` function to include the header file `fd_instr_info.h` and calls the `add-objs` function to add the object files `fd_instr_info` and `fd_flamenco`. This setup is used to conditionally compile and link specific files based on the presence of the `FD_HAS_INT128` macro.
+Adds `fd_instr_info.h` to the header list and `fd_instr_info` to the object list when `FD_HAS_INT128` is defined. The `ifdef` block limits these build entries to targets that support 128-bit integer types.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
