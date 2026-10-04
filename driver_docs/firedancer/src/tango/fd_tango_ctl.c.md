@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A command-line tool for managing and querying memory caches, sequence numbers, and control signals.
+The `fd_tango_ctl.c` file in the `firedancer` codebase implements a command-line tool for managing and querying various shared memory constructs such as mcaches, dcaches, fseqs, cncs, and tcaches, with support for creating, deleting, querying, and updating these constructs.
 
 # Purpose
-The code is an executable C program that serves as a command-line interface for managing various shared memory constructs such as `mcache`, `dcache`, `fseq`, `cnc`, and `tcache`. It includes functionality to create, delete, query, and update these constructs, which are likely used for inter-process communication or data caching. The program processes commands passed as arguments and performs operations based on the command type, such as `new-mcache`, `delete-mcache`, `query-mcache`, and similar commands for other constructs. Each command has specific requirements for arguments, and the program provides error messages if the arguments are insufficient or invalid.
+The provided C source code file is an executable program designed to manage and manipulate various shared memory constructs, such as caches, sequences, and control nodes, within a hosted environment. The program is structured to handle command-line arguments, allowing users to perform operations like creating, deleting, querying, and updating these constructs. The main technical components include functions for managing memory caches (`mcache` and `dcache`), sequence numbers (`fseq`), control nodes (`cnc`), and transaction caches (`tcache`). Each command corresponds to a specific operation on these constructs, and the program provides detailed logging and error handling to guide users through successful execution or to report issues.
 
-The program uses several external functions and macros, such as `fd_boot`, `fd_halt`, `fd_wksp_attach`, and `fd_wksp_alloc`, which are likely part of a larger framework or library for managing shared memory and related resources. The code includes error handling to ensure that operations are successful, and it logs notices for successful command execution. The program is designed to run on hosted platforms, as indicated by the `#if FD_HAS_HOSTED` preprocessor directive, and it provides a fallback main function for unsupported platforms that logs an error message.
+The code is organized around a command-line interface, where each command is parsed and executed in sequence. It includes commands such as `new-mcache`, `delete-mcache`, `query-mcache`, `new-dcache`, `delete-dcache`, `query-dcache`, and similar operations for `fseq`, `cnc`, and `tcache`. The program uses a workspace abstraction (`fd_wksp`) to manage shared memory allocations and mappings, ensuring that resources are properly allocated and freed. The code also includes a help command to assist users in understanding the available operations. This file is intended to be compiled into an executable that provides a broad range of functionalities for managing shared memory constructs in a system that supports hosted execution.
 # Imports and Dependencies
 
 ---
@@ -22,19 +22,18 @@ The program uses several external functions and macros, such as `fd_boot`, `fd_h
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/tango/fd_tango_ctl.c#L743>)
-
-Initializes the environment, checks argument count, logs errors if conditions are not met, and halts the program.
+The `main` function initializes the program, checks the number of command-line arguments, logs an error if the number of arguments is incorrect, and then halts the program.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
+    - `argc`: The count of command-line arguments passed to the program.
     - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
-    - Checks if `argc` is less than 1 and logs an error if true.
-    - Checks if `argc` is greater than 1 and logs an error if true, indicating the platform does not support `fd_tango_ctl`.
-    - Logs a notice that 0 commands were processed.
-    - Calls `fd_halt` to halt the program.
-- **Output**: Returns 0, indicating successful execution.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the program with the given arguments.
+    - Check if `argc` is less than 1, and log an error if true.
+    - Check if `argc` is greater than 1, and log an error if true.
+    - Log a notice indicating that 0 commands were processed.
+    - Call `fd_halt` to halt the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

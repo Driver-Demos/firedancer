@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build script for downloading, building, and running Doxygen with specific configurations.
+Builds Doxygen from source and runs it to generate documentation output.
 
 # Purpose
-The script automates the process of downloading, building, and running Doxygen, a documentation generator tool. It first checks if the Doxygen repository is already cloned; if not, it clones the repository from GitHub. The script then verifies if the Doxygen binary exists in the specified directory. If the binary is not present, it removes any existing build directories, creates necessary directories, and compiles Doxygen using CMake with specific configuration options. After building, the script runs Doxygen with a specified configuration file to generate documentation, storing the output in a designated directory.
+This Bash script automates download, build, and execution of Doxygen from the source tree. It first checks out the `doxygen` repository if it is not present, then configures and builds Doxygen into the local `opt` directory with `cmake`, using `libclang` and system `sqlite3`. After the build step, it removes any previous `dist` output and runs the local `doxygen` binary with `Doxyfile` to generate documentation into the `dist` directory. The file is a build and documentation generation helper script, not an application entry point or a library file.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

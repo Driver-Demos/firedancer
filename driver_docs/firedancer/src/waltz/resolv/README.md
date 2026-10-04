@@ -3,32 +3,32 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-DNS resolution and network address translation functions, tests, and configuration files for Linux userland.
+DNS resolution, lookup, parsing, query, and test code for a Linux userland resolver.
 
 
 ## Files
-- **[fd_dn_expand.c](fd_dn_expand.c.md)**: Expands a DNS name from a compressed format to a full domain name string.
-- **[fd_dns_parse.c](fd_dns_parse.c.md)**: Parses DNS messages and invokes a callback function for each answer section.
-- **[fd_getaddrinfo.c](fd_getaddrinfo.c.md)**: Implements address resolution and error handling functions for network address translation.
-- **[fd_io_readline.c](fd_io_readline.c.md)**: Functions for reading lines and characters from a buffered input stream with error handling.
-- **[fd_io_readline.h](fd_io_readline.h.md)**: Helper functions for buffered line reads from an input stream, including `fd_io_fgets` and `fd_io_fgetc`.
-- **[fd_lookup.h](fd_lookup.h.md)**: Header file for DNS resolution functions and data structures, including address and resolver configurations.
-- **[fd_lookup_ipliteral.c](fd_lookup_ipliteral.c.md)**: Function to resolve IP literals to address structures, supporting both IPv4 and IPv6 families.
-- **[fd_lookup_name.c](fd_lookup_name.c.md)**: Implements functions for resolving hostnames to addresses using various methods, including DNS and local hosts file.
-- **[fd_netdb.h](fd_netdb.h.md)**: Defines data structures and functions for network database operations, including address resolution.
-- **[fd_netdb_open_fds.c](fd_netdb_open_fds.c.md)**: Opens file descriptors for `/etc/resolv.conf` and `/etc/hosts`, logging errors if unsuccessful.
-- **[fd_res_mkquery.c](fd_res_mkquery.c.md)**: Creates a DNS query message in a buffer with specified operation, domain name, class, and type.
-- **[fd_res_msend.c](fd_res_msend.c.md)**: Implements a function for sending multiple DNS queries and handling responses over UDP and TCP.
-- **[fd_resolv.h](fd_resolv.h.md)**: Header file for DNS query operations with functions for expanding domain names and making queries.
-- **[fd_resolvconf.c](fd_resolvconf.c.md)**: Parses and configures DNS resolver settings from `/etc/resolv.conf` into a `fd_resolvconf_t` structure.
-- **[fuzz_dn_expand.c](fuzz_dn_expand.c.md)**: Fuzz testing for the `fd_dn_expand` function using LLVM's libFuzzer framework.
-- **[fuzz_dns_parse.c](fuzz_dns_parse.c.md)**: Fuzz testing for DNS parsing functionality using LLVM's libFuzzer.
-- **[fuzz_lookup_literal.c](fuzz_lookup_literal.c.md)**: Fuzz testing for IP literal lookup functionality with initialization and input handling.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing DNS resolution components in the `firedancer` codebase.
-- **[README.md](README.md.md)**: Linux userland DNS resolver for WAN servers with modifications for security and compatibility.
-- **[test_getaddrinfo.c](test_getaddrinfo.c.md)**: Tests the `fd_getaddrinfo` function by resolving hostnames to IP addresses and printing the results.
-- **[test_resolv.c](test_resolv.c.md)**: Tests the functionality of reading and processing a `resolv.conf` file.
-- **[test_resolvconf.txt](test_resolvconf.txt.md)**: Configuration for testing DNS resolution settings.
+- **[fd_dn_expand.c](fd_dn_expand.c.md)**: The `fd_dn_expand.c` file contains a function that expands a domain name from a compressed format to a full string representation, handling potential reference loops and ensuring the output fits within a specified space.
+- **[fd_dns_parse.c](fd_dns_parse.c.md)**: The `fd_dns_parse.c` file contains a function that parses DNS response messages and processes them using a callback function.
+- **[fd_getaddrinfo.c](fd_getaddrinfo.c.md)**: The `fd_getaddrinfo.c` file in the `firedancer` codebase implements a function to resolve hostnames to addresses, similar to `getaddrinfo`, and provides error string conversion for address resolution errors.
+- **[fd_io_readline.c](fd_io_readline.c.md)**: The `fd_io_readline.c` file in the `firedancer` codebase provides functions for reading lines and characters from a buffered input stream, handling errors and buffer management.
+- **[fd_io_readline.h](fd_io_readline.h.md)**: The `fd_io_readline.h` file provides helper functions for buffered line reading, including `fd_io_fgets` and `fd_io_fgetc`, in the `firedancer` codebase.
+- **[fd_lookup.h](fd_lookup.h.md)**: The `fd_lookup.h` file in the `firedancer` codebase defines structures and functions for DNS resolution and address lookup, including handling of resolver configurations and DNS packet parsing.
+- **[fd_lookup_ipliteral.c](fd_lookup_ipliteral.c.md)**: The `fd_lookup_ipliteral.c` file in the `firedancer` codebase implements a function to resolve IP literals into address structures, supporting both IPv4 and IPv6 formats.
+- **[fd_lookup_name.c](fd_lookup_name.c.md)**: The `fd_lookup_name.c` file in the `firedancer` codebase implements a function for resolving hostnames to network addresses using various methods, including checking null names, numeric addresses, local hosts file, and DNS, while also handling IPv4 and IPv6 address selection and sorting based on RFC 3484/6724 rules.
+- **[fd_netdb.h](fd_netdb.h.md)**: The `fd_netdb.h` file in the `firedancer` codebase defines structures and functions for network database operations, including opening file descriptors for `/etc/hosts` and `/etc/resolv.conf`, and a custom implementation of `getaddrinfo`.
+- **[fd_netdb_open_fds.c](fd_netdb_open_fds.c.md)**: The `fd_netdb_open_fds.c` file in the `firedancer` codebase provides a function to open file descriptors for `/etc/resolv.conf` and `/etc/hosts`, storing them in a `fd_netdb_fds_t` structure.
+- **[fd_res_mkquery.c](fd_res_mkquery.c.md)**: The `fd_res_mkquery.c` file in the `firedancer` codebase implements a function to construct a DNS query with specified operation, domain name, class, and type, while ensuring constraints on input parameters and generating a unique query ID.
+- **[fd_res_msend.c](fd_res_msend.c.md)**: Parallel DNS query sender with UDP and TCP fallback handling.
+- **[fd_resolv.h](fd_resolv.h.md)**: The `fd_resolv.h` file in the `firedancer` codebase declares functions for DNS name expansion and query creation with hidden visibility attributes.
+- **[fd_resolvconf.c](fd_resolvconf.c.md)**: Parses resolv.conf options and nameserver entries into a resolver config.
+- **[fuzz_dn_expand.c](fuzz_dn_expand.c.md)**: Fuzzer for fd_dn_expand that checks DNS name expansion and output bounds.
+- **[fuzz_dns_parse.c](fuzz_dns_parse.c.md)**: DNS parse fuzz harness with initialization and postcondition checks for parsed addresses and canonical names
+- **[fuzz_lookup_literal.c](fuzz_lookup_literal.c.md)**: Fuzzer for fd_lookup_ipliteral with IPv4 and IPv6 family checks.
+- **[Local.mk](Local.mk.md)**: Build rules for DNS resolution headers, objects, unit tests, and fuzz tests.
+- **[README.md](README.md.md)**: The `README.md` file in the `firedancer/src/waltz/resolv` directory describes the `fd_resolv` module, a Linux userland DNS resolver for WAN servers, detailing its modifications from the musl libc's `getaddrinfo` implementation and its alignment with Firedancer's code style.
+- **[test_getaddrinfo.c](test_getaddrinfo.c.md)**: The `test_getaddrinfo.c` file in the `firedancer` codebase tests the functionality of resolving hostnames to IP addresses using the `fd_getaddrinfo` function and prints the results for both IPv4 and IPv6 addresses.
+- **[test_resolv.c](test_resolv.c.md)**: Tests parsing of resolv.conf with and without a trailing newline.
+- **[test_resolvconf.txt](test_resolvconf.txt.md)**: Sample resolv.conf entries for local DNS resolution.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

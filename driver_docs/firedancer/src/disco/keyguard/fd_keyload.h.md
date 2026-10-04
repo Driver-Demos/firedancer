@@ -3,42 +3,47 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for reading, loading, unloading, and allocating protected memory for Solana keypairs.
+The `fd_keyload.h` file in the `firedancer` codebase provides functions for reading, loading, unloading, and allocating protected memory pages for JSON-encoded keypairs, ensuring secure handling and storage of cryptographic keys.
 
 # Purpose
-The code is a C header file that provides function declarations for handling cryptographic key operations in a secure manner. It includes functions to read (`fd_keyload_read`) and load (`fd_keyload_load`) JSON-encoded keypairs from a file descriptor or disk, ensuring that the key data is stored in memory regions that are protected against unauthorized access and do not appear in core dumps. The [`fd_keyload_unload`](<#fd_keyload_unload>) function is used to unload keys from memory, ensuring that the memory is no longer valid for access. Additionally, the [`fd_keyload_alloc_protected_pages`](<#fd_keyload_alloc_protected_pages>) function allocates memory pages with guard pages for enhanced security, preventing the memory from being paged out or accessed by child processes. The header file includes necessary error handling, terminating the process with an error message if any operation fails.
+This C header file defines a set of functions for securely handling cryptographic keypairs, specifically in the context of reading, loading, and unloading keys from memory. The `fd_keyload_read` function reads a JSON-encoded keypair from a file descriptor, while `fd_keyload_load` reads a key file from disk, storing it in a protected memory page that is resistant to core dumps and paging. The [`fd_keyload_unload`](#fd_keyload_unload) function is used to remove a key from shared memory, ensuring it is no longer accessible. Additionally, [`fd_keyload_alloc_protected_pages`](#fd_keyload_alloc_protected_pages) allocates memory pages with guard pages for enhanced security, preventing unauthorized access and ensuring the memory is not paged out or included in core dumps. This file is crucial for applications requiring secure key management, particularly in environments where sensitive data protection is paramount.
 # Imports and Dependencies
 
 ---
 - `../fd_disco_base.h`
 
 
+# Global Variables
+
+---
+### fd\_keyload\_alloc\_protected\_pages
+- **Type**: `function`
+- **Description**: The `fd_keyload_alloc_protected_pages` function is designed to allocate a specified number of regular memory pages, each 4 kB in size, that are protected by a specified number of guard pages on each side. These guard pages are unreadable and unwritable, providing a layer of protection against memory access violations. The allocated pages are configured to not be paged out to disk, not appear in core dumps, and be wiped on fork to prevent access by child processes.
+- **Use**: This function is used to allocate protected memory pages for secure data handling, ensuring that sensitive information is not exposed through memory dumps or unauthorized access.
+
+
 # Function Declarations (Public API)
 
 ---
 ### fd\_keyload\_unload<!-- {{#callable_declaration:FD_FN_SENSITIVE::fd_keyload_unload}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyload.h#L57>)
-
 Unloads a key from shared memory.
-- **Description**: Use this function to remove a key from shared memory that was previously loaded using `fd_keyload_load`. Ensure that the `public_key_only` parameter matches the value used during the loading process. After calling this function, the key should not be accessed, as the memory will no longer be valid. This function is essential for maintaining security by ensuring that sensitive key material is properly cleared from memory.
+- **Description**: Use this function to unload a key that was previously loaded into shared memory using `fd_keyload_load`. It is crucial that the `public_key_only` parameter matches the value used during the loading process. After calling this function, the key should not be accessed as the memory will no longer be valid. This function ensures that the key is securely removed from memory, preventing any further access or potential leaks.
 - **Inputs**:
-    - `key`: A pointer to the key in shared memory. This must be the same pointer returned by `fd_keyload_load`. The caller must ensure this pointer is valid and corresponds to a loaded key.
-    - `public_key_only`: An integer indicating whether only the public key was loaded (non-zero) or the full key (zero). This must match the value used when the key was loaded with `fd_keyload_load`.
+    - `key`: A pointer to the key in shared memory that was loaded with `fd_keyload_load`. The pointer must not be null and should point to the correct memory location as returned by the load function.
+    - `public_key_only`: An integer indicating whether only the public key was loaded (non-zero) or the full key (zero). This must match the value used when the key was loaded.
 - **Output**: None
-- **See Also**: [`FD_FN_SENSITIVE::fd_keyload_unload`](<fd_keyload.c.md#fd_fn_sensitivefd_keyload_unload>)  (Implementation)
+- **See also**: [`FD_FN_SENSITIVE::fd_keyload_unload`](fd_keyload.c.md#fd_fn_sensitivefd_keyload_unload)  (Implementation)
 
 
 ---
 ### fd\_keyload\_alloc\_protected\_pages<!-- {{#callable_declaration:FD_FN_SENSITIVE::fd_keyload_alloc_protected_pages}} -->
-[View Source →](<../../../../../src/disco/keyguard/fd_keyload.h#L76>)
-
 Allocates protected memory pages with guard pages.
-- **Description**: Use this function to allocate a specified number of memory pages that are protected by unreadable and unwritable guard pages on each side. The allocated pages are configured to not be paged out to disk, not appear in core dumps, and be wiped on fork to prevent access by child processes. This function is useful for securely storing sensitive data in memory. It terminates the process with an error message if the allocation fails. The allocated memory is not intended to be freed, and no deallocation function is provided.
+- **Description**: This function allocates a specified number of regular memory pages, each 4 kB in size, surrounded by guard pages that are unreadable and unwritable. The allocated memory is configured to prevent paging to disk, appearing in core dumps, and being accessible by child processes after a fork. It is intended for use cases where sensitive data needs to be protected in memory. The function will terminate the process with an error message if the allocation or protection setup fails. The allocated memory is not intended to be freed, as no deallocation function is provided.
 - **Inputs**:
-    - `page_cnt`: Specifies the number of regular 4 kB pages to allocate. Must be a positive number. If invalid, the process will terminate with an error.
-    - `guard_page_cnt`: Specifies the number of guard pages to allocate on each side of the regular pages. Must be a positive number. If invalid, the process will terminate with an error.
-- **Output**: Returns a pointer to the first byte of the allocated protected memory. The memory within the specified range is readable and writable, while the guard pages will cause a segmentation fault if accessed.
-- **See Also**: [`FD_FN_SENSITIVE::fd_keyload_alloc_protected_pages`](<fd_keyload.c.md#fd_fn_sensitivefd_keyload_alloc_protected_pages>)  (Implementation)
+    - `page_cnt`: The number of regular 4 kB pages to allocate. Must be a positive integer. The allocated pages will be readable and writable.
+    - `guard_page_cnt`: The number of guard pages to allocate on each side of the regular pages. Must be a non-negative integer. These pages will be unreadable and unwritable, providing protection against buffer overflows.
+- **Output**: Returns a pointer to the first byte of the allocated protected memory. The memory within the specified range is readable and writable, while the guard pages will cause a SIGSEGV if accessed.
+- **See also**: [`FD_FN_SENSITIVE::fd_keyload_alloc_protected_pages`](fd_keyload.c.md#fd_fn_sensitivefd_keyload_alloc_protected_pages)  (Implementation)
 
 
 
