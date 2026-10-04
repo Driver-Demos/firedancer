@@ -3,28 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and running QUIC-related unit and fuzz tests in the Firedancer codebase.
+Build rules for QUIC unit, fuzz, and manual tests.
 
 # Purpose
-This Makefile script is used to automate the building and testing of components related to the `fd_quic` library, which is part of a software codebase. It defines a series of unit tests and fuzz tests for the QUIC protocol implementation, utilizing a set of libraries specified by the `QUIC_TEST_LIBS` variable. The script includes conditional logic to add headers and object files if the `FD_HAS_HOSTED` flag is set, indicating a hosted environment. It systematically calls functions to create and run unit tests for various aspects of the QUIC protocol, such as protocol handling, handshake, streams, connections, and more. Additionally, it includes manual test programs and fuzz tests to ensure comprehensive testing coverage of the QUIC implementation.
-# Content Summary
-The provided content is a Makefile script used for managing the build and testing process of a software project related to QUIC (Quick UDP Internet Connections) protocol. The script includes several key components and functionalities:
-
-1. **Conditional Compilation**: The script uses `ifdef FD_HAS_HOSTED` to conditionally include certain headers and object files if the `FD_HAS_HOSTED` flag is defined. This allows for flexibility in the build process depending on the environment.
-
-2. **Header and Object Files**: The script adds specific header files (`fd_quic_sandbox.h`, `fd_quic_test_helpers.h`) and object files (`fd_quic_stream_spam`, `fd_quic_sandbox`, `fd_quic_test_helpers`) to the build process using custom functions `add-hdrs` and `add-objs`.
-
-3. **Library Definitions**: A variable `QUIC_TEST_LIBS` is defined to include a list of libraries (`fd_quic`, `fd_tls`, `fd_tango`, `fd_ballet`, `fd_waltz`, `fd_util`) that are used in the unit tests.
-
-4. **Unit Tests**: The script defines and runs a series of unit tests for different components of the QUIC protocol. Each test is created using the `make-unit-test` function, specifying the test name, target, and required libraries. The tests cover various aspects such as protocol, handshake, streams, connections, bandwidth, layout, conformance, acknowledgment transmission, concurrency, service queue, packet metadata, and keep-alive functionality.
-
-5. **Manual Test Programs**: Additional test programs are defined for manual testing purposes, including client flood, server, transactions, and idle connections.
-
-6. **Fuzz Testing**: If the `FD_HAS_HOSTED` flag is set, fuzz tests are created for `fuzz_quic` and `fuzz_quic_wire` to test the robustness of the QUIC implementation against unexpected inputs.
-
-7. **Key Phase Testing**: A specific unit test for key phase handling in QUIC is defined and executed, which includes the `fd_fibre` library.
-
-This Makefile script is essential for automating the build and testing process, ensuring that all components of the QUIC protocol are thoroughly tested and verified.
+This Makefile fragment defines the build and test targets for the `fd_quic` component when `FD_HAS_HOSTED` is enabled. It adds QUIC-related headers and object files to the build, then declares a shared library list in `QUIC_TEST_LIBS` for use by the test programs. The file also registers many unit tests, manual test programs, and fuzz tests for QUIC protocol behavior, TLS handshake handling, crypto, retry logic, packet metadata, concurrency, and key phase handling. It then schedules the unit tests to run as part of the test workflow, which makes this file a central build and validation entry point for the QUIC code in the codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

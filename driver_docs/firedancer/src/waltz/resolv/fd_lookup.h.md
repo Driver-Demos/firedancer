@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for DNS resolution functions and data structures, including address and resolver configurations.
+The `fd_lookup.h` file in the `firedancer` codebase defines structures and functions for DNS resolution and address lookup, including handling of resolver configurations and DNS packet parsing.
 
 # Purpose
-This C header file defines data structures and function prototypes for DNS resolution and network address handling. It includes necessary headers and declares structures such as `aibuf` and `address` to store address information and configuration details. The `fd_resolvconf` structure holds DNS resolver configuration, including name server addresses and timeout settings. The file defines several function prototypes with hidden visibility attributes, such as [`fd_lookup_name`](<#fd_lookup_name>), [`fd_lookup_ipliteral`](<#fd_lookup_ipliteral>), and [`fd_get_resolv_conf`](<#fd_get_resolv_conf>), which are used for name resolution and configuration retrieval. Additionally, it declares external thread-local variables `fd_etc_hosts_fd` and `fd_etc_resolv_conf_fd` for handling pre-opened file descriptors related to hosts and resolver configuration files.
+This C header file defines structures and function prototypes for DNS resolution and network address handling. It includes definitions for managing address information (`struct aibuf` and `struct address`), a configuration structure for DNS resolver settings (`struct fd_resolvconf`), and constants like `MAXNS` and `MAXADDRS` to limit the number of name servers and addresses processed. The file declares several functions with hidden visibility, such as [`fd_lookup_name`](#fd_lookup_name) and [`fd_get_resolv_conf`](#fd_get_resolv_conf), which are likely used for resolving hostnames and retrieving DNS configuration, respectively. Additionally, it includes external declarations for file descriptors related to system configuration files, enhancing the DNS resolution process by potentially using pre-opened file descriptors for `/etc/hosts` and `/etc/resolv.conf`.
 # Imports and Dependencies
 
 ---
@@ -21,150 +21,140 @@ This C header file defines data structures and function prototypes for DNS resol
 
 ---
 ### fd\_etc\_hosts\_fd
-- **Type**: ``int``
-- **Description**: A global variable that represents a file descriptor for the '/etc/hosts' file. It is declared with the `FD_TL` storage class specifier, which suggests it is thread-local.
-- **Use**: Used to access the '/etc/hosts' file for reading or writing operations.
+- **Type**: `int`
+- **Description**: The `fd_etc_hosts_fd` is a global integer variable that represents a file descriptor for the '/etc/hosts' file. It is declared with the `FD_TL` storage class specifier, which suggests it may be thread-local or have specific linkage attributes.
+- **Use**: This variable is used to access the '/etc/hosts' file, likely for reading or writing host information as part of the DNS resolution process.
 
 
 ---
 ### fd\_etc\_resolv\_conf\_fd
-- **Type**: ``int``
-- **Description**: A global variable that represents a file descriptor for the `/etc/resolv.conf` file. This file typically contains DNS configuration settings for the system.
-- **Use**: Used to access or manipulate the `/etc/resolv.conf` file within the program.
+- **Type**: `int`
+- **Description**: The `fd_etc_resolv_conf_fd` is a global integer variable that represents a file descriptor for the `/etc/resolv.conf` file. This file typically contains DNS resolver configuration for the system.
+- **Use**: This variable is used to access and manage the file descriptor associated with the system's DNS resolver configuration file.
 
 
 # Data Structures
 
 ---
 ### aibuf
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``ai``: Holds address information using the `fd_addrinfo_t` type.
-    - ``sa``: A union that can store either an IPv4 or IPv6 socket address.
-    - ``slot``: A short integer used for indexing or identification purposes.
-    - ``ref``: A short integer used as a reference counter or identifier.
-- **Description**: Stores network address information and related metadata, including address information (`ai`), a union for socket addresses (`sa`), and short integers for slot and reference tracking (`slot` and `ref`).
+    - `ai`: An instance of fd_addrinfo_t, likely containing address information.
+    - `sa`: A union containing either an IPv4 or IPv6 socket address.
+    - `slot`: A short integer used to identify a specific slot or position.
+    - `ref`: A short integer used as a reference counter or identifier.
+- **Description**: The `aibuf` structure is designed to encapsulate network address information, combining both IPv4 and IPv6 socket addresses within a union, and is likely used in network communication or address resolution tasks. It includes an `fd_addrinfo_t` type for address information, a union `sa` for handling both IPv4 and IPv6 addresses, and two short integers, `slot` and `ref`, which may be used for indexing or reference counting purposes.
 
 
 ---
 ### sa
 - **Type**: `union`
 - **Members**:
-    - `sin`: A member of type `struct sockaddr_in` for IPv4 addresses.
-    - `sin6`: A member of type `struct sockaddr_in6` for IPv6 addresses.
-- **Description**: The `sa` union can store either an IPv4 address using `struct sockaddr_in` or an IPv6 address using `struct sockaddr_in6`, allowing flexible handling of network addresses.
+    - `sin`: A member of type `struct sockaddr_in` representing an IPv4 socket address.
+    - `sin6`: A member of type `struct sockaddr_in6` representing an IPv6 socket address.
+- **Description**: The `sa` union is a data structure that can store either an IPv4 or an IPv6 socket address, allowing for flexible handling of network addresses in a single variable. It is used within the `aibuf` structure to accommodate different types of network addresses.
 
 
 ---
 ### address
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `family`: Specifies the address family, such as `AF_INET` for IPv4 or `AF_INET6` for IPv6.
-    - `scopeid`: Holds the scope identifier for the address, used in IPv6.
-    - `addr`: Stores the address in a 16-byte array, accommodating both IPv4 and IPv6 addresses.
-    - `sortkey`: Used to sort addresses, possibly based on preference or priority.
-- **Description**: Defines an address structure that holds information about a network address, including its family, scope, and the address itself, which can be either IPv4 or IPv6.
+    - `family`: Specifies the address family, such as AF_INET for IPv4 or AF_INET6 for IPv6.
+    - `scopeid`: An unsigned integer representing the scope identifier, used primarily for IPv6 addresses.
+    - `addr`: An array of 16 unsigned characters storing the address data, accommodating both IPv4 and IPv6 addresses.
+    - `sortkey`: An integer used for sorting addresses, potentially based on preference or priority.
+- **Description**: The `address` structure is designed to encapsulate network address information, supporting both IPv4 and IPv6 formats. It includes fields for specifying the address family, a scope identifier for IPv6, a 16-byte array to store the address itself, and a sort key for ordering purposes. This structure is likely used in network-related operations where address management and resolution are required.
 
 
 ---
 ### fd\_resolvconf
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``ns``: An array of `struct address` with a maximum size of `MAXNS` to store nameserver addresses.
-    - ``nns``: An unsigned integer representing the number of nameservers.
-    - ``attempts``: An unsigned integer indicating the number of attempts to resolve a query.
-    - ``ndots``: An unsigned integer specifying the minimum number of dots in a domain name to trigger a search.
-    - ``timeout``: An unsigned integer defining the timeout duration for a query.
-- **Description**: Stores configuration settings for DNS resolution, including nameserver addresses, the number of nameservers, query attempts, domain name dot threshold, and query timeout.
+    - `ns`: An array of 'address' structures representing the nameservers, with a maximum of MAXNS entries.
+    - `nns`: An unsigned integer representing the number of nameservers configured.
+    - `attempts`: An unsigned integer indicating the number of attempts to resolve a query.
+    - `ndots`: An unsigned integer specifying the number of dots in a domain name before an initial absolute query is made.
+    - `timeout`: An unsigned integer representing the timeout duration for a query.
+- **Description**: The 'fd_resolvconf' structure is used to store DNS resolver configuration settings, including an array of nameserver addresses, the number of nameservers, the number of query attempts, the number of dots in a domain name before an absolute query is attempted, and the timeout duration for DNS queries. This structure is essential for managing DNS resolution behavior in network applications.
 
 
 ---
 ### fd\_resolvconf\_t
-- **Type**: ``struct fd_resolvconf``
+- **Type**: `struct`
 - **Members**:
-    - ``ns``: An array of `struct address` representing the name servers.
-    - ``nns``: The number of name servers in the `ns` array.
-    - ``attempts``: The number of attempts to resolve a name.
-    - ``ndots``: The number of dots in a name before an initial absolute query.
-    - ``timeout``: The timeout duration for a name resolution attempt.
-- **Description**: Defines the configuration for DNS resolution, including name servers, the number of resolution attempts, the number of dots in a domain name before considering it absolute, and the timeout for resolution attempts.
+    - `ns`: An array of 'address' structures representing the nameservers.
+    - `nns`: The number of nameservers configured.
+    - `attempts`: The number of attempts to resolve a query.
+    - `ndots`: The number of dots in a domain name before an initial absolute query is made.
+    - `timeout`: The timeout duration for a query.
+- **Description**: The 'fd_resolvconf_t' structure is used to store DNS resolver configuration settings, including an array of nameserver addresses, the number of nameservers, the number of query attempts, the number of dots in a domain name before an absolute query is made, and the timeout duration for queries. This structure is essential for managing DNS resolution settings in network applications.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_lookup\_name<!-- {{#callable_declaration:fd_lookup_name}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_lookup.h#L42>)
-
 Resolves a hostname to a list of network addresses.
-- **Description**: Use this function to resolve a given hostname into a list of network addresses, which can include both IPv4 and IPv6 addresses. The function populates the provided buffer with address information and returns the number of addresses found. It can handle special flags for IPv4-mapped IPv6 addresses and can perform DNS lookups if necessary. Ensure that the `name` parameter is not null and does not exceed 254 characters. The function must be called with a valid buffer capable of holding up to `MAXADDRS` addresses. It returns an error code if the name is invalid or if no addresses are found.
+- **Description**: This function attempts to resolve a given hostname into a list of network addresses, storing the results in the provided buffer. It can handle both IPv4 and IPv6 addresses, and supports various flags to modify its behavior, such as handling IPv4-mapped IPv6 addresses. The function should be called with a valid hostname and appropriate family and flags settings. It returns the number of addresses found or an error code if the resolution fails. The canonical name of the host is also returned if available. The function must be called with a buffer capable of holding up to MAXADDRS addresses and a canonical name buffer of at least 256 characters.
 - **Inputs**:
-    - `buf`: An array of `struct address` with a size of at least `MAXADDRS`. The function populates this buffer with the resolved addresses. The caller must ensure the buffer is valid and has sufficient space.
-    - `canon`: A character array with a size of at least 256. The function writes the canonical name of the host into this buffer. The caller must ensure the buffer is valid and has sufficient space.
-    - `name`: A null-terminated string representing the hostname to resolve. It must not be null and should not exceed 254 characters in length. If the name is invalid, the function returns an error code.
-    - `family`: An integer specifying the address family to use for the lookup. It can be `AF_INET` for IPv4, `AF_INET6` for IPv6, or `AF_UNSPEC` for unspecified.
-    - `flags`: An integer representing flags that modify the lookup behavior. It can include `FD_AI_V4MAPPED` to request IPv4-mapped IPv6 addresses and other flags that affect the resolution process.
-- **Output**: Returns the number of addresses found and stored in `buf`. If no addresses are found or if an error occurs, it returns an error code such as `FD_EAI_NONAME`.
-- **See Also**: [`fd_lookup_name`](<fd_lookup_name.c.md#fd_lookup_name>)  (Implementation)
+    - `buf`: An array of 'struct address' with a size of at least MAXADDRS. It is used to store the resolved addresses. The caller must ensure this buffer is properly allocated and has sufficient space.
+    - `canon`: A character array with a size of at least 256. It is used to store the canonical name of the host if available. The caller must ensure this buffer is properly allocated.
+    - `name`: A pointer to a null-terminated string representing the hostname to resolve. It must not be null, and its length must be less than 255 characters. An empty or overly long name will result in an error.
+    - `family`: An integer specifying the address family to use for resolution. It can be AF_INET for IPv4, AF_INET6 for IPv6, or AF_UNSPEC for any family.
+    - `flags`: An integer representing flags that modify the resolution behavior. It can include flags like FD_AI_V4MAPPED to handle IPv4-mapped IPv6 addresses. Invalid flags may alter the function's behavior.
+- **Output**: Returns the number of addresses found on success, or a negative error code on failure. The 'buf' array is populated with the resolved addresses, and 'canon' is set to the canonical name if available.
+- **See also**: [`fd_lookup_name`](fd_lookup_name.c.md#fd_lookup_name)  (Implementation)
 
 
 ---
 ### fd\_lookup\_ipliteral<!-- {{#callable_declaration:fd_lookup_ipliteral}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_lookup.h#L49>)
-
-Converts an IP address literal to a structured address format.
-- **Description**: Use this function to convert a string representation of an IP address into a structured `address` format. It supports both IPv4 and IPv6 addresses. The function requires a valid IP address string and a specified address family. If the address family does not match the IP version of the input string, the function returns an error code. The function writes the converted address into the provided buffer. Ensure that the buffer is not null and has space for at least one `address` structure. The function returns specific error codes for invalid input or mismatched address families.
+Resolves an IP literal to an address structure.
+- **Description**: This function attempts to resolve a given IP literal string into an address structure, storing the result in the provided buffer. It is used when you have a string representation of an IP address and need to convert it into a structured format for network operations. The function supports both IPv4 and IPv6 addresses, and the caller must specify the expected address family. If the IP literal does not match the specified family, or if the conversion fails, the function returns an error code. The buffer must be pre-allocated and capable of holding at least one address structure.
 - **Inputs**:
-    - `buf`: A pointer to an array of at least one `address` structure where the function will store the converted address. Must not be null.
-    - `name`: A null-terminated string representing the IP address to convert. Must be a valid IPv4 or IPv6 address.
-    - `family`: An integer specifying the address family, either `AF_INET` for IPv4 or `AF_INET6` for IPv6. The function returns an error if this does not match the IP version of `name`.
-- **Output**: Returns 1 on success, 0 if the IP address is invalid, or a negative error code if the address family is incorrect or other errors occur.
-- **See Also**: [`fd_lookup_ipliteral`](<fd_lookup_ipliteral.c.md#fd_lookup_ipliteral>)  (Implementation)
+    - `buf`: A pre-allocated array of at least one 'struct address' where the resolved address will be stored. The caller retains ownership and must ensure it is not null.
+    - `name`: A null-terminated string representing the IP literal to be resolved. It must not be null and should be a valid IP address in either IPv4 or IPv6 format.
+    - `family`: An integer specifying the address family, either AF_INET for IPv4 or AF_INET6 for IPv6. If the IP literal does not match the specified family, an error is returned.
+- **Output**: Returns 1 on successful resolution, 0 if the IP literal is invalid, or an error code (e.g., FD_EAI_NODATA, FD_EAI_NONAME) if the family is incorrect or other issues occur.
+- **See also**: [`fd_lookup_ipliteral`](fd_lookup_ipliteral.c.md#fd_lookup_ipliteral)  (Implementation)
 
 
 ---
 ### fd\_get\_resolv\_conf<!-- {{#callable_declaration:fd_get_resolv_conf}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_lookup.h#L54>)
-
-Reads DNS resolver configuration from a file.
-- **Description**: Use this function to populate a `fd_resolvconf_t` structure with DNS resolver settings from a configuration file. It reads the number of name servers, the number of attempts, the timeout, and the ndots option. If the configuration file is not available or no name servers are specified, it defaults to using the local host as the name server. This function must be called with a valid `fd_resolvconf_t` pointer, and it assumes that the file descriptor `fd_etc_resolv_conf_fd` is set to the correct file. The function does not return error codes but initializes the configuration with default values if the file cannot be read.
+Populates a resolver configuration structure with settings from the system's resolv.conf file.
+- **Description**: This function reads the system's /etc/resolv.conf file to populate a provided fd_resolvconf_t structure with DNS resolver settings, such as nameservers, ndots, timeout, and attempts. It should be called when you need to configure DNS resolution settings based on the system's configuration. If the resolv.conf file is not accessible or no nameservers are specified, it defaults to using the local host (127.0.0.1) as the nameserver. The function assumes that the file descriptor for /etc/resolv.conf is pre-opened and available in fd_etc_resolv_conf_fd. It does not handle errors explicitly but logs them if seeking within the file fails.
 - **Inputs**:
-    - `conf`: A pointer to a `fd_resolvconf_t` structure that will be populated with the DNS resolver configuration. Must not be null. The caller retains ownership of the structure.
-- **Output**: Returns 0 after populating the `fd_resolvconf_t` structure with the configuration data or default values.
-- **See Also**: [`fd_get_resolv_conf`](<fd_resolvconf.c.md#fd_get_resolv_conf>)  (Implementation)
+    - `conf`: A pointer to an fd_resolvconf_t structure that will be populated with the resolver configuration. Must not be null. The caller retains ownership of this structure.
+- **Output**: Returns 0 on completion. The conf structure is populated with the resolver settings, including default values if the resolv.conf file is not available or lacks nameserver entries.
+- **See also**: [`fd_get_resolv_conf`](fd_resolvconf.c.md#fd_get_resolv_conf)  (Implementation)
 
 
 ---
 ### fd\_res\_msend\_rc<!-- {{#callable_declaration:fd_res_msend_rc}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_lookup.h#L57>)
-
 Sends multiple DNS queries and receives their responses.
-- **Description**: Use this function to send multiple DNS queries in parallel and receive their responses. It requires a configuration structure that specifies the DNS servers to query and other parameters like timeout and retry attempts. The function sends queries to the specified DNS servers and waits for responses. It handles both IPv4 and IPv6 addresses and can retry queries in case of server failures. The function must be called with valid query data and buffer sizes to store the responses. It returns 0 on success, indicating that all queries have been processed, or -1 if an error occurs during socket operations.
+- **Description**: This function is used to send multiple DNS queries in parallel and receive their responses. It is designed to handle both IPv4 and IPv6 addresses and can retry queries in case of server failures. The function requires a valid configuration structure to specify the DNS servers and query parameters. It must be called with properly initialized input and output buffers, and the caller is responsible for interpreting the received DNS answer packets. The function will attempt to bind a socket and send queries to the configured DNS servers, handling both UDP and TCP protocols as necessary. It returns 0 on success, with the answers and their lengths populated in the provided buffers.
 - **Inputs**:
     - `nqueries`: The number of DNS queries to send. Must be a positive integer.
-    - `queries`: An array of pointers to the DNS query data. Each query must be a valid DNS query packet. The caller retains ownership of the data.
-    - `qlens`: An array of integers specifying the length of each query in the 'queries' array. Each length must correspond to the respective query.
-    - `answers`: An array of pointers to buffers where the function will store the DNS responses. Each buffer must be large enough to hold the response data. The caller retains ownership of the buffers.
-    - `alens`: An array of integers where the function will store the length of each response. The array must have space for 'nqueries' integers.
-    - `asize`: The size of each buffer in the 'answers' array. Must be large enough to store the expected DNS response.
-    - `conf`: A pointer to a 'fd_resolvconf_t' structure containing the DNS server configuration and other parameters. Must not be null.
-- **Output**: Returns 0 on success, or -1 if an error occurs during socket operations. The 'alens' array is updated with the length of each response, or zero if no response is received.
-- **See Also**: [`fd_res_msend_rc`](<fd_res_msend.c.md#fd_res_msend_rc>)  (Implementation)
+    - `queries`: An array of pointers to the DNS query data. Each query must be a valid DNS query packet. The array must not be null, and each query must be properly formatted.
+    - `qlens`: An array of integers representing the lengths of each query in the 'queries' array. Must have the same number of elements as 'nqueries'.
+    - `answers`: An array of pointers where the DNS answers will be stored. Each pointer must point to a buffer large enough to hold the expected answer. The array must not be null.
+    - `alens`: An array of integers where the lengths of the received answers will be stored. Must have the same number of elements as 'nqueries'. The array must not be null.
+    - `asize`: The size of each buffer in the 'answers' array. Must be a positive integer.
+    - `conf`: A pointer to a 'fd_resolvconf_t' structure containing the DNS server configuration. Must not be null and must be properly initialized.
+- **Output**: Returns 0 on success, with the 'answers' and 'alens' arrays populated with the received DNS responses and their lengths, respectively.
+- **See also**: [`fd_res_msend_rc`](fd_res_msend.c.md#fd_res_msend_rc)  (Implementation)
 
 
 ---
 ### fd\_dns\_parse<!-- {{#callable_declaration:fd_dns_parse}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_lookup.h#L66>)
-
 Parses a DNS response and invokes a callback for each answer.
-- **Description**: Use this function to parse a DNS response message and process each answer section through a callback function. The function expects a valid DNS response message in the form of a byte array. It checks for a minimum length and a valid response code before parsing. The callback function is called for each answer, and if it returns a negative value, the parsing stops and the function returns an error. This function is useful when you need to handle DNS responses and process each answer individually.
+- **Description**: This function processes a DNS response packet and calls a user-provided callback function for each answer section in the packet. It should be used when you need to handle DNS responses manually, allowing custom processing of each answer. The function expects a valid DNS response packet and will return an error if the packet is malformed or if the callback function returns a negative value. It is important to ensure that the callback function is capable of handling the data passed to it and that the context pointer is valid.
 - **Inputs**:
-    - `r`: Pointer to a byte array containing the DNS response message. Must not be null and must have a length of at least 12 bytes.
-    - `rlen`: Length of the DNS response message in bytes. Must be at least 12.
-    - `callback`: Function pointer to a callback that processes each DNS answer. The callback receives a context pointer, type, data pointer, data length, the original DNS response, and its length. Must not be null.
-    - `ctx`: Pointer to user-defined data passed to the callback function. Can be null if the callback does not require context.
-- **Output**: Returns 0 on success, -1 on error, or 0 if the response code indicates an error.
-- **See Also**: [`fd_dns_parse`](<fd_dns_parse.c.md#fd_dns_parse>)  (Implementation)
+    - `r`: A pointer to the DNS response packet data. It must not be null and should point to a buffer of at least 'rlen' bytes.
+    - `rlen`: The length of the DNS response packet data. It must be at least 12 to be considered a valid DNS response.
+    - `callback`: A pointer to a function that will be called for each answer in the DNS response. The function should return a non-negative value on success and a negative value on failure.
+    - `ctx`: A user-defined context pointer that will be passed to the callback function. It can be used to maintain state or pass additional information to the callback.
+- **Output**: Returns 0 on success, -1 if the DNS response is malformed or if the callback returns a negative value.
+- **See also**: [`fd_dns_parse`](fd_dns_parse.c.md#fd_dns_parse)  (Implementation)
 
 
 

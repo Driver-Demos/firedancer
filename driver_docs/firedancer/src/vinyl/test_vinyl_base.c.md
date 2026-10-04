@@ -3,50 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for error codes, key initialization, and key comparison functions in the Vinyl module.
+Unit tests for vinyl error codes, key layout, copy, equality, and memo behavior.
 
 # Purpose
-The code is a C program that serves as a test suite for validating the functionality of the `fd_vinyl` library. It includes static assertions to verify that various error codes and constants, such as `FD_VINYL_SUCCESS`, `FD_VINYL_ERR_INVAL`, and `FD_VINYL_KEY_ALIGN`, are correctly defined. The program initializes a random number generator and performs a series of tests on the `fd_vinyl_key_t` data structure. These tests include initializing keys with random values, checking key equality, and verifying the behavior of key memoization functions. The program also tests different key initialization methods, such as zero padding and truncating copies, to ensure that the `fd_vinyl` library functions as expected.
-
-The main function of the program logs error codes and their corresponding string representations using the `fd_vinyl_strerror` function. It then enters a loop to perform extensive testing of key operations, including initialization, equality checks, and memoization. The program uses assertions to confirm that the operations produce the expected results. If all tests pass, the program logs a "pass" message and terminates. This code is intended to be executed as a standalone program to verify the integrity and correctness of the `fd_vinyl` library's key management functionality.
-# Imports and Dependencies
-
----
-- `fd_vinyl.h`
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/vinyl/test_vinyl_base.c#L23>)
-
-Initializes the environment, tests error codes and key operations, and logs results.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: The array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Creates a random number generator `rng` and initializes it with `fd_rng_new`.
-    - Logs various error codes and their string representations using `FD_LOG_NOTICE`.
-    - Deletes the random number generator with `fd_rng_delete`.
-    - Runs a loop 1,000,000 times to test key operations.
-    - In each iteration, generates a `seed` and an array `limb` of 10 random unsigned long integers.
-    - Initializes two keys `ka` and `kb` using [`fd_vinyl_key_init_ulong`](<fd_vinyl_base.h.md#fd_vinyl_key_init_ulong>) with parts of `limb`.
-    - Checks if the keys `ka` and `kb` are initialized correctly and compares them.
-    - Calculates memoization values `ma` and `mb` for keys `ka` and `kb` using [`fd_vinyl_key_memo`](<fd_vinyl_base.h.md#fd_vinyl_key_memo>).
-    - Tests key equality using [`fd_vinyl_key_eq`](<fd_vinyl_base.h.md#fd_vinyl_key_eq>) and verifies memoization values if keys are equal.
-    - Performs zero padding copy, normal copy, and truncating copy operations on keys.
-    - Logs a "pass" message if all tests succeed.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_vinyl_strerror`](<fd_vinyl_base.c.md#fd_vinyl_strerror>)
-    - [`fd_vinyl_key_init_ulong`](<fd_vinyl_base.h.md#fd_vinyl_key_init_ulong>)
-    - [`fd_vinyl_key_memo`](<fd_vinyl_base.h.md#fd_vinyl_key_memo>)
-    - [`fd_vinyl_key_eq`](<fd_vinyl_base.h.md#fd_vinyl_key_eq>)
-
-
+This file is a unit test for the `fd_vinyl` API. It checks compile-time constants with `FD_STATIC_ASSERT`, including error codes, alignment, object sizes, and value limits for `fd_vinyl_key_t` and `fd_vinyl_info_t`. The [`main`](<#main>) function initializes the runtime, prints the text form of each `fd_vinyl` error code with `fd_vinyl_strerror`, and then runs many random tests for `fd_vinyl_key_init_ulong`, `fd_vinyl_key_init`, `fd_vinyl_key_eq`, and `fd_vinyl_key_memo`. It also verifies that copied key data is correct and that unused bytes are zeroed when the copy size is shorter than `FD_VINYL_KEY_FOOTPRINT`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
