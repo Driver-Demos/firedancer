@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_picohttpparser.patch` file in the `firedancer` codebase contains modifications to the `picohttpparser` code, primarily adding explicit type casting and fallthrough attributes to improve type safety and control flow.
+Patch for type casting and fallthrough attribute adjustments in the HTTP parser code.
 
 # Purpose
-The provided content appears to be a diff output from a version control system, showing changes made to a C or C++ source code file. The primary purpose of these changes is to ensure type safety and correctness by explicitly casting arithmetic operations and variable assignments to the appropriate data types, such as casting differences between pointers to `size_t` and initializing integer variables to zero. Additionally, the changes include the use of the `__attribute__((fallthrough))` annotation to explicitly indicate intentional fall-through behavior in switch-case statements, which helps in maintaining code clarity and preventing compiler warnings. The modification of an assertion statement to a more standard form (`assert(0)`) suggests an effort to improve code readability and maintainability. Overall, these changes enhance the robustness and clarity of the code.
+The content describes a series of modifications to a C/C++ source code file, focusing on type casting and code annotations. The changes involve casting arithmetic operations to specific data types, such as `size_t` and `int`, to ensure type safety and prevent potential data type mismatches. Additionally, the code introduces the `__attribute__((fallthrough))` annotation, which is used to explicitly indicate intentional fall-through behavior in switch-case statements, improving code clarity and preventing compiler warnings. The modifications also include changing assertions to use integer comparisons, such as replacing `assert(!"decoder is corrupt")` with `assert(0)`, to maintain consistent assertion practices. These changes aim to enhance code reliability and maintainability by enforcing strict type usage and clarifying control flow.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

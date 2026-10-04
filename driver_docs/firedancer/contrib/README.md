@@ -3,37 +3,37 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Scripts, tools, configs, and tests for build, debug, lint, docs, QUIC, Solana, and CI tasks.
+Scripts, configs, and tools for code generation, analysis, testing, debugging, dashboards, and Solana tasks.
 
 ## Folders
-- **[bundle-test-server](bundle-test-server/README.md)**: Protocol buffers, a gRPC test server, and Rust build and package files.
-- **[codegen](codegen/README.md)**: Python scripts for CAVP, perfect hash, Wycheproof, and seccomp filter generation.
-- **[codeql](codeql/README.md)**: CodeQL queries, tests, and workspace config for C++ bug and dead-code checks.
-- **[containers](containers/README.md)**: Docker build and run instructions plus Rocky Linux 8 images with GCC 8, 9, and 10, CMake, and Rust
-- **[doxygen](doxygen/README.md)**: Build scripts and settings for generating Doxygen HTML API docs from source and README.md
-- **[ed25519](ed25519/README.md)**: The `ed25519` folder in the `firedancer` codebase contains the `dalek_target` directory, which includes source code and configuration files for building a Rust library that uses the ed25519_dalek library for cryptographic operations and interfaces with C through FFI.
-- **[gdb](gdb/README.md)**: The `gdb` folder in the `firedancer` codebase contains Python scripts and documentation aimed at enhancing the debugging experience for Firedancer code by providing custom pretty printers for specific data types in GDB.
-- **[grafana](grafana/README.md)**: Grafana dashboards for bundle, QUIC, and tile metrics.
-- **[ledger-gen](ledger-gen/README.md)**: The `ledger-gen` folder in the `firedancer` codebase contains Rust source files for Solana program management and a Python script for generating Solana test clusters, with its configuration and dependencies specified in the `Cargo.toml` file.
-- **[lint](lint/README.md)**: Checks C/C++ header include guards against Firedancer style.
-- **[offline-replay](offline-replay/README.md)**: Offline replay configs and shell scripts for network setup, replay, and backtest automation.
-- **[quic](quic/README.md)**: QUIC compatibility tests, benchmarks, and interop tooling for Go and Rust.
-- **[repair-analysis](repair-analysis/README.md)**: Generates PDF reports from testnet logs and CSV data for repair, FEC, and peer analysis.
-- **[skip_rate](skip_rate/README.md)**: The `skip_rate` folder in the `firedancer` codebase contains a Python script, `skip_rate.py`, which calculates the skip rate and adjusted skip rate for a Solana validator by analyzing leader slots and identifying missed slots due to offline status.
-- **[test](test/README.md)**: Scripts and helpers for CI, integration, unit, fuzz, ledger, and cluster tests.
-- **[tool](tool/README.md)**: The `tool` folder in the `firedancer` codebase contains various scripts and configuration files for interacting with Solana blockchain nodes, syntax highlighting, debugging, memory leak detection, and code formatting.
+- **[bundle-test-server](bundle-test-server/README.md)**: Protobuf and gRPC definitions, gRPC server implementation, build script, and package configuration.
+- **[codegen](codegen/README.md)**: Python scripts for generating C files with cryptographic test vectors, perfect hash functions, and cBPF code.
+- **[codeql](codeql/README.md)**: CodeQL queries and configurations for C++ analysis, error handling, and memory management.
+- **[containers](containers/README.md)**: Dockerfiles for Rocky Linux 8 containers with various GCC toolsets, CMake 3.26.5, and Rust, plus a README.
+- **[doxygen](doxygen/README.md)**: Doxygen-related version control, build script, and configuration file for documentation generation.
+- **[ed25519](ed25519/README.md)**: Functions for signing and verifying messages using ed25519_dalek, package configuration, and build targets.
+- **[gdb](gdb/README.md)**: GDB scripts and pretty printers for `fd_hash` and `fd_signature` types in Firedancer.
+- **[grafana](grafana/README.md)**: Grafana dashboard configurations for monitoring QUIC, network metrics, and Firedancer tiles using Prometheus.
+- **[ledger-gen](ledger-gen/README.md)**: Functions and utilities for Solana management, package configuration, and test cluster scripts.
+- **[lint](lint/README.md)**: Verifies C/C++ header include guards against Firedancer code style.
+- **[offline-replay](offline-replay/README.md)**: Configuration and Bash scripts for offline replay settings, network parameters, and automation tasks.
+- **[quic](quic/README.md)**: Functions and files for QUIC data transmission, testing, and compatibility in Agave, Go, and Rust.
+- **[repair-analysis](repair-analysis/README.md)**: Generates a PDF report analyzing repair mechanisms in a testnet run using CSV data and logs.
+- **[skip_rate](skip_rate/README.md)**: Calculates skip rate and adjusted skip rate for a Solana validator during a given epoch.
+- **[test](test/README.md)**: CI, fuzz, integration, unit, test vector, cluster setup, and TPS scripts.
+- **[tool](tool/README.md)**: Scripts and tools for Solana block production, transaction generation, memory leak detection, and code formatting.
 
 ## Files
-- **[activate](activate.md)**: The `activate` file is a Bash script that sets up the environment by loading specific modules such as gcc, Python, and openssl, and checks for the presence of the `module` command.
-- **[activate-clang](activate-clang.md)**: The `activate-clang` file is a Bash script used internally to install and activate Clang version 15.0 on development hosts within the `firedancer` codebase.
-- **[activate-gcc](activate-gcc.md)**: The `activate-gcc` file is a Bash script used internally to install and activate GCC version 12.2.0 on development hosts within the `firedancer` codebase.
-- **[build.sh](build.sh.md)**: Build matrix script for gcc and clang targets with dependency setup and failure reporting
-- **[debug.gdb](debug.gdb.md)**: GDB script that breaks on fd_log_private_2, runs, and quits on exit code 0
-- **[deps-bundle.sh](deps-bundle.sh.md)**: Creates a compressed tar bundle of build dependencies from ./opt.
-- **[lint.sh](lint.sh.md)**: The `lint.sh` file is a shell script that checks for the presence of specific patterns ('for (' and 'if (') in the codebase using `git grep` and exits with an error if they are found.
-- **[make-j](make-j.md)**: The `make-j` file is a Bash script that facilitates parallel make operations, with special handling for systems with CPU isolation by targeting isolated cores for the build process.
-- **[tag-release.py](tag-release.py.md)**: The `tag-release.py` file in the `firedancer` codebase automates the process of incrementing the patch version in a version file, verifying branch naming conventions, and creating a corresponding git commit and tag.
-- **[tango.lua](tango.lua.md)**: Wireshark Lua dissectors for Firedancer Tango, TPU, shred, and related message formats.
+- **[activate](activate.md)**: Bash script to load specific modules for Jump's environment, including GCC, Python, and OpenSSL.
+- **[activate-clang](activate-clang.md)**: Bash script to install and activate Clang 15.0 for development environments.
+- **[activate-gcc](activate-gcc.md)**: Bash script to install and activate GCC 12.2.0 for development hosts.
+- **[build.sh](build.sh.md)**: A Bash script for building projects with options for compiler selection, target specification, and error handling.
+- **[debug.gdb](debug.gdb.md)**: A GDB script to set a breakpoint at `fd_log_private_2`, run the program, and exit if successful.
+- **[deps-bundle.sh](deps-bundle.sh.md)**: Creates a redistributable bundle of build dependencies using Zstandard compression and GNU tar.
+- **[lint.sh](lint.sh.md)**: Shell script to search for and exit on lines with 'for (' or 'if (' in the codebase.
+- **[make-j](make-j.md)**: A Bash script for executing parallel make with CPU isolation considerations.
+- **[tag-release.py](tag-release.py.md)**: Automates version incrementing and tagging in a Git repository based on version.mk and branch name.
+- **[tango.lua](tango.lua.md)**: Wireshark plugin for dissecting Firedancer Tango messages, defining protocols and fields for network analysis.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
