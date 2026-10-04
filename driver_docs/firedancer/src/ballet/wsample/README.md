@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Weighted sampling API, implementation, build rules, and tests with add, remove, restore, and AVX512 paths
+Weighted sampling algorithm and tests, ChaCha20 methods, and Makefile for `fd_wsample`.
 
 
 ## Files
-- **[fd_wsample.c](fd_wsample.c.md)**: Weighted sampling with removal, restore, and AVX512 fast paths using a radix-9 tree.
-- **[fd_wsample.h](fd_wsample.h.md)**: Weighted sampling API using ChaCha20, with add, remove, restore, and seed functions.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit test configurations for the `fd_wsample` component within the `ballet` module.
-- **[test_wsample.c](test_wsample.c.md)**: Tests weighted sampling, removal, restore, poison, footprint, and distribution behavior.
+- **[fd_wsample.c](fd_wsample.c.md)**: Implements a weighted sampling algorithm using a radix-9 tree structure for efficient sampling and removal operations.
+- **[fd_wsample.h](fd_wsample.h.md)**: Defines methods for computing weighted random samples using ChaCha20, as used by Solana for leader scheduling and Turbine trees.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_wsample` in the `firedancer` codebase.
+- **[test_wsample.c](test_wsample.c.md)**: Tests for weighted sampling functions, including chi-squared tests and various sampling scenarios.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

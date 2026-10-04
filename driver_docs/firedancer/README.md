@@ -3,32 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build, docs, config, scripts, corpora, and source for Firedancer development and testing.
+GitHub Actions, VSCode config, docs, build tools, scripts, fuzz corpora, and source code.
 
 ## Folders
-- **[.github](.github/README_.md)**: GitHub Actions, Codecov, and Dependabot configuration for builds, tests, coverage, benchmarks, docs, and updates.
-- **[.vscode](.vscode/README.md)**: Launch and build tasks for firedancer-dev with lldb-dap and make -j.
-
-- **[book](book/README.md)**: VitePress docs, guides, and API references for Firedancer.
-- **[config](config/README.md)**: Makefile build settings, rules, and fragments for tools, flags, targets, tests, coverage, and cleanup.
-- **[contrib](contrib/README.md)**: Scripts, tools, configs, and tests for build, debug, lint, docs, QUIC, Solana, and CI tasks.
-- **[corpus](corpus/README.md)**: Fuzzing corpora for base64, HTTP, QUIC, and snapshot HTTP, plus .gitignore.
-- **[doc](doc/README.md)**: Build system, CodeQL, source tree, and testing docs, plus technical notes in `rant`.
-- **[src](src/README.md)**: Blockchain, cryptography, networking, FPGA, and utility modules with tests and build rules.
+- **[.github](.github/README_.md)**: GitHub Actions for CPU management, dependency caching, huge page configuration, submodule caching, and workflows for building, testing, deploying, and analyzing projects, plus configurations for Codecov and Dependabot.
+- **[.vscode](.vscode/README.md)**: Configuration for launching the Firedancer program with LLDB and building the "firedancer-dev" target in VSCode.
+- **[book](book/README.md)**: VitePress documentation, API and guide pages, and site configuration files.
+- **[config](config/README.md)**: Makefile configurations for build options, environments, compiler settings, and project management.
+- **[contrib](contrib/README.md)**: Scripts, configs, and tools for code generation, analysis, testing, debugging, dashboards, and Solana tasks.
+- **[corpus](corpus/README.md)**: Fuzz corpora for base64, HTTP, and QUIC, plus a Git ignore file.
+- **[doc](doc/README.md)**: Discussions on custom integer types, build system documentation, CodeQL guide, source tree organization, and testing documentation.
+- **[src](src/README.md)**: Functions and tools for applications, cryptography, Solana protocols, networking, and FPGA operations.
 
 ## Files
-- **[.gitattributes](.gitattributes.md)**: Git attributes for generated, binary, and protobuf files.
-- **[.gitignore](.gitignore.md)**: Ignore rules for build outputs, editor files, logs, captures, and generated artifacts.
-- **[.gitmodules](.gitmodules.md)**: The `.gitmodules` file in the `firedancer` codebase specifies the configuration for the `agave` submodule, including its path, URL, and branch.
-- **[.pre-commit-config.yaml](.pre-commit-config.yaml.md)**: The `.pre-commit-config.yaml` file in the `firedancer` codebase configures pre-commit hooks to check for trailing whitespace, excluding specific directories.
-- **[CODEOWNERS](CODEOWNERS.md)**: Path-based code ownership assignments for repository directories and files.
-- **[CONTRIBUTING.md](CONTRIBUTING.md.md)**: Code style rules for Firedancer C, macros, portability, security, and documentation.
-- **[deps.sh](deps.sh.md)**: Fetches, checks, and installs Firedancer dependencies for supported OSes.
-- **[LICENSE](LICENSE.md)**: The `LICENSE` file in the `firedancer` codebase outlines the terms and conditions under which the software is licensed, specifically under the Apache License, Version 2.0.
-- **[Makefile](Makefile.md)**: The `GNUmakefile` in the `firedancer` codebase provides a configuration for building the project with support for parallel builds, machine-specific configurations, and optional build features.
-- **[NOTICE](NOTICE.md)**: Legal notices and third-party license attributions for imported code and test data.
-- **[README.md](README.md.md)**: The `README.md` file in the `firedancer` codebase provides an overview of the Firedancer validator client for Solana, highlighting its speed, security, and independence, along with development instructions and licensing information.
-- **[SECURITY.md](SECURITY.md.md)**: The `SECURITY.md` file outlines the security measures for the Firedancer project, including a bug bounty program, third-party security audits, and an audit contest.
+- **[.gitattributes](.gitattributes.md)**: Configuration for Git to manage diff and linguist settings for specific file patterns.
+- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in the `firedancer` codebase for version control.
+- **[.gitmodules](.gitmodules.md)**: Configuration for the "agave" submodule with its path, URL, and branch details.
+- **[.pre-commit-config.yaml](.pre-commit-config.yaml.md)**: Configuration for pre-commit hooks to remove trailing whitespace, excluding specific directories.
+- **[CODEOWNERS](CODEOWNERS.md)**: Defines code ownership for directories and files in the `firedancer` codebase.
+- **[CONTRIBUTING.md](CONTRIBUTING.md.md)**: Guidelines for code style, spacing, alignment, type system, documentation, macros, portability, and security in the Firedancer project.
+- **[deps.sh](deps.sh.md)**: A Bash script for managing dependencies in the Firedancer project, including fetching, checking, and installing them.
+- **[LICENSE](LICENSE.md)**: Apache License, Version 2.0, governing use, reproduction, and distribution of the codebase.
+- **[Makefile](Makefile.md)**: Makefile for building targets with support for machine-specific configurations and optional features.
+- **[NOTICE](NOTICE.md)**: Legal notices and licensing information for various third-party software components used in the Firedancer codebase.
+- **[README.md](README.md.md)**: Documentation for Firedancer, a new validator client for Solana, including setup and development instructions.
+- **[SECURITY.md](SECURITY.md.md)**: Describes the Firedancer security program, including bug bounty, third-party audits, and an audit contest.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

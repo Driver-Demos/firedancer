@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_clang_noarch64.mk` file in the `firedancer` codebase is a makefile configuration that sets up build options for a Linux environment using Clang on a noarch64 architecture, including flags for debugging, security, optimization, and threading.
+Makefile for configuring a Linux build with Clang for noarch64, including various build options.
 
 # Purpose
-This Makefile snippet sets up a build configuration for a software project. It specifies the build directory as `linux/clang/noarch64` and includes several configuration files to extend the build setup with additional features such as Clang support, debugging, security, optimization, and threading. It also defines preprocessor flags and variables to enable double precision and stack allocation features.
+The Makefile sets the build directory to `linux/clang/noarch64` if it is not already defined. It includes several configuration files to extend the build setup with additional features such as Clang support, debugging, security, optimization, and threading. The `CPPFLAGS` variable is appended with preprocessor definitions `-DFD_HAS_DOUBLE=1` and `-DFD_HAS_ALLOCA=1`, which are also assigned as variables `FD_HAS_DOUBLE` and `FD_HAS_ALLOCA` with a value of `1`, indicating that the build should support double precision and stack allocation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
