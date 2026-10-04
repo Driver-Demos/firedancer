@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for writing and reading pcapng blocks, including SHB, IDB, EPB, and TLS key logs.
+The `test_pcapng.c` file in the `firedancer` codebase contains tests for writing and reading various pcapng blocks, including section header blocks, interface description blocks, packets, and TLS key logs, using the `fd_pcapng` library.
 
 # Purpose
-The code is a C program that tests the functionality of writing and reading `pcapng` (Packet Capture Next Generation) files. It includes several static functions that test different types of blocks within a `pcapng` file, such as the Section Header Block (SHB), Interface Description Block (IDB), Enhanced Packet Block (EPB), and Decryption Secrets Block (DSB). These tests involve writing data to a memory buffer using the `fmemopen` function and then verifying the written data using assertions. The program also includes a "dogfood" test, which writes a sequence of blocks to a buffer and then reads them back to verify the integrity and correctness of the data.
+This C source code file is designed to test the functionality of writing and reading pcapng (Packet Capture Next Generation) files, which are used for storing network packet data. The file includes several static functions that test the writing of different types of pcapng blocks, such as Section Header Blocks (SHB), Interface Description Blocks (IDB), Enhanced Packet Blocks (EPB), and Decryption Secrets Blocks (DSB). These tests are performed using the `fmemopen` function to simulate file operations in memory, allowing for the verification of the correct writing of data structures to the pcapng format. The code also includes a "dogfood" test, which writes a series of pcapng blocks and then reads them back to ensure the integrity and correctness of the data handling.
 
-The program uses static assertions to ensure the correct layout of various `pcapng` block structures, such as `fd_pcapng_shb_t`, `fd_pcapng_idb_t`, `fd_pcapng_epb_t`, `fd_pcapng_spb_t`, and `fd_pcapng_dsb_t`. These assertions check the offsets and sizes of the fields within these structures. The [`main`](<#main>) function initializes the program, runs the test functions, and logs the results. The program is designed to be executed as a standalone application, and it does not define public APIs or external interfaces. It focuses on validating the functionality of writing and reading `pcapng` data, ensuring that the data is correctly formatted and can be accurately retrieved.
+The file is structured as an executable C program, with a [`main`](#main) function that initializes the environment, runs the various test functions, and then concludes with a log message indicating success. The code makes use of static assertions to ensure the correct layout of data structures, which is critical for maintaining compatibility with the pcapng format. The inclusion of header files such as "fd_pcapng.h" and "fd_pcapng_private.h" suggests that this file is part of a larger library or application focused on network packet analysis or capture. The file does not define public APIs or external interfaces directly but rather serves as a test suite to validate the functionality of the pcapng handling capabilities provided by the included headers.
 # Imports and Dependencies
 
 ---
@@ -23,148 +23,130 @@ The program uses static assertions to ensure the correct layout of various `pcap
 
 ---
 ### test\_pcapng\_fwrite\_shb<!-- {{#callable:test_pcapng_fwrite_shb}} -->
-[View Source →](<../../../../../src/util/net/test_pcapng.c#L47>)
-
-Tests the writing of a Section Header Block (SHB) to a memory buffer using the [`fd_pcapng_fwrite_shb`](<fd_pcapng.c.md#fd_pcapng_fwrite_shb>) function.
+The function `test_pcapng_fwrite_shb` tests the writing of a Section Header Block (SHB) to a memory buffer using the [`fd_pcapng_fwrite_shb`](fd_pcapng.c.md#fd_pcapng_fwrite_shb) function.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Initialize a buffer `buf` of size 512 bytes to zero.
-    - Open a memory stream `pcap` using `fmemopen` with the buffer `buf` for writing in binary mode.
-    - Check if the `pcap` file stream is successfully opened using `FD_TEST`.
+- **Control Flow**:
+    - Initialize a buffer `buf` of 512 bytes to zero and open it as a file stream `pcap` in write mode using `fmemopen`.
+    - Check if the file stream `pcap` is successfully opened using `FD_TEST`.
     - Log the start of the Section Header Block test using `FD_LOG_INFO`.
     - Initialize `fd_pcapng_shb_opts_t` structure `opts` with hardware, OS, and user application information.
-    - Call [`fd_pcapng_fwrite_shb`](<fd_pcapng.c.md#fd_pcapng_fwrite_shb>) with `opts` and `pcap`, and verify the return value is 1 using `FD_TEST`.
-    - Get the current position in the `pcap` stream using `ftell` and store it in `pos`.
-    - Check if `pos` is non-negative using `FD_TEST`.
-    - Close the `pcap` stream using `fclose` and verify it returns 0 using `FD_TEST`.
+    - Call [`fd_pcapng_fwrite_shb`](fd_pcapng.c.md#fd_pcapng_fwrite_shb) with `opts` and `pcap`, and verify it returns 1 using `FD_TEST`.
+    - Get the current position in the file stream `pcap` using `ftell` and verify it is non-negative using `FD_TEST`.
+    - Close the file stream `pcap` and verify it closes successfully using `FD_TEST`.
     - Log a hex dump of the buffer `buf` up to the position `pos` using `FD_LOG_HEXDUMP_INFO`.
-- **Output**: No direct output is returned; the function logs information and performs tests to verify the writing of the Section Header Block.
-- **Functions Called**:
-    - [`fd_pcapng_fwrite_shb`](<fd_pcapng.c.md#fd_pcapng_fwrite_shb>)
+- **Output**: The function does not return any value; it performs tests and logs results to verify the correct writing of a Section Header Block to a buffer.
+- **Functions called**:
+    - [`fd_pcapng_fwrite_shb`](fd_pcapng.c.md#fd_pcapng_fwrite_shb)
 
 
 ---
 ### test\_pcapng\_fwrite\_idb<!-- {{#callable:test_pcapng_fwrite_idb}} -->
-[View Source →](<../../../../../src/util/net/test_pcapng.c#L69>)
-
-Tests the writing of an Interface Description Block (IDB) to a memory buffer using the [`fd_pcapng_fwrite_idb`](<fd_pcapng.c.md#fd_pcapng_fwrite_idb>) function.
+The function `test_pcapng_fwrite_idb` tests the writing of an Interface Description Block (IDB) to a memory buffer using the [`fd_pcapng_fwrite_idb`](fd_pcapng.c.md#fd_pcapng_fwrite_idb) function.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Initialize a buffer `buf` of 512 bytes to zero.
-    - Open a memory stream `pcap` using `fmemopen` with the buffer `buf` for writing in binary mode.
+- **Control Flow**:
+    - Initialize a buffer `buf` of 512 bytes to zero and open it as a writable memory stream `pcap`.
     - Check if the `pcap` file stream is successfully opened using `FD_TEST`.
-    - Log the start of the Interface Description Block test with `FD_LOG_INFO`.
-    - Initialize `fd_pcapng_idb_opts_t` structure `opts` with interface details such as name, IP address, MAC address, and hardware description.
-    - Call [`fd_pcapng_fwrite_idb`](<fd_pcapng.c.md#fd_pcapng_fwrite_idb>) with Ethernet link type, `opts`, and `pcap`, and verify the return value is 1 using `FD_TEST`.
+    - Log the start of the Interface Description Block test using `FD_LOG_INFO`.
+    - Define and initialize an `fd_pcapng_idb_opts_t` structure `opts` with interface details such as name, IP address, MAC address, and hardware description.
+    - Call [`fd_pcapng_fwrite_idb`](fd_pcapng.c.md#fd_pcapng_fwrite_idb) with Ethernet link type and `opts`, and verify it returns 1 using `FD_TEST`.
     - Get the current position in the `pcap` stream using `ftell` and verify it is non-negative using `FD_TEST`.
-    - Close the `pcap` stream using `fclose` and verify it returns 0 using `FD_TEST`.
+    - Close the `pcap` stream and verify it closes successfully using `FD_TEST`.
     - Log a hex dump of the buffer `buf` up to the position `pos` using `FD_LOG_HEXDUMP_INFO`.
-- **Output**: No output is returned from the function as it is a void function.
-- **Functions Called**:
-    - [`fd_pcapng_fwrite_idb`](<fd_pcapng.c.md#fd_pcapng_fwrite_idb>)
+- **Output**: The function does not return any value; it performs tests and logs results to verify the correct writing of an IDB to a memory buffer.
+- **Functions called**:
+    - [`fd_pcapng_fwrite_idb`](fd_pcapng.c.md#fd_pcapng_fwrite_idb)
 
 
 ---
 ### test\_pcapng\_fwrite\_pkt<!-- {{#callable:test_pcapng_fwrite_pkt}} -->
-[View Source →](<../../../../../src/util/net/test_pcapng.c#L92>)
-
-Tests the writing of a packet to a pcapng file using a buffer and logs the result.
+The function `test_pcapng_fwrite_pkt` tests the writing of a packet to a pcapng file using a memory buffer and verifies the operation's success.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Initialize a buffer `buf` of size 512 bytes to zero.
-    - Open a memory stream `pcap` using `fmemopen` with the buffer `buf` for writing in binary mode.
-    - Check if `pcap` is successfully opened using `FD_TEST`.
+- **Control Flow**:
+    - Initialize a buffer `buf` of 512 bytes to zero and open it as a writable memory stream `pcap`.
+    - Check if the `pcap` file stream is successfully opened using `FD_TEST`.
     - Log the start of the packet test with `FD_LOG_INFO`.
-    - Define a timestamp `ts` with the value `0x12345678`.
-    - Define a packet `pkt` with 6 bytes: `0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF`.
-    - Write the packet to the pcapng file using [`fd_pcapng_fwrite_pkt`](<fd_pcapng.c.md#fd_pcapng_fwrite_pkt>) and verify the return value is 1 using `FD_TEST`.
-    - Get the current position in the file using `ftell` and store it in `pos`.
-    - Check if `pos` is non-negative using `FD_TEST`.
-    - Close the file stream `pcap` and verify it returns 0 using `FD_TEST`.
-    - Log a hex dump of the buffer `buf` up to the position `pos` using `FD_LOG_HEXDUMP_INFO`.
-- **Output**: No output is returned from this function as it is a static void function used for testing.
-- **Functions Called**:
-    - [`fd_pcapng_fwrite_pkt`](<fd_pcapng.c.md#fd_pcapng_fwrite_pkt>)
+    - Define a timestamp `ts` and a packet `pkt` with specific byte values.
+    - Call [`fd_pcapng_fwrite_pkt`](fd_pcapng.c.md#fd_pcapng_fwrite_pkt) to write the packet to the `pcap` stream and verify the return value is 1 using `FD_TEST`.
+    - Get the current position in the `pcap` stream using `ftell` and verify it is non-negative with `FD_TEST`.
+    - Close the `pcap` stream and verify successful closure with `FD_TEST`.
+    - Log a hex dump of the written data in the buffer using `FD_LOG_HEXDUMP_INFO`.
+- **Output**: The function does not return any value; it performs tests and logs results to verify the packet writing process.
+- **Functions called**:
+    - [`fd_pcapng_fwrite_pkt`](fd_pcapng.c.md#fd_pcapng_fwrite_pkt)
 
 
 ---
 ### test\_pcapng\_fwrite\_tls\_key\_log<!-- {{#callable:test_pcapng_fwrite_tls_key_log}} -->
-[View Source →](<../../../../../src/util/net/test_pcapng.c#L111>)
-
-Tests the writing of a TLS key log to a pcapng file using a memory buffer.
+The function `test_pcapng_fwrite_tls_key_log` tests the writing of a TLS key log entry to a pcapng file using a memory buffer.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Initialize a buffer `buf` of size 512 bytes to zero.
+- **Control Flow**:
+    - Initialize a buffer `buf` of 512 bytes to zero.
     - Open a memory stream `pcap` using `fmemopen` with the buffer `buf` for writing in binary mode.
-    - Check if the `pcap` file stream is successfully opened using `FD_TEST`.
+    - Check if the file stream `pcap` is successfully opened using `FD_TEST`.
     - Log the start of the TLS key log test using `FD_LOG_INFO`.
-    - Define a constant character array `log` containing a TLS key log string of 161 characters.
-    - Call [`fd_pcapng_fwrite_tls_key_log`](<fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log>) to write the TLS key log to the `pcap` stream and verify the return value is 1 using `FD_TEST`.
-    - Get the current position in the `pcap` stream using `ftell` and store it in `pos`.
-    - Verify that `pos` is non-negative using `FD_TEST`.
+    - Define a constant character array `log` containing a TLS key log entry.
+    - Call [`fd_pcapng_fwrite_tls_key_log`](fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log) to write the TLS key log entry to the `pcap` stream and verify the return value is 1 using `FD_TEST`.
+    - Get the current position in the `pcap` stream using `ftell` and verify it is non-negative using `FD_TEST`.
     - Close the `pcap` stream using `fclose` and verify it returns 0 using `FD_TEST`.
     - Log a hex dump of the buffer `buf` up to the position `pos` using `FD_LOG_HEXDUMP_INFO`.
-- **Output**: No direct output is returned; the function performs tests and logs information.
-- **Functions Called**:
-    - [`fd_pcapng_fwrite_tls_key_log`](<fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log>)
+- **Output**: The function does not return any value; it performs tests and logs information to verify the correct writing of a TLS key log entry to a pcapng file.
+- **Functions called**:
+    - [`fd_pcapng_fwrite_tls_key_log`](fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log)
 
 
 ---
 ### test\_pcapng\_dogfood<!-- {{#callable:test_pcapng_dogfood}} -->
-[View Source →](<../../../../../src/util/net/test_pcapng.c#L131>)
-
-Tests writing and reading of pcapng data blocks to ensure correct functionality.
+The function `test_pcapng_dogfood` writes a pcapng file to a memory buffer, reads it back to verify the contents, and logs the process.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Initializes a buffer `buf` and opens a memory stream `pcap` for writing and reading.
-    - Logs the start of the test with `FD_LOG_INFO`.
-    - Writes a Section Header Block (SHB) with specified options using [`fd_pcapng_fwrite_shb`](<fd_pcapng.c.md#fd_pcapng_fwrite_shb>) and logs the position.
-    - Writes an Interface Description Block (IDB) with specified options using [`fd_pcapng_fwrite_idb`](<fd_pcapng.c.md#fd_pcapng_fwrite_idb>) and logs the position.
-    - Writes multiple Enhanced Packet Blocks (EPB) with different packet data using [`fd_pcapng_fwrite_pkt`](<fd_pcapng.c.md#fd_pcapng_fwrite_pkt>) and logs each position.
-    - Writes a Decryption Secrets Block (DSB) with a TLS key log using [`fd_pcapng_fwrite_tls_key_log`](<fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log>) and logs the position.
-    - Flushes the `pcap` stream and logs a hexdump of the buffer content.
-    - Rewinds the `pcap` stream and initializes an iterator `iter` for reading the pcapng data.
-    - Iterates over the frames using [`fd_pcapng_iter_next`](<fd_pcapng.c.md#fd_pcapng_iter_next>), checks the frame type, and validates the packet data and sizes.
-    - Logs and checks for errors in the iteration process.
-    - Writes another SHB to the `pcap` stream at the end.
-- **Output**: No direct output; performs internal tests and logs results.
-- **Functions Called**:
-    - [`fd_pcapng_fwrite_shb`](<fd_pcapng.c.md#fd_pcapng_fwrite_shb>)
-    - [`fd_pcapng_fwrite_idb`](<fd_pcapng.c.md#fd_pcapng_fwrite_idb>)
-    - [`fd_pcapng_fwrite_pkt`](<fd_pcapng.c.md#fd_pcapng_fwrite_pkt>)
-    - [`fd_pcapng_fwrite_tls_key_log`](<fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log>)
-    - [`fd_pcapng_iter_align`](<fd_pcapng.c.md#fd_pcapng_iter_align>)
-    - [`fd_pcapng_iter_footprint`](<fd_pcapng.c.md#fd_pcapng_iter_footprint>)
-    - [`fd_pcapng_iter_new`](<fd_pcapng.c.md#fd_pcapng_iter_new>)
-    - [`fd_pcapng_iter_next`](<fd_pcapng.c.md#fd_pcapng_iter_next>)
-    - [`fd_pcapng_is_pkt`](<fd_pcapng.h.md#fd_pcapng_is_pkt>)
-    - [`fd_pcapng_iter_err`](<fd_pcapng.c.md#fd_pcapng_iter_err>)
+- **Control Flow**:
+    - Initialize a static buffer and open it as a file stream for writing and reading.
+    - Log the start of the test with 'TEST: dogfood'.
+    - Write a Section Header Block (SHB) with specified options to the pcapng file and log the position.
+    - Write an Interface Description Block (IDB) with specified options to the pcapng file and log the position.
+    - Write three Enhanced Packet Blocks (EPBs) with different packet data and log the positions after each write.
+    - Write a Decryption Secrets Block (DSB) with a TLS key log and log the position.
+    - Flush the file stream, log a hexdump of the buffer, and rewind the file stream for reading.
+    - Initialize an iterator for reading the pcapng file and verify its alignment and size.
+    - Iterate over the frames in the pcapng file, verifying the type and content of each frame against expected values.
+    - Check for the end of the iteration and verify no errors occurred.
+    - Write another SHB to the pcapng file to conclude the test.
+- **Output**: The function does not return any value; it performs tests and logs results to verify the correctness of pcapng file writing and reading.
+- **Functions called**:
+    - [`fd_pcapng_fwrite_shb`](fd_pcapng.c.md#fd_pcapng_fwrite_shb)
+    - [`fd_pcapng_fwrite_idb`](fd_pcapng.c.md#fd_pcapng_fwrite_idb)
+    - [`fd_pcapng_fwrite_pkt`](fd_pcapng.c.md#fd_pcapng_fwrite_pkt)
+    - [`fd_pcapng_fwrite_tls_key_log`](fd_pcapng.c.md#fd_pcapng_fwrite_tls_key_log)
+    - [`fd_pcapng_iter_align`](fd_pcapng.c.md#fd_pcapng_iter_align)
+    - [`fd_pcapng_iter_footprint`](fd_pcapng.c.md#fd_pcapng_iter_footprint)
+    - [`fd_pcapng_iter_new`](fd_pcapng.c.md#fd_pcapng_iter_new)
+    - [`fd_pcapng_iter_next`](fd_pcapng.c.md#fd_pcapng_iter_next)
+    - [`fd_pcapng_is_pkt`](fd_pcapng.h.md#fd_pcapng_is_pkt)
+    - [`fd_pcapng_iter_err`](fd_pcapng.c.md#fd_pcapng_iter_err)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/net/test_pcapng.c#L231>)
-
-Initializes the environment, runs a series of pcapng format tests, logs a success message, and then halts the program.
+The `main` function initializes the environment, runs a series of tests on pcapng writing functions, logs a success message, and then halts the program.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Executes [`test_pcapng_fwrite_shb`](<#test_pcapng_fwrite_shb>) to test writing a Section Header Block in pcapng format.
-    - Executes [`test_pcapng_fwrite_idb`](<#test_pcapng_fwrite_idb>) to test writing an Interface Description Block in pcapng format.
-    - Executes [`test_pcapng_fwrite_pkt`](<#test_pcapng_fwrite_pkt>) to test writing a packet in pcapng format.
-    - Executes [`test_pcapng_fwrite_tls_key_log`](<#test_pcapng_fwrite_tls_key_log>) to test writing a TLS key log in pcapng format.
-    - Executes [`test_pcapng_dogfood`](<#test_pcapng_dogfood>) to perform a comprehensive test of writing and reading pcapng data.
-    - Logs a notice message indicating the tests passed using `FD_LOG_NOTICE`.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`test_pcapng_fwrite_shb`](<#test_pcapng_fwrite_shb>)
-    - [`test_pcapng_fwrite_idb`](<#test_pcapng_fwrite_idb>)
-    - [`test_pcapng_fwrite_pkt`](<#test_pcapng_fwrite_pkt>)
-    - [`test_pcapng_fwrite_tls_key_log`](<#test_pcapng_fwrite_tls_key_log>)
-    - [`test_pcapng_dogfood`](<#test_pcapng_dogfood>)
+    - `argc`: An integer representing the number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments passed to the program.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - Execute [`test_pcapng_fwrite_shb`](#test_pcapng_fwrite_shb) to test writing a Section Header Block to a pcapng file.
+    - Execute [`test_pcapng_fwrite_idb`](#test_pcapng_fwrite_idb) to test writing an Interface Description Block to a pcapng file.
+    - Execute [`test_pcapng_fwrite_pkt`](#test_pcapng_fwrite_pkt) to test writing a packet to a pcapng file.
+    - Execute [`test_pcapng_fwrite_tls_key_log`](#test_pcapng_fwrite_tls_key_log) to test writing a TLS key log to a pcapng file.
+    - Execute [`test_pcapng_dogfood`](#test_pcapng_dogfood) to test writing and reading back a pcapng file.
+    - Log a notice message indicating the tests passed.
+    - Call `fd_halt` to clean up and terminate the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`test_pcapng_fwrite_shb`](#test_pcapng_fwrite_shb)
+    - [`test_pcapng_fwrite_idb`](#test_pcapng_fwrite_idb)
+    - [`test_pcapng_fwrite_pkt`](#test_pcapng_fwrite_pkt)
+    - [`test_pcapng_fwrite_tls_key_log`](#test_pcapng_fwrite_tls_key_log)
+    - [`test_pcapng_dogfood`](#test_pcapng_dogfood)
 
 
 

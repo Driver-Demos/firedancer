@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generates C test code from Wycheproof and CCTV test vectors for EDDSA and XDH algorithms.
+The `gen_wycheproofs.py` file in the `firedancer` codebase downloads the latest Wycheproof test vectors and generates corresponding C test code for EDDSA and XDH algorithms.
 
 # Purpose
-The code is a Python script designed to download and process cryptographic test vectors from external sources, specifically for the EDDSA and XDH algorithms. It retrieves test data from the Wycheproof project and the C2SP CCTV project, then generates C code to verify these cryptographic algorithms. The script defines two data classes, `EddsaVerify` and `XDHVerify`, to structure the test data for EDDSA and XDH, respectively. It includes functions [`_gen_ed25519`](<#_gen_ed25519>), [`_gen_x25519`](<#_gen_x25519>), and [`_gen_cctv_ed25519`](<#_gen_cctv_ed25519>) to handle the downloading, parsing, and conversion of test vectors into C structures. These functions output C code that includes the test vectors, which are then written to specific C source files.
+This Python script is designed to automate the process of downloading cryptographic test vectors from external sources and generating corresponding C test code. It specifically targets test vectors for the EdDSA (Edwards-curve Digital Signature Algorithm) and XDH (Elliptic Curve Diffie-Hellman) algorithms, utilizing data from Google's Wycheproof project and the C2SP CCTV project. The script defines data structures using Python's `dataclass` to represent test cases for EdDSA and XDH, and it processes JSON data fetched from URLs to populate these structures. The script then generates C code that includes these test vectors, formatted as static arrays of structs, which can be used for testing cryptographic implementations in C.
 
-The script is intended to be executed as a standalone program, as indicated by the `if __name__ == "__main__":` block. It changes the working directory to the root of the project and calls the [`main`](<#main>) function, which orchestrates the generation of the C test files. The generated C files are intended to be used for testing the cryptographic implementations in the project, ensuring they conform to the test vectors provided by the external sources. The script does not define public APIs or external interfaces, as its primary function is to automate the generation of test code for internal use.
+The script is structured to be executed as a standalone program, with a [`main`](#main) function that orchestrates the generation of C test files. It writes the generated C code to specific files within a project directory, redirecting the standard output to these files. The script ensures that the generated C code is marked as auto-generated and includes a timestamp for reference. This automation facilitates the integration of up-to-date test vectors into a C-based cryptographic library, ensuring that the library can be tested against known test cases for correctness and security compliance.
 # Imports and Dependencies
 
 ---
@@ -25,127 +25,107 @@ The script is intended to be executed as a standalone program, as indicated by t
 
 ---
 ### EddsaVerify<!-- {{#class:firedancer/contrib/codegen/gen_wycheproofs.EddsaVerify}} -->
-[View Source →](<../../../../contrib/codegen/gen_wycheproofs.py#L16>)
-
 - **Decorators**: `@dataclass`
 - **Members**:
-    - `tcId`: An integer that identifies the test case.
-    - `comment`: A string that contains a comment about the test case.
-    - `msg`: A byte sequence that represents the message to verify.
-    - `sig`: A byte sequence that represents the signature to verify.
-    - `pub`: A byte sequence that represents the public key used for verification.
-    - `ok`: A boolean that indicates if the verification is successful.
-- **Description**: Represents a test case for verifying EdDSA signatures, containing details such as the test case ID, message, signature, public key, and the expected result of the verification.
+    - `tcId`: An integer representing the test case ID.
+    - `comment`: A string containing comments or descriptions for the test case.
+    - `msg`: A byte sequence representing the message to be verified.
+    - `sig`: A byte sequence representing the signature to be verified.
+    - `pub`: A byte sequence representing the public key used for verification.
+    - `ok`: A boolean indicating whether the test case is expected to pass (True) or fail (False).
+- **Description**: The EddsaVerify class is a data structure used to represent test cases for verifying EdDSA signatures. It includes fields for the test case ID, a comment, the message, signature, public key, and a boolean indicating the expected result of the verification. This class is used in the context of generating test vectors for cryptographic verification processes.
 
 
 ---
 ### XDHVerify<!-- {{#class:firedancer/contrib/codegen/gen_wycheproofs.XDHVerify}} -->
-[View Source →](<../../../../contrib/codegen/gen_wycheproofs.py#L98>)
-
 - **Decorators**: `@dataclass`
 - **Members**:
-    - `tcId`: An integer that identifies the test case.
-    - `comment`: A string that contains comments about the test case.
-    - `shared`: A byte sequence representing the shared secret.
-    - `prv`: A byte sequence representing the private key.
-    - `pub`: A byte sequence representing the public key.
-    - `ok`: A boolean indicating if the test case is valid.
-- **Description**: Represents a test case for verifying XDH (Elliptic Curve Diffie-Hellman) operations, including details such as test case ID, comments, shared secret, private key, public key, and validity status.
+    - `tcId`: An integer representing the test case identifier.
+    - `comment`: A string providing additional information or comments about the test case.
+    - `shared`: A bytes object representing the shared secret in the test case.
+    - `prv`: A bytes object representing the private key used in the test case.
+    - `pub`: A bytes object representing the public key used in the test case.
+    - `ok`: A boolean indicating whether the test case is expected to pass or fail.
+- **Description**: The XDHVerify class is a data structure used to represent test cases for verifying XDH (Elliptic Curve Diffie-Hellman) operations. It includes fields for storing the test case ID, comments, shared secret, private key, public key, and a boolean indicating the expected result of the test. This class is part of a system that generates C test code from Wycheproof test vectors.
 
 
 # Functions
 
 ---
 ### \_gen\_ed25519<!-- {{#callable:firedancer/contrib/codegen/gen_wycheproofs._gen_ed25519}} -->
-[View Source →](<../../../../contrib/codegen/gen_wycheproofs.py#L26>)
-
-Generates C test code for EDDSA verification using Wycheproof test vectors.
+The `_gen_ed25519` function fetches EDDSA test vectors from a remote JSON file, processes them, and generates corresponding C code for verification tests.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Send a GET request to the Wycheproof test vectors URL for EDDSA.
-    - Assert that the HTTP response status code is 200.
-    - Parse the JSON response from the request.
-    - Assert that the algorithm is 'EDDSA' and the schema is 'eddsa_verify_schema.json'.
-    - Initialize an empty list `verify_tests` to store test cases.
-    - Iterate over each test group in the JSON data.
-    - Skip test groups that are not of type 'EddsaVerify'.
-    - Convert the public key from hexadecimal to bytes.
-    - Iterate over each test in the group and append an [`EddsaVerify`](<#eddsaverify>) object to `verify_tests`.
-    - Print a header comment indicating the code is auto-generated.
-    - Print the current UTC timestamp in ISO format.
-    - Print the C structure definition for `fd_ed25519_verify_wycheproof`.
-    - Iterate over each test in `verify_tests`.
-    - Skip tests where the signature length is not 64 bytes.
-    - Print each test case in the C array format.
-    - Print a terminating zero entry and close the C array.
-- **Output**: C code for EDDSA verification test cases is printed to the standard output.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/gen_wycheproofs.EddsaVerify`](<#eddsaverify>)
+- **Control Flow**:
+    - Send a GET request to the specified URL to fetch the EDDSA test vectors JSON file.
+    - Assert that the HTTP response status code is 200, indicating a successful request.
+    - Parse the JSON response and assert that it contains the expected algorithm and schema values.
+    - Initialize an empty list `verify_tests` to store processed test cases.
+    - Iterate over each test group in the JSON file, skipping any group that is not of type 'EddsaVerify'.
+    - For each valid test group, extract the public key and iterate over its tests, converting each test's message and signature from hexadecimal to bytes and appending an [`EddsaVerify`](#eddsaverify) instance to `verify_tests`.
+    - Print a header comment indicating the code is auto-generated and include the current UTC timestamp.
+    - Print the C structure definition for `fd_ed25519_verify_wycheproof` and its typedef.
+    - Iterate over the `verify_tests` list, printing each test case in the C array format, ensuring the signature length is 64 bytes.
+    - Print a terminating zero entry and closing brace for the C array.
+- **Output**: The function outputs C code to the standard output, which includes a C array of test cases for EDDSA verification, formatted according to the `fd_ed25519_verify_wycheproof` structure.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/gen_wycheproofs.EddsaVerify`](#eddsaverify)
 
 
 ---
 ### \_gen\_x25519<!-- {{#callable:firedancer/contrib/codegen/gen_wycheproofs._gen_x25519}} -->
-[View Source →](<../../../../contrib/codegen/gen_wycheproofs.py#L107>)
-
-Generates C test code for X25519 verification using Wycheproof test vectors.
+The `_gen_x25519` function fetches X25519 test vectors from a remote JSON file, processes them, and generates corresponding C code for verification tests.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Send a GET request to the specified URL to download the X25519 test vectors in JSON format.
-    - Assert that the HTTP response status code is 200 to ensure the request was successful.
-    - Parse the JSON response and assert that the algorithm and schema match expected values ('XDH' and 'xdh_comp_schema.json').
-    - Initialize an empty list `verify_tests` to store test cases.
-    - Iterate over each test group in the JSON data, skipping groups that are not of type 'XdhComp'.
-    - For each test in the valid groups, create an [`XDHVerify`](<#xdhverify>) object with the test case details and append it to `verify_tests`.
-    - Print a header comment indicating the code is auto-generated and include the current UTC timestamp.
-    - Print the C structure definition for `fd_x25519_verify_wycheproof` and its typedef.
-    - Iterate over the `verify_tests` list and print each test case in the C array format, converting byte data to hexadecimal string format.
-    - Print a closing brace and semicolon to complete the C array definition.
-- **Output**: C code for X25519 verification tests, formatted as a static array of `fd_x25519_verify_wycheproof_t` structures.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/gen_wycheproofs.XDHVerify`](<#xdhverify>)
+- **Control Flow**:
+    - Send a GET request to fetch the X25519 test vectors JSON file from a specified URL.
+    - Check if the HTTP response status code is 200 to ensure the request was successful.
+    - Parse the JSON response and verify the algorithm and schema fields to ensure they match expected values.
+    - Iterate over each test group in the JSON file, skipping any group that is not of type 'XdhComp'.
+    - For each test in the valid groups, create an [`XDHVerify`](#xdhverify) object with test details and append it to the `verify_tests` list.
+    - Print a header comment indicating the code is auto-generated and include a timestamp of generation.
+    - Generate C code for each test in `verify_tests`, converting byte data to hexadecimal string format and outputting the test details in a structured format.
+    - Print a closing brace to complete the C array definition.
+- **Output**: The function outputs C code that defines an array of `fd_x25519_verify_wycheproof_t` structures, each representing a test case with its associated data and expected result.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/gen_wycheproofs.XDHVerify`](#xdhverify)
 
 
 ---
 ### \_gen\_cctv\_ed25519<!-- {{#callable:firedancer/contrib/codegen/gen_wycheproofs._gen_cctv_ed25519}} -->
-[View Source →](<../../../../contrib/codegen/gen_wycheproofs.py#L172>)
-
-Generates C test code for ED25519 verification using CCTV test vectors.
+The function `_gen_cctv_ed25519` fetches Ed25519 test vectors from a remote JSON file, processes them to determine their validity, and generates corresponding C test code for verification.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Send a GET request to retrieve the ED25519 test vectors from a specified URL.
-    - Assert that the HTTP response status code is 200 to ensure successful retrieval.
-    - Parse the JSON response to obtain the test vectors.
-    - Iterate over each test vector in the JSON file.
-    - For each test, check the 'flags' field to determine the validity of the test case.
-    - Raise an exception if the 'non_canonical_R' flag is present without the 'low_order_R' flag.
-    - Append each test case to the 'verify_tests' list as an 'EddsaVerify' object with the appropriate attributes.
-    - Print the generated C code header and structure definition for the test cases.
-    - Iterate over the 'verify_tests' list to print each test case in the C structure format.
-    - Ensure that only signatures of length 64 are included in the output.
-    - Print a terminating zero entry in the C array to mark the end of the test cases.
-- **Output**: C code for ED25519 verification test cases using the CCTV test vectors.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/gen_wycheproofs.EddsaVerify`](<#eddsaverify>)
+- **Control Flow**:
+    - The function sends a GET request to a specified URL to fetch Ed25519 test vectors in JSON format.
+    - It asserts that the HTTP response status code is 200, indicating a successful request.
+    - The JSON response is parsed into a Python object, and an empty list `verify_tests` is initialized to store processed test cases.
+    - The function iterates over each test case in the JSON file, extracting the `flags` field to determine the validity of the test case.
+    - If `flags` are present, it checks specific conditions to set the `ok` variable, which indicates whether the test case should pass or fail.
+    - If the `flags` contain 'non_canonical_R' without 'low_order_R', an exception is raised with the test case number.
+    - Each test case is converted into an [`EddsaVerify`](#eddsaverify) object with relevant fields and appended to the `verify_tests` list.
+    - The function prints a header comment indicating the code is auto-generated and includes the current UTC timestamp.
+    - It defines a C struct `fd_ed25519_verify_cctv` and a corresponding typedef for storing test case data.
+    - The function iterates over the `verify_tests` list, printing each test case in a C-compatible format, ensuring the signature length is 64 bytes.
+    - Finally, it prints a terminating zero entry for the C array.
+- **Output**: The function outputs C code that defines a static array of `fd_ed25519_verify_cctv_t` structs, each representing a test case with fields for test case ID, comment, message, signature, public key, and a boolean indicating expected verification success.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/gen_wycheproofs.EddsaVerify`](#eddsaverify)
 
 
 ---
 ### main<!-- {{#callable:firedancer/contrib/codegen/gen_wycheproofs.main}} -->
-[View Source →](<../../../../contrib/codegen/gen_wycheproofs.py#L244>)
-
-Generates C test code for ED25519 and X25519 using Wycheproof and CCTV test vectors.
+The `main` function generates C test code files for ED25519 and X25519 cryptographic algorithms using Wycheproof and CCTV test vectors.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Opens a file named `test_ed25519_wycheproof.c` in write mode and redirects the standard output to this file.
-    - Calls the [`_gen_ed25519`](<#_gen_ed25519>) function to generate ED25519 test code and writes it to the file.
-    - Opens a file named `test_x25519_wycheproof.c` in write mode and redirects the standard output to this file.
-    - Calls the [`_gen_x25519`](<#_gen_x25519>) function to generate X25519 test code and writes it to the file.
-    - Opens a file named `test_ed25519_cctv.c` in write mode and redirects the standard output to this file.
-    - Calls the [`_gen_cctv_ed25519`](<#_gen_cctv_ed25519>) function to generate ED25519 test code using CCTV vectors and writes it to the file.
-- **Output**: No return value; writes generated C test code to specified files.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/gen_wycheproofs._gen_ed25519`](<#_gen_ed25519>)
-    - [`firedancer/contrib/codegen/gen_wycheproofs._gen_x25519`](<#_gen_x25519>)
-    - [`firedancer/contrib/codegen/gen_wycheproofs._gen_cctv_ed25519`](<#_gen_cctv_ed25519>)
+- **Control Flow**:
+    - Opens a file 'src/ballet/ed25519/test_ed25519_wycheproof.c' for writing and redirects stdout to this file.
+    - Calls the [`_gen_ed25519`](#_gen_ed25519) function to generate ED25519 test code and writes it to the opened file.
+    - Opens a file 'src/ballet/ed25519/test_x25519_wycheproof.c' for writing and redirects stdout to this file.
+    - Calls the [`_gen_x25519`](#_gen_x25519) function to generate X25519 test code and writes it to the opened file.
+    - Opens a file 'src/ballet/ed25519/test_ed25519_cctv.c' for writing and redirects stdout to this file.
+    - Calls the [`_gen_cctv_ed25519`](#_gen_cctv_ed25519) function to generate ED25519 test code using CCTV vectors and writes it to the opened file.
+- **Output**: The function does not return any value; it writes generated C test code to specified files.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/gen_wycheproofs._gen_ed25519`](#_gen_ed25519)
+    - [`firedancer/contrib/codegen/gen_wycheproofs._gen_x25519`](#_gen_x25519)
+    - [`firedancer/contrib/codegen/gen_wycheproofs._gen_cctv_ed25519`](#_gen_cctv_ed25519)
 
 
 
