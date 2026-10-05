@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and object files for the keyguard component, conditional on the presence of hosted and Linux environments, and includes a unit test for `test_keyload`.
+Makefile configuration for adding headers, objects, and unit tests related to keyguard and keyswitch.
 
 # Purpose
-This file is a Makefile segment used for conditional compilation in a software project. It checks for the presence of specific features or environments, such as `FD_HAS_HOSTED`, `FD_HAS_LINUX`, and `FD_HAS_INT128`, to conditionally include headers and object files related to key management functionalities like `fd_keyguard`, `fd_keyguard_client`, `fd_keyswitch`, and `fd_keyload`. It also defines a unit test target for `test_keyload`, ensuring that the necessary components are compiled and linked when the specified conditions are met.
+The Makefile script configures the build process for a software project. It checks for the presence of specific conditions, such as `FD_HAS_HOSTED`, `FD_HAS_LINUX`, and `FD_HAS_INT128`, to determine which headers and object files to include. The script uses `add-hdrs` and `add-objs` functions to add header files like `fd_keyguard.h`, `fd_keyguard_client.h`, `fd_keyswitch.h`, and `fd_keyload.h`, and object files like `fd_keyguard_authorize`, `fd_keyguard_match`, `fd_keyguard_client`, and `fd_keyswitch`. It also sets up a unit test for `test_keyload` using the `make-unit-test` function, linking it with `fd_disco` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

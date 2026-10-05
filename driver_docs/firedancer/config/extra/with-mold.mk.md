@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-mold.mk` file configures the build system to use the 'mold' linker for faster linking of large binaries, with special handling for older GCC versions.
+Configures the linker to use 'mold' for faster linking of large binaries.
 
 # Purpose
-This configuration file is designed to optimize the linking process in a software build system by switching the default linker to 'mold', a faster alternative, particularly beneficial for large binaries. It sets the `MOLD_LDFLAGS` variable to use 'mold' and includes a conditional check to accommodate older versions of GCC that do not recognize the `-fuse-ld=mold` flag, instead using the `-B` option to specify the path to 'mold'. The `LDFLAGS` variable is then appended with the `MOLD_LDFLAGS` to ensure the linker configuration is applied during the build process.
+The file configures the build process to use the `mold` linker, which is known for its speed with large binaries. It sets the `MOLD_LDFLAGS` variable to `-fuse-ld=mold` by default. If the `FD_USING_GCC` flag is set and the GCC version is older than 12, it adjusts `MOLD_LDFLAGS` to use the path to `mold` directly with `-B$(shell which mold)`. Finally, it appends the `MOLD_LDFLAGS` to the `LDFLAGS` variable, ensuring that the build process uses the specified linker flags.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
