@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test.py` file in the `firedancer` codebase is a cocotb-based test script for simulating and verifying the functionality of an ED25519 signature verification module.
+A cocotb-based test for the ed25519 signature verification module with random input generation.
 
 # Purpose
-This Python file is a test script designed to verify the functionality of a digital circuit using the Cocotb framework, which is a coroutine-based co-simulation library for verifying VHDL and Verilog designs. The script is structured to perform a test on a device under test (DUT) by simulating clock signals, toggling reset signals, and generating random input signals to the DUT. The test is specifically focused on verifying the behavior of an Ed25519 signature verification module, as indicated by the use of the `wd_cocotil.mon_ed25519_sigverify_1` function and the `q_o_ed25519_sigverify_1` dictionary, which appears to store transaction data related to the signature verification process.
+The code is a test suite for a digital design verification environment using the Cocotb framework. It defines an asynchronous test function [`test`](<#test>) that interacts with a device under test (DUT) to verify its behavior. The test initializes several input signals of the DUT, such as `i_v`, `i_m`, and `o_r`, and sets up a clock signal using the `Clock` class from Cocotb. It also uses utility functions from the `wd_cocotil` module to toggle reset signals and perform random signal toggling, which helps simulate various operating conditions.
 
-The script initializes various input signals to the DUT, including vectors for public keys, signatures, and other cryptographic parameters, using the `BinaryValue` class to handle bit-level operations. It employs a loop to simulate multiple test cycles, during which it generates random transaction identifiers and data, applies them to the DUT, and waits for the DUT to process the inputs. The script also handles backpressure scenarios, where the DUT is not ready to accept new inputs, by waiting for the appropriate conditions before proceeding. This test script is a critical component in the verification process, ensuring that the Ed25519 signature verification module operates correctly under various conditions and input scenarios.
+The test function generates random transactions and assigns them to the DUT's input signals. It uses the `BinaryValue` class to create binary representations of the input data, which are then assigned to the DUT's inputs. The test includes mechanisms to handle backpressure by waiting for the DUT to be ready to accept new data. The test also maintains a dictionary `q_o_ed25519_sigverify_1` to track transactions by their transaction IDs (`tid`). The test runs for a specified number of cycles, ensuring that the DUT processes the input data correctly and that the expected behavior is observed.
 # Imports and Dependencies
 
 ---
@@ -26,31 +26,25 @@ The script initializes various input signals to the DUT, including vectors for p
 
 ---
 ### test<!-- {{#callable:firedancer/src/wiredancer/sim/ed25519_sigverify_1/test.test}} -->
-The `test` function is a cocotb testbench that initializes and simulates a digital circuit, handling clock generation, reset toggling, and random signal generation for testing purposes.
+[View Source →](<../../../../../../src/wiredancer/sim/ed25519_sigverify_1/test.py#L11>)
+
+Executes a testbench for a digital design using the cocotb framework, simulating signal interactions and monitoring outputs.
 - **Decorators**: `@cocotb.test`
 - **Inputs**:
-    - `dut`: The device under test (DUT) which is a digital circuit model to be simulated and tested.
-- **Control Flow**:
-    - Initialize DUT signals `i_v`, `i_m`, `o_r`, and `max_pending` to specific values.
+    - `dut`: The device under test (DUT) which is a digital design module to be simulated.
+- **Logic and Control Flow**:
+    - Initialize DUT input signals `i_v`, `i_m`, `o_r`, and `max_pending` to specific values.
     - Create an empty dictionary `q_o_ed25519_sigverify_1` to store transaction data.
-    - Start a clock on `dut.clk` with a period of 1 ns.
-    - Start a reset toggle on `dut.rst` with a duration of 32 cycles, active high.
-    - Start a random toggle on `dut.o_r` with a 50% probability.
-    - Start monitoring the `ed25519_sigverify_1` process with logging enabled.
+    - Start the clock and various asynchronous processes using `cocotb.start()` to simulate reset toggling, random signal toggling, and monitoring.
     - Wait for 1024 clock cycles to allow for post-reset stabilization.
-    - Retrieve the width of `W_M` from the DUT and generate a random transaction ID `tid`.
-    - Loop 4 times to simulate transactions:
-    -   - Wait for backpressure conditions to clear before proceeding.
-    -   - Introduce random gaps by setting `i_v` to 0 based on a random condition.
-    -   - Increment the transaction ID `tid`.
-    -   - Generate a random transaction `tr` and store it in `q_o_ed25519_sigverify_1`.
-    -   - Create binary values for various signals with specified bit widths.
-    -   - Assign values to these binary signals based on transaction data.
-    -   - Set DUT input signals to these binary values and assert `i_v`.
-    -   - Wait for a rising edge of the clock to simulate the transaction.
-    - After the loop, wait for any remaining backpressure conditions to clear and set `i_v` to 0.
-    - Continue clock cycles until all transactions in `q_o_ed25519_sigverify_1` are processed.
-- **Output**: The function does not return any value; it performs simulation and testing of the DUT.
+    - Retrieve the width of the message `W_M` from the DUT and generate a random transaction ID `tid`.
+    - Iterate four times to simulate transactions, checking for backpressure and introducing random gaps between transactions.
+    - In each iteration, increment `tid`, generate a random transaction, and store it in `q_o_ed25519_sigverify_1`.
+    - Create binary values for various signals with specified bit widths and assign them to the DUT inputs.
+    - Set `i_v` to 1 to indicate valid input and wait for a rising edge of the clock.
+    - After the loop, ensure no backpressure by waiting for `i_r` to be asserted before setting `i_v` to 0.
+    - Continue waiting for rising edges of the clock until all transactions in `q_o_ed25519_sigverify_1` are processed.
+- **Output**: No explicit return value; the function operates asynchronously to simulate and test the DUT.
 
 
 
