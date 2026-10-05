@@ -3,28 +3,39 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `monitor.seccomppolicy` file defines security policies for the monitor binary in the Firedancer codebase, detailing how it handles logging, process supervision, and terminal interactions.
+Defines security policies for the monitor binary, including logging, process control, and I/O operations.
 
 # Purpose
-The provided content is a configuration file for a monitoring tool that operates alongside the Firedancer validator, a component likely used in blockchain or distributed systems. This file outlines the logging and diagnostic functionalities of the monitor, detailing how it manages log files and outputs, including the use of file descriptors for writing and syncing log messages. It specifies the conditions under which log messages are written to standard output or error streams and how the monitor handles log message interleaving when supervising Firedancer. The file also describes the monitor's behavior in terms of process control, such as waiting for screen refreshes, handling exit signals, and managing terminal attributes for a user interface. The configuration is crucial for ensuring that the monitor can effectively supervise and report on the performance and status of the Firedancer validator, providing both development and operational insights.
+This file configures the monitoring functionality for a software component called Firedancer. It defines how the monitor interacts with log files and pipes to manage diagnostic output and logging. The file specifies file descriptors for logging (`logfile_fd` and `drain_output_fd`) and outlines conditions for writing and syncing log messages, ensuring that warnings and errors are immediately written to disk. It also describes how the monitor waits for the appropriate time to refresh diagnostic output using functions like `nanosleep` and `sched_yield`. Additionally, the file includes configurations for handling process termination signals and managing terminal attributes for a user interface. The monitor can also operate in a development mode to supervise Firedancer, interposing log messages with diagnostics, which is not required in production environments.
 # Content Summary
-The provided content outlines the configuration and operational details of a monitoring binary that operates alongside the Firedancer software, primarily for diagnostic and logging purposes. This monitor is designed to print diagnostics about the status and performance of the Firedancer validator, and it manages logging through specific file descriptors.
+The provided content describes the configuration and operational details of a monitoring component that works alongside the Firedancer software. This monitor is a binary executable that provides diagnostic information about the status and performance of the Firedancer validator.
 
-Key technical details include:
+Key functional details include:
 
-1. **Logging Mechanism**: The monitor uses file descriptors to manage logging. The `logfile_fd` is typically used to write all log messages to a file, while `drain_output_fd` is used when the monitor supervises Firedancer, allowing it to interleave log messages with monitoring output. Log messages of 'WARNING' level and above are written to STDERR, while all messages are logged to the file. The monitor uniquely uses STDOUT for its diagnostics.
+1. **Log Management**: 
+   - The monitor can manage log files through file descriptors `logfile_fd` and `drain_output_fd`. These descriptors are used to write log messages to a file or pipe. 
+   - Log messages of 'WARNING' level and above are written to STDERR, while all messages are logged to a file. The monitor uses STDOUT for its diagnostics.
+   - The `write` operation ensures that log messages are directed to the correct file descriptors, including STDOUT and STDERR.
 
-2. **File Descriptor Operations**: The configuration specifies operations for writing and syncing logs. The `write` operation checks if the file descriptor is STDOUT, STDERR, or the log file descriptor, ensuring proper routing of log messages. The `fsync` operation ensures that 'WARNING' level messages and above are immediately written to disk, enhancing reliability.
+2. **Immediate Log Synchronization**:
+   - For critical log messages ('WARNING' and above), the monitor uses `fsync` to immediately write the log file to disk, ensuring data integrity.
 
-3. **Process Control**: The monitor can exit gracefully when signaled with SIGINT or SIGTERM by calling `exit_group()`. This ensures that the monitor can terminate its operations cleanly when required.
+3. **Diagnostic Output Refresh**:
+   - The monitor uses `fd_log_wait_until()` to determine when to refresh the diagnostic output screen. This function may call `nanosleep` or `sched_yield` based on the required wait time.
 
-4. **Development Mode**: In a development setting, the monitor can act as a supervisor for Firedancer, using a custom pipe to manage log messages. This mode is not intended for production use and allows for enhanced logging and diagnostics interleaving.
+4. **Process Termination**:
+   - The monitor can terminate itself using `exit_group` when it receives a SIGINT or SIGTERM signal.
 
-5. **Terminal and Input Handling**: The monitor uses `tcgetattr` and `tcsetattr` to manage terminal attributes, facilitating a curses-like user interface. It also employs `pselect6` to check for data availability on STDIN without blocking, ensuring responsive input handling.
+5. **Development Mode**:
+   - In development mode, the monitor can act as a supervisor for Firedancer, using a custom pipe to interpose log messages with diagnostics. This mode is not intended for production use.
 
-6. **Output Refreshing**: The monitor uses `fd_log_wait_until()` to determine when to refresh the diagnostic output screen, utilizing `nanosleep` or `sched_yield` based on the required wait time, optimizing CPU usage during idle periods.
+6. **Terminal Interaction**:
+   - The monitor uses `ioctl` to manage terminal attributes, enabling a curses-like user interface.
 
-Overall, this configuration file provides a comprehensive setup for the monitor's logging, process management, and user interface operations, ensuring efficient and reliable diagnostics alongside Firedancer.
+7. **Non-blocking Input Handling**:
+   - The monitor uses `pselect6` to check for data availability on STDIN without blocking, ensuring it can read new input data efficiently.
+
+These details are crucial for developers to understand how the monitor interacts with Firedancer, manages logging, and handles process control and user interface operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

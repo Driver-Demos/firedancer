@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_zksdk_zero_ciphertext.c` file in the `firedancer` codebase implements functions to initialize a transcript and verify a zero-ciphertext proof using multi-scalar multiplication and point decompression.
+Implements functions to initialize and verify zero-ciphertext proofs in a zk-SDK context.
 
 # Purpose
-This C source code file is part of a cryptographic library, specifically dealing with zero-knowledge proofs related to zero ciphertexts. The file provides functionality to verify proofs that a given ciphertext is zero under a specific public key, using a zero-knowledge proof system. The main components of the file include the initialization of a cryptographic transcript and the verification of the proof through a multi-scalar multiplication (MSM) process. The code is structured around two static inline functions: [`zero_ciphertext_transcript_init`](#zero_ciphertext_transcript_init), which initializes a cryptographic transcript with public key and ciphertext data, and [`fd_zksdk_verify_proof_zero_ciphertext`](#fd_zksdk_verify_proof_zero_ciphertext), which performs the actual verification of the proof by checking specific mathematical equivalences using elliptic curve operations.
+The code provides functionality for verifying zero-knowledge proofs related to zero ciphertexts in a cryptographic context. It includes functions to initialize a transcript for a zero ciphertext proof and to verify such proofs using elliptic curve operations. The [`zero_ciphertext_transcript_init`](<#zero_ciphertext_transcript_init>) function initializes a transcript with public key and ciphertext data, which is necessary for the proof verification process. The [`fd_zksdk_verify_proof_zero_ciphertext`](<#fd_zksdk_verify_proof_zero_ciphertext>) function performs the actual verification by checking specific mathematical equivalences using multi-scalar multiplication (MSM) on elliptic curve points. This function validates inputs, finalizes the transcript, extracts challenges, computes necessary scalars, and performs the MSM to verify the proof.
 
-The file is designed to be part of a larger cryptographic library, as indicated by the inclusion of a private header file and the use of specific data structures and functions prefixed with `fd_zksdk_`. It does not define a public API directly but provides internal functionality that can be used by other parts of the library to verify zero-knowledge proofs. The code relies on elliptic curve cryptography, specifically using the Ristretto255 curve, to perform point decompression and multi-scalar multiplication, which are critical for the proof verification process. The file is likely intended to be compiled into a library and used by other components that require cryptographic proof verification capabilities.
+The code is part of a cryptographic library and is intended to be used as a component in a larger system that requires zero-knowledge proof verification. It defines internal functions with `static inline` to optimize performance and encapsulate functionality within the file. The [`fd_zksdk_instr_verify_proof_zero_ciphertext`](<#fd_zksdk_instr_verify_proof_zero_ciphertext>) function serves as an interface to verify a zero ciphertext proof, taking context and proof data as input. This function initializes the transcript and calls the verification function, returning a success or error code based on the verification result. The code relies on external cryptographic functions and data structures, such as `fd_ristretto255_point_t` and `fd_curve25519_scalar_validate`, to perform its operations.
 # Imports and Dependencies
 
 ---
@@ -19,51 +19,57 @@ The file is designed to be part of a larger cryptographic library, as indicated 
 
 ---
 ### zero\_ciphertext\_transcript\_init<!-- {{#callable:zero_ciphertext_transcript_init}} -->
-The `zero_ciphertext_transcript_init` function initializes a transcript for zero-ciphertext instructions by appending a public key and ciphertext to it.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/instructions/fd_zksdk_zero_ciphertext.c#L3>)
+
+Initializes a transcript for zero-ciphertext operations by appending specific context data.
 - **Inputs**:
-    - `transcript`: A pointer to an `fd_zksdk_transcript_t` structure that will be initialized and appended with data.
-    - `context`: A pointer to a constant `fd_zksdk_zero_ciphertext_context_t` structure containing the public key and ciphertext to be appended to the transcript.
-- **Control Flow**:
-    - Call `fd_zksdk_transcript_init` to initialize the transcript with the literal 'zero-ciphertext-instruction'.
-    - Call `fd_zksdk_transcript_append_pubkey` to append the public key from the context to the transcript with the label 'pubkey'.
-    - Call `fd_zksdk_transcript_append_ciphertext` to append the ciphertext from the context to the transcript with the label 'ciphertext'.
-- **Output**: This function does not return a value; it modifies the `transcript` in place.
+    - `transcript`: A pointer to an `fd_zksdk_transcript_t` structure that will be initialized.
+    - `context`: A pointer to a constant `fd_zksdk_zero_ciphertext_context_t` structure containing the public key and ciphertext to append to the transcript.
+- **Logic and Control Flow**:
+    - Call `fd_zksdk_transcript_init` to initialize the `transcript` with the literal "zero-ciphertext-instruction".
+    - Call `fd_zksdk_transcript_append_pubkey` to append the public key from `context` to the `transcript` with the label "pubkey".
+    - Call `fd_zksdk_transcript_append_ciphertext` to append the ciphertext from `context` to the `transcript` with the label "ciphertext".
+- **Output**: No output is returned as the function operates directly on the `transcript` pointer.
 
 
 ---
 ### fd\_zksdk\_verify\_proof\_zero\_ciphertext<!-- {{#callable:fd_zksdk_verify_proof_zero_ciphertext}} -->
-The function `fd_zksdk_verify_proof_zero_ciphertext` verifies a zero-knowledge proof for a zero ciphertext by checking specific mathematical equivalences using multi-scalar multiplication.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/instructions/fd_zksdk_zero_ciphertext.c#L12>)
+
+Verifies a zero-knowledge proof for a zero ciphertext using multi-scalar multiplication (MSM) and transcript challenges.
 - **Inputs**:
-    - `proof`: A pointer to a `fd_zksdk_zero_ciphertext_proof_t` structure containing the proof data, including the scalar `z` and points `yp` and `yd`.
-    - `pubkey`: A 32-byte array representing the public key used in the verification process.
-    - `ciphertext`: A 64-byte array representing the ciphertext to be verified.
-    - `transcript`: A pointer to a `fd_zksdk_transcript_t` structure used to manage the transcript of the proof verification process.
-- **Control Flow**:
+    - `proof`: A pointer to a `fd_zksdk_zero_ciphertext_proof_t` structure containing the proof data.
+    - `pubkey`: A 32-byte array representing the public key.
+    - `ciphertext`: A 64-byte array representing the ciphertext.
+    - `transcript`: A pointer to a `fd_zksdk_transcript_t` structure used for managing the transcript of the proof verification process.
+- **Logic and Control Flow**:
     - Initialize arrays for scalars and points, and validate the scalar `z` from the proof.
-    - Set the first point to the basepoint `H` and decompress the public key and ciphertext into points.
-    - Decompress the proof points `yp` and `yd` into the points array and a separate point `y`.
-    - Finalize the transcript with domain separation and append the proof points `yp` and `yd` to it.
-    - Extract challenge scalars `c` and `w` from the transcript.
-    - Compute the scalars for the multi-scalar multiplication (MSM) using the challenges and proof scalar `z`.
+    - Decompress the public key and ciphertext into Ristretto255 points and store them in the `points` array.
+    - Decompress the proof points `yp` and `yd` and validate them.
+    - Finalize the transcript by appending the proof points and extracting challenge scalars `c` and `w`.
+    - Compute the scalars for the MSM using the challenge scalars and the proof scalar `z`.
     - Perform the MSM with the computed scalars and points.
-    - Check if the result of the MSM matches the decompressed point `y` and return success or error based on the comparison.
-- **Output**: Returns `FD_EXECUTOR_INSTR_SUCCESS` if the proof is verified successfully, otherwise returns `FD_ZKSDK_VERIFY_PROOF_ERROR`.
+    - Check if the result of the MSM matches the decompressed point `y`.
+    - Return `FD_EXECUTOR_INSTR_SUCCESS` if the MSM result matches `y`, otherwise return `FD_ZKSDK_VERIFY_PROOF_ERROR`.
+- **Output**: Returns an integer indicating success (`FD_EXECUTOR_INSTR_SUCCESS`) or failure (`FD_ZKSDK_VERIFY_PROOF_ERROR`) of the proof verification.
 
 
 ---
 ### fd\_zksdk\_instr\_verify\_proof\_zero\_ciphertext<!-- {{#callable:fd_zksdk_instr_verify_proof_zero_ciphertext}} -->
-The function `fd_zksdk_instr_verify_proof_zero_ciphertext` verifies a zero-knowledge proof that a given ciphertext encrypts the value zero using a specified context and proof.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/instructions/fd_zksdk_zero_ciphertext.c#L99>)
+
+Verifies a zero-knowledge proof for a zero ciphertext using a given context and proof.
 - **Inputs**:
-    - `_context`: A pointer to a `fd_zksdk_zero_ciphertext_context_t` structure containing the public key and ciphertext to be verified.
-    - `_proof`: A pointer to a `fd_zksdk_zero_ciphertext_proof_t` structure containing the proof data to be verified.
-- **Control Flow**:
-    - Initialize a transcript for the zero-ciphertext verification using the provided context.
-    - Call [`fd_zksdk_verify_proof_zero_ciphertext`](#fd_zksdk_verify_proof_zero_ciphertext) with the proof, public key, ciphertext, and initialized transcript to perform the verification.
-    - Return the result of the verification process, which indicates success or failure.
-- **Output**: An integer indicating the success or failure of the proof verification, where a specific success or error code is returned.
-- **Functions called**:
-    - [`zero_ciphertext_transcript_init`](#zero_ciphertext_transcript_init)
-    - [`fd_zksdk_verify_proof_zero_ciphertext`](#fd_zksdk_verify_proof_zero_ciphertext)
+    - `_context`: A pointer to a `fd_zksdk_zero_ciphertext_context_t` structure containing the public key and ciphertext.
+    - `_proof`: A pointer to a `fd_zksdk_zero_ciphertext_proof_t` structure containing the proof data.
+- **Logic and Control Flow**:
+    - Initialize a `fd_zksdk_transcript_t` object using the [`zero_ciphertext_transcript_init`](<#zero_ciphertext_transcript_init>) function with the provided context.
+    - Call [`fd_zksdk_verify_proof_zero_ciphertext`](<#fd_zksdk_verify_proof_zero_ciphertext>) with the proof, public key, ciphertext, and transcript to verify the proof.
+    - Return the result of the verification process.
+- **Output**: Returns an integer indicating the success or failure of the proof verification.
+- **Functions Called**:
+    - [`zero_ciphertext_transcript_init`](<#zero_ciphertext_transcript_init>)
+    - [`fd_zksdk_verify_proof_zero_ciphertext`](<#fd_zksdk_verify_proof_zero_ciphertext>)
 
 
 

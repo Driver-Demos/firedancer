@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp filter for write and fsync on stdout and logfile_fd.
+Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
 
 
 ## Files
-- **[fd_sign_tile_seccomp.h](fd_sign_tile_seccomp.h.md)**: Seccomp filter for write and fsync on stdout and logfile_fd.
+- **[fd_sign_tile_seccomp.h](fd_sign_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase is a makefile script that conditionally builds and tests the `fd_fibre` library and its unit tests if both `FD_HAS_HOSTED` and `FD_HAS_LINUX` are defined.
+Makefile for building and testing the fd_fibre library and its unit tests on Linux.
 
 # Purpose
-This is a Makefile snippet used for conditional compilation and testing within a software project. It checks if the `FD_HAS_HOSTED` and `FD_HAS_LINUX` conditions are met, and if so, it compiles the `fd_fibre` library, adds its object files, creates a unit test named `test_fibre` that depends on `fd_fibre` and `fd_util`, and then runs the unit test `test_fibre`.
+The `Makefile` content defines build and test instructions for a software component named `fd_fibre` when certain conditions are met. If both `FD_HAS_HOSTED` and `FD_HAS_LINUX` are defined, it calls a function to create a library for `fd_fibre`, adds `fd_fibre` to the list of objects, and sets up a unit test named `test_fibre` that depends on `fd_fibre` and `fd_util`. It then runs the `test_fibre` unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

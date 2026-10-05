@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_poh` and `fd_ballet` components, and includes a command to run the `test_poh` unit test.
+Makefile for adding headers, objects, and running unit tests for `fd_poh` in the `firedancer` codebase.
 
 # Purpose
-The file is a Makefile script used for building and testing components in a software project. It defines build rules by adding header files (`fd_poh.h`) and object files (`fd_poh`, `fd_ballet`) to the build process. It also specifies the creation and execution of a unit test named `test_poh`, which depends on the `fd_ballet` and `fd_util` components.
+The Makefile content defines build and test instructions for a software project. It adds the header file `fd_poh.h` and object files `fd_poh` and `fd_ballet` to the build process. It also specifies a unit test named `test_poh`, which depends on `fd_ballet` and `fd_util`, and includes instructions to run this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
