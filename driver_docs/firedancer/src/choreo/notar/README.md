@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for blockchain vote management, Solana block confirmation API, build configuration, and tests.
+Vote counting, slot confirmation, and block vote threshold tracking for notarized blocks.
 
 
 ## Files
-- **[fd_notar.c](fd_notar.c.md)**: Implements functions for managing and processing votes in a blockchain notarization system.
-- **[fd_notar.h](fd_notar.h.md)**: API for tracking block confirmation levels based on stake thresholds in a Solana cluster.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing components with optional support for INT128 and SECP256K1.
-- **[test_notar.c](test_notar.c.md)**: Tests the functionality of the `fd_notar` module, including block and vote operations.
+- **[fd_notar.c](fd_notar.c.md)**: Vote counting and slot confirmation logic for notarized blocks.
+- **[fd_notar.h](fd_notar.h.md)**: API for tracking block vote thresholds, validator votes, and root publication.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_notar headers, objects, and unit tests when int128, hosted, and secp256k1 are enabled
+- **[test_notar.c](test_notar.c.md)**: Test for notar block and vote insertion using a workspace and tower.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
