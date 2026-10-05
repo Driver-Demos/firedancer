@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for managing headers, objects, and unit tests in the `firedancer` codebase.
+Build rules for fd_funk headers, objects, unit tests, and a hosted benchmark.
 
 # Purpose
-The Makefile script conditionally includes headers and object files for the `fd_funk` module if `FD_HAS_ATOMIC` is defined. It adds headers such as `fd_funk_base.h`, `fd_funk_txn.h`, `fd_funk_rec.h`, `fd_funk_val.h`, and `fd_funk.h`, and object files like `fd_funk_base`, `fd_funk_txn`, `fd_funk_rec`, `fd_funk_val`, and `fd_funk`. The script also defines and runs unit tests for `test_funk_base` and `test_funk` using the `fd_funk` and `fd_util` modules. If `FD_HAS_HOSTED` is defined, it additionally creates a unit test for `bench_funk_index`.
+This build file section adds the `fd_funk` headers and object files when `FD_HAS_ATOMIC` is set, then defines and runs the `test_funk_base` and `test_funk` unit tests. When `FD_HAS_HOSTED` is also set, it adds the `bench_funk_index` benchmark target.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

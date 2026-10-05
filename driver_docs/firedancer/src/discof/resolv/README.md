@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Includes `fd_resolv_tile.c`, `fd_resolv_tile.h`, `fd_resolv_tile.seccomppolicy`, and Makefile logic with `FD_HAS_ALLOCA` and `FD_HAS_INT128`.
+Transaction resolution tile code, replay signal message, seccomp policy, build rules, and generated filter.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific conditions.
+- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only on stdout and logfile_fd.
 
 ## Files
-- **[fd_resolv_tile.c](fd_resolv_tile.c.md)**: Implements a transaction resolution tile with blockhash management, transaction stashing, and address lookup table handling.
-- **[fd_resolv_tile.h](fd_resolv_tile.h.md)**: Defines a structure for signaling the completion of processing a root bank in the resolv tile.
-- **[fd_resolv_tile.seccomppolicy](fd_resolv_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
-- **[Local.mk](Local.mk.md)**: Makefile logic to add objects for `fd_resolv_tile` and `fd_discof` if `FD_HAS_ALLOCA` and `FD_HAS_INT128`.
+- **[fd_resolv_tile.c](fd_resolv_tile.c.md)**: Transaction resolution tile for blockhash tracking, ALUT lookup, stashing, and replay bank handoff.
+- **[fd_resolv_tile.h](fd_resolv_tile.h.md)**: Message struct for a replay signal that a root bank can be freed.
+- **[fd_resolv_tile.seccomppolicy](fd_resolv_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_resolv_tile when FD_HAS_ALLOCA and FD_HAS_INT128 are set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
