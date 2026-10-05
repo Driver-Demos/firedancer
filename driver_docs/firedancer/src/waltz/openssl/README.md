@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `openssl` folder in the `firedancer` codebase contains source and header files for converting OpenSSL SSL error codes into human-readable strings, along with a makefile for managing OpenSSL-related build configurations.
+Maps OpenSSL SSL error codes to strings and conditionally includes OpenSSL headers and objects.
 
 
 ## Files
-- **[fd_openssl.c](fd_openssl.c.md)**: The `fd_openssl.c` file in the `firedancer` codebase provides a function to convert OpenSSL SSL error codes into human-readable error strings.
-- **[fd_openssl.h](fd_openssl.h.md)**: The `fd_openssl.h` file in the `firedancer` codebase provides a function to return human-readable strings for SSL error codes when using OpenSSL.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects related to OpenSSL, conditional on the presence of `FD_HAS_OPENSSL`.
+- **[fd_openssl.c](fd_openssl.c.md)**: Maps OpenSSL SSL error codes to their string representations.
+- **[fd_openssl.h](fd_openssl.h.md)**: Defines a function to return human-readable strings for SSL error codes in OpenSSL.
+- **[Local.mk](Local.mk.md)**: Makefile for adding OpenSSL headers and objects conditionally based on FD_HAS_OPENSSL.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `secp256k1_dettman_64.c` file in the `firedancer` codebase provides implementations for multiplication and squaring of field elements using the secp256k1 curve with Dettman multiplication, optimized for a 64-bit machine word size.
+Implements multiplication and squaring operations for secp256k1 field elements using Dettman multiplication.
 
 # Purpose
-This C source code file is an implementation of arithmetic operations specifically designed for the secp256k1 elliptic curve, which is widely used in cryptographic applications such as Bitcoin. The file provides two primary functions: [`fiat_secp256k1_dettman_mul`](#fiat_secp256k1_dettman_mul) and [`fiat_secp256k1_dettman_square`](#fiat_secp256k1_dettman_square). These functions perform multiplication and squaring of field elements, respectively, within the finite field defined by the prime modulus \(2^{256} - 4294968273\). The code is optimized for 64-bit architectures and uses 128-bit integer types to handle intermediate calculations that exceed the standard 64-bit range. The operations are implemented using a technique known as Dettman multiplication, which is efficient for large integer arithmetic.
+The code defines two static inline functions, [`fiat_secp256k1_dettman_mul`](<#fiat_secp256k1_dettman_mul>) and [`fiat_secp256k1_dettman_square`](<#fiat_secp256k1_dettman_square>), which perform multiplication and squaring operations on field elements for the secp256k1 curve using the Dettman multiplication method. These functions are part of a cryptographic library that operates on 256-bit integers, specifically designed for elliptic curve cryptography. The code is intended to be used in environments that support 64-bit machine word sizes and assumes a two's complement system.
 
-The file is intended to be used as part of a larger cryptographic library, providing low-level arithmetic operations that can be utilized by higher-level cryptographic protocols. It is designed to be included in other C programs, as indicated by the use of `static` and `inline` keywords, which suggest that these functions are meant to be compiled directly into the calling program rather than being part of a shared library. The code is highly specialized, focusing on the specific needs of elliptic curve cryptography, and does not define any public APIs or external interfaces beyond the two functions provided. The use of conditional compilation directives ensures compatibility with different compilers, and the code explicitly checks for a two's complement system, which is a common requirement for cryptographic computations.
+The [`fiat_secp256k1_dettman_mul`](<#fiat_secp256k1_dettman_mul>) function takes two input arrays, `arg1` and `arg2`, each containing five 64-bit unsigned integers representing field elements, and computes their product modulo a large prime number, storing the result in the `out1` array. Similarly, the [`fiat_secp256k1_dettman_square`](<#fiat_secp256k1_dettman_square>) function computes the square of a field element given in the `arg1` array and stores the result in `out1`. Both functions use 128-bit integer types for intermediate calculations to handle potential overflow during arithmetic operations. The code is auto-generated and includes preprocessor directives to ensure compatibility with GCC and Clang compilers.
 # Imports and Dependencies
 
 ---
@@ -19,49 +19,53 @@ The file is intended to be used as part of a larger cryptographic library, provi
 
 ---
 ### fiat\_secp256k1\_dettman\_int128
-- **Type**: `typedef signed __int128`
-- **Description**: The `fiat_secp256k1_dettman_int128` is a type definition for a signed 128-bit integer, utilizing the `__int128` type available in some compilers like GCC and Clang. This type is used to handle large integer values that exceed the standard 64-bit integer range, which is necessary for certain cryptographic operations.
-- **Use**: This variable is used to perform arithmetic operations on large integers, particularly in the context of cryptographic algorithms for the secp256k1 curve.
+- **Type**: ``typedef signed __int128``
+- **Description**: Defines `fiat_secp256k1_dettman_int128` as a signed 128-bit integer type using the `__int128` type extension. This type is used for arithmetic operations that require large integer values, specifically in the context of the secp256k1 curve operations.
+- **Use**: Used to represent signed 128-bit integers for calculations in cryptographic operations on the secp256k1 curve.
 
 
 ---
 ### fiat\_secp256k1\_dettman\_uint128
-- **Type**: `unsigned __int128`
-- **Description**: The `fiat_secp256k1_dettman_uint128` is a typedef for an unsigned 128-bit integer, which is a data type capable of storing large integer values up to 2^128 - 1. This type is used to handle arithmetic operations that require more than the standard 64-bit integer range, particularly in cryptographic computations.
-- **Use**: This variable is used in the implementation of cryptographic functions, such as multiplication and squaring of field elements, within the secp256k1 curve operations.
+- **Type**: ``typedef unsigned __int128``
+- **Description**: Represents an unsigned 128-bit integer type used in the secp256k1 Dettman multiplication implementation. This type is used to handle large integer arithmetic operations that exceed the standard 64-bit integer range.
+- **Use**: Used in arithmetic operations within the `fiat_secp256k1_dettman_mul` and `fiat_secp256k1_dettman_square` functions to perform multiplications and squarings of large integers.
 
 
 # Functions
 
 ---
 ### fiat\_secp256k1\_dettman\_mul<!-- {{#callable:fiat_secp256k1_dettman_mul}} -->
-The function `fiat_secp256k1_dettman_mul` performs a multiplication of two 5-element arrays representing field elements in the secp256k1 curve, with modular reduction.
+[View Source →](<../../../../../src/ballet/fiat-crypto/secp256k1_dettman_64.c#L44>)
+
+Multiplies two 5-element arrays representing field elements in the secp256k1 curve and stores the result in a 5-element output array.
 - **Inputs**:
-    - `out1`: A 5-element array of uint64_t where the result of the multiplication will be stored.
-    - `arg1`: A 5-element array of uint64_t representing the first field element to be multiplied.
-    - `arg2`: A 5-element array of uint64_t representing the second field element to be multiplied.
-- **Control Flow**:
-    - Initialize several variables of type `fiat_secp256k1_dettman_uint128` and `uint64_t` to store intermediate results.
+    - `out1`: A 5-element array of `uint64_t` where the function stores the result of the multiplication.
+    - `arg1`: A 5-element array of `uint64_t` representing the first field element to multiply.
+    - `arg2`: A 5-element array of `uint64_t` representing the second field element to multiply.
+- **Logic and Control Flow**:
+    - Initialize `fiat_secp256k1_dettman_uint128` and `uint64_t` variables to store intermediate results.
     - Compute the product of the last elements of `arg1` and `arg2`, storing the result in `x1`, and split it into high (`x2`) and low (`x3`) 64-bit parts.
-    - Calculate a series of intermediate products and sums involving elements of `arg1` and `arg2`, applying modular reduction using constants like `0x1000003d10` and `0x1000003d10000`.
-    - Perform bitwise shifts and masks to extract and propagate carry bits across the intermediate results.
-    - Store the final reduced results into the `out1` array, representing the product of `arg1` and `arg2` modulo the curve's prime.
-- **Output**: The function outputs a 5-element array `out1` containing the result of the multiplication of `arg1` and `arg2`, reduced modulo the prime of the secp256k1 curve.
+    - Calculate intermediate products and sums using the elements of `arg1` and `arg2`, applying modular reduction with constants `0x1000003d10` and `0x1000003d10000` at various stages.
+    - Shift and mask operations are used to manage the size of intermediate results, ensuring they fit within the required bit-widths.
+    - Store the final results of the calculations into the `out1` array, representing the product of `arg1` and `arg2` modulo the curve's prime.
+- **Output**: A 5-element array `out1` containing the product of `arg1` and `arg2` modulo the secp256k1 curve's prime.
 
 
 ---
 ### fiat\_secp256k1\_dettman\_square<!-- {{#callable:fiat_secp256k1_dettman_square}} -->
-The function `fiat_secp256k1_dettman_square` computes the square of a 5-element field element array under the secp256k1 curve using the Dettman multiplication method.
+[View Source →](<../../../../../src/ballet/fiat-crypto/secp256k1_dettman_64.c#L129>)
+
+Squares a field element in the secp256k1_dettman curve.
 - **Inputs**:
-    - `out1`: A pointer to an array of 5 uint64_t elements where the result of the square operation will be stored.
-    - `arg1`: A pointer to an array of 5 uint64_t elements representing the field element to be squared.
-- **Control Flow**:
-    - Initialize temporary variables for intermediate calculations.
-    - Double the values of the first four elements of `arg1` to prepare for cross multiplication.
-    - Compute the square of the last element of `arg1` and split the result into high and low parts.
-    - Perform a series of multiplications and additions to compute intermediate results, using the Dettman multiplication method to handle large numbers and modular reduction.
-    - Store the final results into the `out1` array, ensuring each element is reduced to fit within the specified bounds.
-- **Output**: The function outputs the squared result of the input field element in the `out1` array, with each element reduced to fit within the bounds specified for the secp256k1 curve.
+    - `out1`: An array of 5 `uint64_t` elements where the result of the square operation will be stored.
+    - `arg1`: An array of 5 `uint64_t` elements representing the field element to be squared.
+- **Logic and Control Flow**:
+    - Multiply each element of `arg1` by 2 to prepare for the square operation.
+    - Calculate the square of the last element of `arg1` and store the result in `x5`.
+    - Perform a series of multiplications and additions involving elements of `arg1` and constants, storing intermediate results in variables `x8`, `x11`, `x14`, `x19`, `x22`, `x25`, `x28`, `x31`, and `x34`.
+    - Shift and mask operations are used to extract parts of the intermediate results, which are then used in further calculations.
+    - Store the final results in the `out1` array.
+- **Output**: An array of 5 `uint64_t` elements representing the squared field element, reduced modulo the curve's prime.
 
 
 

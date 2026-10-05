@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and object files related to topology and disco components based on the presence of hosted, threads, and Linux configurations.
+Makefile logic for adding headers and objects based on platform and threading conditions.
 
 # Purpose
-This file is a Makefile snippet used for conditional compilation in a software build process. It checks for the presence of specific features or environments—`FD_HAS_HOSTED`, `FD_HAS_THREADS`, and `FD_HAS_LINUX`—and, if all are defined, it adds certain header files and object files related to topology and discovery to the build process. This ensures that the relevant components are only included when the specified conditions are met.
+The `Makefile` content uses conditional directives to manage the inclusion of headers and object files based on specific conditions. If the macros `FD_HAS_HOSTED`, `FD_HAS_THREADS`, and `FD_HAS_LINUX` are defined, it calls the `add-hdrs` function to include the `fd_topo.h` header file and the `add-objs` function to include the object files `fd_topo`, `fd_topob`, `fd_cpu_topo`, and `fd_topo_run` in the `fd_disco` target. This setup ensures that the build process only includes these files when the specified conditions are met.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
