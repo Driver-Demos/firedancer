@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines version and commit reference constants for the Firedancer application.
+The `version.c` file in the `firedancer` codebase defines versioning information for the application, including major, minor, and patch versions, as well as commit reference strings and numbers.
 
 # Purpose
-This code is a C source file that defines versioning information for the Firedancer software. It includes header files `fd_util.h` and `version.h` and sets default values for the patch version and commit reference if they are not already defined. The file declares constants for the major, minor, and patch version numbers, as well as the commit reference in both integer and string formats. Additionally, it constructs version strings for both Firedancer and `fdctl` using macros to convert version numbers into string format. This information is useful for tracking software versions and ensuring compatibility across different components of the software.
+This C source code file is a configuration and versioning utility for a software project, likely named "Firedancer." It defines and initializes several constants related to the versioning of the software, including major, minor, and patch version numbers, as well as commit reference identifiers. The file uses preprocessor directives to set default values for the patch version and commit reference if they are not already defined, ensuring that the software has a consistent versioning scheme. Additionally, it provides string representations of these version numbers and commit references, which can be used for display or logging purposes. The inclusion of headers like "fd_util.h" and "version.h" suggests that this file is part of a larger codebase, and the constants defined here are likely used throughout the project to maintain version consistency.
 # Imports and Dependencies
 
 ---
@@ -19,57 +19,57 @@ This code is a C source file that defines versioning information for the Firedan
 ---
 ### firedancer\_major\_version
 - **Type**: `ulong`
-- **Description**: Represents the major version number of the Firedancer software.
-- **Use**: Used to identify the major version of the software in versioning operations.
+- **Description**: The `firedancer_major_version` is a global constant variable of type `ulong` that holds the major version number of the Firedancer software. It is initialized with the value of the macro `FIREDANCER_MAJOR_VERSION`, which is expected to be defined elsewhere in the codebase.
+- **Use**: This variable is used to represent and access the major version number of the Firedancer software throughout the program.
 
 
 ---
 ### firedancer\_minor\_version
-- **Type**: ``ulong``
-- **Description**: A constant unsigned long integer that holds the minor version number of the Firedancer software. The value is defined by the preprocessor macro `FIREDANCER_MINOR_VERSION`.
-- **Use**: Used to represent the minor version component of the Firedancer software versioning scheme.
+- **Type**: `ulong`
+- **Description**: The `firedancer_minor_version` is a global constant variable of type `ulong` that holds the minor version number of the Firedancer software. It is defined using a preprocessor macro `FIREDANCER_MINOR_VERSION`, which is expected to be set elsewhere in the code or build system.
+- **Use**: This variable is used to represent and access the minor version component of the Firedancer software versioning scheme.
 
 
 ---
 ### firedancer\_patch\_version
 - **Type**: `ulong`
-- **Description**: Represents the patch version number of the Firedancer software. It is a constant value defined by the macro `FIREDANCER_PATCH_VERSION`, which defaults to 9999 if not otherwise specified.
-- **Use**: Used to store the patch version number of the Firedancer software as a constant.
+- **Description**: The `firedancer_patch_version` is a global constant variable of type `ulong` that holds the patch version number of the Firedancer software. It is defined using a preprocessor macro `FIREDANCER_PATCH_VERSION`, which defaults to 9999 if not otherwise specified.
+- **Use**: This variable is used to track the specific patch version of the Firedancer software, aiding in version control and software updates.
 
 
 ---
 ### firedancer\_commit\_ref
-- **Type**: ``uint``
-- **Description**: A constant unsigned integer that stores the commit reference of the Firedancer project in a 32-bit format. It is defined using the macro `FIREDANCER_COMMIT_REF_U32`, which defaults to `0x0` if not specified.
-- **Use**: Used to store and reference the specific commit version of the Firedancer project in a numeric format.
+- **Type**: `uint`
+- **Description**: The `firedancer_commit_ref` is a global constant variable of type `uint` that holds the commit reference of the Firedancer project as a 32-bit unsigned integer. It is defined using the macro `FIREDANCER_COMMIT_REF_U32`, which defaults to `0x0` if not otherwise specified.
+- **Use**: This variable is used to store and provide the commit reference of the Firedancer project in a numeric format for version tracking and identification purposes.
 
 
 ---
 ### firedancer\_commit\_ref\_string
-- **Type**: ``char const[]``
-- **Description**: Stores the commit reference as a string for the Firedancer project. The value is defined by the macro `FIREDANCER_COMMIT_REF_CSTR`, which defaults to a 40-character string of zeros if not otherwise defined.
-- **Use**: Used to provide a string representation of the commit reference for version tracking or display purposes.
+- **Type**: `char const[]`
+- **Description**: The `firedancer_commit_ref_string` is a global constant character array that holds the commit reference string for the Firedancer project. It is defined using the preprocessor macro `FIREDANCER_COMMIT_REF_CSTR`, which defaults to a string of 40 zeros if not otherwise specified.
+- **Use**: This variable is used to store and provide the commit reference string for version tracking and identification purposes in the Firedancer project.
 
 
 ---
 ### firedancer\_version\_string
 - **Type**: ``char const[]``
-- **Description**: A constant character array that stores the version string of the Firedancer software. The version string is constructed by concatenating the major, minor, and patch version numbers, each converted to a string using the `FD_EXPAND_THEN_STRINGIFY` macro.
-- **Use**: Used to represent the version of the Firedancer software as a string.
+- **Description**: The `firedancer_version_string` is a constant character array that holds the version number of the Firedancer software in a string format. It is constructed by concatenating the major, minor, and patch version numbers, which are defined as macros, into a single string separated by periods.
+- **Use**: This variable is used to represent and display the current version of the Firedancer software as a human-readable string.
 
 
 ---
 ### fdctl\_commit\_ref\_string
-- **Type**: ``char const[]``
-- **Description**: A constant character array that stores the commit reference string for the `fdctl` component. It is initialized with the value of the macro `FIREDANCER_COMMIT_REF_CSTR`, which defaults to a string of 40 zeros if not defined elsewhere.
-- **Use**: Used to store and provide the commit reference string for the `fdctl` component.
+- **Type**: `char const[]`
+- **Description**: The `fdctl_commit_ref_string` is a global constant character array that holds the commit reference string for the Firdancer project. It is initialized with the value of the macro `FIREDANCER_COMMIT_REF_CSTR`, which defaults to a string of 40 zeros if not defined elsewhere.
+- **Use**: This variable is used to store and provide access to the commit reference string for version control purposes in the Firdancer project.
 
 
 ---
 ### fdctl\_version\_string
-- **Type**: ``char const[]``
-- **Description**: A constant character array that stores the version string of the `fdctl` component. The version string is constructed by concatenating the major, minor, and patch version numbers of the Firdancer software, separated by periods.
-- **Use**: Used to represent the version of the `fdctl` component in a human-readable format.
+- **Type**: `char const[]`
+- **Description**: The `fdctl_version_string` is a constant character array that holds the version string of the fdctl component, formatted as 'major.minor.patch'. It is constructed using macros that expand to the major, minor, and patch version numbers of the Fdctl software.
+- **Use**: This variable is used to provide a human-readable version identifier for the fdctl component, which can be used in logging, debugging, or display purposes.
 
 
 
