@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for a Solana testnet with gossip entrypoints, consensus settings, RPC, layout, and reporting.
+The `testnet.toml` file in the `firedancer` codebase configures network settings for a Solana testnet, including gossip entrypoints, consensus validators, RPC settings, layout configurations, and reporting metrics.
 
 # Purpose
-The configuration file defines settings for a Solana testnet environment. The `[gossip]` section specifies entry points for network communication, listing multiple server addresses and ports. The `[consensus]` section includes the expected genesis hash and a list of known validators, which are essential for maintaining network integrity and validating transactions. The `[rpc]` section configures the Remote Procedure Call (RPC) server, setting the port to `8899` and enabling the full API while marking it as private. The `[layout]` section configures the number of shred tiles to handle computational overhead, which is necessary due to the expanded validator peer set in the testnet. Finally, the `[reporting]` section provides the configuration for sending metrics to a specified host, database, and credentials, facilitating performance monitoring and analysis.
+The provided configuration file is designed for setting up a Solana testnet node, detailing various network and operational parameters. The `[gossip]` section specifies entry points for the node to connect to the testnet, which are essential for discovering other nodes in the network. The `[consensus]` section includes the expected genesis hash and a list of known validators, which are crucial for ensuring the node is synchronized with the correct blockchain and can validate transactions accurately. The `[rpc]` section configures the Remote Procedure Call (RPC) server, specifying the port, enabling the full API, and setting it as private, which controls how the node communicates with external applications. The `[layout]` section addresses the computational needs for handling shred tiles, which are part of Solana's data propagation mechanism, to accommodate the testnet's validator set. Finally, the `[reporting]` section configures metrics reporting to a specified host, allowing for performance monitoring and analysis of the testnet node.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
