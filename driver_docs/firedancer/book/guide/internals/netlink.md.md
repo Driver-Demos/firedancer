@@ -3,35 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Documentation of Firedancer's netlink integration for userland networking, detailing configuration, security, and data flows.
+The `netlink.md` file in the `firedancer` codebase provides a detailed guide on how Firedancer's userland networking stack integrates with netlink to achieve zero configuration interoperability with Linux, focusing on security and performance improvements through a separate netlink tile and shared memory caches.
 
 # Purpose
-The document describes the integration of Firedancer's userland networking stack with the Linux netlink interface. This integration allows Firedancer to operate with minimal configuration by leveraging netlink for network configuration and management tasks, contrasting with other networking stacks that require complex setups. The document details how Firedancer uses the eXpress Data Path (XDP) for fast packet processing, which necessitates handling routing and neighbor resolution within the software. The netlink tile, a component of Firedancer, manages these tasks by interacting with the kernel's rtnetlink API to obtain necessary network information, which it caches in a shared memory region called "netbase." This setup enhances security by isolating the netlink interface from untrusted traffic and improves performance by reducing the frequency of netlink requests. The document also outlines the data flows between different components, emphasizing the security measures in place to protect against potential attacks through the netlink interface. Additionally, it explains the handling of neighbor discovery and routing, highlighting the synchronization of specific routing tables and the use of a hash table for ARP entries.
+The provided content is a documentation excerpt detailing the integration of the Firedancer networking stack with the Linux netlink interface. This file is a configuration and architectural overview document that explains how Firedancer leverages netlink to achieve efficient and secure networking operations with minimal configuration. The document outlines the use of XDP for fast packet processing, which requires certain kernel-level operations to be handled within the Firedancer software, specifically routing and neighbor resolution. It describes the architecture of the "netlink tile," which isolates netlink interactions to enhance security and performance by caching network information in shared memory. The document also details the data flow between various components, emphasizing security measures and performance optimizations, such as the use of a read-only cache and deduplication of neighbor solicitation requests. This file is crucial for developers and system administrators to understand the network configuration and security architecture of the Firedancer stack within a Linux environment.
 # Content Summary
-The provided content describes the integration of Firedancer's userland networking stack with the Linux netlink interface. This integration allows for minimal configuration while maintaining interoperability with Linux systems. The document outlines the technical details of how Firedancer uses netlink to manage network configurations and operations.
+The provided document outlines the integration of the Firedancer userland networking stack with the Linux netlink interface, emphasizing a mostly zero-configuration approach for interoperability. This integration is designed to contrast with other fast networking stacks that often require complex configurations or dedicated IP addresses. The document details how Firedancer leverages the eXpress Data Path (XDP) for efficient packet processing, which necessitates handling certain tasks traditionally managed by the kernel, such as routing and link-level neighbor resolution, within the Firedancer software itself.
 
-### Key Functional Details:
+A key component of this integration is the use of a separate "netlink tile" to handle netlink requests, which enhances both security and performance. The netlink tile isolates the netlink interface from untrusted user traffic, reducing security risks, and utilizes shared memory caches to minimize the frequency of netlink requests, thereby improving performance. The shared memory region, referred to as "netbase," stores a read-only cache of critical networking information, including interface tables, IPv4 route tables, and neighbor tables for XDP-enabled Ethernet interfaces.
 
-1. **Netlink Integration**: Firedancer uses the netlink interface to source configuration data, which allows it to operate with minimal configuration compared to other networking stacks that require complex setups or dedicated IP addresses.
+Security considerations are paramount, as the netlink interface presents a significant attack surface. The netlink tile operates with an rtnetlink socket, subscribing to route and neighbor table changes and issuing specific requests. Importantly, all netlink interactions can be performed by a regular unprivileged user on certain Linux distributions, such as RHEL 8 with a Linux 4.18 kernel.
 
-2. **XDP and Packet Processing**: Firedancer employs eXpress Data Path (XDP) for fast networking, which shifts some packet processing tasks from the kernel to the Firedancer software. This includes routing and resolving link-level neighbors.
+The document also describes various data flows within the system, highlighting how net tiles interact with the netbase, how sysadmin changes propagate through the netlink tile, and how neighbor discovery is managed. Notably, the netlink tile is responsible for deduplicating neighbor solicitation requests and forwarding them to the kernel, ensuring efficient and secure handling of untrusted traffic.
 
-3. **Netlink Tile Architecture**: 
-   - **Security and Performance**: Netlink requests are handled in a separate tile to enhance security and performance. This tile isolates the netlink interface from untrusted user traffic and uses shared memory caches to reduce the frequency of netlink requests.
-   - **Shared Memory ("Netbase")**: The netlink tile maintains a read-only cache of interface tables, IPv4 route tables, and neighbor tables in a shared memory region called "netbase."
-
-4. **Security Considerations**: The netlink tile operates with an rtnetlink socket and subscribes to route and neighbor table changes. It can perform netlink interactions without elevated privileges on certain Linux distributions, such as RHEL 8 with a Linux 4.18 kernel. The tile is designed to minimize exposure to untrusted inputs.
-
-5. **Data Flows**:
-   - Net tiles access the netbase object in a read-only manner.
-   - Route and neighbor table updates are processed by the netlink tile and written to the shared memory region.
-   - Neighbor discovery involves deduplicating requests and forwarding them to the kernel, with a focus on maintaining a simple message format for security.
-
-6. **Neighbor Discovery and Routing**:
-   - A concurrent hash table is used for storing ARP entries, keeping them in sync with the kernel.
-   - The network stack supports simple routing tables, synchronizing only the "local" and "main" tables. Policy-based routing and additional tables are not supported.
-
-This document provides a comprehensive overview of how Firedancer integrates with the Linux netlink interface to manage network configurations efficiently and securely.
+Finally, the document touches on routing and neighbor discovery mechanisms. Firedancer supports simple routing tables, synchronizing only the "local" and "main" tables, and does not support policy-based routing or additional tables. Neighbor discovery is managed using a concurrent open-addressed hash table to store ARP entries, maintaining synchronization with the kernel. This comprehensive integration ensures Firedancer's networking stack operates efficiently and securely within a Linux environment.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,26 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines constants and metadata for repair-related metrics, including counters and histograms, in the Firedancer codebase.
+Generated metric definitions for repair counters and histograms.
 
 # Purpose
-This C header file defines a set of metrics related to network packet repair operations. It includes definitions for various counters and histograms that track different aspects of the repair process, such as the total number of packets sent, types of client messages sent, and the number of repaired slots. Each metric is associated with an offset, name, type, description, and conversion type. The file also specifies histograms for measuring time-related metrics, such as the time to complete a slot and response latency. The file is automatically generated and should not be manually edited. It includes necessary headers and declares an external array `FD_METRICS_REPAIR` to store metadata for these metrics.
-# Imports and Dependencies
-
----
-- `../fd_metrics_base.h`
-- `fd_metrics_enums.h`
-
-
-# Global Variables
-
----
-### FD\_METRICS\_REPAIR
-- **Type**: ``fd_metrics_meta_t` array`
-- **Description**: An array of `fd_metrics_meta_t` structures that contains metadata for various repair metrics. Each element in the array represents a specific metric related to network repair operations, such as packet counts, slot completions, and response latencies.
-- **Use**: Used to store and access metadata for repair-related metrics in the system.
-
-
+This header file defines generated metric metadata for the `repair` area of the codebase. It declares a set of counters and histograms with fixed offsets, names, types, descriptions, and value conversion rules, so other parts of the program can register and read these metrics in a consistent way. The entries cover packet counts, packet type counts, repair progress, peer requests, sign tile availability, repair latency, and signing duration. The `FD_METRICS_REPAIR_TOTAL` value and the `FD_METRICS_REPAIR` array declaration provide the complete metric set for this group, while the include guard and generated-file notice control safe use and maintenance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

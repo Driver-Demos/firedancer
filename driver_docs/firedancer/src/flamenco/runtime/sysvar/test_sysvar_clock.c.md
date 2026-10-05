@@ -3,48 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for the sysvar clock functionality, including data size and alignment checks.
+Tests clock sysvar decode footprint, size, and alignment bounds.
 
 # Purpose
-This code is a C test suite designed to validate the functionality and constraints of the system variable clock, specifically focusing on its binary encoding and footprint. It includes the header files `fd_sysvar_clock.h` and `fd_types.h` to access necessary definitions and types. The function [`test_sysvar_clock_bounds`](<#test_sysvar_clock_bounds>) tests the size and alignment of a static array `data` against expected constants `FD_SYSVAR_CLOCK_BINCODE_SZ`, `FD_SYSVAR_CLOCK_FOOTPRINT`, and `FD_SYSVAR_CLOCK_ALIGN`. It uses the `FD_TEST` macro to assert that the decoded footprint and alignment match the expected values. The [`test_sysvar_clock`](<#test_sysvar_clock>) function calls [`test_sysvar_clock_bounds`](<#test_sysvar_clock_bounds>) and is intended to include additional tests, as indicated by the placeholder comment.
-# Imports and Dependencies
-
----
-- `fd_sysvar_clock.h`
-- `../../types/fd_types.h`
-
-
-# Functions
-
----
-### test\_sysvar\_clock\_bounds<!-- {{#callable:test_sysvar_clock_bounds}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/sysvar/test_sysvar_clock.c#L4>)
-
-Validates the size, decoding footprint, and alignment of a sysvar clock binary code against expected constants.
-- **Inputs**: None
-- **Logic and Control Flow**:
-    - Defines a static array `data` representing a sysvar account observed on-chain.
-    - Checks if the size of `data` matches `FD_SYSVAR_CLOCK_BINCODE_SZ` using `FD_TEST`.
-    - Initializes a `fd_bincode_decode_ctx_t` structure `ctx` with `data` and its endpoint.
-    - Initializes `obj_sz` to zero and checks if `fd_sol_sysvar_clock_decode_footprint` returns `FD_BINCODE_SUCCESS` and sets `obj_sz` to `FD_SYSVAR_CLOCK_FOOTPRINT`.
-    - Verifies that `fd_sol_sysvar_clock_align` returns `FD_SYSVAR_CLOCK_ALIGN`.
-- **Output**: No output is returned; the function uses assertions to validate conditions.
-
-
----
-### test\_sysvar\_clock<!-- {{#callable:test_sysvar_clock}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/sysvar/test_sysvar_clock.c#L22>)
-
-Calls the [`test_sysvar_clock_bounds`](<#test_sysvar_clock_bounds>) function to perform boundary tests on the system variable clock.
-- **Inputs**: None
-- **Logic and Control Flow**:
-    - Calls the [`test_sysvar_clock_bounds`](<#test_sysvar_clock_bounds>) function to execute its tests.
-    - Contains a placeholder comment indicating that more tests should be added in the future.
-- **Output**: No output is returned as the function is of type `void`.
-- **Functions Called**:
-    - [`test_sysvar_clock_bounds`](<#test_sysvar_clock_bounds>)
-
-
+This file contains a small unit test for the Solana clock sysvar decode logic. The [`test_sysvar_clock_bounds`](<#test_sysvar_clock_bounds>) function checks that a known on-chain `data` buffer has the expected `FD_SYSVAR_CLOCK_BINCODE_SZ`, then uses `fd_sol_sysvar_clock_decode_footprint` to verify the decoded object size and `fd_sol_sysvar_clock_align` to verify the required alignment. The [`test_sysvar_clock`](<#test_sysvar_clock>) function runs the bounds test and leaves a placeholder for more tests.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
