@@ -3,33 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a function to calculate a stake bucket for an active set in the Firedancer project.
+Stake bucket calculation from a stake value.
 
 # Purpose
-This code is a C header file that defines a static inline function [`fd_active_set_stake_bucket`](<#fd_active_set_stake_bucket>). The function calculates a "bucket" value based on a given stake, which is an unsigned long integer. It first scales down the input `_stake` by dividing it by 1,000,000,000. If the resulting `stake` is zero, the function returns zero. Otherwise, it calculates the bucket by determining the position of the most significant bit in `stake` using the `__builtin_clzl` function and subtracts this from 64. The function then returns the minimum of this bucket value and 24, using the `fd_ulong_min` function. The header file includes another header, `fd_bits.h`, which likely provides utility functions or macros used in this file.
-# Imports and Dependencies
-
----
-- `../../util/bits/fd_bits.h`
-
-
-# Functions
-
----
-### fd\_active\_set\_stake\_bucket<!-- {{#callable:fd_active_set_stake_bucket}} -->
-[View Source →](<../../../../../src/flamenco/gossip/fd_active_set_private.h#L6>)
-
-Calculates a stake bucket index based on the input stake value.
-- **Inputs**:
-    - `_stake`: The input stake value as an unsigned long integer.
-- **Logic and Control Flow**:
-    - Divide `_stake` by 1,000,000,000 to normalize the stake value.
-    - Check if the normalized stake is zero using `FD_UNLIKELY`; if true, return 0.
-    - Calculate the bucket index by subtracting the number of leading zeros in the normalized stake from 64.
-    - Return the minimum of the calculated bucket index and 24 using `fd_ulong_min`.
-- **Output**: An unsigned long integer representing the stake bucket index.
-
-
+This header file defines a small helper for the gossip `active_set` code. The [`fd_active_set_stake_bucket`](<#fd_active_set_stake_bucket>) function converts a stake value into a bucket index by first scaling the input down by `1000000000`, then computing the bit length of the result with `__builtin_clzl`. If the scaled stake is zero, the function returns `0`; otherwise, it returns the smaller of the computed bucket value and `24`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
