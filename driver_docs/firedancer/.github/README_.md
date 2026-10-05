@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions, Codecov, and Dependabot configuration for builds, tests, coverage, benchmarks, docs, and updates.
+GitHub Actions for CPU management, dependency caching, huge page configuration, submodule caching, and workflows for building, testing, deploying, and analyzing projects, plus configurations for Codecov and Dependabot.
 
 ## Folders
-- **[actions](actions/README.md)**: GitHub Actions for CPU online state, dependencies, huge pages, and submodule cache.
-- **[workflows](workflows/README.md)**: GitHub Actions workflows for builds, tests, coverage, benchmarks, docs, and analysis.
+- **[actions](actions/README.md)**: GitHub Actions for CPU management, dependency caching, huge page configuration, and submodule caching.
+- **[workflows](workflows/README.md)**: GitHub Actions workflows for building, testing, deploying, and analyzing Firedancer projects with various configurations.
 
 ## Files
-- **[codecov.yml](codecov.yml.md)**: The `codecov.yml` file in the `firedancer` codebase configures Codecov settings, disabling project and patch status checks, turning off comments, and enabling carryforward for `clusterfuzz` and `ledgers` flags.
-- **[dependabot.yml](dependabot.yml.md)**: The `dependabot.yml` file in the `firedancer` codebase configures Dependabot to update GitHub Actions weekly and npm packages daily.
+- **[codecov.yml](codecov.yml.md)**: Configuration for Codecov coverage settings, disabling project and patch status, with specific flags.
+- **[dependabot.yml](dependabot.yml.md)**: Configuration for Dependabot to update GitHub Actions weekly and npm packages daily.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

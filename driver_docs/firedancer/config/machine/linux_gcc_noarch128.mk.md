@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_noarch128.mk` file in the `firedancer` codebase is a makefile configuration that sets up build options for a Linux environment using GCC with support for 128-bit integers, double precision, and stack allocation.
+Makefile for configuring a Linux GCC build with specific flags and features for noarch128.
 
 # Purpose
-This Makefile snippet is used to configure the build environment for a software project. It sets the build directory to `linux/gcc/noarch128` and includes several configuration files to extend the build setup with additional features such as GCC support, debugging, security, optimization, and threading. It also defines preprocessor flags and variables to enable specific features like 128-bit integers, double precision, and dynamic memory allocation using `alloca`.
+The Makefile sets up the build environment for a software project targeting a Linux system with a GCC compiler and a noarch128 architecture. It includes several configuration files to extend the build with additional features such as debugging, security, optimization, and threading. The file also defines preprocessor flags and variables to enable support for 128-bit integers, double precision floating-point numbers, and the `alloca` function.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
