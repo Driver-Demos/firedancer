@@ -3,58 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for monitoring system calls with architecture-specific checks.
+Generated seccomp BPF filter for allowed syscalls and argument checks.
 
 # Purpose
-The code is a C header file that defines a seccomp (secure computing mode) filter policy for a monitoring application. It is generated automatically by a script and should not be edited manually. The file includes necessary headers for seccomp and BPF (Berkeley Packet Filter) operations, and it defines architecture-specific constants to ensure compatibility with the runtime environment. The primary function, [`populate_sock_filter_policy_monitor`](<#populate_sock_filter_policy_monitor>), initializes a BPF filter array with 36 instructions. These instructions enforce a security policy by allowing or denying specific system calls based on predefined conditions.
-
-The filter checks the architecture of the executing environment and allows or denies system calls such as `write`, `fsync`, `nanosleep`, `sched_yield`, `exit_group`, `read`, `ioctl`, and `pselect6`. The policy uses BPF statements and jumps to evaluate syscall numbers and arguments, allowing only those that match specific criteria. If a syscall does not match any allowed pattern, the filter defaults to a `SECCOMP_RET_KILL_PROCESS` action, terminating the process. This ensures that only safe and expected operations are permitted, enhancing the security of the application.
-# Imports and Dependencies
-
----
-- `../../../../../../src/util/fd_util_base.h`
-- `linux/audit.h`
-- `linux/capability.h`
-- `linux/filter.h`
-- `linux/seccomp.h`
-- `linux/bpf.h`
-- `sys/syscall.h`
-- `signal.h`
-- `stddef.h`
-
-
-# Global Variables
-
----
-### sock\_filter\_policy\_monitor\_instr\_cnt
-- **Type**: ``unsigned int``
-- **Description**: A static constant variable that holds the number of instructions in a socket filter policy for monitoring.
-- **Use**: Used to define the size of the `filter` array in the `populate_sock_filter_policy_monitor` function.
-
-
-# Functions
-
----
-### populate\_sock\_filter\_policy\_monitor<!-- {{#callable:populate_sock_filter_policy_monitor}} -->
-[View Source →](<../../../../../../../../src/app/shared/commands/monitor/generated/monitor_seccomp.h#L26>)
-
-Populates a `sock_filter` array with a predefined seccomp filter policy to monitor and control system calls.
-- **Inputs**:
-    - `out_cnt`: The number of elements in the `out` array, which must be at least 36.
-    - `out`: A pointer to a `sock_filter` array where the filter policy will be copied.
-    - `logfile_fd`: The file descriptor for the log file, used in syscall checks.
-    - `drain_output_fd`: The file descriptor for draining output, used in syscall checks.
-- **Logic and Control Flow**:
-    - Check if `out_cnt` is at least 36 using `FD_TEST` macro.
-    - Define a `sock_filter` array `filter` with 36 elements to specify the seccomp filter policy.
-    - Load the architecture from `seccomp_data` and compare it with `ARCH_NR`; jump to `RET_KILL_PROCESS` if they do not match.
-    - Load the syscall number and check against allowed syscalls like `SYS_write`, `SYS_fsync`, `SYS_nanosleep`, `SYS_sched_yield`, `SYS_exit_group`, `SYS_read`, `SYS_ioctl`, and `SYS_pselect6`.
-    - For each allowed syscall, load the appropriate syscall arguments and compare them with expected values or file descriptors (`logfile_fd`, `drain_output_fd`).
-    - If a syscall does not match any allowed pattern, jump to `RET_KILL_PROCESS`.
-    - Copy the `filter` array to the `out` array using `fd_memcpy`.
-- **Output**: The function does not return a value; it modifies the `out` array in place.
-
-
+This header defines a generated seccomp BPF policy for the `monitor` command. It sets the target architecture with `ARCH_NR`, declares the filter length in `sock_filter_policy_monitor_instr_cnt`, and provides `populate_sock_filter_policy_monitor()` to copy the filter program into an output buffer. The filter allows only a small set of syscalls, including `write`, `fsync`, `read`, `ioctl`, `pselect6`, `nanosleep`, `sched_yield`, and `exit_group`, and it checks syscall arguments so that access is limited to the expected file descriptors and terminal control requests. Any syscall or argument pattern that does not match the allowed cases ends with `SECCOMP_RET_KILL_PROCESS`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
