@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A Bash script for executing parallel make with CPU isolation considerations.
+The `make-j` file is a Bash script that facilitates parallel make operations, with special handling for systems with CPU isolation by targeting isolated cores for the build process.
 
 # Purpose
-The script is a Bash script designed to optimize the execution of the `make` command on systems with CPU isolation. It first checks if any CPUs are isolated by reading from `/sys/devices/system/cpu/isolated`. If no CPUs are isolated, it executes a normal parallel `make` using `make -j -Otarget`. If CPUs are isolated, the script uses `chrt` and `taskset` to ensure that the `make` command runs on the isolated CPUs, which are typically more numerous. This approach addresses the limitations of `taskset` and the default kernel scheduling policy, which may not handle isolated and non-isolated cores effectively. The script calculates the number of available cores using `nproc --all` and `nproc` to determine the correct number of jobs for `make`, ensuring efficient use of CPU resources.
+This script is a Bash configuration file designed to optimize the execution of the `make` command in environments with CPU isolation. It first checks if any CPUs are isolated by reading from the `/sys/devices/system/cpu/isolated` file. If no CPUs are isolated, it executes a standard parallel `make` command. However, if CPU isolation is detected, the script employs a more complex setup using `chrt` and `taskset` to ensure that the `make` process runs efficiently on the isolated CPUs. This approach addresses the challenge of running parallel tasks on systems where some cores are isolated from the operating system, ensuring that the build process utilizes the correct number of cores and adheres to real-time scheduling policies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

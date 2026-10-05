@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+Generated seccomp BPF filter for watch, allowing read/write/fsync only on set file descriptors.
 
 
 ## Files
-- **[watch_seccomp.h](watch_seccomp.h.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+- **[watch_seccomp.h](watch_seccomp.h.md)**: Generated seccomp BPF filter for watch, allowing read/write/fsync only on set file descriptors.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
