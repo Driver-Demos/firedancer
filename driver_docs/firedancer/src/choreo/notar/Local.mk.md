@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components with optional support for INT128 and SECP256K1.
+Build rules for fd_notar headers, objects, and unit tests when int128, hosted, and secp256k1 are enabled
 
 # Purpose
-The Makefile snippet conditionally includes headers and object files based on the presence of certain features. If `FD_HAS_INT128` is defined, it adds the header `fd_notar.h` and the objects `fd_notar` and `fd_choreo`. If both `FD_HAS_HOSTED` and `FD_HAS_SECP256K1` are defined, it creates and runs a unit test named `test_notar` with dependencies on `fd_choreo`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.
+This Makefile fragment adds `fd_notar.h` to the header list and `fd_notar` to the object list when `FD_HAS_INT128` is set. It also defines and runs the `test_notar` unit test only when `FD_HAS_HOSTED` and `FD_HAS_SECP256K1` are set, and it links the test with `fd_choreo`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

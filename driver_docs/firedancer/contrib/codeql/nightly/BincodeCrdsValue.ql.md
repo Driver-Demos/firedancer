@@ -3,23 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL query to detect improper initialization of `fd_value_elem->data` using methods other than `fd_crds_value_encode`.
+CodeQL path query flagging non-fd_crds_value_encode writes to fd_value_elem->data
 
 # Purpose
-The code is a configuration for a data flow analysis module, specifically designed to enforce a security constraint related to the encoding of gossip values using Bincode. It is implemented using CodeQL, a query language for code analysis. The primary purpose of this code is to ensure that the `data` field of a `fd_value_elem` type is only initialized using the `fd_crds_value_encode` function. This constraint is enforced to prevent bugs that have occurred in the past when other encoding methods, such as `fd_crds_data_encode`, were used.
-
-The code defines a class `CtxData` that extends `FieldAccess` to identify specific field accesses related to the `fd_bincode_encode_ctx` type and its `data` field. It also implements a `Config` module that specifies the data flow configuration. This configuration includes predicates to identify sources, barriers, sinks, and additional flow steps in the data flow. The `isSource` predicate identifies pointers that are assigned or initialized, while the `isBarrier` predicate ensures that the data is initialized correctly. The `isSink` predicate identifies the `data` field of `fd_value_elem` as the sink, and the `isAdditionalFlowStep` predicate accounts for specific function calls like `fd_memcpy` that affect the data flow.
-
-The module concludes with a query that selects paths in the code where the data flow from a source to a sink violates the constraint of using only `fd_crds_value_encode` for initialization. This query helps in identifying and warning about potential security issues in the codebase, ensuring that the encoding process adheres to the specified guidelines.
-# Imports and Dependencies
-
----
-- `cpp`
-- `semmle.code.cpp.dataflow.new.DataFlow`
-- `Flow::PathGraph`
-- `filter`
-
-
+This CodeQL query detects unsafe initialization of `fd_value_elem->data` in the `fd_bincode_encode_ctx` flow. It treats pointer assignments and initializers as sources, follows data flow through `fd_memcpy`, and reports a sink when data reaches the `data` field of `fd_value_elem`. The `CtxData` helper marks accesses to `fd_bincode_encode_ctx.data` inside `fd_crds_value_encode` as a barrier, so the query allows the approved encoding path and blocks other paths. The query message enforces the rule that only `fd_crds_value_encode` may initialize `fd_value_elem->data`, which matches the documented bug reference in the metadata.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

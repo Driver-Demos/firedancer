@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements the SipHash-1-3 cryptographic hash function with initialization, appending, and finalization.
+The `fd_siphash13.c` file in the `firedancer` codebase implements a modified version of the SipHash-1-3 cryptographic hash function, providing initialization, data appending, and finalization functionalities.
 
 # Purpose
-The code implements the SipHash-1-3 cryptographic hash function, which is a variant of the SipHash family designed for fast hashing of short messages. It provides a set of functions to initialize, update, and finalize the hash computation. The [`fd_siphash13_init`](<#fd_siphash13_init>) function initializes the hash state with a given key, while [`fd_siphash13_append`](<#fd_siphash13_append>) and [`fd_siphash13_append_fast`](<#fd_siphash13_append_fast>) allow for incremental addition of data to the hash. The [`fd_siphash13_fini`](<#fd_siphash13_fini>) function finalizes the hash computation and returns the resulting hash value. Additionally, the [`fd_siphash13_hash`](<#fd_siphash13_hash>) function provides a one-shot interface to compute the hash of a complete data block in a single call.
+This C source code file implements the SipHash-1-3 cryptographic hash function, a variant of the SipHash family designed for fast and secure hashing of data. The code is a modified version of an existing implementation, as indicated by the comments referencing the original authors and contributors. The primary purpose of this file is to provide a robust hashing mechanism that can be used to generate a fixed-size hash value from variable-length input data, which is particularly useful for hash tables, checksums, and other applications requiring data integrity verification.
 
-The code is structured to handle data in blocks, optimizing for aligned data access, and includes mechanisms to handle any remaining bytes after processing full blocks. The use of `FD_SIPHASH_ROUND` indicates that the core hash computation involves multiple rounds of mixing the state. The code is intended to be part of a library, as indicated by the inclusion of a header file `fd_siphash13.h`, and it defines a public API for external use. The implementation is a modified version of an existing SipHash implementation, with contributions from multiple authors over several years.
+The file defines several key functions: [`fd_siphash13_init`](#fd_siphash13_init), [`fd_siphash13_append`](#fd_siphash13_append), [`fd_siphash13_append_fast`](#fd_siphash13_append_fast), [`fd_siphash13_fini`](#fd_siphash13_fini), and [`fd_siphash13_hash`](#fd_siphash13_hash). These functions collectively manage the initialization, processing, and finalization of the hash computation. The [`fd_siphash13_init`](#fd_siphash13_init) function sets up the initial state of the hash using a pair of keys, while [`fd_siphash13_append`](#fd_siphash13_append) and [`fd_siphash13_append_fast`](#fd_siphash13_append_fast) allow for incremental data processing. The [`fd_siphash13_fini`](#fd_siphash13_fini) function finalizes the hash computation, and [`fd_siphash13_hash`](#fd_siphash13_hash) provides a complete hash calculation in a single call. The code is structured to handle data in blocks, optimizing for performance, and includes mechanisms to handle any remaining bytes after processing full blocks. The use of static and inline functions, along with attributes for alignment and fallthrough, indicates a focus on performance optimization.
 # Imports and Dependencies
 
 ---
@@ -19,126 +19,115 @@ The code is structured to handle data in blocks, optimizing for aligned data acc
 
 ---
 ### fd\_siphash13\_initial
-- **Type**: ``static const ulong[4]``
-- **Description**: An array of four unsigned long integers, each initialized with a specific 64-bit constant value. These values are used as the initial state for the SipHash-1-3 algorithm.
-- **Use**: Used to initialize the state vector in the `fd_siphash13_init` function for the SipHash-1-3 hashing process.
+- **Type**: `static const ulong[4]`
+- **Description**: The `fd_siphash13_initial` is a static constant array of four unsigned long integers, each initialized with a specific 64-bit hexadecimal value. These values are aligned to a 64-byte boundary for performance optimization.
+- **Use**: This array is used as the initial state vector for the SipHash-1-3 algorithm, providing a starting point for the hash computation.
 
 
 # Functions
 
 ---
 ### fd\_siphash13\_init<!-- {{#callable:fd_siphash13_init}} -->
-[View Source →](<../../../../../src/ballet/siphash13/fd_siphash13.c#L20>)
-
-Initializes a `fd_siphash13_t` structure with given keys and default values.
+The `fd_siphash13_init` function initializes a SipHash-1-3 state with given keys.
 - **Inputs**:
-    - `sip`: A pointer to a `fd_siphash13_t` structure to initialize.
-    - `k0`: The first 64-bit key used for initialization.
-    - `k1`: The second 64-bit key used for initialization.
-- **Logic and Control Flow**:
-    - Set all bytes of the `sip` structure to zero using `memset`.
-    - Assign a pointer `v` to the `v` array within the `sip` structure.
-    - Copy the default initial values from `fd_siphash13_initial` into the `v` array.
-    - Apply XOR operation on `v[3]` with `k1`, `v[2]` with `k0`, `v[1]` with `k1`, and `v[0]` with `k0`.
-    - Return the pointer to the initialized `sip` structure.
-- **Output**: Returns a pointer to the initialized `fd_siphash13_t` structure.
+    - `sip`: A pointer to an `fd_siphash13_t` structure that will be initialized.
+    - `k0`: The first 64-bit key used for initializing the SipHash state.
+    - `k1`: The second 64-bit key used for initializing the SipHash state.
+- **Control Flow**:
+    - The function begins by zeroing out the memory of the `fd_siphash13_t` structure pointed to by `sip` using `memset`.
+    - It then initializes a local pointer `v` to the `v` array within the `sip` structure.
+    - The function sets the elements of `v` to the predefined constants from `fd_siphash13_initial`.
+    - Each element of `v` is then XORed with the provided keys `k0` and `k1` to finalize the initialization.
+    - Finally, the function returns the pointer to the initialized `fd_siphash13_t` structure.
+- **Output**: A pointer to the initialized `fd_siphash13_t` structure.
 
 
 ---
 ### fd\_siphash1N\_core<!-- {{#callable:fd_siphash1N_core}} -->
-[View Source →](<../../../../../src/ballet/siphash13/fd_siphash13.c#L41>)
-
-Processes a buffer of data using the SipHash algorithm by iterating over each block and applying a round function.
+The `fd_siphash1N_core` function processes a buffer of data in blocks, updating a state vector using the SipHash algorithm.
 - **Inputs**:
-    - `v`: An array of 4 unsigned long integers used as the internal state for the SipHash algorithm.
-    - `buf`: A pointer to a constant unsigned char array representing the input data buffer to be processed.
-    - `n`: An unsigned long integer representing the number of 8-byte blocks in the buffer to process.
-- **Logic and Control Flow**:
-    - Initialize a variable `m` to store each 8-byte block from the buffer.
-    - Iterate over each block in the buffer using a loop that runs `n` times.
-    - In each iteration, extract an 8-byte block from `buf` and store it in `m`.
-    - XOR the third element of `v` with `m`.
-    - Call the `FD_SIPHASH_ROUND` macro with `v` to perform a round of the SipHash algorithm.
-    - XOR the first element of `v` with `m`.
-- **Output**: No direct output; the function modifies the `v` array in place to update the internal state of the SipHash algorithm.
+    - `v`: A state vector of 4 unsigned long integers, which is updated during the hash computation.
+    - `buf`: A pointer to a buffer of unsigned characters, representing the data to be hashed.
+    - `n`: The number of 8-byte blocks in the buffer to process.
+- **Control Flow**:
+    - Initialize a variable `m` to store each 8-byte block of data from the buffer.
+    - Iterate over each block of data in the buffer, from index 0 to n-1.
+    - For each block, cast the corresponding part of the buffer to an unsigned long and store it in `m`.
+    - XOR the third element of the state vector `v` with `m`.
+    - Call the macro `FD_SIPHASH_ROUND` to perform a round of the SipHash algorithm on the state vector `v`.
+    - XOR the first element of the state vector `v` with `m`.
+- **Output**: The function does not return a value; it modifies the state vector `v` in place.
 
 
 ---
 ### fd\_siphash13\_append<!-- {{#callable:fd_siphash13_append}} -->
-[View Source →](<../../../../../src/ballet/siphash13/fd_siphash13.c#L54>)
-
-Appends data to a SipHash state, processing it in blocks and updating the hash state accordingly.
+The `fd_siphash13_append` function appends data to a SipHash state, processing it in blocks and buffering any remaining bytes.
 - **Inputs**:
     - `sip`: A pointer to the `fd_siphash13_t` structure representing the current state of the SipHash.
-    - `data`: A pointer to the data to append to the hash state.
-    - `sz`: The size of the data to append, in bytes.
-- **Logic and Control Flow**:
-    - Retrieve the current hash state and buffer usage from `sip`.
+    - `data`: A pointer to the data to be appended to the SipHash state.
+    - `sz`: The size in bytes of the data to be appended.
+- **Control Flow**:
+    - Initialize local variables `v`, `buf`, and `buf_used` from the `sip` structure.
     - Increment the total byte count `sip->n` by `sz`.
-    - If there are leftover bytes in the buffer (`buf_used` is non-zero), check if the new data can complete the current block.
-    - If the new data is insufficient to complete the block, copy it to the buffer and return.
-    - If the new data completes the block, copy enough bytes to complete the block, update the hash using [`fd_siphash1N_core`](<#fd_siphash1n_core>), and adjust `data` and `sz` to process remaining bytes.
-    - Process the bulk of the data in 8-byte blocks using [`fd_siphash1N_core`](<#fd_siphash1n_core>).
-    - Copy any remaining bytes to the buffer for future processing.
+    - Check if there are any buffered bytes from a previous append using `buf_used`.
+    - If there are buffered bytes and the new data is not enough to complete a block, copy the data to the buffer and return.
+    - If the new data completes a block, copy enough data to complete the block, update the hash using [`fd_siphash1N_core`](#fd_siphash1n_core), and adjust `data` and `sz` to reflect the processed bytes.
+    - Process the bulk of the data in 8-byte blocks using [`fd_siphash1N_core`](#fd_siphash1n_core).
+    - Buffer any remaining bytes that do not form a complete block.
 - **Output**: Returns a pointer to the updated `fd_siphash13_t` structure.
-- **Functions Called**:
-    - [`fd_siphash1N_core`](<#fd_siphash1n_core>)
+- **Functions called**:
+    - [`fd_siphash1N_core`](#fd_siphash1n_core)
 
 
 ---
 ### fd\_siphash13\_append\_fast<!-- {{#callable:fd_siphash13_append_fast}} -->
-[View Source →](<../../../../../src/ballet/siphash13/fd_siphash13.c#L101>)
-
-Appends data to a SipHash state and processes it in 8-byte blocks.
+The `fd_siphash13_append_fast` function appends data to a SipHash state, updating the state with the provided data in blocks of 8 bytes.
 - **Inputs**:
-    - ``sip``: A pointer to the `fd_siphash13_t` structure representing the SipHash state.
-    - ``data``: A pointer to the data to append to the SipHash state.
-    - ``sz``: The size of the data in bytes.
-- **Logic and Control Flow**:
-    - Increment the `n` field of the `sip` structure by `sz` to update the total number of bytes processed.
-    - Call [`fd_siphash1N_core`](<#fd_siphash1n_core>) to process the data in 8-byte blocks, passing the `v` array from the `sip` structure, the `data` pointer, and the number of 8-byte blocks (`sz >> 3`).
+    - `sip`: A pointer to the `fd_siphash13_t` structure representing the current state of the SipHash.
+    - `data`: A pointer to the data to be appended to the SipHash state.
+    - `sz`: The size of the data to be appended, in bytes.
+- **Control Flow**:
+    - Increment the `n` field of the `sip` structure by `sz` to account for the new data size.
+    - Call [`fd_siphash1N_core`](#fd_siphash1n_core) to process the data in blocks of 8 bytes, passing the state vector `sip->v`, the data pointer, and the number of 8-byte blocks (`sz >> 3`).
     - Return the updated `sip` structure.
 - **Output**: Returns a pointer to the updated `fd_siphash13_t` structure.
-- **Functions Called**:
-    - [`fd_siphash1N_core`](<#fd_siphash1n_core>)
+- **Functions called**:
+    - [`fd_siphash1N_core`](#fd_siphash1n_core)
 
 
 ---
 ### fd\_siphash13\_fini<!-- {{#callable:fd_siphash13_fini}} -->
-[View Source →](<../../../../../src/ballet/siphash13/fd_siphash13.c#L111>)
-
-Finalizes the SipHash-1-3 computation and returns the hash value.
+The `fd_siphash13_fini` function finalizes the SipHash-1-3 hashing process by processing any remaining data and performing finalization rounds to produce the hash value.
 - **Inputs**:
-    - ``sip``: A pointer to an `fd_siphash13_t` structure containing the state of the hash computation.
-- **Logic and Control Flow**:
-    - Unpack the internal state from the `sip` structure, including the hash state `v`, buffer `buf`, total byte count `n`, and the number of bytes used in the buffer `buf_used`.
-    - Initialize a variable `b` with the total byte count `n` shifted left by 56 bits.
-    - Use a switch statement to process the remaining bytes in the buffer `buf` and update `b` accordingly, using fallthrough to handle each byte position.
-    - Call [`fd_siphash1N_core`](<#fd_siphash1n_core>) to process the last block of data with the updated `b`.
+    - `sip`: A pointer to an `fd_siphash13_t` structure containing the state of the hash computation, including the internal state array `v`, buffer `buf`, and the total number of bytes processed `n`.
+- **Control Flow**:
+    - Unpack the internal state `v`, buffer `buf`, and the number of bytes processed `n` from the `sip` structure.
+    - Calculate the number of bytes used in the buffer `buf_used` as `n & 7UL`.
+    - Initialize a variable `b` with the value `n << 56UL` to prepare for processing the last block.
+    - Use a switch statement to process the remaining bytes in the buffer, updating `b` with the appropriate byte values shifted into place.
+    - Call [`fd_siphash1N_core`](#fd_siphash1n_core) to process the last block using the updated `b`.
     - XOR the third element of `v` with `0xff` to prepare for finalization.
-    - Perform three rounds of the `FD_SIPHASH_ROUND` macro on `v` to finalize the hash computation.
+    - Perform three rounds of the SipHash compression function using `FD_SIPHASH_ROUND` macro to finalize the hash.
     - Compute the final hash value by XORing all elements of `v` and return the result.
-- **Output**: Returns the final hash value as an `ulong`.
-- **Functions Called**:
-    - [`fd_siphash1N_core`](<#fd_siphash1n_core>)
+- **Output**: The function returns an `ulong` representing the final hash value computed by the SipHash-1-3 algorithm.
+- **Functions called**:
+    - [`fd_siphash1N_core`](#fd_siphash1n_core)
 
 
 ---
 ### fd\_siphash13\_hash<!-- {{#callable:fd_siphash13_hash}} -->
-[View Source →](<../../../../../src/ballet/siphash13/fd_siphash13.c#L146>)
-
-Computes a SipHash-1-3 hash for the given data using two 64-bit keys.
+The `fd_siphash13_hash` function computes a 64-bit hash of the input data using the SipHash-1-3 algorithm with two 64-bit keys.
 - **Inputs**:
-    - `data`: Pointer to the input data to hash.
-    - `data_sz`: Size of the input data in bytes.
-    - `k0`: First 64-bit key for the hash function.
-    - `k1`: Second 64-bit key for the hash function.
-- **Logic and Control Flow**:
-    - Initialize a 4-element array `v` with predefined constants from `fd_siphash13_initial` and modify it using the keys `k0` and `k1`.
-    - Iterate over the input data in 8-byte blocks, updating the hash state `v` for each block using the `FD_SIPHASH_ROUND` macro.
-    - Handle any remaining bytes (less than 8) by constructing a final block `b` and updating the hash state `v` with it.
-    - Finalize the hash by performing additional rounds of `FD_SIPHASH_ROUND` and combining the elements of `v` to produce the final hash value.
-- **Output**: Returns a 64-bit unsigned long integer representing the computed hash value.
+    - `data`: A pointer to the input data to be hashed.
+    - `data_sz`: The size of the input data in bytes.
+    - `k0`: The first 64-bit key used in the hashing process.
+    - `k1`: The second 64-bit key used in the hashing process.
+- **Control Flow**:
+    - Initialize a 4-element array `v` with predefined constants and XOR it with the keys `k0` and `k1`.
+    - Iterate over the input data in 8-byte blocks, XOR each block with `v[3]`, perform a SipHash round, and then XOR the block with `v[0]`.
+    - Handle any remaining bytes (less than 8) by constructing a final block `b` with the size of the data and the remaining bytes, then XOR `b` with `v[3]`, perform a SipHash round, and XOR `b` with `v[0]`.
+    - Finalize the hash by XORing `v[2]` with 0xff, performing three additional SipHash rounds, and combining the elements of `v` to produce the final hash value.
+- **Output**: A 64-bit unsigned long integer representing the hash of the input data.
 
 
 

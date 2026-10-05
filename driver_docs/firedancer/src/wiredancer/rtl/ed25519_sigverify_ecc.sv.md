@@ -3,54 +3,52 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a multi-stage pipeline for ECC operations on Ed25519 signatures with various arithmetic operations.
+The `ed25519_sigverify_ecc.sv` file implements a hardware module for verifying Ed25519 signatures using a multi-stage pipeline that performs various arithmetic operations, including addition, subtraction, and modular multiplication.
 
 # Purpose
-The `ed25519_sigverify_ecc` module implements a multi-stage pipeline for performing various arithmetic and logical operations on large integers, specifically tailored for elliptic curve cryptography (ECC) operations related to the Ed25519 curve. The module processes inputs through a series of sub-pipelines, each responsible for different operations such as addition, subtraction, and modular arithmetic. The operations are parameterized by constants like `MUL_T`, `MUL_D`, `W_M`, and `W_D`, which define the characteristics of the arithmetic operations and the bit-widths of the data being processed.
+The provided Verilog code defines a module named `ed25519_sigverify_ecc`, which is designed to perform various arithmetic operations as part of an elliptic curve cryptography (ECC) signature verification process, specifically for the Ed25519 curve. This module integrates multiple sub-pipelines into a single-input, single-output pipeline, allowing it to handle different operations with varying depths. The operations include logical AND, equality and inequality checks, bitwise shifts, addition, subtraction, and modular arithmetic operations such as addition, subtraction, and multiplication modulo a prime number specific to the Ed25519 curve. The module uses a series of local parameters to define operation codes and constants, such as the prime number `ED25519_P` and its complement `ED25519_P_N`, which are crucial for modular arithmetic operations.
 
-The module uses a combination of logical operations and arithmetic operations, including bitwise AND, equality checks, shifts, and modular addition and subtraction. It also includes a specialized multiplication operation (`mul_modp`) for modular multiplication. The pipeline stages are implemented using a series of `always_ff` blocks and instantiated sub-modules like `piped_adder` and `ed25519_mul_modp`, which handle specific arithmetic tasks. The module is designed to handle inputs and outputs synchronously with a clock signal (`clk`) and can be reset using a reset signal (`rst`). The design is structured to support the efficient computation of ECC operations, which are critical in cryptographic applications.
+The module is structured to handle input signals and produce output signals through a series of pipelined stages, utilizing always blocks and case statements to manage the flow of data and control signals. It employs several sub-modules, such as `piped_adder` and `ed25519_mul_modp`, to perform specific arithmetic operations. These sub-modules are instantiated with parameters that define their behavior, such as word width and carry-in settings. The design is clocked and resettable, ensuring synchronous operation and allowing for the initialization of the pipeline. Overall, this module provides a focused functionality for ECC operations, specifically tailored for the Ed25519 signature verification process, and is likely a component within a larger cryptographic system.
 # Modules
 
 ---
 ### ed25519\_sigverify\_ecc
-Implements elliptic curve cryptography operations for the Ed25519 signature verification process. Supports various arithmetic operations and modular arithmetic over a 256-bit field.
+The `ed25519_sigverify_ecc` module is designed to perform various arithmetic operations required for elliptic curve cryptography, specifically for the Ed25519 signature verification process. It handles operations such as addition, subtraction, and modular arithmetic using a pipelined architecture to optimize performance.
 - **Constants**:
-    - ``MUL_T``: Defines a constant value used in multiplication operations, set to `32'h007F_CCC2`.
-    - ``MUL_D``: Specifies the depth of the multiplication pipeline, set to 15.
-    - ``W_M``: Defines the width of the multiplier, set to 128 bits.
-    - ``W_D``: Defines the width of the data path, set to 256 bits.
-    - ``OP_AND``: Represents the operation code for bitwise AND, set to 0.
-    - ``OP_EQ``: Represents the operation code for equality check, set to 1.
-    - ``OP_NE``: Represents the operation code for inequality check, set to 2.
-    - ``OP_GE``: Represents the operation code for greater than or equal check, set to 3.
-    - ``OP_SHL``: Represents the operation code for logical shift left, set to 4.
-    - ``OP_SHR``: Represents the operation code for logical shift right, set to 5.
-    - ``OP_ADD``: Represents the operation code for addition, set to 6.
-    - ``OP_SUB``: Represents the operation code for subtraction, set to 7.
-    - ``OP_ADD_MODP``: Represents the operation code for addition modulo a prime, set to 8.
-    - ``OP_SUB_MODP``: Represents the operation code for subtraction modulo a prime, set to 9.
-    - ``OP_MUL_MODP``: Represents the operation code for multiplication modulo a prime, set to 10.
-    - ``OP_TERNARY``: Represents the operation code for a ternary operation, set to `5'h1B`.
-    - ``ED25519_P``: Defines the prime number used in Ed25519, set to `255'h7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed`.
-    - ``ED25519_P_N``: Defines the negated prime number plus one, used for modular arithmetic, set to `256'h1 + ~256'h7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed`.
+    - `MUL_T`: A constant used in the multiplication operation, set to 32'h007F_CCC2.
+    - `MUL_D`: Defines the depth of the multiplication pipeline, set to 15.
+    - `W_M`: Width of the multiplier input, set to 128 bits.
+    - `W_D`: Width of the data input, set to 256 bits.
+    - `OP_AND`: Operation code for bitwise AND, set to 0.
+    - `OP_EQ`: Operation code for equality check, set to 1.
+    - `OP_NE`: Operation code for inequality check, set to 2.
+    - `OP_GE`: Operation code for greater than or equal check, set to 3.
+    - `OP_SHL`: Operation code for shift left, set to 4.
+    - `OP_SHR`: Operation code for shift right, set to 5.
+    - `OP_ADD`: Operation code for addition, set to 6.
+    - `OP_SUB`: Operation code for subtraction, set to 7.
+    - `OP_ADD_MODP`: Operation code for addition modulo prime, set to 8.
+    - `OP_SUB_MODP`: Operation code for subtraction modulo prime, set to 9.
+    - `OP_MUL_MODP`: Operation code for multiplication modulo prime, set to 10.
+    - `OP_TERNARY`: Operation code for ternary operation, set to 5'h1B.
+    - `ED25519_P`: The prime number used in Ed25519, set to 255'h7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed.
+    - `ED25519_P_N`: The negated prime number plus one, used for modular arithmetic, set to 256'h1 + ~256'h7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed.
 - **Ports**:
-    - ``i_o``: Input operation code, 5 bits wide.
-    - ``i_a``: First input operand, 256 bits wide.
-    - ``i_b``: Second input operand, 256 bits wide.
-    - ``i_c``: Input for ternary operation, 1 bit wide.
-    - ``i_m``: Input multiplier, 128 bits wide.
-    - ``o_d``: Output data, 256 bits wide.
-    - ``o_m``: Output multiplier, 128 bits wide.
-    - ``clk``: Clock input signal.
-    - ``rst``: Reset input signal.
-- **Logic and Control Flow**:
-    - Uses an `always_ff` block triggered on the positive edge of `clk` to manage data flow and operations.
-    - Implements a pipeline structure with multiple stages for different operations, using registers like `c_1_o`, `c_2_o`, `c_3_o`, and `c_4_o` to hold intermediate operation codes.
-    - Handles various operations using `case` statements based on the input operation code `i_o`, such as bitwise AND, equality, inequality, greater than or equal, shift left, shift right, and ternary operations.
-    - Uses additional `case` statements for further operations based on intermediate operation codes `c_2_o`, `c_4_o`, and `c_m_o`, including addition, subtraction, and modular arithmetic.
-    - Instantiates `piped_adder` modules for addition, subtraction, and addition modulo prime operations, with specific configurations for each operation.
-    - Instantiates a `shift_adder_3` module for subtraction modulo prime, using a conditional assignment to handle the prime modulus.
-    - Instantiates an `ed25519_mul_modp` module for multiplication modulo prime, using the `MUL_T` parameter for configuration.
+    - `i_o`: 5-bit input wire for operation code.
+    - `i_a`: 256-bit input wire for the first operand.
+    - `i_b`: 256-bit input wire for the second operand.
+    - `i_c`: 1-bit input wire for conditional operations.
+    - `i_m`: 128-bit input wire for multiplier input.
+    - `o_d`: 256-bit output logic for data result.
+    - `o_m`: 128-bit output logic for multiplier result.
+    - `clk`: Clock input for synchronous operations.
+    - `rst`: Reset input to initialize the module.
+- **Logic And Control Flow**:
+    - The module uses an `always_ff` block triggered on the positive edge of the clock to handle sequential logic and data flow through the pipeline stages.
+    - The `always_ff` block contains a series of case statements to perform operations based on the input operation code `i_o`, such as bitwise AND, equality check, and shift operations.
+    - The module instantiates several sub-modules like `piped_adder` and `shift_adder_3` to perform addition, subtraction, and modular arithmetic operations.
+    - The `piped_adder` instances are used for addition and subtraction operations, with specific configurations for modular arithmetic.
+    - The `ed25519_mul_modp` sub-module is instantiated for performing multiplication modulo the Ed25519 prime.
 
 
 
