@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for point addition, subtraction, doubling, and affine conversion on Curve25519.
+The `fd_curve25519.c` file in the `firedancer` codebase implements operations for elliptic curve point addition, subtraction, doubling, and serialization/deserialization on the Curve25519, with optional optimizations for scalar multiplication.
 
 # Purpose
-The code provides functions for performing arithmetic operations on points in the Ed25519 elliptic curve, which is a variant of the Curve25519 used in cryptographic applications. The primary operations implemented are point addition, subtraction, and doubling, with optimizations for specific cases to improve performance during scalar multiplication. The functions `fd_ed25519_point_add_with_opts` and `fd_ed25519_point_sub_with_opts` allow for optional optimizations such as skipping certain multiplications when conditions are met, like when a point is in affine form or precomputed. The code also includes functions for converting points to and from affine coordinates, which are useful for initializing points or converting them for specific operations.
+This C source code file provides functionality for operations on elliptic curve points, specifically for the Curve25519 and Ed25519 elliptic curves. The file includes functions for point addition, subtraction, doubling, and conversion between different representations of elliptic curve points. The primary focus is on optimizing these operations for performance, particularly in the context of scalar multiplication, which is a common operation in cryptographic algorithms. The functions `fd_ed25519_point_add_with_opts` and `fd_ed25519_point_sub_with_opts` allow for optional optimizations based on the properties of the input points, such as whether a point is in affine form or precomputed, which can save computational resources by reducing the number of multiplications required.
 
-The file defines a set of functions that can be used as part of a cryptographic library, focusing on efficient point arithmetic on the Ed25519 curve. It includes both basic operations and more complex ones with optional optimizations, which are crucial for high-performance cryptographic computations. The functions are designed to be used in contexts where elliptic curve operations are needed, such as digital signatures or key exchange protocols. The code also provides serialization and deserialization functions for points, allowing them to be converted to and from byte arrays, which is essential for data transmission and storage in cryptographic systems.
+The file also includes functions for serializing and deserializing elliptic curve points, as well as converting points to and from affine coordinates. These operations are crucial for cryptographic protocols that require efficient and secure handling of elliptic curve points. The code is structured to be part of a larger library, as indicated by the inclusion of a header file and the use of inline functions for performance-critical operations. The functions defined in this file are likely intended to be used as part of a cryptographic library that implements the Ed25519 signature scheme or similar protocols, providing a robust and efficient foundation for elliptic curve arithmetic.
 # Imports and Dependencies
 
 ---
@@ -19,102 +19,93 @@ The file defines a set of functions that can be used as part of a cryptographic 
 
 ---
 ### fd\_ed25519\_point\_add<!-- {{#callable:fd_ed25519_point_add}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/ref/fd_curve25519.c#L95>)
-
-Computes the sum of two Ed25519 points and returns the result.
+The `fd_ed25519_point_add` function computes the sum of two Ed25519 elliptic curve points and returns the result.
 - **Inputs**:
-    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result will be stored.
-    - `a`: A constant pointer to the first `fd_ed25519_point_t` structure representing the first point to add.
-    - `b`: A constant pointer to the second `fd_ed25519_point_t` structure representing the second point to add.
-- **Logic and Control Flow**:
-    - Calls the `fd_ed25519_point_add_with_opts` function with the provided points `a` and `b`, and default optimization flags set to 0.
-    - Returns the result of the addition operation.
-- **Output**: A pointer to the `fd_ed25519_point_t` structure `r` containing the sum of points `a` and `b`.
+    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result of the addition will be stored.
+    - `a`: A constant pointer to an `fd_ed25519_point_t` structure representing the first point to be added.
+    - `b`: A constant pointer to an `fd_ed25519_point_t` structure representing the second point to be added.
+- **Control Flow**:
+    - The function `fd_ed25519_point_add` is a wrapper that calls `fd_ed25519_point_add_with_opts` with default options (all set to 0).
+    - The `fd_ed25519_point_add_with_opts` function performs the actual addition of the two points `a` and `b` on the Ed25519 curve.
+    - It uses several temporary variables to perform arithmetic operations such as addition, subtraction, and multiplication on the coordinates of the points.
+    - The function checks for optimizations based on the options provided, such as whether `b->Z` is one, whether `b` is precomputed, and whether to skip the last multiplication step.
+    - The result of the addition is stored in the point `r`, which is then returned.
+- **Output**: A pointer to the `fd_ed25519_point_t` structure `r` containing the result of the addition.
 
 
 ---
 ### fd\_ed25519\_point\_sub<!-- {{#callable:fd_ed25519_point_sub}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/ref/fd_curve25519.c#L182>)
-
-Computes the subtraction of two Ed25519 points and returns the result.
+The `fd_ed25519_point_sub` function computes the subtraction of two Ed25519 points and returns the result.
 - **Inputs**:
-    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result will be stored.
-    - `a`: A constant pointer to an `fd_ed25519_point_t` structure representing the first point.
-    - `b`: A constant pointer to an `fd_ed25519_point_t` structure representing the second point to be subtracted from the first.
-- **Logic and Control Flow**:
-    - Calls the function `fd_ed25519_point_sub_with_opts` with the provided points `a` and `b`, and default options set to 0.
-    - Returns the result of the subtraction operation.
-- **Output**: A pointer to an `fd_ed25519_point_t` structure containing the result of the subtraction `a - b`.
+    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result of the subtraction will be stored.
+    - `a`: A constant pointer to an `fd_ed25519_point_t` structure representing the first point in the subtraction.
+    - `b`: A constant pointer to an `fd_ed25519_point_t` structure representing the second point in the subtraction.
+- **Control Flow**:
+    - The function calls `fd_ed25519_point_sub_with_opts` with the provided points `a` and `b`, and the result pointer `r`.
+    - It passes additional parameters `0, 0, 0` to `fd_ed25519_point_sub_with_opts`, indicating no special options are used for optimization.
+- **Output**: The function returns a pointer to the `fd_ed25519_point_t` structure `r`, which contains the result of the subtraction `a - b`.
 
 
 ---
 ### fd\_ed25519\_point\_dbl<!-- {{#callable:fd_ed25519_point_dbl}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/ref/fd_curve25519.c#L193>)
-
-Doubles an Ed25519 point using a dedicated doubling method and returns the result.
+The function `fd_ed25519_point_dbl` computes the doubling of an elliptic curve point using a dedicated doubling method and returns the result.
 - **Inputs**:
-    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result will be stored.
+    - `r`: A pointer to an `fd_ed25519_point_t` structure where the result of the doubling operation will be stored.
     - `a`: A constant pointer to an `fd_ed25519_point_t` structure representing the point to be doubled.
-- **Logic and Control Flow**:
-    - Declare a temporary `fd_ed25519_point_t` array `t` with one element.
-    - Call `fd_ed25519_partial_dbl` with `t` and `a` to perform the partial doubling of the point `a`.
-    - Call `fd_ed25519_point_add_final_mul` with `r` and `t` to complete the doubling operation and store the result in `r`.
-    - Return the pointer `r`.
+- **Control Flow**:
+    - A temporary `fd_ed25519_point_t` structure `t` is declared to hold intermediate results.
+    - The function `fd_ed25519_partial_dbl` is called with `t` and `a` to perform the partial doubling operation, which uses squaring instead of multiplication as per the reference paper.
+    - The function `fd_ed25519_point_add_final_mul` is called with `r` and `t` to complete the doubling operation and store the result in `r`.
 - **Output**: A pointer to the `fd_ed25519_point_t` structure `r` containing the doubled point.
 
 
 ---
 ### fd\_ed25519\_point\_frombytes\_2x<!-- {{#callable:fd_ed25519_point_frombytes_2x}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/ref/fd_curve25519.c#L209>)
-
-Converts two byte arrays into two Ed25519 points and returns a status code indicating success or failure for each conversion.
+The function `fd_ed25519_point_frombytes_2x` attempts to deserialize two Ed25519 points from byte arrays into point structures and returns a status code indicating success or failure.
 - **Inputs**:
-    - ``r1``: A pointer to an `fd_ed25519_point_t` structure where the first converted point will be stored.
-    - ``buf1``: A constant byte array of size 32 that contains the data to convert into the first Ed25519 point.
-    - ``r2``: A pointer to an `fd_ed25519_point_t` structure where the second converted point will be stored.
-    - ``buf2``: A constant byte array of size 32 that contains the data to convert into the second Ed25519 point.
-- **Logic and Control Flow**:
+    - `r1`: A pointer to an `fd_ed25519_point_t` structure where the first deserialized point will be stored.
+    - `buf1`: A constant byte array of size 32 containing the serialized data for the first point.
+    - `r2`: A pointer to an `fd_ed25519_point_t` structure where the second deserialized point will be stored.
+    - `buf2`: A constant byte array of size 32 containing the serialized data for the second point.
+- **Control Flow**:
     - Initialize a pointer `res` to `NULL`.
-    - Call `fd_ed25519_point_frombytes` with `r1` and `buf1` to convert the first byte array into an Ed25519 point.
-    - Check if the result of the first conversion is `NULL`; if so, return 1 to indicate failure.
-    - Call `fd_ed25519_point_frombytes` with `r2` and `buf2` to convert the second byte array into an Ed25519 point.
-    - Check if the result of the second conversion is `NULL`; if so, return 2 to indicate failure.
-    - Return 0 to indicate both conversions were successful.
-- **Output**: Returns an integer status code: 0 if both conversions are successful, 1 if the first conversion fails, and 2 if the second conversion fails.
+    - Call `fd_ed25519_point_frombytes` with `r1` and `buf1` to attempt deserialization of the first point.
+    - If the result is `NULL`, return 1 indicating failure to deserialize the first point.
+    - Call `fd_ed25519_point_frombytes` with `r2` and `buf2` to attempt deserialization of the second point.
+    - If the result is `NULL`, return 2 indicating failure to deserialize the second point.
+    - Return 0 indicating successful deserialization of both points.
+- **Output**: The function returns an integer: 0 if both points are successfully deserialized, 1 if the first point fails to deserialize, and 2 if the second point fails to deserialize.
 
 
 ---
 ### fd\_curve25519\_affine\_frombytes<!-- {{#callable:fd_curve25519_affine_frombytes}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/ref/fd_curve25519.c#L229>)
-
-Converts 32-byte `x` and `y` coordinates into an affine point on the Curve25519 elliptic curve.
+The function `fd_curve25519_affine_frombytes` initializes an `fd_ed25519_point_t` structure from two 32-byte arrays representing the x and y coordinates in affine form.
 - **Inputs**:
     - `r`: A pointer to an `fd_ed25519_point_t` structure where the result will be stored.
     - `x`: A constant 32-byte array representing the x-coordinate of the point.
     - `y`: A constant 32-byte array representing the y-coordinate of the point.
-- **Logic and Control Flow**:
+- **Control Flow**:
     - Convert the 32-byte array `x` into the field element `r->X` using `fd_f25519_frombytes`.
     - Convert the 32-byte array `y` into the field element `r->Y` using `fd_f25519_frombytes`.
-    - Set the field element `r->Z` to one using `fd_f25519_set` and `fd_f25519_one`.
+    - Set the field element `r->Z` to the constant value representing one using `fd_f25519_set`.
     - Compute the product of `r->X` and `r->Y` and store it in `r->T` using `fd_f25519_mul`.
-    - Return the pointer `r`.
-- **Output**: A pointer to the `fd_ed25519_point_t` structure `r`, now representing the affine point.
+    - Return the pointer `r` to the initialized `fd_ed25519_point_t` structure.
+- **Output**: A pointer to the initialized `fd_ed25519_point_t` structure `r`.
 
 
 ---
 ### fd\_curve25519\_into\_affine<!-- {{#callable:fd_curve25519_into_affine}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/ref/fd_curve25519.c#L240>)
-
-Converts a point on the Curve25519 elliptic curve from projective coordinates to affine coordinates.
+The function `fd_curve25519_into_affine` converts a point on the Curve25519 elliptic curve from projective coordinates to affine coordinates.
 - **Inputs**:
-    - `r`: A pointer to a `fd_ed25519_point_t` structure representing a point on the Curve25519 elliptic curve in projective coordinates.
-- **Logic and Control Flow**:
-    - Calculate the inverse of the Z coordinate of the point `r` and store it in `invz`.
-    - Multiply the X coordinate of `r` by `invz` to convert it to affine coordinates.
-    - Multiply the Y coordinate of `r` by `invz` to convert it to affine coordinates.
-    - Set the Z coordinate of `r` to 1, indicating that the point is now in affine coordinates.
-    - Calculate the T coordinate of `r` as the product of the new X and Y coordinates.
-- **Output**: Returns a pointer to the `fd_ed25519_point_t` structure `r`, now representing the point in affine coordinates.
+    - `r`: A pointer to an `fd_ed25519_point_t` structure representing a point on the Curve25519 elliptic curve in projective coordinates.
+- **Control Flow**:
+    - Calculate the inverse of the Z coordinate of the point and store it in `invz`.
+    - Multiply the X coordinate of the point by `invz` to convert it to affine coordinates.
+    - Multiply the Y coordinate of the point by `invz` to convert it to affine coordinates.
+    - Set the Z coordinate of the point to 1, indicating that it is now in affine coordinates.
+    - Multiply the X and Y coordinates to compute the T coordinate, which is used in some elliptic curve operations.
+    - Return the modified point `r`.
+- **Output**: A pointer to the modified `fd_ed25519_point_t` structure, now representing the point in affine coordinates.
 
 
 

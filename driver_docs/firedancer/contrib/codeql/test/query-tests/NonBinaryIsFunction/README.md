@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines structures and functions for instruction accounts, expected test outputs, and query references.
+Tests and expected results for nonbinary is-style function return values.
 
 
 ## Files
-- **[NonBinaryIsFunction.c](NonBinaryIsFunction.c.md)**: Defines structures and functions for handling instruction accounts and bank status checks.
-- **[NonBinaryIsFunction.expected](NonBinaryIsFunction.expected.md)**: Expected output for tests on functions named like `is` functions but returning non-binary values.
-- **[NonBinaryIsFunction.qlref](NonBinaryIsFunction.qlref.md)**: References a query and postprocess script for testing non-binary function detection.
+- **[NonBinaryIsFunction.c](NonBinaryIsFunction.c.md)**: Tests nonbinary return values from functions using is-style names.
+- **[NonBinaryIsFunction.expected](NonBinaryIsFunction.expected.md)**: Expected CodeQL query results for nonbinary is-function cases.
+- **[NonBinaryIsFunction.qlref](NonBinaryIsFunction.qlref.md)**: Query reference for NonBinaryIsFunction.ql and InlineExpectationsTestQuery.ql postprocessing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

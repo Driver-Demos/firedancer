@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for the netconf command function and related action in the Firedancer application.
+The `netconf.h` file declares a function for network configuration commands and an external action related to network configuration in the Firedancer application.
 
 # Purpose
-This code is a C header file that declares a function and an external variable related to network configuration commands. It includes the header file `fd_config.h`, which likely contains configuration settings or definitions used by the function or variable. The function [`netconf_cmd_fn`](<#netconf_cmd_fn>) takes two parameters, `args` and `config`, which are pointers to `args_t` and `config_t` types, respectively, and is intended to perform operations related to network configuration. The external variable `fd_action_netconf` is declared as an `action_t` type, suggesting it represents an action or command related to network configuration. The file uses include guards to prevent multiple inclusions, ensuring that the declarations are only processed once during compilation.
+This code is a C header file that provides declarations for network configuration commands within an application. It includes a function prototype for [`netconf_cmd_fn`](#netconf_cmd_fn), which likely handles network configuration tasks using the provided `args_t` and `config_t` structures. The file also declares an external variable `fd_action_netconf`, which suggests it is used to represent or trigger a specific network-related action within the application. The inclusion of `fd_config.h` indicates that this header relies on configuration settings defined elsewhere. The use of include guards prevents multiple inclusions of this header file, ensuring efficient compilation.
 # Imports and Dependencies
 
 ---
@@ -17,24 +17,22 @@ This code is a C header file that declares a function and an external variable r
 
 ---
 ### fd\_action\_netconf
-- **Type**: ``action_t``
-- **Description**: A global variable of type `action_t` that is declared as an external variable. It is likely used to represent or store an action related to network configuration.
-- **Use**: Used to define or reference an action for network configuration operations.
+- **Type**: `action_t`
+- **Description**: The variable `fd_action_netconf` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is located in another source file.
+- **Use**: This variable is used to represent a specific action related to network configuration within the application.
 
 
 # Function Declarations (Public API)
 
 ---
 ### netconf\_cmd\_fn<!-- {{#callable_declaration:netconf_cmd_fn}} -->
-[View Source →](<../../../../../../src/app/shared/commands/netconf.h#L6>)
-
 Displays network configuration details.
-- **Description**: Use this function to print network configuration details, including interfaces, IPv4 routes, and neighbor tables, to the standard output. It requires a valid configuration object that contains network topology information. The function does not modify the input parameters and does not return any value. Ensure that the configuration object is correctly initialized and populated with network topology data before calling this function.
+- **Description**: This function is used to display various network configuration details, including interfaces, IPv4 routes, and neighbor tables. It should be called when a detailed view of the network topology and configuration is required. The function requires a valid configuration object to access the network topology and assumes that the necessary network components are present and correctly configured. It outputs the information directly to the standard output.
 - **Inputs**:
-    - `args`: A pointer to an `args_t` structure. This parameter is not used in the function, and its value is ignored.
-    - `config`: A pointer to a `config_t` structure that contains network topology information. Must not be null and must be properly initialized with valid data. The function will log an error if required network components are not found in the topology.
+    - `args`: A pointer to an `args_t` structure. This parameter is currently unused and can be set to NULL.
+    - `config`: A pointer to a `config_t` structure that contains the network topology information. Must not be NULL, and the configuration should be properly initialized and populated with the necessary network components.
 - **Output**: None
-- **See Also**: [`netconf_cmd_fn`](<netconf.c.md#netconf_cmd_fn>)  (Implementation)
+- **See also**: [`netconf_cmd_fn`](netconf.c.md#netconf_cmd_fn)  (Implementation)
 
 
 
