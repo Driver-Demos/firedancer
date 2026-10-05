@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions for CPU online state, dependencies, huge pages, and submodule cache.
+GitHub Actions for CPU management, dependency caching, huge page configuration, and submodule caching.
 
 ## Folders
-- **[cpusonline](cpusonline/README.md)**: The `cpusonline` folder in the `firedancer` codebase contains a GitHub Action configuration file, `action.yml`, which is designed to switch all CPUs to an online state using a bash script.
-- **[deps](deps/README.md)**: The `deps` folder in the `firedancer` codebase contains a GitHub Action configuration file, `action.yml`, which is used for building and caching dependencies with customizable options.
-- **[hugepages](hugepages/README.md)**: GitHub Action to set up 1 GiB and 2 MiB huge pages
-- **[submodule](submodule/README.md)**: The `submodule` folder in the `firedancer` codebase contains a GitHub Action configuration file, `action.yml`, which is used for caching the agave submodule with various configurable inputs.
+- **[cpusonline](cpusonline/README.md)**: A GitHub Action to switch all CPUs to online using a bash script.
+- **[deps](deps/README.md)**: GitHub Action for building and caching dependencies with configurable scripts and compiler options.
+- **[hugepages](hugepages/README.md)**: GitHub Action to set up 1 GiB gigantic pages with configurable huge and gigantic page counts.
+- **[submodule](submodule/README.md)**: Defines a GitHub Action for caching the agave submodule with machine and compiler options.
 
 
 ---

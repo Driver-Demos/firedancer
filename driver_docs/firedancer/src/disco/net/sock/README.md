@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-UDP socket tile, private state, build rule, and seccomp policy for network I/O and logging
+Socket management and seccomp policies for network tiles, with architecture-specific configurations.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp BPF filter for ppoll, recvmmsg, sendmmsg, write, and fsync.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for socket operations with architecture-specific configurations.
 
 ## Files
-- **[fd_sock_tile.c](fd_sock_tile.c.md)**: UDP socket tile for RX/TX batching, packet framing, and metrics.
-- **[fd_sock_tile.seccomppolicy](fd_sock_tile.seccomppolicy.md)**: Seccomp policy for socket tile network I/O and logging syscalls.
-- **[fd_sock_tile_private.h](fd_sock_tile_private.h.md)**: Private state, metrics, and socket link structures for a UDP socket tile.
-- **[Local.mk](Local.mk.md)**: Build rule that adds fd_sock_tile to fd_disco when FD_HAS_ALLOCA is set.
+- **[fd_sock_tile.c](fd_sock_tile.c.md)**: Implements socket management and data transmission for a network tile, including UDP socket creation and packet handling.
+- **[fd_sock_tile.seccomppolicy](fd_sock_tile.seccomppolicy.md)**: Defines seccomp policy rules for logging and network packet transmission and reception.
+- **[fd_sock_tile_private.h](fd_sock_tile_private.h.md)**: Defines data structures and constants for managing UDP and RAW socket communication in a sock tile.
+- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects `fd_sock_tile` and `fd_disco` if `FD_HAS_ALLOCA` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
