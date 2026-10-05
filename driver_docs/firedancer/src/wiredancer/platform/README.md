@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CL-specific constraints, DDR DRAM DMA module, and TCL script for FPGA design synthesis on Amazon's platform.
+Constraints, DDR DMA and PCIe bridge logic, and FPGA synthesis scripts.
 
 ## Folders
-- **[f1](f1/README.md)**: CL-specific constraints, DDR DRAM DMA module, and TCL script for FPGA design synthesis on Amazon's platform.
+- **[f1](f1/README.md)**: Constraints, DDR DMA and PCIe bridge logic, and FPGA synthesis scripts.
 
 
 ---
