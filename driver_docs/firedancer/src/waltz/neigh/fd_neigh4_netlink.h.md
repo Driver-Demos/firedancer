@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-APIs for importing IPv4 neighbors from Linux netlink, assuming 6-byte link-layer addresses.
+The `fd_neigh4_netlink.h` file provides APIs for importing IPv4 neighbors from Linux netlink, including functions to request a dump of the IPv4 neighbor table and to ingest netlink messages for updating the neighbor table.
 
 # Purpose
-The `fd_neigh4_netlink.h` file is a C header file that provides APIs for managing IPv4 neighbor information using Linux netlink. It includes functions to request a dump of the IPv4 neighbor table for a specified network interface and to process netlink messages related to IPv4 neighbors. The [`fd_neigh4_netlink_request_dump`](<#fd_neigh4_netlink_request_dump>) function sends a request to the kernel to obtain the neighbor table, while the [`fd_neigh4_netlink_ingest_message`](<#fd_neigh4_netlink_ingest_message>) function processes incoming netlink messages to update the neighbor table, handling only IPv4 entries and ignoring IPv6 entries. The header assumes that link-layer addresses are 6 bytes long and is intended for use on Linux systems, as indicated by the conditional compilation directive.
+This C header file, `fd_neigh4_netlink.h`, provides an interface for managing IPv4 neighbor information using Linux netlink sockets. It is designed to work specifically on Linux systems, as indicated by the conditional compilation directive `#if defined(__linux__)`. The file includes function prototypes for requesting a dump of the IPv4 neighbor table ([`fd_neigh4_netlink_request_dump`](#fd_neigh4_netlink_request_dump)) and for processing netlink messages related to neighbor entries ([`fd_neigh4_netlink_ingest_message`](#fd_neigh4_netlink_ingest_message)). The functions handle operations such as inserting, updating, or removing entries in a neighbor table, focusing exclusively on IPv4 entries and ignoring IPv6 entries. The header assumes that link-layer addresses are 6 bytes long, typical for Ethernet, and includes error handling for netlink operations.
 # Imports and Dependencies
 
 ---
@@ -18,29 +18,25 @@ The `fd_neigh4_netlink.h` file is a C header file that provides APIs for managin
 
 ---
 ### fd\_neigh4\_netlink\_request\_dump<!-- {{#callable_declaration:fd_neigh4_netlink_request_dump}} -->
-[View Source →](<../../../../../src/waltz/neigh/fd_neigh4_netlink.h#L16>)
-
-Requests a dump of the IPv4 neighbor table for a specified interface index.
-- **Description**: Use this function to request the IPv4 neighbor table from the kernel for a specific network interface. This function sends a netlink request to the kernel, which typically responds with multi-part messages containing the neighbor table data. It is important to ensure that the `netlink` parameter is properly initialized and that the interface index `if_idx` corresponds to a valid network interface. The function returns 0 on success, indicating that the request was sent successfully, or an error code if the request fails.
+Request a dump of the IPv4 neighbor table for a specified interface index.
+- **Description**: This function is used to request a dump of the IPv4 neighbor table from the Linux kernel for a specified network interface. It should be called when you need to retrieve the current state of the IPv4 neighbor table for a given interface. The function sends a netlink request to the kernel, which typically responds with multi-part messages containing the neighbor table entries. The function returns 0 on success, indicating that the request was sent successfully, or an error code if the request fails. It is important to ensure that the `netlink` parameter is properly initialized and that the `if_idx` corresponds to a valid network interface index.
 - **Inputs**:
-    - `netlink`: A pointer to an `fd_netlink_t` structure. This must be initialized before calling the function. The caller retains ownership.
-    - `if_idx`: An unsigned integer representing the interface index for which the neighbor table is requested. Must correspond to a valid network interface.
-- **Output**: Returns 0 on success. On failure, returns an error code indicating the type of error encountered.
-- **See Also**: [`fd_neigh4_netlink_request_dump`](<fd_neigh4_netlink.c.md#fd_neigh4_netlink_request_dump>)  (Implementation)
+    - `netlink`: A pointer to an `fd_netlink_t` structure that must be properly initialized before calling this function. The caller retains ownership and is responsible for ensuring it is valid.
+    - `if_idx`: An unsigned integer representing the interface index for which the IPv4 neighbor table dump is requested. It should correspond to a valid network interface index.
+- **Output**: Returns 0 on success, or an error code (errno) on failure.
+- **See also**: [`fd_neigh4_netlink_request_dump`](fd_neigh4_netlink.c.md#fd_neigh4_netlink_request_dump)  (Implementation)
 
 
 ---
 ### fd\_neigh4\_netlink\_ingest\_message<!-- {{#callable_declaration:fd_neigh4_netlink_ingest_message}} -->
-[View Source →](<../../../../../src/waltz/neigh/fd_neigh4_netlink.h#L35>)
-
 Imports an RTM_NEWNEIGH or RTM_DELNEIGH message into the neighbor table.
-- **Description**: Use this function to process netlink messages related to IPv4 neighbor entries for a specific interface. It logs a warning if the message type is not RTM_NEWNEIGH or RTM_DELNEIGH, or if the link-layer address is not 6 bytes long. The function ignores messages for interfaces other than the specified one and only processes IPv4 entries, ignoring IPv6 entries. It updates the neighbor table by inserting, updating, or removing entries based on the message content.
+- **Description**: This function processes a netlink message to update an IPv4 neighbor table, either inserting, updating, or removing an entry based on the message type and state. It should be used when handling netlink messages related to IPv4 neighbors, specifically for Ethernet interfaces. The function logs warnings for unexpected message types or invalid link-layer address sizes and ignores messages not matching the specified interface index or those related to IPv6. It is essential to ensure that the interface index corresponds to an Ethernet interface before calling this function.
 - **Inputs**:
-    - `map`: A pointer to an `fd_neigh4_hmap_t` structure representing the neighbor table. The caller retains ownership and must ensure it is valid.
-    - `msg`: A pointer to a `struct nlmsghdr` containing the netlink message. Must not be null. The function logs a warning if the message type is not RTM_NEWNEIGH or RTM_DELNEIGH.
-    - `if_idx`: An unsigned integer representing the interface index. The function ignores messages with an interface index other than this value.
+    - `map`: A pointer to the fd_neigh4_hmap_t structure representing the neighbor table to be updated. The caller retains ownership and must ensure it is valid.
+    - `msg`: A pointer to a constant nlmsghdr structure containing the netlink message to be processed. Must not be null and should represent either an RTM_NEWNEIGH or RTM_DELNEIGH message.
+    - `if_idx`: An unsigned integer representing the interface index. The function will only process messages matching this index, assuming it corresponds to an Ethernet interface.
 - **Output**: None
-- **See Also**: [`fd_neigh4_netlink_ingest_message`](<fd_neigh4_netlink.c.md#fd_neigh4_netlink_ingest_message>)  (Implementation)
+- **See also**: [`fd_neigh4_netlink_ingest_message`](fd_neigh4_netlink.c.md#fd_neigh4_netlink_ingest_message)  (Implementation)
 
 
 

@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Classes and functions for metrics parsing, C code generation, and Markdown documentation.
+XML metric type parsing and code and Markdown generation for metric metadata, enums, and tables
 
 
 ## Files
-- **[types.py](types.py.md)**: Defines metric-related classes and functions for parsing XML data into metric objects.
-- **[write_codegen.py](write_codegen.py.md)**: Generates C header and source files for metrics based on given metric definitions and enums.
-- **[write_docs.py](write_docs.py.md)**: Generates Markdown documentation for metrics, converting metric names to snake_case and formatting them.
+- **[types.py](types.py.md)**: XML metric type parsing and layout classes for counters, gauges, histograms, and enums.
+- **[write_codegen.py](write_codegen.py.md)**: Generates C headers and source files for metric metadata, enums, and tile metric tables.
+- **[write_docs.py](write_docs.py.md)**: The `write_docs.py` file in the `firedancer` codebase generates documentation for metrics by writing them to a Markdown file, formatting them with HTML spans for styling, and categorizing them by type and description.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

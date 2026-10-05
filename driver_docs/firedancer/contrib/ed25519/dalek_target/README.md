@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for signing and verifying messages using ed25519_dalek, package configuration, and build targets.
+The `dalek_target` folder in the `firedancer` codebase contains the source code and configuration files necessary for building a Rust library that utilizes the ed25519_dalek library for cryptographic operations and interfaces with C through FFI.
 
 ## Folders
-- **[src](src/README.md)**: Functions for signing and verifying messages using the ed25519_dalek library.
+- **[src](src/README.md)**: The `src` folder in the `firedancer` codebase contains the `lib.rs` file, which provides functions for signing and verifying messages using the ed25519_dalek library and interfaces with C through FFI.
 
 ## Files
-- **[Cargo.toml](Cargo.toml.md)**: Configuration for the `dalek_target` package, specifying dependencies and library type.
-- **[Makefile](Makefile.md)**: Build and clean targets for Rust project with specific RUSTFLAGS and version 1.76.0.
+- **[Cargo.toml](Cargo.toml.md)**: The `Cargo.toml` file in the `firedancer` codebase specifies the package configuration for the `dalek_target` library, including its dependencies and crate type.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/contrib/ed25519/dalek_target` directory sets up build and clean commands for a Rust project, specifying custom `RUSTFLAGS` and using Cargo with Rust version 1.76.0.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

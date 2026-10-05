@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Template macros for defining and structuring QUIC-related data structures in the Firedancer codebase.
+The `fd_quic_defs.h` file in the `firedancer` codebase provides template macros for defining structures and their members related to QUIC protocol implementation.
 
 # Purpose
-This code is a C header file template that defines macros for generating structures related to QUIC (Quick UDP Internet Connections) protocol data handling. The macros, such as `FD_TEMPL_DEF_STRUCT_BEGIN` and `FD_TEMPL_DEF_STRUCT_END`, are used to define the beginning and end of a structure, respectively. Other macros like `FD_TEMPL_MBR_ELEM`, `FD_TEMPL_MBR_ELEM_HIDDEN`, and `FD_TEMPL_MBR_ELEM_VARINT` define different types of structure members, including standard elements, hidden elements, and variable-length integers. The macro `FD_TEMPL_MBR_ELEM_PKTNUM` is specifically for handling packet numbers, which are encrypted and require special handling. The file concludes with an inclusion of another header file, `fd_quic_dft.h`, which likely contains default settings or additional definitions related to the QUIC protocol.
+This code is a C header file template designed for defining structures related to the QUIC protocol, specifically for use in a project involving the Fast Data (FD) framework. It provides a set of macros to facilitate the creation of structured data types, which are prefixed with `fd_quic_`, indicating their association with the QUIC protocol. The macros define various types of structure members, including standard elements, hidden elements, variable-length integers, packet numbers, and raw data arrays. The template also includes a mechanism for defining the beginning and end of a structure, ensuring that each structure is properly encapsulated and typedef'd for ease of use. The inclusion of `fd_quic_dft.h` suggests that this file is part of a larger system where default configurations or additional definitions are provided.
 # Imports and Dependencies
 
 ---

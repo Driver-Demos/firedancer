@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers and running unit tests for `fd_uint256`.
+The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and the setup and execution of a unit test for `fd_uint256` functionality.
 
 # Purpose
-The `Makefile` content defines a build process for unit testing. It uses the `add-hdr` function to include headers `fd_uint256.h` and `fd_uint256_mul.h`. The `make-unit-test` function creates a unit test named `test_uint256` with dependencies on `fd_util`. Finally, the `run-unit-test` function executes the `test_uint256` unit test.
+The file is a Makefile snippet used for building and testing a software project. It adds header files `fd_uint256.h` and `fd_uint256_mul.h` to the build process, defines a unit test named `test_uint256` that depends on the `fd_util` library, and executes the unit test `test_uint256`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
