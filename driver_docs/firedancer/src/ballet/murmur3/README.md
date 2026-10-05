@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `murmur3` folder in the `firedancer` codebase contains the implementation, API definitions, build configuration, and testing for the MurmurHash3 algorithm, focusing on generating 32-bit hashes.
+Implements and tests the Murmur3 hash function with APIs for 32-bit unsigned integers and program counter hashes.
 
 
 ## Files
-- **[fd_murmur3.c](fd_murmur3.c.md)**: The `fd_murmur3.c` file implements the MurmurHash3 algorithm for generating a 32-bit hash from input data.
-- **[fd_murmur3.h](fd_murmur3.h.md)**: The `fd_murmur3.h` file provides APIs for computing Murmur3-32 hashes and includes functions for hashing program counters and their inverses in the `firedancer` codebase.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the build configuration for the `murmur3` module, including header and object files, as well as unit test creation and execution.
-- **[test_murmur3.c](test_murmur3.c.md)**: The `test_murmur3.c` file in the `firedancer` codebase contains test vectors and benchmarking code for the Murmur3 hash function, including tests for correctness and performance measurements for various input sizes and hash functions.
+- **[fd_murmur3.c](fd_murmur3.c.md)**: Implements the Murmur3 hash function for 32-bit unsigned integers.
+- **[fd_murmur3.h](fd_murmur3.h.md)**: APIs for Murmur3 hashing, including functions for computing and inverting program counter hashes.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the Murmur3 hash implementation in the Firedancer codebase.
+- **[test_murmur3.c](test_murmur3.c.md)**: Tests and benchmarks for the Murmur3 hash function implementation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
