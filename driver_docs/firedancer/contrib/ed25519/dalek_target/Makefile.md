@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/contrib/ed25519/dalek_target` directory sets up build and clean commands for a Rust project, specifying custom `RUSTFLAGS` and using Cargo with Rust version 1.76.0.
+Build and clean targets for Rust project with specific RUSTFLAGS and version 1.76.0.
 
 # Purpose
-This Makefile is used to automate the build and clean processes for a Rust project. It sets specific `RUSTFLAGS` to enable various sanitizer coverage options and force frame pointers, which are useful for debugging and profiling. The `build` target compiles the project using Cargo with the specified Rust version and target architecture, while the `clean` target removes build artifacts.
+The `Makefile` configures the build process for a Rust project. It sets `RUSTFLAGS` to include specific compiler options for sanitizer coverage and debugging, such as `-Cpasses=sancov-module` and `-Clink-dead-code`. The `RUST_VERSION` is specified as `1.76.0`, and the `CARGO` command is set to `cargo` by default. The `build` target compiles the project using the specified Rust version and target architecture `x86_64-unknown-linux-gnu` in release mode. The `clean` target removes build artifacts using the `cargo clean` command. The `.PHONY` directive declares `clean` and `build` as phony targets, indicating they are not associated with actual files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

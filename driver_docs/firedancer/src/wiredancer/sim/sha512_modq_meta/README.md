@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `sha512_modq_meta` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog module using Questa and a `test.py` script for cocotb-based testing of SHA-512 modulo Q metadata processing in hardware design.
+Makefile for simulating `sha512_modq_meta` with Verilog and Questa, and cocotb tests for SHA-512 modulo Q.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/sha512_modq_meta` directory is configured to simulate a Verilog module named `sha512_modq_meta` using the Questa simulator, with various Verilog source files specified for the simulation.
-- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase is a cocotb-based test script for simulating and verifying the SHA-512 modulo Q metadata processing in a hardware design.
+- **[Makefile](Makefile.md)**: Makefile for simulating the `sha512_modq_meta` module using Verilog sources with Questa.
+- **[test.py](test.py.md)**: Tests the SHA-512 modulo Q metadata processing using the cocotb framework.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

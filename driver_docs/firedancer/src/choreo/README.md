@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Consensus constants, epoch, equivocation, fork-choice, notarization, TowerBFT, and voter state code.
+Functions, structures, APIs, and tests for epoch management, equivocation detection, fork management, Solana's LMD-GHOST and TowerBFT algorithms, and voter state management.
 
 ## Folders
-- **[epoch](epoch/README.md)**: Epoch lifecycle, voter map layout, and conditional build settings.
-- **[eqvoc](eqvoc/README.md)**: Equivocation proof management, API, build rules, and tests for shred verification.
-- **[ghost](ghost/README.md)**: LMD-GHOST fork-choice tree, vote tracking, duplicate handling, and unit tests.
-- **[notar](notar/README.md)**: Vote counting, slot confirmation, and block vote threshold tracking for notarized blocks.
-- **[tower](tower/README.md)**: TowerBFT vote tower logic, APIs, build rules, and tests.
-- **[voter](voter/README.md)**: Vote state access, control encoding, build rules, and format tests.
+- **[epoch](epoch/README.md)**: Functions and structures for epoch management, and Makefile logic for 128-bit integer support.
+- **[eqvoc](eqvoc/README.md)**: Functions and API for equivocation detection and handling, Makefile, and tests for proof verification.
+- **[ghost](ghost/README.md)**: Functions and tests for managing ghost data structures and Solana's LMD-GHOST fork choice rule.
+- **[notar](notar/README.md)**: Functions for blockchain vote management, Solana block confirmation API, build configuration, and tests.
+- **[tower](tower/README.md)**: Functions, API, and tests for Solana's TowerBFT algorithm and voting tower management.
+- **[voter](voter/README.md)**: Functions and data structures for voter state management, JSON parsing, and testing in a choreographic context.
 
 ## Files
-- **[fd_choreo.h](fd_choreo.h.md)**: Includes choreo base, epoch, eqvoc, ghost, notar, tower, and voter headers.
-- **[fd_choreo_base.h](fd_choreo_base.h.md)**: Consensus constants and type aliases for block IDs and slot-based keys.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally builds the `fd_choreo` library and its associated headers and unit tests if `FD_HAS_INT128` is defined.
-- **[test_choreo_base.c](test_choreo_base.c.md)**: The `test_choreo_base.c` file in the `firedancer` codebase contains a simple test program that initializes and halts the `fd_choreo` system.
+- **[fd_choreo.h](fd_choreo.h.md)**: Header file for including various modules like fd_choreo_base, fd_epoch, fd_eqvoc, and others.
+- **[fd_choreo_base.h](fd_choreo_base.h.md)**: Defines constants, types, and functions for the Choreo consensus library, including block and voter management.
+- **[Local.mk](Local.mk.md)**: Makefile for building the fd_choreo library and its unit tests if FD_HAS_INT128 is defined.
+- **[test_choreo_base.c](test_choreo_base.c.md)**: Tests the initialization and termination functions in the `fd_choreo` module.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

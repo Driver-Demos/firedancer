@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_ballet_base.h` file defines constants and macros for maximum transaction size and memory alignment based on platform capabilities in the Firedancer codebase.
+Defines constants for Solana transaction size and platform-specific memory alignment.
 
 # Purpose
-This C header file, `fd_ballet_base.h`, serves as a configuration and setup file for defining constants and macros related to data alignment and transaction size in a Solana-based application. It defines `FD_TPU_MTU`, which specifies the maximum size of a Solana transaction in its serialized form, excluding network headers. The file also establishes a macro, `FD_ALIGN`, to determine the default memory alignment based on the platform's capabilities, such as AVX512, AVX, or the presence of 128-bit integers. Additionally, it provides a macro, `FD_ALIGNED`, to facilitate the use of compiler-specific alignment attributes. The file includes a placeholder for future interoperability functionality, indicating potential expansion to include more complex operations or definitions.
+This C header file defines configuration constants and alignment macros for use in a software project. It specifies `FD_TPU_MTU`, which is the maximum size of a Solana transaction in serialized wire-protocol form, excluding network-level headers. The file also defines `FD_ALIGN`, which sets the default memory alignment based on the platform capabilities, such as AVX512, AVX, or the presence of 128-bit integers. The `FD_ALIGNED` macro is a shortcut for applying the compiler's aligned attribute using the default alignment. The file includes a placeholder section for future interoperability functionality, indicated by the commented-out `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` markers.
 # Imports and Dependencies
 
 ---

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules that add fd_bank_tile objects when FD_HAS_ATOMIC and FD_HAS_INT128 are set.
+Makefile logic for adding objects to `fd_bank_tile` if `FD_HAS_ATOMIC` and `FD_HAS_INT128` are defined.
 
 # Purpose
-Build rules include `fd_discof` in `fd_bank_tile` only when both `FD_HAS_ATOMIC` and `FD_HAS_INT128` are defined. The nested `ifdef` blocks gate the `$(call add-objs,fd_bank_tile,fd_discof)` rule so the object is added only for builds that support both features.
+The `Makefile` snippet uses conditional directives to manage the inclusion of object files in the build process. If both `FD_HAS_ATOMIC` and `FD_HAS_INT128` are defined, the `add-objs` function is called to add `fd_bank_tile` and `fd_discof` to the list of object files. This ensures that these files are only included when the specified conditions are met, allowing for conditional compilation based on the presence of atomic operations and 128-bit integer support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
