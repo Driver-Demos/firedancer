@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
+Generated seccomp filters for logfile_fd and fd 2 write and fsync permissions.
 
 
 ## Files
-- **[fd_gossip_tile_seccomp.h](fd_gossip_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific syscalls.
-- **[fd_gossvf_tile_seccomp.h](fd_gossvf_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific syscalls.
+- **[fd_gossip_tile_seccomp.h](fd_gossip_tile_seccomp.h.md)**: Generated seccomp filter allowing write and fsync only on logfile_fd.
+- **[fd_gossvf_tile_seccomp.h](fd_gossvf_tile_seccomp.h.md)**: Generated seccomp filter allowing write and fsync only on fd 2 or logfile_fd.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

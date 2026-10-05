@@ -3,63 +3,68 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-APIs for parsing TOML config files with error handling and deserialization into fd_pod structures.
+The `fd_toml.h` file in the `firedancer` codebase provides APIs for parsing TOML configuration files, including error handling and mapping TOML types to `fd_pod` types, while noting certain deviations from the TOML specification.
 
 # Purpose
-The `fd_toml.h` file is a C header file that provides an API for parsing TOML configuration files. It defines error codes for various parsing errors and includes a structure, `fd_toml_err_info_t`, to store information about parse failures, such as the line number where the error occurred. The primary function, [`fd_toml_parse`](<#fd_toml_parse>), deserializes a TOML document into an `fd_pod` object, using specified scratch memory for processing. The function returns success or an error code, and optionally fills an error information structure. The header also includes the [`fd_toml_strerror`](<#fd_toml_strerror>) function, which returns a human-readable string describing a given error code. The implementation notes that the parser supports a subset of the TOML specification and lists several known limitations and deviations from the standard.
+This C header file, `fd_toml.h`, provides an API for parsing TOML (Tom's Obvious, Minimal Language) configuration files into a structured format using a custom data structure called `fd_pod`. It defines several error codes to handle various parsing issues, such as running out of space or encountering duplicate keys, and specifies a maximum path length for the parsed data. The primary function, [`fd_toml_parse`](#fd_toml_parse), deserializes a TOML document into an `fd_pod` object, utilizing scratch memory for processing, and returns detailed error information if parsing fails. The file also includes a function, [`fd_toml_strerror`](#fd_toml_strerror), to convert error codes into human-readable strings. Notably, the implementation supports only a subset of the TOML specification, with several known limitations and deviations from the official TOML grammar.
 # Imports and Dependencies
 
 ---
 - `../../util/pod/fd_pod.h`
 
 
+# Global Variables
+
+---
+### fd\_toml\_strerror
+- **Type**: `function pointer`
+- **Description**: `fd_toml_strerror` is a function that returns a constant character pointer to a human-readable error string. This string describes the error code provided as an argument, which corresponds to the negative return values from the `fd_toml_parse` function.
+- **Use**: This function is used to translate error codes from `fd_toml_parse` into descriptive error messages for easier debugging and user feedback.
+
+
 # Data Structures
 
 ---
 ### fd\_toml\_err\_info
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``line``: 1-indexed line number indicating where the error occurred in the TOML file.
-- **Description**: Contains information about a TOML parse failure, specifically the line number where the error occurred. This structure is used to provide detailed error information when parsing TOML files fails, allowing users to identify and correct issues in the TOML configuration.
+    - `line`: 1-indexed line number indicating where the error occurred in the TOML file.
+- **Description**: The `fd_toml_err_info` structure is designed to hold information about errors encountered during the parsing of a TOML file. Currently, it contains a single member, `line`, which records the line number where the error occurred, using a 1-based index. This structure is intended to be expanded with additional fields to provide more detailed error information in the future.
 
 
 ---
 ### fd\_toml\_err\_info\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `line`: 1-indexed line number indicating where the error occurred in the TOML document.
-- **Description**: Contains information about a TOML parse failure, specifically the line number where the error occurred. This structure is used to provide detailed error information when parsing TOML documents fails, helping users to identify and correct issues in the TOML configuration files.
+    - `line`: 1-indexed line number indicating where the error occurred in the TOML file.
+- **Description**: The `fd_toml_err_info_t` structure is designed to store information about errors encountered during the parsing of a TOML file. Currently, it contains a single member, `line`, which records the line number where the parsing error occurred. This structure can be expanded to include additional error details as needed, providing a mechanism for detailed error reporting in TOML parsing operations.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_toml\_parse<!-- {{#callable_declaration:fd_toml_parse}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.h#L33>)
-
-Deserializes a TOML document into an object tree within a pod.
-- **Description**: Use this function to parse a TOML document and insert its object tree into a provided pod. The function requires a pointer to the TOML data and its size, a pod for storing the parsed data, and a scratch memory area for temporary storage during parsing. Ensure the scratch memory is at least 4kB to avoid deserialization failures with long strings or sub-tables. The function returns success or an error code indicating the type of failure. Optionally, provide a structure to receive error details, including the line number of any parse failure. The function is not secure against untrusted input and does not optimize for performance.
+Deserializes a TOML document into an fd_pod object tree.
+- **Description**: Use this function to parse a TOML document and insert its object tree into an fd_pod. It requires a pointer to the TOML data, its size, a local join to an fd_pod, and a scratch memory area for temporary storage during parsing. The function is suitable for parsing TOML documents that do not require strict adherence to the TOML specification, as it allows certain deviations. It is not optimized for performance and should not be used with untrusted input. The function returns success or an error code, and optionally provides error details if parsing fails.
 - **Inputs**:
-    - `toml`: Pointer to the first byte of the TOML data. If `toml_sz` is 0, this pointer is ignored and can be invalid.
-    - `toml_sz`: Size in bytes of the TOML data. Must be greater than 0 to process the TOML data.
-    - `pod`: Pointer to a local join to an `fd_pod_t` where the parsed object tree will be stored. Caller retains ownership.
-    - `scratch`: Pointer to a memory area used for temporary storage during parsing. Must not be null.
-    - `scratch_sz`: Size in bytes of the scratch memory. Recommended to be at least 4kB. If too small, parsing may fail.
-    - `opt_err`: Optional pointer to a `fd_toml_err_info_t` structure to receive error information. If null, error details are not provided.
-- **Output**: Returns `FD_TOML_SUCCESS` on success or an error code (`FD_TOML_ERR_*`) on failure. If `opt_err` is provided, it is initialized with error information.
-- **See Also**: [`fd_toml_parse`](<fd_toml.c.md#fd_toml_parse>)  (Implementation)
+    - `toml`: Pointer to the first byte of the TOML document. If toml_sz is 0, this pointer is ignored and may be invalid.
+    - `toml_sz`: The byte length of the TOML document. If 0, the function does nothing and returns success.
+    - `pod`: A local join to an fd_pod where the parsed object tree will be inserted. The caller retains ownership.
+    - `scratch`: Pointer to a scratch memory area used during deserialization. Must be non-null and large enough to handle the parsing process.
+    - `scratch_sz`: Size of the scratch memory area. Recommended to be at least 4kB. If too small, parsing may fail for long strings and sub-tables.
+    - `opt_err`: Optional pointer to a fd_toml_err_info_t structure to receive error information. If null, error details are not provided.
+- **Output**: Returns FD_TOML_SUCCESS on success or an appropriate FD_TOML_ERR_* code on failure. If opt_err is provided, it is initialized with error information.
+- **See also**: [`fd_toml_parse`](fd_toml.c.md#fd_toml_parse)  (Implementation)
 
 
 ---
 ### fd\_toml\_strerror<!-- {{#callable_declaration:fd_toml_strerror}} -->
-[View Source →](<../../../../../src/ballet/toml/fd_toml.h#L116>)
-
-Returns a human-readable error message for a given error code.
-- **Description**: Use this function to obtain a descriptive error message for a specific error code returned by TOML parsing functions. This is useful for debugging and logging purposes, as it translates error codes into understandable text. The function handles both known error codes and unknown ones, providing a default message for the latter. It is important to use this function with error codes returned by `fd_toml_parse` to ensure accurate error descriptions.
+Return a human-readable error string for a given TOML error code.
+- **Description**: Use this function to obtain a descriptive error message corresponding to a specific TOML error code, which can be useful for logging or debugging purposes. It is particularly relevant for interpreting negative return values from the `fd_toml_parse` function. The function returns a static string, so there is no need to manage memory for the returned value. It handles all defined TOML error codes and returns "unknown error" for any unrecognized codes.
 - **Inputs**:
-    - `err`: An integer representing the error code. Valid values are the negative error codes defined for TOML parsing, such as `FD_TOML_ERR_POD`, `FD_TOML_ERR_SCRATCH`, etc. The function also handles unknown error codes by returning a generic message.
-- **Output**: A pointer to a constant character string containing the error message. The string is statically allocated and should not be modified or freed by the caller.
-- **See Also**: [`fd_toml_strerror`](<fd_toml.c.md#fd_toml_strerror>)  (Implementation)
+    - `err`: An integer representing a TOML error code, typically a negative value returned by `fd_toml_parse`. Valid values include FD_TOML_SUCCESS, FD_TOML_ERR_POD, FD_TOML_ERR_SCRATCH, FD_TOML_ERR_KEY, FD_TOML_ERR_DUP, FD_TOML_ERR_RANGE, and FD_TOML_ERR_PARSE. If an unrecognized error code is provided, the function returns "unknown error".
+- **Output**: A constant character pointer to a static string describing the error associated with the provided error code.
+- **See also**: [`fd_toml_strerror`](fd_toml.c.md#fd_toml_strerror)  (Implementation)
 
 
 

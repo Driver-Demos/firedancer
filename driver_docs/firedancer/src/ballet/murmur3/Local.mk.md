@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the Murmur3 hash implementation in the Firedancer codebase.
+The `Local.mk` file in the `firedancer` codebase specifies the build configuration for the `murmur3` module, including header and object files, as well as unit test creation and execution.
 
 # Purpose
-The `Makefile` content defines build and test instructions for the `fd_murmur3` component. It adds the header file `fd_murmur3.h` and the object files `fd_murmur3` and `fd_ballet` to the build process. It also specifies a unit test named `test_murmur3`, which depends on `fd_ballet` and `fd_util`, and includes a command to execute this unit test.
+The file is a Makefile snippet used for building and testing components of a software project. It adds the header file `fd_murmur3.h` and object files `fd_murmur3` and `fd_ballet` to the build process, defines a unit test named `test_murmur3` that depends on `fd_ballet` and `fd_util`, and specifies the execution of this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

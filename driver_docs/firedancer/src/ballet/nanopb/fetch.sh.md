@@ -3,38 +3,38 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fetches and modifies specific files from the nanopb repository based on a specified tag.
+The `fetch.sh` file in the `firedancer` codebase is a Bash script that downloads specific files from a specified version of the `nanopb` repository and modifies the include statements in those files.
 
 # Purpose
-This script is a Bash executable that automates the process of downloading specific files from a remote repository. It sets up the environment by determining the script's directory and reads a repository tag from a file named `nanopb_tag.txt`. The script defines a list of files to download, which includes header and source files related to the `nanopb` library. For each file in the list, it constructs a URL using the repository URL and tag, then uses `curl` to download the file into the script's directory. After downloading, the script modifies each file to replace the `#include "pb.h"` directive with `#include "pb_firedancer.h"`.
+This Bash script is designed to automate the process of downloading specific files from a remote repository and modifying them for local use. It provides narrow functionality, focusing specifically on fetching a set of files from a specified version (tag) of the nanopb library hosted on GitHub. The script reads the desired repository tag from a local file named `nanopb_tag.txt`, then constructs URLs to download a predefined list of files, which include both header and source files related to nanopb. After downloading, it performs a text replacement in each file to change an `#include` directive, suggesting that these files are being adapted for integration into a different project environment. This script is not an executable or a library but rather a utility script intended to facilitate setup or maintenance tasks in a development workflow.
 # Global Variables
 
 ---
 ### SCRIPT\_DIR
 - **Type**: `string`
-- **Description**: Contains the absolute path of the directory where the script is located. It is determined by changing to the directory of the script file and then obtaining the current working directory.
-- **Use**: Used to specify the directory path for saving downloaded files.
+- **Description**: `SCRIPT_DIR` is a string variable that stores the absolute path of the directory where the script is located. It is determined by using the `dirname` command on the script's source path and resolving it to an absolute path with `pwd`. This ensures that any file operations within the script are relative to the script's location.
+- **Use**: `SCRIPT_DIR` is used to construct file paths for downloading and saving files in the same directory as the script.
 
 
 ---
 ### REPO\_URL
-- **Type**: ``string``
-- **Description**: A string that contains the base URL for accessing raw content from the 'nanopb' repository on GitHub. It is used to construct URLs for downloading specific files from the repository.
-- **Use**: Used to form the base part of the URL for downloading files from the 'nanopb' GitHub repository.
+- **Type**: `string`
+- **Description**: The `REPO_URL` variable is a string that holds the base URL of the GitHub repository for the nanopb project. It is used to construct the full URL for downloading specific files from the repository.
+- **Use**: This variable is used as the base URL to fetch files from the nanopb GitHub repository by appending the repository tag and file names to it.
 
 
 ---
 ### REPO\_TAG
-- **Type**: ``string``
-- **Description**: Contains the tag or version identifier for the `nanopb` repository. The value is read from the file `nanopb_tag.txt`.
-- **Use**: Used to construct the URL for downloading specific files from the `nanopb` repository at a particular version.
+- **Type**: `string`
+- **Description**: The `REPO_TAG` variable is a string that holds the content of the file `nanopb_tag.txt`. This file is expected to contain a specific tag or version identifier for the nanopb repository.
+- **Use**: `REPO_TAG` is used to construct URLs for downloading specific versions of files from the nanopb repository.
 
 
 ---
 ### FILES
-- **Type**: `array`
-- **Description**: The `FILES` variable is an array that contains a list of filenames. These filenames correspond to header and source files related to the nanopb library.
-- **Use**: Stores the list of filenames to be processed in a loop for downloading and modifying.
+- **Type**: `array of strings`
+- **Description**: The `FILES` variable is a global array of strings that lists the filenames of source and header files related to the nanopb library. These files include both C source files and header files necessary for the nanopb library's functionality.
+- **Use**: This variable is used to iterate over each filename in the array to download the corresponding file from a specified repository URL and perform a text replacement operation on each file.
 
 
 

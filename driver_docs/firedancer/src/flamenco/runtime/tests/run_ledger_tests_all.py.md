@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Runs ledger tests in parallel using multiple CPU batches and handles command execution errors.
+The `run_ledger_tests_all.py` file in the `firedancer` codebase is a Python script that manages the execution of commands from a file using multiprocessing, distributing tasks across CPU batches and handling errors.
 
 # Purpose
-This script is designed to execute a series of shell commands in parallel using multiple CPU cores. It reads commands from a specified file and distributes them across available CPU cores, grouped into batches. The script defines two functions, [`group_cpus_by_batch_size`](<#group_cpus_by_batch_size>) and [`group_cpus_by_num_batches`](<#group_cpus_by_num_batches>), to organize CPU cores into batches based on either a specified batch size or a specified number of batches. These batches are used to define parameter ranges for the commands.
+This Python script is designed to execute a series of shell commands in parallel using multiple CPU cores. It achieves this by dividing the available CPU cores into batches and assigning each batch to a separate worker process. The script reads commands from a specified file, and each command is executed with a specific set of CPU cores as parameters. The script uses the `multiprocessing` module to manage parallel execution and inter-process communication, employing queues to distribute commands and parameters to worker processes. It also includes error handling to detect and respond to any command execution failures, ensuring that all processes are terminated if an error occurs.
 
-The script uses the `multiprocessing` module to manage parallel execution. It creates a pool of worker processes, each responsible for executing commands with specific CPU parameters. The [`worker`](<#worker>) function retrieves commands from a queue, executes them, and handles any errors that occur during execution. If an error occurs, it sets an event to signal all workers to stop processing. The script ensures that all commands are processed and checks for errors before terminating. The script is intended to be run as a standalone program, taking a file path as a command-line argument to specify the file containing the commands to execute.
+The script is structured as a standalone executable, intended to be run from the command line with a file path argument specifying the file containing the commands to be executed. The main components include functions for grouping CPUs into batches, a worker function that executes commands, and a main function that orchestrates the overall process. The script is particularly useful for scenarios where tasks can be parallelized across multiple CPU cores, such as batch processing or distributed computing tasks. It does not define a public API or external interfaces, as its primary purpose is to execute a predefined set of commands in a parallelized manner.
 # Imports and Dependencies
 
 ---
@@ -25,79 +25,70 @@ The script uses the `multiprocessing` module to manage parallel execution. It cr
 
 ---
 ### group\_cpus\_by\_batch\_size<!-- {{#callable:firedancer/src/flamenco/runtime/tests/run_ledger_tests_all.group_cpus_by_batch_size}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/tests/run_ledger_tests_all.py#L7>)
-
-Groups available CPUs into batches of a specified size, with a maximum limit of 128 CPUs.
+The function `group_cpus_by_batch_size` organizes available CPU indices into batches of a specified size, starting from the third CPU.
 - **Inputs**:
-    - `batch_size`: The number of CPUs to include in each batch, with a default value of 8.
-- **Logic and Control Flow**:
-    - Import the `os` module to access CPU information.
-    - Get the total number of available CPUs using `os.cpu_count()`.
-    - Limit the number of CPUs to 128 if the available count exceeds 128.
+    - `batch_size`: An integer specifying the number of CPUs to include in each batch, defaulting to 8.
+- **Control Flow**:
+    - Import the `os` module to access system-level information.
+    - Retrieve the total number of CPUs available using `os.cpu_count()`.
+    - Limit the number of CPUs to 128 if more are available.
     - Print the total number of CPUs available.
-    - Create batches of CPUs starting from index 2 up to the total number of CPUs, with each batch containing up to `batch_size` CPUs.
+    - Create a list of batches, each containing a range of CPU indices starting from the third CPU, with each batch having a size defined by `batch_size`.
     - Return the list of CPU batches.
-- **Output**: A list of lists, where each inner list contains indices representing a batch of CPUs.
+- **Output**: A list of lists, where each inner list contains indices of CPUs grouped into batches of the specified size.
 
 
 ---
 ### group\_cpus\_by\_num\_batches<!-- {{#callable:firedancer/src/flamenco/runtime/tests/run_ledger_tests_all.group_cpus_by_num_batches}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/tests/run_ledger_tests_all.py#L19>)
-
-Groups available CPUs into a specified number of batches.
+The function `group_cpus_by_num_batches` divides available CPUs into a specified number of batches.
 - **Inputs**:
-    - `num_batches`: The number of batches to divide the CPUs into, default is 4.
-- **Logic and Control Flow**:
+    - `num_batches`: An integer specifying the number of batches to divide the CPUs into, with a default value of 4.
+- **Control Flow**:
     - Import the `os` module to access system-level information.
-    - Get the total number of available CPUs using `os.cpu_count()`.
-    - Calculate the `batch_size` by dividing `num_cpus` by `num_batches`.
-    - Create a list of CPU batches using a list comprehension, where each batch is a list of CPU indices.
-    - Limit the number of batches to `num_batches` by slicing the list of batches.
+    - Retrieve the total number of available CPUs using `os.cpu_count()`.
+    - Calculate the batch size by dividing the total number of CPUs by the number of batches.
+    - Create a list of CPU batches, where each batch is a list of CPU indices, starting from index 2, and ensure the number of batches does not exceed `num_batches`.
     - Return the list of CPU batches.
 - **Output**: A list of lists, where each inner list contains indices of CPUs grouped into a batch.
 
 
 ---
 ### worker<!-- {{#callable:firedancer/src/flamenco/runtime/tests/run_ledger_tests_all.worker}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/tests/run_ledger_tests_all.py#L32>)
-
-Executes commands from a queue using available parameters and handles errors during execution.
+The `worker` function processes commands from a queue using available parameters, handling errors and signaling termination if any command fails.
 - **Inputs**:
-    - `command_queue`: A queue containing commands to execute.
-    - `available_params`: A queue containing available parameters for command execution.
-    - `error_occurred`: A shared integer value to indicate if an error occurred.
-    - `error_event`: An event object to signal if an error has occurred.
-- **Logic and Control Flow**:
-    - Continuously checks if the `error_event` is set; if not, retrieves a command from `command_queue`.
-    - If the command is `None`, breaks the loop to stop the worker.
-    - Retrieves a parameter from `available_params` to use with the command.
-    - Attempts to execute the command with the parameter using `subprocess.run`.
-    - If the command execution fails, prints an error message, sets `error_occurred` to 1, sets `error_event`, and breaks the loop.
-    - Releases the parameter back to `available_params` after command execution.
-- **Output**: No direct output; performs command execution and error handling.
+    - `command_queue`: A queue from which commands are retrieved for execution.
+    - `available_params`: A queue containing parameters that can be used with commands.
+    - `error_occurred`: A shared integer value used to indicate if an error has occurred during command execution.
+    - `error_event`: An event object used to signal if an error has occurred, prompting the worker to stop processing.
+- **Control Flow**:
+    - The function enters a loop that continues until the `error_event` is set.
+    - It retrieves a command from the `command_queue`.
+    - If the command is `None`, the loop breaks, signaling the worker to quit.
+    - A parameter is acquired from the `available_params` queue.
+    - The command is executed with the parameter using `subprocess.run`.
+    - If the command execution is successful, a completion message is printed.
+    - If a `subprocess.CalledProcessError` is raised, an error message is printed, `error_occurred` is set to 1, `error_event` is set, and the loop breaks.
+    - The parameter is returned to the `available_params` queue in a `finally` block, ensuring it is always released.
+- **Output**: The function does not return a value; it performs command execution and error handling, affecting shared state through `error_occurred` and `error_event`.
 
 
 ---
 ### main<!-- {{#callable:firedancer/src/flamenco/runtime/tests/run_ledger_tests_all.main}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/tests/run_ledger_tests_all.py#L55>)
-
-Executes commands from a file using multiprocessing with CPU batch parameters and handles errors.
+The `main` function orchestrates the execution of commands from a file using multiprocessing, distributing tasks across CPU batches and handling errors.
 - **Inputs**:
-    - `file_path`: The path to the file containing commands to execute.
-- **Logic and Control Flow**:
-    - Calls [`group_cpus_by_batch_size`](<#group_cpus_by_batch_size>) to get CPU batches and limits to the first 5 batches.
-    - Prints the CPU batches and defines parameter ranges for each batch.
-    - Opens the file at `file_path` and reads commands into a list, stripping whitespace.
-    - Creates a `multiprocessing.Manager` to manage shared queues and values across processes.
-    - Initializes a queue `available_params` with parameter ranges and a queue `command_queue` with commands.
-    - Initializes a shared integer `error_occurred` to track errors and an `Event` `error_event` for error signaling.
-    - Creates and starts a process for each CPU batch, targeting the `worker` function with necessary arguments.
-    - Signals workers to stop by putting `None` in the `command_queue` for each process.
-    - Waits for all processes to complete using `join`.
-    - Checks if any process failed by examining `error_occurred`; if so, terminates all processes and exits with an error code.
-- **Output**: None. The function performs actions and prints output but does not return a value.
-- **Functions Called**:
-    - [`firedancer/src/flamenco/runtime/tests/run_ledger_tests_all.group_cpus_by_batch_size`](<#group_cpus_by_batch_size>)
+    - `file_path`: A string representing the path to a file containing commands to be executed.
+- **Control Flow**:
+    - The function starts by grouping CPUs into batches of size 10 and selects the first 5 batches.
+    - It constructs parameter ranges for each CPU batch to be used in command execution.
+    - Commands are read from the specified file and stored in a queue for processing.
+    - A multiprocessing manager is used to create shared queues for available parameters and commands, and a shared value for error tracking.
+    - Worker processes are created, each executing the `worker` function with the command queue, available parameters, and error tracking variables.
+    - Each worker process retrieves commands and parameters, executes them, and handles any errors by setting an error flag and event.
+    - After all commands are processed, workers are signaled to stop by placing `None` in the command queue.
+    - The function waits for all worker processes to complete and checks for any errors, terminating the script if an error occurred.
+- **Output**: The function does not return a value; it prints output to the console and may terminate the script if an error occurs during command execution.
+- **Functions called**:
+    - [`firedancer/src/flamenco/runtime/tests/run_ledger_tests_all.group_cpus_by_batch_size`](#group_cpus_by_batch_size)
 
 
 
