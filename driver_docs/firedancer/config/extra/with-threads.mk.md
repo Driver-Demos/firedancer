@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for enabling thread and atomic support with specific compiler and linker flags.
+The `with-threads.mk` file in the `firedancer` codebase configures build settings to enable threading and atomic operations by setting appropriate compiler and linker flags.
 
 # Purpose
-The file includes additional makefile configurations from `config/extra/with-hosted.mk`. It appends the `-pthread`, `-DFD_HAS_THREADS=1`, and `-DFD_HAS_ATOMIC=1` flags to `CPPFLAGS`, and appends `-pthread` to `LDFLAGS`, indicating the use of POSIX threads and enabling thread and atomic operation support. The variables `FD_HAS_THREADS` and `FD_HAS_ATOMIC` are set to `1`, confirming that the build process should support threading and atomic operations.
+This Makefile snippet is used to configure the build process of a software project. It includes additional makefile configurations from `config/extra/with-hosted.mk` and sets preprocessor flags (`CPPFLAGS`) and linker flags (`LDFLAGS`) to enable threading and atomic operations, indicating that the software is built with support for multithreading and atomic operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

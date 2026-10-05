@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines maximum sizes for packet metadata address and packet data.
+The `packet.options` file in the `firedancer` codebase specifies the maximum sizes for `packet.Meta.addr` and `packet.Packet.data` as 256 and 2048, respectively.
 
 # Purpose
-The configuration file specifies the maximum size constraints for certain data fields in a packet structure. The `packet.Meta.addr` field has a maximum size of 256 bytes, while the `packet.Packet.data` field has a maximum size of 2048 bytes. These constraints ensure that the data fields do not exceed the specified byte limits during processing.
+The file specifies constraints for two data fields within a software system. It defines a maximum size of 256 bytes for the `addr` field in `packet.Meta` and a maximum size of 2048 bytes for the `data` field in `packet.Packet`, likely to ensure data integrity and prevent overflow.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

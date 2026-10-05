@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing TLS components, including unit and fuzz tests, with optional OpenSSL support.
+Build rules for fd_tls, unit tests, fuzz tests, and OpenSSL tests.
 
 # Purpose
-The `Makefile` content automates the build process for a software project involving TLS (Transport Layer Security) components. It uses custom functions to manage the compilation and testing of the `fd_tls` library and its associated headers and object files. The `make-lib` function compiles the `fd_tls` library, while `add-hdrs` and `add-objs` functions include the necessary header and object files. The file also defines unit tests and fuzz tests for the TLS components, using `make-unit-test` and `make-fuzz-test` functions, which are conditional on the presence of certain features like `FD_HAS_HOSTED` and `FD_HAS_OPENSSL`. The `run-unit-test` function executes the defined unit tests, ensuring the integrity and functionality of the TLS components within the project.
+This Makefile fragment defines the build targets for the `fd_tls` library and its related test programs. It adds the public headers `fd_tls.h`, `fd_tls_proto.h`, `fd_tls_asn1.h`, and `fd_tls_estate.h`, and it registers the library objects `fd_tls`, `fd_tls_proto`, and `fd_tls_asn1` under the `fd_tls` target. It also adds `test_tls_helper.h`, creates the `test_tls` unit test, and runs that test during the build. When `FD_HAS_HOSTED` is set, it adds the `fuzz_tls` and `fuzz_tls_msg_parser` fuzz tests, and when `FD_HAS_OPENSSL` is set, it adds and runs the `test_tls_openssl` unit test with the `ssl` and `crypto` link flags.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

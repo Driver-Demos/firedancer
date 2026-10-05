@@ -3,20 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Documentation for configuring, setting up, running, monitoring, and troubleshooting Firedancer and Frankendancer.
+Guides for configuring, initializing, monitoring, troubleshooting, tuning, and internals.
 
 ## Folders
-- **[internals](internals/README.md)**: Documentation for Firedancer's net tile and netlink integration, focusing on networking and data flows.
+- **[internals](internals/README.md)**: AF_XDP networking, packet routing, and netlink integration guides.
 
 ## Files
-- **[configuring.md](configuring.md.md)**: Guide for configuring Firedancer using a TOML file, including options, logging, layout, and GUI settings.
-- **[faq.md](faq.md.md)**: Frequently asked questions about Frankendancer hardware, binaries, branches, errors, compatibility, monitoring, and delinquency.
-- **[firedancer.md](firedancer.md.md)**: Guide for setting up and running the Firedancer validator for Solana, detailing its development and features.
-- **[getting-started.md](getting-started.md.md)**: A guide for building, installing, and running the Frankendancer validator, including hardware requirements and configuration instructions.
-- **[initializing.md](initializing.md.md)**: Guide for configuring the Firedancer host operator system using the `fdctl configure` command, detailing stages like `hugetlbfs`, `sysctl`, and `ethtool` settings.
-- **[monitoring.md](monitoring.md.md)**: Guide for monitoring the Frankendancer validator using Agave CLI, Prometheus metrics, and live tools.
-- **[troubleshooting.md](troubleshooting.md.md)**: Troubleshooting steps for building, configuring, and running Frankendancer, with error-specific solutions.
-- **[tuning.md](tuning.md.md)**: Guide for performance tuning of the Firedancer validator, detailing thread assignments, configuration, and benchmarking.
+- **[configuring.md](configuring.md.md)**: The `configuring.md` file in the `firedancer` codebase provides a comprehensive guide on configuring Firedancer using a TOML file, detailing default options, migration tips, logging, layout, and GUI settings.
+- **[faq.md](faq.md.md)**: The `faq.md` file in the `firedancer` codebase provides answers to frequently asked questions about running and troubleshooting the Frankendancer validator, including hardware requirements, obtaining binaries, and monitoring node status.
+- **[firedancer.md](firedancer.md.md)**: The `firedancer.md` file provides an overview and guide for Firedancer, a high-performance Solana validator developed by Jump Trading Group to enhance the Solana ecosystem's power, reliability, and security.
+- **[getting-started.md](getting-started.md.md)**: Frankendancer setup, build, update, run, and network requirements guide
+- **[initializing.md](initializing.md.md)**: Kernel and network setup stages for hugetlbfs, sysctl, hyperthreads, ethtool, and snapshots.
+- **[monitoring.md](monitoring.md.md)**: The `monitoring.md` file in the `firedancer` codebase provides a guide on monitoring the Agave validator using command line tools, Prometheus-compatible metrics, and live monitoring tools included with Firedancer.
+- **[troubleshooting.md](troubleshooting.md.md)**: The `troubleshooting.md` file provides a collection of common troubleshooting steps for operators encountering errors while building and running Frankendancer in the Firedancer codebase, along with recommendations for resolving specific issues and guidance on configuration and execution.
+- **[tuning.md](tuning.md.md)**: Performance tuning, tile layout, and benchmarking guidance for Firedancer.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
