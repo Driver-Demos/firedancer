@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile and Cocotb test for simulating and verifying the ED25519 signature verification module.
+The `ed25519_sigverify_0` folder in the `firedancer` codebase contains a `Makefile` for configuring and running Verilog simulations and a `test.py` file for cocotb-based testing of the `ed25519_sigverify_0` module.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: Makefile for simulating and verifying the `ed25519_sigverify_0` module using Verilog sources.
-- **[test.py](test.py.md)**: Cocotb test for simulating and verifying the ED25519 signature verification module.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/ed25519_sigverify_0` directory is used to configure and run simulations for the `ed25519_sigverify_0` module using Verilog sources and the Questa simulator.
+- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase contains a cocotb-based test for verifying the functionality of the `ed25519_sigverify_0` module, including clock generation, reset toggling, and random transaction generation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and data structures for voter state management, JSON parsing, and testing in a choreographic context.
+Vote state access, control encoding, build rules, and format tests.
 
 
 ## Files
-- **[fd_voter.h](fd_voter.h.md)**: API for accessing and interpreting bincode-serialized on-chain voter accounts without deserialization.
-- **[fd_voter_ctl.c](fd_voter_ctl.c.md)**: Reads a JSON file, parses data, and logs a base58-encoded vote account address.
-- **[Local.mk](Local.mk.md)**: Makefile for building `fd_voter` components and unit tests with conditional compilation flags.
-- **[test_voter.c](test_voter.c.md)**: Tests for voter state decoding and validation in different versions using the Firedancer framework.
+- **[fd_voter.h](fd_voter.h.md)**: Zero-copy vote account state access, voter records, and tower vote helpers.
+- **[fd_voter_ctl.c](fd_voter_ctl.c.md)**: The `fd_voter_ctl.c` file in the `firedancer` codebase reads a JSON file to extract and encode a vote account address using base58 encoding.
+- **[Local.mk](Local.mk.md)**: Build rules for voter headers, control binary, and unit test when int128 and hosted support exist.
+- **[test_voter.c](test_voter.c.md)**: Tests vote state decoding for v1.14.11 and current formats.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
