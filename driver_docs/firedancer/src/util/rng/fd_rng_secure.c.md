@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Secure random number generation function with platform-specific implementations for Linux, FreeBSD, and Apple.
+The `fd_rng_secure.c` file implements a platform-specific secure random number generator function, using `getrandom` for Linux and FreeBSD, `CCRandomGenerateBytes` for Apple, and logging a warning if the platform is unsupported.
 
 # Purpose
-The code provides a platform-specific implementation of a secure random number generator function named [`fd_rng_secure`](<#fd_rng_secure>). It is designed to work on different operating systems, including Linux, FreeBSD, and Apple platforms, by using the appropriate system calls or libraries available on each platform. For Linux and FreeBSD, it uses the `getrandom` system call to fill a buffer with random bytes. On Apple systems, it uses the `CCRandomGenerateBytes` function from the CommonCrypto library. If the platform is not supported, the function logs a warning and returns `NULL`.
+This C source code file provides a platform-specific implementation of a secure random number generator function, [`fd_rng_secure`](#fd_rng_secure). The function is designed to fill a buffer with cryptographically secure random bytes, and it adapts its implementation based on the operating system. For Linux and FreeBSD systems, it utilizes the `getrandom` system call to generate random data, ensuring that the operation is secure and blocking until sufficient entropy is available. On Apple systems, it uses the `CCRandomGenerateBytes` function from the CommonCrypto library to achieve the same goal. If the code is compiled on an unsupported platform, the function logs a warning and returns `NULL`, indicating that secure random number generation is not available.
 
-The function [`fd_rng_secure`](<#fd_rng_secure>) takes a pointer `d` and a size `sz` as arguments, and it attempts to fill the memory pointed to by `d` with `sz` bytes of secure random data. The function is marked with the `FD_FN_SENSITIVE` attribute and the `warn_unused_result` attribute, indicating that it handles sensitive data and that the return value should be checked by the caller. The code includes error handling that logs warnings if the random number generation fails, using the `FD_LOG_WARNING` macro from the included `fd_log.h` header. This code is intended to be part of a larger system where secure random number generation is required, and it provides a consistent interface across different platforms.
+The file includes necessary headers for logging and platform-specific random number generation functions. It uses conditional compilation to select the appropriate implementation based on the detected operating system. The function is marked with attributes to indicate that its return value should not be ignored, emphasizing the importance of checking for errors. This code is intended to be part of a larger system, likely as a utility function within a library, providing a consistent interface for secure random number generation across different platforms. The use of logging and error handling ensures that any issues during random number generation are reported, aiding in debugging and system reliability.
 # Imports and Dependencies
 
 ---
@@ -24,17 +24,15 @@ The function [`fd_rng_secure`](<#fd_rng_secure>) takes a pointer `d` and a size 
 
 ---
 ### fd\_rng\_secure<!-- {{#callable:fd_rng_secure}} -->
-[View Source →](<../../../../../src/util/rng/fd_rng_secure.c#L49>)
-
-Generates secure random bytes and writes them to a specified buffer, with platform-specific implementations for Linux, FreeBSD, and Apple, and a fallback for unsupported platforms.
+The `fd_rng_secure` function generates cryptographically secure random bytes and stores them in a provided buffer, with platform-specific implementations for Linux, FreeBSD, and Apple, and a fallback for unsupported platforms.
 - **Inputs**:
-    - `d`: A pointer to the buffer where the random bytes will be written.
-    - `sz`: The number of random bytes to generate and write to the buffer.
-- **Logic and Control Flow**:
-    - On Linux or FreeBSD, uses `getrandom` to fill the buffer with random bytes, logging a warning and returning `NULL` if `getrandom` fails.
-    - On Apple platforms, uses `CCRandomGenerateBytes` to fill the buffer, logging a warning and returning `NULL` if the function does not succeed.
-    - For unsupported platforms, logs a warning and returns `NULL`.
-- **Output**: Returns a pointer to the buffer `d` if successful, or `NULL` if an error occurs.
+    - `d`: A pointer to the buffer where the random bytes will be stored.
+    - `sz`: The number of random bytes to generate and store in the buffer.
+- **Control Flow**:
+    - On Linux or FreeBSD, it uses the `getrandom` system call to fill the buffer with random bytes, logging a warning and returning NULL if the call fails.
+    - On Apple platforms, it uses `CCRandomGenerateBytes` to fill the buffer, logging a warning and returning NULL if the function does not succeed.
+    - On unsupported platforms, it logs a warning indicating that the function is not supported and returns NULL.
+- **Output**: A pointer to the buffer `d` if successful, or NULL if the operation fails or is unsupported.
 
 
 

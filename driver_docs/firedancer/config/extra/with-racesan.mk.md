@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration to enable race condition sanitizer with `FD_HAS_RACESAN` flag.
+Build flag that defines FD_HAS_RACESAN and adds it to CPPFLAGS.
 
 # Purpose
-The file configures the build system to enable race condition sanitization. It sets the `FD_HAS_RACESAN` variable to `1` and appends the preprocessor flag `-DFD_HAS_RACESAN=1` to `CPPFLAGS`. This ensures that the code is compiled with race condition detection enabled.
+Sets the `FD_HAS_RACESAN` build flag to `1` and adds `-DFD_HAS_RACESAN=1` to `CPPFLAGS`. This enables conditional compilation for code that checks the `FD_HAS_RACESAN` macro.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
