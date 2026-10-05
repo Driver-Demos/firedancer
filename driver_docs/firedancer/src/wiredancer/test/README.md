@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Replay, monitor, and test tools for AWS-F1 Wiredancer, with build rules.
+Functions and tests for replaying pcap streams, monitoring AWS-F1 performance, and building Wiredancer.
 
 
 ## Files
-- **[fd_replay_loop.c](fd_replay_loop.c.md)**: The `fd_replay_loop.c` file in the `firedancer` codebase implements functions for replaying packets from a pcap file stream, managing flow control, and handling diagnostics and housekeeping tasks within a replay loop.
-- **[fd_replay_loop.h](fd_replay_loop.h.md)**: Replay tile API, diagnostics, scratch sizing, and loop control for pcap-to-frag streaming.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build rules and dependencies for the `fd_wiredancer_test` library and its associated unit test `test_wiredancer_demo` when `FD_HAS_WIREDANCER` is enabled.
-- **[test_wiredancer_demo.c](test_wiredancer_demo.c.md)**: The `test_wiredancer_demo.c` file is a unit test designed to run in AWS-F1 to verify the performance and correctness of the Wiredancer system against x86, involving packet replay, transaction parsing, and signature verification, with options for random transaction corruption and FPGA slot configuration.
-- **[wd_f1_mon.c](wd_f1_mon.c.md)**: The `wd_f1_mon.c` file in the `firedancer` codebase implements a monitoring tool for AWS-F1 FPGA systems, providing functionality to read and display various performance counters and metrics in an ASCII chart format.
-- **[wd_f1_mon.h](wd_f1_mon.h.md)**: Monitor state and TSC calibration helper for wiredancer tests.
+- **[fd_replay_loop.c](fd_replay_loop.c.md)**: Implements functions for replaying pcap file streams with flow control and diagnostic logging.
+- **[fd_replay_loop.h](fd_replay_loop.h.md)**: Header file for replaying data from a pcap file into a tango fragment stream with flow control diagnostics.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the Wiredancer component with specific headers and objects.
+- **[test_wiredancer_demo.c](test_wiredancer_demo.c.md)**: A unit test for the Wiredancer system, designed to run on AWS-F1, comparing Wiredancer's performance against x86 by replaying network packets and verifying transactions.
+- **[wd_f1_mon.c](wd_f1_mon.c.md)**: Monitors and displays performance metrics for AWS-F1 FPGA and x86 systems using ASCII charts.
+- **[wd_f1_mon.h](wd_f1_mon.h.md)**: Defines a monitoring state structure and functions for thread management and TSC calibration.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
