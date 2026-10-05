@@ -3,178 +3,178 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines static constant arrays for Poseidon hash function parameters using BN254 curve, including round constants and MDS matrices.
+The `fd_poseidon_params.c` file in the `firedancer` codebase contains static constant arrays of `fd_bn254_scalar_t` structures, which are used to define round constants and Maximum Distance Separable (MDS) matrices for the Poseidon cryptographic hash function tailored for the BN254 elliptic curve, facilitating secure and efficient hashing operations in cryptographic protocols such as zero-knowledge proofs.
 
 # Purpose
-The code defines a series of static constant arrays that provide essential parameters for the Poseidon cryptographic hash function, specifically tailored for use with the BN254 curve. These arrays are organized by different widths (2 to 13) and rounds, and are named using the convention `fd_poseidon_ark_w` and `fd_poseidon_mds_w`, where `w` indicates the width of the Poseidon permutation. The `fd_poseidon_ark_w` arrays contain round constants, which introduce non-linearity in each round of the Poseidon permutation, while the `fd_poseidon_mds_w` arrays contain Maximum Distance Separable (MDS) matrices, which ensure diffusion by mixing the state in each round. The arrays are composed of structures that hold four 64-bit integers, representing scalars in Montgomery form, and are intended for internal use within a cryptographic library. The code does not define public APIs or external interfaces but serves as a configuration file providing constants necessary for implementing the Poseidon hash function in cryptographic applications.
+The provided C code is a collection of static constant arrays containing hexadecimal values, specifically designed for use in the Poseidon cryptographic hash function, tailored for the BN254 elliptic curve. These arrays, such as `fd_poseidon_ark_w` and `fd_poseidon_mds_w`, where `w` represents the width of the Poseidon permutation, are crucial for defining the round constants and Maximum Distance Separable (MDS) matrices, which are essential components in the Poseidon permutation process. The constants are represented in Montgomery form to optimize modular arithmetic operations, a common requirement in cryptographic computations. This code is not a standalone executable but rather a part of a larger cryptographic library, providing the necessary parameters for implementing the Poseidon hash function, which is particularly useful in zero-knowledge proofs and other cryptographic protocols. The arrays are intended for internal use within the library, facilitating secure and efficient hashing operations without directly exposing public APIs or external interfaces.
 # Global Variables
 
 ---
 ### fd\_poseidon\_ark\_2
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant values of type `fd_bn254_scalar_t`, which is a structure containing four 64-bit unsigned integers. Each element in the array represents a specific scalar value used in cryptographic operations.
-- **Use**: Used as part of cryptographic computations, likely in a Poseidon hash function implementation.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_ark_2` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is likely used as part of the Poseidon cryptographic hash function, specifically as part of the round constants (ARK) used in the permutation process.
+- **Use**: This variable is used to store the round constants for the Poseidon hash function, which are applied during the permutation rounds to ensure cryptographic security.
 
 
 ---
 ### fd\_poseidon\_mds\_2
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: A static constant array of type `fd_bn254_scalar_t` that contains four elements, each of which is a structure with four 64-bit hexadecimal values. These values are likely used in cryptographic computations or transformations.
-- **Use**: Used to store a matrix of constants for cryptographic operations, possibly related to the Poseidon hash function.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_2` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is likely used to store a matrix or set of constants for cryptographic operations, specifically related to the Poseidon hash function, which is a cryptographic hash function designed for zero-knowledge proofs.
+- **Use**: This variable is used to provide constant values for cryptographic computations, likely as part of the Poseidon hash function implementation.
 
 
 ---
 ### fd\_poseidon\_ark\_3
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant values of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar in a cryptographic context. The array contains multiple elements, each initialized with a set of four hexadecimal values.
-- **Use**: Used to store a series of precomputed constants for cryptographic operations, possibly as part of a larger cryptographic algorithm or protocol.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: The `fd_poseidon_ark_3` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar value in a specific finite field, possibly used in cryptographic operations. The array contains multiple elements, each initialized with a set of four hexadecimal values, suggesting that each element is a multi-part scalar value.
+- **Use**: This variable is used to store a series of precomputed scalar values, likely for use in cryptographic algorithms such as the Poseidon hash function.
 
 
 ---
 ### fd\_poseidon\_mds\_3
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as coefficients or parameters in cryptographic or mathematical operations.
-- **Use**: Used to store a predefined set of scalar values for operations involving the Poseidon hash function or similar cryptographic algorithms.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_3` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers represent elements of a matrix used in cryptographic operations, specifically in the Poseidon hash function, which is a cryptographic hash function designed for zero-knowledge proofs and other cryptographic applications.
+- **Use**: This variable is used to store a matrix of constants for the Poseidon hash function, which is utilized in cryptographic computations.
 
 
 ---
 ### fd\_poseidon\_ark\_4
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant values of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar in a specific cryptographic context. Each element in the array is a structure containing four 64-bit unsigned integers, represented in hexadecimal format.
-- **Use**: Used to store a series of precomputed constants for cryptographic operations, possibly related to the Poseidon hash function.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: The `fd_poseidon_ark_4` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar value in a specific finite field, possibly used in cryptographic operations. The array contains multiple elements, each initialized with a set of four 64-bit hexadecimal values, indicating that each element is a complex structure or a multi-part number.
+- **Use**: This variable is used to store a set of constants, likely for use in cryptographic algorithms such as the Poseidon hash function, where these constants might serve as round constants or similar parameters.
 
 
 ---
 ### fd\_poseidon\_mds\_4
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: A static constant array of type `fd_bn254_scalar_t` that contains 16 elements, each of which is a structure with four 64-bit unsigned integers. These integers are represented in hexadecimal format.
-- **Use**: Used to store a matrix of constants for cryptographic operations, likely related to the Poseidon hash function.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: The `fd_poseidon_mds_4` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar in a finite field, specifically designed for cryptographic operations. This array contains multiple elements, each initialized with a set of four 64-bit hexadecimal values, suggesting it is used for matrix operations in cryptographic algorithms, such as the Poseidon hash function.
+- **Use**: This variable is used as a constant matrix in cryptographic computations, likely as part of the Poseidon hash function's matrix multiplication step.
 
 
 ---
 ### fd\_poseidon\_ark\_5
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant values of type `fd_bn254_scalar_t`, which is a structure containing four 64-bit unsigned integers. Each element in the array represents a scalar value used in cryptographic operations.
-- **Use**: Used as a set of constants in cryptographic algorithms, likely for the Poseidon hash function.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: The `fd_poseidon_ark_5` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar value in a specific finite field, used in cryptographic operations. The array contains multiple elements, each initialized with a set of four 64-bit hexadecimal values, indicating that each element is a complex structure or a large integer split into parts.
+- **Use**: This variable is used to store a set of constants, likely for use in cryptographic algorithms such as the Poseidon hash function, which requires specific constants for its operations.
 
 
 ---
 ### fd\_poseidon\_mds\_5
 - **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These constants are likely used in cryptographic operations or mathematical computations involving the Poseidon hash function.
-- **Use**: Used to store a matrix of constants for the Poseidon hash function's MDS (Maximum Distance Separable) matrix.
+- **Description**: The `fd_poseidon_mds_5` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar in a specific finite field, possibly used in cryptographic operations. The array contains multiple elements, each initialized with a set of four 64-bit hexadecimal values, suggesting it is used for mathematical or cryptographic computations.
+- **Use**: This variable is used to store a matrix of constants for cryptographic operations, likely as part of a Poseidon hash function implementation.
 
 
 ---
 ### fd\_poseidon\_ark\_6
 - **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constants, each represented as a `fd_bn254_scalar_t` type, which is a structure containing four 64-bit unsigned integers. These constants are likely used as parameters or constants in cryptographic operations, specifically related to the Poseidon hash function.
-- **Use**: Used to store a series of constants for cryptographic operations, likely as part of the Poseidon hash function implementation.
+- **Description**: `fd_poseidon_ark_6` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is used to store a set of constants, likely for cryptographic operations, specifically related to the Poseidon hash function, which is a cryptographic hash function designed for use in zero-knowledge proofs.
+- **Use**: This variable is used to store the round constants for the Poseidon hash function, which are applied during the hash computation process.
 
 
 ---
 ### fd\_poseidon\_mds\_6
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as elements of a matrix or transformation in cryptographic operations.
-- **Use**: Used to store a matrix of constants for cryptographic computations, possibly in a Poseidon hash function.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_6` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is likely used to store a matrix or set of constants for cryptographic operations, specifically related to the Poseidon hash function, which is a cryptographic hash function designed for use in zero-knowledge proofs.
+- **Use**: This variable is used to provide a set of predefined constants for cryptographic computations, likely as part of the Poseidon hash function implementation.
 
 
 ---
 ### fd\_poseidon\_ark\_7
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers represent scalar values used in cryptographic operations.
-- **Use**: Used as a set of constants for cryptographic computations, likely in a cryptographic algorithm or protocol.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: `fd_poseidon_ark_7` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar value in a specific finite field, possibly used in cryptographic operations. The array contains multiple elements, each initialized with a set of four 64-bit hexadecimal values, indicating that each element is a complex structure or a multi-part number.
+- **Use**: This variable is used to store a series of constants, likely for use in cryptographic algorithms or operations, such as those involving the Poseidon hash function.
 
 
 ---
 ### fd\_poseidon\_mds\_7
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as elements of a matrix or transformation in cryptographic operations.
-- **Use**: Used to store a matrix of constants for cryptographic computations.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: The `fd_poseidon_mds_7` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar value in a specific finite field, possibly related to cryptographic operations. The array contains multiple elements, each initialized with a set of four 64-bit hexadecimal values, suggesting that each element represents a multi-part scalar value.
+- **Use**: This variable is used to store a matrix of scalar values, potentially for use in cryptographic algorithms such as the Poseidon hash function.
 
 
 ---
 ### fd\_poseidon\_ark\_8
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant values of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar in a specific cryptographic context. Each element in the array is a structure containing four 64-bit unsigned integers, which are represented in hexadecimal format.
-- **Use**: Used to store a series of precomputed constants for cryptographic operations, possibly as part of the Poseidon hash function.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: `fd_poseidon_ark_8` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar value in a specific finite field, possibly used in cryptographic operations. The array contains multiple elements, each initialized with a set of four 64-bit hexadecimal values, suggesting that each element is a multi-part scalar value.
+- **Use**: This variable is used to store a series of scalar values, likely as part of a cryptographic algorithm, such as a Poseidon hash function, where these values serve as constants or parameters in the computation.
 
 
 ---
 ### fd\_poseidon\_mds\_8
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as elements of a matrix or transformation in cryptographic operations, specifically related to the Poseidon hash function.
-- **Use**: Used to store a matrix of constants for cryptographic operations in the Poseidon hash function.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_8` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is used to store a matrix of constants for the Poseidon hash function, specifically for the MDS (Maximum Distance Separable) matrix used in the hash function's permutation layer.
+- **Use**: This variable is used as a precomputed MDS matrix in the Poseidon hash function to ensure efficient and secure cryptographic operations.
 
 
 ---
 ### fd\_poseidon\_ark\_9
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as parameters or constants in cryptographic operations, specifically related to the Poseidon hash function.
-- **Use**: Used to store a set of constants for cryptographic computations, possibly as part of the Poseidon hash function implementation.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: `fd_poseidon_ark_9` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is used to store a series of constants that are likely used in cryptographic operations, specifically in the Poseidon hash function, which is a cryptographic hash function designed for use in zero-knowledge proofs and other cryptographic protocols.
+- **Use**: This variable is used to provide a set of constants for the Poseidon hash function, which are applied during the hash computation process.
 
 
 ---
 ### fd\_poseidon\_mds\_9
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as elements of a matrix or transformation in cryptographic operations.
-- **Use**: Used to store a predefined set of scalar values for cryptographic computations.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_9` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is used to store a matrix of constants for the Poseidon hash function, which is a cryptographic hash function designed for use in zero-knowledge proofs and other cryptographic applications.
+- **Use**: This variable is used to provide a matrix of constants for the Poseidon hash function, which is essential for its cryptographic operations.
 
 
 ---
 ### fd\_poseidon\_ark\_10
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers represent scalar values used in cryptographic operations.
-- **Use**: Used as constants in cryptographic algorithms, likely for the Poseidon hash function.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: `fd_poseidon_ark_10` is a static constant array of type `fd_bn254_scalar_t`, which is a custom data type likely representing a scalar value in a specific finite field, possibly used in cryptographic operations. The array contains multiple elements, each initialized with a set of four 64-bit unsigned integers, suggesting that each element represents a large scalar value split into four parts.
+- **Use**: This array is used to store a series of constants, likely for use in cryptographic algorithms such as the Poseidon hash function, where these constants serve as round constants in the algorithm's permutation or mixing steps.
 
 
 ---
 ### fd\_poseidon\_mds\_10
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit hexadecimal values. These values are likely used as part of a matrix or transformation in cryptographic operations.
-- **Use**: Used to store a matrix of constants for cryptographic computations.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_10` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is likely used to store a matrix of constants for cryptographic operations, specifically for the Poseidon hash function, which is a cryptographic hash function designed for use in zero-knowledge proofs.
+- **Use**: This variable is used to provide a matrix of constants for cryptographic operations, likely within the Poseidon hash function implementation.
 
 
 ---
 ### fd\_poseidon\_ark\_11
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant values of type `fd_bn254_scalar_t`, which is a structure containing four 64-bit unsigned integers. Each element in the array represents a scalar value used in cryptographic operations.
-- **Use**: Used as a set of constants in cryptographic computations, likely as part of the Poseidon hash function implementation.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: `fd_poseidon_ark_11` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is used to store a series of constants, likely for cryptographic purposes, such as in a cryptographic permutation or hash function.
+- **Use**: This variable is used to store constants for cryptographic operations, possibly as part of a larger cryptographic algorithm or protocol.
 
 
 ---
 ### fd\_poseidon\_mds\_11
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as coefficients or elements in cryptographic or mathematical computations.
-- **Use**: Used to store a predefined set of scalar values for cryptographic or mathematical operations.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: The `fd_poseidon_mds_11` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is used to store a matrix of constants for the Poseidon hash function, specifically for the MDS (Maximum Distance Separable) matrix in the context of the BN254 elliptic curve.
+- **Use**: This variable is used as a precomputed MDS matrix for the Poseidon hash function, which is a cryptographic hash function used in zero-knowledge proofs and other cryptographic applications.
 
 
 ---
 ### fd\_poseidon\_ark\_12
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant values of type `fd_bn254_scalar_t`, each element is a 4-element array of 64-bit unsigned integers. These values are likely used as constants in cryptographic operations, specifically related to the Poseidon hash function.
-- **Use**: Used as a set of constants in cryptographic computations, possibly for the Poseidon hash function.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: `fd_poseidon_ark_12` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is initialized with a large number of elements, each representing a specific set of cryptographic constants used in the Poseidon hash function.
+- **Use**: This array is used to store the round constants for the Poseidon hash function, which are applied during the cryptographic operations to ensure security and randomness.
 
 
 ---
 ### fd\_poseidon\_mds\_12
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is initialized with a series of hexadecimal values.
-- **Use**: Used to store a matrix of constants for cryptographic operations, likely related to the Poseidon hash function.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_12` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is used to store a matrix of constants for the Poseidon hash function, which is a cryptographic hash function designed for use in zero-knowledge proofs and other cryptographic applications.
+- **Use**: This variable is used as a matrix of constants in the Poseidon hash function implementation.
 
 
 ---
 ### fd\_poseidon\_ark\_13
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constants of type `fd_bn254_scalar_t`, each element is a 4-element array of 64-bit unsigned integers. These constants are likely used in cryptographic operations, specifically in the Poseidon hash function.
-- **Use**: Used as constants in cryptographic computations, possibly as part of the Poseidon hash function's round constants.
+- **Type**: `fd_bn254_scalar_t[]`
+- **Description**: `fd_poseidon_ark_13` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is initialized with a large set of pre-defined values.
+- **Use**: This array is used to store constants for the Poseidon hash function, specifically for the Ark transformation in the 13th round.
 
 
 ---
 ### fd\_poseidon\_mds\_13
-- **Type**: ``fd_bn254_scalar_t[]``
-- **Description**: An array of constant `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. These integers are likely used as elements of a matrix or transformation in cryptographic operations.
-- **Use**: Used to store a matrix of constants for cryptographic computations, possibly in a Poseidon hash function.
+- **Type**: `array of `fd_bn254_scalar_t``
+- **Description**: The `fd_poseidon_mds_13` is a static constant array of `fd_bn254_scalar_t` structures, each containing four 64-bit unsigned integers. This array is likely used to store a matrix of constants for cryptographic operations, specifically related to the Poseidon hash function, which is a cryptographic hash function designed for use in zero-knowledge proofs.
+- **Use**: This variable is used to provide a matrix of constants for cryptographic operations in the Poseidon hash function.
 
 
 

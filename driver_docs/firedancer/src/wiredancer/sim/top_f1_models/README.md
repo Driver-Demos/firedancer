@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Modules for ED25519 signature verification, CPU modeling, and PCIe transaction testing with a Makefile for simulation.
+The `top_f1_models` folder in the `firedancer` codebase contains SystemVerilog modules and a cocotb-based test script for simulating and verifying hardware designs related to Ed25519 signature verification, hash data processing, and includes a Makefile for building the simulation environment.
 
 
 ## Files
-- **[ed25519_sigverify_dsdp_mul.sv](ed25519_sigverify_dsdp_mul.sv.md)**: Implements a module for ED25519 signature verification using DSDP multiplication in SystemVerilog.
-- **[Makefile](Makefile.md)**: Makefile for compiling and simulating Verilog sources with Questa and Cocotb in a specific directory.
-- **[schl_cpu.sv](schl_cpu.sv.md)**: A SystemVerilog module for a CPU model with hash data input and output interfaces.
-- **[test.py](test.py.md)**: A cocotb-based test for simulating and verifying PCIe transactions and ED25519 signature operations.
+- **[ed25519_sigverify_dsdp_mul.sv](ed25519_sigverify_dsdp_mul.sv.md)**: The `ed25519_sigverify_dsdp_mul.sv` file defines a SystemVerilog module for performing multiplication and addition operations as part of the Ed25519 signature verification process in the Firedancer project.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/top_f1_models` directory is used to configure and build a simulation environment for Verilog modules using the Questa simulator, with various source files and compilation arguments specified.
+- **[schl_cpu.sv](schl_cpu.sv.md)**: The `schl_cpu.sv` file defines a SystemVerilog module `shcl_cpu` for handling hash data input and output with specific parameters and signal interfaces.
+- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase is a cocotb-based test script for simulating and verifying the behavior of a hardware design, including components like PCIe transactions, SHA processing, and ED25519 signature verification.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
