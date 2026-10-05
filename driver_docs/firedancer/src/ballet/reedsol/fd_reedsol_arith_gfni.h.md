@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines arithmetic operations for Galois Field using AVX instructions with specific compiler conditions.
+The `fd_reedsol_arith_gfni.h` file in the `firedancer` codebase provides definitions and macros for Galois Field arithmetic operations using AVX instructions, specifically optimized for use with the Reed-Solomon error correction algorithm.
 
 # Purpose
-The code is a C header file that defines arithmetic operations for Galois Field (GF) computations using SIMD (Single Instruction, Multiple Data) instructions, specifically targeting AVX (Advanced Vector Extensions) and GFNI (Galois Field New Instructions) capabilities. It is part of a larger library related to Reed-Solomon error correction, as indicated by the file path and naming conventions. The file includes type definitions, macros, and function-like macros for loading, storing, and performing arithmetic operations such as addition and multiplication in a Galois Field. The use of SIMD instructions allows for efficient parallel processing of data, which is crucial for high-performance computing tasks like error correction.
+This C header file, `fd_reedsol_arith_gfni.h`, is part of a larger library focused on arithmetic operations in Galois Fields, specifically optimized for use with Intel's AVX (Advanced Vector Extensions) and GFNI (Galois Field New Instructions) instruction sets. The file is not intended to be included directly; instead, it should be accessed through `fd_reedsol_private.h`, ensuring that it is used within the correct context of the library. The file defines a set of macros and functions for performing arithmetic operations in a Galois Field, such as addition, multiplication, and logical operations, using SIMD (Single Instruction, Multiple Data) operations to leverage parallel processing capabilities of modern CPUs.
 
-The header file is not intended to be included directly by other source files; instead, it should be included through `fd_reedsol_private.h`, as enforced by the preprocessor directive. The file defines several macros for Galois Field operations, such as `GF_ADD`, `GF_OR`, and `GF_MUL`, which utilize AVX and GFNI instructions to perform operations on wide vectors (`wb_t`). The file also includes conditional compilation to handle differences in compiler versions, particularly addressing a known issue with older versions of GCC related to the `_mm256_gf2p8affine_epi64_epi8` intrinsic. This ensures compatibility and correct functionality across different compiler environments.
+The file provides a narrow but highly specialized functionality, focusing on efficient Galois Field arithmetic, which is crucial for error correction algorithms like Reed-Solomon. It defines macros for loading, storing, and zeroing data, as well as for performing addition and multiplication operations. The multiplication operations are particularly noteworthy, as they include conditional compilation to handle differences in compiler versions, specifically addressing a bug in older versions of GCC. The file also includes an external constant array, `fd_reedsol_arith_consts_gfni_mul`, which is aligned for optimal memory access. This header is designed to be part of a larger system, providing low-level, performance-critical operations that can be used to build more complex error correction algorithms.
 # Imports and Dependencies
 
 ---
@@ -19,9 +19,9 @@ The header file is not intended to be included directly by other source files; i
 
 ---
 ### fd\_reedsol\_arith\_consts\_gfni\_mul
-- **Type**: ``uchar const[]``
-- **Description**: An external constant array of unsigned characters, aligned to 128 bytes. It is used in arithmetic operations related to Galois Field (GF) multiplication with the `gfni` (Galois Field New Instructions) extension.
-- **Use**: Used to load constants for Galois Field multiplication operations in functions like `GF_MUL` and `GF_MUL_VAR`.
+- **Type**: `uchar const[]`
+- **Description**: The `fd_reedsol_arith_consts_gfni_mul` is an external constant array of unsigned characters, aligned to 128 bytes. It is used in the context of Galois Field arithmetic operations, specifically for multiplication using the GFNI (Galois Field New Instructions) set.
+- **Use**: This variable is used to store precomputed constants for efficient Galois Field multiplication operations in the Reed-Solomon error correction algorithm.
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for ZSTD in the Firedancer project.
+The `Local.mk` file in the `firedancer` codebase defines build and test instructions for the ZSTD component, including header and object file additions and unit test execution, conditional on `FD_HAS_ZSTD`.
 
 # Purpose
-The makefile snippet conditionally includes and compiles components related to Zstandard (ZSTD) compression if the `FD_HAS_ZSTD` flag is defined. It adds the header file `fd_zstd.h` and the object files `fd_zstd` and `fd_util` to the build process. Additionally, it sets up and runs a unit test named `test_zstd` to verify the functionality of the ZSTD components.
+This file is a Makefile snippet used for conditional compilation and testing of a software component related to Zstandard (ZSTD) compression. It checks if the `FD_HAS_ZSTD` flag is defined, and if so, it adds the `fd_zstd.h` header, compiles the `fd_zstd` object with `fd_util`, and sets up a unit test named `test_zstd` that is subsequently executed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

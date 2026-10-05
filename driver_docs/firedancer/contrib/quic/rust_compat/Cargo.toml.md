@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for the `firedancer-rust-quic-test` package with dependencies and build settings.
+Rust QUIC test package manifest with bindgen, quiche, quinn, rustls, and tokio dependencies.
 
 # Purpose
-This metadata file is a Cargo manifest for a Rust project named `firedancer-rust-quic-test`. It specifies the package version as `0.1.0` and uses the Rust 2021 edition. The package is not intended for publishing (`publish = false`) and includes a custom build script `build.rs`. The `build-dependencies` section lists `bindgen` version `0.71` as a build dependency. The `dependencies` section includes several libraries: `env_logger`, `libc` version `0.2`, `quiche` version `0.24.5` with the `qlog` feature, `quinn` version `0.11` with `rustls-aws-lc-rs` and `rustls-ring` features, `rustls` version `0.23` with `aws_lc_rs` and `ring` features, `rustls-post-quantum` version `0.2.1`, and `tokio` version `1.42` with `net` and `rt` features.
+Defines the `firedancer-rust-quic-test` Rust package and sets its build and dependency requirements. It uses `build.rs` with `bindgen` at build time, disables publishing, and includes `quiche`, `quinn`, `rustls`, `rustls-post-quantum`, `tokio`, `libc`, and `env_logger` with the listed feature sets.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
