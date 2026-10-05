@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-C implementation and header for cJSON library, Makefile for fd_ballet, and README with licensing details.
+The `json` folder in the `firedancer` codebase contains the implementation and interface files for a C-based JSON parser and generator, along with a makefile for module inclusion and a README for library and licensing information.
 
 
 ## Files
-- **[cJSON.c](cJSON.c.md)**: A C implementation of a JSON parser and printer, including functions for creating, manipulating, and comparing JSON objects and arrays.
-- **[cJSON.h](cJSON.h.md)**: Header file for the cJSON library, defining structures, macros, and functions for JSON parsing and manipulation.
-- **[Local.mk](Local.mk.md)**: Makefile for adding cJSON headers and objects to the fd_ballet target.
-- **[README.txt](README.txt.md)**: A copy of the cJSON library from commit `cb8693b` with licensing details in the root NOTICE file.
+- **[cJSON.c](cJSON.c.md)**: The `cJSON.c` file in the `firedancer` codebase provides a C implementation of a JSON parser and generator, including functions for parsing JSON strings, creating JSON objects, arrays, and values, as well as utilities for manipulating and comparing JSON data.
+- **[cJSON.h](cJSON.h.md)**: The `cJSON.h` file in the `firedancer` codebase provides the interface for a C library that facilitates parsing, printing, and manipulating JSON data structures, with support for custom memory management and platform-specific symbol visibility.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of the `cJSON.h` header and the `cJSON` object file for the `fd_ballet` module.
+- **[README.txt](README.txt.md)**: The `README.txt` file in the `firedancer/src/ballet/json` directory provides information about the inclusion of the cJSON library, specifying its exact commit and directing users to the root NOTICE file for licensing details.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
