@@ -3,425 +3,379 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-AVX2 SIMD vector byte API for 256-bit wide operations on unsigned 8-bit integers, including constructors, arithmetic, bitwise, logical, and conversion operations.
+The `fd_avx_wb.h` file in the `firedancer` codebase provides a set of macros and inline functions for handling 256-bit wide vector operations on unsigned 8-bit integers using AVX instructions, including constructors, memory operations, arithmetic, bitwise, logical, and conversion operations.
 
 # Purpose
-The code defines a set of macros and inline functions for working with 256-bit wide vectors using the AVX (Advanced Vector Extensions) instruction set in C. It focuses on operations involving vectors of unsigned 8-bit integers, also known as `uchar`. The primary data type used is `wb_t`, which is an alias for `__m256i`, a 256-bit integer vector type. The code provides a variety of operations, including vector construction, memory operations, arithmetic, bit manipulation, logical operations, and conversions between different data types. These operations are implemented using AVX intrinsics, which allow for efficient parallel processing of data.
+This C header file provides a set of macros and inline functions for working with 256-bit wide SIMD (Single Instruction, Multiple Data) operations using the AVX (Advanced Vector Extensions) instruction set. The file is designed to handle vectors of unsigned 8-bit integers (uchars) and offers a comprehensive suite of operations for constructing, manipulating, and performing arithmetic and logical operations on these vectors. The primary data type used is `__m256i`, which represents a 256-bit integer vector, and the file defines a type alias `wb_t` for this purpose. The file includes a variety of operations such as vector construction, broadcasting, permutation, arithmetic, bitwise, logical, and conditional operations, as well as memory operations for loading and storing vectors. Additionally, it provides conversion functions to transform vector elements into different data types and reduction operations to compute aggregate values like sum, minimum, and maximum across vector elements.
 
-The code is structured to provide a comprehensive API for handling vectorized data, with functions for loading and storing vectors, performing arithmetic and logical operations, and converting between different data types. It includes predefined constants and utility functions for common operations such as broadcasting values across a vector, shuffling elements, and reducing vectors to single values (e.g., sum, min, max). The use of macros and inline functions aims to optimize performance by minimizing function call overhead and allowing the compiler to generate efficient machine code. The file is intended to be included indirectly through a header file (`fd_avx.h`), as indicated by the initial preprocessor directive, which ensures proper usage and integration within a larger codebase.
+The file is intended to be included indirectly through another header (`fd_avx.h`), as indicated by the preprocessor directive at the beginning. This suggests that it is part of a larger library or framework for SIMD operations. The use of macros and inline functions is emphasized to ensure efficient execution by minimizing function call overhead and allowing the compiler to optimize the code effectively. The file does not define public APIs or external interfaces directly but rather provides low-level building blocks for SIMD operations that can be utilized by higher-level code. The detailed implementation of various operations reflects a focus on performance and flexibility, catering to applications that require high-speed data processing using SIMD parallelism.
 # Functions
 
 ---
 ### wb\_bcast\_pair<!-- {{#callable:wb_bcast_pair}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L32>)
-
-Creates a 256-bit vector with alternating repetitions of two input bytes.
+The `wb_bcast_pair` function creates a 256-bit vector with alternating repetitions of two given unsigned 8-bit integers.
 - **Inputs**:
-    - `b0`: The first unsigned 8-bit integer to broadcast.
-    - `b1`: The second unsigned 8-bit integer to broadcast.
-- **Logic and Control Flow**:
-    - Converts `b0` and `b1` to signed 8-bit integers.
-    - Uses `_mm256_setr_epi8` to create a 256-bit vector with the pattern `[b0, b1, b0, b1, ..., b0, b1]`, repeating 16 times.
-- **Output**: A 256-bit vector (`wb_t`) with the pattern `[b0, b1, b0, b1, ..., b0, b1]`.
+    - `b0`: An unsigned 8-bit integer (uchar) to be repeated in the vector.
+    - `b1`: Another unsigned 8-bit integer (uchar) to be repeated in the vector.
+- **Control Flow**:
+    - The function takes two unsigned 8-bit integers, `b0` and `b1`, as input.
+    - It uses the `_mm256_setr_epi8` intrinsic to create a 256-bit vector.
+    - The vector is filled with alternating values of `b0` and `b1`, repeated 16 times each, resulting in a total of 32 elements.
+- **Output**: A 256-bit vector (`wb_t`) containing 32 elements, with `b0` and `b1` alternating.
 
 
 ---
 ### wb\_bcast\_quad<!-- {{#callable:wb_bcast_quad}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L40>)
-
-Creates a 256-bit vector with a repeated sequence of four unsigned 8-bit integers.
+The `wb_bcast_quad` function creates a 256-bit vector with a repeated sequence of four 8-bit unsigned integers.
 - **Inputs**:
-    - `b0`: The first unsigned 8-bit integer to include in the sequence.
-    - `b1`: The second unsigned 8-bit integer to include in the sequence.
-    - `b2`: The third unsigned 8-bit integer to include in the sequence.
-    - `b3`: The fourth unsigned 8-bit integer to include in the sequence.
-- **Logic and Control Flow**:
-    - Converts each input `uchar` to a `char` type.
-    - Uses `_mm256_setr_epi8` to create a 256-bit vector with the sequence `[b0, b1, b2, b3]` repeated eight times.
-- **Output**: A 256-bit vector (`wb_t`) containing the sequence `[b0, b1, b2, b3]` repeated eight times.
+    - `b0`: An unsigned 8-bit integer to be placed in the vector.
+    - `b1`: An unsigned 8-bit integer to be placed in the vector.
+    - `b2`: An unsigned 8-bit integer to be placed in the vector.
+    - `b3`: An unsigned 8-bit integer to be placed in the vector.
+- **Control Flow**:
+    - The function takes four unsigned 8-bit integers as input parameters.
+    - Each input integer is cast to a signed 8-bit integer (char) and used to populate a 256-bit vector.
+    - The sequence [b0, b1, b2, b3] is repeated eight times to fill the 32 lanes of the vector.
+    - The function returns the constructed 256-bit vector.
+- **Output**: A 256-bit vector (`wb_t`) containing the sequence [b0, b1, b2, b3] repeated eight times.
 
 
 ---
 ### wb\_bcast\_oct<!-- {{#callable:wb_bcast_oct}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L48>)
-
-Creates a 256-bit vector with eight 8-bit unsigned integers repeated four times.
+The `wb_bcast_oct` function creates a 256-bit vector with repeated sequences of eight 8-bit unsigned integers.
 - **Inputs**:
-    - `b0`: The first 8-bit unsigned integer to include in the vector.
-    - `b1`: The second 8-bit unsigned integer to include in the vector.
-    - `b2`: The third 8-bit unsigned integer to include in the vector.
-    - `b3`: The fourth 8-bit unsigned integer to include in the vector.
-    - `b4`: The fifth 8-bit unsigned integer to include in the vector.
-    - `b5`: The sixth 8-bit unsigned integer to include in the vector.
-    - `b6`: The seventh 8-bit unsigned integer to include in the vector.
-    - `b7`: The eighth 8-bit unsigned integer to include in the vector.
-- **Logic and Control Flow**:
-    - Converts each input `uchar` to a `char` type.
-    - Uses `_mm256_setr_epi8` to create a 256-bit vector with the input values repeated four times.
-- **Output**: A 256-bit vector (`wb_t`) containing the input values repeated four times.
+    - `b0`: The first 8-bit unsigned integer to be included in the vector.
+    - `b1`: The second 8-bit unsigned integer to be included in the vector.
+    - `b2`: The third 8-bit unsigned integer to be included in the vector.
+    - `b3`: The fourth 8-bit unsigned integer to be included in the vector.
+    - `b4`: The fifth 8-bit unsigned integer to be included in the vector.
+    - `b5`: The sixth 8-bit unsigned integer to be included in the vector.
+    - `b6`: The seventh 8-bit unsigned integer to be included in the vector.
+    - `b7`: The eighth 8-bit unsigned integer to be included in the vector.
+- **Control Flow**:
+    - The function takes eight 8-bit unsigned integers as input parameters.
+    - Each input integer is cast to a signed 8-bit integer (char) and used to populate a 256-bit vector.
+    - The vector is constructed using the `_mm256_setr_epi8` intrinsic, which sets the vector's elements in a specified order.
+    - The eight input integers are repeated four times to fill the 32 lanes of the 256-bit vector.
+- **Output**: The function returns a 256-bit vector (`wb_t`) containing the repeated sequence of the eight input integers.
 
 
 ---
 ### wb\_bcast\_hex<!-- {{#callable:wb_bcast_hex}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L56>)
-
-Creates a 256-bit vector with two consecutive copies of 16 input `uchar` values.
+The `wb_bcast_hex` function creates a 256-bit vector with two repeated sequences of 16 unsigned 8-bit integers (uchars) using AVX intrinsics.
 - **Inputs**:
-    - `b0`: First unsigned 8-bit integer value.
-    - `b1`: Second unsigned 8-bit integer value.
-    - `b2`: Third unsigned 8-bit integer value.
-    - `b3`: Fourth unsigned 8-bit integer value.
-    - `b4`: Fifth unsigned 8-bit integer value.
-    - `b5`: Sixth unsigned 8-bit integer value.
-    - `b6`: Seventh unsigned 8-bit integer value.
-    - `b7`: Eighth unsigned 8-bit integer value.
-    - `b8`: Ninth unsigned 8-bit integer value.
-    - `b9`: Tenth unsigned 8-bit integer value.
-    - `b10`: Eleventh unsigned 8-bit integer value.
-    - `b11`: Twelfth unsigned 8-bit integer value.
-    - `b12`: Thirteenth unsigned 8-bit integer value.
-    - `b13`: Fourteenth unsigned 8-bit integer value.
-    - `b14`: Fifteenth unsigned 8-bit integer value.
-    - `b15`: Sixteenth unsigned 8-bit integer value.
-- **Logic and Control Flow**:
-    - Converts each input `uchar` to a `char` type.
-    - Uses `_mm256_setr_epi8` to create a 256-bit vector with the first 16 `char` values followed by a repeat of the same 16 `char` values.
-- **Output**: A 256-bit vector of type `wb_t` containing two consecutive copies of the 16 input `uchar` values.
+    - `b0`: The first unsigned 8-bit integer to be included in the vector.
+    - `b1`: The second unsigned 8-bit integer to be included in the vector.
+    - `b2`: The third unsigned 8-bit integer to be included in the vector.
+    - `b3`: The fourth unsigned 8-bit integer to be included in the vector.
+    - `b4`: The fifth unsigned 8-bit integer to be included in the vector.
+    - `b5`: The sixth unsigned 8-bit integer to be included in the vector.
+    - `b6`: The seventh unsigned 8-bit integer to be included in the vector.
+    - `b7`: The eighth unsigned 8-bit integer to be included in the vector.
+    - `b8`: The ninth unsigned 8-bit integer to be included in the vector.
+    - `b9`: The tenth unsigned 8-bit integer to be included in the vector.
+    - `b10`: The eleventh unsigned 8-bit integer to be included in the vector.
+    - `b11`: The twelfth unsigned 8-bit integer to be included in the vector.
+    - `b12`: The thirteenth unsigned 8-bit integer to be included in the vector.
+    - `b13`: The fourteenth unsigned 8-bit integer to be included in the vector.
+    - `b14`: The fifteenth unsigned 8-bit integer to be included in the vector.
+    - `b15`: The sixteenth unsigned 8-bit integer to be included in the vector.
+- **Control Flow**:
+    - The function takes 16 unsigned 8-bit integers as input parameters.
+    - Each input integer is cast to a signed 8-bit integer (char) and passed to the `_mm256_setr_epi8` intrinsic.
+    - The `_mm256_setr_epi8` intrinsic is used to create a 256-bit vector with the first 16 elements set to the input integers in order, followed by the same 16 integers repeated in the same order.
+- **Output**: The function returns a 256-bit vector (`wb_t`) containing two sequences of the 16 input unsigned 8-bit integers.
 
 
 ---
 ### wb\_expand\_pair<!-- {{#callable:wb_expand_pair}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L65>)
-
-Creates a 256-bit vector with the first 16 bytes set to `b0` and the next 16 bytes set to `b1`.
+The `wb_expand_pair` function creates a 256-bit vector with the first half filled with repeated instances of `b0` and the second half with repeated instances of `b1`.
 - **Inputs**:
-    - `b0`: An unsigned 8-bit integer (`uchar`) to fill the first 16 bytes of the vector.
-    - `b1`: An unsigned 8-bit integer (`uchar`) to fill the next 16 bytes of the vector.
-- **Logic and Control Flow**:
-    - Converts `b0` and `b1` to `char` type.
-    - Uses `_mm256_setr_epi8` to create a 256-bit vector.
-    - Fills the first 16 bytes of the vector with `b0`.
-    - Fills the next 16 bytes of the vector with `b1`.
-- **Output**: A 256-bit vector (`wb_t`) with the specified pattern of bytes.
+    - `b0`: An unsigned 8-bit integer (uchar) to be repeated in the first half of the vector.
+    - `b1`: An unsigned 8-bit integer (uchar) to be repeated in the second half of the vector.
+- **Control Flow**:
+    - The function takes two uchar inputs, `b0` and `b1`.
+    - It uses the `_mm256_setr_epi8` intrinsic to create a 256-bit vector.
+    - The first 16 bytes of the vector are filled with the value of `b0`, repeated 16 times.
+    - The next 16 bytes of the vector are filled with the value of `b1`, repeated 16 times.
+- **Output**: A 256-bit vector (`wb_t`) where the first 16 bytes are filled with `b0` and the next 16 bytes are filled with `b1`.
 
 
 ---
 ### wb\_expand\_quad<!-- {{#callable:wb_expand_quad}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L73>)
-
-Expands four `uchar` values into a 256-bit vector with each value repeated eight times consecutively.
+The `wb_expand_quad` function creates a 256-bit vector with each of the four input bytes repeated eight times consecutively.
 - **Inputs**:
-    - `b0`: The first `uchar` value to expand.
-    - `b1`: The second `uchar` value to expand.
-    - `b2`: The third `uchar` value to expand.
-    - `b3`: The fourth `uchar` value to expand.
-- **Logic and Control Flow**:
-    - Converts each input `uchar` value (`b0`, `b1`, `b2`, `b3`) to a `char` type.
-    - Uses the `_mm256_setr_epi8` intrinsic to create a 256-bit vector.
-    - Places each `char` value eight times consecutively in the vector in the order of `b0`, `b1`, `b2`, and `b3`.
-- **Output**: A 256-bit vector (`wb_t`) with the pattern `[ b0 b0 ... b0 b1 b1 ... b1 b2 b2 ... b2 b3 b3 ... b3 ]`.
+    - `b0`: An unsigned 8-bit integer (uchar) to be repeated in the first 8 positions of the vector.
+    - `b1`: An unsigned 8-bit integer (uchar) to be repeated in the next 8 positions of the vector.
+    - `b2`: An unsigned 8-bit integer (uchar) to be repeated in the following 8 positions of the vector.
+    - `b3`: An unsigned 8-bit integer (uchar) to be repeated in the last 8 positions of the vector.
+- **Control Flow**:
+    - The function takes four unsigned 8-bit integers as input parameters.
+    - Each input byte is cast to a signed 8-bit integer (char) and repeated eight times in the resulting vector.
+    - The function uses the `_mm256_setr_epi8` intrinsic to set the 32 bytes of the 256-bit vector, arranging them in the specified order.
+- **Output**: A 256-bit vector (`wb_t`) where each of the input bytes is repeated eight times consecutively.
 
 
 ---
 ### wb\_expand\_oct<!-- {{#callable:wb_expand_oct}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L81>)
-
-Expands each input byte into four consecutive bytes in a 256-bit vector.
+The `wb_expand_oct` function takes eight unsigned 8-bit integers and returns a 256-bit vector where each input integer is repeated four times consecutively.
 - **Inputs**:
-    - `b0`: The first unsigned 8-bit integer to expand.
-    - `b1`: The second unsigned 8-bit integer to expand.
-    - `b2`: The third unsigned 8-bit integer to expand.
-    - `b3`: The fourth unsigned 8-bit integer to expand.
-    - `b4`: The fifth unsigned 8-bit integer to expand.
-    - `b5`: The sixth unsigned 8-bit integer to expand.
-    - `b6`: The seventh unsigned 8-bit integer to expand.
-    - `b7`: The eighth unsigned 8-bit integer to expand.
-- **Logic and Control Flow**:
-    - Converts each input byte to a signed 8-bit integer using a cast to `char`.
-    - Uses `_mm256_setr_epi8` to create a 256-bit vector with each input byte repeated four times consecutively.
-- **Output**: A 256-bit vector (`wb_t`) containing the expanded bytes.
+    - `b0`: An unsigned 8-bit integer to be repeated four times in the output vector.
+    - `b1`: An unsigned 8-bit integer to be repeated four times in the output vector.
+    - `b2`: An unsigned 8-bit integer to be repeated four times in the output vector.
+    - `b3`: An unsigned 8-bit integer to be repeated four times in the output vector.
+    - `b4`: An unsigned 8-bit integer to be repeated four times in the output vector.
+    - `b5`: An unsigned 8-bit integer to be repeated four times in the output vector.
+    - `b6`: An unsigned 8-bit integer to be repeated four times in the output vector.
+    - `b7`: An unsigned 8-bit integer to be repeated four times in the output vector.
+- **Control Flow**:
+    - The function is defined as a static inline function, which suggests it is intended for use within the same translation unit and optimized for performance.
+    - It uses the `_mm256_setr_epi8` intrinsic to construct a 256-bit vector (`__m256i`) from the input bytes.
+    - Each input byte (`b0` to `b7`) is cast to a `char` and repeated four times in sequence to fill the 32-byte vector.
+- **Output**: A 256-bit vector (`wb_t`, which is a typedef for `__m256i`) where each of the eight input bytes is repeated four times consecutively.
 
 
 ---
 ### wb\_expand\_hex<!-- {{#callable:wb_expand_hex}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L89>)
-
-Expands each input byte into two consecutive bytes in a 256-bit vector.
+The `wb_expand_hex` function duplicates each of the 16 input unsigned 8-bit integers (uchars) and returns them as a 256-bit vector using AVX2 intrinsics.
 - **Inputs**:
-    - `b0`: First input byte to expand.
-    - `b1`: Second input byte to expand.
-    - `b2`: Third input byte to expand.
-    - `b3`: Fourth input byte to expand.
-    - `b4`: Fifth input byte to expand.
-    - `b5`: Sixth input byte to expand.
-    - `b6`: Seventh input byte to expand.
-    - `b7`: Eighth input byte to expand.
-    - `b8`: Ninth input byte to expand.
-    - `b9`: Tenth input byte to expand.
-    - `b10`: Eleventh input byte to expand.
-    - `b11`: Twelfth input byte to expand.
-    - `b12`: Thirteenth input byte to expand.
-    - `b13`: Fourteenth input byte to expand.
-    - `b14`: Fifteenth input byte to expand.
-    - `b15`: Sixteenth input byte to expand.
-- **Logic and Control Flow**:
-    - Converts each input byte to a signed 8-bit integer using a cast to `char`.
-    - Duplicates each converted byte to form two consecutive bytes.
-    - Uses `_mm256_setr_epi8` to create a 256-bit vector with the expanded bytes.
-- **Output**: A 256-bit vector (`wb_t`) containing the expanded bytes.
+    - `b0`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b1`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b2`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b3`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b4`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b5`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b6`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b7`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b8`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b9`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b10`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b11`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b12`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b13`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b14`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+    - `b15`: An unsigned 8-bit integer (uchar) to be duplicated in the vector.
+- **Control Flow**:
+    - The function takes 16 unsigned 8-bit integers as input parameters.
+    - Each input integer is cast to a signed 8-bit integer (char) and duplicated.
+    - The duplicated values are arranged in a 256-bit vector using the `_mm256_setr_epi8` intrinsic, which sets the vector with the specified bytes in the given order.
+    - The function returns the constructed 256-bit vector.
+- **Output**: A 256-bit vector (`wb_t`) where each of the 16 input uchars is duplicated, resulting in a vector of 32 bytes.
 
 
 ---
 ### wb\_exch\_adj\_hex<!-- {{#callable:wb_exch_adj_hex}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L117>)
-
-Reorders the 32-byte vector by swapping the first and second 16-byte halves.
+The `wb_exch_adj_hex` function swaps the two 128-bit lanes of a 256-bit vector of unsigned 8-bit integers.
 - **Inputs**:
-    - `x`: A 32-byte vector of type `wb_t`.
-- **Logic and Control Flow**:
-    - Uses the `_mm256_permute2f128_si256` intrinsic to swap the two 16-byte halves of the input vector `x`.
-- **Output**: A 32-byte vector with the first and second 16-byte halves exchanged.
+    - `x`: A 256-bit vector of unsigned 8-bit integers (type `wb_t`).
+- **Control Flow**:
+    - The function takes a 256-bit vector `x` as input.
+    - It uses the `_mm256_permute2f128_si256` intrinsic to swap the two 128-bit lanes of the vector.
+    - The intrinsic is called with the same vector `x` for both source operands and a control value of `1`, which specifies the lane swap operation.
+- **Output**: A 256-bit vector with its two 128-bit lanes swapped.
 
 
 ---
 ### wb\_ld<!-- {{#callable:wb_ld}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L146>)
-
-Loads 32 unsigned 8-bit integers from a 32-byte aligned memory location into a vector.
+The `wb_ld` function loads a 256-bit vector of 32 unsigned 8-bit integers from a 32-byte aligned memory location.
 - **Inputs**:
-    - `p`: A pointer to a 32-byte aligned memory location containing 32 unsigned 8-bit integers.
-- **Logic and Control Flow**:
-    - Casts the input pointer `p` to a pointer of type `__m256i const *`.
-    - Uses the `_mm256_load_si256` intrinsic to load the data from the memory location pointed to by `p` into a `__m256i` vector.
-- **Output**: A `wb_t` type, which is a `__m256i` vector containing the loaded 32 unsigned 8-bit integers.
+    - `p`: A pointer to a 32-byte aligned memory location containing 32 unsigned 8-bit integers (uchar).
+- **Control Flow**:
+    - The function takes a pointer `p` as input, which is expected to be aligned to a 32-byte boundary.
+    - It casts the pointer `p` to a pointer of type `__m256i const *`, which is suitable for AVX operations.
+    - The function then uses the `_mm256_load_si256` intrinsic to load the 256-bit data from the memory location pointed to by `p` into a `__m256i` vector register.
+    - The loaded vector is returned as the result of the function.
+- **Output**: A `wb_t` type, which is a 256-bit vector containing 32 unsigned 8-bit integers loaded from the specified memory location.
 
 
 ---
 ### wb\_st<!-- {{#callable:wb_st}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L147>)
-
-Stores a 256-bit vector of unsigned 8-bit integers into a 32-byte aligned memory location.
+The `wb_st` function stores a 256-bit vector of unsigned 8-bit integers into a specified memory location.
 - **Inputs**:
-    - `p`: A pointer to a 32-byte aligned memory location where the vector will be stored.
-    - `i`: A 256-bit vector of type `wb_t` containing unsigned 8-bit integers to store.
-- **Logic and Control Flow**:
-    - Uses the `_mm256_store_si256` intrinsic to store the vector `i` into the memory location pointed to by `p`.
-- **Output**: No return value; the function performs a memory store operation.
+    - `p`: A pointer to a memory location where the 256-bit vector will be stored; it should be 32-byte aligned.
+    - `i`: A 256-bit vector of type `wb_t` (which is an alias for `__m256i`) containing 32 unsigned 8-bit integers to be stored.
+- **Control Flow**:
+    - The function uses the `_mm256_store_si256` intrinsic to store the 256-bit vector `i` into the memory location pointed to by `p`.
+- **Output**: The function does not return any value; it performs a side effect by writing data to the memory location pointed to by `p`.
 
 
 ---
 ### wb\_ldu<!-- {{#callable:wb_ldu}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L149>)
-
-Loads a 256-bit vector from a memory location that does not need to be aligned.
+The `wb_ldu` function loads a 256-bit vector of unsigned 8-bit integers from an unaligned memory address.
 - **Inputs**:
-    - `p`: A pointer to a memory location from which to load the 256-bit vector.
-- **Logic and Control Flow**:
-    - Casts the input pointer `p` to a pointer of type `__m256i const *`.
-    - Uses the `_mm256_loadu_si256` intrinsic to load a 256-bit vector from the memory location pointed to by the casted pointer.
-- **Output**: Returns a `wb_t` type, which is a 256-bit vector loaded from the specified memory location.
+    - `p`: A pointer to a memory location from which the 256-bit vector will be loaded; the memory does not need to be aligned.
+- **Control Flow**:
+    - The function casts the input pointer `p` to a pointer of type `__m256i const *` to ensure it is treated as a 256-bit integer vector.
+    - It then calls the intrinsic function `_mm256_loadu_si256` to load the 256-bit vector from the memory location pointed to by `p`.
+- **Output**: The function returns a `wb_t` type, which is a 256-bit vector containing 32 unsigned 8-bit integers loaded from the specified memory location.
 
 
 ---
 ### wb\_stu<!-- {{#callable:wb_stu}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L150>)
-
-Stores a 256-bit vector of unsigned 8-bit integers to a memory location without alignment requirements.
+The `wb_stu` function stores a 256-bit vector of unsigned 8-bit integers to a memory location that does not need to be aligned.
 - **Inputs**:
-    - `p`: A pointer to the memory location where the 256-bit vector will be stored. The location does not need to be aligned.
-    - `i`: A 256-bit vector of unsigned 8-bit integers (`wb_t`) to store at the memory location pointed to by `p`.
-- **Logic and Control Flow**:
-    - Uses the `_mm256_storeu_si256` intrinsic to store the vector `i` at the memory location `p`.
-- **Output**: No return value; the function performs a memory store operation.
+    - `p`: A pointer to the memory location where the 256-bit vector will be stored; the location does not need to be aligned.
+    - `i`: A 256-bit vector of unsigned 8-bit integers (type `wb_t`) to be stored at the memory location pointed to by `p`.
+- **Control Flow**:
+    - The function uses the `_mm256_storeu_si256` intrinsic to store the 256-bit vector `i` at the memory location pointed to by `p`.
+- **Output**: The function does not return any value; it performs a side effect by storing data at the specified memory location.
 
 
 ---
 ### wb\_extract\_variable<!-- {{#callable:wb_extract_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L169>)
-
-Extracts a specific byte from a 256-bit vector of unsigned 8-bit integers.
+The `wb_extract_variable` function extracts a specific unsigned 8-bit integer from a 256-bit vector at a given index.
 - **Inputs**:
-    - ``a``: A 256-bit vector (`wb_t`) containing 32 unsigned 8-bit integers.
-    - ``n``: An integer index specifying which byte to extract from the vector, ranging from 0 to 31.
-- **Logic and Control Flow**:
-    - Declare a union `t` that can store a 256-bit vector or an array of 32 unsigned 8-bit integers.
-    - Store the 256-bit vector `a` into the union `t` using `_mm256_store_si256`.
-    - Return the `n`-th byte from the array `t->i`.
-- **Output**: Returns the `n`-th byte from the 256-bit vector as an unsigned 8-bit integer (`uchar`).
+    - `a`: A 256-bit vector (`wb_t`) containing 32 unsigned 8-bit integers.
+    - `n`: An integer representing the index (0 to 31) of the byte to extract from the vector.
+- **Control Flow**:
+    - A union is defined to allow type punning between a 256-bit vector and an array of 32 unsigned 8-bit integers.
+    - The 256-bit vector `a` is stored into the union's vector member using `_mm256_store_si256`.
+    - The byte at index `n` is accessed from the union's array member and returned.
+- **Output**: The function returns the unsigned 8-bit integer located at the specified index `n` in the vector `a`.
 
 
 ---
 ### wb\_insert\_variable<!-- {{#callable:wb_insert_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L176>)
-
-Inserts a given unsigned 8-bit integer into a specified position of a 256-bit vector and returns the modified vector.
+The `wb_insert_variable` function replaces a specific byte in a 256-bit vector with a new value at a given index.
 - **Inputs**:
-    - `a`: A 256-bit vector of type `wb_t` where each lane holds an unsigned 8-bit integer.
-    - `n`: An integer representing the position (0 to 31) in the vector where the new value will be inserted.
-    - `v`: An unsigned 8-bit integer (`uchar`) to insert into the vector at position `n`.
-- **Logic and Control Flow**:
-    - Store the 256-bit vector `a` into a temporary union `t` that allows access to individual bytes.
-    - Replace the byte at position `n` in the array `t->i` with the value `v`.
-    - Load the modified 256-bit vector from the union `t` and return it.
-- **Output**: A 256-bit vector of type `wb_t` with the value `v` inserted at position `n`.
+    - `a`: A 256-bit vector (`wb_t`) containing 32 unsigned 8-bit integers.
+    - `n`: An integer representing the index (0 to 31) of the byte to be replaced in the vector.
+    - `v`: An unsigned 8-bit integer (`uchar`) that will replace the byte at index `n` in the vector.
+- **Control Flow**:
+    - A union is defined to allow type punning between a 256-bit vector and an array of 32 bytes.
+    - The input vector `a` is stored into the union's 256-bit vector field using `_mm256_store_si256`.
+    - The byte at index `n` in the union's byte array is replaced with the new value `v`.
+    - The modified 256-bit vector is loaded back from the union's vector field using `_mm256_load_si256`.
+- **Output**: The function returns a new 256-bit vector (`wb_t`) with the byte at index `n` replaced by `v`.
 
 
 ---
 ### wb\_rol<!-- {{#callable:wb_rol}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L228>)
-
-Performs a left bitwise rotation on each 8-bit lane of a 256-bit vector by a specified number of bits.
+The `wb_rol` function performs a bitwise left rotation on each 8-bit lane of a 256-bit vector by a specified number of bits.
 - **Inputs**:
-    - ``a``: A 256-bit vector of type `wb_t` where each lane is an 8-bit unsigned integer.
-    - ``imm``: An integer specifying the number of bits to rotate left, masked to the range 0-7.
-- **Logic and Control Flow**:
-    - Masks the `imm` value with 7 to ensure it is within the range 0-7.
-    - Performs a left shift on the vector `a` by the masked `imm` value using `wb_shl`.
-    - Performs a right shift on the vector `a` by the negated and masked `imm` value using `wb_shr`.
-    - Combines the results of the left and right shifts using a bitwise OR operation with `wb_or`.
-- **Output**: Returns a 256-bit vector of type `wb_t` with each 8-bit lane rotated left by the specified number of bits.
+    - `a`: A 256-bit vector (`wb_t`) where each 8-bit lane holds an unsigned 8-bit integer.
+    - `imm`: An integer specifying the number of bits to rotate left, which is masked to the range 0-7.
+- **Control Flow**:
+    - The function masks the `imm` value with 7 to ensure it is within the range 0-7.
+    - It performs a left shift on the vector `a` by the masked `imm` value using `wb_shl`.
+    - It performs a right shift on the vector `a` by the negated and masked `imm` value using `wb_shr`.
+    - The results of the left and right shifts are combined using a bitwise OR operation with `wb_or`.
+- **Output**: A 256-bit vector (`wb_t`) with each 8-bit lane rotated left by the specified number of bits.
 
 
 ---
 ### wb\_ror<!-- {{#callable:wb_ror}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L229>)
-
-Performs a bitwise right rotation on a vector of unsigned 8-bit integers by a specified number of bits.
+The `wb_ror` function performs a bitwise right rotation on each 8-bit lane of a 256-bit vector by a specified number of bits.
 - **Inputs**:
-    - ``a``: A vector of unsigned 8-bit integers (`wb_t`) to rotate.
-    - ``imm``: An integer specifying the number of bits to rotate right; only the lower 3 bits are used (range 0-7).
-- **Logic and Control Flow**:
-    - Compute the right shift of `a` by `imm & 7` bits using `wb_shr`.
-    - Compute the left shift of `a` by `(-imm) & 7` bits using `wb_shl`.
-    - Combine the results of the right and left shifts using `wb_or` to perform the rotation.
-- **Output**: Returns a vector of unsigned 8-bit integers (`wb_t`) that is the result of the right rotation.
+    - `a`: A 256-bit vector (`wb_t`) where each 8-bit lane holds an unsigned 8-bit integer.
+    - `imm`: An integer specifying the number of bits to rotate right, which is masked to the range 0-7.
+- **Control Flow**:
+    - The function masks the `imm` value with 7 to ensure it is within the range 0-7.
+    - It performs a right logical shift on the vector `a` by the masked `imm` value using `wb_shr`.
+    - It performs a left logical shift on the vector `a` by the negated and masked `imm` value using `wb_shl`.
+    - The results of the two shifts are combined using a bitwise OR operation with `wb_or` to achieve the rotation effect.
+- **Output**: A 256-bit vector (`wb_t`) with each 8-bit lane rotated right by the specified number of bits.
 
 
 ---
 ### wb\_rol\_variable<!-- {{#callable:wb_rol_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L231>)
-
-Performs a variable bitwise left rotation on a vector of unsigned 8-bit integers.
+The `wb_rol_variable` function performs a variable bitwise left rotation on a vector of 8-bit unsigned integers.
 - **Inputs**:
-    - ``a``: A vector of unsigned 8-bit integers (`wb_t`) to rotate.
-    - ``n``: An integer specifying the number of bits to rotate `a` to the left.
-- **Logic and Control Flow**:
-    - Compute `n & 7` to ensure the rotation is within the range of 0 to 7 bits.
-    - Call `wb_shl_variable` to perform a left shift on `a` by `n & 7` bits.
-    - Compute `(-n) & 7` to determine the equivalent right shift for the rotation.
-    - Call `wb_shr_variable` to perform a right shift on `a` by `(-n) & 7` bits.
-    - Combine the results of the left and right shifts using `wb_or` to complete the rotation.
-- **Output**: Returns a vector of unsigned 8-bit integers (`wb_t`) that is the result of the left rotation of `a` by `n` bits.
+    - `a`: A vector of 8-bit unsigned integers (type `wb_t`) to be rotated.
+    - `n`: An integer specifying the number of positions to rotate the vector `a` to the left.
+- **Control Flow**:
+    - The function calculates `n & 7` to ensure the rotation amount is within the range of 0 to 7 bits.
+    - It calls `wb_shl_variable` to perform a left shift on `a` by `n & 7` bits.
+    - It calls `wb_shr_variable` to perform a right shift on `a` by `(-n) & 7` bits.
+    - The results of the left and right shifts are combined using `wb_or` to produce the final rotated vector.
+- **Output**: The function returns a vector of 8-bit unsigned integers (type `wb_t`) that is the result of rotating the input vector `a` to the left by `n` positions.
 
 
 ---
 ### wb\_ror\_variable<!-- {{#callable:wb_ror_variable}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L232>)
-
-Performs a variable bitwise right rotation on a vector of unsigned 8-bit integers.
+The `wb_ror_variable` function performs a variable bitwise right rotation on a vector of 8-bit unsigned integers.
 - **Inputs**:
-    - ``a``: A vector of type `wb_t` containing unsigned 8-bit integers to rotate.
-    - ``n``: An integer specifying the number of bits to rotate right, masked to the range 0-7.
-- **Logic and Control Flow**:
-    - Masks the input `n` to ensure it is within the range 0-7 by using `n & 7`.
-    - Performs a right shift on `a` by `n` bits using `wb_shr_variable(a, n&7)`.
-    - Performs a left shift on `a` by `(-n) & 7` bits using `wb_shl_variable(a, (-n)&7)`.
-    - Combines the results of the right and left shifts using a bitwise OR operation with `wb_or`.
-- **Output**: Returns a vector of type `wb_t` with the elements of `a` rotated right by `n` bits.
+    - `a`: A vector of 8-bit unsigned integers (type `wb_t`) to be rotated.
+    - `n`: An integer specifying the number of positions to rotate the vector `a` to the right.
+- **Control Flow**:
+    - The function calculates `n & 7` to ensure the rotation amount is within the range of 0 to 7 bits.
+    - It calls `wb_shr_variable` to perform a right shift on `a` by `n & 7` bits.
+    - It calls `wb_shl_variable` to perform a left shift on `a` by `(-n) & 7` bits.
+    - The results of the two shifts are combined using `wb_or` to complete the rotation.
+- **Output**: The function returns a vector of 8-bit unsigned integers (type `wb_t`) that is the result of the right rotation of the input vector `a` by `n` positions.
 
 
 ---
 ### wb\_expand\_internal\_8<!-- {{#callable:wb_expand_internal_8}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L301>)
-
-Converts a specified 128-bit segment of a 256-bit vector of unsigned 8-bit integers to a 256-bit vector of signed 32-bit integers based on an immediate value.
+The `wb_expand_internal_8` function extracts and zero-extends a group of 8 unsigned 8-bit integers from a 256-bit vector based on a specified index.
 - **Inputs**:
-    - ``a``: A 256-bit vector (`wb_t`) containing 32 unsigned 8-bit integers.
-    - ``imm``: An integer immediate value that determines which 128-bit segment of the vector `a` to process.
-- **Logic and Control Flow**:
-    - Check the value of `imm` to determine which case to execute.
-    - If `imm` is 0, extract the lower 128 bits of `a` and convert them to signed 32-bit integers.
-    - If `imm` is 1, extract the lower 128 bits of `a`, shift right by 8 bytes, and convert to signed 32-bit integers.
-    - If `imm` is 2, extract the upper 128 bits of `a` and convert them to signed 32-bit integers.
-    - If `imm` is 3, extract the upper 128 bits of `a`, shift right by 8 bytes, and convert to signed 32-bit integers.
-    - Return a zeroed 256-bit vector if none of the cases match (unreachable in this context).
-- **Output**: A 256-bit vector of signed 32-bit integers, with the selected 128-bit segment of `a` zero-extended and converted.
+    - `a`: A 256-bit vector (`wb_t`) containing 32 unsigned 8-bit integers.
+    - `imm`: An integer index (0 to 3) specifying which group of 8 integers to extract and expand.
+- **Control Flow**:
+    - The function uses a switch statement to determine the action based on the value of `imm`.
+    - If `imm` is 0, it extracts the lower 128 bits of `a` and converts the first 8 bytes to 32-bit integers.
+    - If `imm` is 1, it extracts the lower 128 bits of `a`, shifts it right by 8 bytes, and converts the next 8 bytes to 32-bit integers.
+    - If `imm` is 2, it extracts the upper 128 bits of `a` and converts the first 8 bytes to 32-bit integers.
+    - If `imm` is 3, it extracts the upper 128 bits of `a`, shifts it right by 8 bytes, and converts the next 8 bytes to 32-bit integers.
+    - The function returns a zeroed 256-bit vector if none of the cases match, although this is unreachable.
+- **Output**: A 256-bit vector (`__m256i`) containing 8 zero-extended 32-bit integers.
 
 
 ---
 ### wb\_expand\_internal\_4<!-- {{#callable:wb_expand_internal_4}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L312>)
-
-Converts a specific 128-bit segment of a 256-bit vector of unsigned 8-bit integers to a 128-bit vector of signed 32-bit integers based on an immediate value.
+The `wb_expand_internal_4` function extracts a 128-bit segment from a 256-bit vector and zero-extends it to a 128-bit integer vector based on the specified immediate value.
 - **Inputs**:
-    - ``a``: A 256-bit vector (`wb_t`) containing unsigned 8-bit integers.
-    - ``imm``: An integer that specifies which 128-bit segment of the vector `a` to process.
-- **Logic and Control Flow**:
-    - Check the value of `imm` to determine which case to execute.
-    - If `imm` is 0, extract the lower 128 bits of `a` and convert the first 4 bytes to signed 32-bit integers.
-    - If `imm` is 1, extract the lower 128 bits of `a`, shift right by 4 bytes, and convert the next 4 bytes to signed 32-bit integers.
-    - If `imm` is 2, extract the lower 128 bits of `a`, shift right by 8 bytes, and convert the next 4 bytes to signed 32-bit integers.
-    - If `imm` is 3, extract the lower 128 bits of `a`, shift right by 12 bytes, and convert the next 4 bytes to signed 32-bit integers.
-    - If `imm` is 4, extract the upper 128 bits of `a` and convert the first 4 bytes to signed 32-bit integers.
-    - If `imm` is 5, extract the upper 128 bits of `a`, shift right by 4 bytes, and convert the next 4 bytes to signed 32-bit integers.
-    - If `imm` is 6, extract the upper 128 bits of `a`, shift right by 8 bytes, and convert the next 4 bytes to signed 32-bit integers.
-    - If `imm` is 7, extract the upper 128 bits of `a`, shift right by 12 bytes, and convert the next 4 bytes to signed 32-bit integers.
-    - Return a zeroed 128-bit vector if none of the cases match (unreachable in this context).
-- **Output**: A 128-bit vector (`__m128i`) containing signed 32-bit integers converted from the specified segment of the input vector.
+    - `a`: A 256-bit vector of type `wb_t` (which is an alias for `__m256i`) containing 32 unsigned 8-bit integers.
+    - `imm`: An integer immediate value that determines which 128-bit segment of the vector `a` to extract and process.
+- **Control Flow**:
+    - The function uses a switch statement to handle different cases based on the value of `imm` ranging from 0 to 7.
+    - For each case, it extracts a 128-bit segment from the 256-bit vector `a` using `_mm256_extractf128_si256` and optionally shifts it using `_mm_bsrli_si128` to align the desired 4-byte group.
+    - The extracted segment is then zero-extended to a 128-bit integer vector using `_mm_cvtepu8_epi32`.
+    - If `imm` is not in the range 0 to 7, the function returns a zero-initialized 128-bit vector using `_mm_setzero_si128`, although this is marked as unreachable.
+- **Output**: A 128-bit integer vector (`__m128i`) that contains zero-extended 32-bit integers derived from a 4-byte group within the specified segment of the input vector `a`.
 
 
 ---
 ### wb\_sum\_all<!-- {{#callable:wb_sum_all}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L345>)
-
-Calculates the sum of all elements in a 256-bit vector of unsigned 8-bit integers and returns a vector with the sum broadcasted across all lanes.
+The `wb_sum_all` function computes the sum of all 8-bit unsigned integers in a 256-bit vector and returns a vector where each byte is the broadcasted sum.
 - **Inputs**:
     - `x`: A 256-bit vector (`wb_t`) containing 32 unsigned 8-bit integers.
-- **Logic and Control Flow**:
-    - Use `_mm256_sad_epu8` to compute the sum of each 8-byte segment in `x`, resulting in four 64-bit sums.
-    - Use `_mm256_add_epi64` to add the sums from the two 128-bit halves of the vector, resulting in two 64-bit sums.
-    - Use `_mm256_shuffle_epi8` and `wb_bcast` to broadcast the low byte of each 64-bit sum across the vector lanes.
-    - Add the two broadcasted vectors using `_mm256_add_epi8` to obtain the final result.
-- **Output**: A 256-bit vector (`wb_t`) where each lane contains the sum of all elements in the input vector `x`.
+- **Control Flow**:
+    - The function starts by using `_mm256_sad_epu8` to compute the sum of absolute differences between the input vector `x` and a zero vector, resulting in four 64-bit integers each representing the sum of 8 bytes from `x`.
+    - It then uses `_mm256_permute2f128_si256` to shuffle the 128-bit lanes of the vector, effectively summing the first and third 64-bit integers with the second and fourth, respectively.
+    - Finally, it uses `_mm256_shuffle_epi8` and `_mm256_add_epi8` to broadcast the low byte of each 64-bit sum across the vector and sum them, resulting in a vector where each byte is the total sum of the original vector's bytes.
+- **Output**: A 256-bit vector (`wb_t`) where each byte contains the sum of all bytes in the input vector `x`.
 
 
 ---
 ### wb\_min\_all<!-- {{#callable:wb_min_all}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L352>)
-
-Finds the minimum value across all lanes of a 256-bit vector of unsigned 8-bit integers and broadcasts it to all lanes.
+The `wb_min_all` function computes the minimum value across all lanes of a 256-bit vector of unsigned 8-bit integers and broadcasts this minimum value across all lanes of the vector.
 - **Inputs**:
-    - ``x``: A 256-bit vector (`wb_t`) where each lane contains an unsigned 8-bit integer.
-- **Logic and Control Flow**:
-    - Use `_mm256_min_epu8` to find the minimum between the original vector `x` and a permuted version of `x` where the high and low 128-bit lanes are swapped.
-    - Use `_mm256_min_epu8` to find the minimum between the current vector and a shuffled version of `x` that rearranges the bytes to compare adjacent groups of 8 bytes.
-    - Use `_mm256_min_epu8` to find the minimum between the current vector and a shuffled version of `x` that rearranges the bytes to compare adjacent groups of 4 bytes.
-    - Use `_mm256_min_epu8` to find the minimum between the current vector and a shuffled version of `x` that rearranges the bytes to compare adjacent groups of 2 bytes.
-    - Use `_mm256_min_epu8` to find the minimum between the current vector and a shuffled version of `x` that rearranges the bytes to compare adjacent pairs of bytes.
-    - Return the vector `x` where all lanes contain the minimum value found.
-- **Output**: A 256-bit vector (`wb_t`) where each lane contains the minimum value found in the input vector `x`.
-- **Functions Called**:
-    - [`wb_bcast_quad`](<#wb_bcast_quad>)
-    - [`wb_bcast_pair`](<#wb_bcast_pair>)
+    - `x`: A 256-bit vector (`wb_t`) where each lane contains an unsigned 8-bit integer.
+- **Control Flow**:
+    - The function first computes the minimum of the two 128-bit halves of the input vector using `_mm256_min_epu8` and `_mm256_permute2f128_si256`.
+    - It then shuffles the vector to compare and find the minimum across different lanes using `_mm256_shuffle_epi8` with specific patterns.
+    - This process is repeated with different shuffle patterns to progressively reduce the vector to a single minimum value.
+    - Finally, the minimum value is broadcasted across all lanes of the vector.
+- **Output**: A 256-bit vector (`wb_t`) where each lane contains the minimum value found in the original input vector.
+- **Functions called**:
+    - [`wb_bcast_quad`](#wb_bcast_quad)
+    - [`wb_bcast_pair`](#wb_bcast_pair)
 
 
 ---
 ### wb\_max\_all<!-- {{#callable:wb_max_all}} -->
-[View Source →](<../../../../../src/util/simd/fd_avx_wb.h#L364>)
-
-Finds the maximum value in a 256-bit vector of unsigned 8-bit integers and broadcasts it across all lanes.
+The `wb_max_all` function computes the maximum value across all lanes of a 256-bit vector of unsigned 8-bit integers and broadcasts this maximum value to all lanes of the vector.
 - **Inputs**:
-    - ``x``: A 256-bit vector (`wb_t`) containing 32 unsigned 8-bit integers.
-- **Logic and Control Flow**:
-    - Use `_mm256_max_epu8` to find the maximum between `x` and its permuted version using `_mm256_permute2f128_si256`, effectively comparing the first and second halves of the vector.
-    - Apply `_mm256_max_epu8` with `_mm256_shuffle_epi8` and a shuffle mask created by `wb` to further reduce the vector by comparing adjacent groups of 8 elements.
-    - Repeat the max operation with another shuffle mask to compare adjacent groups of 4 elements.
-    - Use `_mm256_max_epu8` with a shuffle mask from [`wb_bcast_quad`](<#wb_bcast_quad>) to compare adjacent pairs of elements.
-    - Finally, use `_mm256_max_epu8` with a shuffle mask from [`wb_bcast_pair`](<#wb_bcast_pair>) to ensure the maximum value is broadcast across all lanes.
+    - `x`: A 256-bit vector (`wb_t`) where each lane holds an unsigned 8-bit integer.
+- **Control Flow**:
+    - The function first computes the maximum of the input vector `x` and its permuted version, which swaps the lower and upper 128-bit lanes.
+    - It then performs a series of shuffle and maximum operations to progressively reduce the vector, comparing and shuffling the elements to find the maximum value across all lanes.
+    - The final result is a vector where all lanes contain the maximum value found in the original vector `x`.
 - **Output**: A 256-bit vector (`wb_t`) where each lane contains the maximum value found in the input vector `x`.
-- **Functions Called**:
-    - [`wb_bcast_quad`](<#wb_bcast_quad>)
-    - [`wb_bcast_pair`](<#wb_bcast_pair>)
+- **Functions called**:
+    - [`wb_bcast_quad`](#wb_bcast_quad)
+    - [`wb_bcast_pair`](#wb_bcast_pair)
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for conditionally adding headers and objects if 128-bit integers are available.
+The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and objects related to transaction generation and flamenco if 128-bit integer support is available.
 
 # Purpose
-The content is a Makefile segment that conditionally includes headers and object files based on the presence of the `FD_HAS_INT128` macro. If `FD_HAS_INT128` is defined, it adds `fd_txn_generate.h` to the list of headers and `fd_txn_generate` and `fd_flamenco` to the list of object files for compilation. This ensures that these files are only included when the system supports 128-bit integers.
+This file is a Makefile snippet used in a build system to conditionally include headers and object files based on the presence of a 128-bit integer type. If the macro `FD_HAS_INT128` is defined, it adds `fd_txn_generate.h` to the headers and `fd_txn_generate` and `fd_flamenco` to the object files for compilation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
