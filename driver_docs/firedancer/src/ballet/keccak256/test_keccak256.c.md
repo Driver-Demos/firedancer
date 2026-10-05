@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_keccak256.c` file in the `firedancer` codebase contains unit tests and benchmarks for the Keccak-256 hashing implementation, verifying its correctness and performance.
+Tests and benchmarks for the Keccak-256 hashing implementation.
 
 # Purpose
-This C source code file is designed to test and benchmark the implementation of the Keccak-256 cryptographic hash function. It includes the necessary headers and test vectors to validate the correctness and performance of the Keccak-256 algorithm. The code begins by asserting the alignment and footprint of the Keccak-256 data structures to ensure they meet expected specifications. The main function initializes a random number generator and performs a series of tests to verify the functionality of the Keccak-256 implementation. These tests include both single-shot and incremental hashing, comparing the computed hash values against expected results from predefined test vectors.
+The code is a C program designed to test and benchmark the `fd_keccak256` hashing functions. It includes static assertions to verify the alignment and footprint of the `fd_keccak256` structures, ensuring they match expected values. The program initializes a random number generator and performs a series of tests on the `fd_keccak256` functions, including alignment and footprint checks, single-shot hashing, and incremental hashing. It uses test vectors from `fd_keccak256_test_vector.c` to validate the correctness of the hash outputs against expected values.
 
-Additionally, the code conducts performance benchmarks to measure the throughput of the Keccak-256 hashing process on different packet sizes, simulating typical network payloads. The benchmarks are executed in two modes: incremental and streamlined, with results logged in terms of gigabits per second (Gbps) throughput. The file concludes with cleanup operations to release allocated resources. This code is primarily intended for testing and performance evaluation purposes, rather than being a library for external use, as it does not define public APIs or interfaces for broader application integration.
+Additionally, the program benchmarks the performance of the `fd_keccak256` hashing algorithm on different payload sizes, simulating Ethernet packet processing. It measures the throughput in gigabits per second for both incremental and streamlined hashing processes. The program concludes by cleaning up resources and logging the results of the tests and benchmarks. This code is intended to be executed as a standalone program, as indicated by the presence of the [`main`](<#main>) function, and it does not define public APIs or external interfaces.
 # Imports and Dependencies
 
 ---
@@ -21,31 +21,33 @@ Additionally, the code conducts performance benchmarks to measure the throughput
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, performs tests and benchmarks on the Keccak-256 hashing algorithm, and cleans up resources before exiting.
+[View Source →](<../../../../../src/ballet/keccak256/test_keccak256.c#L13>)
+
+Initializes, tests, benchmarks, and cleans up the Keccak-256 hashing process.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Create and join a random number generator `rng`.
-    - Verify alignment and footprint of Keccak-256 using `FD_TEST`.
-    - Allocate memory for Keccak-256 state and verify its creation and joining.
-    - Iterate over test vectors to perform single-shot and incremental hashing tests, comparing results with expected hashes.
-    - Benchmark Keccak-256 hashing on small and large payloads, logging throughput results.
-    - Clean up by leaving and deleting Keccak-256 state and random number generator.
-    - Log success message and halt the program.
-- **Output**: The function returns an integer `0` indicating successful execution.
-- **Functions called**:
-    - [`fd_keccak256_align`](fd_keccak256.c.md#fd_keccak256_align)
-    - [`fd_keccak256_footprint`](fd_keccak256.c.md#fd_keccak256_footprint)
-    - [`fd_keccak256_new`](fd_keccak256.c.md#fd_keccak256_new)
-    - [`fd_keccak256_join`](fd_keccak256.c.md#fd_keccak256_join)
-    - [`fd_keccak256_init`](fd_keccak256.c.md#fd_keccak256_init)
-    - [`fd_keccak256_append`](fd_keccak256.c.md#fd_keccak256_append)
-    - [`fd_keccak256_fini`](fd_keccak256.c.md#fd_keccak256_fini)
-    - [`fd_keccak256_hash`](fd_keccak256.c.md#fd_keccak256_hash)
-    - [`fd_keccak256_leave`](fd_keccak256.c.md#fd_keccak256_leave)
-    - [`fd_keccak256_delete`](fd_keccak256.c.md#fd_keccak256_delete)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Verifies alignment and footprint of Keccak-256 using `FD_TEST`.
+    - Tests [`fd_keccak256_new`](<fd_keccak256.c.md#fd_keccak256_new>) and [`fd_keccak256_join`](<fd_keccak256.c.md#fd_keccak256_join>) with null and misaligned memory to ensure they return `NULL`.
+    - Initializes a Keccak-256 object `obj` and joins it to `sha`.
+    - Iterates over test vectors to perform single-shot and incremental hashing, comparing results with expected hashes.
+    - Benchmarks Keccak-256 hashing on small and large UDP payloads, logging throughput results.
+    - Cleans up by leaving and deleting the Keccak-256 object and random number generator, then halts the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_keccak256_align`](<fd_keccak256.c.md#fd_keccak256_align>)
+    - [`fd_keccak256_footprint`](<fd_keccak256.c.md#fd_keccak256_footprint>)
+    - [`fd_keccak256_new`](<fd_keccak256.c.md#fd_keccak256_new>)
+    - [`fd_keccak256_join`](<fd_keccak256.c.md#fd_keccak256_join>)
+    - [`fd_keccak256_init`](<fd_keccak256.c.md#fd_keccak256_init>)
+    - [`fd_keccak256_append`](<fd_keccak256.c.md#fd_keccak256_append>)
+    - [`fd_keccak256_fini`](<fd_keccak256.c.md#fd_keccak256_fini>)
+    - [`fd_keccak256_hash`](<fd_keccak256.c.md#fd_keccak256_hash>)
+    - [`fd_keccak256_leave`](<fd_keccak256.c.md#fd_keccak256_leave>)
+    - [`fd_keccak256_delete`](<fd_keccak256.c.md#fd_keccak256_delete>)
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for gossip headers, objects, unit tests, and a fuzz test.
+Makefile for adding headers, objects, and unit tests for the gossip module in the Firedancer project.
 
 # Purpose
-This Makefile fragment adds header files and object files for the gossip and bloom filter components to the `fd_flamenco` build target. It also defines unit test targets for `test_bloom`, `test_active_set`, `test_ping_tracker`, and `test_gossip`, and it runs each test after it is built. The `ifdef FD_HAS_HOSTED` block adds the `fuzz_gossip_msg_parse` fuzz test only when hosted build support is enabled.
+The content is a Makefile script used to automate the build process of a software project. It defines targets for adding header files and object files to the build system using the `add-hdrs` and `add-objs` functions. The script specifies unit tests for various components such as `test_bloom`, `test_active_set`, `test_ping_tracker`, and `test_gossip`, and includes commands to compile and run these tests. Additionally, it conditionally includes a fuzz test for `fuzz_gossip_msg_parse` if the `FD_HAS_HOSTED` variable is defined, indicating that the fuzz test should only be executed in certain environments. This Makefile helps streamline the compilation and testing processes, ensuring that all necessary components are built and verified.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_pretty_print_decl.h` file defines a macro for beginning the declaration of a pretty print function for QUIC structures in the Firedancer codebase.
+Defines a macro for generating pretty-print functions for QUIC structures.
 
 # Purpose
-This code is a C header file snippet that defines a macro for generating function declarations related to pretty-printing structures in a QUIC (Quick UDP Internet Connections) protocol context. The macro `FD_TEMPL_DEF_STRUCT_BEGIN(NAME)` is designed to create an inline function declaration named `fd_quic_pretty_print_struct_##NAME`, which takes a constant pointer to a structure of type `fd_quic_##NAME##_t` as its parameter. This setup suggests that the macro is used to facilitate the creation of functions that output human-readable representations of various QUIC-related data structures. The inclusion of `"fd_quic_dft.h"` indicates that this file likely relies on definitions or declarations provided in that header, possibly related to default settings or additional macros for the QUIC protocol implementation.
+The code defines a macro `FD_TEMPL_DEF_STRUCT_BEGIN` that generates a function prototype for pretty-printing a structure associated with QUIC (Quick UDP Internet Connections). The macro takes a parameter `NAME` and constructs a function named `fd_quic_pretty_print_struct_##NAME`, which is intended to print the contents of a structure of type `fd_quic_##NAME##_t`. The function is declared as `static inline`, indicating that it is defined in a header file and should be inlined by the compiler. The inclusion of the header file `fd_quic_dft.h` suggests that this file is part of a larger codebase related to QUIC protocol handling, where `fd_quic_dft.h` likely contains additional definitions or declarations used in conjunction with this macro.
 # Imports and Dependencies
 
 ---

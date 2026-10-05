@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for ipecho objects, unit test, and fuzz test.
+Makefile rules for building and testing `fd_ipecho` components with optional fuzz testing.
 
 # Purpose
-Build rules for the `ipecho` components are enabled only when `FD_HAS_ALLOCA` is defined. The file adds the `fd_ipecho_tile`, `fd_ipecho_client`, and `fd_ipecho_server` objects to `fd_discof`, defines the `test_ipecho_client` unit test with its required libraries, and defines the `fuzz_ipecho_client` fuzz test only when `FD_HAS_HOSTED` is defined.
+This Makefile script is used to conditionally compile and link object files and tests for a software project. If the `FD_HAS_ALLOCA` flag is defined, it adds object files `fd_ipecho_tile`, `fd_ipecho_client`, and `fd_ipecho_server` to the build using the `fd_discof` library. It also creates a unit test named `test_ipecho_client` with dependencies on several libraries. If the `FD_HAS_HOSTED` flag is also defined, it creates a fuzz test named `fuzz_ipecho_client` with specified dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
