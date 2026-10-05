@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `skip_rate` folder in the `firedancer` codebase contains a Python script, `skip_rate.py`, which calculates the skip rate and adjusted skip rate for a Solana validator by analyzing leader slots and identifying missed slots due to offline status.
+Calculates skip rate and adjusted skip rate for a Solana validator during a given epoch.
 
 
 ## Files
-- **[skip_rate.py](skip_rate.py.md)**: The `skip_rate.py` file in the `firedancer` codebase calculates the skip rate and adjusted skip rate for a Solana validator by analyzing leader slots and determining which slots were missed due to being offline.
+- **[skip_rate.py](skip_rate.py.md)**: Calculates skip rate and adjusted skip rate for a Solana validator during a given epoch.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Batch and block size constants with static checks for shred FEC set buffering.
+Header file for partitioning blocks into batches of microblocks and fixed-size FEC sets with data and parity shreds.
 
 # Purpose
-This header defines the size limits and buffer rules for shred batches in the shred tile. It sets the number of FEC sets per batch, the watermark used to close a batch, and the extra capacity needed for the last batch in a block when the payload size changes from chained to resigned mode. It also defines the raw batch buffer size and the maximum block data size, and it uses `FD_STATIC_ASSERT` checks to verify that these limits can hold the required MTU and overhead cases. The file is used to keep batch assembly, padding, and FEC set generation within fixed memory and block-size constraints across normal, chained, and resigned shred formats.
+The code is a C header file that defines constants and performs static assertions related to the partitioning of data blocks into batches of microblocks for Forward Error Correction (FEC) processing. It is part of a system that handles data shreds, which are divided into fixed-size FEC sets consisting of 32 data shreds and 32 parity shreds. The file specifies the parameters for managing these batches, such as the number of FEC sets per batch, the watermark levels for batch processing, and the buffer sizes required to accommodate different types of FEC sets (normal, chained, and resigned).
+
+The header file includes definitions for constants like `FD_SHRED_BATCH_FEC_SETS_WMARK`, `FD_SHRED_BATCH_FEC_SETS_MAX`, and `FD_SHRED_BATCH_RAW_BUF_SZ`, which are used to control the size and structure of the batches. It also contains static assertions to ensure that the defined sizes and capacities meet the necessary requirements, such as supporting a minimum payload size (`FD_POH_SHRED_MTU`). The file is intended to be included in other C source files that implement the logic for processing and managing data shreds, ensuring that the batch processing adheres to the defined constraints and limits.
+# Imports and Dependencies
+
+---
+- `../../util/fd_util_base.h`
+- `../shred/fd_shredder.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
