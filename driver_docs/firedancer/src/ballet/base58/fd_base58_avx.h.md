@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_base58_avx.h` file in the `firedancer` codebase provides AVX2-optimized functions for converting data to and from base58 encoding, including operations for loading, storing, and manipulating vectors, as well as counting leading zeros and packing base58 digits.
+Header file for AVX2-optimized base58 encoding and decoding operations, including vector manipulation functions.
 
 # Purpose
-This C source code file is designed to perform operations related to Base58 encoding using AVX2 SIMD (Single Instruction, Multiple Data) instructions for high-performance vectorized computations. The file is not a standalone header and is intended to be included only in specific source files, namely `fd_base58.c` and `test_base58_avx.c`, as indicated by the absence of an include guard. The code provides specialized functions for loading, storing, and manipulating 256-bit AVX2 registers, which are used to handle data in parallel, thereby optimizing the performance of Base58 encoding operations.
+The code is a C source file that provides functions for handling base58 encoding using AVX2 SIMD (Single Instruction, Multiple Data) instructions. It is not a standalone header file and is intended to be included only in specific source files, namely `fd_base58.c` and `test_base58_avx.c`. The file does not have an include guard, indicating its limited scope of use. The primary functionality revolves around converting data into base58 format, which is a binary-to-text encoding scheme commonly used in applications like Bitcoin addresses.
 
-The primary functionality of this file revolves around converting data into Base58 format, a common encoding scheme used in applications like Bitcoin addresses. The code includes functions to convert intermediate vector forms into raw Base58 digits, map these digits to their corresponding Base58 characters, and count leading zeros in byte sequences. Additionally, it provides macros for packing Base58 digits into contiguous AVX2 registers. The use of AVX2 instructions allows for efficient handling of multiple data elements simultaneously, making the code suitable for performance-critical applications that require fast encoding and decoding of Base58 data.
+The file defines several inline functions and macros to perform operations on AVX2 registers. These operations include loading and storing 256-bit vectors, converting intermediate forms of data into raw base58 digits, and mapping raw base58 values to their corresponding character representations. Additionally, the code includes functions to count leading zero bytes in vectors and to pack base58 digits into a more compact form. The use of AVX2 instructions allows for efficient parallel processing of data, which is beneficial for performance-critical applications. The file also includes detailed comments explaining the mathematical operations and the rationale behind the use of specific AVX2 instructions.
 # Imports and Dependencies
 
 ---
@@ -20,128 +20,150 @@ The primary functionality of this file revolves around converting data into Base
 
 ---
 ### wuc\_ld<!-- {{#callable:wuc_ld}} -->
-The `wuc_ld` function loads a 256-bit vector from a memory address aligned to 32 bytes using AVX2 instructions.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L9>)
+
+Loads a 256-bit value from a memory address aligned to 32 bytes.
 - **Inputs**:
-    - `p`: A pointer to an unsigned char array, which should be aligned to 32 bytes for optimal performance.
-- **Control Flow**:
-    - The function casts the input pointer `p` to a pointer of type `__m256i const *`, which is suitable for AVX2 operations.
-    - It then uses the `_mm256_load_si256` intrinsic to load a 256-bit vector from the memory location pointed to by the casted pointer.
-- **Output**: The function returns a `wuc_t` type, which is defined as `__m256i`, representing a 256-bit vector loaded from the specified memory location.
+    - `p`: A pointer to a memory location of type `uchar const *`, which must be aligned to 32 bytes.
+- **Logic and Control Flow**:
+    - Casts the input pointer `p` to a pointer of type `__m256i const *`.
+    - Uses the `_mm256_load_si256` intrinsic to load a 256-bit value from the memory location pointed to by the casted pointer.
+- **Output**: Returns a 256-bit value of type `wuc_t`, which is defined as `__m256i`.
 
 
 ---
 ### wuc\_ldu<!-- {{#callable:wuc_ldu}} -->
-The `wuc_ldu` function loads 256 bits of unaligned data from a given memory address into an AVX2 register.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L10>)
+
+Loads 32 bytes of unaligned data from a memory location into an AVX2 register.
 - **Inputs**:
-    - `p`: A pointer to an unaligned memory location of type `uchar` from which 256 bits of data will be loaded.
-- **Control Flow**:
-    - The function casts the input pointer `p` to a pointer of type `__m256i const *`, which is suitable for AVX2 operations.
-    - It then uses the `_mm256_loadu_si256` intrinsic to load 256 bits of data from the unaligned memory location pointed to by `p` into an AVX2 register.
-- **Output**: The function returns a `wuc_t` type, which is an alias for `__m256i`, containing the loaded 256 bits of data.
+    - `p`: A pointer to an unaligned memory location of type `uchar` from which 32 bytes will be loaded.
+- **Logic and Control Flow**:
+    - Casts the input pointer `p` to a pointer of type `__m256i const *` to treat the data as a 256-bit integer vector.
+    - Uses the `_mm256_loadu_si256` intrinsic to load 32 bytes from the unaligned memory location pointed to by `p` into an AVX2 register.
+- **Output**: Returns a `wuc_t` type, which is an alias for `__m256i`, containing the loaded 32 bytes of data.
 
 
 ---
 ### wuc\_st<!-- {{#callable:wuc_st}} -->
-The `wuc_st` function stores a 256-bit AVX2 vector into a memory location aligned to 32 bytes.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L11>)
+
+Stores a 256-bit AVX2 vector to a specified memory location using aligned memory access.
 - **Inputs**:
-    - `p`: A pointer to an unsigned char array where the 256-bit vector will be stored.
-    - `i`: A 256-bit AVX2 vector of type `wuc_t` to be stored at the memory location pointed to by `p`.
-- **Control Flow**:
-    - The function uses the `_mm256_store_si256` intrinsic to store the 256-bit vector `i` into the memory location pointed to by `p`, which must be aligned to 32 bytes.
-- **Output**: The function does not return any value; it performs an in-place store operation.
+    - ``p``: A pointer to the memory location where the 256-bit vector will be stored. It must be aligned to a 32-byte boundary.
+    - ``i``: The 256-bit AVX2 vector (`wuc_t`) to store at the memory location pointed to by `p`.
+- **Logic and Control Flow**:
+    - Uses the `_mm256_store_si256` intrinsic to store the 256-bit vector `i` into the memory location pointed to by `p`.
+    - The memory location `p` must be aligned to a 32-byte boundary for this operation to be valid.
+- **Output**: No return value; the function performs an in-place store operation.
 
 
 ---
 ### wuc\_stu<!-- {{#callable:wuc_stu}} -->
-The `wuc_stu` function stores a 256-bit AVX2 vector into a memory location without alignment requirements.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L12>)
+
+Stores a 256-bit AVX2 vector into memory without alignment requirements.
 - **Inputs**:
-    - `p`: A pointer to an unsigned char array where the 256-bit vector will be stored.
-    - `i`: A 256-bit AVX2 vector of type `wuc_t` to be stored at the location pointed to by `p`.
-- **Control Flow**:
-    - The function uses the `_mm256_storeu_si256` intrinsic to store the 256-bit vector `i` into the memory location pointed to by `p` without requiring the memory to be aligned.
-- **Output**: The function does not return any value; it performs an in-place operation on the memory location pointed to by `p`.
+    - ``p``: A pointer to the memory location where the 256-bit vector will be stored.
+    - ``i``: The 256-bit AVX2 vector (`wuc_t`) to store.
+- **Logic and Control Flow**:
+    - Uses the `_mm256_storeu_si256` intrinsic to store the 256-bit vector `i` into the memory location pointed to by `p`.
+    - The function does not require the memory location to be aligned.
+- **Output**: No return value; the function performs a side effect by storing data in memory.
 
 
 ---
 ### intermediate\_to\_raw<!-- {{#callable:intermediate_to_raw}} -->
-The `intermediate_to_raw` function converts a vector of four intermediate form terms into 20 raw base58 digits, compactly stored in an AVX2 register.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L18>)
+
+Converts a vector of intermediate base58 values into a compact form of raw base58 digits using AVX2 instructions.
 - **Inputs**:
-    - `intermediate`: A vector of type `wl_t` containing four terms in intermediate form, each representing digits in the range [0, 58^5).
-- **Control Flow**:
-    - Initialize constants for division by 58 and 58^2 using magic multiplication.
-    - Define macros for division by 58 and 58^2 using these constants and bit shifts.
-    - Compute successive divisions and remainders to extract base58 digits from the intermediate form.
-    - Store the remainders in separate registers, each representing a digit in base58.
-    - Shuffle and shift the remainders to compact them into a single AVX2 register, maintaining the correct order of digits.
-- **Output**: A `wuc_t` type AVX2 register containing 20 base58 digits, stored in two groups of 10 in the lower 10 bytes of each 128-bit half of the register.
+    - `intermediate`: A vector of type `wl_t` containing intermediate base58 values, each less than 58^5.
+- **Logic and Control Flow**:
+    - Broadcast constants `cA` and `cB` for division by 58 and 58^2 using magic multiplication.
+    - Define macros `DIV58` and `DIV3364` to perform division by 58 and 58^2 using AVX2 instructions.
+    - Calculate `div0`, `div1`, `div2`, `div3`, and `div4` as the floor of the division of `intermediate` by increasing powers of 58.
+    - Calculate `rem0`, `rem1`, `rem2`, `rem3`, and `rem4` as the remainder of the division results modulo 58.
+    - Use `_mm256_shuffle_epi8` and `_mm256_slli_si256` to rearrange and compact the remainder values into a single AVX2 register `shift`.
+    - Return the compacted vector `shift` containing the raw base58 digits.
+- **Output**: A vector of type `wuc_t` containing 20 raw base58 digits in a compact form, stored in the lower 10 bytes of each 128-bit half of the vector.
 
 
 ---
 ### raw\_to\_base58<!-- {{#callable:raw_to_base58}} -->
-The `raw_to_base58` function converts each byte in an AVX2 register from raw base58 values [0,58) to base58 character digits ('1'-'z') using arithmetic expressions and SIMD operations.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L124>)
+
+Converts each byte in an AVX2 register from raw base58 values to base58 character digits using arithmetic expressions and comparisons.
 - **Inputs**:
-    - `in`: An AVX2 register (`wuc_t`) containing bytes in the range [0,58) representing raw base58 values.
-- **Control Flow**:
-    - Initialize five comparison vectors (`gt0` to `gt4`) using `_mm256_cmpgt_epi8` to determine if each byte in `in` exceeds certain thresholds (8, 16, 21, 32, 43).
-    - Compute two vectors (`gt0_7` and `gt3_6`) by ANDing the comparison results with -7 and -6, respectively, to create offsets for the base58 conversion.
-    - Sum all the negative offsets using `_mm256_add_epi8` to calculate the total adjustment needed for each byte.
-    - Subtract the computed sum from the input vector `in` using `_mm256_sub_epi8` to obtain the final base58 character values.
-- **Output**: An AVX2 register (`wuc_t`) containing the base58 character values corresponding to the input raw base58 values.
+    - ``in``: An AVX2 register (`wuc_t`) containing bytes in the range [0, 58) representing raw base58 values.
+- **Logic and Control Flow**:
+    - Compare each byte in `in` with the thresholds 8, 16, 21, 32, and 43 using `_mm256_cmpgt_epi8` to determine if they exceed these values.
+    - For each comparison, generate a mask of 0xFF for true and 0x00 for false, which is used to calculate offsets for the base58 conversion.
+    - Calculate the offsets by ANDing the masks with -7 or -6, depending on the threshold, to get the required negative offsets.
+    - Sum all the negative offsets using `_mm256_add_epi8` to compute the total offset for each byte.
+    - Subtract the total offset from each byte in `in` using `_mm256_sub_epi8` to convert the raw base58 values to base58 character digits.
+- **Output**: An AVX2 register (`wuc_t`) containing the converted base58 character digits.
 
 
 ---
 ### count\_leading\_zeros\_26<!-- {{#callable:count_leading_zeros_26}} -->
-The function `count_leading_zeros_26` counts the number of leading zero bytes in a 256-bit AVX2 register up to a maximum of 26 bytes.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L163>)
+
+Counts the number of leading zero bytes in the first 26 bytes of an AVX2 register.
 - **Inputs**:
-    - `in`: A 256-bit AVX2 register (`wuc_t`) containing the data to be analyzed for leading zeros.
-- **Control Flow**:
-    - The function first compares each byte in the input register `in` with zero using `_mm256_cmpeq_epi8`, resulting in a mask where each byte is either 0xFF (if equal to zero) or 0x00 (if not).
-    - The mask is then converted to a 32-bit integer using `_mm256_movemask_epi8`, which creates a bitmask where each bit represents whether the corresponding byte in the input was zero.
-    - A mask for the first 27 bits is created using `fd_ulong_mask_lsb(27)`, and the first 26 bits of the zero comparison mask are flipped using XOR with `fd_ulong_mask_lsb(26)`.
-    - The function then finds the least significant bit set in the resulting mask using `fd_ulong_find_lsb`, which effectively counts the number of leading zero bytes in the input.
-- **Output**: The function returns an `ulong` representing the number of leading zero bytes in the input, up to a maximum of 26.
+    - `in`: An AVX2 register (`wuc_t`) containing the bytes to be analyzed.
+- **Logic and Control Flow**:
+    - Create a mask `mask0` by comparing each byte in `in` to zero and converting the result to a bitmask using `_mm256_movemask_epi8`.
+    - Create a mask `mask` by flipping the low 26 bits of `mask0` and setting bit 26 using `fd_ulong_mask_lsb`.
+    - Find the least significant bit set in `mask` using `fd_ulong_find_lsb`.
+- **Output**: Returns the number of leading zero bytes as an `ulong`.
 
 
 ---
 ### count\_leading\_zeros\_32<!-- {{#callable:count_leading_zeros_32}} -->
-The function `count_leading_zeros_32` calculates the number of leading zero bytes in a 32-byte AVX2 register.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L170>)
+
+Counts the number of leading zero bytes in a 32-byte AVX2 register.
 - **Inputs**:
-    - `in`: A 32-byte AVX2 register (`wuc_t`) containing the data to be analyzed for leading zero bytes.
-- **Control Flow**:
-    - The function first compares each byte in the input register `in` with zero using `_mm256_cmpeq_epi8`, resulting in a mask where each byte is either 0xFF (if the byte was zero) or 0x00 (if the byte was non-zero).
-    - The `_mm256_movemask_epi8` function is used to create a 32-bit integer mask from the comparison results, where each bit represents whether the corresponding byte in the input was zero.
-    - The function then creates a mask with the least significant 33 bits set using `fd_ulong_mask_lsb(33)` and XORs it with the 32-bit integer mask to flip the bits, effectively marking the position of the first non-zero byte.
-    - Finally, `fd_ulong_find_lsb` is called to find the position of the least significant set bit in the resulting mask, which corresponds to the number of leading zero bytes in the input.
-- **Output**: The function returns an `ulong` representing the number of leading zero bytes in the input register, ranging from 0 to 32.
+    - `in`: An AVX2 register of type `wuc_t` containing 32 bytes to be analyzed for leading zeros.
+- **Logic and Control Flow**:
+    - Create a mask by comparing each byte in `in` to zero using `_mm256_cmpeq_epi8` and then use `_mm256_movemask_epi8` to generate a bitmask where each bit represents whether the corresponding byte in `in` is zero.
+    - Invert the lower 33 bits of the mask using `fd_ulong_mask_lsb(33)` and XOR operation to prepare for finding the first non-zero byte.
+    - Use `fd_ulong_find_lsb` to find the position of the least significant bit set in the inverted mask, which corresponds to the number of leading zero bytes.
+- **Output**: Returns the number of leading zero bytes as an `ulong`.
 
 
 ---
 ### count\_leading\_zeros\_45<!-- {{#callable:count_leading_zeros_45}} -->
-The function `count_leading_zeros_45` calculates the number of leading zero bytes in the first 45 bytes of two 256-bit AVX2 vectors.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L176>)
+
+Counts the number of leading zero bytes in the first 45 bytes of two 32-byte AVX2 registers.
 - **Inputs**:
-    - `in0`: The first 256-bit AVX2 vector containing the first 32 bytes to be checked for leading zeros.
-    - `in1`: The second 256-bit AVX2 vector containing the next 13 bytes to be checked for leading zeros.
-- **Control Flow**:
-    - Compute a mask for `in0` by comparing each byte to zero and converting the result to a bitmask using `_mm256_movemask_epi8`.
-    - Compute a mask for `in1` in the same way, but only consider the first 13 bytes by applying a mask with `fd_ulong_mask_lsb(13)` and shifting the result left by 32 bits.
-    - Combine the two masks using a bitwise OR operation and XOR the result with a mask that has the least significant 46 bits set to 1 using `fd_ulong_mask_lsb(46)`.
-    - Find the least significant bit set in the resulting mask using `fd_ulong_find_lsb`, which indicates the number of leading zero bytes.
-- **Output**: The function returns an `ulong` representing the number of leading zero bytes in the first 45 bytes of the input vectors.
+    - `in0`: The first 32-byte AVX2 register to check for leading zeros.
+    - `in1`: The second 32-byte AVX2 register to check for leading zeros.
+- **Logic and Control Flow**:
+    - Create a mask `mask0` by comparing `in0` with zero and converting the result to a bitmask using `_mm256_movemask_epi8`.
+    - Create a mask `mask1` by comparing `in1` with zero and converting the result to a bitmask using `_mm256_movemask_epi8`.
+    - Combine `mask0` and `mask1` into a single mask `mask` by shifting `mask1` left by 32 bits, masking it with `fd_ulong_mask_lsb(13)`, and XORing with `mask0`.
+    - Invert the lower 46 bits of `mask` using `fd_ulong_mask_lsb(46)` and XOR.
+    - Find the least significant bit set in `mask` using `fd_ulong_find_lsb`.
+- **Output**: Returns the number of leading zero bytes as an unsigned long integer.
 
 
 ---
 ### count\_leading\_zeros\_64<!-- {{#callable:count_leading_zeros_64}} -->
-The `count_leading_zeros_64` function calculates the number of leading zero bytes in two 32-byte AVX2 vectors, returning a count up to 64.
+[View Source →](<../../../../../src/ballet/base58/fd_base58_avx.h#L185>)
+
+Counts the number of leading zero bytes in two 32-byte AVX2 registers, returning the count up to 64.
 - **Inputs**:
-    - `in0`: The first 32-byte AVX2 vector of type `wuc_t` to be analyzed for leading zeros.
-    - `in1`: The second 32-byte AVX2 vector of type `wuc_t` to be analyzed for leading zeros.
-- **Control Flow**:
-    - Compute a mask for `in0` by comparing each byte to zero and converting the result to a bitmask using `_mm256_movemask_epi8`.
-    - Compute a mask for `in1` similarly, resulting in a second bitmask.
-    - Combine the two masks by shifting the second mask left by 32 bits and performing a bitwise OR with the first mask.
-    - Invert the combined mask to prepare for finding the least significant bit set to 1.
-    - Use `fd_ulong_find_lsb_w_default` to find the position of the least significant bit set to 1 in the inverted mask, defaulting to 64 if no such bit is found.
-- **Output**: The function returns an `ulong` representing the number of leading zero bytes in the combined 64-byte input.
+    - `in0`: The first 32-byte AVX2 register to check for leading zeros.
+    - `in1`: The second 32-byte AVX2 register to check for leading zeros.
+- **Logic and Control Flow**:
+    - Convert each byte in `in0` and `in1` to a mask of 1s and 0s, where 1 indicates a zero byte.
+    - Combine the masks from `in0` and `in1` into a single 64-bit mask, with `in1` shifted left by 32 bits.
+    - Invert the combined mask to prepare for finding the least significant bit (LSB).
+    - Use `fd_ulong_find_lsb_w_default` to find the position of the first 1 in the inverted mask, which corresponds to the number of leading zeros.
+- **Output**: Returns the number of leading zero bytes as an `ulong`, with a maximum value of 64.
 
 
 
