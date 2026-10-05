@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `help.c` file in the `firedancer` codebase implements a command function that displays usage information and available subcommands for the application.
+Defines a help command function that prints usage instructions and available subcommands.
 
 # Purpose
-This C source code file defines a function and a data structure related to a command-line interface (CLI) utility, likely part of a larger application. The `help_cmd_fn` function is responsible for printing a help message to the standard output, detailing the usage of the application, available options, and subcommands. It utilizes external variables for the application and binary names, and iterates over an array of actions to display their names and descriptions. The `fd_action_help` structure is an instance of `action_t`, representing the "help" command, and is configured to invoke `help_cmd_fn` when executed. This file is part of a modular system where actions are dynamically listed and executed, providing a user-friendly interface for interacting with the software.
+The code defines a help command function for a command-line application. It includes necessary headers and declares external variables `FD_APP_NAME`, `FD_BINARY_NAME`, and an array of `ACTIONS`. The `help_cmd_fn` function outputs usage instructions and available options for the application, including `--config`, `--version`, and `--help` flags. It also iterates over the `ACTIONS` array to display available subcommands and their descriptions. The `fd_action_help` structure is an instance of `action_t` that represents the help command, specifying its name, function, and description.
 # Imports and Dependencies
 
 ---
@@ -20,36 +20,36 @@ This C source code file defines a function and a data structure related to a com
 ---
 ### FD\_APP\_NAME
 - **Type**: ``char const *``
-- **Description**: `FD_APP_NAME` is a global variable that holds a constant character pointer to the name of the application. It is declared as an external variable, indicating that its definition is likely located in another source file.
-- **Use**: This variable is used to display the name of the application in log messages, particularly in the help command function.
+- **Description**: A pointer to a constant character string that represents the name of the application.
+- **Use**: Used to display the application name in log messages and help command output.
 
 
 ---
 ### FD\_BINARY\_NAME
-- **Type**: `char const *`
-- **Description**: `FD_BINARY_NAME` is a global variable that holds a constant character pointer to the name of the binary executable for the application. It is declared as an external variable, indicating that its definition is located in another translation unit.
-- **Use**: This variable is used to display the name of the binary in help messages and usage instructions.
+- **Type**: ``char const *``
+- **Description**: A pointer to a constant character string that represents the name of the binary executable file.
+- **Use**: Used in the `help_cmd_fn` function to display the usage information of the binary.
 
 
 ---
 ### ACTIONS
-- **Type**: `action_t *`
-- **Description**: `ACTIONS` is an external array of pointers to `action_t` structures, which are likely defined elsewhere in the program. Each element in the array represents a specific action that can be performed by the application, with associated metadata such as the action's name and description.
-- **Use**: `ACTIONS` is used to iterate over and display available subcommands and their descriptions in the help command function.
+- **Type**: ``action_t *` array`
+- **Description**: An array of pointers to `action_t` structures, where each element represents a specific action with associated metadata such as name, description, and function pointer.
+- **Use**: Used to iterate over and execute different actions based on their metadata.
 
 
 ---
 ### help\_cmd\_fn
 - **Type**: `function`
-- **Description**: The `help_cmd_fn` is a function designed to display help information for a command-line application. It outputs the application name, usage instructions, available options, and subcommands to the standard output.
-- **Use**: This function is used to provide users with guidance on how to use the application, including details on command-line options and subcommands.
+- **Description**: Outputs help information for the control binary, including usage instructions, options, and subcommands.
+- **Use**: Provides a help message to the user when invoked.
 
 
 ---
 ### fd\_action\_help
-- **Type**: `action_t`
-- **Description**: The `fd_action_help` variable is an instance of the `action_t` structure, which represents a command action in the application. It is specifically configured to handle the 'help' command, providing a description and linking to the `help_cmd_fn` function that outputs help information to the user.
-- **Use**: This variable is used to define and execute the 'help' command, which prints the help message for the application.
+- **Type**: ``action_t``
+- **Description**: Defines an action for displaying help information in the application. It includes the name of the action, a function pointer to `help_cmd_fn`, and flags indicating that it is a help, immediate, and diagnostic action.
+- **Use**: Used to provide help information to the user by executing the `help_cmd_fn` function when the help action is triggered.
 
 
 
