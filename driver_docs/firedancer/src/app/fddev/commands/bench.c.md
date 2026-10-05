@@ -3,12 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a command for testing validator TPS benchmarks using multithreading.
+The `bench.c` file in the `firedancer` codebase implements a command for testing validator TPS benchmarks, including the creation of a persistent thread for the `agave_boot` function.
 
 # Purpose
-The code defines a command function for a benchmarking operation within a development environment. It includes headers from a shared development directory, indicating that it relies on shared components for its functionality. The primary function, [`fddev_bench_cmd_fn`](<#fddev_bench_cmd_fn>), is responsible for executing a benchmark command by calling `bench_cmd_fn` and then creating a new thread to run [`agave_thread_main`](<#agave_thread_main>). This thread executes the [`agave_boot`](<#agave_boot>) function, which is designed to run indefinitely, as indicated by the comment stating that the exit flag is never set to true.
-
-The code also defines an `action_t` structure named `fd_action_bench`, which represents a command action with the name "bench". This structure includes pointers to the function [`fddev_bench_cmd_fn`](<#fddev_bench_cmd_fn>), argument definitions, permission settings, and a description of the action. The description indicates that the purpose of this command is to test the validator transactions per second (TPS) benchmark. The code is structured to be part of a larger system where it can be invoked as a command, likely within a command-line interface or a similar environment.
+This C source code file defines a function [`fddev_bench_cmd_fn`](#fddev_bench_cmd_fn) that is responsible for executing a benchmark command within a multi-threaded environment. It includes necessary headers for threading and command functionalities, and it utilizes the `pthread` library to create a new thread that runs the [`agave_thread_main`](#agave_thread_main) function. This function, in turn, calls [`agave_boot`](#agave_boot), which is expected to run indefinitely, as indicated by the comment stating that Agave will never exit. The main thread is put to sleep indefinitely, allowing the program to be terminated via an external interrupt like Ctrl+C. Additionally, the file defines an `action_t` structure `fd_action_bench`, which encapsulates metadata and function pointers related to the benchmark command, including its name, arguments, and permissions, indicating its role in testing validator transactions per second (TPS) benchmarks.
 # Imports and Dependencies
 
 ---
@@ -22,57 +20,51 @@ The code also defines an `action_t` structure named `fd_action_bench`, which rep
 
 ---
 ### fd\_action\_bench
-- **Type**: ``action_t``
-- **Description**: Defines an action structure for a benchmark command. It includes the name of the action, arguments, a function pointer to execute the command, permission settings, a flag indicating if it is for a local cluster, and a description of the action.
-- **Use**: Used to configure and execute a benchmark command within the application.
+- **Type**: `action_t`
+- **Description**: The `fd_action_bench` is a global variable of type `action_t` that represents a specific action configuration for a command named 'bench'. It includes various fields such as the name of the action, arguments, function pointer, permissions, a flag indicating if it is for a local cluster, and a description of the action.
+- **Use**: This variable is used to define and configure the 'bench' command action, which is likely part of a command-line interface or a similar system for testing validator TPS benchmarks.
 
 
 # Functions
 
 ---
 ### agave\_thread\_main<!-- {{#callable:agave_thread_main}} -->
-[View Source →](<../../../../../../src/app/fddev/commands/bench.c#L10>)
-
-Executes the [`agave_boot`](<../../fdctl/commands/run_agave.c.md#agave_boot>) function in a separate thread and logs an error if it exits.
+The `agave_thread_main` function initializes a thread by calling [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot) with a configuration and logs an error if [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot) exits.
 - **Inputs**:
-    - `_args`: A pointer to `config_t` which contains configuration data for the [`agave_boot`](<../../fdctl/commands/run_agave.c.md#agave_boot>) function.
-- **Logic and Control Flow**:
-    - Cast `_args` to a `config_t` pointer and store it in `config`.
-    - Call the [`agave_boot`](<../../fdctl/commands/run_agave.c.md#agave_boot>) function with `config` as the argument.
-    - Log an error message if [`agave_boot`](<../../fdctl/commands/run_agave.c.md#agave_boot>) exits, indicating unexpected behavior.
-    - Return `NULL` as the function's result.
-- **Output**: Returns `NULL` after logging an error if [`agave_boot`](<../../fdctl/commands/run_agave.c.md#agave_boot>) exits.
-- **Functions Called**:
-    - [`agave_boot`](<../../fdctl/commands/run_agave.c.md#agave_boot>)
+    - `_args`: A pointer to a `config_t` structure that contains configuration data for the [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot) function.
+- **Control Flow**:
+    - The function casts the `_args` parameter to a `config_t` pointer named `config`.
+    - It calls the [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot) function with the `config` pointer.
+    - If [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot) exits, it logs an error message using `FD_LOG_ERR`.
+    - The function returns `NULL` after logging the error.
+- **Output**: The function returns `NULL` after logging an error message if [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot) exits.
+- **Functions called**:
+    - [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot)
 
 
 ---
 ### fddev\_bench\_cmd\_fn<!-- {{#callable:fddev_bench_cmd_fn}} -->
-[View Source →](<../../../../../../src/app/fddev/commands/bench.c#L20>)
-
-Executes a benchmark command and starts a separate thread for agave processing, then pauses indefinitely.
+The `fddev_bench_cmd_fn` function initiates a benchmark command and starts a separate thread to run the `agave_thread_main` function, then puts the main thread to sleep indefinitely.
 - **Inputs**:
-    - `args`: A pointer to an `args_t` structure that contains the arguments for the benchmark command.
-    - `config`: A pointer to a `config_t` structure that contains the configuration for the benchmark and agave processing.
-- **Logic and Control Flow**:
-    - Calls the `bench_cmd_fn` function with `args` and `config` to execute the benchmark command.
-    - Creates a new thread named `agave` that runs the `agave_thread_main` function, passing `config` as an argument.
-    - Enters an infinite loop that pauses the parent thread indefinitely, allowing termination only via external interruption (e.g., Ctrl+C).
-- **Output**: No output is returned as the function is of type `void`.
+    - `args`: A pointer to an `args_t` structure containing command-line arguments for the benchmark command.
+    - `config`: A pointer to a `config_t` structure containing configuration settings for the benchmark and agave thread.
+- **Control Flow**:
+    - Call the `bench_cmd_fn` function with `args` and `config` to execute the benchmark command.
+    - Create a new thread named `agave` that runs the `agave_thread_main` function, passing `config` as an argument.
+    - Enter an infinite loop where the main thread pauses indefinitely, effectively sleeping until interrupted by a signal such as Ctrl+C.
+- **Output**: This function does not return any value as it is a `void` function.
 
 
 # Function Declarations (Public API)
 
 ---
 ### agave\_boot<!-- {{#callable_declaration:agave_boot}} -->
-[View Source →](<../../../../../../src/app/fddev/commands/bench.c#L7>)
-
 Boots the Agave validator with the specified configuration.
-- **Description**: Use this function to start the Agave validator with the given configuration settings. It prepares and executes the necessary command-line arguments based on the provided configuration. This function must be called with a valid configuration structure, and it does not return control to the caller as it will execute the validator process. Ensure that the configuration is correctly populated with all required fields before calling this function.
+- **Description**: This function initializes and starts the Agave validator using the provided configuration settings. It constructs command-line arguments based on the configuration and sets environment variables as needed. The function must be called with a valid configuration structure, and it assumes that the configuration is fully populated with all necessary parameters. It does not return, as it ultimately calls a function that exits the process on failure. This function should be used when you need to start the Agave validator with specific settings defined in a configuration object.
 - **Inputs**:
-    - `config`: A pointer to a `config_t` structure containing the configuration settings for the Agave validator. The structure must be fully initialized and must not be null. The function reads various fields from this structure to construct command-line arguments for the validator.
+    - `config`: A pointer to a constant `config_t` structure containing the configuration settings for the Agave validator. The structure must be fully populated with valid data, as the function does not perform deep validation of the configuration contents. The caller retains ownership of the configuration object, and it must not be null.
 - **Output**: None
-- **See Also**: [`agave_boot`](<../../fdctl/commands/run_agave.c.md#agave_boot>)  (Implementation)
+- **See also**: [`agave_boot`](../../fdctl/commands/run_agave.c.md#agave_boot)  (Implementation)
 
 
 
