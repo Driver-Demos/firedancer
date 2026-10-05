@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for configuring a Linux GCC x86_64 build with various optimizations and features.
+The `linux_gcc_x86_64.mk` file in the `firedancer` codebase configures build settings for a Linux environment using GCC on x86_64 architecture, including various optimizations and feature flags.
 
 # Purpose
-The Makefile configuration sets up the build environment for a software project targeting a Linux system with a GCC compiler on an x86_64 architecture. It specifies the build directory with the variable `BUILDDIR`, defaulting to `linux/gcc/x86_64`, and includes several configuration files to extend the build setup with additional features such as debugging, security, optimization, and threading. The `CPPFLAGS` variable is augmented with specific compiler flags to optimize for the Haswell and Skylake microarchitectures and to define several preprocessor macros that enable features like 128-bit integers, double precision, stack allocation, and various x86 instruction sets including SSE and AVX. The file also sets several feature flags, such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and others, to indicate the availability of these features in the build environment.
+The provided content is a Makefile, which is used to automate the build process of a software project. The `BUILDDIR` variable specifies the directory structure for the build, indicating a target environment of Linux with GCC for the x86_64 architecture. The file includes several other Makefiles from the `config` directory, each likely containing specific configurations for different build features such as debugging, security, optimization, and threading. The `CPPFLAGS` are compiler flags that optimize the build for specific CPU architectures (Haswell and Skylake) and enable various features like 128-bit integers, double precision, and advanced instruction sets (SSE and AVX). The repeated definitions of `FD_HAS_*` variables suggest these features are being explicitly enabled for the build process, ensuring the compiled software can leverage these capabilities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

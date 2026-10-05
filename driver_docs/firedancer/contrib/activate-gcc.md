@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Bash script to install and activate GCC 12.2.0 for development hosts.
+The `activate-gcc` file is a Bash script used internally to install and activate GCC version 12.2.0 on development hosts within the `firedancer` codebase.
 
 # Purpose
-This script is a Bash executable intended for internal use, specifically for managing development environments. It provides narrow functionality by checking if the first argument is "install" and, if so, installs the `jump_module_gcc-12.2.0` package using the `yum` package manager. After the installation, or if no arguments are provided, the script purges all currently loaded modules and loads the `gcc-12.2.0` module. Finally, it lists all currently loaded modules to confirm the environment setup.
+This Bash script is designed for internal use, likely within a development environment, and provides narrow functionality focused on managing software modules. It checks if the script is executed with the "install" argument, and if so, it installs a specific package (`jump_module_gcc-12.2.0`) using the `yum` package manager, which suggests it is intended for systems using Red Hat-based distributions. After handling the installation, the script purges any currently loaded modules and then loads the `gcc-12.2.0` module, ensuring that the specified version of GCC is active. Finally, it lists all currently loaded modules, which helps verify the environment setup. This script is likely used to prepare development hosts with the necessary compiler version and manage module environments efficiently.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

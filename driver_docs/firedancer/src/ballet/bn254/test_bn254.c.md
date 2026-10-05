@@ -3,68 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests and benchmarks for BN254 elliptic curve operations, including addition, scalar multiplication, and compression.
+BN254 syscall tests and benchmarks for G1, G2, pairing, and final exponentiation.
 
 # Purpose
-The code is a C program designed to test and benchmark cryptographic operations related to the BN254 elliptic curve, which is commonly used in pairing-based cryptography. The program includes a [`main`](<#main>) function that initializes the environment and executes a series of tests on various cryptographic functions. These functions include `fd_bn254_g1_add_syscall`, `fd_bn254_g1_scalar_mul_syscall`, `fd_bn254_final_exp`, `fd_bn254_g1_compress`, `fd_bn254_g1_decompress`, `fd_bn254_g2_compress`, `fd_bn254_g2_decompress`, and `fd_bn254_pairing_is_one_syscall`. Each function is tested with predefined hexadecimal input data, and the results are compared against expected outputs to verify correctness.
+This file is a test and benchmark executable for BN254 elliptic curve operations. It boots the `fd` runtime, then runs a set of fixed test vectors for `fd_bn254_g1_add_syscall`, `fd_bn254_g1_scalar_mul_syscall`, `fd_bn254_final_exp`, and `fd_bn254_pairing_is_one_syscall`. The test data is stored as hex strings, decoded with `fd_hex_decode`, and compared against expected byte results with `fd_memeq`. If any result does not match, the code logs a hex dump and stops with an error.
 
-The program also includes performance benchmarking for each cryptographic operation. It measures the time taken to execute a fixed number of iterations of each function and logs the performance metrics, such as the number of operations per second and the time per call. The code uses several utility functions, such as `fd_hex_decode` for converting hexadecimal strings to byte arrays, and `fd_memeq` for comparing memory regions. The program is structured to handle errors and log warnings if the test results do not match the expected values, ensuring the reliability of the cryptographic operations being tested.
-# Imports and Dependencies
-
----
-- `fd_bn254_internal.h`
-- `../hex/fd_hex.h`
-- `../../util/fd_util.h`
-
-
-# Functions
-
----
-### log\_bench<!-- {{#callable:log_bench}} -->
-[View Source →](<../../../../../src/ballet/bn254/test_bn254.c#L6>)
-
-Logs the performance metrics of a benchmark test, including the rate of iterations per second per core and the average time per call.
-- **Inputs**:
-    - ``descr``: A constant character pointer that describes the benchmark test.
-    - ``iter``: An unsigned long integer representing the number of iterations performed in the benchmark.
-    - ``dt``: A long integer representing the total time taken for the benchmark in microseconds.
-- **Logic and Control Flow**:
-    - Calculate the rate of iterations per second per core (`khz`) by multiplying 1,000,000 by the number of iterations and dividing by the total time.
-    - Calculate the average time per call (`tau`) by dividing the total time by the number of iterations.
-    - Log the description, rate of iterations per second per core, and average time per call using the `FD_LOG_NOTICE` macro.
-- **Output**: No return value; the function logs the performance metrics using the `FD_LOG_NOTICE` macro.
-
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/bn254/test_bn254.c#L15>)
-
-Executes a series of cryptographic tests and benchmarks on elliptic curve operations using the BN254 curve.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Defines a series of test cases for elliptic curve operations, including addition, scalar multiplication, and pairing checks.
-    - For each test case, decodes hexadecimal input strings into byte arrays.
-    - Performs elliptic curve operations such as `fd_bn254_g1_add_syscall`, `fd_bn254_g1_scalar_mul_syscall`, and `fd_bn254_pairing_is_one_syscall`.
-    - Compares the results of operations with expected values using `fd_memeq` and logs warnings if they do not match.
-    - Runs performance benchmarks for each operation by measuring execution time over multiple iterations.
-    - Logs the performance results using [`log_bench`](<#log_bench>).
-    - Logs a notice message indicating successful completion and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`log_bench`](<#log_bench>)
-    - [`fd_bn254_fp6_is_zero`](<fd_bn254_internal.h.md#fd_bn254_fp6_is_zero>)
-    - [`fd_bn254_fp6_set_one`](<fd_bn254_internal.h.md#fd_bn254_fp6_set_one>)
-    - [`fd_bn254_fp6_is_one`](<fd_bn254_internal.h.md#fd_bn254_fp6_is_one>)
-    - [`fd_bn254_fp12_mul`](<fd_bn254_field_ext.c.md#fd_bn254_fp12_mul>)
-    - [`fd_bn254_fp12_set_one`](<fd_bn254_internal.h.md#fd_bn254_fp12_set_one>)
-    - [`fd_bn254_fp12_inv`](<fd_bn254_field_ext.c.md#fd_bn254_fp12_inv>)
-    - [`fd_bn254_fp12_is_one`](<fd_bn254_internal.h.md#fd_bn254_fp12_is_one>)
-    - [`fd_bn254_final_exp`](<fd_bn254_pairing.c.md#fd_bn254_final_exp>)
-
-
+The file also checks point compression and decompression for `G1` and `G2` with `fd_bn254_g1_compress`, `fd_bn254_g1_decompress`, `fd_bn254_g2_compress`, and `fd_bn254_g2_decompress`. After the correctness checks, it runs simple timing loops and prints throughput with [`log_bench`](<#log_bench>). The file is an executable test driver, not a library header, and it uses the BN254 internal API from `fd_bn254_internal.h` together with utility and hex decode helpers.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

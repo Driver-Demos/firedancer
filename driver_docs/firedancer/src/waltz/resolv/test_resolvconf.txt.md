@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for testing DNS resolution settings.
+Sample resolv.conf entries for local DNS resolution.
 
 # Purpose
-The configuration file specifies DNS settings for a system. The `nameserver` directive sets the DNS server to `127.0.0.53`, which is typically a local DNS resolver. The `options` directive enables `edns0` for extended DNS options and `trust-ad` to trust DNS responses with the AD (Authenticated Data) flag. The `search` directive specifies the search domain as the root domain, represented by a single dot (`.`).
+Configures the local DNS resolver to use `127.0.0.53` as the name server. The `options edns0 trust-ad` line enables EDNS0 and marks authenticated DNS data as trusted, and `search .` sets the DNS search domain list to the root domain only.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
