@@ -3,34 +3,34 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, APIs, data structures, tests for CNC, data cache, flow control, sequence numbers, memory cache, transactional cache, time performance, benchmarking, command-line tools, Makefiles, and scripts for inter-process communication and fragment processing.
+Shared-memory caches, flow control, sequence, tempo, and control tools with tests and scripts
 
 ## Folders
-- **[cnc](cnc/README.md)**: Functions, APIs, data structures, and unit tests for CNC in shared memory and high-performance applications.
-- **[dcache](dcache/README.md)**: Functions, headers, and tests for managing and validating a data cache with alignment and memory management.
-- **[fctl](fctl/README.md)**: Functions and APIs for flow control in shared memory, Makefile for build configuration, and unit tests.
-- **[fseq](fseq/README.md)**: Defines and manages shared memory for sequence numbers, APIs, a Makefile, and tests for `fd_fseq`.
-- **[mcache](mcache/README.md)**: Functions, headers, and tests for managing and verifying memory cache alignment and operations.
-- **[tcache](tcache/README.md)**: Functions and headers for a transactional cache system, a Makefile, and unit tests for `fd_tcache`.
-- **[tempo](tempo/README.md)**: Models and measures time performance, provides APIs, a Makefile, and tests for the `fd_tempo` module.
+- **[cnc](cnc/README.md)**: The `cnc` folder in the `firedancer` codebase contains source code and configuration files for managing command-and-control structures, including implementation, API definitions, build specifications, and unit tests.
+- **[dcache](dcache/README.md)**: The `dcache` folder in the `firedancer` codebase contains source files, headers, and a makefile for managing and testing a data cache system, including its creation, alignment, and operations, as well as unit tests to verify its functionality.
+- **[fctl](fctl/README.md)**: The `fctl` folder in the `firedancer` codebase contains source code, headers, and build configurations for implementing and testing a credit-based flow control system designed for large-scale distributed systems.
+- **[fseq](fseq/README.md)**: The `fseq` folder in the `firedancer` codebase contains source code and tests for managing sequence numbers in shared memory, including implementation files (`fd_fseq.c` and `fd_fseq.h`), a makefile (`Local.mk`), and unit tests (`test_fseq.c`).
+- **[mcache](mcache/README.md)**: Shared-memory cache API, layout helpers, and unit tests for fragment metadata and app data.
+- **[tcache](tcache/README.md)**: The `tcache` folder in the `firedancer` codebase contains source code and configuration files for managing a transactional cache system, including its implementation, header definitions, build instructions, and unit tests to ensure functionality and performance.
+- **[tempo](tempo/README.md)**: The `tempo` folder in the `firedancer` codebase contains source code, headers, and tests for modeling and measuring time and tick intervals, including wallclock and tickcount operations, as well as a makefile for managing the build process.
 
 ## Files
-- **[bench_frag_tx.c](bench_frag_tx.c.md)**: A benchmarking tool for fragment transmission using synthetic load and flow control in a network environment.
-- **[fd_tango.h](fd_tango.h.md)**: Header file for including various modules like tempo, cnc, fseq, fctl, mcache, dcache, and tcache.
-- **[fd_tango_base.h](fd_tango_base.h.md)**: Defines data structures and functions for managing and processing message fragments in a messaging system.
-- **[fd_tango_ctl.c](fd_tango_ctl.c.md)**: A command-line tool for managing and querying memory caches, sequence numbers, and control signals.
-- **[fd_tango_ctl_help](fd_tango_ctl_help.md)**: Command-line tool for managing and querying caches, flow control, and command-control variables.
-- **[Local.mk](Local.mk.md)**: Makefile for building the fd_tango library, binaries, unit tests, and adding test scripts.
-- **[test_frag_rx.c](test_frag_rx.c.md)**: A test program for receiving and processing fragments with flow control and diagnostics in a Tango environment.
-- **[test_frag_tx.c](test_frag_tx.c.md)**: A unit test for fragment transmission in the Firedancer codebase, simulating network packet bursts and flow control.
-- **[test_ipc_fini](test_ipc_fini.md)**: A shell script to finalize IPC tests by deleting workspace and configuration files.
-- **[test_ipc_full](test_ipc_full.md)**: A Bash script to test inter-process communication (IPC) using shared memory and NUMA node configuration.
-- **[test_ipc_init](test_ipc_init.md)**: Bash script to initialize and configure shared memory for interprocess communication tests.
-- **[test_ipc_meta](test_ipc_meta.md)**: A Bash script to test inter-process communication (IPC) using shared memory and NUMA node configuration.
-- **[test_meta_rx.c](test_meta_rx.c.md)**: A test program for receiving and processing metadata fragments with flow control and diagnostics.
-- **[test_meta_tx.c](test_meta_tx.c.md)**: A unit test for flow control and metadata transmission in a hosted environment with AVX support.
-- **[test_tango_base.c](test_tango_base.c.md)**: Tests for static assertions and sequence operations in the Firedancer Tango base.
-- **[test_tango_ctl](test_tango_ctl.md)**: A Bash script for testing various `fd_tango_ctl` commands in the `firedancer` codebase.
+- **[bench_frag_tx.c](bench_frag_tx.c.md)**: The `bench_frag_tx.c` file in the `firedancer` codebase implements a benchmark for transmitting synthetic network fragments, utilizing AVX instructions and flow control mechanisms, with configurable parameters for payload size and burst characteristics.
+- **[fd_tango.h](fd_tango.h.md)**: The `fd_tango.h` file in the `firedancer` codebase serves as a header file that includes various other headers related to tempo, CNC, fseq, fctl, mcache, dcache, and tcache functionalities.
+- **[fd_tango_base.h](fd_tango_base.h.md)**: Tango fragment metadata, sequence, chunk, control, and timestamp helpers.
+- **[fd_tango_ctl.c](fd_tango_ctl.c.md)**: The `fd_tango_ctl.c` file in the `firedancer` codebase implements a command-line tool for managing and querying various shared memory constructs such as mcaches, dcaches, fseqs, cncs, and tcaches, with support for creating, deleting, querying, and updating these constructs.
+- **[fd_tango_ctl_help](fd_tango_ctl_help.md)**: The `fd_tango_ctl_help` file provides a command-line interface for managing various caches, flow control variables, and command and control variables within the `firedancer` codebase, including commands for creation, deletion, querying, and updating these components.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build rules for the `fd_tango` library, its binaries, unit tests, and test scripts.
+- **[test_frag_rx.c](test_frag_rx.c.md)**: The `test_frag_rx.c` file in the `firedancer` codebase implements a test for receiving and processing fragment sequences with flow control and diagnostics, utilizing AVX instructions when available.
+- **[test_frag_tx.c](test_frag_tx.c.md)**: The `test_frag_tx.c` file in the `firedancer` codebase implements a unit test for transmitting synthetic network fragments, including configuration of packet parameters and flow control, and requires FD_HAS_HOSTED and FD_HAS_AVX capabilities to run.
+- **[test_ipc_fini](test_ipc_fini.md)**: The `test_ipc_fini` file is a bash script that checks for the existence of a configuration file, deletes a workspace using a control command, and then removes the configuration file.
+- **[test_ipc_full](test_ipc_full.md)**: The `test_ipc_full` file is a Bash script used to test inter-process communication (IPC) by setting up and running transmitter and receiver processes on specified CPU cores, utilizing shared memory objects, and then halting them after a set duration.
+- **[test_ipc_init](test_ipc_init.md)**: The `test_ipc_init` file is a Bash script used to set up and configure shared memory workspaces for interprocess communication in the `firedancer` project, generating a configuration file with the details.
+- **[test_ipc_meta](test_ipc_meta.md)**: The `test_ipc_meta` file is a Bash script used to set up and run inter-process communication (IPC) tests in the `firedancer` codebase, managing receiver and transmitter processes with specific CPU core assignments and configurations.
+- **[test_meta_rx.c](test_meta_rx.c.md)**: The `test_meta_rx.c` file in the `firedancer` codebase implements a test for receiving and processing metadata fragments with flow control and diagnostics, utilizing AVX instructions if available.
+- **[test_meta_tx.c](test_meta_tx.c.md)**: The `test_meta_tx.c` file in the `firedancer` codebase implements a unit test for testing metadata transmission with flow control and diagnostics, requiring FD_HAS_HOSTED and FD_HAS_AVX capabilities.
+- **[test_tango_base.c](test_tango_base.c.md)**: The `test_tango_base.c` file in the `firedancer` codebase contains a series of unit tests for validating the functionality and integrity of fragment metadata operations, sequence number manipulations, and memory alignment checks within the Tango module.
+- **[test_tango_ctl](test_tango_ctl.md)**: The `test_tango_ctl` file is a Bash script that performs a series of tests on the `fd_tango_ctl` command-line tool, checking various operations such as creating, querying, and deleting different types of caches and sequences within the `firedancer` codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

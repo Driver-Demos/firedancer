@@ -3,161 +3,169 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-APIs for managing sequence numbers as persistent shared memory objects for inter-process communication.
+The `fd_fseq.h` file in the `firedancer` codebase provides APIs for managing sequence numbers as persistent shared memory objects, primarily for flow control in communications, including functions for creating, joining, leaving, querying, and updating these sequence numbers.
 
 # Purpose
-The code is a C header file that defines an API for managing sequence numbers as persistent shared memory objects. This functionality is primarily intended for use in flow control communications between receiver and transmitter processes, but it can also be used to make sequence numbers visible to other processes at runtime. The header file includes definitions for alignment and footprint requirements for the sequence number objects (`fseq`), ensuring that memory regions are properly aligned to mitigate false sharing.
+This C header file, `fd_fseq.h`, defines a set of APIs for managing sequence numbers as persistent shared memory objects, primarily intended for use in flow control communications between receiver and transmitter processes. The file provides a structured way to handle sequence numbers in a shared memory context, allowing multiple processes to access and update these numbers safely and efficiently. The key components include functions for creating, joining, leaving, and deleting a sequence number object (`fseq`), as well as querying and updating the sequence number. The file specifies alignment and footprint requirements for memory regions used as `fseq`, ensuring proper memory management and minimizing issues like false sharing.
 
-Key functions in the API include [`fd_fseq_new`](<#fd_fseq_new>), which initializes a memory region for use as a sequence number object, and [`fd_fseq_join`](<#fd_fseq_join>) and [`fd_fseq_leave`](<#fd_fseq_leave>), which manage the joining and leaving of processes to the sequence number object. The API also provides functions for querying and updating the sequence number ([`fd_fseq_query`](<#fd_fseq_query>) and [`fd_fseq_update`](<#fd_fseq_update>)), as well as accessing the application region of the sequence number object ([`fd_fseq_app_laddr`](<#fd_fseq_app_laddr>)). The header file ensures that these operations are performed with appropriate memory fences to maintain consistency and visibility across processes.
+The header file is designed to be included in other C source files, providing a public API for sequence number management in shared memory. It defines constants for alignment and footprint, ensuring that memory regions are correctly sized and aligned. The functions provided facilitate the lifecycle management of `fseq` objects, from initialization ([`fd_fseq_new`](#fd_fseq_new)) to cleanup ([`fd_fseq_delete`](#fd_fseq_delete)), and include mechanisms for safely accessing and modifying the sequence number ([`fd_fseq_query`](#fd_fseq_query) and [`fd_fseq_update`](#fd_fseq_update)). The use of compiler fences ensures memory operations are performed in a consistent order, which is crucial in a concurrent processing environment. Overall, this file offers a robust interface for handling sequence numbers in applications requiring inter-process communication.
 # Imports and Dependencies
 
 ---
 - `../fd_tango_base.h`
 
 
+# Global Variables
+
+---
+### fd\_fseq\_new
+- **Type**: `function`
+- **Description**: The `fd_fseq_new` function is responsible for formatting an unused memory region to be used as a sequence number object in shared memory. It initializes the sequence number to `seq0` and clears the application region to zero. This function is part of a system designed to manage sequence numbers for inter-process communication.
+- **Use**: This function is used to initialize a memory region for use as a sequence number object, ensuring it is properly formatted and ready for subsequent operations.
+
+
+---
+### fd\_fseq\_join
+- **Type**: `function`
+- **Description**: The `fd_fseq_join` function is designed to join the caller to a sequence number wrapped in a shared memory object, known as a fseq. It takes a pointer to the first byte of the memory region backing the fseq and returns a pointer in the local address space to the fseq on success.
+- **Use**: This function is used to establish a connection to a fseq, allowing the caller to interact with the sequence number stored in shared memory.
+
+
+---
+### fd\_fseq\_leave
+- **Type**: `function pointer`
+- **Description**: The `fd_fseq_leave` function is a global function that facilitates leaving a current local join to a sequence number shared memory object. It takes a pointer to a constant unsigned long integer, which represents the sequence number object, and returns a pointer to the underlying shared memory region on success or NULL on failure.
+- **Use**: This function is used to safely disconnect from a shared memory sequence number object, ensuring proper resource management and cleanup.
+
+
+---
+### fd\_fseq\_delete
+- **Type**: `function pointer`
+- **Description**: The `fd_fseq_delete` function is a global function pointer that unformats a memory region used as a fseq (sequence number in shared memory). It assumes that no process is currently joined to the region and returns a pointer to the underlying shared memory region or NULL if there is an error.
+- **Use**: This function is used to delete a formatted fseq memory region, transferring ownership of the memory back to the caller.
+
+
 # Functions
 
 ---
 ### fd\_fseq\_app\_laddr<!-- {{#callable:fd_fseq_app_laddr}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L87>)
-
-Returns the local address of the application region of a sequence number object.
+The `fd_fseq_app_laddr` function returns the local address of the application region of a sequence number object, offset by two elements from the start of the sequence.
 - **Inputs**:
-    - `fseq`: A pointer to a sequence number object, which must be a current local join.
-- **Logic and Control Flow**:
-    - Calculates the address by adding 2 to the `fseq` pointer.
-    - Casts the result to a `void *` for `fd_fseq_app_laddr` or `void const *` for `fd_fseq_app_laddr_const`.
-- **Output**: A pointer to the application region of the sequence number object.
+    - `fseq`: A pointer to an unsigned long integer array representing the sequence number object.
+- **Control Flow**:
+    - The function takes a pointer to a sequence number object (`fseq`).
+    - It calculates the address by adding an offset of two to the `fseq` pointer.
+    - The function returns this calculated address cast to a `void *` type.
+- **Output**: A `void *` pointer to the local address of the application region of the sequence number object, offset by two elements.
 
 
 ---
 ### fd\_fseq\_app\_laddr\_const<!-- {{#callable:fd_fseq_app_laddr_const}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L88>)
-
-Returns a constant pointer to the application region of a sequence number object.
+The function `fd_fseq_app_laddr_const` returns a constant pointer to the application region of a sequence number object in shared memory.
 - **Inputs**:
-    - `fseq`: A constant pointer to an unsigned long integer, representing the sequence number object.
-- **Logic and Control Flow**:
-    - Calculates the address of the application region by adding 2 to the `fseq` pointer.
-    - Casts the calculated address to a constant void pointer.
-    - Returns the constant void pointer.
-- **Output**: A constant void pointer to the application region of the sequence number object.
+    - `fseq`: A constant pointer to an unsigned long integer, representing the base address of a sequence number object in shared memory.
+- **Control Flow**:
+    - The function takes a constant pointer `fseq` as input.
+    - It calculates the address of the application region by adding 2 to the `fseq` pointer.
+    - The function returns this calculated address cast to a constant void pointer.
+- **Output**: A constant void pointer to the application region of the sequence number object, offset by two ulong positions from the base address.
 
 
 ---
 ### fd\_fseq\_seq0<!-- {{#callable:fd_fseq_seq0}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L93>)
-
-Returns the sequence number used when the `fseq` was created.
+The `fd_fseq_seq0` function retrieves the initial sequence number used when the fseq was created.
 - **Inputs**:
-    - `fseq`: A pointer to a `ulong` that represents a current local join of a sequence number object.
-- **Logic and Control Flow**:
-    - Accesses the memory location immediately before the `fseq` pointer.
-    - Returns the value at this memory location, which is the initial sequence number.
-- **Output**: The initial sequence number as an `ulong`.
+    - `fseq`: A pointer to a constant unsigned long integer, representing a current local join of a sequence number object.
+- **Control Flow**:
+    - The function accesses the memory location immediately before the given pointer `fseq` to retrieve the initial sequence number.
+- **Output**: The function returns an unsigned long integer representing the initial sequence number used when the fseq was created.
 
 
 ---
 ### fd\_fseq\_query<!-- {{#callable:fd_fseq_query}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L100>)
-
-Reads the current sequence number from a sequence object in shared memory.
+The `fd_fseq_query` function reads and returns the current sequence number from a sequence number object in shared memory, ensuring memory consistency with compiler fences.
 - **Inputs**:
-    - `fseq`: A pointer to a constant unsigned long integer representing the sequence object in shared memory.
-- **Logic and Control Flow**:
-    - Executes a memory fence to ensure memory operations are completed before proceeding.
-    - Reads the sequence number from the first element of the `fseq` array using a volatile read to prevent compiler optimizations that could reorder operations.
-    - Executes another memory fence to ensure the read operation is completed before any subsequent operations.
-    - Returns the sequence number read from the `fseq`.
-- **Output**: Returns the current sequence number as an unsigned long integer.
+    - `fseq`: A pointer to a constant unsigned long integer representing the sequence number object in shared memory.
+- **Control Flow**:
+    - A memory fence is executed to ensure memory operations are completed before reading the sequence number.
+    - The sequence number is read from the first element of the `fseq` array using a volatile read to prevent compiler optimizations that could reorder operations.
+    - Another memory fence is executed to ensure memory operations are completed after reading the sequence number.
+    - The read sequence number is returned.
+- **Output**: The function returns the current sequence number as an unsigned long integer.
 
 
 ---
 ### fd\_fseq\_update<!-- {{#callable:fd_fseq_update}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L113>)
-
-Updates the sequence number stored in the `fseq` to the specified `seq` value.
+The `fd_fseq_update` function updates the sequence number stored in a shared memory sequence object, ensuring memory consistency with compiler fences.
 - **Inputs**:
-    - `fseq`: A pointer to an `ulong` representing the sequence number storage location.
-    - `seq`: An `ulong` value representing the new sequence number to store.
-- **Logic and Control Flow**:
-    - Executes a memory fence to ensure memory operations are completed before updating the sequence number.
-    - Updates the sequence number at the first position of the `fseq` array to the value of `seq`.
-    - Executes another memory fence to ensure the update is visible to other processes.
-- **Output**: No return value; the function updates the sequence number in place.
+    - `fseq`: A pointer to an unsigned long representing the shared memory sequence object to be updated.
+    - `seq`: An unsigned long value representing the new sequence number to be stored in the sequence object.
+- **Control Flow**:
+    - A memory fence is executed to ensure memory operations are completed before updating the sequence number.
+    - The sequence number at the first position of the `fseq` array is updated to the new `seq` value using a volatile write to ensure visibility across threads.
+    - Another memory fence is executed to ensure the update is visible to other threads.
+- **Output**: The function does not return a value; it updates the sequence number in the provided sequence object.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_fseq\_align<!-- {{#callable_declaration:fd_fseq_align}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L27>)
-
-Returns the required alignment for a sequence number memory region.
-- **Description**: Use this function to obtain the alignment requirement for a memory region intended to be used as a sequence number in shared memory. This is important for ensuring that the memory region is correctly aligned to avoid performance issues related to false sharing. The alignment value is a positive integer power of 2, recommended to be at least double the cache line size.
+Return the required alignment for a memory region suitable for use as a fseq.
+- **Description**: Use this function to obtain the alignment requirement for a memory region intended to be used as a fseq. This is particularly useful when setting up shared memory for sequence number management in flow control communications. The alignment value returned is a positive integer power of 2, which is recommended to be at least double the cache line size to mitigate false sharing. This function does not require any prior initialization and can be called at any time.
 - **Inputs**: None
-- **Output**: Returns an unsigned long integer representing the alignment requirement.
-- **See Also**: [`fd_fseq_align`](<fd_fseq.c.md#fd_fseq_align>)  (Implementation)
+- **Output**: Returns the alignment requirement as an unsigned long integer.
+- **See also**: [`fd_fseq_align`](fd_fseq.c.md#fd_fseq_align)  (Implementation)
 
 
 ---
 ### fd\_fseq\_footprint<!-- {{#callable_declaration:fd_fseq_footprint}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L36>)
-
 Returns the memory footprint required for a sequence number object.
-- **Description**: Use this function to obtain the size of memory needed to store a sequence number object in shared memory. This is useful for ensuring that memory allocations are correctly sized before initializing or manipulating sequence number objects. The function does not require any parameters and can be called at any time to retrieve the constant footprint size.
+- **Description**: Use this function to determine the size of the memory region needed to store a sequence number object in shared memory. This is useful for allocating the correct amount of memory when setting up a sequence number for inter-process communication. The function is constant and does not depend on any input parameters or state.
 - **Inputs**: None
-- **Output**: The function returns an unsigned long integer representing the memory footprint size in bytes.
-- **See Also**: [`fd_fseq_footprint`](<fd_fseq.c.md#fd_fseq_footprint>)  (Implementation)
+- **Output**: The function returns an unsigned long integer representing the required memory footprint in bytes.
+- **See also**: [`fd_fseq_footprint`](fd_fseq.c.md#fd_fseq_footprint)  (Implementation)
 
 
 ---
 ### fd\_fseq\_new<!-- {{#callable_declaration:fd_fseq_new}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L47>)
-
 Formats a memory region for use as a sequence number object.
-- **Description**: Use this function to initialize a memory region as a sequence number object, which is primarily for use in flow control communications. The memory region must be non-null, properly aligned, and have the required footprint. The function initializes the sequence number to the specified value and clears the application region. It returns the memory region pointer on success or NULL if the memory region is invalid, logging details of the failure.
+- **Description**: This function initializes a given memory region to be used as a sequence number object, which is primarily intended for flow control communications in shared memory environments. It requires the memory region to be non-null, properly aligned, and of sufficient size. The sequence number is initialized to the provided value, and the application region is cleared. If the memory region is invalid, the function logs a warning and returns NULL.
 - **Inputs**:
-    - `shmem`: A pointer to the memory region to format. Must not be null and must be aligned according to `fd_fseq_align()`. The caller retains ownership.
-    - `seq0`: The initial sequence number to set. There are no specific constraints on its value.
-- **Output**: Returns the pointer to the formatted memory region on success, or NULL on failure.
-- **See Also**: [`fd_fseq_new`](<fd_fseq.c.md#fd_fseq_new>)  (Implementation)
+    - `shmem`: A pointer to the memory region to be formatted as a sequence number object. It must not be null, must be aligned according to fd_fseq_align(), and must have a footprint of at least FD_FSEQ_FOOTPRINT bytes. If these conditions are not met, the function returns NULL.
+    - `seq0`: The initial sequence number to set in the sequence number object. This value is used to initialize the sequence number fields in the memory region.
+- **Output**: Returns the pointer to the formatted memory region on success, or NULL if the input memory region is invalid.
+- **See also**: [`fd_fseq_new`](fd_fseq.c.md#fd_fseq_new)  (Implementation)
 
 
 ---
 ### fd\_fseq\_join<!-- {{#callable_declaration:fd_fseq_join}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L61>)
-
-Joins the caller to a sequence number in shared memory.
-- **Description**: Use this function to access a sequence number stored in a shared memory region. The input must be a pointer to the first byte of the memory region that backs the sequence number in the caller's address space. The function returns a pointer to the sequence number on success. Ensure that the memory region is correctly aligned and initialized before calling. If the input is null, misaligned, or does not point to a valid sequence number, the function returns null and logs a warning. Each successful call should be paired with a corresponding leave call to properly manage the join's lifecycle.
+Joins the caller to a sequence number shared memory object.
+- **Description**: Use this function to join a sequence number shared memory object, allowing the caller to interact with it. The function requires a pointer to the first byte of the memory region backing the sequence number object in the caller's address space. It returns a pointer to the sequence number on success, which should not be assumed to be a simple cast of the input pointer. Ensure that the memory region is correctly aligned and initialized as a sequence number object before calling this function. A successful join must be matched with a corresponding leave to properly manage resources.
 - **Inputs**:
-    - `shfseq`: A pointer to the first byte of the memory region backing the sequence number in the caller's address space. Must not be null and must be aligned according to `fd_fseq_align()`. The memory region must be initialized and contain a valid sequence number. If these conditions are not met, the function returns null and logs a warning.
-- **Output**: Returns a pointer to the sequence number in the local address space on success, or null on failure.
-- **See Also**: [`fd_fseq_join`](<fd_fseq.c.md#fd_fseq_join>)  (Implementation)
+    - `shfseq`: A pointer to the first byte of the memory region backing the sequence number object in the caller's address space. Must not be null and must be aligned according to fd_fseq_align(). The memory region must be properly initialized as a sequence number object. If these conditions are not met, the function returns NULL and logs a warning.
+- **Output**: Returns a pointer to the sequence number in the local address space on success, or NULL on failure.
+- **See also**: [`fd_fseq_join`](fd_fseq.c.md#fd_fseq_join)  (Implementation)
 
 
 ---
 ### fd\_fseq\_leave<!-- {{#callable_declaration:fd_fseq_leave}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L69>)
-
-Leaves a current local join to a sequence number.
-- **Description**: Use this function to leave a current local join to a sequence number that was previously joined. It returns a pointer to the underlying shared memory region on success. Ensure that the input is a valid pointer to a sequence number that is currently joined. If the input is null, the function logs a warning and returns null. This function is typically used in conjunction with `fd_fseq_join` to manage the lifecycle of a sequence number join.
+Leaves a current local join to a sequence number shared memory object.
+- **Description**: Use this function to leave a current local join to a sequence number shared memory object, typically after operations on the sequence number are complete. This function should be called after a successful join using `fd_fseq_join`. It returns a pointer to the underlying shared memory region on success, which is not simply a cast of the input pointer. If the input is NULL, the function logs a warning and returns NULL, indicating failure.
 - **Inputs**:
-    - `fseq`: A pointer to a sequence number that is currently joined. Must not be null. If null, the function logs a warning and returns null.
-- **Output**: Returns a pointer to the underlying shared memory region on success, or null if the input is invalid.
-- **See Also**: [`fd_fseq_leave`](<fd_fseq.c.md#fd_fseq_leave>)  (Implementation)
+    - `fseq`: A pointer to the sequence number shared memory object. Must not be NULL. The function logs a warning and returns NULL if this parameter is NULL.
+- **Output**: Returns a pointer to the underlying shared memory region on success, or NULL on failure.
+- **See also**: [`fd_fseq_leave`](fd_fseq.c.md#fd_fseq_leave)  (Implementation)
 
 
 ---
 ### fd\_fseq\_delete<!-- {{#callable_declaration:fd_fseq_delete}} -->
-[View Source →](<../../../../../src/tango/fseq/fd_fseq.h#L78>)
-
 Unformats a memory region used as a fseq.
-- **Description**: Use this function to unformat a memory region that was previously formatted as a fseq. It is important to ensure that no process is currently joined to the fseq before calling this function. The function returns a pointer to the underlying shared memory region, transferring ownership to the caller. If the input is invalid, such as when the pointer does not point to a valid fseq, the function returns NULL and logs a warning.
+- **Description**: Use this function to unformat a memory region that was previously formatted as a fseq, assuming no processes are currently joined to it. This function should be called when the fseq is no longer needed, and it transfers ownership of the memory region back to the caller upon success. It returns a pointer to the underlying shared memory region or NULL if the input is invalid, such as when the pointer does not point to a valid fseq. The function logs details of any errors encountered.
 - **Inputs**:
-    - `shfseq`: A pointer to the memory region to unformat. It must be non-NULL, aligned according to `fd_fseq_align()`, and point to a valid fseq. If these conditions are not met, the function returns NULL and logs a warning.
+    - `shfseq`: A pointer to the memory region that is currently formatted as a fseq. It must be aligned according to fd_fseq_align() and must not be NULL. The function will return NULL and log a warning if the pointer is NULL, misaligned, or does not point to a valid fseq.
 - **Output**: Returns a pointer to the underlying shared memory region on success, or NULL if the input is invalid.
-- **See Also**: [`fd_fseq_delete`](<fd_fseq.c.md#fd_fseq_delete>)  (Implementation)
+- **See also**: [`fd_fseq_delete`](fd_fseq.c.md#fd_fseq_delete)  (Implementation)
 
 
 

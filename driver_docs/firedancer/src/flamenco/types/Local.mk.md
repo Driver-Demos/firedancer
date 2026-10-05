@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing components in the `firedancer` codebase with conditional compilation.
+Build rules for types tests, fixtures, bincode tools, fuzzing, and Protobuf objects.
 
 # Purpose
-The content is a Makefile script used to automate the build process for a software project. It defines a series of conditional and procedural instructions to compile and test various components of the project. The `ifdef FD_HAS_INT128` directive checks for the presence of a specific feature (`FD_HAS_INT128`) and, if available, includes headers and object files necessary for building and testing. The script uses `$(call make-unit-test,...)` to define unit tests for different modules, such as `test_types_meta` and `test_types_yaml`, and `$(call run-unit-test,...)` to execute these tests. Additionally, the script includes instructions to create a library (`fd_flamenco_test`) and, conditionally, a binary (`fd_bincode2yaml`) and a fuzz test (`fuzz_types_decode`) if `FD_HAS_HOSTED` is defined. The script also references Protobuf definitions for "ConfirmedBlock" by adding the object file `fd_solana_block.pb` to the build process.
+This build file section controls which type-related headers, object files, unit tests, and tools are built for the `fd_flamenco` target when `FD_HAS_INT128` is enabled. It adds the type metadata and YAML support files, defines unit tests for metadata, type walking, YAML handling, fixtures, and casting, and then registers those tests to run during the build. It also creates the `fd_flamenco_test` library and adds reflection objects used by test and conversion tools. When `FD_HAS_HOSTED` is enabled, it builds the `fd_bincode2yaml` utility and the `fuzz_types_decode` fuzz test, and it also adds the `fd_solana_block.pb` object that contains the `ConfirmedBlock` Protobuf definitions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
