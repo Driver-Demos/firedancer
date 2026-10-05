@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_eth.c` file in the `firedancer` codebase contains unit tests for Ethernet-related functionalities, including MAC address conversion, frame checksum calculations, and VLAN tagging.
+Tests for Ethernet header types, MAC address conversion, and frame checksum validation.
 
 # Purpose
-This C source code file is a comprehensive test suite for Ethernet-related functionalities, specifically focusing on Ethernet header and MAC address operations. It includes static assertions to verify the correctness of various Ethernet constants and structures, such as header types and payload sizes, ensuring that they conform to expected values. The code defines a static Ethernet frame and tests various functions related to MAC address manipulation, including conversion from string to MAC address, checking if a MAC address is multicast, local, broadcast, or IPv4 multicast, and formatting MAC addresses. Additionally, it tests the calculation and verification of the Frame Check Sequence (FCS) for Ethernet frames, ensuring data integrity.
+The code is a C test suite for validating Ethernet-related functionalities. It includes static assertions to verify constants and data structure sizes related to Ethernet headers and VLAN tags. The code tests various functions from the `fd_eth` library, such as `fd_cstr_to_mac_addr`, which converts a string representation of a MAC address to its binary form, and `fd_eth_fcs`, which calculates the Frame Check Sequence (FCS) for Ethernet frames. The test suite also checks the correctness of MAC address manipulation functions, including multicast, broadcast, and IPv4 multicast address checks, as well as MAC address copying.
 
-The file serves as an executable test program, as indicated by the presence of a [`main`](#main) function, which orchestrates the execution of various test cases. It leverages utility functions from included headers (`fd_util.h` and `fd_eth.h`) to perform operations on Ethernet headers and MAC addresses. The tests cover a wide range of scenarios, including valid and invalid MAC address strings, and ensure that the Ethernet functionalities behave as expected. This file is crucial for validating the correctness and robustness of Ethernet-related operations in the broader software system, providing a reliable foundation for network communication features.
+The [`main`](<#main>) function initializes the test environment and performs a series of tests to ensure the correctness of Ethernet header and VLAN tag offsets, MAC address properties, and FCS calculations. It uses predefined Ethernet frames and MAC addresses to validate the expected behavior of the functions. The test suite logs the results and halts the execution after completing all tests. This code is intended to be executed as a standalone program to verify the integrity and correctness of the Ethernet-related functionalities provided by the `fd_eth` library.
 # Imports and Dependencies
 
 ---
@@ -20,58 +20,61 @@ The file serves as an executable test program, as indicated by the presence of a
 
 ---
 ### frame
-- **Type**: `uchar const[]`
-- **Description**: The `frame` variable is a static constant array of unsigned characters (bytes) that represents a predefined Ethernet frame. It contains a sequence of hexadecimal values that likely correspond to an Ethernet header and payload, including MAC addresses and possibly an ARP request.
-- **Use**: This variable is used to store a predefined Ethernet frame for testing or demonstration purposes, such as verifying frame checksum calculations.
+- **Type**: ``uchar const[]``
+- **Description**: An array of unsigned characters that represents a static Ethernet frame. The frame includes destination and source MAC addresses, an ARP protocol type, and other network-related data.
+- **Use**: Used to store a predefined Ethernet frame for testing or network communication purposes.
 
 
 # Functions
 
 ---
 ### test\_cstr\_to\_mac\_addr<!-- {{#callable:test_cstr_to_mac_addr}} -->
-The function `test_cstr_to_mac_addr` tests the conversion of C-style string representations of MAC addresses into their binary form and validates the conversion results.
+[View Source →](<../../../../../src/util/net/test_eth.c#L31>)
+
+Tests the conversion of C-style strings to MAC addresses and validates the results.
 - **Inputs**: None
-- **Control Flow**:
-    - Initialize a 6-byte array `mac` to store the MAC address.
-    - Define macros `MAC_OK` and `MAC_FAIL` to test successful and failed conversions respectively.
-    - Test valid MAC address strings using `MAC_OK` to ensure they convert correctly to the expected binary form.
-    - Iterate over each character position in a valid MAC address string and replace it with invalid characters to test failure cases using `MAC_FAIL`.
-    - Test strings with invalid separators and unexpected separators using `MAC_FAIL` to ensure they are correctly identified as invalid.
-- **Output**: The function does not return any value; it uses assertions to validate the correctness of the MAC address conversion.
+- **Logic and Control Flow**:
+    - Defines a MAC address array `mac` with 6 elements initialized to zero.
+    - Uses the macro `MAC_OK` to test valid MAC address strings by converting them and comparing the result to an expected value.
+    - Uses the macro `MAC_FAIL` to test invalid MAC address strings, ensuring the conversion fails.
+    - Iterates over possible invalid characters and truncated strings to test the conversion failure for each case.
+    - Tests invalid separator placements in the MAC address string to ensure conversion fails.
+    - Tests unexpected separator placements in the MAC address string to ensure conversion fails.
+- **Output**: No output is returned as this function is a test function that uses assertions to validate behavior.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, performs a series of tests on Ethernet MAC addresses and VLAN tags, and validates the functionality of Ethernet frame checksum calculations.
+[View Source →](<../../../../../src/util/net/test_eth.c#L94>)
+
+Initializes the environment, performs various Ethernet-related tests, and logs the results before halting.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Perform static assertions on Ethernet header and VLAN tag structures to ensure correct offsets and sizes.
-    - Initialize a source MAC address and perform tests to check if it is multicast, local, broadcast, or IPv4 multicast.
-    - Log the formatted MAC address for testing purposes.
-    - Convert the source MAC address to an IPv4 multicast MAC address and verify the conversion and properties.
-    - Calculate the frame checksum (FCS) for a predefined Ethernet frame and verify it against an expected value.
-    - Append to the FCS in parts and verify the final checksum matches the expected value.
-    - Initialize a destination MAC address as a broadcast address and verify its properties.
-    - Copy the source MAC address to the destination and verify the copy operation.
-    - Create a VLAN tag and verify its fields using byte-swapped values.
-    - Call [`test_cstr_to_mac_addr`](#test_cstr_to_mac_addr) to test string to MAC address conversion.
-    - Log a notice indicating the tests passed and call `fd_halt` to terminate the program.
-- **Output**: The function returns 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_eth_mac_is_mcast`](fd_eth.h.md#fd_eth_mac_is_mcast)
-    - [`fd_eth_mac_is_local`](fd_eth.h.md#fd_eth_mac_is_local)
-    - [`fd_eth_mac_is_bcast`](fd_eth.h.md#fd_eth_mac_is_bcast)
-    - [`fd_eth_mac_is_ip4_mcast`](fd_eth.h.md#fd_eth_mac_is_ip4_mcast)
-    - [`fd_eth_mac_ip4_mcast`](fd_eth.h.md#fd_eth_mac_ip4_mcast)
-    - [`fd_eth_fcs`](fd_eth.h.md#fd_eth_fcs)
-    - [`fd_eth_fcs_append`](fd_eth.c.md#fd_eth_fcs_append)
-    - [`fd_eth_mac_bcast`](fd_eth.h.md#fd_eth_mac_bcast)
-    - [`fd_eth_mac_cpy`](fd_eth.h.md#fd_eth_mac_cpy)
-    - [`fd_vlan_tag`](fd_eth.h.md#fd_vlan_tag)
-    - [`test_cstr_to_mac_addr`](#test_cstr_to_mac_addr)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Performs static assertions on Ethernet header and VLAN tag structures to verify their offsets.
+    - Initializes a MAC address `src` and performs tests to check if it is multicast, local, broadcast, or IPv4 multicast.
+    - Logs the formatted MAC address using `FD_LOG_NOTICE`.
+    - Modifies `src` to represent an IPv4 multicast address and verifies its properties.
+    - Calculates and verifies the Frame Check Sequence (FCS) for a predefined Ethernet frame using [`fd_eth_fcs`](<fd_eth.h.md#fd_eth_fcs>) and [`fd_eth_fcs_append`](<fd_eth.c.md#fd_eth_fcs_append>).
+    - Initializes a MAC address `dst` as a broadcast address and verifies its properties.
+    - Copies `src` to `dst` and verifies the copy operation.
+    - Creates a VLAN tag and verifies its properties using `fd_vlan_tag`.
+    - Calls [`test_cstr_to_mac_addr`](<#test_cstr_to_mac_addr>) to test MAC address string conversion.
+    - Logs a success message and calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_eth_mac_is_mcast`](<fd_eth.h.md#fd_eth_mac_is_mcast>)
+    - [`fd_eth_mac_is_local`](<fd_eth.h.md#fd_eth_mac_is_local>)
+    - [`fd_eth_mac_is_bcast`](<fd_eth.h.md#fd_eth_mac_is_bcast>)
+    - [`fd_eth_mac_is_ip4_mcast`](<fd_eth.h.md#fd_eth_mac_is_ip4_mcast>)
+    - [`fd_eth_mac_ip4_mcast`](<fd_eth.h.md#fd_eth_mac_ip4_mcast>)
+    - [`fd_eth_fcs`](<fd_eth.h.md#fd_eth_fcs>)
+    - [`fd_eth_fcs_append`](<fd_eth.c.md#fd_eth_fcs_append>)
+    - [`fd_eth_mac_bcast`](<fd_eth.h.md#fd_eth_mac_bcast>)
+    - [`fd_eth_mac_cpy`](<fd_eth.h.md#fd_eth_mac_cpy>)
+    - [`test_cstr_to_mac_addr`](<#test_cstr_to_mac_addr>)
 
 
 
