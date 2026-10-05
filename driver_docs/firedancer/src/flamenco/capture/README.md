@@ -3,24 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Solana capture protobufs, readers, writers, diff, import, YAML, and build rules.
+Tools and programs for capturing, comparing, and processing Solana blockchain data using Protobuf and YAML.
 
 
 ## Files
-- **[fd_solcap.pb.c](fd_solcap.pb.c.md)**: Nanopb constant bindings for fd_solcap protobuf messages.
-- **[fd_solcap.pb.h](fd_solcap.pb.h.md)**: Nanopb message definitions for Solana capture file metadata, accounts, rewards, and transactions.
-- **[fd_solcap.proto](fd_solcap.proto.md)**: Proto messages for Solana capture file metadata, bank preimages, accounts, rewards, and transactions.
-- **[fd_solcap_diff.c](fd_solcap_diff.c.md)**: Diffs Solana capture files and prints bank, account, and transaction mismatches.
-- **[fd_solcap_import.c](fd_solcap_import.c.md)**: Imports JSON runtime capture directories into a Solana capture output file.
-- **[fd_solcap_proto.h](fd_solcap_proto.h.md)**: Solcap capture file format headers, chunk types, and size limits.
-- **[fd_solcap_reader.c](fd_solcap_reader.c.md)**: The `fd_solcap_reader.c` file in the `firedancer` codebase implements functions for reading and decoding Solana capture data from a file, including iterating over chunks and extracting specific metadata using Protobuf.
-- **[fd_solcap_reader.h](fd_solcap_reader.h.md)**: The `fd_solcap_reader.h` file in the `firedancer` codebase provides functions and structures for iterating through and reading chunks of a solcap file, including handling errors and specific data retrieval like bank preimages and account tables.
-- **[fd_solcap_writer.c](fd_solcap_writer.c.md)**: Solana capture writer functions for account, bank, transaction, and reward protobuf chunks.
-- **[fd_solcap_writer.h](fd_solcap_writer.h.md)**: SOLCAP capture writer API for slots, accounts, bank hashes, transactions, stake rewards, and protobuf blobs
-- **[fd_solcap_writer_stub.c](fd_solcap_writer_stub.c.md)**: Stub fd_solcap_writer implementation for non-hosted targets.
-- **[fd_solcap_yaml.c](fd_solcap_yaml.c.md)**: Prints Solana runtime capture files as YAML with bank, account, and transaction details.
-- **[Local.mk](Local.mk.md)**: Build rules for solcap headers, objects, and binaries, with a stub when hosted support is absent.
-- **[Makefile](Makefile.md)**: Build rules for nanopb-generated .pb.h and .pb.c files from fd_solcap.proto, with clean support.
+- **[fd_solcap.pb.c](fd_solcap.pb.c.md)**: Automatically generated nanopb constant definitions for various fd_solcap data structures.
+- **[fd_solcap.pb.h](fd_solcap.pb.h.md)**: Defines nanopb message structures and field specifications for Solana capture data, including metadata, bank preimages, account details, and transaction information.
+- **[fd_solcap.proto](fd_solcap.proto.md)**: Defines protocol buffer messages for capturing Solana blockchain data, including metadata, bank preimages, account details, and transaction information.
+- **[fd_solcap_diff.c](fd_solcap_diff.c.md)**: A C program for comparing Solana capture files, identifying differences in bank hashes, accounts, and transactions.
+- **[fd_solcap_import.c](fd_solcap_import.c.md)**: Imports runtime capture directories from JSON and writes them to an output file using a Solcap writer.
+- **[fd_solcap_proto.h](fd_solcap_proto.h.md)**: Defines the "solcap" data format for capturing Solana runtime data, using C structs and Protobufs.
+- **[fd_solcap_reader.c](fd_solcap_reader.c.md)**: Functions for reading and decoding Solana capture data from files using Protobuf.
+- **[fd_solcap_reader.h](fd_solcap_reader.h.md)**: Defines structures and functions for iterating and reading chunks in a solcap file.
+- **[fd_solcap_writer.c](fd_solcap_writer.c.md)**: Implements a capture writer for Solana bank hash pre-images and account changes, with functions for writing and managing data chunks in a file.
+- **[fd_solcap_writer.h](fd_solcap_writer.h.md)**: Header file for managing the lifecycle and operations of a capture writer object for SOLCAP_V1_BANK files.
+- **[fd_solcap_writer_stub.c](fd_solcap_writer_stub.c.md)**: Stub implementation of `fd_solcap_writer` for non-hosted targets with basic memory operations.
+- **[fd_solcap_yaml.c](fd_solcap_yaml.c.md)**: Converts runtime capture files to YAML format with options for verbosity and filtering by slot range.
+- **[Local.mk](Local.mk.md)**: Makefile rules for building binaries and objects related to Solcap in the Firedancer project.
+- **[Makefile](Makefile.md)**: Build rules for generating and cleaning Protocol Buffers files using a custom nanopb generator.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

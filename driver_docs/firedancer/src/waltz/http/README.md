@@ -3,28 +3,28 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-HTTP and WebSocket server code, URL parsing, patched picohttpparser, fuzz tests, and build rules
+HTTP server implementation with WebSocket support, URL parsing, picohttpparser, fuzz testing, and build scripts.
 
 
 ## Files
-- **[.gitignore](.gitignore.md)**: The `.gitignore` file in the `firedancer/src/waltz/http/` directory specifies that the files `picohttpparsertemp.c` and `fd_picohttpparser.c` should be ignored by Git.
-- **[fd_http_server.c](fd_http_server.c.md)**: HTTP and WebSocket server with request parsing, response staging, and connection management.
-- **[fd_http_server.h](fd_http_server.h.md)**: WebSocket-capable HTTP server API with request, response, and polling functions.
-- **[fd_http_server_private.h](fd_http_server_private.h.md)**: Private HTTP server state, connection, WebSocket, and staging buffer structures.
-- **[fd_picohttpparser.patch](fd_picohttpparser.patch.md)**: The `fd_picohttpparser.patch` file in the `firedancer` codebase contains modifications to the `picohttpparser` code, primarily adding explicit type casting and fallthrough attributes to improve type safety and control flow.
-- **[fd_url.c](fd_url.c.md)**: URL parsing and percent-unescape functions for HTTP and HTTPS strings.
-- **[fd_url.h](fd_url.h.md)**: Basic URL parsing and in-place percent-unescape functions.
-- **[fuzz_httpserver.c](fuzz_httpserver.c.md)**: Fuzzes the HTTP server with random HTTP and WebSocket client actions.
-- **[fuzz_picohttpparser.c](fuzz_picohttpparser.c.md)**: The `fuzz_picohttpparser.c` file in the `firedancer` codebase implements fuzz testing for the picohttpparser library, focusing on parsing HTTP requests, responses, headers, and chunked data.
-- **[fuzz_url_parse.c](fuzz_url_parse.c.md)**: The `fuzz_url_parse.c` file in the `firedancer` codebase implements a fuzzing test for URL parsing, ensuring that parsed components are within the bounds of the input data.
-- **[Local.mk](Local.mk.md)**: Build rules for patching picohttpparser and adding HTTP headers, objects, and tests.
-- **[picohttpparser.c](picohttpparser.c.md)**: The `picohttpparser.c` file in the `firedancer` codebase provides an implementation for parsing HTTP requests and responses, including functions for handling headers and chunked transfer encoding.
-- **[picohttpparser.h](picohttpparser.h.md)**: The `picohttpparser.h` file in the `firedancer` codebase provides function declarations and structures for parsing HTTP requests, responses, and headers, as well as decoding chunked transfer encoding.
-- **[README.txt](README.txt.md)**: The `README.txt` file in the `firedancer` codebase explains that the directory contains a patched version of the picohttpparser library, originally from commit `66534e6`, and provides instructions for updating the patch.
-- **[test_http_server.c](test_http_server.c.md)**: Tests HTTP server staging and ring buffer alignment behavior.
-- **[test_http_server.py](test_http_server.py.md)**: The `test_http_server.py` file in the `firedancer` codebase tests an HTTP server by making multiple GET and POST requests and establishes a WebSocket connection to subscribe to slot updates.
-- **[test_live_http_server.c](test_live_http_server.c.md)**: The `test_live_http_server.c` file in the `firedancer` codebase implements a test HTTP server with WebSocket support, handling HTTP requests and WebSocket messages, and includes signal handling for graceful shutdown.
-- **[test_live_http_server.py](test_live_http_server.py.md)**: The `test_live_http_server.py` file tests the functionality of an HTTP server by making multiple GET and POST requests and establishing a WebSocket connection to verify responses.
+- **[.gitignore](.gitignore.md)**: Specifies files to ignore in version control for the HTTP component of the Firedancer project.
+- **[fd_http_server.c](fd_http_server.c.md)**: Implementation of an HTTP server with WebSocket support, connection management, and optional ZSTD compression.
+- **[fd_http_server.h](fd_http_server.h.md)**: Header file for a WebSocket-capable HTTP server designed for streaming messages to multiple clients efficiently.
+- **[fd_http_server_private.h](fd_http_server_private.h.md)**: Defines private structures and constants for managing HTTP and WebSocket server connections in Firedancer.
+- **[fd_picohttpparser.patch](fd_picohttpparser.patch.md)**: Patch for type casting and fallthrough attribute adjustments in the HTTP parser code.
+- **[fd_url.c](fd_url.c.md)**: Parses and unescapes URLs, supporting HTTP and HTTPS schemes, with error handling for invalid components.
+- **[fd_url.h](fd_url.h.md)**: API for basic URL handling, including parsing and unescaping, with limitations on compliance and features.
+- **[fuzz_httpserver.c](fuzz_httpserver.c.md)**: Fuzz testing implementation for an HTTP server with WebSocket support, using random input generation and callbacks.
+- **[fuzz_picohttpparser.c](fuzz_picohttpparser.c.md)**: Fuzz testing for HTTP request and response parsing using picohttpparser.
+- **[fuzz_url_parse.c](fuzz_url_parse.c.md)**: Fuzz testing for URL parsing with boundary checks in the Firedancer codebase.
+- **[Local.mk](Local.mk.md)**: Applies a local patch to picohttpparser and compiles it, with unit and fuzz tests for HTTP components.
+- **[picohttpparser.c](picohttpparser.c.md)**: HTTP parser implementation for parsing requests, responses, and headers, with chunked transfer decoding.
+- **[picohttpparser.h](picohttpparser.h.md)**: HTTP parser functions and data structures for parsing requests, responses, and chunked data.
+- **[README.txt](README.txt.md)**: A copy of the picohttpparser library with a build-time patch for compatibility.
+- **[test_http_server.c](test_http_server.c.md)**: Tests for the HTTP server's staging and unstaging functionality in the Firedancer codebase.
+- **[test_http_server.py](test_http_server.py.md)**: Tests HTTP and WebSocket server interactions using requests and websockets libraries.
+- **[test_live_http_server.c](test_live_http_server.c.md)**: Tests a live HTTP server with signal handling, request processing, and WebSocket support.
+- **[test_live_http_server.py](test_live_http_server.py.md)**: Tests for HTTP and WebSocket server interactions using requests and websockets libraries.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
