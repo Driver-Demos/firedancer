@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Shred parsing, deshredding, FEC sets, and tests for Solana block data.
+Parsing, validating, deshredding, and testing Solana shreds.
 
 
 ## Files
-- **[fd_deshredder.c](fd_deshredder.c.md)**: The `fd_deshredder.c` file in the `firedancer` codebase implements functions to initialize and process a deshredder, which consumes and processes data shreds into a buffer.
-- **[fd_deshredder.h](fd_deshredder.h.md)**: The `fd_deshredder.h` file defines the `fd_deshredder_t` structure and functions for deserializing a vector of shreds into block entries within the Firedancer codebase.
-- **[fd_fec_set.h](fd_fec_set.h.md)**: The `fd_fec_set.h` file defines the structure and components of a Forward Error Correction (FEC) set used in the Firedancer project, which includes handling data and parity shreds for transmission and reception.
-- **[fd_shred.c](fd_shred.c.md)**: Shred parsing and Merkle root computation with size and field validation.
-- **[fd_shred.h](fd_shred.h.md)**: Shred layout, type constants, parsing, and helper functions for Solana block data.
-- **[fuzz_shred_parse.c](fuzz_shred_parse.c.md)**: The `fuzz_shred_parse.c` file in the `firedancer` codebase implements a fuzz testing harness for parsing and validating different types of shreds, including checks for bounds and specific shred properties.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and conditional fuzz tests for the shred and deshredder components within the `fd_ballet` module.
-- **[test_deshredder.c](test_deshredder.c.md)**: The `test_deshredder.c` file in the `firedancer` codebase tests the functionality of the deshredder by reading, parsing, and processing shreds from binary archives to verify the integrity and correctness of the deshredded content.
-- **[test_shred.c](test_shred.c.md)**: Unit tests for shred parsing, type checks, size checks, and legacy shred fixtures.
+- **[fd_deshredder.c](fd_deshredder.c.md)**: Implements functions to initialize and process shreds in a deshredder structure.
+- **[fd_deshredder.h](fd_deshredder.h.md)**: Header file for deserializing vectors of shreds into block entries with initialization and processing functions.
+- **[fd_fec_set.h](fd_fec_set.h.md)**: Defines the `fd_fec_set` structure for managing data and parity shreds in FEC sets.
+- **[fd_shred.c](fd_shred.c.md)**: Functions for parsing and validating shreds, and computing their Merkle roots.
+- **[fd_shred.h](fd_shred.h.md)**: Header file defining the structure and functions for handling Solana shreds, including types, sizes, and error correction.
+- **[fuzz_shred_parse.c](fuzz_shred_parse.c.md)**: Fuzz testing for parsing and validating different types of shreds with boundary checks.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests, with optional fuzz testing for hosted environments.
+- **[test_deshredder.c](test_deshredder.c.md)**: Tests the deshredding process by reading, parsing, and verifying shred data from binary archives.
+- **[test_shred.c](test_shred.c.md)**: Tests for parsing and validating different types of shreds, including legacy and Merkle variants.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

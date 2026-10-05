@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `macos_clang_m1.mk` file in the `firedancer` codebase configures the build environment for macOS using Clang on Apple M1, including specific compiler flags and dependencies.
+Makefile for configuring build settings on macOS with Clang for Apple M1 architecture.
 
 # Purpose
-This file is a Makefile, which is used to automate the build process of a software project, specifically targeting the macOS platform with Clang on an Apple M1 chip. The `BUILDDIR` variable specifies the directory structure for the build, indicating a focus on macOS with Clang for the M1 architecture. The file includes several other Makefiles, such as `base.mk` and additional configuration files for Clang, debugging, and optimization, which likely contain further build instructions and settings. The file sets preprocessor flags (`CPPFLAGS`) to define various macros that control the compilation process, such as enabling support for 128-bit integers, double precision, and atomic operations, while also specifying the target CPU architecture. Comments in the file suggest the use of LLVM tools installed via Homebrew and note certain configurations that are temporary until broader support is implemented for macOS.
+The Makefile configuration sets up the build environment for a macOS system using the Clang compiler on an Apple M1 chip. It specifies the build directory as `macos/clang/m1` and includes several configuration files to extend the base settings with Clang-specific, debug, and optimization options. The file contains commented instructions for installing LLVM and setting the compiler and linker paths. It defines several preprocessor flags (`CPPFLAGS`) to enable specific features such as 128-bit integers, double precision, and stack allocation. Additionally, it configures the build to use the Apple M1 CPU architecture and sets flags related to environment, I/O, and logging styles, which are currently disabled for macOS.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
