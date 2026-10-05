@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A YAML fixture file with a single encoded transaction vote string.
+The `txn_vote.yml` file in the `firedancer` codebase appears to contain a single encoded or hashed string, likely representing a transaction vote or identifier.
 
 # Purpose
-The string `'2yGd7N4nJJP3Mpjr7JguB8xnCRiMRYLeqPePCjZUqU8KX5JaeqhE18fQQqV7n6X99joo17wwgb28hgd68FXdz7e'` is likely used as a secret key or token within a software application. It may serve purposes such as authentication, encryption, or access control, ensuring secure communication or data protection.
+The file contains a single string, which appears to be a cryptographic hash or token. This string is likely used for authentication, authorization, or as a unique identifier within a software system.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
