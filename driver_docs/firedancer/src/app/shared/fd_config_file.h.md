@@ -3,10 +3,38 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Config file name and data buffer structure.
+Defines the `fd_config_file` structure for configuration files with name and data attributes.
 
 # Purpose
-This header file defines the `fd_config_file` data type used to describe a configuration file in memory. The `fd_config_file` structure stores the file `name`, a pointer to the file `data`, and the data size in `data_sz`. The file also defines `fd_config_file_t` as a type alias for `struct fd_config_file` and includes `fd_util_base.h` for basic type definitions such as `uchar` and `ulong`.
+This code is a C header file that defines a structure and a type alias for handling configuration files. The `fd_config_file` structure contains three members: a pointer to a constant character `name` for the file name, a pointer to constant unsigned characters `data` for the file data, and an unsigned long `data_sz` for the size of the data. The `typedef` statement creates an alias `fd_config_file_t` for the `fd_config_file` structure, simplifying its use in other parts of the program. The header file also includes a base utility header `fd_util_base.h` from a relative path, which may provide additional utility functions or definitions needed by this file. Include guards are used to prevent multiple inclusions of this header file.
+# Imports and Dependencies
+
+---
+- `../../util/fd_util_base.h`
+
+
+# Data Structures
+
+---
+### fd\_config\_file
+- **Type**: ``struct``
+- **Members**:
+    - ``name``: A pointer to a constant character string that represents the name of the configuration file.
+    - ``data``: A pointer to a constant unsigned character array that contains the configuration file data.
+    - ``data_sz``: An unsigned long integer that specifies the size of the data in bytes.
+- **Description**: Defines a structure to store information about a configuration file, including its name, the data it contains, and the size of that data.
+
+
+---
+### fd\_config\_file\_t
+- **Type**: ``struct``
+- **Members**:
+    - ``name``: A pointer to a constant character string that represents the name of the configuration file.
+    - ``data``: A pointer to a constant unsigned character array that contains the data of the configuration file.
+    - ``data_sz``: An unsigned long integer that specifies the size of the data in the configuration file.
+- **Description**: Defines a structure to represent a configuration file with its name, data, and data size.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

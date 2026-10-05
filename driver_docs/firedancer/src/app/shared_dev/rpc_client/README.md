@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-HTTP JSON-RPC client, request/state structs, tests, and build files for block hash and tx count requests.
+RPC client programs, implementations, headers, private structures, a Makefile, and test functionality.
 
 
 ## Files
-- **[dump_rpc_client.c](dump_rpc_client.c.md)**: The `dump_rpc_client.c` file in the `firedancer` codebase implements a simple RPC client that connects to a local server to request and print the transaction count.
-- **[fd_rpc_client.c](fd_rpc_client.c.md)**: HTTP RPC client for sending JSON-RPC requests and parsing responses.
-- **[fd_rpc_client.h](fd_rpc_client.h.md)**: Poor RPC client API for latest block hash and transaction count requests.
-- **[fd_rpc_client_private.h](fd_rpc_client_private.h.md)**: Private RPC client request and state structs with pollfd tracking.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase defines build and test configurations for the `rpc_client` component, including header and object files, as well as unit tests, conditional on the `FD_HAS_HOSTED` flag.
-- **[test_rpc_client.c](test_rpc_client.c.md)**: Unit tests for RPC client requests, response parsing, and lifecycle functions.
+- **[dump_rpc_client.c](dump_rpc_client.c.md)**: A program to initialize an RPC client, request transaction count, and print the result.
+- **[fd_rpc_client.c](fd_rpc_client.c.md)**: Implements an RPC client for handling JSON-RPC requests and responses over HTTP in a non-blocking manner.
+- **[fd_rpc_client.h](fd_rpc_client.h.md)**: A basic RPC client for retrieving information from the Agave validator, not intended for production use.
+- **[fd_rpc_client_private.h](fd_rpc_client_private.h.md)**: Defines private data structures for managing RPC client requests and responses in the Firedancer codebase.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fd_rpc_client` with conditional compilation based on `FD_HAS_HOSTED`.
+- **[test_rpc_client.c](test_rpc_client.c.md)**: Tests for the RPC client, including server setup, request handling, and response validation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

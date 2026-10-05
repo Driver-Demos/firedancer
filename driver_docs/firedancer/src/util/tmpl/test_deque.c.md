@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_deque.c` file in the `firedancer` codebase implements a comprehensive test suite for a deque data structure, including various operations such as push, pop, and iteration, while also verifying boundary conditions and handling invalid arguments.
+Tests for deque operations, including push, pop, and iteration, with boundary condition checks.
 
 # Purpose
-This C source code file is designed to test the functionality of a deque (double-ended queue) implementation. It includes both a custom buffer-based deque and a more generic deque implementation imported from "fd_deque.c". The file defines a static buffer with a maximum size of 8 elements and provides functions to manipulate this buffer, such as pushing and popping elements from both the head and tail. The main function initializes a random number generator and performs a series of operations on the deque, including pushing, popping, and iterating over elements, to ensure the deque's operations are functioning correctly. The code also includes tests for boundary conditions and invalid operations to verify the robustness of the deque implementation.
+The code is a test suite for a double-ended queue (deque) implementation in C. It includes functions to manipulate a static buffer as a deque, with operations such as [`buf_push_head`](<#buf_push_head>), [`buf_push_tail`](<#buf_push_tail>), [`buf_pop_head`](<#buf_pop_head>), [`buf_pop_tail`](<#buf_pop_tail>), and [`buf_pop_idx`](<#buf_pop_idx>). These functions manage the buffer's start, end, and count to simulate deque operations. The code also includes a main function that tests the deque's functionality by performing a series of operations on a deque instance created using the `fd_deque.c` library. The test suite verifies the correctness of deque operations, including pushing and popping elements from both ends, iterating over elements, and handling boundary conditions.
 
-The file is structured to be an executable test suite rather than a library or header file intended for reuse. It includes comprehensive testing of the deque's API, including both standard and zero-copy operations, and checks for correct alignment and footprint of the deque in memory. The use of macros and conditional compilation directives suggests that the code is designed to be portable and adaptable to different environments, with specific sections enabled only when certain conditions are met (e.g., hosted environments). The file also includes logging and assertions to provide detailed feedback during testing, ensuring that any issues are promptly identified and addressed.
+The code uses macros to define the deque's characteristics, such as `DEQUE_NAME`, `DEQUE_T`, and `DEQUE_MAX`, and includes the `fd_deque.c` file to provide the deque implementation. The main function initializes a random number generator and performs a series of randomized operations on the deque, checking the results against the static buffer implementation to ensure consistency. It also includes tests for invalid operations and boundary conditions, using logging and assertions to verify expected behavior. The code is designed to run in a hosted environment, as indicated by the conditional inclusion of system headers and the use of process control functions for testing error conditions.
 # Imports and Dependencies
 
 ---
@@ -23,134 +23,145 @@ The file is structured to be an executable test suite rather than a library or h
 
 ---
 ### buf
-- **Type**: `int array`
-- **Description**: `buf` is a static integer array with a size defined by the macro `TEST_DEQUE_MAX`, which is set to 8. It is used to store integer elements in a circular buffer or deque structure.
-- **Use**: The `buf` array is used to hold the elements of a deque, allowing operations such as push and pop from both the head and tail of the deque.
+- **Type**: ``int[]``
+- **Description**: An array of integers with a size defined by the macro `TEST_DEQUE_MAX`. It is used to store elements in a circular buffer or deque structure.
+- **Use**: Stores integer elements for operations such as push and pop in a circular buffer.
 
 
 ---
 ### buf\_start
-- **Type**: `ulong`
-- **Description**: `buf_start` is a static global variable of type `ulong` that represents the starting index of a circular buffer used in the program. It is initialized to 0UL and is used to track the position where the next element will be inserted or removed from the head of the buffer.
-- **Use**: `buf_start` is used to manage the head position of the circular buffer, ensuring correct insertion and removal of elements.
+- **Type**: ``ulong``
+- **Description**: Stores the index of the start of the buffer in a circular buffer implementation. It is initialized to 0 and is used to track the position where the next element will be pushed or popped from the head of the buffer.
+- **Use**: Tracks the starting index of the buffer for operations like pushing and popping elements from the head.
 
 
 ---
 ### buf\_end
-- **Type**: `ulong`
-- **Description**: `buf_end` is a static global variable of type `ulong` that represents the index position in the buffer where the next element will be added when pushing to the tail of the deque. It is initialized to 0UL, indicating the starting position of the buffer.
-- **Use**: `buf_end` is used to track the end position of the buffer for tail operations, ensuring elements are added in a circular manner within the buffer's capacity.
+- **Type**: ``ulong``
+- **Description**: Stores the index of the next position in the buffer where a new element will be added when using the `buf_push_tail` function. It is initialized to 0 and is incremented each time an element is added to the tail of the buffer.
+- **Use**: Tracks the end position of the buffer for tail operations.
 
 
 ---
 ### buf\_cnt
-- **Type**: `ulong`
-- **Description**: `buf_cnt` is a static global variable of type `ulong` initialized to 0. It represents the current number of elements in a circular buffer implemented as an array.
-- **Use**: This variable is used to track the number of elements currently stored in the buffer, ensuring operations like push and pop are performed within the buffer's capacity.
+- **Type**: ``ulong``
+- **Description**: `buf_cnt` is a static unsigned long integer that tracks the number of elements currently stored in the buffer `buf`. It is initialized to zero and is used to ensure that the buffer does not exceed its maximum capacity, defined by `TEST_DEQUE_MAX`. The variable is incremented or decremented as elements are added to or removed from the buffer.
+- **Use**: Tracks the current count of elements in the buffer to manage buffer operations and ensure it does not exceed its capacity.
 
 
 ---
 ### scratch
-- **Type**: `uchar array`
-- **Description**: The `scratch` variable is a global array of unsigned characters with a size defined by `SCRATCH_FOOTPRINT`, which is 1024 bytes. It is aligned in memory according to `SCRATCH_ALIGN`, which is 128 bytes, to ensure optimal access and performance.
-- **Use**: This variable is used as a memory buffer for operations requiring temporary storage, such as the creation and manipulation of a deque in the program.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters with a size defined by `SCRATCH_FOOTPRINT`, which is 1024 bytes. The array is aligned in memory according to `SCRATCH_ALIGN`, which is 128 bytes.
+- **Use**: Used as a memory region for operations that require specific alignment and footprint constraints, such as the `test_deque` operations.
 
 
 # Functions
 
 ---
 ### buf\_push\_head<!-- {{#callable:buf_push_head}} -->
-The `buf_push_head` function inserts an integer at the head of a circular buffer, adjusting the buffer's start index and count accordingly.
+[View Source →](<../../../../../src/util/tmpl/test_deque.c#L15>)
+
+Inserts an integer at the head of a circular buffer, adjusting the buffer's start index and count.
 - **Inputs**:
-    - `i`: The integer value to be inserted at the head of the buffer.
-- **Control Flow**:
-    - Check if the buffer count is less than the maximum allowed size using `FD_TEST` macro.
+    - `i`: The integer value to insert at the head of the buffer.
+- **Logic and Control Flow**:
+    - Check if the buffer count `buf_cnt` is less than `TEST_DEQUE_MAX` using `FD_TEST` macro.
     - Increment the buffer count `buf_cnt`.
     - Decrement the buffer start index `buf_start`.
-    - If `buf_start` is greater than or equal to `TEST_DEQUE_MAX`, set `buf_start` to `TEST_DEQUE_MAX-1UL` to wrap around the buffer.
-    - Assign the input integer `i` to the buffer at the new start index `buf[buf_start]`.
-- **Output**: This function does not return a value; it modifies the global buffer state by adding an element to the head.
+    - If `buf_start` is greater than or equal to `TEST_DEQUE_MAX`, set `buf_start` to `TEST_DEQUE_MAX-1UL`.
+    - Assign the integer `i` to the buffer at the position `buf[buf_start]`.
+- **Output**: No return value; the function modifies the global buffer state.
 
 
 ---
 ### buf\_push\_tail<!-- {{#callable:buf_push_tail}} -->
-The `buf_push_tail` function adds an integer to the end of a circular buffer, updating the buffer's count and end index, and wrapping the end index if necessary.
+[View Source →](<../../../../../src/util/tmpl/test_deque.c#L22>)
+
+Adds an integer to the end of a circular buffer if it is not full.
 - **Inputs**:
-    - `i`: The integer value to be added to the end of the buffer.
-- **Control Flow**:
-    - Check that the buffer is not full using `FD_TEST(buf_cnt<TEST_DEQUE_MAX)`; if the buffer is full, the function will not proceed.
-    - Assign the integer `i` to the current end position of the buffer, `buf[buf_end]`.
+    - `i`: The integer value to add to the buffer.
+- **Logic and Control Flow**:
+    - Check if the buffer is not full using `FD_TEST(buf_cnt<TEST_DEQUE_MAX)`; if full, the function does not proceed.
+    - Assign the integer `i` to the current end position of the buffer `buf[buf_end]`.
     - Increment the buffer count `buf_cnt` and the end index `buf_end`.
-    - Check if `buf_end` has reached or exceeded `TEST_DEQUE_MAX`; if so, wrap `buf_end` back to 0 to maintain the circular nature of the buffer.
-- **Output**: The function does not return a value; it modifies the global buffer state by adding an element to the tail.
+    - If `buf_end` reaches `TEST_DEQUE_MAX`, reset `buf_end` to 0 to maintain the circular nature of the buffer.
+- **Output**: No return value; the function modifies the global buffer state.
 
 
 ---
 ### buf\_pop\_head<!-- {{#callable:buf_pop_head}} -->
-The `buf_pop_head` function removes and returns the integer at the head of a circular buffer, updating the buffer's start index and count accordingly.
+[View Source →](<../../../../../src/util/tmpl/test_deque.c#L29>)
+
+Removes and returns the integer at the head of a circular buffer, updating the buffer's start index and count.
 - **Inputs**: None
-- **Control Flow**:
-    - Check if the buffer is not empty using `FD_TEST(buf_cnt)`.
-    - Retrieve the integer at the current head of the buffer using `buf[buf_start]`.
-    - Decrement the buffer count `buf_cnt`.
-    - Increment the buffer start index `buf_start`.
-    - If `buf_start` exceeds or equals `TEST_DEQUE_MAX`, reset `buf_start` to 0 to maintain the circular nature of the buffer.
-    - Return the retrieved integer.
-- **Output**: The function returns the integer value that was at the head of the buffer before it was removed.
+- **Logic and Control Flow**:
+    - Checks if the buffer is not empty using `FD_TEST(buf_cnt)`.
+    - Retrieves the integer at the current `buf_start` index from the `buf` array and stores it in `i`.
+    - Decrements `buf_cnt` to reflect the removal of an element.
+    - Increments `buf_start` to point to the next element in the buffer.
+    - Checks if `buf_start` has reached or exceeded `TEST_DEQUE_MAX`, and if so, wraps it around to 0.
+- **Output**: Returns the integer that was at the head of the buffer.
 
 
 ---
 ### buf\_pop\_tail<!-- {{#callable:buf_pop_tail}} -->
-The `buf_pop_tail` function removes and returns the last element from a circular buffer, adjusting the buffer's end index and count accordingly.
+[View Source →](<../../../../../src/util/tmpl/test_deque.c#L37>)
+
+Removes and returns the last element from a buffer, adjusting the buffer's end and count accordingly.
 - **Inputs**: None
-- **Control Flow**:
-    - Check if the buffer is not empty using `FD_TEST(buf_cnt)`; if empty, the function will likely trigger an error or halt.
-    - Decrement the buffer count `buf_cnt` and the buffer end index `buf_end`.
-    - If `buf_end` becomes greater than or equal to `TEST_DEQUE_MAX`, reset `buf_end` to `TEST_DEQUE_MAX-1UL` to handle the circular nature of the buffer.
-    - Return the element at the new `buf_end` index from the buffer.
-- **Output**: The function returns the integer value of the element that was at the tail of the buffer before it was removed.
+- **Logic and Control Flow**:
+    - Check if the buffer count `buf_cnt` is non-zero using `FD_TEST` macro.
+    - Decrement the buffer count `buf_cnt` and the buffer end `buf_end`.
+    - If `buf_end` is greater than or equal to `TEST_DEQUE_MAX`, set `buf_end` to `TEST_DEQUE_MAX-1UL`.
+    - Return the element at the new `buf_end` position in the buffer `buf`.
+- **Output**: Returns the integer value of the element removed from the end of the buffer.
 
 
 ---
 ### buf\_pop\_idx<!-- {{#callable:buf_pop_idx}} -->
-The `buf_pop_idx` function removes and returns an element from a circular buffer at a specified index, shifting subsequent elements to fill the gap.
+[View Source →](<../../../../../src/util/tmpl/test_deque.c#L44>)
+
+Removes an element at a specified index from a circular buffer and shifts subsequent elements to fill the gap.
 - **Inputs**:
-    - `idx`: An unsigned long integer representing the index of the element to be removed from the buffer.
-- **Control Flow**:
-    - Check if the buffer is not empty using `FD_TEST(buf_cnt)`.
-    - Decrement `buf_cnt` and `buf_end`, adjusting `buf_end` if it exceeds the maximum buffer size.
-    - Calculate the position of the element to be removed using `(buf_start + idx) % TEST_DEQUE_MAX` and store its value in `val`.
-    - Initialize `gap` with the value of `idx`.
-    - Iterate while `gap` is less than or equal to `buf_cnt`, shifting elements from the position `(buf_start + gap + 1) % TEST_DEQUE_MAX` to `(buf_start + gap) % TEST_DEQUE_MAX`.
-    - Increment `gap` in each iteration to continue shifting elements.
-    - Return the value of the removed element `val`.
-- **Output**: The function returns an integer, which is the value of the element removed from the buffer at the specified index.
+    - `idx`: The index of the element to remove from the buffer.
+- **Logic and Control Flow**:
+    - Checks if the buffer is not empty using `FD_TEST(buf_cnt)`.
+    - Decrements `buf_cnt` and `buf_end` to reflect the removal of an element.
+    - Adjusts `buf_end` if it exceeds `TEST_DEQUE_MAX` to wrap around the buffer.
+    - Retrieves the value at the specified index `idx` from the buffer using `(buf_start+idx) % TEST_DEQUE_MAX`.
+    - Initializes `gap` with the value of `idx` and enters a loop to shift elements.
+    - In the loop, calculates the current and next indices `i` and `j` using `(buf_start+gap) % TEST_DEQUE_MAX` and `(buf_start+gap+1) % TEST_DEQUE_MAX`, respectively.
+    - Copies the element from index `j` to index `i` to shift elements left.
+    - Increments `gap` and continues the loop until `gap` exceeds `buf_cnt`.
+    - Returns the value of the removed element.
+- **Output**: The function returns the integer value of the element removed from the buffer.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and tests a deque data structure by performing a series of randomized operations and validating their correctness.
+[View Source →](<../../../../../src/util/tmpl/test_deque.c#L66>)
+
+Tests the functionality of a deque data structure by performing various operations and validating their correctness.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program with `fd_boot` and set up a random number generator `rng`.
-    - Check if the alignment and footprint of the deque exceed predefined limits, logging a warning and exiting if they do.
-    - Log the start of the construction test and verify the alignment and footprint of the deque.
-    - Create and join a new deque using the `test_deque_new` and `test_deque_join` functions, respectively.
-    - Log the start of the accessor tests and verify the maximum size and initial count of the deque.
-    - Log the start of the operations test and perform 100 million iterations of random deque operations.
-    - For each iteration, randomly select an operation to perform on the deque, such as push, pop, or iterate, and validate the operation's correctness using `FD_TEST`.
-    - Handle special cases like resetting the buffer or handling full/empty conditions with specific operations.
-    - If hosted and handholding is enabled, test invalid arguments and boundary conditions, expecting critical log messages for invalid operations.
-    - Leave and delete the deque, clean up the random number generator, and log the successful completion of tests before halting the program.
-- **Output**: The function returns an integer status code, typically 0, indicating successful execution.
-- **Functions called**:
-    - [`buf_push_head`](#buf_push_head)
-    - [`buf_push_tail`](#buf_push_tail)
-    - [`buf_pop_head`](#buf_pop_head)
-    - [`buf_pop_tail`](#buf_pop_tail)
-    - [`buf_pop_idx`](#buf_pop_idx)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Initializes the random number generator and checks alignment and footprint constraints for the deque.
+    - Logs the start of testing for construction, accessors, and operations.
+    - Creates and joins a new deque using the `scratch` memory region.
+    - Performs a loop of 100,000,000 iterations where a random operation is selected and executed on the deque.
+    - Handles operations such as push, pop, zero-copy push/pop, and iterating over the deque in both forward and reverse directions.
+    - Checks the deque's state after each operation to ensure it matches expected conditions (e.g., full, empty, correct count).
+    - Tests boundary conditions and invalid arguments if hosted environment is available.
+    - Deletes the deque and cleans up resources before exiting.
+- **Output**: Returns 0 after successfully testing the deque operations.
+- **Functions Called**:
+    - [`buf_push_head`](<#buf_push_head>)
+    - [`buf_push_tail`](<#buf_push_tail>)
+    - [`buf_pop_head`](<#buf_pop_head>)
+    - [`buf_pop_tail`](<#buf_pop_tail>)
+    - [`buf_pop_idx`](<#buf_pop_idx>)
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects, and defines a unit test for the `fd_env` and `fd_util` components.
+Makefile for adding headers, objects, and running unit tests for `fd_env` and `fd_util`.
 
 # Purpose
-The file is a Makefile script used for building and testing components in a software project. It defines build rules by adding headers and object files, specifically `fd_env.h` and `fd_env` with `fd_util`, and sets up a unit test named `test_env` that depends on `fd_util`. It also includes a command to execute the `test_env` unit test.
+The `Makefile` content defines build and test instructions for a software project. It uses a series of `call` functions to add headers and objects, create a unit test, and run the unit test. Specifically, it adds the header `fd_env.h`, includes the objects `fd_env` and `fd_util`, and sets up a unit test named `test_env` that depends on `fd_util`. Finally, it runs the `test_env` unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

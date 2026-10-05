@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `aio` components within the `waltz` module.
+Makefile for adding headers, objects, and unit tests for `fd_aio`, `fd_aio_pcapng`, and `fd_aio_tango`.
 
 # Purpose
-This file is a Makefile script used to automate the build process of a software project. It defines rules for adding header files and object files, creating unit tests, and executing those tests. The script specifically handles the inclusion of headers and objects related to `fd_aio`, `fd_aio_pcapng`, and `fd_aio_tango`, and sets up a unit test for `test_aio` using dependencies `fd_waltz` and `fd_util`.
+This Makefile script defines build instructions for a software project. It uses the `add-hdrs` and `add-objs` functions to specify header files and object files for different components, such as `fd_aio.h`, `fd_aio_pcapng.h`, and `fd_aio_tango.h`. The script also includes a unit test setup and execution for `test_aio`, linking it with the `fd_waltz` and `fd_util` components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
