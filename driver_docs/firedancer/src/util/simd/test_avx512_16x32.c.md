@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for AVX-512 16x32 SIMD operations, including arithmetic, bitwise, and comparison functions.
+The `test_avx512_16x32.c` file in the `firedancer` codebase contains a comprehensive set of tests for AVX-512 SIMD operations on 16x32-bit integer vectors, including construction, arithmetic, bitwise, comparison, and conversion operations.
 
 # Purpose
-The code is a C program designed to test the functionality of wide-word integer (`wwi_t`) and wide-word unsigned integer (`wwu_t`) operations using AVX-512 instructions. It includes a main function that initializes a random number generator and performs a series of tests on these data types. The tests cover a wide range of operations, including construction, permutation, selection, broadcasting, arithmetic operations, bitwise operations, and comparisons. The program uses macros such as `WWI_TEST` and `WWU_TEST` to verify the correctness of each operation by comparing the results against expected values.
+The provided C source code is a comprehensive test suite for verifying the functionality of operations on wide word integer types (`wwi_t`) and wide word unsigned integer types (`wwu_t`). The code is structured as a standalone executable, as indicated by the presence of the [`main`](#main) function. It includes a series of tests that cover a wide range of operations, including construction, permutation, selection, broadcasting, arithmetic, bitwise operations, comparisons, and conversions for both signed and unsigned wide word types. The tests are executed in a loop, running a million iterations to ensure robustness and correctness of the operations.
 
-The program is structured to repeatedly test the operations for a large number of iterations, ensuring thorough validation of the functionality. It includes tests for loading and storing data, arithmetic operations like addition and subtraction, bitwise operations like AND, OR, and XOR, and more complex operations like rotations and transpositions. The code also tests conditional operations and conversions between different data types. The use of AVX-512 instructions suggests that the program is optimized for high-performance computing environments where such vectorized operations can be leveraged for efficiency.
+The code utilizes a random number generator (`fd_rng_t`) to generate test data, ensuring that the tests cover a broad spectrum of possible input values. The operations tested include basic arithmetic (addition, subtraction, multiplication), bitwise operations (AND, OR, XOR, NOT, shifts), and more complex operations like permutations, selections, and conditional operations. The code also tests conversion functions that transform wide word types into other data types. The use of macros like `WWI_TEST` and `WWU_TEST` suggests a framework for validating the results of each operation against expected outcomes. The inclusion of logging and a final notice of "pass" indicates that the tests are designed to provide clear feedback on the success of the operations being tested.
 # Imports and Dependencies
 
 ---
@@ -19,41 +19,37 @@ The program is structured to repeatedly test the operations for a large number o
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/simd/test_avx512_16x32.c#L3>)
-
-Executes a series of tests on wide word integer (`wwi_t`) and wide word unsigned integer (`wwu_t`) operations using random data.
+The `main` function initializes a random number generator, performs extensive testing on wide word integer (wwi_t) and wide word unsigned integer (wwu_t) operations, and logs the results.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Initializes the system with `fd_boot` using `argc` and `argv`.
-    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Logs the start of testing for `wwi_t`.
-    - Runs a loop 1,000,000 times to test various operations on `wwi_t` using random integers.
-    - Performs construction, permutation, selection, broadcast, arithmetic, bitwise, comparison, and lane operations on `wwi_t`.
-    - Logs the start of testing for `wwu_t`.
-    - Runs a loop 1,000,000 times to test various operations on `wwu_t` using random unsigned integers.
-    - Performs similar operations as `wwi_t` on `wwu_t`, including byte swap and additional unsigned-specific operations.
-    - Deletes the random number generator with `fd_rng_delete`.
-    - Logs the completion of tests and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`wwi_st`](<fd_avx512_wwi.h.md#wwi_st>)
-    - [`wwi_ld`](<fd_avx512_wwi.h.md#wwi_ld>)
-    - [`wwi_stu`](<fd_avx512_wwi.h.md#wwi_stu>)
-    - [`wwi_ldu`](<fd_avx512_wwi.h.md#wwi_ldu>)
-    - [`wwi_rol_variable`](<fd_avx512_wwi.h.md#wwi_rol_variable>)
-    - [`wwi_ror_variable`](<fd_avx512_wwi.h.md#wwi_ror_variable>)
-    - [`wwi_rol_vector`](<fd_avx512_wwi.h.md#wwi_rol_vector>)
-    - [`wwi_ror_vector`](<fd_avx512_wwi.h.md#wwi_ror_vector>)
-    - [`wwu_st`](<fd_avx512_wwu.h.md#wwu_st>)
-    - [`wwu_ld`](<fd_avx512_wwu.h.md#wwu_ld>)
-    - [`wwu_stu`](<fd_avx512_wwu.h.md#wwu_stu>)
-    - [`wwu_ldu`](<fd_avx512_wwu.h.md#wwu_ldu>)
-    - [`wwu_rol_variable`](<fd_avx512_wwu.h.md#wwu_rol_variable>)
-    - [`wwu_ror_variable`](<fd_avx512_wwu.h.md#wwu_ror_variable>)
-    - [`wwu_rol_vector`](<fd_avx512_wwu.h.md#wwu_rol_vector>)
-    - [`wwu_ror_vector`](<fd_avx512_wwu.h.md#wwu_ror_vector>)
+    - `argc`: An integer representing the number of command-line arguments.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program with `fd_boot` using command-line arguments.
+    - Create and join a random number generator `rng`.
+    - Log the start of testing for `wwi_t`.
+    - Run a loop 1,000,000 times to test various operations on `wwi_t` including construction, permutation, selection, arithmetic, bitwise, and comparison operations.
+    - Log the start of testing for `wwu_t`.
+    - Run a loop 1,000,000 times to test various operations on `wwu_t` similar to `wwi_t`.
+    - Delete the random number generator and log the completion of tests.
+    - Call `fd_halt` to terminate the program.
+- **Output**: The function returns an integer `0` indicating successful execution.
+- **Functions called**:
+    - [`wwi_st`](fd_avx512_wwi.h.md#wwi_st)
+    - [`wwi_ld`](fd_avx512_wwi.h.md#wwi_ld)
+    - [`wwi_stu`](fd_avx512_wwi.h.md#wwi_stu)
+    - [`wwi_ldu`](fd_avx512_wwi.h.md#wwi_ldu)
+    - [`wwi_rol_variable`](fd_avx512_wwi.h.md#wwi_rol_variable)
+    - [`wwi_ror_variable`](fd_avx512_wwi.h.md#wwi_ror_variable)
+    - [`wwi_rol_vector`](fd_avx512_wwi.h.md#wwi_rol_vector)
+    - [`wwi_ror_vector`](fd_avx512_wwi.h.md#wwi_ror_vector)
+    - [`wwu_st`](fd_avx512_wwu.h.md#wwu_st)
+    - [`wwu_ld`](fd_avx512_wwu.h.md#wwu_ld)
+    - [`wwu_stu`](fd_avx512_wwu.h.md#wwu_stu)
+    - [`wwu_ldu`](fd_avx512_wwu.h.md#wwu_ldu)
+    - [`wwu_rol_variable`](fd_avx512_wwu.h.md#wwu_rol_variable)
+    - [`wwu_ror_variable`](fd_avx512_wwu.h.md#wwu_ror_variable)
+    - [`wwu_rol_vector`](fd_avx512_wwu.h.md#wwu_rol_vector)
+    - [`wwu_ror_vector`](fd_avx512_wwu.h.md#wwu_ror_vector)
 
 
 

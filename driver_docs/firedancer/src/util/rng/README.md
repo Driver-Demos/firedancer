@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for random number generation, secure RNG, tests, and a Makefile for the RNG module.
+Non-cryptographic and secure RNG functions, distributions, and tests.
 
 
 ## Files
-- **[fd_rng.c](fd_rng.c.md)**: Functions for generating random floating-point numbers with various distributions, including robust, exponential, and normal, using the ziggurat algorithm.
-- **[fd_rng.h](fd_rng.h.md)**: A non-cryptographic pseudo-random number generator supporting parallel generation, shared memory, and various random number distributions.
-- **[fd_rng_secure.c](fd_rng_secure.c.md)**: Secure random number generation function with platform-specific implementations for Linux, FreeBSD, and Apple.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for the RNG module.
-- **[test_rng.c](test_rng.c.md)**: Tests for the random number generator functions in the Firedancer codebase, including alignment, footprint, and statistical properties.
+- **[fd_rng.c](fd_rng.c.md)**: The `fd_rng.c` file in the `firedancer` codebase implements various random number generation functions, including robust, exponential, and normal distributions for both float and double precision, utilizing techniques like the ziggurat algorithm.
+- **[fd_rng.h](fd_rng.h.md)**: Non-cryptographic PRNG state, integer and float generators, rolls, and secure byte fill.
+- **[fd_rng_secure.c](fd_rng_secure.c.md)**: The `fd_rng_secure.c` file implements a platform-specific secure random number generator function, using `getrandom` for Linux and FreeBSD, `CCRandomGenerateBytes` for Apple, and logging a warning if the platform is unsupported.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the random number generator utilities, including `fd_rng` and `fd_rng_secure`.
+- **[test_rng.c](test_rng.c.md)**: The `test_rng.c` file in the `firedancer` codebase contains a comprehensive suite of tests for the random number generator (RNG) functionality, including alignment, footprint, sequence and index operations, domain testing, and secure RNG testing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

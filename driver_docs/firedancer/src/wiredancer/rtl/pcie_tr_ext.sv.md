@@ -3,39 +3,38 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a PCIe transaction extension module with buffering and signal verification.
+The `pcie_tr_ext.sv` file in the `firedancer` codebase implements a SystemVerilog module for handling PCIe transactions, including buffering and processing of PCIe data streams with metadata extraction and FIFO management.
 
 # Purpose
-The `pcie_tr_ext` module is a Verilog hardware description that processes PCI Express (PCIe) transaction layer packets. It is designed to handle data input and output operations, specifically managing the flow of PCIe data through a buffer. The module uses a parameterized buffer size (`BUFF_SZ`) to store incoming PCIe data and metadata, and it calculates the buffer's fill level (`pcie_l`) and full status (`pcie_f`). The module processes incoming data (`pcie_d`) and validates it using a magic number (`PCIE_MAGIC`) to ensure data integrity. It also manages transaction identifiers (`tid`) and constructs metadata for further processing.
+The provided Verilog code defines a module named `pcie_tr_ext`, which is designed to handle PCI Express (PCIe) transaction processing. This module is primarily focused on managing data flow and metadata associated with PCIe transactions. It includes input and output ports for PCIe data and control signals, and it processes these signals to generate formatted output data and metadata. The module uses a state machine to manage the transaction flow, with states for initializing and processing data blocks. The code also includes a FIFO (First-In-First-Out) buffer, implemented using the `showahead_fifo` module, to manage data storage and retrieval, ensuring smooth data flow between the PCIe interface and the output.
 
-The module includes a state machine with two states (`st_blk`) to control the data processing flow. In the first state, it initializes and prepares metadata based on the incoming data. In the second state, it processes the data, updates metadata fields, and manages the start and end of packet signals. The module uses a `showahead_fifo` to buffer processed data and metadata, allowing for asynchronous read and write operations. The FIFO ensures that data is available for output when requested, and it manages the synchronization between the input and output interfaces. The module is designed to operate synchronously with a clock (`clk`) and can be reset using a reset signal (`rst`).
+The module's functionality is centered around processing incoming PCIe data (`pcie_d`) and generating corresponding metadata (`o_m0` and `o_m1`) while managing flow control signals (`pcie_f` and `pcie_l`). The state machine within the module handles the segmentation of data into blocks, updates transaction identifiers, and manages the start and end of packet signals. The use of parameterized buffer sizes and metadata structures allows for flexible adaptation to different PCIe configurations. Overall, this module provides a specialized function within a larger PCIe system, focusing on data handling and metadata management for PCIe transactions.
 # Modules
 
 ---
 ### pcie\_tr\_ext
-Implements a PCIe transaction extension module that processes incoming PCIe data and manages a FIFO buffer for output. Handles data flow control and metadata management for PCIe transactions.
+The `pcie_tr_ext` module is designed to handle PCIe transactions, processing input data and managing a FIFO buffer for output. It includes logic to handle data flow control and state transitions based on input signals and internal conditions.
 - **Constants**:
-    - ``BUFF_SZ``: Defines the buffer size for the FIFO, set to 1024.
-    - ``BUFF_SZ_L``: Calculates the logarithm base 2 of `BUFF_SZ` to determine the bit width needed for addressing the buffer.
+    - `BUFF_SZ`: Defines the buffer size for the FIFO, set to 1024.
+    - `BUFF_SZ_L`: Calculates the logarithm base 2 of BUFF_SZ to determine the number of bits needed to address the buffer size.
 - **Ports**:
-    - ``pcie_v``: Input signal indicating valid PCIe data.
-    - ``pcie_d``: Input data bus for PCIe data, 512 bits wide.
-    - ``pcie_f``: Output signal indicating if the FIFO is full.
-    - ``pcie_l``: Output signal indicating the fill level of the FIFO.
-    - ``o_v``: Output signal indicating valid data for reading.
-    - ``o_r``: Input signal for read request.
-    - ``o_e``: Output signal indicating end of packet.
-    - ``o_m0``: Output for metadata type `sv_meta2_t`.
-    - ``o_m1``: Output for metadata type `pcie_meta_t`.
-    - ``clk``: Clock input signal.
-    - ``rst``: Reset input signal.
-- **Logic and Control Flow**:
-    - Uses an `always_ff` block triggered on the rising edge of `clk` to manage state transitions and data processing.
-    - Initializes and updates the `st_blk` state machine to control the processing of PCIe data.
-    - In state 0, initializes block variables and checks for valid PCIe data with a specific magic number to transition to state 1.
-    - In state 1, processes PCIe data, updates metadata, and manages the start and end of packet signals.
-    - Resets the state machine and related signals when `rst` is asserted.
-    - Instantiates a `showahead_fifo` to buffer processed data and manage read/write operations.
+    - `pcie_v`: Input wire indicating the validity of the PCIe data.
+    - `pcie_d`: 512-bit input wire carrying the PCIe data.
+    - `pcie_f`: Output logic indicating if the FIFO is full.
+    - `pcie_l`: Output logic indicating the fill level of the FIFO.
+    - `o_v`: Output logic indicating the validity of the output data.
+    - `o_r`: Input wire for output ready signal.
+    - `o_e`: Output logic indicating the end of a packet.
+    - `o_m0`: Output logic carrying metadata of type `sv_meta2_t`.
+    - `o_m1`: Output logic carrying metadata of type `pcie_meta_t`.
+    - `clk`: Input wire for the clock signal.
+    - `rst`: Input wire for the reset signal.
+- **Logic And Control Flow**:
+    - The module uses an `always_ff` block triggered on the positive edge of the clock to manage state transitions and data processing.
+    - The state machine has two states: state 0 initializes and processes the incoming PCIe data, while state 1 handles data transfer and updates the transaction ID.
+    - In state 0, the module checks the validity of the PCIe data and updates metadata fields, transitioning to state 1 if conditions are met.
+    - In state 1, the module processes the data, updates the metadata, and manages the start and end of packet signals, transitioning back to state 0 when the transaction is complete.
+    - The module includes a `showahead_fifo` instance to buffer the processed data, with control signals for writing and reading data based on the state and input signals.
 
 
 

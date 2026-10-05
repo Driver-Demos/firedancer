@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a backtesting tile with RocksDB and Makefile logic for conditional compilation.
+RocksDB-backed backtest accessors, playback validation, and conditional build rules.
 
 
 ## Files
-- **[fd_backtest_rocksdb.c](fd_backtest_rocksdb.c.md)**: Functions for managing and querying a read-only RocksDB database for backtesting purposes.
-- **[fd_backtest_rocksdb.h](fd_backtest_rocksdb.h.md)**: Header file for managing RocksDB-based backtesting, including initialization and data retrieval functions.
-- **[fd_backtest_tile.c](fd_backtest_tile.c.md)**: Implements a backtest tile for processing and replaying data using RocksDB, handling shreds, and managing slots.
-- **[Local.mk](Local.mk.md)**: Makefile logic for conditional compilation based on INT128 and RocksDB availability.
+- **[fd_backtest_rocksdb.c](fd_backtest_rocksdb.c.md)**: RocksDB-backed accessors for root slots, shreds, and bank hashes in read-only backtest data.
+- **[fd_backtest_rocksdb.h](fd_backtest_rocksdb.h.md)**: RocksDB-backed backtest accessors for alignment, init, root slots, shreds, and bank hashes.
+- **[fd_backtest_tile.c](fd_backtest_tile.c.md)**: Backtest playback and replay validation with shred buffering, bank hash checks, and tower updates.
+- **[Local.mk](Local.mk.md)**: Build rules that add backtest objects when int128 and RocksDB are available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

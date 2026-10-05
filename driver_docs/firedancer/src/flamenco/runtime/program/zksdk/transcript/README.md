@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and macros for handling zk-SNARK transcripts with the Merlin protocol.
+The `transcript` folder in the `firedancer` codebase contains the `fd_zksdk_transcript.h` file, which provides definitions and functions for managing zero-knowledge proof transcripts using the Merlin and rangeproofs libraries.
 
 
 ## Files
-- **[fd_zksdk_transcript.h](fd_zksdk_transcript.h.md)**: Defines functions and macros for handling zk-SNARK transcripts using the Merlin protocol.
+- **[fd_zksdk_transcript.h](fd_zksdk_transcript.h.md)**: The `fd_zksdk_transcript.h` file in the `firedancer` codebase provides definitions and inline functions for handling zero-knowledge proof transcripts, utilizing the Merlin and rangeproofs libraries for operations such as appending messages, points, and scalars, as well as defining domain separators for various proof types.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
