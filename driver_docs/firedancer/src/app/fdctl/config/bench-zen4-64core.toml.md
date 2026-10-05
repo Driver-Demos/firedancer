@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for benchmarking on an AMD Zen4 CPU with 64 physical and 128 logical cores.
+The `bench-zen4-64core.toml` file is a configuration file for benchmarking on an AMD Zen4 CPU with 64 physical cores, detailing settings for layout, development, RPC, and tiles in the `firedancer` codebase.
 
 # Purpose
-This configuration file is used for benchmarking on an AMD Zen4 CPU with 64 physical cores and 128 logical cores, such as an AMD EPYC 9554P. It specifies various settings for different components of the system. The `layout` section defines the number of tiles for verification, banking, and shredding. The `development.genesis` section sets initial parameters for account funding and the number of hashes per tick. The `development.bench` section configures benchmarking parameters, including tile counts and block cost limits, and disables certain features like blockstore from a specific slot and status cache. The `rpc` section controls transaction history and metadata storage settings. Finally, the `tiles.gui` and `tiles.pack` sections manage GUI enablement and the use of consumed compute units, respectively.
+This configuration file is designed for benchmarking software performance on an AMD Zen4 CPU, specifically tailored for a high-performance processor like the AMD EPYC 9554P, which features 64 physical cores and 128 logical cores. The file specifies various settings across different sections, such as layout, development, RPC, and tiles, to optimize the benchmarking process. The `[layout]` section defines parameters for tile verification and distribution, while `[development.genesis]` and `[development.bench]` sections configure initial account funding, hash processing, and benchmarking tile counts, along with enabling or disabling certain features to test performance limits. The `[rpc]` section manages transaction history and metadata storage settings, and the `[tiles]` sections control GUI enablement and resource consumption settings. Overall, this file is crucial for setting up a controlled environment to measure and analyze the performance characteristics of the software on the specified hardware.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

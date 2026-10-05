@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging behavior, including file descriptor management and log synchronization.
+The `archiver_feeder.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
 
 # Purpose
-The configuration file defines the logging behavior for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above also directed to the standard error (STDERR) pipe. The file descriptor for logging is managed by `logfile_fd`, which can be disabled by configuration. The `write` operation checks if the file descriptor is either STDERR (descriptor 2) or the `logfile_fd`, ensuring that all messages are logged appropriately. Additionally, for messages of 'WARNING' level and above, the `fsync` operation ensures that the log file is immediately synchronized to disk, using the `logfile_fd` descriptor.
+The provided file contents describe a logging configuration for a software system, focusing on how log messages are managed and written. It specifies that log messages are typically written to a log file upon system boot, with the option to disable this feature through configuration. The configuration ensures that messages of 'WARNING' level and above are directed to the STDERR pipe (file descriptor 2) and are also written to the log file. Additionally, it mandates that 'WARNING' level messages and above trigger an immediate fsync operation to the log file, ensuring that these critical messages are promptly and reliably saved to disk. This setup is designed to maintain a robust logging mechanism that captures and preserves important system events and errors.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

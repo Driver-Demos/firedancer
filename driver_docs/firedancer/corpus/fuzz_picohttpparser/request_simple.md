@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A simple HTTP GET request example for fuzz testing.
+The `request_simple` file in the `firedancer` codebase contains a simple HTTP GET request example with a specified host and an empty cookie header.
 
 # Purpose
-The content represents an HTTP GET request to the path `/hoge` on the server `example.com`. The request uses HTTP version 1.1 and includes an empty `Cookie` header, indicating that no cookies are sent with the request.
+The file contents represent an HTTP request header for a GET request to the path "/hoge" on the host "example.com". It specifies the HTTP version as 1.1 and includes a "Cookie" header, which is currently empty, indicating no cookies are being sent with the request.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

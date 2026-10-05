@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for file operations related to logging and peer cache management.
+The `fd_repair_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for file operations related to logging and managing a cache of good repair peers, including rules for writing, seeking, truncating, syncing, and reading specific file descriptors.
 
 # Purpose
-The configuration file defines the handling of log files and a cache file for known good peers in a software system. It specifies that log messages are written to a file or pipe, with messages of 'WARNING' level and above also sent to the STDERR pipe. The file descriptors `logfile_fd` and `good_peer_cache_file_fd` are used to manage these files, with specific operations such as `write`, `lseek`, `ftruncate`, `fsync`, and `read` being associated with them. The `write` operation ensures that messages are directed to the correct file descriptor, while `lseek` and `ftruncate` manage the reading and writing positions in the good peer cache file. The `fsync` operation ensures that critical log messages are immediately written to disk, and the `read` operation is used to load the good peer cache file during the boot process.
+The provided file contents describe a configuration setup for managing logging and peer cache operations within a software system. It defines file descriptors for a log file (`logfile_fd`) and a good peer cache file (`good_peer_cache_file_fd`), which are used to handle logging and peer management tasks. The configuration specifies that log messages, particularly those of 'WARNING' level and above, are written to both a log file and STDERR, with immediate disk synchronization for critical messages. Additionally, the good peer cache file is periodically updated, requiring operations such as seeking to the start of the file, truncating it before writing, and reading it during the boot process. These configurations ensure efficient logging and management of peer data, crucial for maintaining system reliability and performance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
