@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `secp256r1` folder in the `firedancer` codebase contains implementation files, headers, and tests for elliptic curve cryptography operations and ECDSA signature verification using the secp256r1 curve.
+ECDSA signature verification, elliptic curve operations, and tests for secp256r1 with SHA-256 hashing.
 
 
 ## Files
-- **[fd_secp256r1.c](fd_secp256r1.c.md)**: The `fd_secp256r1.c` file in the `firedancer` codebase implements the verification of ECDSA signatures using the secp256r1 curve.
-- **[fd_secp256r1.h](fd_secp256r1.h.md)**: The `fd_secp256r1.h` file provides APIs for verifying secp256r1 signatures, including a function to verify a signature using a message, signature, public key, and SHA-256 context.
-- **[fd_secp256r1_private.h](fd_secp256r1_private.h.md)**: The `fd_secp256r1_private.h` file defines data structures and constants for secp256r1 elliptic curve operations, including field elements, scalar field elements, and points in Jacobian coordinates, as part of the Firedancer codebase.
-- **[fd_secp256r1_s2n.c](fd_secp256r1_s2n.c.md)**: The `fd_secp256r1_s2n.c` file in the `firedancer` codebase provides functions for operations on scalars, field elements, and points in the secp256r1 elliptic curve, including scalar multiplication, inversion, and point conversion from bytes.
-- **[fd_secp256r1_table.c](fd_secp256r1_table.c.md)**: The `fd_secp256r1_table.c` file in the Firedancer codebase contains a static array of precomputed hexadecimal values, specifically a table of multiples of the base point for the Secp256r1 elliptic curve, used to optimize elliptic curve cryptography operations by reducing repeated calculations.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally includes headers, objects, and unit tests for `secp256r1` based on the presence of `FD_HAS_S2NBIGNUM`, otherwise issuing a warning if `s2n-bignum` is not available.
-- **[test_secp256r1.c](test_secp256r1.c.md)**: The `test_secp256r1.c` file in the `firedancer` codebase contains a series of tests and benchmarks for various secp256r1 elliptic curve operations, including scalar and point conversions, multiplication, inversion, square root calculations, and signature verification.
+- **[fd_secp256r1.c](fd_secp256r1.c.md)**: Implements ECDSA signature verification for the secp256r1 curve using SHA-256 hashing.
+- **[fd_secp256r1.h](fd_secp256r1.h.md)**: APIs for SECP256r1 signature verification, including a function to verify signatures.
+- **[fd_secp256r1_private.h](fd_secp256r1_private.h.md)**: Defines data structures and constants for secp256r1 elliptic curve operations in Montgomery form.
+- **[fd_secp256r1_s2n.c](fd_secp256r1_s2n.c.md)**: Implements scalar, field, and point operations for the secp256r1 elliptic curve.
+- **[fd_secp256r1_table.c](fd_secp256r1_table.c.md)**: Defines a static constant array for precomputed Secp256r1 elliptic curve base point multiples.
+- **[Local.mk](Local.mk.md)**: Makefile logic for building and testing secp256r1 with s2n-bignum dependency.
+- **[test_secp256r1.c](test_secp256r1.c.md)**: Tests and benchmarks for secp256r1 scalar, field, and point operations, including verification.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

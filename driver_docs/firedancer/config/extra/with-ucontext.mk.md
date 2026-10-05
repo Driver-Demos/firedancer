@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-ucontext.mk` file in the `firedancer` codebase configures the build system to use `libucontext` if it is available, setting flags to indicate the presence of `ucontext.h` which is no longer part of POSIX.
+Makefile configuration to use `libucontext` if available, setting flags for `ucontext` support.
 
 # Purpose
-This Makefile snippet checks for the presence of the `libucontext.a` library file and, if found, appends `-lucontext` to the `LDFLAGS` to link against it. It also sets a preprocessor flag `FD_HAS_UCONTEXT` to indicate the availability of `ucontext` functionality, which is no longer part of POSIX but still present in some C libraries like glibc.
+This Makefile snippet checks for the presence of the `libucontext` library and adjusts the build flags accordingly. If the file `/lib/libucontext.a` exists, it appends `-lucontext` to the `LDFLAGS`, indicating that the linker should use the `libucontext` library. Additionally, it sets the `FD_HAS_UCONTEXT` variable to `1` and adds `-DFD_HAS_UCONTEXT=1` to `CPPFLAGS`, which defines the `FD_HAS_UCONTEXT` macro during compilation. This configuration ensures compatibility with systems where `ucontext.h` is not part of the standard library, such as musl libc.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

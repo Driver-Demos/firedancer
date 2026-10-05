@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_tower_tile objects to fd_discof when FD_HAS_INT128 is set.
+Makefile logic to add objects for `fd_tower_tile` and `fd_discof` if `FD_HAS_INT128` is defined.
 
 # Purpose
-Builds `fd_tower_tile` into the `fd_discof` target only when `FD_HAS_INT128` is defined. The `ifdef` guard makes this object addition conditional on support for 128-bit integer types.
+The `Makefile` snippet conditionally adds object files to the build process. If the macro `FD_HAS_INT128` is defined, it invokes the `add-objs` function to include `fd_tower_tile` and `fd_discof` in the build. This ensures that these object files are only compiled when the system supports 128-bit integers.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

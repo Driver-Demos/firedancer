@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GCC 15+ zen5 build flags and feature defines for x86-64, debug, security, threads, and optimization.
+Makefile for configuring GCC 15+ with Zen 5 optimizations and various architecture flags.
 
 # Purpose
-This Makefile fragment defines a build target for `linux/gcc/zen5` and includes shared build settings from `config/base.mk` and several `config/extra` files that enable GCC, x86-64, debug, security, brutality, optimization, and threads options. It checks the GCC major version with `$(CC) -dumpversion` and stops the build unless GCC 15 or later is used, then sets `CPPFLAGS` to use `-march=znver5` and `-mtune=znver5` for Zen 5 code generation. The file also defines feature macros such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, `FD_HAS_X86`, `FD_HAS_AVX`, `FD_HAS_AVX512`, and `FD_HAS_GFNI` in both `CPPFLAGS` and Make variables so the source code can compile with the expected platform capabilities.
+This Makefile is used to configure the build environment for a software project targeting the Zen 5 architecture using GCC. It sets the build directory to `linux/gcc/zen5` and includes several configuration files that add support for GCC, x86-64 architecture, debugging, security, optimization, and threading. The file checks the GCC version to ensure it is 15 or higher, as this version includes necessary optimizations for Zen 5. If the GCC version is not supported, an error message is displayed. The file also defines several preprocessor flags (`CPPFLAGS`) and variables to enable specific features such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and various instruction set extensions like SSE, AVX, and AVX512.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

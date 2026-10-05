@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.txt` file in the `firedancer/src/ballet/json` directory provides information about the inclusion of the cJSON library, specifying its exact commit and directing users to the root NOTICE file for licensing details.
+A copy of the cJSON library from commit `cb8693b` with licensing details in the root NOTICE file.
 
 # Purpose
-The file provides information about the inclusion of the cJSON library within the directory, specifying that it is an exact copy from commit `cb8693b`. It also directs users to the root repository's NOTICE file for licensing details.
+The directory contains a copy of the `cJSON` library, which is a lightweight JSON parsing and printing library. The library is copied exactly from commit `cb8693b`. For licensing information, refer to the `NOTICE` file in the root of the repository.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
