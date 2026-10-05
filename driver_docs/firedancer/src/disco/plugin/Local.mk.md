@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_plugin_tile objects when FD_HAS_INT128 is defined.
+Makefile logic to conditionally add objects based on the presence of 128-bit integer support.
 
 # Purpose
-Builds the `fd_plugin_tile` object list only when `FD_HAS_INT128` is defined. The `add-objs` call adds the `fd_disco` and `fd_flamenco` objects to the `fd_plugin_tile` target under that condition.
+The `Makefile` snippet conditionally adds object files to the build process. If the macro `FD_HAS_INT128` is defined, it invokes the `add-objs` function to include the object files `fd_plugin_tile`, `fd_disco`, and `fd_flamenco` in the build. This ensures that these components are only compiled when the system supports 128-bit integers.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

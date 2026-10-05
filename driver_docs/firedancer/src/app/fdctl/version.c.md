@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `version.c` file in the `firedancer` codebase defines versioning information for the `fdctl` application, including major, minor, and patch versions, as well as commit reference details.
+Defines version information and commit references for the fdctl application.
 
 # Purpose
-This C source code file is a configuration and versioning module for a software project. It defines and initializes constants related to the versioning of the software, such as major, minor, and patch version numbers, as well as commit reference identifiers. The file includes headers for utility functions and version definitions, and it uses preprocessor directives to set default values for patch version and commit references if they are not already defined. The constants are used to store version information in both numeric and string formats, which can be utilized elsewhere in the project for version tracking and display purposes. This setup is typical for maintaining consistent version information across a software application.
+This code is a C source file that defines versioning information for a software component. It includes two header files: `fd_util.h` and `version.h`, which likely provide utility functions and version macros, respectively. The file defines default values for patch version and commit reference using preprocessor directives, which can be overridden if already defined. It declares and initializes several constants: `fdctl_major_version`, `fdctl_minor_version`, and `fdctl_patch_version` for version numbers, `fdctl_commit_ref` for a commit reference in unsigned integer format, and `fdctl_commit_ref_string` for the commit reference as a string. Additionally, it constructs a version string `fdctl_version_string` by concatenating the major, minor, and patch version numbers. This file is used to manage and provide access to version information for the software component.
 # Imports and Dependencies
 
 ---
@@ -18,44 +18,44 @@ This C source code file is a configuration and versioning module for a software 
 
 ---
 ### fdctl\_major\_version
-- **Type**: `ulong`
-- **Description**: The `fdctl_major_version` is a global constant variable of type `ulong` that holds the major version number of the software. It is initialized with the value of the macro `FDCTL_MAJOR_VERSION`, which is expected to be defined elsewhere in the codebase, likely in the included "version.h" file.
-- **Use**: This variable is used to represent and access the major version number of the software throughout the program.
+- **Type**: ``ulong``
+- **Description**: A constant unsigned long integer that stores the major version number of the software component identified by `FDCTL_MAJOR_VERSION`. This value is defined at compile time and remains constant throughout the execution of the program.
+- **Use**: Used to identify the major version of the software component for version control and compatibility checks.
 
 
 ---
 ### fdctl\_minor\_version
-- **Type**: `ulong`
-- **Description**: The `fdctl_minor_version` is a global constant variable of type `ulong` that holds the minor version number of the software. It is defined using a preprocessor macro `FDCTL_MINOR_VERSION`, which is expected to be set elsewhere in the code or build system.
-- **Use**: This variable is used to track and represent the minor version component of the software's versioning scheme.
+- **Type**: ``ulong``
+- **Description**: Represents the minor version number of the software component, defined as a constant of type `ulong`. It is initialized with the value of the macro `FDCTL_MINOR_VERSION`, which is expected to be defined elsewhere in the code.
+- **Use**: Used to store and provide the minor version number of the software component.
 
 
 ---
 ### fdctl\_patch\_version
-- **Type**: `ulong`
-- **Description**: The `fdctl_patch_version` is a global constant variable of type `ulong` that holds the patch version number of the software. It is defined using the preprocessor macro `FDCTL_PATCH_VERSION`, which defaults to 9999 if not previously defined.
-- **Use**: This variable is used to track and represent the patch version of the software, allowing for version control and identification.
+- **Type**: ``ulong``
+- **Description**: Represents the patch version number of the software as an unsigned long integer. It is defined as a constant and initialized with the value of `FDCTL_PATCH_VERSION`, which defaults to 9999 if not defined elsewhere.
+- **Use**: Used to store the patch version number of the software for version tracking and display purposes.
 
 
 ---
 ### fdctl\_commit\_ref
-- **Type**: `uint`
-- **Description**: The `fdctl_commit_ref` is a global constant variable of type `uint` that holds a 32-bit unsigned integer representing the commit reference for the software version control. It is initialized with the value defined by the macro `FDCTL_COMMIT_REF_U32`, which defaults to `0x0` if not otherwise specified.
-- **Use**: This variable is used to store and provide a numeric representation of the commit reference for version tracking purposes.
+- **Type**: ``uint``
+- **Description**: A constant unsigned integer that stores the commit reference as a 32-bit unsigned integer value.
+- **Use**: Used to store the commit reference in a numeric format for version control purposes.
 
 
 ---
 ### fdctl\_commit\_ref\_string
 - **Type**: ``char const[]``
-- **Description**: The `fdctl_commit_ref_string` is a global constant character array that holds the commit reference string for the software. It is defined using the macro `FDCTL_COMMIT_REF_CSTR`, which defaults to a string of 40 zeros if not otherwise specified. This variable is used to identify the specific commit of the source code from which the software was built.
-- **Use**: This variable is used to store and provide the commit reference string for version tracking and identification purposes.
+- **Description**: A constant character array that stores the commit reference string for the software version control.
+- **Use**: Used to hold the commit reference as a string, which is defined by the macro `FDCTL_COMMIT_REF_CSTR`.
 
 
 ---
 ### fdctl\_version\_string
-- **Type**: `char const[]`
-- **Description**: The `fdctl_version_string` is a constant character array that holds the version string of the software, formatted as 'major.minor.patch'. It is constructed using macros that expand to the major, minor, and patch version numbers of the software.
-- **Use**: This variable is used to provide a human-readable version string for the software, which can be displayed in logs or user interfaces.
+- **Type**: ``char const[]``
+- **Description**: A constant character array that stores the version string of the software. The version string is constructed by concatenating the major, minor, and patch version numbers, each converted to a string, and separated by periods.
+- **Use**: Used to represent the version of the software in a human-readable format.
 
 
 

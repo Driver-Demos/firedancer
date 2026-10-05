@@ -3,10 +3,23 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Nightly backtest test runner that updates code, builds, runs tests, and sends Slack alerts.
+Automates nightly code updates, environment setup, and backtest execution with Slack notifications.
 
 # Purpose
-A Bash automation script pulls the latest code from the nightly branch, prepares the build environment, and rebuilds the project with the `offline-replay` extra enabled. It then runs `./src/flamenco/runtime/tests/run_backtest_tests_all.sh` to execute the backtest test suite and captures the exit status. A helper function named `send_slack_message` sends a JSON payload to `SLACK_WEBHOOK_URL` so the script can report success or failure in Slack. This file is an executable CI or nightly job script that performs source update, build, test, and notification steps.
+This script is a Bash executable designed to automate the process of updating a code repository, setting up the environment, and running a series of tests. It begins by navigating to a specified directory and updating the repository to the latest commit on a specified branch. The script then configures the environment by adjusting the `PATH` and `PKG_CONFIG_PATH` variables and performs a clean build setup. It installs necessary dependencies using a custom script and prepares the environment for running tests. The script executes a set of backtest tests and captures the exit status. Based on the test results, it sends a notification message to a Slack channel using a webhook URL, indicating whether the tests passed or failed.
+# Functions
+
+---
+### send\_slack\_message
+Sends a message to a Slack channel using a webhook URL.
+- **Inputs**:
+    - `MESSAGE`: The message text to send to the Slack channel.
+- **Logic and Control Flow**:
+    - Create a JSON payload with the message text and set 'link_names' to 1.
+    - Use the 'curl' command to send a POST request with the JSON payload to the Slack webhook URL.
+- **Output**: No output is returned from this function.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

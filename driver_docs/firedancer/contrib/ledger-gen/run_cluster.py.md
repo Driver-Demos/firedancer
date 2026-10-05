@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `run_cluster.py` file in the `firedancer` codebase is a script designed to generate and manage a test Solana cluster, allowing for the creation of both single-node and multi-node clusters using Solana binaries built from a specified source directory.
+Script to generate and manage a test Solana cluster with options for multi-node configurations.
 
 # Purpose
-This Python script is designed to automate the setup and management of a Solana test cluster, which can be used for testing and development purposes. It provides functionality to create both single-node and multi-node Solana clusters by building and deploying Solana binaries from a specified source directory. The script is structured to handle various tasks such as building the necessary Solana components, generating cryptographic keys for the cluster nodes, and configuring the nodes to operate as validators within the cluster. It also includes mechanisms to monitor the cluster's status and manage the lifecycle of the validator processes.
+This script is designed to generate a test Solana cluster, which is useful for creating test ledgers. It can create both a single-node test validator and multi-node clusters. The script builds and uses Solana binaries from a specified source directory, allowing users to test different Solana versions. The script includes functionality to monitor the cluster using Solana commands and provides a mechanism to stop the cluster by terminating the script.
 
-The script is intended to be executed as a standalone command-line tool, as indicated by its use of the `argparse` module to parse command-line arguments. It defines several asynchronous functions to perform tasks like building Solana binaries, generating cluster keys, and running validator nodes. The script leverages Python's `asyncio` library to manage asynchronous operations, allowing for efficient handling of subprocesses and I/O operations. The script's primary purpose is to facilitate the creation and management of test environments for Solana, making it a valuable tool for developers working on Solana-based applications or testing new features in a controlled environment.
+The script uses asynchronous programming to manage the execution of shell commands for building Solana binaries, generating cluster keys, and running validators. It defines several asynchronous context managers to handle the lifecycle of the Solana cluster and its validators. The script also includes a command-line interface for configuring the cluster, such as specifying the number of nodes, tick duration, snapshot intervals, and output directory. The main function orchestrates the setup and execution of the Solana cluster based on the provided arguments.
 # Imports and Dependencies
 
 ---
@@ -23,263 +23,290 @@ The script is intended to be executed as a standalone command-line tool, as indi
 
 ---
 ### shell<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.shell}} -->
-The `shell` function asynchronously executes a shell command and waits for its completion.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L21>)
+
+Executes a shell command asynchronously and waits for its completion.
 - **Inputs**:
-    - `cmd`: A string representing the shell command to be executed.
-    - `kwargs`: Additional keyword arguments that are passed to `asyncio.create_subprocess_shell`.
-- **Control Flow**:
-    - The function uses `asyncio.create_subprocess_shell` to create a subprocess for the given command `cmd` with additional options specified in `kwargs`.
-    - It awaits the creation of the subprocess and then awaits the completion of the subprocess using the `wait` method.
-- **Output**: The function returns the exit status of the executed shell command as an integer.
+    - `cmd`: The shell command to execute as a string.
+    - `kwargs`: Additional keyword arguments to pass to `asyncio.create_subprocess_shell`.
+- **Logic and Control Flow**:
+    - Calls `asyncio.create_subprocess_shell` with the given command and keyword arguments to create a subprocess.
+    - Awaits the creation of the subprocess and then calls `wait()` on the subprocess to wait for its completion.
+    - Returns the result of the `wait()` call, which is the exit status of the command.
+- **Output**: The exit status of the executed shell command as an integer.
 
 
 ---
 ### build\_solana<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.build_solana}} -->
-The `build_solana` function asynchronously builds specific Solana packages from a given source directory using the Cargo build system.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L24>)
+
+Builds the Solana binaries from the specified source directory using the Cargo build system.
 - **Inputs**:
-    - `source_dir`: The directory path where the Solana source code is located, which will be used as the current working directory for the build process.
-- **Control Flow**:
-    - The function calls the [`shell`](#shell) function with a command to build several Solana packages using Cargo in release mode.
-    - The [`shell`](#shell) function is awaited, indicating that the build process is asynchronous and the function will pause until the build is complete.
-- **Output**: The function does not return any value; it performs an asynchronous build operation.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](#shell)
+    - `source_dir`: The directory path where the Solana source code is located.
+- **Logic and Control Flow**:
+    - Calls the [`shell`](<#shell>) function with a command to build Solana packages using Cargo in release mode.
+    - Specifies the current working directory for the shell command as `source_dir`.
+    - Awaits the completion of the shell command execution.
+- **Output**: Does not return any value; it performs an asynchronous build operation.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](<#shell>)
 
 
 ---
 ### solana\_binary<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.solana_binary}} -->
-The `solana_binary` function constructs the file path to a Solana binary executable within a specified source directory.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L27>)
+
+Constructs a file path to a Solana binary in the release directory.
 - **Inputs**:
-    - `name`: The name of the Solana binary executable file.
+    - `name`: The name of the Solana binary file.
     - `source_dir`: The directory path where the Solana source code is located.
-- **Control Flow**:
-    - The function uses the `os.path.join` method to concatenate the `source_dir`, the subdirectory 'target/release', and the `name` of the binary to form the full path.
-- **Output**: A string representing the full file path to the specified Solana binary executable within the 'target/release' directory of the given source directory.
+- **Logic and Control Flow**:
+    - Use the `os.path.join` function to concatenate the `source_dir`, the path 'target/release', and the `name` to form the full path to the binary.
+- **Output**: A string representing the full file path to the specified Solana binary in the release directory.
 
 
 ---
 ### parse\_genesis\_output<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.parse_genesis_output}} -->
-The `parse_genesis_output` function extracts the genesis hash and shred version from a given output string.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L30>)
+
+Parses the output string to extract the 'Genesis hash' and 'Shred version' values.
 - **Inputs**:
-    - `output`: A string containing the output from which the genesis hash and shred version need to be extracted.
-- **Control Flow**:
-    - The function splits the input string `output` into lines using the newline character as a delimiter.
-    - It initializes two variables, `genesis_hash` and `shred_version`, to `None`.
-    - The function iterates over each line in the split lines.
-    - If a line contains the substring 'Genesis hash', it extracts the value after the colon and assigns it to `genesis_hash`.
-    - If a line contains the substring 'Shred version', it extracts the value after the colon and assigns it to `shred_version`.
-- **Output**: A tuple containing the extracted `genesis_hash` and `shred_version` values.
+    - `output`: A string containing lines of text, each potentially including 'Genesis hash' or 'Shred version' information.
+- **Logic and Control Flow**:
+    - Split the input string `output` into a list of lines using the newline character as a delimiter.
+    - Initialize `genesis_hash` and `shred_version` to `None`.
+    - Iterate over each line in the list of lines.
+    - Check if the line contains the substring 'Genesis hash'.
+    - If 'Genesis hash' is found, split the line at the colon character and strip whitespace from the second part to get the `genesis_hash`.
+    - Check if the line contains the substring 'Shred version'.
+    - If 'Shred version' is found, split the line at the colon character and strip whitespace from the second part to get the `shred_version`.
+    - Return a tuple containing `genesis_hash` and `shred_version`.
+- **Output**: A tuple containing two elements: the `genesis_hash` and the `shred_version`, both as strings or `None` if not found.
 
 
 ---
 ### run\_genesis<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.run_genesis}} -->
-The `run_genesis` function asynchronously executes the Solana genesis process to initialize a test cluster and returns the genesis hash and shred version from the output.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L44>)
+
+Executes the Solana genesis process and parses its output.
 - **Inputs**:
-    - `output_dir`: The directory where the genesis process will be executed and where output files will be stored.
+    - `output_dir`: The directory where the process will execute and store its output.
     - `solana_source_directory`: The directory containing the Solana source code and binaries.
-    - `tick_duration`: The duration of each tick in the Solana cluster configuration.
-- **Control Flow**:
-    - The function constructs a command string to run the 'solana-genesis' binary with various parameters, including cluster type, ledger path, bootstrap validator keys, lamports, and tick duration.
-    - It uses `asyncio.create_subprocess_shell` to asynchronously execute the command in a subprocess, capturing both stdout and stderr.
-    - The function waits for the subprocess to complete and captures its stdout output.
-    - The captured stdout is decoded from bytes to a UTF-8 string.
-    - The decoded output is passed to the [`parse_genesis_output`](#parse_genesis_output) function to extract the genesis hash and shred version.
-    - The function returns the extracted genesis hash and shred version as a tuple.
+    - `tick_duration`: The duration of each tick in the genesis process.
+- **Logic and Control Flow**:
+    - Creates an asynchronous subprocess to run the Solana genesis command with specified parameters.
+    - Sets the working directory for the subprocess to `output_dir`.
+    - Captures the standard output and error streams of the subprocess.
+    - Waits for the subprocess to complete and captures its output.
+    - Parses the output of the genesis process to extract the genesis hash and shred version.
 - **Output**: A tuple containing the genesis hash and shred version extracted from the genesis process output.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](#solana_binary)
-    - [`firedancer/contrib/ledger-gen/run_cluster.parse_genesis_output`](#parse_genesis_output)
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](<#solana_binary>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.parse_genesis_output`](<#parse_genesis_output>)
 
 
 ---
 ### generate\_cluster\_keys<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.generate_cluster_keys}} -->
-The `generate_cluster_keys` function asynchronously generates key pairs for a specified number of Solana nodes and writes them to an output directory.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L54>)
+
+Generates key pairs for a specified number of Solana cluster nodes and saves them in the specified output directory.
 - **Inputs**:
-    - `nodes`: An integer representing the number of Solana nodes for which keys need to be generated.
-    - `output_dir`: A string specifying the directory where the generated keys will be stored.
-    - `solana_source_directory`: A string indicating the directory path to the Solana source code, used to locate the Solana binaries.
-- **Control Flow**:
-    - The function starts by generating two key files, 'faucet.json' and 'authority.json', in the specified output directory using the Solana keygen binary.
-    - It then iterates over the range of nodes, creating a subdirectory for each node named 'keys-i', where 'i' is the node index.
-    - For each node, it creates three key files ('id.json', 'vote.json', and 'stake.json') in the respective subdirectory.
-    - Each key file is generated by executing the Solana keygen command, and the output is written to a corresponding '.seed' file.
-- **Output**: The function does not return any value; it performs file operations to generate and store key files in the specified output directory.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](#shell)
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](#solana_binary)
+    - `nodes`: The number of Solana cluster nodes for which to generate keys.
+    - `output_dir`: The directory where the generated keys will be saved.
+    - `solana_source_directory`: The directory containing the Solana source code, used to locate the Solana binaries.
+- **Logic and Control Flow**:
+    - Executes an asynchronous shell command to generate a new key pair for the 'faucet' and saves it as 'faucet.json' in the output directory.
+    - Executes an asynchronous shell command to generate a new key pair for the 'authority' and saves it as 'authority.json' in the output directory.
+    - Iterates over the range of nodes to create a directory for each node's keys.
+    - For each node, creates a directory named 'keys-i' where 'i' is the node index.
+    - For each key type ('id', 'vote', 'stake'), opens a file to write the seed and executes an asynchronous shell command to generate a new key pair, saving the output to a JSON file in the node's key directory.
+- **Output**: No explicit return value; the function performs file operations and shell command executions to generate and store key pairs.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](<#shell>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](<#solana_binary>)
 
 
 ---
 ### get\_pubkey<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.get_pubkey}} -->
-The `get_pubkey` function asynchronously retrieves the public key from a Solana key file using the `solana-keygen` command.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L66>)
+
+Retrieves the public key for a given vote key using the Solana keygen tool.
 - **Inputs**:
-    - `vote_key`: A string representing the path to the Solana key file for which the public key is to be retrieved.
-    - `solana_source_directory`: A string representing the directory path where the Solana binaries are located.
-- **Control Flow**:
-    - The function constructs a shell command to execute the `solana-keygen` binary with the `pubkey` subcommand, using the provided `vote_key` and `solana_source_directory` to form the command.
-    - It then creates an asynchronous subprocess to run this shell command, capturing the standard output and standard error streams.
-    - The function waits for the subprocess to complete and captures the output.
-    - If the subprocess returns a non-zero exit code, indicating an error, an exception is raised with a message indicating the failure of the `solana-keygen` command.
-    - If successful, the function decodes the standard output from bytes to a string, strips any leading or trailing whitespace, and returns the resulting public key string.
-- **Output**: The function returns a string representing the public key extracted from the specified Solana key file.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](#solana_binary)
+    - `vote_key`: The path to the vote key file for which the public key is to be retrieved.
+    - `solana_source_directory`: The directory path where the Solana source code is located, used to locate the Solana binaries.
+- **Logic and Control Flow**:
+    - Creates an asynchronous subprocess to execute the 'solana-keygen pubkey' command with the provided vote key.
+    - Waits for the subprocess to complete and captures the standard output and error streams.
+    - Checks the return code of the subprocess; if it is not zero, raises an exception indicating the command failed.
+    - Decodes the standard output from bytes to a string, strips any leading or trailing whitespace, and returns the result.
+- **Output**: Returns the decoded and stripped public key as a string.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](<#solana_binary>)
 
 
 ---
 ### first\_cluster\_validator<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.first_cluster_validator}} -->
-The `first_cluster_validator` function sets up and manages the lifecycle of the first validator node in a Solana cluster using an asynchronous context manager.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L77>)
+
+Manages the lifecycle of a Solana validator process with specific configurations.
 - **Decorators**: `@asynccontextmanager`
 - **Inputs**:
     - `expected_shred_version`: The expected shred version for the validator.
     - `expected_genesis_hash`: The expected genesis hash for the validator.
-    - `solana_source_directory`: The directory path where the Solana source code is located.
+    - `solana_source_directory`: The directory path where Solana source code is located.
     - `output_dir`: The directory path where output files, such as keys and ledgers, are stored.
-    - `snapshot_interval`: The interval in slots at which snapshots are taken.
-    - `snapshots_to_retain`: The number of full snapshots to retain.
-- **Control Flow**:
-    - Constructs paths for the ledger, identity key, and vote key based on the output directory.
-    - Retrieves the public key for the vote account using the [`get_pubkey`](#get_pubkey) function.
-    - Creates an asynchronous subprocess to run the Solana validator with specified parameters, including ledger path, identity key, vote account, expected shred version, and genesis hash.
-    - Yields the process object to allow the caller to interact with the running validator process.
-    - Ensures that the validator process is terminated and awaited upon exit from the context manager.
-- **Output**: The function yields a process object representing the running validator subprocess, allowing interaction with the process during its execution.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.get_pubkey`](#get_pubkey)
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](#solana_binary)
+    - `snapshot_interval`: The interval in slots between snapshots.
+    - `snapshots_to_retain`: The maximum number of full snapshots to retain.
+- **Logic and Control Flow**:
+    - Constructs paths for the ledger, identity key, and vote key based on the `output_dir`.
+    - Retrieves the public key for the vote account using the [`get_pubkey`](<#get_pubkey>) function.
+    - Starts an asynchronous subprocess to run the Solana validator with the specified configurations, including ledger path, identity key, vote account, expected shred version, and genesis hash.
+    - Yields control to allow the caller to interact with the running process.
+    - Ensures the process is terminated and waits for it to finish when the context is exited.
+- **Output**: Yields a running subprocess object representing the Solana validator process.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.get_pubkey`](<#get_pubkey>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](<#solana_binary>)
 
 
 ---
 ### solana\_cluster\_validators<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.solana_cluster_validators}} -->
-The `solana_cluster_validators` function sets up and manages multiple Solana validator nodes by creating and delegating stake accounts, and spawning validator processes.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L96>)
+
+Manages the creation and delegation of stake accounts and spawns validator nodes for a Solana cluster.
 - **Decorators**: `@asynccontextmanager`
 - **Inputs**:
-    - `count`: The number of validator nodes to set up.
+    - `count`: The number of validator nodes to create and manage.
     - `expected_shred_version`: The expected shred version for the validators.
     - `expected_genesis_hash`: The expected genesis hash for the validators.
-    - `solana_source_directory`: The directory path where the Solana source code is located.
-    - `output_dir`: The directory path where output files, such as keys and logs, will be stored.
-- **Control Flow**:
+    - `solana_source_directory`: The directory path where Solana source code is located.
+    - `output_dir`: The directory path where output files, such as keys and logs, are stored.
+- **Logic and Control Flow**:
     - Prints a message indicating the start of creating and delegating stake accounts.
     - Iterates over the range from 1 to `count` to create and delegate stake accounts for each validator.
     - For each validator, constructs file paths for vote, stake, faucet, and authority keys.
-    - Executes shell commands to create stake accounts and delegate stakes using the Solana CLI.
-    - Pauses execution for 5 seconds to allow for setup completion.
+    - Executes shell commands to create and delegate stake accounts using the Solana binary.
+    - Pauses execution for 5 seconds to allow for processing time.
     - Initializes an empty list `processes` to store subprocesses for validator nodes.
     - Prints a message indicating the start of spawning validator nodes.
     - Iterates over the range from 1 to `count` to spawn each validator node.
     - For each validator, constructs file paths for ledger, log, identity, vote, stake, faucet, and authority keys.
-    - Retrieves the public key for the vote account using the [`get_pubkey`](#get_pubkey) function.
-    - Creates a subprocess for each validator node using the Solana CLI and appends it to the `processes` list.
-    - Yields the list of processes to allow for external management of the subprocesses.
-    - In the `finally` block, iterates over the `processes` list to terminate and wait for each subprocess to finish.
-- **Output**: Yields a list of subprocesses representing the running validator nodes.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](#shell)
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](#solana_binary)
-    - [`firedancer/contrib/ledger-gen/run_cluster.get_pubkey`](#get_pubkey)
+    - Retrieves the public key for the vote account using the [`get_pubkey`](<#get_pubkey>) function.
+    - Creates a subprocess for each validator node using the Solana binary and appends it to the `processes` list.
+    - Yields the list of processes to allow for further asynchronous operations.
+    - In the `finally` block, terminates each process in the `processes` list and waits for them to finish.
+- **Output**: Yields a list of subprocesses representing the spawned validator nodes.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](<#shell>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](<#solana_binary>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.get_pubkey`](<#get_pubkey>)
 
 
 ---
 ### spawn\_solana\_cluster<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.spawn_solana_cluster}} -->
-The `spawn_solana_cluster` function sets up and manages a Solana cluster with multiple validator nodes, handling key generation, genesis block creation, validator readiness checks, and snapshot management.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L142>)
+
+Manages the setup and operation of a Solana cluster with multiple validator nodes.
 - **Decorators**: `@asynccontextmanager`
 - **Inputs**:
-    - `nodes`: The number of validator nodes to be included in the Solana cluster.
-    - `output_dir`: The directory where output files, such as keys and ledgers, will be stored.
+    - `nodes`: The number of validator nodes to set up in the Solana cluster.
+    - `output_dir`: The directory where the output files, such as keys and ledgers, are stored.
     - `solana_source_directory`: The directory containing the Solana source code and binaries.
     - `tick_duration`: The duration of ticks for the Solana cluster.
     - `snapshot_interval`: The interval at which snapshots are taken in the cluster.
     - `snapshots_to_retain`: The number of snapshots to retain in the cluster.
-- **Control Flow**:
-    - Generate cluster keys for the specified number of nodes using [`generate_cluster_keys`](#generate_cluster_keys).
-    - Run the genesis process to obtain the genesis hash and shred version using [`run_genesis`](#run_genesis).
-    - Start the first validator node using [`first_cluster_validator`](#first_cluster_validator) and wait until it is ready by checking for '1 current validators' in the output.
-    - Create and fund vote accounts for the remaining validators by transferring SOL and creating vote accounts.
-    - Wait for the first validator to create a snapshot at the specified interval by checking for the existence of a 'state_complete' file.
-    - Start the remaining validator nodes using [`solana_cluster_validators`](#solana_cluster_validators) and wait until all validators are ready by checking for the expected number of validators in the output.
-- **Output**: Yields control back to the caller once all validators are ready, allowing for further operations or monitoring.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.generate_cluster_keys`](#generate_cluster_keys)
-    - [`firedancer/contrib/ledger-gen/run_cluster.run_genesis`](#run_genesis)
-    - [`firedancer/contrib/ledger-gen/run_cluster.first_cluster_validator`](#first_cluster_validator)
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](#solana_binary)
-    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](#shell)
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_cluster_validators`](#solana_cluster_validators)
+- **Logic and Control Flow**:
+    - Generates cluster keys for the specified number of nodes and stores them in the output directory.
+    - Runs the genesis process to initialize the cluster and obtain the genesis hash and shred version.
+    - Starts the first validator node and waits until it is ready by checking for the presence of a validator in the output of a Solana command.
+    - Creates and funds vote accounts for the remaining validator nodes by transferring SOL and creating vote accounts.
+    - Waits for the first validator to create a snapshot at the specified interval by checking for the existence of a snapshot file.
+    - Starts the remaining validator nodes and waits until all validators are ready by checking the output of a Solana command.
+    - Yields control to allow further operations while the cluster is running.
+- **Output**: Yields control to the caller once the Solana cluster is set up and all validators are running.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.generate_cluster_keys`](<#generate_cluster_keys>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.run_genesis`](<#run_genesis>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.first_cluster_validator`](<#first_cluster_validator>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](<#solana_binary>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.shell`](<#shell>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_cluster_validators`](<#solana_cluster_validators>)
 
 
 ---
 ### spawn\_solana\_test\_validator<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.spawn_solana_test_validator}} -->
-The `spawn_solana_test_validator` function asynchronously manages the lifecycle of a Solana test validator process, ensuring it is properly terminated after use.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L203>)
+
+Manages the lifecycle of a Solana test validator process asynchronously.
 - **Decorators**: `@asynccontextmanager`
 - **Inputs**:
-    - `solana_source_directory`: The directory path where the Solana source code is located, used to locate the Solana binary.
-    - `output_dir`: The directory path where the process will be executed, typically used for storing output files and logs.
-- **Control Flow**:
-    - The function is decorated with `@asynccontextmanager`, indicating it is used as an asynchronous context manager.
-    - A subprocess is created using `asyncio.create_subprocess_shell` to run the Solana test validator binary, with its standard output and error streams piped.
-    - The process is yielded to the context block, allowing the caller to interact with the running process.
-    - In the `finally` block, the process is terminated using `process.terminate()`, and the function waits for the process to exit with `await process.wait()`.
-- **Output**: The function yields a subprocess object representing the running Solana test validator, allowing interaction with the process within the context block.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](#solana_binary)
+    - `solana_source_directory`: The directory path where the Solana source code is located.
+    - `output_dir`: The directory path where the output, such as logs and ledgers, will be stored.
+- **Logic and Control Flow**:
+    - Uses `asyncio.create_subprocess_shell` to start a Solana test validator process with the specified source directory and output directory.
+    - Yields control to allow the caller to interact with the process while it is running.
+    - In the `finally` block, terminates the process and waits for it to finish to ensure proper cleanup.
+- **Output**: Yields a process object representing the running Solana test validator.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana_binary`](<#solana_binary>)
 
 
 ---
 ### solana<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.solana}} -->
-The `solana` function is an asynchronous context manager that sets up and manages a Solana cluster for testing purposes, optionally building the Solana binaries if required.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L217>)
+
+Manages the setup and execution of a Solana cluster, optionally building Solana binaries if required.
 - **Decorators**: `@asynccontextmanager`
 - **Inputs**:
     - `cluster_nodes`: The number of nodes to use for the Solana cluster.
     - `output_dir`: The directory where validator keys and ledgers are written.
     - `solana_source_directory`: The directory containing the Solana source code.
-    - `skip_build_solana`: A boolean flag indicating whether to skip building the Solana binaries.
-    - `tick_duration`: The duration of ticks for the Solana cluster.
+    - `skip_build_solana`: A boolean flag indicating whether to skip building Solana binaries.
+    - `tick_duration`: The duration of ticks in the Solana cluster.
     - `snapshot_interval`: The interval between snapshots in the Solana cluster.
     - `snapshots_to_retain`: The number of snapshots to retain in the Solana cluster.
-- **Control Flow**:
-    - If `skip_build_solana` is True, the function calls [`build_solana`](#build_solana) to build the Solana binaries from the source directory.
-    - The function then enters a try block where it uses the [`spawn_solana_cluster`](#spawn_solana_cluster) context manager to set up the Solana cluster with the specified parameters.
-    - The `yield` statement allows the caller to perform operations while the cluster is running.
-    - The function has a finally block that currently does nothing, but it ensures that any necessary cleanup can be added in the future.
-- **Output**: The function yields control back to the caller while the Solana cluster is running, allowing for asynchronous operations to be performed within the context.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.build_solana`](#build_solana)
-    - [`firedancer/contrib/ledger-gen/run_cluster.spawn_solana_cluster`](#spawn_solana_cluster)
+- **Logic and Control Flow**:
+    - If `skip_build_solana` is true, call [`build_solana`](<#build_solana>) to build Solana binaries from the source directory.
+    - Use [`spawn_solana_cluster`](<#spawn_solana_cluster>) to set up and manage the Solana cluster with the specified parameters.
+    - Yield control to allow the cluster to run within the context manager.
+    - Ensure proper cleanup and resource management by using a `try` block with a `finally` clause.
+- **Output**: Yields control to allow the Solana cluster to run within the context manager.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.build_solana`](<#build_solana>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.spawn_solana_cluster`](<#spawn_solana_cluster>)
 
 
 ---
 ### clean<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.clean}} -->
-The `clean` function removes an existing directory and recreates it to ensure a clean state.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L227>)
+
+Removes the specified directory if it exists and then creates a new empty directory with the same name.
 - **Inputs**:
-    - `output_dir`: The path to the directory that needs to be cleaned and recreated.
-- **Control Flow**:
+    - `output_dir`: The path to the directory that will be removed and recreated.
+- **Logic and Control Flow**:
     - Check if the directory specified by `output_dir` exists using `os.path.exists`.
     - If the directory exists, remove it and all its contents using `shutil.rmtree`.
-    - Create a new directory at the `output_dir` path using `os.mkdir`.
-- **Output**: The function does not return any value; it performs directory operations to ensure the specified directory is empty and exists.
+    - Create a new empty directory with the same name using `os.mkdir`.
+- **Output**: No return value; the function performs operations on the file system.
 
 
 ---
 ### main<!-- {{#callable:firedancer/contrib/ledger-gen/run_cluster.main}} -->
-The `main` function initializes and runs a Solana validator cluster based on user-specified configurations.
+[View Source →](<../../../../contrib/ledger-gen/run_cluster.py#L232>)
+
+Parses command-line arguments to configure and run a Solana validator cluster asynchronously.
 - **Inputs**:
-    - `--solana-source-directory`: Absolute path to the Solana checkout, required for locating Solana binaries.
-    - `--skip-build-solana`: Flag to skip building Solana binaries, defaults to building if not specified.
-    - `--solana-cluster-nodes`: Number of nodes to use for the multi-node Solana cluster, optional.
-    - `--tick-duration`: Duration of ticks in the Solana cluster, optional with a default value of 100000.
-    - `--snapshot-interval`: Interval between snapshots in the Solana cluster, optional with a default value of 10.
-    - `--snapshots-to-retain`: Number of snapshots to retain in the Solana cluster, optional with a default value of 20.
-    - `--output-dir`: Output directory where validator keys and ledgers are written to, required.
-- **Control Flow**:
-    - Parse command-line arguments using argparse to configure the Solana cluster.
-    - Clean the specified output directory by removing existing contents and creating a new directory.
-    - Use an asynchronous context manager to set up and run the Solana cluster with the specified configurations.
-    - Within the context manager, enter an infinite loop that keeps the program running, allowing the Solana cluster to operate continuously.
-- **Output**: The function does not return any value; it sets up and runs a Solana validator cluster indefinitely.
-- **Functions called**:
-    - [`firedancer/contrib/ledger-gen/run_cluster.clean`](#clean)
-    - [`firedancer/contrib/ledger-gen/run_cluster.solana`](#solana)
+    - `None`: This function does not take any direct input parameters but uses command-line arguments.
+- **Logic and Control Flow**:
+    - Creates an argument parser to handle command-line inputs for Solana configuration.
+    - Parses the command-line arguments to extract configuration details.
+    - Cleans the specified output directory by removing existing contents and creating a new directory.
+    - Uses an asynchronous context manager to set up and run the Solana cluster with the specified configuration.
+    - Enters an infinite loop to keep the process running, allowing the Solana cluster to operate continuously.
+- **Output**: Does not return a value; it runs the Solana cluster based on the provided configuration.
+- **Functions Called**:
+    - [`firedancer/contrib/ledger-gen/run_cluster.clean`](<#clean>)
+    - [`firedancer/contrib/ledger-gen/run_cluster.solana`](<#solana>)
 
 
 
