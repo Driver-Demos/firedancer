@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for defining structures, constants, and macros for zero-knowledge proof verification functions.
+The `fd_zksdk_private.h` file in the `firedancer` codebase defines internal structures, constants, and function prototypes for verifying various zero-knowledge proof instructions related to ciphertext and public key validity.
 
 # Purpose
-The code is a C header file that defines internal components and functions for a zero-knowledge proof (ZKP) system. It includes various headers related to ZKP, such as `fd_zksdk.h`, `fd_zksdk_transcript.h`, and `fd_rangeproofs.h`, which suggest that it is part of a larger cryptographic library. The file defines constants, structures, and function prototypes that are used to verify different types of cryptographic proofs, such as zero ciphertext, ciphertext equality, and public key validity. These components are essential for ensuring the integrity and validity of cryptographic operations within the system.
+This C header file, `fd_zksdk_private.h`, is part of a larger software system that deals with zero-knowledge proofs (ZKPs) within a cryptographic framework. The file primarily defines internal structures, constants, and function prototypes related to the verification of various cryptographic proofs. It includes a series of headers that provide specific functionalities, such as handling different types of cryptographic instructions and proofs, including zero ciphertext, ciphertext equality, and public key validity. The file also defines macros and constants that are used to manage error handling and basepoints for Pedersen commitments, which are essential in cryptographic operations.
 
-The file also defines macros and constants for handling errors and managing basepoints for Pedersen commitments, which are used in cryptographic proofs. It includes arrays that specify the sizes of context and proof structures for various verification instructions, indicating that the file is designed to handle multiple types of proofs. The use of macros to define verification functions (`DEFINE_VERIFY_PROOF`) suggests a consistent interface for proof verification, which is crucial for maintaining the modularity and extensibility of the cryptographic library. The file is intended for internal use within the library, as indicated by its inclusion of private headers and its focus on defining internal structures and functions.
+The file is not intended to be a standalone executable but rather a component of a larger library or application, likely used internally within the system to facilitate the verification of cryptographic proofs. It defines a set of function prototypes using a macro to ensure consistency across different proof verification functions. These functions are designed to verify various cryptographic properties, such as equality and validity, in a structured and efficient manner. The file also includes metadata structures that are used to manage the state of proof contexts, indicating its role in maintaining the integrity and correctness of cryptographic operations within the system.
 # Imports and Dependencies
 
 ---
@@ -30,43 +30,43 @@ The file also defines macros and constants for handling errors and managing base
 
 ---
 ### fd\_zksdk\_context\_sz
-- **Type**: ``ulong[]``
-- **Description**: An array of unsigned long integers that stores the size of context structures for various zero-knowledge proof (ZKP) verification instructions. Each element in the array corresponds to a specific instruction and holds the size of the context structure required for that instruction.
-- **Use**: Used to determine the size of context structures needed for different ZKP verification instructions.
+- **Type**: `array of ulong`
+- **Description**: The `fd_zksdk_context_sz` is a static constant array of unsigned long integers that holds the sizes of various context structures used in zero-knowledge proof (ZKP) verification instructions. Each element in the array corresponds to the size of a specific context structure required for a particular ZKP verification instruction, such as verifying zero ciphertext, ciphertext equality, and other cryptographic proofs.
+- **Use**: This array is used to determine the size of context structures needed for different ZKP verification instructions in the SDK.
 
 
 ---
 ### fd\_zksdk\_proof\_sz
-- **Type**: ``ulong[]``
-- **Description**: An array of unsigned long integers that stores the sizes of different proof structures used in zero-knowledge proof (ZKP) verification instructions. Each element in the array corresponds to the size of a specific proof type, such as zero ciphertext proof, ciphertext equality proof, and others.
-- **Use**: Used to determine the size of proof structures for various ZKP verification instructions.
+- **Type**: `array of ulong`
+- **Description**: The `fd_zksdk_proof_sz` is a static constant array of unsigned long integers that holds the sizes of various proof structures used in zero-knowledge proof (ZKP) verification instructions. Each element in the array corresponds to the size of a specific proof type, such as zero ciphertext proof, ciphertext equality proof, and others, as defined by the ZKP SDK.
+- **Use**: This array is used to determine the size of proof structures required for different ZKP verification instructions.
 
 
 ---
 ### DEFINE\_VERIFY\_PROOF
-- **Type**: `macro`
-- **Description**: Defines a macro `DEFINE_VERIFY_PROOF` that generates function prototypes for verifying different types of zero-knowledge proofs. Each function prototype is named `fd_zksdk_instr_verify_proof_<name>` and takes two constant void pointers as parameters, representing the context and the proof.
-- **Use**: Used to declare function prototypes for various zero-knowledge proof verification functions in a consistent manner.
+- **Type**: `Macro`
+- **Description**: `DEFINE_VERIFY_PROOF` is a macro used to define a series of function prototypes for verifying different types of zero-knowledge proofs. It takes a single argument, `name`, and generates a function prototype for `fd_zksdk_instr_verify_proof_ ## name`, which is a function that verifies a specific type of proof using the provided context and proof data.
+- **Use**: This macro is used to streamline the definition of multiple proof verification function prototypes, ensuring consistency and reducing code duplication.
 
 
 # Data Structures
 
 ---
 ### fd\_zksdk\_proof\_ctx\_state\_meta
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `ctx_state_authority`: Holds the public key authority for the context state.
-    - `proof_type`: Indicates the type of proof as an unsigned character.
-- **Description**: Defines metadata for a proof context state, including the authority's public key and the type of proof, and is packed to minimize memory usage.
+    - `ctx_state_authority`: A public key type representing the authority of the context state.
+    - `proof_type`: An unsigned character indicating the type of proof.
+- **Description**: The `fd_zksdk_proof_ctx_state_meta` structure is a packed data structure used to store metadata about a proof context state in the ZK-SDK framework. It contains a public key (`ctx_state_authority`) that signifies the authority of the context state and a `proof_type` field that specifies the type of proof being handled. This structure is likely used in the context of zero-knowledge proof verification processes, where different proof types and authorities need to be managed efficiently.
 
 
 ---
 ### fd\_zksdk\_proof\_ctx\_state\_meta\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `ctx_state_authority`: Holds the public key authority for the context state.
-    - `proof_type`: Indicates the type of proof as an unsigned character.
-- **Description**: `fd_zksdk_proof_ctx_state_meta_t` is a packed structure that contains metadata for a proof context state in the Zero-Knowledge Proof (ZKP) SDK. It includes a public key (`ctx_state_authority`) that represents the authority of the context state and a `proof_type` that specifies the type of proof being handled. This structure is used to manage and verify different types of proofs within the ZKP framework.
+    - `ctx_state_authority`: A public key representing the authority of the context state.
+    - `proof_type`: An unsigned character indicating the type of proof.
+- **Description**: The `fd_zksdk_proof_ctx_state_meta_t` structure is a packed data structure used to store metadata about a proof context state in the ZK-SDK framework. It contains a public key (`ctx_state_authority`) that signifies the authority of the context state and a `proof_type` field that specifies the type of proof being handled. This structure is integral to managing and verifying different types of cryptographic proofs within the framework.
 
 
 

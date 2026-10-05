@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions to identify and name blockchain clusters based on genesis hash values.
+The `fd_genesis_cluster.c` file in the `firedancer` codebase provides functions to identify and name blockchain clusters based on their genesis hash values.
 
 # Purpose
-The code provides functionality to identify and name blockchain clusters based on a given genesis hash. It defines two functions: [`fd_genesis_cluster_identify`](<#fd_genesis_cluster_identify>) and [`fd_genesis_cluster_name`](<#fd_genesis_cluster_name>). The [`fd_genesis_cluster_identify`](<#fd_genesis_cluster_identify>) function takes a string representing an expected genesis hash and compares it against predefined constants for different blockchain environments, such as `DEVNET_GENESIS_HASH`, `TESTNET_GENESIS_HASH`, `MAINNET_BETA_GENESIS_HASH`, `PYTHTEST_GENESIS_HASH`, and `PYTHNET_GENESIS_HASH`. It returns an identifier of type `ulong` that corresponds to the recognized cluster, or `FD_CLUSTER_UNKNOWN` if the hash does not match any known cluster.
+This C source code file provides functionality for identifying and naming blockchain clusters based on their genesis hash values. It defines two primary functions: [`fd_genesis_cluster_identify`](#fd_genesis_cluster_identify) and [`fd_genesis_cluster_name`](#fd_genesis_cluster_name). The [`fd_genesis_cluster_identify`](#fd_genesis_cluster_identify) function takes a string representing an expected genesis hash and compares it against predefined hash values for various blockchain environments, such as Devnet, Testnet, Mainnet Beta, Pythtest, and Pythnet. It returns an identifier for the cluster, which is of type `ulong`, corresponding to the matched environment or `FD_CLUSTER_UNKNOWN` if no match is found. The [`fd_genesis_cluster_name`](#fd_genesis_cluster_name) function takes this cluster identifier and returns a human-readable string representing the name of the cluster.
 
-The [`fd_genesis_cluster_name`](<#fd_genesis_cluster_name>) function takes a cluster identifier and returns a string representing the name of the cluster. It uses a switch statement to map the cluster identifiers to their respective names, such as "devnet", "testnet", "mainnet-beta", etc. If the identifier does not match any known cluster, it returns "unknown". This code is likely part of a larger system that manages or interacts with different blockchain networks, providing a way to programmatically identify and label them based on their genesis hashes.
+The code is designed to be part of a larger system, likely a blockchain-related application, where identifying the correct network environment is crucial. It does not define a public API or external interface but rather provides utility functions that can be used internally within the application. The use of macros like `FD_FN_PURE` and `FD_FN_CONST` suggests an emphasis on function purity and const-correctness, which are important for optimization and reliability in software development. The file is focused on a narrow functionality, specifically the identification and naming of blockchain clusters, and is likely intended to be included in other parts of a larger codebase.
 # Imports and Dependencies
 
 ---
@@ -19,37 +19,33 @@ The [`fd_genesis_cluster_name`](<#fd_genesis_cluster_name>) function takes a clu
 
 ---
 ### fd\_genesis\_cluster\_identify<!-- {{#callable:fd_genesis_cluster_identify}} -->
-[View Source →](<../../../../../src/disco/genesis/fd_genesis_cluster.c#L3>)
-
-Identifies the cluster type based on the provided genesis hash.
+The function `fd_genesis_cluster_identify` determines the cluster type based on a given genesis hash string.
 - **Inputs**:
-    - `expected_genesis_hash`: A pointer to a constant character string representing the expected genesis hash to identify the cluster.
-- **Logic and Control Flow**:
-    - Initialize `cluster` to `FD_CLUSTER_UNKNOWN`.
+    - `expected_genesis_hash`: A constant character pointer representing the expected genesis hash to identify the cluster.
+- **Control Flow**:
+    - Initialize a variable `cluster` to `FD_CLUSTER_UNKNOWN`.
     - Check if `expected_genesis_hash` is not null using `FD_LIKELY`.
-    - Compare `expected_genesis_hash` with predefined genesis hashes for different clusters using `strcmp`.
-    - If a match is found, set `cluster` to the corresponding cluster identifier (e.g., `FD_CLUSTER_DEVNET`, `FD_CLUSTER_TESTNET`).
-    - Return the identified `cluster`.
-- **Output**: Returns an `ulong` representing the identified cluster type, or `FD_CLUSTER_UNKNOWN` if no match is found.
+    - Compare `expected_genesis_hash` with predefined genesis hash strings for different clusters using `strcmp`.
+    - If a match is found, set `cluster` to the corresponding cluster constant using `FD_UNLIKELY`.
+    - Return the identified `cluster` value.
+- **Output**: Returns an unsigned long integer representing the identified cluster type, or `FD_CLUSTER_UNKNOWN` if no match is found.
 
 
 ---
 ### fd\_genesis\_cluster\_name<!-- {{#callable:fd_genesis_cluster_name}} -->
-[View Source →](<../../../../../src/disco/genesis/fd_genesis_cluster.c#L23>)
-
-Maps a cluster identifier to its corresponding cluster name as a string.
+The `fd_genesis_cluster_name` function returns the name of a cluster as a string based on the provided cluster identifier.
 - **Inputs**:
     - `cluster`: An unsigned long integer representing the cluster identifier.
-- **Logic and Control Flow**:
-    - Use a switch statement to check the value of `cluster`.
-    - If `cluster` matches `FD_CLUSTER_UNKNOWN`, return "unknown".
-    - If `cluster` matches `FD_CLUSTER_PYTHTEST`, return "pythtest".
-    - If `cluster` matches `FD_CLUSTER_TESTNET`, return "testnet".
-    - If `cluster` matches `FD_CLUSTER_DEVNET`, return "devnet".
-    - If `cluster` matches `FD_CLUSTER_PYTHNET`, return "pythnet".
-    - If `cluster` matches `FD_CLUSTER_MAINNET_BETA`, return "mainnet-beta".
-    - If `cluster` does not match any known value, return "unknown".
-- **Output**: A constant character pointer to a string representing the cluster name.
+- **Control Flow**:
+    - The function uses a switch statement to determine the cluster name based on the value of the `cluster` argument.
+    - If the `cluster` matches `FD_CLUSTER_UNKNOWN`, it returns "unknown".
+    - If the `cluster` matches `FD_CLUSTER_PYTHTEST`, it returns "pythtest".
+    - If the `cluster` matches `FD_CLUSTER_TESTNET`, it returns "testnet".
+    - If the `cluster` matches `FD_CLUSTER_DEVNET`, it returns "devnet".
+    - If the `cluster` matches `FD_CLUSTER_PYTHNET`, it returns "pythnet".
+    - If the `cluster` matches `FD_CLUSTER_MAINNET_BETA`, it returns "mainnet-beta".
+    - If the `cluster` does not match any known identifiers, it defaults to returning "unknown".
+- **Output**: A constant character pointer to a string representing the name of the cluster.
 
 
 

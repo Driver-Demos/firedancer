@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and APIs for flow control in shared memory, Makefile for build configuration, and unit tests.
+The `fctl` folder in the `firedancer` codebase contains source code, headers, and build configurations for implementing and testing a credit-based flow control system designed for large-scale distributed systems.
 
 
 ## Files
-- **[fd_fctl.c](fd_fctl.c.md)**: Functions for configuring and managing flow control settings in shared memory.
-- **[fd_fctl.h](fd_fctl.h.md)**: APIs for ultra-low overhead, credit-based flow control in distributed systems, with emphasis on minimizing backpressure.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_fctl` in the `firedancer` codebase.
-- **[test_fctl.c](test_fctl.c.md)**: Unit tests for the `fd_fctl` module, verifying configuration, alignment, and control flow logic.
+- **[fd_fctl.c](fd_fctl.c.md)**: The `fd_fctl.c` file in the `firedancer` codebase implements functions for configuring and managing flow control settings, including initialization, adding receiver configurations, and finalizing the configuration with burst and refill parameters.
+- **[fd_fctl.h](fd_fctl.h.md)**: The `fd_fctl.h` file in the `firedancer` codebase provides APIs for implementing ultra-flexible, low-overhead credit-based flow control, designed to be used sparingly in large-scale distributed systems to manage backpressure between transmitters and receivers.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_fctl` component, including running the `test_fctl` unit test.
+- **[test_fctl.c](test_fctl.c.md)**: The `test_fctl.c` file in the `firedancer` codebase contains a unit test for the `fd_fctl` module, verifying its configuration and functionality through various test cases and assertions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

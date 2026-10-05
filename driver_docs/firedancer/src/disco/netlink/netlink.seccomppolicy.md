@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines file descriptors and seccomp policies for logging, ARP probes, and rtnetlink socket operations.
+The `netlink.seccomppolicy` file in the `firedancer` codebase defines security policies for handling file descriptors and network sockets, including logging, sending, and receiving network messages using specific file descriptors.
 
 # Purpose
-The configuration file defines several file descriptors and their associated operations for logging and network communication. The `logfile_fd` is used to write log messages to a file, while `nl_mon_fd` and `nl_req_fd` are rtnetlink sockets for monitoring updates and handling request-reply communication, respectively. The `arp_probe_fd` is a UDP socket for generating ARP probes. Logging operations ensure that messages of 'WARNING' level and above are written to STDERR and the log file, with immediate disk synchronization for critical messages. Network operations include sending and receiving data through the defined sockets, with specific conditions for each operation to ensure proper communication and monitoring.
+The provided content appears to be a configuration file that defines the behavior of logging and network socket operations within a software system. It specifies the use of file descriptors for logging purposes, where log messages are written to a file and/or STDERR, with 'WARNING' level messages and above being immediately synchronized to disk. The file also outlines the use of rtnetlink sockets for monitoring and sending network requests, as well as UDP sockets for generating ARP probes. The configuration ensures that specific file descriptors are used for these operations, with conditions set for sending and receiving data through these sockets, highlighting the system's approach to handling network communication and logging efficiently.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
