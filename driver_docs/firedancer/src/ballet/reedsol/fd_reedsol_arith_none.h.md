@@ -3,57 +3,61 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_reedsol_arith_none.h` file defines arithmetic operations for Galois fields used in the Firedancer codebase, including addition, multiplication, and storage operations, while ensuring it is included only through `fd_reedsol_private.h`.
+Defines arithmetic operations for Galois Field elements using lookup tables in the Firedancer codebase.
 
 # Purpose
-This C header file defines arithmetic operations for a Galois Field (GF) used in Reed-Solomon error correction coding, specifically for a field with elements represented as single bytes stored in `ulong` types. The file provides inline functions and macros for basic GF operations such as loading and storing field elements ([`gf_ldu`](#gf_ldu) and [`gf_stu`](#gf_stu)), addition (`GF_ADD`), and multiplication (`GF_MUL` and `GF_MUL_VAR`). It includes compile-time constants and tables for logarithmic and inverse logarithmic operations, which are essential for efficient GF arithmetic. The file is intended to be included indirectly through `fd_reedsol_private.h`, ensuring proper encapsulation and dependency management. The use of attributes and static inline functions suggests a focus on performance optimization, although the comment indicates that performance is not the primary concern in this implementation.
+This C header file defines arithmetic operations for a Galois Field with a width of one byte, stored in an `ulong`. It includes type definitions and macros for basic operations such as addition (`GF_ADD`), logical OR (`GF_OR`), and multiplication (`GF_MUL`, `GF_MUL_VAR`) within the field. The file uses lookup tables for logarithmic and inverse logarithmic operations to facilitate multiplication. It also includes inline functions for loading and storing Galois Field elements from and to memory. The file is intended to be included indirectly through `fd_reedsol_private.h`, ensuring proper dependency management.
 # Global Variables
 
 ---
 ### fd\_reedsol\_arith\_consts\_generic\_mul
-- **Type**: `uchar const[]`
-- **Description**: The `fd_reedsol_arith_consts_generic_mul` is an external constant array of unsigned characters, aligned to a 128-byte boundary. It is used in the context of Reed-Solomon arithmetic operations, likely as a lookup table for multiplication operations in a Galois Field.
-- **Use**: This variable is used as a base address for the `gf_arith_log_tbl` and `gf_arith_invlog_tbl`, which are lookup tables for logarithmic and inverse logarithmic operations in Galois Field arithmetic.
+- **Type**: ``uchar const[]``
+- **Description**: An external constant array of unsigned characters, aligned to 128 bytes. It is used in Galois Field arithmetic operations, specifically for multiplication.
+- **Use**: Used as a lookup table for Galois Field multiplication operations in Reed-Solomon error correction algorithms.
 
 
 ---
 ### gf\_arith\_log\_tbl
-- **Type**: `short const *`
-- **Description**: `gf_arith_log_tbl` is a static pointer to a constant short array, which is cast from the `fd_reedsol_arith_consts_generic_mul` array. It is used to store logarithmic values for Galois Field arithmetic operations, specifically indexed in the range [0,256).
-- **Use**: This variable is used in Galois Field multiplication operations to retrieve logarithmic values for efficient computation.
+- **Type**: ``short const *``
+- **Description**: Points to a table of logarithmic values used in Galois Field arithmetic operations. The table is indexed from 0 to 256 and is used to facilitate multiplication operations in the Galois Field.
+- **Use**: Used to access logarithmic values for Galois Field multiplication operations.
 
 
 ---
 ### gf\_arith\_invlog\_tbl
-- **Type**: `uchar const *`
-- **Description**: The `gf_arith_invlog_tbl` is a pointer to a constant unsigned character array that is part of a lookup table used in Galois Field arithmetic operations. It is offset from the base of `fd_reedsol_arith_consts_generic_mul` by 256 short integers and 512 unsigned characters, allowing it to be indexed from -512 to 512. This table is likely used for efficient computation of inverse logarithms in finite field arithmetic.
-- **Use**: This variable is used to perform fast inverse logarithm calculations in Galois Field arithmetic, particularly in the context of Reed-Solomon error correction.
+- **Type**: ``uchar const *``
+- **Description**: Points to a location in the `fd_reedsol_arith_consts_generic_mul` array, offset by 256 times the size of a `short` and 512 times the size of a `uchar`. It is used to access elements in the range of [-512, 512) for arithmetic operations.
+- **Use**: Used in Galois Field arithmetic operations to retrieve inverse logarithm values for multiplication.
 
 
 # Functions
 
 ---
 ### gf\_ldu<!-- {{#callable:gf_ldu}} -->
-The `gf_ldu` function loads a byte from a given memory address and returns it as an unsigned long integer.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_arith_none.h#L13>)
+
+Loads a byte from a given memory address and returns it as an unsigned long.
 - **Inputs**:
-    - `addr`: A pointer to an unsigned char (uchar const *) from which a byte will be loaded.
-- **Control Flow**:
-    - The function takes a pointer to an unsigned char as input.
-    - It dereferences the pointer to obtain the byte value stored at the given memory address.
-    - The byte value is then cast to an unsigned long integer.
-    - The resulting unsigned long integer is returned.
-- **Output**: The function returns the byte at the specified address as an unsigned long integer (gf_t).
+    - `addr`: A pointer to an unsigned character (`uchar const *`) representing the memory address from which to load the byte.
+- **Logic and Control Flow**:
+    - Dereferences the pointer `addr` to access the byte stored at the given memory address.
+    - Casts the dereferenced byte to an `ulong` type.
+    - Returns the casted value.
+- **Output**: Returns the byte at the specified memory address as an `ulong`.
 
 
 ---
 ### gf\_stu<!-- {{#callable:gf_stu}} -->
-The function `gf_stu` stores a `gf_t` value into a memory location pointed to by a `uchar` pointer.
+[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_arith_none.h#L16>)
+
+Stores a Galois field element into a memory address.
 - **Inputs**:
-    - `addr`: A pointer to an unsigned char where the value will be stored.
-    - `v`: A value of type `gf_t` (which is a typedef for `ulong`) to be stored at the location pointed to by `addr`.
-- **Control Flow**:
-    - The function casts the `gf_t` value `v` to an `uchar` and assigns it to the memory location pointed to by `addr`.
-- **Output**: The function does not return a value; it performs an in-place update of the memory location pointed to by `addr`.
+    - ``addr``: A pointer to the memory location where the Galois field element will be stored.
+    - ``v``: The Galois field element to store, represented as a `gf_t` type.
+- **Logic and Control Flow**:
+    - Casts the Galois field element `v` from `gf_t` to `uchar`.
+    - Stores the casted value into the memory location pointed to by `addr`.
+- **Output**: No return value; the function modifies the memory location pointed to by `addr`.
 
 
 

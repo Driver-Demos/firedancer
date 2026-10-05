@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL test pack for C++ queries with fd-nightly-queries dependency.
+Configuration for CodeQL tests with dependencies on `fd-nightly-queries` and `cpp-all`.
 
 # Purpose
-Defines a CodeQL test pack for the `asymmetric-research/fd-nightly-queries` project. It sets the pack name and version, declares dependencies on `asymmetric-research/fd-nightly-queries` and `codeql/cpp-all`, selects the `cpp` extractor, enables `warnOnImplicitThis`, and uses the current directory as the test root.
+This configuration file specifies metadata for a software package. It defines the package name as `asymmetric-research/fd-nightly-queries-tests` and sets the version to `0.0.0`. The file lists dependencies, including `asymmetric-research/fd-nightly-queries` and `codeql/cpp-all`, both with version constraints set to any version (`"*"`). The `extractor` is set to `cpp`, indicating the use of a C++ extractor. The `warnOnImplicitThis` option is enabled, which will generate warnings for implicit `this` usage. The `tests` field points to the current directory (`.`) for test files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
