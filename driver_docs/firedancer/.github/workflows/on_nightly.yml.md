@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Nightly workflow for coverage, CodeQL, and build jobs.
+GitHub Actions workflow for nightly builds, coverage reports, and CodeQL analysis.
 
 # Purpose
-This GitHub Actions workflow defines the `On Nightly` automation that runs on a manual trigger and on a daily schedule at `0 4 * * *`. It starts reusable workflows for coverage reporting, CodeQL analysis, and several build jobs, and it passes build parameters such as compiler and machine lists through the `with` section. The `builds_1` job runs a wide set of GCC and Clang exception builds across multiple Linux targets, while `builds_2`, `builds_3`, and `builds_4` run focused build sets for specific machines and compiler settings. The `permissions` and `secrets: inherit` settings give the called workflows the access they need to publish security events and use repository secrets.
+This YAML configuration file defines a GitHub Actions workflow named `On Nightly`. The workflow is triggered manually via `workflow_dispatch` or automatically on a schedule set by the cron expression `0 4 * * *`, which runs the workflow daily at 4:00 AM UTC. The workflow includes several jobs: `coverage-report`, `codeql`, and multiple build jobs (`builds_1`, `builds_2`, `builds_3`, `builds_4`). Each job uses a specific workflow file located in the `.github/workflows` directory. The `coverage-report` and `codeql` jobs focus on generating coverage reports and performing code quality analysis, respectively. The build jobs execute different build configurations, specifying parameters such as `machine`, `build_arm`, `clang`, and `cid`, with exceptions for certain compiler and machine combinations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

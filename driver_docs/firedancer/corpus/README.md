@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fuzzing corpora for base64, HTTP, QUIC, and snapshot HTTP, plus .gitignore.
+Fuzz corpora for base64, HTTP, and QUIC, plus a Git ignore file.
 
 ## Folders
-- **[fuzz_base64_garbage](fuzz_base64_garbage/README.md)**: The `fuzz_base64_garbage` folder in the `firedancer` codebase contains a file that appears to be a crash report or test case related to fuzz testing of base64 encoding/decoding.
-- **[fuzz_picohttpparser](fuzz_picohttpparser/README.md)**: The `fuzz_picohttpparser` folder in the `firedancer` codebase contains a file named `request_simple` which provides a simple HTTP GET request example.
-- **[fuzz_quic](fuzz_quic/README.md)**: Binary or incomplete fuzzing corpus files for QUIC.
-- **[fuzz_snapshot_http](fuzz_snapshot_http/README.md)**: The `fuzz_snapshot_http` folder in the `firedancer` codebase contains an example HTTP response file named `200-ok`, which demonstrates a 200 OK status code with headers and a "Hello World!" message.
+- **[fuzz_base64_garbage](fuzz_base64_garbage/README.md)**: Binary data file for fuzz testing base64 decoding.
+- **[fuzz_picohttpparser](fuzz_picohttpparser/README.md)**: A simple HTTP GET request example for fuzz testing.
+- **[fuzz_quic](fuzz_quic/README.md)**: Fuzz testing corpus for QUIC protocol implementations.
+- **[fuzz_snapshot_http](fuzz_snapshot_http/README.md)**: An HTTP response with status 200 OK, headers, and a "Hello World!" message.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: The `.gitignore` file in the `firedancer` codebase specifies that the `explore/` directory should be ignored by Git.
+- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in the `firedancer/corpus` directory for Git version control.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
