@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SHA-256 round constants and initial hash values.
+SHA-256 constants for use in cryptographic computations, including initial hash values and round constants.
 
 # Purpose
-This header file defines the fixed constants used by the SHA-256 implementation. It provides the 64 round constants in `fd_sha256_K` and the eight initial hash values in `FD_SHA256_INITIAL_A` through `FD_SHA256_INITIAL_H`, which the algorithm uses to start and process each message block. The `fd_sha256_K` array is declared with 64-byte alignment so the compiler can use it efficiently during constant propagation and hashing operations. The include guard `HEADER_fd_src_ballet_sha256_fd_sha256_constants_h` prevents multiple inclusion of the same definitions.
+This C header file defines constants used in the SHA-256 cryptographic hash function. It includes a static array `fd_sha256_K` containing 64 constant values, which are the round constants used in the SHA-256 algorithm. The array is aligned to 64 bytes to optimize memory access. Additionally, the file defines initial hash values `FD_SHA256_INITIAL_A` through `FD_SHA256_INITIAL_H`, which are used to initialize the hash state before processing input data. The use of these constants allows the compiler to perform constant propagation, improving the efficiency of the hash computation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

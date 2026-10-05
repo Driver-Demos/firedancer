@@ -3,10 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL query that flags fd_rwlock calls with a return path lacking an unlock.
+Detects functions where an `fd_rwlock` is not unlocked on all code paths, issuing a warning.
 
 # Purpose
-This query detects functions that call `fd_rwlock_read` or `fd_rwlock_write` and then return on at least one control-flow path without first calling `fd_rwlock_unread` or `fd_rwlock_unwrite`. It defines `LockCall` for the lock operations and `UnlockCall` for the unlock operations, then uses control-flow checks to find a `ReturnStmt` that can follow a lock call without passing through an unlock call. The query reports each matching lock call with the message `Missing unlock`, and it is marked as a warning with high precision. Its purpose is to find asymmetric lock handling in C++ code where a read or write lock is not released on all branches.
+This code is a query script designed to identify potential issues in C++ code related to the use of `fd_rwlock` locks. It specifically targets functions where a `fd_rwlock` is acquired but not released on all execution paths, which can lead to resource leaks or deadlocks. The script defines classes `LockCall` and `UnlockCall` to detect function calls that acquire and release locks, respectively. It uses control flow analysis to find paths where a lock is acquired but not followed by a corresponding unlock operation. The script is intended to be used as a static analysis tool, issuing warnings when it detects such mismatches in lock and unlock calls.
+# Imports and Dependencies
+
+---
+- `cpp`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
