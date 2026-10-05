@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.md` file in the `firedancer/contrib/gdb` directory explains that the directory contains Python GDB scripts designed to enhance the debugging experience for Firedancer code.
+Python GDB scripts to improve the debugging experience of Firedancer code.
 
 # Purpose
-This file is a README or informational text that describes the purpose of the directory it resides in. It indicates that the directory contains Python scripts designed to enhance the debugging process for Firedancer code using GDB (GNU Debugger).
+The directory contains Python GDB scripts that enhance the debugging process for Firedancer code. These scripts provide additional functionality and tools to assist developers in diagnosing and resolving issues within the Firedancer codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

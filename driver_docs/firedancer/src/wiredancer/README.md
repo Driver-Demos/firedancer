@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-PCIe, ED25519, DMA, FPGA RTL, simulation, and test tools for AWS-F1.
+PCIe, FPGA, Ed25519, SHA-512, simulation, test, and AWS-F1 build tools.
 
 ## Folders
-- **[c](c/README.md)**: PCI and ED25519 verify workspace types and hardware access functions.
-- **[platform](platform/README.md)**: Constraints, DDR DMA and PCIe bridge logic, and FPGA synthesis scripts.
-- **[py](py/README.md)**: The `py` folder in the `firedancer` codebase contains Python files focused on implementing and testing cryptographic operations, particularly using the Ed25519 curve, including signature verification, point decomposition, and multiplication, as well as providing a reference implementation and simulation tools.
-- **[rtl](rtl/README.md)**: SystemVerilog modules for PCIe, DMA, FIFOs, SHA-512, Ed25519, and scheduler logic.
-- **[sim](sim/README.md)**: The `sim` folder in the `firedancer` codebase contains various subfolders and a README file dedicated to simulating and verifying hardware designs using Verilog, Questa, and cocotb, focusing on operations like ED25519 point addition and doubling, signature verification, wide multiplication, CPU simulation, and SHA-512 processing.
-- **[test](test/README.md)**: Replay, monitor, and test tools for AWS-F1 Wiredancer, with build rules.
+- **[c](c/README.md)**: Implements and manages PCIe communication, data streaming, and Ed25519 verification for FPGA operations.
+- **[platform](platform/README.md)**: CL-specific constraints, DDR DRAM DMA module, and TCL script for FPGA design synthesis on Amazon's platform.
+- **[py](py/README.md)**: Ed25519 signature verification, elliptic curve operations, optimizations, and testing utilities.
+- **[rtl](rtl/README.md)**: ED25519, SHA-512, PCIe, FIFO, RAM, CPU, and reset RTL modules.
+- **[sim](sim/README.md)**: Simulations and tests for ED25519 operations, SHA-512, CPU, and PCIe using Verilog, Cocotb, and Questa.
+- **[test](test/README.md)**: Functions and tests for replaying pcap streams, monitoring AWS-F1 performance, and building Wiredancer.
 
 ## Files
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that conditionally builds the `fd_wiredancer` library and adds headers and objects if `FD_HAS_WIREDANCER` is defined.
-- **[README.md](README.md.md)**: The `README.md` file in the `firedancer/src/wiredancer` directory provides detailed instructions and information on building, using, and understanding the WireDancer functionalities, including its asynchronous API, SigVerify process, and pipeline design for AWS-F1 series platforms.
+- **[Local.mk](Local.mk.md)**: Makefile for building the `fd_wiredancer` library with specified headers and objects if `FD_HAS_WIREDANCER` is defined.
+- **[README.md](README.md.md)**: Documentation for building, using, and running WireDancer on AWS-F1, including SigVerify API and design details.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
