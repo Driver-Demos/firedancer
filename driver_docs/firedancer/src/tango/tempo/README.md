@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `tempo` folder in the `firedancer` codebase contains source code, headers, and tests for modeling and measuring time and tick intervals, including wallclock and tickcount operations, as well as a makefile for managing the build process.
+Models and measures time performance, provides APIs, a Makefile, and tests for the `fd_tempo` module.
 
 
 ## Files
-- **[fd_tempo.c](fd_tempo.c.md)**: The `fd_tempo.c` file in the `firedancer` codebase implements functions for modeling and measuring the performance of wallclock and tickcount operations, as well as setting and retrieving the ticks per nanosecond ratio.
-- **[fd_tempo.h](fd_tempo.h.md)**: The `fd_tempo.h` file in the `firedancer` codebase provides APIs for measuring time and tick intervals, including models for wallclock and tickcount, functions for setting and estimating tick rates, and utilities for managing timing intervals in asynchronous processes.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `tempo` component, including the `fd_tempo.h` header and `test_tempo` unit test.
-- **[test_tempo.c](test_tempo.c.md)**: The `test_tempo.c` file in the `firedancer` codebase contains a series of tests for the `fd_tempo` module, including wallclock and tickcount models, tick per nanosecond calculations, and various asynchronous timing functions.
+- **[fd_tempo.c](fd_tempo.c.md)**: Models and measures wallclock and tickcount performance, and calculates asynchronous minimum intervals.
+- **[fd_tempo.h](fd_tempo.h.md)**: APIs for measuring time and tick intervals, including models, settings, and housekeeping utilities.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for the fd_tempo and fd_tango components.
+- **[test_tempo.c](test_tempo.c.md)**: Tests for the `fd_tempo` module, including wallclock, tickcount, and asynchronous timing functions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

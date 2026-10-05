@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_neigh4_map.c` file in the `firedancer` codebase implements functions for handling IPv4 neighbor mappings, including printing the mappings to a file.
+Functions for printing IPv4 and MAC address mappings from a neighbor map to a file.
 
 # Purpose
-This C source code file is designed to handle operations related to a data structure that maps IPv4 addresses to Ethernet MAC addresses, specifically within a hosted environment. The file includes necessary headers and definitions for managing this mapping, such as `fd_neigh4_map.h` and `fd_neigh4_map_defines.h`, which likely contain the function prototypes and constant definitions needed for the map's operations. The code utilizes a template-based approach to implement the map, as indicated by the inclusion of `fd_map_slot_para.c` with a specific implementation style defined by `MAP_IMPL_STYLE 2`. This suggests a modular design where different map implementations can be selected or configured.
+The code is part of a C source file that implements functionality for handling and printing entries in an IPv4 neighbor map. It includes necessary headers and definitions for working with the `fd_neigh4_map` data structure, which is used to manage mappings between IPv4 addresses and Ethernet MAC addresses. The file includes a function [`fd_neigh4_hmap_fprintf`](<#fd_neigh4_hmap_fprintf>), which iterates over the entries in the neighbor map and prints each valid entry's IPv4 address and corresponding MAC address to a specified file stream. This function is designed to work in a hosted environment, as indicated by the `FD_HAS_HOSTED` preprocessor directive.
 
-The primary functionality provided by this file is the [`fd_neigh4_hmap_fprintf`](#fd_neigh4_hmap_fprintf) function, which outputs the contents of the IPv4-to-MAC address map to a specified file stream. This function iterates over the map's entries, performing speculative reads and checks to ensure data integrity before printing each valid mapping. The use of speculative reads and checks for overruns indicates a focus on performance and reliability, ensuring that only valid and complete data is printed. The function is designed to be used in environments where the `FD_HAS_HOSTED` macro is defined, suggesting that it is part of a larger system that can operate in different environments, with this particular functionality being specific to hosted systems.
+The function [`fd_neigh4_hmap_fprintf`](<#fd_neigh4_hmap_fprintf>) uses several utility functions and macros to interact with the neighbor map, such as `fd_neigh4_hmap_ele_max`, `fd_neigh4_hmap_shele_const`, and `fd_neigh4_hmap_query_try`. It performs speculative reads and checks for read overruns to ensure data integrity. The function outputs the formatted IPv4 and MAC addresses using the `fprintf` function, and it handles potential errors by returning the appropriate error code. This code is intended to be part of a larger system that manages network neighbor information, providing a mechanism to output the current state of the neighbor map for diagnostic or logging purposes.
 # Imports and Dependencies
 
 ---
@@ -25,20 +25,24 @@ The primary functionality provided by this file is the [`fd_neigh4_hmap_fprintf`
 
 ---
 ### fd\_neigh4\_hmap\_fprintf<!-- {{#callable:fd_neigh4_hmap_fprintf}} -->
-The function `fd_neigh4_hmap_fprintf` iterates over a hash map of IPv4 to MAC address entries and prints each valid entry to a specified file.
+[View Source →](<../../../../../src/waltz/neigh/fd_neigh4_map.c#L16>)
+
+Prints the IP and MAC address entries from a hash map to a specified file.
 - **Inputs**:
-    - `map`: A pointer to a constant `fd_neigh4_hmap_t` structure representing the hash map of IPv4 to MAC address entries.
-    - `file_`: A void pointer that is cast to a `FILE` pointer, representing the file where the entries will be printed.
-- **Control Flow**:
-    - Retrieve the maximum number of elements (`ele_max`) and the element array (`ele`) from the hash map using `fd_neigh4_hmap_ele_max` and `fd_neigh4_hmap_shele_const` respectively.
+    - ``map``: A pointer to a `fd_neigh4_hmap_t` structure representing the hash map containing IP and MAC address entries.
+    - ``file_``: A pointer to a `FILE` object where the function will print the IP and MAC address entries.
+- **Logic and Control Flow**:
+    - Initialize `file` as a `FILE` pointer from `file_`.
+    - Retrieve the maximum number of elements (`ele_max`) and a pointer to the elements (`ele`) from the hash map using `fd_neigh4_hmap_ele_max` and `fd_neigh4_hmap_shele_const`.
     - Iterate over each element in the hash map up to `ele_max`.
-    - For each element, extract the IPv4 address (`ip4_addr`) and attempt a speculative read using `fd_neigh4_hmap_query_try`.
+    - For each element, retrieve the IP address (`ip4_addr`) and perform a speculative read using `fd_neigh4_hmap_query_try`.
     - If the speculative read is unsuccessful, continue to the next element.
-    - Copy the queried entry to a local variable `e` using `memcpy`.
+    - Copy the queried element data into a local variable `e` using `memcpy`.
     - Check if the read was overrun using `fd_neigh4_hmap_query_test`; if so, continue to the next element.
-    - If the entry's IPv4 address is valid, print the IPv4 and MAC address to the file using `fprintf`.
+    - If the IP address in `e` is non-zero, print the IP and MAC address to the file using `fprintf`.
     - If `fprintf` fails, return the error number `errno`.
-- **Output**: Returns 0 on success, or an error number if `fprintf` fails.
+    - Return 0 upon successful completion of the loop.
+- **Output**: Returns 0 on success or an error number if `fprintf` fails.
 
 
 
