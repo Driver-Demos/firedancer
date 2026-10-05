@@ -3,46 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the functionality of reading and processing a `resolv.conf` file.
+Tests parsing of resolv.conf with and without a trailing newline.
 
 # Purpose
-The code is an executable C program designed to test the functionality of reading and processing a `resolv.conf` file. It includes necessary headers and utilities for file descriptor operations and imports a binary resource, `test_resolvconf`, which is a test configuration file. The program uses the `memfd_create` function to create an in-memory file descriptor for the `resolv.conf` file, writes the test data to this file descriptor, and then verifies the correct reading and parsing of the configuration using the `fd_get_resolv_conf` function.
-
-The program performs two main tests: one with a normal `resolv.conf` file and another with the file missing a trailing newline. It uses assertions (`FD_TEST`) to ensure that each step, such as file creation, writing, and reading, is successful. The program logs a notice of "pass" if all tests are successful and then halts execution. This code is part of a test suite to validate the handling of DNS resolver configurations in a controlled environment.
-# Imports and Dependencies
-
----
-- `sys/mman.h`
-- `unistd.h`
-- `fd_lookup.h`
-- `../../util/fd_util.h`
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/waltz/resolv/test_resolv.c#L9>)
-
-Tests the reading and parsing of a `resolv.conf` file using in-memory file descriptors.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Creates an in-memory file descriptor `fd_etc_resolv_conf_fd` for `resolv.conf` using `memfd_create`.
-    - Writes the contents of `test_resolvconf` to the file descriptor and checks if the write operation was successful.
-    - Seeks to the beginning of the file descriptor using `lseek`.
-    - Calls [`fd_get_resolv_conf`](<fd_resolvconf.c.md#fd_get_resolv_conf>) to parse the `resolv.conf` data into a `fd_resolvconf_t` structure and checks for success.
-    - Closes the file descriptor using `close`.
-    - Repeats the above steps after removing the trailing newline from `test_resolvconf`.
-    - Logs a notice message indicating the test passed.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_get_resolv_conf`](<fd_resolvconf.c.md#fd_get_resolv_conf>)
-
-
+This file is a small C test program for `fd_get_resolv_conf`. It uses `memfd_create` to build an in-memory `resolv.conf` file, writes test data into `fd_etc_resolv_conf_fd`, and checks that `fd_get_resolv_conf` can read a normal file and a file without a trailing newline. The program imports test data from `src/waltz/resolv/test_resolvconf.txt`, runs the checks with `FD_TEST`, and prints `pass` when the tests succeed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

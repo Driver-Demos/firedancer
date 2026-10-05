@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Capability checks, configuration validation, file and network utilities, system functions, and build scripts.
+Capability, config, file, network, and system utility functions with build rules.
 
 
 ## Files
-- **[fd_cap_chk.c](fd_cap_chk.c.md)**: Implements capability and resource limit checks with error handling for processes.
-- **[fd_cap_chk.h](fd_cap_chk.h.md)**: Mechanisms to check and report missing capabilities or permissions for a process.
-- **[fd_config_extract.c](fd_config_extract.c.md)**: Detects and logs unrecognized configuration keys in a pod structure.
-- **[fd_config_extract.h](fd_config_extract.h.md)**: Utilities for querying and validating configuration data from a pod structure, with logging for warnings.
-- **[fd_config_macros.c](fd_config_macros.c.md)**: Macros for extracting configuration values from a pod structure in various formats.
-- **[fd_file_util.c](fd_file_util.c.md)**: Utility functions for file operations, including reading, writing, directory management, and file path retrieval.
-- **[fd_file_util.h](fd_file_util.h.md)**: Utilities for reading and writing integers to files, directory management, and retrieving executable paths.
-- **[fd_net_util.c](fd_net_util.c.md)**: Network utility functions for managing network namespaces, interfaces, and addresses.
-- **[fd_net_util.h](fd_net_util.h.md)**: Network utility functions for interface index retrieval, network namespace management, and IP address acquisition.
-- **[fd_sys_util.c](fd_sys_util.c.md)**: System utility functions for process management, user identification, and sleep operations.
-- **[fd_sys_util.h](fd_sys_util.h.md)**: Utility functions for process management, sleeping, and user information retrieval.
-- **[Local.mk](Local.mk.md)**: Makefile for building protocol-agnostic fdctl code with config parsing and system utilities.
+- **[fd_cap_chk.c](fd_cap_chk.c.md)**: The `fd_cap_chk.c` file in the `firedancer` codebase provides functionality for checking and managing process capabilities and resource limits, including error handling for capability checks and resource limit adjustments.
+- **[fd_cap_chk.h](fd_cap_chk.h.md)**: Capability checks for root, Linux capabilities, and RLIMIT changes with error accumulation.
+- **[fd_config_extract.c](fd_config_extract.c.md)**: The `fd_config_extract.c` file in the `firedancer` codebase implements a function to recursively search for and log unrecognized configuration keys in a given pod structure.
+- **[fd_config_extract.h](fd_config_extract.h.md)**: Config query helpers and leftover-pod warning logic.
+- **[fd_config_macros.c](fd_config_macros.c.md)**: Macros for extracting config values, arrays, and table fields from a pod.
+- **[fd_file_util.c](fd_file_util.c.md)**: File utilities for reading and writing numbers, creating and removing directories, and mapping files.
+- **[fd_file_util.h](fd_file_util.h.md)**: File utilities for reading and writing integers, directory creation and removal, executable path lookup, and full-file reads.
+- **[fd_net_util.c](fd_net_util.c.md)**: The `fd_net_util.c` file in the `firedancer` codebase provides utility functions for network namespace management, interface index retrieval, and interface address acquisition.
+- **[fd_net_util.h](fd_net_util.h.md)**: Network interface and namespace utility function declarations.
+- **[fd_sys_util.c](fd_sys_util.c.md)**: The `fd_sys_util.c` file in the `firedancer` codebase provides utility functions for system operations, including exiting a process group, sleeping for a specified duration, retrieving the login username, and converting a username to user and group IDs.
+- **[fd_sys_util.h](fd_sys_util.h.md)**: System-call wrappers for exit_group, nanosleep, login user lookup, and user-to-UID/GID mapping.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the build configuration for the `fdctl_platform` library, including headers and object files for configuration parsing and system utilities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
