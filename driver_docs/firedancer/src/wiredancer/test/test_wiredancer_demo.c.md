@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_wiredancer_demo.c` file is a unit test designed to run in AWS-F1 to verify the performance and correctness of the Wiredancer system against x86, involving packet replay, transaction parsing, and signature verification, with options for random transaction corruption and FPGA slot configuration.
+A unit test for the Wiredancer system, designed to run on AWS-F1, comparing Wiredancer's performance against x86 by replaying network packets and verifying transactions.
 
 # Purpose
-The provided C code is a comprehensive unit test for a system called "Wiredancer," designed to be executed on AWS-F1 instances. The primary purpose of this code is to validate the performance and correctness of the Wiredancer system against an x86-based verification process. The test involves several components, including a "replay" tile that feeds network packets to a "parser" tile, which then parses transactions and sends signature verification requests downstream. These requests can be processed by either an x86-based "verify" tile or the Wiredancer system itself. The "checker" tile compares the outputs from the x86 and Wiredancer systems to ensure consistency by matching sequence numbers.
+The code is a unit test for the Wiredancer system, designed to be executed in an AWS-F1 environment. Its primary function is to validate the performance and correctness of the Wiredancer system against an x86-based system. The test involves a series of components, including a "replay" tile that feeds network packets to a "parser" tile. The parser processes these packets, assuming one transaction per packet, and sends signature verification requests downstream. These requests can be processed by either an x86-based "verify" tile or the Wiredancer system. The "checker" tile then compares the outputs from the x86 system and Wiredancer by matching sequence numbers to ensure consistency.
 
-The code is structured into multiple components, each with a specific role in the testing process. It includes functions for replaying network packets, parsing transactions, verifying signatures using both x86 and Wiredancer, and checking the results. The code also includes configuration settings for various parameters such as the number of FPGA slots, test duration, and random transaction corruption. Additionally, it provides mechanisms for signal handling and logging to facilitate monitoring and debugging during the test execution. The test is designed to be flexible, allowing it to run with either Wiredancer or x86 independently, or both for comparative analysis.
+The code is structured into several main components, each represented by a function that runs on a separate tile (or thread). These components include the [`replay_tile_main`](<#replay_tile_main>), [`parser_tile_main`](<#parser_tile_main>), [`v_x86_tile_main`](<#v_x86_tile_main>), and [`vcheck_tile_main`](<#vcheck_tile_main>) functions, which handle the replay, parsing, x86 verification, and result checking processes, respectively. The test configuration is managed through a `test_cfg` structure, which holds various parameters and state information needed for the test execution. The code also includes mechanisms for handling command-line arguments to configure the test environment, such as the number of FPGA slots, test duration, and whether to enable random transaction corruption. The main function orchestrates the setup, execution, and teardown of the test, ensuring that all components are properly initialized and synchronized.
 # Imports and Dependencies
 
 ---
@@ -32,265 +32,287 @@ The code is structured into multiple components, each with a specific role in th
 ---
 ### test\_halt
 - **Type**: `ulong`
-- **Description**: The `test_halt` variable is a global variable of type `ulong` initialized to 0UL. It is used to signal the main function to halt execution when a specific condition is met, such as receiving a POSIX signal.
-- **Use**: This variable is used as a flag to indicate when the main function should stop running, typically in response to an external signal.
+- **Description**: `test_halt` is a global variable of type `ulong` initialized to `0UL`. It is used to signal the main function to halt execution when a specific condition is met, such as receiving a POSIX signal.
+- **Use**: Used to indicate when the main function should stop running.
 
 
 # Data Structures
 
 ---
 ### parsed\_txn\_compressed\_meta
-- **Type**: `union`
+- **Type**: ``union``
 - **Members**:
-    - `all`: A single unsigned long integer representing the entire union.
-    - `msg_sz`: A 16-bit unsigned short representing the message size.
-    - `msg_off`: A 16-bit unsigned short representing the message offset from the start of the packet.
-    - `signature_off`: A 16-bit unsigned short representing the signature offset from the start of the packet.
-    - `public_key_off`: A 16-bit unsigned short representing the public key offset from the start of the packet.
-- **Description**: The `parsed_txn_compressed_meta` is a union data structure designed to store metadata about a parsed transaction in a compressed format. It can be accessed as a single `ulong` for quick operations or as a structured set of fields for detailed information. The structured fields include offsets and sizes for the message, signature, and public key within a packet, allowing for efficient parsing and processing of transaction data.
+    - ``all``: A `ulong` that represents the entire union as a single value.
+    - ``msg_sz``: A `ushort` that specifies the message size.
+    - ``msg_off``: A `ushort` that indicates the message offset from the start of the packet.
+    - ``signature_off``: A `ushort` that indicates the signature offset from the start of the packet.
+    - ``public_key_off``: A `ushort` that indicates the public key offset from the start of the packet.
+- **Description**: The `parsed_txn_compressed_meta` union is a data structure that can represent transaction metadata in two ways: as a single `ulong` value (`all`) or as a structured set of `ushort` values (`msg_sz`, `msg_off`, `signature_off`, `public_key_off`) that provide specific offsets and sizes related to a transaction's message, signature, and public key within a packet.
 
 
 ---
 ### parsed\_txn\_compressed\_meta\_t
-- **Type**: `union`
+- **Type**: ``union``
 - **Members**:
-    - `all`: A single unsigned long integer representing the entire union.
-    - `value`: A struct containing four unsigned short integers representing various offsets and sizes within a packet.
-- **Description**: The `parsed_txn_compressed_meta_t` is a union designed to store metadata about a parsed transaction in a compact form. It can be accessed as a single `ulong` for efficient storage and comparison, or as a struct with four `ushort` fields that provide specific offsets and sizes related to the transaction's message, signature, and public key within a packet. This structure is used to facilitate the processing and verification of transactions in a network packet, ensuring that the necessary data can be quickly accessed and manipulated.
+    - ``all``: A `ulong` that represents the entire compressed metadata as a single value.
+    - ``value``: A `struct` containing individual fields for message size, message offset, signature offset, and public key offset.
+    - ``msg_sz``: A `ushort` indicating the size of the message.
+    - ``msg_off``: A `ushort` indicating the offset of the message from the start of the packet.
+    - ``signature_off``: A `ushort` indicating the offset of the signature from the start of the packet.
+    - ``public_key_off``: A `ushort` indicating the offset of the public key from the start of the packet.
+- **Description**: The `parsed_txn_compressed_meta_t` is a `union` that encapsulates metadata for a parsed transaction in a compressed form. It allows access to the metadata either as a single `ulong` value or as a `struct` with individual fields for message size, message offset, signature offset, and public key offset. This structure is used to efficiently store and access transaction metadata within a fixed size, ensuring that the total size of the union matches the size of a `ulong`.
 
 
 ---
 ### test\_cfg
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `wksp`: Pointer to a workspace object used for memory management.
-    - `replay_cnc`: Pointer to a command and control structure for the replay tile.
-    - `replay_pcap`: Constant character pointer to the path of the pcap file to be replayed.
-    - `replay_mtu`: Maximum transmission unit size for the replay.
-    - `replay_orig`: Original sequence number for the replay.
-    - `replay_mcache`: Pointer to a metadata cache for the replay.
-    - `replay_dcache`: Pointer to a data cache for the replay.
-    - `replay_cr_max`: Maximum credit for replay flow control.
-    - `replay_lazy`: Laziness parameter for replay processing.
-    - `replay_seed`: Seed for the random number generator used in replay.
-    - `replay_fseq`: Pointer to an array of flow sequence numbers for replay.
-    - `replay_fseq_cnt`: Count of flow sequences for replay.
-    - `parser_cnc`: Pointer to a command and control structure for the parser tile.
-    - `parser_mcache`: Pointer to a metadata cache for the parser.
-    - `parser_lazy`: Laziness parameter for parser processing.
-    - `parser_seed`: Seed for the random number generator used in parser.
-    - `parser_enabled`: Flag indicating if the parser is enabled.
-    - `parser_replay_fseq`: Pointer to the replay flow sequence used by the parser.
-    - `parser_rand_txn_corrupt`: Flag indicating if random transaction corruption is enabled in the parser.
-    - `v_x86_cnc`: Pointer to a command and control structure for the x86 verification tile.
-    - `v_x86_mcache`: Pointer to a metadata cache for the x86 verification.
-    - `v_x86_lazy`: Laziness parameter for x86 verification processing.
-    - `v_x86_seed`: Seed for the random number generator used in x86 verification.
-    - `v_x86_enabled`: Flag indicating if the x86 verification is enabled.
-    - `v__wd_enabled`: Flag indicating if the Wiredancer verification is enabled.
-    - `v__wd_mcache`: Pointer to a metadata cache for the Wiredancer verification.
-    - `vcheck_cnc`: Pointer to a command and control structure for the verification checker tile.
-    - `vcheck_seed`: Seed for the random number generator used in verification checking.
-    - `vcheck_lazy`: Laziness parameter for verification checking processing.
-    - `test_version`: Version of the test being executed.
-    - `wd_slots`: Number of FPGA slots used in the Wiredancer test.
-    - `wd_split`: Flag indicating if the Wiredancer workload is split.
-- **Description**: The `test_cfg` structure is a configuration data structure used in a unit test for the Wiredancer system, which is designed to test the performance and correctness of packet processing across different components, including replay, parsing, and verification on both x86 and FPGA-based systems. It contains pointers to various command and control structures, metadata caches, and data caches, as well as configuration parameters such as seeds for random number generation, laziness parameters for processing, and flags to enable or disable certain components. The structure is used to manage the flow of data and control signals between different tiles in the test setup, ensuring that the test runs according to the specified configuration.
+    - ``wksp``: Pointer to a workspace of type `fd_wksp_t`.
+    - ``replay_cnc``: Pointer to a command and control structure for replay of type `fd_cnc_t`.
+    - ``replay_pcap``: Pointer to a constant character string representing the replay pcap file.
+    - ``replay_mtu``: Unsigned long representing the maximum transmission unit for replay.
+    - ``replay_orig``: Unsigned long representing the original replay value.
+    - ``replay_mcache``: Pointer to a replay metadata cache of type `fd_frag_meta_t`.
+    - ``replay_dcache``: Pointer to a replay data cache of type `uchar`.
+    - ``replay_cr_max``: Unsigned long representing the maximum replay credit.
+    - ``replay_lazy``: Long representing the replay laziness factor.
+    - ``replay_seed``: Unsigned integer representing the seed for replay randomness.
+    - ``replay_fseq``: Pointer to an array of unsigned long pointers representing replay flow sequences.
+    - ``replay_fseq_cnt``: Unsigned long representing the count of replay flow sequences.
+    - ``parser_cnc``: Pointer to a command and control structure for parser of type `fd_cnc_t`.
+    - ``parser_mcache``: Pointer to a parser metadata cache of type `fd_frag_meta_t`.
+    - ``parser_lazy``: Integer representing the parser laziness factor.
+    - ``parser_seed``: Unsigned integer representing the seed for parser randomness.
+    - ``parser_enabled``: Integer indicating if the parser is enabled.
+    - ``parser_replay_fseq``: Pointer to an unsigned long representing the parser replay flow sequence.
+    - ``parser_rand_txn_corrupt``: Integer indicating if random transaction corruption is enabled for the parser.
+    - ``v_x86_cnc``: Pointer to a command and control structure for x86 verification of type `fd_cnc_t`.
+    - ``v_x86_mcache``: Pointer to an x86 verification metadata cache of type `fd_frag_meta_t`.
+    - ``v_x86_lazy``: Integer representing the x86 verification laziness factor.
+    - ``v_x86_seed``: Unsigned integer representing the seed for x86 verification randomness.
+    - ``v_x86_enabled``: Integer indicating if x86 verification is enabled.
+    - ``v__wd_enabled``: Integer indicating if Wiredancer verification is enabled.
+    - ``v__wd_mcache``: Pointer to a Wiredancer verification metadata cache of type `fd_frag_meta_t`.
+    - ``vcheck_cnc``: Pointer to a command and control structure for verification check of type `fd_cnc_t`.
+    - ``vcheck_seed``: Unsigned integer representing the seed for verification check randomness.
+    - ``vcheck_lazy``: Integer representing the verification check laziness factor.
+    - ``test_version``: Integer representing the version of the test.
+    - ``wd_slots``: Unsigned long representing the Wiredancer FPGA slots.
+    - ``wd_split``: Integer indicating if Wiredancer split is enabled.
+- **Description**: Defines configuration parameters for a unit test involving replay, parsing, and verification of network packets using both x86 and Wiredancer platforms. It includes pointers to various command and control structures, metadata caches, and configuration settings such as MTU, randomness seeds, and laziness factors for different components of the test.
 
 
 ---
 ### test\_cfg\_t
-- **Type**: `typedef struct test_cfg test_cfg_t;`
+- **Type**: ``struct``
 - **Members**:
-    - `wksp`: Pointer to a workspace structure used for memory management.
-    - `replay_cnc`: Pointer to a command and control structure for the replay tile.
-    - `replay_pcap`: Constant character pointer to the path of the pcap file to be replayed.
-    - `replay_mtu`: Maximum transmission unit size for replay packets.
-    - `replay_orig`: Original sequence number for replay packets.
-    - `replay_mcache`: Pointer to a metadata cache for replay packets.
-    - `replay_dcache`: Pointer to a data cache for replay packets.
-    - `replay_cr_max`: Maximum credit for replay flow control.
-    - `replay_lazy`: Lazy parameter for replay tile processing.
-    - `replay_seed`: Seed for random number generation in replay tile.
-    - `replay_fseq`: Array of pointers to flow sequence numbers for replay consumers.
-    - `replay_fseq_cnt`: Count of replay flow sequence consumers.
-    - `parser_cnc`: Pointer to a command and control structure for the parser tile.
-    - `parser_mcache`: Pointer to a metadata cache for parser output.
-    - `parser_lazy`: Lazy parameter for parser tile processing.
-    - `parser_seed`: Seed for random number generation in parser tile.
-    - `parser_enabled`: Flag indicating if the parser tile is enabled.
-    - `parser_replay_fseq`: Pointer to the replay flow sequence used by the parser.
-    - `parser_rand_txn_corrupt`: Flag indicating if random transaction corruption is enabled in the parser.
-    - `v_x86_cnc`: Pointer to a command and control structure for the x86 verification tile.
-    - `v_x86_mcache`: Pointer to a metadata cache for x86 verification output.
-    - `v_x86_lazy`: Lazy parameter for x86 verification tile processing.
-    - `v_x86_seed`: Seed for random number generation in x86 verification tile.
-    - `v_x86_enabled`: Flag indicating if the x86 verification tile is enabled.
-    - `v__wd_enabled`: Flag indicating if the Wiredancer verification tile is enabled.
-    - `v__wd_mcache`: Pointer to a metadata cache for Wiredancer verification output.
-    - `vcheck_cnc`: Pointer to a command and control structure for the verification checker tile.
-    - `vcheck_seed`: Seed for random number generation in verification checker tile.
-    - `vcheck_lazy`: Lazy parameter for verification checker tile processing.
-    - `test_version`: Version of the test to be executed.
-    - `wd_slots`: Bitmask indicating the FPGA slots used by Wiredancer.
-    - `wd_split`: Flag indicating if Wiredancer should split its workload.
-- **Description**: The `test_cfg_t` structure is a configuration data structure used in a unit test for the Wiredancer system, which is designed to test the system's performance and correctness against an x86-based verification system. It contains various configuration parameters and pointers to resources such as workspaces, caches, and command and control structures for different tiles (replay, parser, x86 verification, and Wiredancer verification). The structure also includes flags and seeds for enabling features and controlling random number generation, as well as parameters for managing flow control and processing laziness. This configuration is crucial for setting up and managing the test environment and ensuring that the test runs with the desired settings and conditions.
+    - ``wksp``: Pointer to a workspace structure.
+    - ``replay_cnc``: Pointer to a command and control structure for replay.
+    - ``replay_pcap``: Constant character pointer to the replay pcap file path.
+    - ``replay_mtu``: Maximum transmission unit for replay.
+    - ``replay_orig``: Original replay value.
+    - ``replay_mcache``: Pointer to a replay memory cache structure.
+    - ``replay_dcache``: Pointer to a replay data cache.
+    - ``replay_cr_max``: Maximum replay credit.
+    - ``replay_lazy``: Replay laziness parameter.
+    - ``replay_seed``: Seed for replay random number generation.
+    - ``replay_fseq``: Pointer to an array of replay flow sequence pointers.
+    - ``replay_fseq_cnt``: Count of replay flow sequences.
+    - ``parser_cnc``: Pointer to a command and control structure for the parser.
+    - ``parser_mcache``: Pointer to a parser memory cache structure.
+    - ``parser_lazy``: Parser laziness parameter.
+    - ``parser_seed``: Seed for parser random number generation.
+    - ``parser_enabled``: Flag indicating if the parser is enabled.
+    - ``parser_replay_fseq``: Pointer to the parser's replay flow sequence.
+    - ``parser_rand_txn_corrupt``: Flag for random transaction corruption in the parser.
+    - ``v_x86_cnc``: Pointer to a command and control structure for x86 verification.
+    - ``v_x86_mcache``: Pointer to an x86 verification memory cache structure.
+    - ``v_x86_lazy``: x86 verification laziness parameter.
+    - ``v_x86_seed``: Seed for x86 verification random number generation.
+    - ``v_x86_enabled``: Flag indicating if x86 verification is enabled.
+    - ``v__wd_enabled``: Flag indicating if Wiredancer verification is enabled.
+    - ``v__wd_mcache``: Pointer to a Wiredancer verification memory cache structure.
+    - ``vcheck_cnc``: Pointer to a command and control structure for verification checking.
+    - ``vcheck_seed``: Seed for verification checking random number generation.
+    - ``vcheck_lazy``: Verification checking laziness parameter.
+    - ``test_version``: Version of the test being conducted.
+    - ``wd_slots``: Number of Wiredancer slots.
+    - ``wd_split``: Flag indicating if Wiredancer is split.
+- **Description**: The `test_cfg_t` structure is a configuration data structure used for setting up and managing various components of a unit test for the Wiredancer system. It includes pointers to command and control structures, memory caches, and data caches for different test components such as replay, parser, x86 verification, and Wiredancer verification. It also contains parameters for controlling the behavior of these components, such as laziness, random number generation seeds, and flags for enabling or disabling specific functionalities. The structure is designed to facilitate the configuration and execution of tests that compare the performance and correctness of Wiredancer against x86-based systems.
 
 
 # Functions
 
 ---
 ### sha512\_modq\_lsB<!-- {{#callable:sha512_modq_lsB}} -->
-The `sha512_modq_lsB` function computes a SHA-512 hash of a signature, public key, and message, reduces it modulo a large prime, and returns the least significant byte of the result.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L179>)
+
+Computes a SHA-512 hash of a message, signature, and public key, reduces it modulo a large prime, and returns the least significant byte of the result.
 - **Inputs**:
-    - `msg`: A pointer to the message data to be hashed.
-    - `sz`: The size of the message data in bytes.
-    - `sig`: A pointer to the signature data, which is expected to be 32 bytes long.
-    - `public_key`: A pointer to the public key data, which is expected to be 32 bytes long.
-    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing operations.
-- **Control Flow**:
-    - Cast the `sig` input to a `uchar` pointer and assign it to `r`.
+    - `msg`: Pointer to the message data to hash.
+    - `sz`: Size of the message data in bytes.
+    - `sig`: Pointer to the signature data, expected to be at least 32 bytes.
+    - `public_key`: Pointer to the public key data, expected to be at least 32 bytes.
+    - `sha`: Pointer to an `fd_sha512_t` structure used for SHA-512 operations.
+- **Logic and Control Flow**:
+    - Cast the `sig` pointer to a `uchar` pointer and assign it to `r`.
     - Initialize a 64-byte array `h` to store the hash result.
-    - Initialize the SHA-512 context using `fd_sha512_init` with the provided `sha` pointer.
-    - Append the first 32 bytes of the signature (`r`) to the SHA-512 context.
-    - Append the 32-byte public key to the SHA-512 context.
-    - Append the message data of size `sz` to the SHA-512 context.
-    - Finalize the SHA-512 hash computation and store the result in `h`.
+    - Initialize the SHA-512 context using `fd_sha512_init` with `sha`.
+    - Append the first 32 bytes of `sig` to the SHA-512 context using `fd_sha512_append`.
+    - Append the first 32 bytes of `public_key` to the SHA-512 context using `fd_sha512_append`.
+    - Append the message data to the SHA-512 context using `fd_sha512_append`.
+    - Finalize the SHA-512 hash computation using `fd_sha512_fini`, storing the result in `h`.
     - Reduce the hash `h` modulo a large prime using `fd_ed25519_sc_reduce`.
     - Return the least significant byte of the reduced hash as an integer.
-- **Output**: The function returns an integer representing the least significant byte of the reduced hash.
+- **Output**: Returns the least significant byte of the reduced hash as an integer.
 
 
 ---
 ### replay\_tile\_main<!-- {{#callable:replay_tile_main}} -->
-The `replay_tile_main` function initializes and runs a replay tile loop for packet processing in a network test environment.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L223>)
+
+Initializes and runs the replay tile loop for packet processing in a network test environment.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments, which is cast to a `test_cfg_t` configuration structure for the function.
-- **Control Flow**:
-    - The function begins by casting `argv` to a `test_cfg_t` pointer to access configuration settings.
-    - It logs a notice indicating the activation of the replay tile.
-    - A random number generator (`fd_rng_t`) is initialized using a seed from the configuration.
-    - A scratch space is allocated with specific alignment and footprint requirements for the replay tile.
-    - The function calls [`fd_replay_tile_loop`](fd_replay_loop.c.md#fd_replay_tile_loop) with various configuration parameters, including control and data caches, sequence numbers, and the random number generator, to execute the main loop of the replay tile.
-    - The function checks the result of [`fd_replay_tile_loop`](fd_replay_loop.c.md#fd_replay_tile_loop) to ensure it completes successfully.
-    - Finally, the random number generator is cleaned up, and the function returns 0 to indicate successful execution.
-- **Output**: The function returns an integer, specifically 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_replay_tile_loop`](fd_replay_loop.c.md#fd_replay_tile_loop)
+    - `argc`: The number of arguments passed to the function, which is not used in this function.
+    - `argv`: An array of arguments, where the first element is cast to a `test_cfg_t` structure containing configuration settings for the replay tile.
+- **Logic and Control Flow**:
+    - Logs the activation of the `replay_tile_main` function.
+    - Initializes a random number generator (`rng`) using the `replay_seed` from the configuration.
+    - Allocates a scratch buffer with a size and alignment defined by `FD_REPLAY_TILE_SCRATCH_FOOTPRINT` and `FD_REPLAY_TILE_SCRATCH_ALIGN`.
+    - Calls [`fd_replay_tile_loop`](<fd_replay_loop.c.md#fd_replay_tile_loop>) with various configuration parameters and checks its return value with `FD_TEST`.
+    - Deletes the random number generator and returns 0, indicating successful execution.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_replay_tile_loop`](<fd_replay_loop.c.md#fd_replay_tile_loop>)
 
 
 ---
 ### parser\_tile\_main<!-- {{#callable:parser_tile_main}} -->
-The `parser_tile_main` function processes network packets, parses transactions, and sends signature verification requests to either an x86-based or Wiredancer-based verification system.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L264>)
+
+Processes network packets by parsing transactions, verifying signatures, and managing flow control between different components.
 - **Inputs**:
-    - `argc`: An integer representing the number of arguments passed to the function, used here to derive the parser index.
-    - `argv`: An array of character pointers representing the arguments passed to the function, used here to access the configuration structure `test_cfg_t`.
-- **Control Flow**:
-    - Initialize various components such as workspace, command and control (CNC), and memory caches based on the configuration provided in `argv`.
-    - Log the activation of the parser tile.
-    - Set up connections to various caches and control structures, including replay and output caches, and initialize diagnostic counters.
-    - Initialize random number generator and configure transaction corruption settings.
-    - Initialize Wiredancer if enabled, and set up for signature verification requests.
-    - Enter the main processing loop, signaling the CNC to run.
-    - In each loop iteration, wait for a fragment sequence and perform housekeeping tasks if necessary.
-    - Process each received network packet, extracting and verifying headers (Ethernet, IPv4, UDP) and parsing transactions.
-    - For each transaction, potentially corrupt the message, and send signature verification requests to either x86 or Wiredancer systems based on configuration.
-    - Update diagnostic counters and publish results to the output cache.
-    - Check for overruns and increment sequence numbers for the next iteration.
-    - Upon loop exit, clean up resources, signal CNC to boot, and return 0.
-- **Output**: The function returns an integer, 0, indicating successful execution.
+    - `argc`: The number of arguments passed to the function, used to initialize `parser_idx`.
+    - `argv`: An array of arguments, where the first element is a pointer to a `test_cfg_t` structure containing configuration data for the parser.
+- **Logic and Control Flow**:
+    - Initialize `parser_idx`, `cfg`, and `wksp` from `argc` and `argv`.
+    - Log the activation of the function using `FD_LOG_NOTICE`.
+    - Set up connections to various components such as `cnc`, `mcache`, `fseq`, and `out_mcache` using the configuration in `cfg`.
+    - Initialize diagnostic counters for packets, transactions, and signatures.
+    - Initialize random number generator and configure random transaction corruption if enabled.
+    - Initialize Wiredancer workspace and verify setup with `wd_init_pci` and `wd_ed25519_verify_init_req`.
+    - Enter the main loop, signaling the start with `fd_cnc_signal`.
+    - In each iteration, wait for a fragment sequence and perform housekeeping tasks if necessary.
+    - Process received fragments by parsing Ethernet, IPv4, and UDP headers, and verify transaction signatures.
+    - If transactions are valid, update diagnostic counters and publish results to output caches.
+    - Handle both x86 and Wiredancer verification paths, updating sequences and diagnostics accordingly.
+    - Check for overruns during processing and handle errors with `FD_LOG_ERR`.
+    - Wind up for the next iteration by incrementing sequence numbers.
+    - On exit, clean up resources, signal completion, and return 0.
+- **Output**: Returns 0 upon successful completion of the function.
 
 
 ---
 ### v\_x86\_tile\_main<!-- {{#callable:v_x86_tile_main}} -->
-The `v_x86_tile_main` function processes transaction fragments, verifies signatures using either Ed25519 or SHA512MODQ, and publishes results to an output cache.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L522>)
+
+Processes incoming transaction fragments, verifies signatures using either Ed25519 or SHA512ModQ, and publishes results to an output cache.
 - **Inputs**:
-    - `argc`: The number of command-line arguments, used to initialize the `v_x86_idx` variable.
-    - `argv`: An array of command-line arguments, cast to a `test_cfg_t` structure pointer to access configuration settings.
-- **Control Flow**:
-    - Initialize local variables and log the function activation.
-    - Retrieve configuration settings from the `test_cfg_t` structure, including workspace, CNC, and mcache pointers.
-    - Set initial diagnostic values for transaction and signature counts in the CNC diagnostics array.
-    - Enter the main processing loop, signaling the CNC to run and waiting for the parser CNC to advance beyond the current sequence number.
-    - In the loop, perform housekeeping tasks such as sending heartbeats and checking for halt signals.
-    - Implement auto-throttling by adjusting the sequence number based on the difference between parser and current sequences.
-    - Wait for a fragment to be available in the parser mcache, checking for overruns.
-    - Process the received fragment by extracting message, signature, and public key data from the fragment's metadata.
-    - Verify the signature using the specified test version (Ed25519 or SHA512MODQ) and publish the verification result to the output mcache.
-    - Check for overruns during processing and increment sequence numbers for the next iteration.
-    - Update CNC diagnostics with the number of processed transactions and signatures.
-    - Exit the loop if a halt signal is received or an error occurs.
-    - Clean up resources by deleting the random number generator and signaling the CNC to boot.
-- **Output**: The function returns an integer status code, typically 0 for successful execution.
-- **Functions called**:
-    - [`sha512_modq_lsB`](#sha512_modq_lsb)
+    - `argc`: The number of arguments passed to the function, used to initialize `v_x86_idx`.
+    - `argv`: An array of arguments, cast to a `test_cfg_t` structure pointer to access configuration settings.
+- **Logic and Control Flow**:
+    - Initialize `v_x86_idx` with `argc` and cast `argv` to `test_cfg_t` to access configuration.
+    - Log the activation of the function using `FD_LOG_NOTICE`.
+    - Retrieve the test version from the configuration to determine the verification method.
+    - Connect to the command-and-control (CNC) and parser CNC using configuration settings.
+    - Initialize diagnostic counters for transactions and signals.
+    - Connect to the parser's metadata cache (`mcache`) and output cache (`out_mcache`) to manage data flow.
+    - Initialize a random number generator with a seed from the configuration.
+    - Enter the main loop, signaling the CNC to run and waiting for the parser to produce data.
+    - In the loop, perform housekeeping by sending heartbeats and checking for halt signals.
+    - Throttle processing based on the difference between parser and current sequence numbers.
+    - Wait for and process incoming transaction fragments, checking for overruns.
+    - Extract message, signature, and public key from the fragment using metadata offsets.
+    - Verify the signature using the specified method (Ed25519 or SHA512ModQ) and publish the result to the output cache.
+    - Increment sequence numbers and update diagnostic counters.
+    - Check for overruns during processing and handle errors.
+    - Signal the CNC to boot and clean up resources before returning.
+- **Output**: Returns 0 upon successful completion.
+- **Functions Called**:
+    - [`sha512_modq_lsB`](<#sha512_modq_lsb>)
 
 
 ---
 ### vcheck\_tile\_main<!-- {{#callable:vcheck_tile_main}} -->
-The `vcheck_tile_main` function verifies the signature verification results from x86 and Wiredancer, comparing them and updating diagnostic counters accordingly.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L701>)
+
+Executes a verification process comparing x86 and Wiredancer outputs, handling command and control signals, and managing diagnostic information.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the function.
-    - `argv`: An array of command-line arguments, where the first argument is a pointer to a `test_cfg_t` structure containing configuration data for the test.
-- **Control Flow**:
+    - `argc`: The number of arguments passed to the function.
+    - `argv`: An array of arguments, where the first argument is a pointer to a `test_cfg_t` structure containing configuration data.
+- **Logic and Control Flow**:
     - Initialize variables and log the start of the function.
-    - Set up command and control diagnostics by initializing diagnostic counters to zero.
-    - Check if x86 and Wiredancer producers are enabled and set up their respective caches and sequences.
-    - Initialize a random number generator using the seed from the configuration.
+    - Connect to the command and control (CNC) interface using the configuration from `argv`.
+    - Initialize diagnostic counters for CNC.
+    - Check if x86 and Wiredancer producers are enabled using the configuration.
+    - Set up connections to x86 and Wiredancer memory caches if they are enabled.
+    - Initialize a random number generator with a seed from the configuration.
     - Initialize Wiredancer PCI and verification response.
     - Enter the main loop, signaling the CNC to run.
-    - Poll the x86 mcache if x86 is enabled, waiting for fragments and handling signals.
-    - Poll the Wiredancer mcache if Wiredancer is enabled, synchronizing with x86 sequence and handling signals.
-    - Process x86 fragments, checking for overruns and incrementing sequence.
-    - Process Wiredancer fragments, checking for overruns, incrementing sequence, and updating pass/fail counters.
-    - Compare x86 and Wiredancer results if both are enabled, logging discrepancies and updating validation counters.
+    - Poll x86 and Wiredancer caches for new data, handling overruns and command signals.
+    - Extract and compare signature data from x86 and Wiredancer, updating diagnostic counters.
+    - If both x86 and Wiredancer are enabled, compare their outputs and update validation counters.
     - Increment the expected signature for the next iteration.
-    - Free Wiredancer PCI resources and clean up the random number generator.
-    - Signal the CNC to boot and return 0.
-- **Output**: The function returns an integer, specifically 0, indicating successful execution.
+    - On exit, free resources and signal the CNC to boot.
+- **Output**: Returns 0 upon successful completion of the function.
 
 
 ---
 ### test\_sigaction<!-- {{#callable:test_sigaction}} -->
-The `test_sigaction` function handles a POSIX signal by logging the signal number and setting a halt flag.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L944>)
+
+Handles a POSIX signal by logging the signal number and setting a halt flag.
 - **Inputs**:
-    - `sig`: The signal number that was received.
-    - `info`: A pointer to a `siginfo_t` structure containing additional information about the signal (unused in this function).
-    - `context`: A pointer to a context structure (unused in this function).
-- **Control Flow**:
-    - The function begins by casting the `info` and `context` pointers to void to indicate they are unused.
-    - A log message is generated to indicate that a POSIX signal was received, including the signal number.
-    - The global variable `test_halt` is set to 1UL to signal that the main process should halt.
-- **Output**: This function does not return any value.
+    - `sig`: The signal number received.
+    - `info`: A pointer to a `siginfo_t` structure, which is not used in this function.
+    - `context`: A pointer to a context, which is not used in this function.
+- **Logic and Control Flow**:
+    - Ignores the `info` and `context` parameters by casting them to void.
+    - Logs a notice message indicating the receipt of a POSIX signal with the signal number.
+    - Sets the global variable `test_halt` to 1UL to indicate a halt condition.
+- **Output**: No return value; the function operates by side effects, specifically logging and setting a global variable.
 
 
 ---
 ### test\_signal\_trap<!-- {{#callable:test_signal_trap}} -->
-The `test_signal_trap` function sets up a signal handler for a specified signal to handle it using a custom action.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L954>)
+
+Sets up a signal handler for a specified signal to execute a custom action when the signal is received.
 - **Inputs**:
-    - `sig`: An integer representing the signal number for which the handler is being set.
-- **Control Flow**:
+    - `sig`: The signal number for which the handler is being set.
+- **Logic and Control Flow**:
     - Declare a `sigaction` structure `act` to hold the signal action configuration.
     - Assign the `test_sigaction` function to `act->sa_sigaction` to handle the signal.
-    - Call `sigemptyset` to initialize the signal mask set in `act->sa_mask` to empty, logging an error if it fails.
-    - Set `act->sa_flags` to `SA_SIGINFO | SA_RESETHAND` to specify that the handler should receive additional information and reset to default after handling.
+    - Call `sigemptyset` to initialize the signal set in `act->sa_mask` to exclude all signals, logging an error if it fails.
+    - Set `act->sa_flags` to `SA_SIGINFO | SA_RESETHAND` to receive additional signal information and reset the handler to default after handling the signal.
     - Call `sigaction` to set the action for the specified signal `sig`, logging an error if it fails.
-- **Output**: The function does not return any value; it sets up a signal handler for the specified signal.
+- **Output**: No return value; the function sets up a signal handler.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, checks for necessary capabilities, logs a warning if they are not present, and then halts the program.
+[View Source →](<../../../../../src/wiredancer/test/test_wiredancer_demo.c#L1309>)
+
+Initializes the environment, logs a warning, and halts the program if certain capabilities are not present.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments passed to the program.
-- **Control Flow**:
-    - The function begins by calling `fd_boot` to initialize the environment with the command-line arguments.
-    - It logs a warning message indicating that the unit test requires certain capabilities (FD_HAS_HOSTED, FD_HAS_X86, and FD_HAS_WIREDANCER) which are not present.
-    - The function then calls `fd_halt` to terminate the program.
-    - Finally, it returns 0, indicating successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Logs a warning message indicating that the unit test requires specific capabilities (`FD_HAS_HOSTED`, `FD_HAS_X86`, and `FD_HAS_WIREDANCER`).
+    - Calls `fd_halt` to terminate the program.
+    - Returns 0 to indicate successful execution.
+- **Output**: Returns an integer value 0, indicating successful execution.
 
 
 

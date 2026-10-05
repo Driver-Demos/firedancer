@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_dcache.c` file in the `firedancer` codebase contains unit tests for verifying the alignment, footprint calculations, and functionality of the dcache (data cache) implementation, including tests for dcache creation, accessors, and destruction.
+Unit tests for verifying the alignment, footprint, and functionality of dcache operations.
 
 # Purpose
-This C source code file is a comprehensive unit test for a data cache (dcache) system, likely part of a larger software library. The file includes a series of static assertions to verify the correctness of various constants and functions related to memory alignment and footprint calculations. These assertions ensure that the memory layout and size calculations for chunks and cache slots are as expected, which is crucial for the performance and correctness of memory operations. The code also defines a main function that initializes a random number generator and performs extensive testing of the dcache's functionality, including alignment, footprint calculations, data size requirements, and the creation and destruction of cache instances.
+The code is a C program designed to test the functionality and integrity of a data cache (dcache) system. It includes a series of static assertions to verify the alignment and footprint of various cache components, such as `FD_CHUNK_ALIGN`, `FD_DCACHE_ALIGN`, and `FD_DCACHE_FOOTPRINT`. These assertions ensure that the cache system meets specific size and alignment requirements. The program also defines maximum allowable sizes for data and application segments (`DATA_MAX` and `APP_MAX`) and uses these to allocate shared memory for the cache.
 
-The main technical components of this file include the use of static assertions to validate compile-time constants, the implementation of a main function to execute runtime tests, and the use of a random number generator to simulate various scenarios for testing the dcache's behavior. The file tests the dcache's ability to handle different data and application sizes, checks for proper alignment, and verifies that the cache can be safely compacted and accessed. Additionally, the code includes error handling to ensure that invalid configurations are correctly identified and reported. This file is intended to be compiled and executed as a standalone test program, providing a robust validation of the dcache system's functionality and reliability.
+The [`main`](<#main>) function initializes the environment and parses command-line arguments to determine the sizes of the data and application segments. It then performs a series of tests to validate the cache's alignment, footprint calculations, and data size requirements. The program tests the creation, joining, and destruction of the cache, as well as the safety and correctness of compacting operations within the cache. It uses random number generation to simulate various cache configurations and verifies that the cache behaves as expected under these conditions. The program concludes by logging the results and halting execution.
 # Imports and Dependencies
 
 ---
@@ -19,33 +19,43 @@ The main technical components of this file include the use of static assertions 
 
 ---
 ### shmem
-- **Type**: `ulong array`
-- **Description**: The `shmem` variable is a statically allocated array of unsigned long integers, aligned to the cache line size defined by `FD_DCACHE_ALIGN`. Its size is determined by the macro `FD_DCACHE_FOOTPRINT`, which calculates the required footprint based on the maximum data and application sizes (`DATA_MAX` and `APP_MAX`).
-- **Use**: This variable is used as a shared memory buffer for data cache operations, ensuring proper alignment and size for efficient memory access.
+- **Type**: ``ulong[]``
+- **Description**: An array of unsigned long integers with a size determined by the macro `FD_DCACHE_FOOTPRINT` using `DATA_MAX` and `APP_MAX` as parameters. The array is aligned to `FD_DCACHE_ALIGN` to ensure proper memory alignment for cache operations.
+- **Use**: Used to allocate shared memory for data cache operations in the program.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and tests a data cache system by setting up parameters, validating configurations, and performing various tests on cache creation, access, and destruction.
+[View Source →](<../../../../../src/tango/dcache/test_dcache.c#L63>)
+
+Executes a series of tests on data cache (dcache) operations, including creation, joining, accessor functions, and compactness checks, using command-line arguments for configuration.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
+    - `argc`: The number of command-line arguments.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment and parse command-line arguments for data and application sizes.
-    - Check if the parsed sizes exceed predefined maximums and log errors if they do.
-    - Log the sizes being tested and initialize a random number generator.
-    - Perform alignment and footprint tests on the data cache for a large number of iterations.
-    - Calculate the footprint of the data cache and validate it against expected values.
-    - Test failure cases for creating a new data cache with invalid parameters.
-    - Create a new data cache and test failure cases for joining the cache with invalid parameters.
-    - Join the data cache and test its alignment and size accessors.
-    - Initialize the data cache regions with a test pattern and verify the pattern was written correctly.
-    - Perform compactness and safety tests on the data cache with various parameters.
-    - Test the destruction of the data cache and clean up resources.
-    - Log a success message and halt the program.
-- **Output**: The function returns an integer status code, typically 0 for successful execution.
+- **Logic and Control Flow**:
+    - Initialize the environment with `fd_boot` using `argc` and `argv`.
+    - Extract `--data-sz` and `--app-sz` from command-line arguments using `fd_env_strip_cmdline_ulong` with maximum limits `DATA_MAX` and `APP_MAX`.
+    - Log an error and exit if `data_sz` or `app_sz` exceed their respective maximum limits.
+    - Log the current testing configuration with `data_sz` and `app_sz`.
+    - Initialize a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Test dcache alignment with `fd_dcache_align` and `FD_DCACHE_ALIGN`.
+    - Run a loop 1,000,000 times to test `fd_dcache_footprint` and `fd_dcache_req_data_sz` against expected values using random sizes.
+    - Calculate the dcache footprint for `data_sz` and `app_sz` and log an error if it is zero.
+    - Test failure cases for `fd_dcache_new` with various invalid inputs and ensure they return `NULL`.
+    - Create a new dcache with `fd_dcache_new` and test its validity.
+    - Test failure cases for `fd_dcache_join` with invalid inputs and ensure they return `NULL`.
+    - Join the dcache with `fd_dcache_join` and test its alignment.
+    - Test dcache accessor functions for data and application sizes and their alignment.
+    - Initialize dcache regions with test patterns and verify their correctness.
+    - Test compactness safety and chunk calculations for dcache using `fd_dcache_compact_is_safe`, `fd_dcache_compact_chunk0`, `fd_dcache_compact_chunk1`, and `fd_dcache_compact_wmark`.
+    - Run additional tests for compactness safety with different base references and chunk calculations.
+    - Test `fd_dcache_compact_next` for valid chunk transitions within the watermark range.
+    - Test dcache destruction with `fd_dcache_leave` and `fd_dcache_delete` for valid and invalid inputs.
+    - Delete the random number generator with `fd_rng_delete` and `fd_rng_leave`.
+    - Log a success message and halt the program with `fd_halt`.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 

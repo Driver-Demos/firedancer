@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_heap.c` file in the `firedancer` codebase contains a comprehensive test suite for heap operations, including insertion, removal, and validation of heap properties, using a custom data structure and memory pool.
+Tests for heap and pool data structures, including operations like insert, remove, and verify.
 
 # Purpose
-This C source code file is an executable program designed to test the functionality of a custom memory pool and heap data structure. The code includes the necessary headers and defines a structure `ele` with fields for left and right child indices and a value, which is used as the element type for both the pool and heap. The program utilizes macros to include and configure external pool and heap implementations (`fd_pool.c` and `fd_heap.c`), which are likely part of a larger library or framework. The main function initializes the environment, sets up a random number generator, and performs a series of tests to verify the integrity and correctness of the pool and heap operations, such as insertion, removal, and address conversion.
+The code is a C program that tests the functionality of a custom heap and pool data structure. It includes the necessary headers and defines several macros to configure the behavior of the heap and pool. The `ele` structure is defined with fields for left and right child indices and a value, which are used to manage elements within the heap and pool. The program uses these structures to perform various operations such as inserting elements, removing the minimum element, and verifying the integrity of the heap.
 
-The code is structured to handle a maximum of 64 elements, as indicated by the constraints on `ele_max`, and it includes detailed testing of edge cases and error handling. The program also includes conditional compilation for hosted environments, allowing for additional testing features like process forking and signal handling. The use of macros and external file inclusion suggests that this code is part of a modular system where the pool and heap implementations can be reused or replaced. The file does not define public APIs or external interfaces directly but rather serves as a test harness for the underlying data structures, ensuring their reliability and performance under various conditions.
+The [`main`](<#main>) function initializes the environment, sets up a random number generator, and configures the heap and pool with a specified maximum number of elements. It then performs a series of tests to ensure the correct behavior of the heap and pool operations, including address conversion, alignment, footprint checks, and insertion and removal of elements. The program also includes tests for error handling and logging, particularly in scenarios where operations are expected to fail. The code concludes by cleaning up resources and logging the test results.
 # Imports and Dependencies
 
 ---
@@ -24,58 +24,59 @@ The code is structured to handle a maximum of 64 elements, as indicated by the c
 
 ---
 ### scratch
-- **Type**: `uchar array`
-- **Description**: The `scratch` variable is a static array of unsigned characters (`uchar`) with a size defined by `SCRATCH_FOOTPRINT`, which is 1024 bytes. It is aligned in memory according to `SCRATCH_ALIGN`, which is 128 bytes, using the `__attribute__((aligned(SCRATCH_ALIGN)))` directive.
-- **Use**: This variable is used as a memory buffer for operations requiring temporary storage, such as initializing and joining a pool of elements in the program.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters with a size defined by `SCRATCH_FOOTPRINT`, aligned to `SCRATCH_ALIGN` bytes.
+- **Use**: Used as a memory buffer for operations requiring temporary storage, such as pool and heap management.
 
 
 # Data Structures
 
 ---
 ### ele
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `left_cidx`: Represents the left child index in a heap or pool structure.
-    - `right_cidx`: Represents the right child index in a heap or pool structure.
-    - `val`: Stores a value of type VAL_T, which is a signed character.
-- **Description**: The `ele` structure is a compound data type used to represent elements in a heap or pool data structure. It contains three members: `left_cidx` and `right_cidx`, which are indices of type `CIDX_T` (an unsigned character) used to navigate the structure's hierarchy, and `val`, which holds a value of type `VAL_T` (a signed character). This structure is integral to managing elements within the heap and pool, facilitating operations such as insertion, removal, and value comparison.
+    - ``left_cidx``: Stores the left child index of type `CIDX_T`.
+    - ``right_cidx``: Stores the right child index of type `CIDX_T`.
+    - ``val``: Holds a value of type `VAL_T`.
+- **Description**: Defines a structure with three members used to represent an element in a data structure, such as a heap or pool, where `left_cidx` and `right_cidx` are indices for child elements, and `val` is the value associated with the element.
 
 
 ---
 ### ele\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `left_cidx`: An index of type CIDX_T representing the left child in a binary heap or pool structure.
-    - `right_cidx`: An index of type CIDX_T representing the right child in a binary heap or pool structure.
-    - `val`: A value of type VAL_T (schar) stored in the element, used for comparison in heap operations.
-- **Description**: The `ele_t` structure is a compound data type used to represent an element in a binary heap or pool. It contains indices for left and right children (`left_cidx` and `right_cidx`) and a value (`val`) used for ordering within the heap. This structure is integral to the heap and pool operations, allowing for efficient management and manipulation of elements based on their values.
+    - ``left_cidx``: Stores the index of the left child in a heap or pool.
+    - ``right_cidx``: Stores the index of the right child in a heap or pool.
+    - ``val``: Holds a signed character value associated with the element.
+- **Description**: Defines a structure `ele` that represents an element in a heap or pool, with fields for managing child indices and a value.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and tests a heap data structure with various operations, ensuring its integrity and performance under different conditions.
+[View Source →](<../../../../../src/util/tmpl/test_heap.c#L36>)
+
+Initializes and tests a heap and pool data structure with various operations and checks.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Parse command-line options for `--max` and `--seed`, setting defaults if not provided.
-    - Check if `ele_max` exceeds 64 and log an error if it does.
-    - Log the testing parameters `ele_max` and `seed`.
-    - Initialize a random number generator `rng`.
-    - Calculate alignment and footprint for the pool and check against predefined limits, logging an error if exceeded.
-    - Create and join a pool of elements using `pool_new` and `pool_join`.
-    - Test special values and address conversions for heap elements.
-    - Verify alignment and footprint of the heap structure.
-    - Create and join a heap using `heap_new` and `heap_join`.
-    - Perform a series of operations (peek_min, insert, remove_min) on the heap, testing its integrity with each operation.
-    - Optionally test 'handholding' features if hosted environment is available.
-    - Test leaving and deleting the heap and pool structures.
-    - Delete the random number generator and log the completion of tests.
-    - Call `fd_halt` to terminate the program.
-- **Output**: The function returns an integer, `0`, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Retrieves `ele_max` and `seed` from command-line arguments using `fd_env_strip_cmdline_ulong`.
+    - Checks if `ele_max` exceeds 64 and logs an error if true.
+    - Logs the testing parameters `ele_max` and `seed`.
+    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Calculates alignment and footprint for the pool and checks against predefined limits, logging an error if exceeded.
+    - Creates and joins a pool using `pool_new` and `pool_join`.
+    - Tests special values and address conversion functions for the heap.
+    - Tests alignment and footprint of the heap.
+    - Creates and joins a heap using `heap_new` and `heap_join`.
+    - Performs a series of operations on the heap, including `peek_min`, `insert`, and `remove_min`, while verifying heap integrity.
+    - Tests handholding features if applicable, using `FD_EXPECT_LOG_CRIT`.
+    - Tests leaving and deleting the heap and pool, ensuring proper cleanup.
+    - Logs a success message and halts the program.
+- **Output**: Returns 0 upon successful execution.
 
 
 

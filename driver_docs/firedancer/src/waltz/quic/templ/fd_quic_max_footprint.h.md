@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_max_footprint.h` file in the `firedancer` codebase defines macros to calculate the maximum encoding sizes for QUIC frames at compile time by constructing structs with character arrays.
+Macros for calculating maximum encoding sizes of QUIC frames at compile time using struct definitions.
 
 # Purpose
-This C header file defines a set of macros used to calculate the maximum memory footprint required for encoding QUIC (Quick UDP Internet Connections) frames at compile time. The macros construct temporary structures with character arrays to determine the sizes of various frame components, allowing developers to compute the maximum size needed for encoding without using packed structures. The `FD_QUIC_MAX_FOOTPRINT` macro calculates the maximum footprint for a given frame, while other macros like `FD_TEMPL_ENCODE_FP`, `FD_TEMPL_MBR_FRAME_TYPE`, and `FD_TEMPL_MBR_ELEM` define the size of different elements within a frame. This approach ensures efficient memory allocation by determining the size of encoded data elements, such as packet numbers and variable-length integers, at compile time. The file includes another header, `fd_quic_dft.h`, which likely contains additional definitions or implementations related to QUIC encoding.
+The code defines a set of macros to calculate the maximum encoding sizes for QUIC (Quick UDP Internet Connections) frames at compile time. It constructs structures with character arrays to determine the sizes of different frame components, which eliminates the need for packed structures. The macro `FD_QUIC_MAX_FOOTPRINT` calculates the maximum footprint for a given frame by using the `sizeof` operator on a specific structure. Other macros, such as `FD_TEMPL_ENCODE_FP`, `FD_TEMPL_MBR_FRAME_TYPE`, and `FD_TEMPL_MBR_ELEM`, define the encoding footprint for various elements, including frame types, packet numbers, and variable-length integers. The code includes a header file `fd_quic_dft.h`, which likely contains additional definitions or dependencies related to QUIC encoding.
 # Imports and Dependencies
 
 ---
