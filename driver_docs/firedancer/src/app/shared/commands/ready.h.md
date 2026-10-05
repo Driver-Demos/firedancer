@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ready.h` file in the `firedancer` codebase declares the `ready_cmd_fn` function and the `fd_action_ready` external action for handling readiness commands.
+Declares the `ready_cmd_fn` function and the `fd_action_ready` external action.
 
 # Purpose
-This code is a C header file that defines an interface for a command function and an external action related to a "ready" command within an application. It includes a configuration header file, `fd_config.h`, suggesting that it relies on predefined configurations or settings. The file declares a function prototype, [`ready_cmd_fn`](#ready_cmd_fn), which takes pointers to `args_t` and `config_t` structures, indicating that it processes command arguments and configuration data. Additionally, it declares an external variable, `fd_action_ready`, of type `action_t`, which likely represents an action or operation associated with the "ready" command. The use of include guards ensures that the file's contents are only included once during compilation, preventing redefinition errors.
+This code is a C header file that declares a function and an external variable related to a command functionality. The function [`ready_cmd_fn`](<#ready_cmd_fn>) takes pointers to `args_t` and `config_t` structures as parameters, indicating it likely processes command arguments and configuration data. The external variable `fd_action_ready` is declared as an `action_t` type, suggesting it represents an action or command that can be executed. The file includes a configuration header `fd_config.h` and uses macro guards to prevent multiple inclusions. The `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` macros are used to encapsulate the function prototype, which may be part of a larger framework or library.
 # Imports and Dependencies
 
 ---
@@ -17,9 +17,9 @@ This code is a C header file that defines an interface for a command function an
 
 ---
 ### fd\_action\_ready
-- **Type**: `action_t`
-- **Description**: The variable `fd_action_ready` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is likely located in another source file. The `action_t` type suggests that this variable is used to represent an action or command within the application.
-- **Use**: `fd_action_ready` is used to reference a specific action or command that is ready to be executed within the application.
+- **Type**: ``action_t``
+- **Description**: `fd_action_ready` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is located in another source file.
+- **Use**: Used to reference an action that is ready to be executed within the application.
 
 
 

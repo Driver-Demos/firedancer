@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_tcache` component, and includes commands to build and run the `test_tcache` unit test.
+Makefile for adding headers, objects, and unit tests for `fd_tcache` in the `firedancer` codebase.
 
 # Purpose
-The file is a Makefile script used for building and testing components in a software project. It adds the header file `fd_tcache.h` and object files `fd_tcache` and `fd_tango` to the build process. Additionally, it defines and executes a unit test named `test_tcache`, which depends on `fd_tango` and `fd_util`.
+The `Makefile` content defines build and test instructions for a software project. It uses the `add-hdrs` function to include the header file `fd_tcache.h`. The `add-objs` function adds object files `fd_tcache` and `fd_tango` to the build. The `make-unit-test` function creates a unit test named `test_tcache` with dependencies on `fd_tango` and `fd_util`. Finally, the `run-unit-test` function executes the `test_tcache` unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
