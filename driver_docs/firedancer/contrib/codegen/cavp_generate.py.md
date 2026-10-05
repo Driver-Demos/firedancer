@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generates C include files with NIST CAVP test vectors for cryptographic hash function verification.
+The `cavp_generate.py` file in the `firedancer` codebase generates C include files containing NIST CAVP test vectors for verifying cryptographic hash function implementations.
 
 # Purpose
-This Python script generates C include files containing test vectors for cryptographic hash functions, specifically for the NIST Cryptographic Algorithm Validation Program (CAVP). The script reads a CAVP response file, which contains message tests, and converts these into C data structures that can be used to verify implementations of SHA-2 hash functions. The script supports SHA-256, SHA-384, and SHA-512 algorithms.
+This Python script is designed to generate C include files containing test vectors for cryptographic hash functions, specifically those defined by the NIST Cryptographic Algorithm Validation Program (CAVP). The script processes CAVP response files, which contain test data for verifying cryptographic hash function implementations, and outputs C code that defines these test vectors as static constant arrays. The script is part of the Firedancer project and is intended to be executed as a standalone script, as indicated by the presence of the `__main__` block.
 
-The script defines several key components, including functions like [`bin2cstr`](<#bin2cstr>) and [`bin2carr`](<#bin2carr>) to format binary data as C strings and arrays, respectively. It also includes a `Msg` data class to represent messages and their corresponding digests. The `HashMsgGenerator` class is responsible for generating the C test vectors, and the [`_main`](<#_main>) function handles command-line arguments and orchestrates the overall process. The script outputs the generated C code to either a specified file or standard output, making it suitable for integration into larger projects that require automated generation of test vectors for cryptographic validation.
+Key components of the script include functions for converting binary data into C string and array initializers ([`bin2cstr`](#bin2cstr) and [`bin2carr`](#bin2carr)), a `Msg` dataclass to represent message-digest pairs, and a `HashMsgGenerator` class that manages the generation of C test vector definitions. The script uses regular expressions to parse the response files and extract message and digest data, which are then formatted into C code. The script supports SHA-2 algorithms (SHA-256, SHA-384, and SHA-512) and allows users to specify the algorithm, test name, and output file via command-line arguments. The generated C code is output to either a specified file or standard output, making it suitable for integration into C projects that require cryptographic validation.
 # Imports and Dependencies
 
 ---
@@ -25,103 +25,89 @@ The script defines several key components, including functions like [`bin2cstr`]
 
 ---
 ### Msg<!-- {{#class:firedancer/contrib/codegen/cavp_generate.Msg}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L56>)
-
 - **Decorators**: `@dataclass`
 - **Members**:
-    - `msg`: Contains the message data as bytes.
-    - `digest`: Contains the digest of the message as bytes.
-- **Description**: Represents a message and its corresponding digest, both stored as byte sequences, used for cryptographic hash function testing.
+    - `msg`: A byte sequence representing the message.
+    - `digest`: A byte sequence representing the message digest.
+- **Description**: The Msg class is a simple data structure used to encapsulate a message and its corresponding digest, both represented as byte sequences. It is designed to facilitate the handling and processing of cryptographic test vectors, particularly in the context of parsing and generating CAVP response files for cryptographic hash function verification.
 
 
 ---
 ### HashMsgGenerator<!-- {{#class:firedancer/contrib/codegen/cavp_generate.HashMsgGenerator}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L91>)
-
 - **Members**:
-    - `name`: Stores the name of the test.
-    - `test_vector_type`: Indicates the type of the test vector.
-    - `hashes`: Contains a list of hash digests as bytes.
-- **Description**: Generates C include files with NIST CAVP test vectors for cryptographic hash function verification. It manages test vector names and stores hash digests for output.
+    - `name`: The name of the test vector.
+    - `test_vector_type`: The type of the test vector, typically related to the hash algorithm.
+    - `hashes`: A list of byte arrays representing the message digests.
+- **Description**: The HashMsgGenerator class is responsible for generating C include files containing static const test vectors for cryptographic hash functions. It manages the creation of test vectors by storing message digests and formatting them into C array initializers. The class is initialized with a name and a test vector type, and it provides methods to write individual test vectors and finalize the output by printing the complete set of test vectors in a format suitable for inclusion in C source files.
 - **Methods**:
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.__init__`](<#hashmsggenerator__init__>)
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator._test_vector_name`](<#hashmsggenerator_test_vector_name>)
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.write_test`](<#hashmsggeneratorwrite_test>)
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.finish`](<#hashmsggeneratorfinish>)
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.__init__`](#hashmsggenerator__init__)
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator._test_vector_name`](#hashmsggenerator_test_vector_name)
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.write_test`](#hashmsggeneratorwrite_test)
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.finish`](#hashmsggeneratorfinish)
 
 **Methods**
 
 ---
 #### HashMsgGenerator\.\_\_init\_\_<!-- {{#callable:firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.__init__}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L96>)
-
-Initializes a `HashMsgGenerator` object with a name and test vector type, and prepares an empty list for hashes.
+The `__init__` method initializes a `HashMsgGenerator` object with a name, test vector type, and an empty list for storing hashes.
 - **Inputs**:
-    - `name`: A string representing the name of the hash message generator.
-    - `test_vector_type`: A string representing the type of test vector.
-- **Logic and Control Flow**:
-    - Assigns the input `name` to the instance variable `self.name`.
-    - Assigns the input `test_vector_type` to the instance variable `self.test_vector_type`.
+    - `name`: A string representing the name of the test vector.
+    - `test_vector_type`: A string representing the type of the test vector.
+- **Control Flow**:
+    - Assigns the input parameter `name` to the instance variable `self.name`.
+    - Assigns the input parameter `test_vector_type` to the instance variable `self.test_vector_type`.
     - Initializes `self.hashes` as an empty list to store hash values.
-- **Output**: None (constructor method).
-- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](<#hashmsggenerator>)  (Base Class)
+- **Output**: This method does not return any value; it initializes the instance variables of the `HashMsgGenerator` class.
+- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](#hashmsggenerator)  (Base Class)
 
 
 ---
 #### HashMsgGenerator\.\_test\_vector\_name<!-- {{#callable:firedancer/contrib/codegen/cavp_generate.HashMsgGenerator._test_vector_name}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L101>)
-
-Generates a test vector name by appending an index to the class's name attribute.
+The `_test_vector_name` method generates a formatted string representing a test vector name using the instance's name and a given index.
 - **Inputs**:
     - `i`: An integer index used to differentiate test vector names.
-- **Logic and Control Flow**:
-    - Uses the `name` attribute of the `HashMsgGenerator` class instance.
-    - Appends the string '_test_' followed by the integer `i` to the `name` attribute.
-    - Returns the concatenated string as the test vector name.
-- **Output**: A string representing the test vector name, formatted as '<name>_test_<i>'.
-- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](<#hashmsggenerator>)  (Base Class)
+- **Control Flow**:
+    - The method takes an integer `i` as input.
+    - It returns a formatted string that combines the instance's `name` attribute with the string '_test_' and the integer `i`.
+- **Output**: A string formatted as "{self.name}_test_{i}".
+- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](#hashmsggenerator)  (Base Class)
 
 
 ---
 #### HashMsgGenerator\.write\_test<!-- {{#callable:firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.write_test}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L104>)
-
-Appends a message digest to the list of hashes and prints a C array initializer for the message if the message is not empty.
+The `write_test` method generates and prints a C static array declaration for a given message and its digest, appending the digest to an internal list.
 - **Inputs**:
-    - `msg`: An instance of the `Msg` class containing a message and its digest.
-- **Logic and Control Flow**:
-    - Check if the message in `msg` is empty; if it is, return immediately.
+    - `msg`: An instance of the `Msg` class containing a message (`msg`) and its digest (`digest`).
+- **Control Flow**:
+    - Check if the message (`msg.msg`) is empty; if so, return immediately without doing anything.
     - Determine the current index `i` by getting the length of the `hashes` list.
-    - Append the `digest` from `msg` to the `hashes` list.
-    - Print a C array declaration using the [`_test_vector_name`](<#hashmsggenerator_test_vector_name>) method to generate the name, with the index `i`.
-    - Convert the message to a C array initializer using [`bin2carr`](<#bin2carr>) and print it with indentation.
-    - Print the closing brace for the C array declaration.
-- **Output**: No explicit return value; outputs are printed to the standard output.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator._test_vector_name`](<#hashmsggenerator_test_vector_name>)
-    - [`firedancer/contrib/codegen/cavp_generate.bin2carr`](<#bin2carr>)
-- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](<#hashmsggenerator>)  (Base Class)
+    - Append the message digest (`msg.digest`) to the `hashes` list.
+    - Print a C static array declaration using the [`_test_vector_name`](#hashmsggenerator_test_vector_name) method to generate the array name based on the current index `i`.
+    - Convert the message bytes to a C array initializer format using [`bin2carr`](#bin2carr) and print it with indentation.
+    - Close the C array declaration with a closing brace and semicolon.
+- **Output**: The method does not return any value; it outputs C code to the standard output.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator._test_vector_name`](#hashmsggenerator_test_vector_name)
+    - [`firedancer/contrib/codegen/cavp_generate.bin2carr`](#bin2carr)
+- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](#hashmsggenerator)  (Base Class)
 
 
 ---
 #### HashMsgGenerator\.finish<!-- {{#callable:firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.finish}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L113>)
-
-Generates and prints a C array of test vectors from stored hash digests.
+The `finish` method generates and prints a C array of test vectors from stored hash digests.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Prints the start of a C array declaration using `self.test_vector_type` and `self.name`.
-    - Iterates over `self.hashes` to process each hash digest.
-    - For each hash digest, calls [`_test_vector_name`](<#hashmsggenerator_test_vector_name>) to get the declaration name.
-    - Prints the declaration name and its size in the C array format.
-    - Converts each hash digest to a C string using [`bin2cstr`](<#bin2cstr>) and prints it.
-    - Prints a terminating entry `{ NULL, 0UL, { 0 } }` to the C array.
+- **Control Flow**:
+    - Prints the beginning of a C array declaration using the `test_vector_type` and `name` attributes.
+    - Iterates over the `hashes` list, which contains hash digests, using an index and the digest value.
+    - For each digest, it generates a test vector name using [`_test_vector_name`](#hashmsggenerator_test_vector_name) and prints a C struct initializer with the test vector name and its size.
+    - Converts each digest to a C string format using [`bin2cstr`](#bin2cstr) and prints it as part of the struct initializer.
+    - Prints a terminating struct with null values to indicate the end of the array.
     - Prints the closing of the C array declaration.
-- **Output**: No return value; outputs C array declarations to standard output.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator._test_vector_name`](<#hashmsggenerator_test_vector_name>)
-    - [`firedancer/contrib/codegen/cavp_generate.bin2cstr`](<#bin2cstr>)
-- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](<#hashmsggenerator>)  (Base Class)
+- **Output**: The method outputs a formatted C array declaration to the standard output, representing the test vectors.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator._test_vector_name`](#hashmsggenerator_test_vector_name)
+    - [`firedancer/contrib/codegen/cavp_generate.bin2cstr`](#bin2cstr)
+- **See also**: [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](#hashmsggenerator)  (Base Class)
 
 
 
@@ -129,108 +115,96 @@ Generates and prints a C array of test vectors from stored hash digests.
 
 ---
 ### bin2cstr<!-- {{#callable:firedancer/contrib/codegen/cavp_generate.bin2cstr}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L19>)
-
-Converts a byte sequence into a C-style string with hex-escaped characters.
+The `bin2cstr` function converts a byte sequence into a C-style string with hex-escaped characters, formatted for readability.
 - **Inputs**:
-    - `data`: A byte sequence to convert into a C-style string.
-- **Logic and Control Flow**:
-    - Check if the input `data` is empty; if so, return the string 'NULL'.
-    - Initialize the output string `out` with a double quote character.
-    - Iterate over each byte `b` in the input `data` with its index `i`.
+    - `data`: A byte sequence that needs to be converted into a C-style string with hex-escaped characters.
+- **Control Flow**:
+    - Check if the input data is empty; if so, return 'NULL'.
+    - Initialize the output string with a starting double quote.
+    - Iterate over each byte in the input data, using its index and value.
     - For the first byte, do nothing special.
-    - For every 32nd byte, append a newline and a double quote to `out`.
-    - For every 8th byte, append a space and a double quote to `out`.
-    - Append the hex-escaped representation of the byte `b` to `out`.
-    - For every 8th byte, append a closing double quote to `out`.
-    - After the loop, if the length of `data` is not a multiple of 8, append a closing double quote to `out`.
-    - Return the constructed C-style string `out`.
-- **Output**: A C-style string with hex-escaped characters representing the input byte sequence.
+    - For every 32nd byte, add a newline and a starting double quote to the output string.
+    - For every 8th byte (except the first), add a space and a starting double quote to the output string.
+    - Convert each byte to a hex-escaped string and append it to the output string.
+    - For every 8th byte, add a closing double quote to the output string.
+    - After the loop, if the total number of bytes is not a multiple of 8, add a closing double quote to the output string.
+    - Return the formatted C-style string.
+- **Output**: A string representing the input byte sequence as a C-style string with hex-escaped characters, formatted for readability.
 
 
 ---
 ### bin2carr<!-- {{#callable:firedancer/contrib/codegen/cavp_generate.bin2carr}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L39>)
-
-Converts binary data into a C array initializer string.
+The `bin2carr` function converts a bytes object into a C array initializer string with formatted hexadecimal values.
 - **Inputs**:
-    - `data`: A bytes object containing the binary data to convert.
-- **Logic and Control Flow**:
-    - Asserts that the length of `data` is greater than 0.
-    - Initializes an empty string `out` to accumulate the C array initializer.
-    - Iterates over each byte `b` in `data` with its index `i`.
-    - For the first byte, does nothing special.
-    - For every 16th byte, appends a newline and a comma to `out`.
-    - For every 8th byte, appends a space and a comma to `out`.
-    - For all other bytes, appends a comma to `out`.
-    - Formats each byte `b` as a two-digit hexadecimal string prefixed by `_(` and appends it to `out`.
-- **Output**: A string representing the C array initializer with the given binary data.
+    - `data`: A bytes object containing the binary data to be converted into a C array initializer.
+- **Control Flow**:
+    - The function asserts that the input data is not empty.
+    - An empty string `out` is initialized to accumulate the C array initializer.
+    - The function iterates over each byte in the input data using `enumerate` to get both the index and the byte value.
+    - For the first byte, no prefix is added to the output string.
+    - For every 16th byte, a newline followed by a comma is added to the output string.
+    - For every 8th byte that is not the 16th, a comma followed by a space is added to the output string.
+    - For all other bytes, a comma is added to the output string.
+    - Each byte is formatted as a two-digit hexadecimal number prefixed by `_()` and appended to the output string.
+    - The function returns the accumulated string `out` as the C array initializer.
+- **Output**: A string representing the C array initializer with each byte formatted as a two-digit hexadecimal number prefixed by `_()`.
 
 
 ---
 ### \_find\_line\_match<!-- {{#callable:firedancer/contrib/codegen/cavp_generate._find_line_match}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L62>)
-
-Finds and returns the first line in an iterator that matches a given regular expression pattern.
+The function `_find_line_match` searches through an iterator of lines to find and return the first line that matches a given regular expression pattern.
 - **Inputs**:
-    - `lines`: An iterator over strings, representing lines to search through.
-    - `pat`: A compiled regular expression pattern to match against each line.
-- **Logic and Control Flow**:
-    - Iterate over each line in the provided `lines` iterator.
-    - For each line, attempt to match it against the provided regular expression pattern `pat`.
-    - If a match is found, return the match object immediately.
-    - If no match is found after all lines are checked, raise an `AssertionError` with the message 'failed to parse file'.
-- **Output**: A `re.Match` object representing the first successful match of the pattern in the lines.
+    - `lines`: An iterator of strings, where each string represents a line to be checked against the pattern.
+    - `pat`: A compiled regular expression pattern used to match against each line in the iterator.
+- **Control Flow**:
+    - Iterates over each line in the provided `lines` iterator.
+    - For each line, attempts to match it against the provided regular expression pattern `pat`.
+    - If a match is found, the function immediately returns the match object.
+    - If no match is found after all lines have been checked, an `AssertionError` is raised with the message 'failed to parse file'.
+- **Output**: The function returns a `re.Match` object representing the first successful match found in the lines, or raises an `AssertionError` if no match is found.
 
 
 ---
 ### parse\_msg\_rsp<!-- {{#callable:firedancer/contrib/codegen/cavp_generate.parse_msg_rsp}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L70>)
-
-Parses a CAVP response file to extract message tests and their corresponding digests.
+The `parse_msg_rsp` function parses a CAVP response file to extract message tests and returns a list of [`Msg`](#msg) objects containing the message and its digest.
 - **Inputs**:
-    - `file`: An iterable file object containing lines of a CAVP response file.
-- **Logic and Control Flow**:
-    - Initialize an iterator over the input file lines.
+    - `file`: An iterable file object representing a CAVP response file containing message tests.
+- **Control Flow**:
+    - Initialize an iterator over the lines of the input file.
     - Compile regular expressions to match message count, message size, message content, and message digest.
-    - Initialize an empty list `msgs` to store parsed messages.
-    - Extract the message count from the file using the `_match_msg_count` pattern.
-    - Iterate while `msg_count` is greater than zero:
-    -   - Extract the message size using the `_match_msg_sz` pattern.
-    -   - Extract the message content using the `_match_msg` pattern and convert it from hexadecimal to bytes, truncating to `msg_sz`.
-    -   - Extract the message digest using the `_match_md` pattern and convert it from hexadecimal to bytes.
-    -   - Create a [`Msg`](<#msg>) object with the message and digest, and append it to `msgs`.
-    -   - Decrement `msg_count` by one.
-    - Return the list `msgs` containing all parsed [`Msg`](<#msg>) objects.
-- **Output**: A list of [`Msg`](<#msg>) objects, each containing a message and its corresponding digest.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/cavp_generate._find_line_match`](<#_find_line_match>)
-    - [`firedancer/contrib/codegen/cavp_generate.Msg`](<#msg>)
+    - Initialize an empty list `msgs` to store parsed [`Msg`](#msg) objects.
+    - Extract the total number of messages (`msg_count`) from the file using the `_match_msg_count` pattern.
+    - Enter a loop that continues until all messages are parsed (`msg_count` > 0).
+    - Within the loop, extract the message size (`msg_sz`), message content (`msg`), and message digest (`md`) using the respective regular expressions.
+    - Convert the message and digest from hexadecimal to bytes and truncate the message to its specified size.
+    - Create a [`Msg`](#msg) object with the parsed message and digest, and append it to the `msgs` list.
+    - Decrement `msg_count` to process the next message.
+    - Return the list of [`Msg`](#msg) objects after all messages have been parsed.
+- **Output**: A list of [`Msg`](#msg) objects, each containing a message and its corresponding digest extracted from the CAVP response file.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/cavp_generate._find_line_match`](#_find_line_match)
+    - [`firedancer/contrib/codegen/cavp_generate.Msg`](#msg)
 
 
 ---
 ### \_main<!-- {{#callable:firedancer/contrib/codegen/cavp_generate._main}} -->
-[View Source →](<../../../../contrib/codegen/cavp_generate.py#L124>)
-
-Parses command-line arguments to generate C include files with SHA-2 test vectors from a CAVS response file.
+The `_main` function parses command-line arguments to generate C include files containing SHA-2 test vectors from a CAVS response file, outputting the result to stdout or a specified file.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Creates an argument parser with a description of the program's functionality.
-    - Adds arguments to the parser for the response file path, algorithm choice, test name, and optional output file.
-    - Parses the command-line arguments and stores them in the `args` variable.
-    - If an output file is specified, redirects `sys.stdout` to write to that file.
-    - Prints a header comment indicating the file is auto-generated and defines a macro for formatting bytes.
-    - Opens the specified response file and parses it to extract message test vectors using [`parse_msg_rsp`](<#parse_msg_rsp>).
-    - Initializes a [`HashMsgGenerator`](<#hashmsggenerator>) with the test name and test vector type based on the algorithm.
-    - Iterates over the parsed messages and writes each test vector using the [`HashMsgGenerator`](<#hashmsggenerator>).
-    - Calls the [`finish`](<#hashmsggeneratorfinish>) method of [`HashMsgGenerator`](<#hashmsggenerator>) to complete the test vector definition.
-    - Undefines the macro used for formatting bytes.
-- **Output**: Generates C include files with SHA-2 test vectors and writes them to stdout or a specified file.
-- **Functions Called**:
-    - [`firedancer/contrib/codegen/cavp_generate.parse_msg_rsp`](<#parse_msg_rsp>)
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](<#hashmsggenerator>)
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.write_test`](<#hashmsggeneratorwrite_test>)
-    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.finish`](<#hashmsggeneratorfinish>)
+- **Control Flow**:
+    - An `ArgumentParser` is created to handle command-line arguments, including `--rsp` for the response file path, `--alg` for the algorithm type, `--name` for the test name, and `--out` for the output file path.
+    - The parsed arguments are stored in `args`, and if `args.out` is specified, `sys.stdout` is redirected to the specified file.
+    - A header comment is printed to the output, indicating the file was auto-generated and specifying the response file name.
+    - The response file specified by `args.rsp` is opened and parsed using [`parse_msg_rsp`](#parse_msg_rsp) to extract message test vectors.
+    - A [`HashMsgGenerator`](#hashmsggenerator) object is instantiated with the test name and test vector type derived from the algorithm argument.
+    - For each message in the parsed response, [`write_test`](#hashmsggeneratorwrite_test) is called on the [`HashMsgGenerator`](#hashmsggenerator) to generate and print the test vector.
+    - After processing all messages, `gen.finish()` is called to finalize and print the test vector array.
+    - A macro definition `#define _(v)` is used to format bytes, and it is undefined at the end of the function.
+- **Output**: The function outputs a C include file containing static const SHA-2 test vectors, either to stdout or to a specified file.
+- **Functions called**:
+    - [`firedancer/contrib/codegen/cavp_generate.parse_msg_rsp`](#parse_msg_rsp)
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator`](#hashmsggenerator)
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.write_test`](#hashmsggeneratorwrite_test)
+    - [`firedancer/contrib/codegen/cavp_generate.HashMsgGenerator.finish`](#hashmsggeneratorfinish)
 
 
 

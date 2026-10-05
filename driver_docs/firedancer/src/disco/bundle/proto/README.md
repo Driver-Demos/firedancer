@@ -3,36 +3,36 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Protocol buffer definitions, nanopb-generated files, and build scripts for authentication, block engine, bundle, packet, shared, and timestamp operations.
+The `proto` folder in the `firedancer` codebase contains protocol buffer definitions, options, and automatically generated nanopb source and header files for handling various components such as authentication, block engine operations, bundles, packets, shared resources, and timestamps, along with build configuration files like `Makefile` and `Local.mk`.
 
 
 ## Files
-- **[auth.options](auth.options.md)**: Defines maximum sizes for authentication-related request and token fields.
-- **[auth.pb.c](auth.pb.c.md)**: Nanopb constant definitions for authentication protocol buffer messages.
-- **[auth.pb.h](auth.pb.h.md)**: Defines protocol buffer structures and enums for authentication challenges and token generation using nanopb.
-- **[auth.proto](auth.proto.md)**: Defines protobuf messages and services for generating and refreshing authentication tokens.
-- **[block_engine.options](block_engine.options.md)**: Defines the maximum length of the pubkey in BlockBuilderFeeInfoResponse as 44.
-- **[block_engine.pb.c](block_engine.pb.c.md)**: Nanopb-generated constant definitions for block engine protocol buffers.
-- **[block_engine.pb.h](block_engine.pb.h.md)**: Nanopb-generated header file defining protocol buffer message structures and encoding specifications for block engine operations.
-- **[block_engine.proto](block_engine.proto.md)**: Defines gRPC services for validators to subscribe to packet and bundle streams and retrieve fee info.
-- **[bundle.options](bundle.options.md)**: Defines a maximum size of 128 for bundle.BundleUuid.uuid.
-- **[bundle.pb.c](bundle.pb.c.md)**: Automatically generated nanopb constant definitions for bundle_Bundle and bundle_BundleUuid.
-- **[bundle.pb.h](bundle.pb.h.md)**: Nanopb-generated header for defining and initializing `bundle_Bundle` and `bundle_BundleUuid` structures.
-- **[bundle.proto](bundle.proto.md)**: Defines protobuf messages for a bundle with a header, packets, and a UUID.
-- **[Local.mk](Local.mk.md)**: Makefile for adding protobuf object files to the fd_disco target.
-- **[Makefile](Makefile.md)**: Build script for generating and cleaning Protocol Buffers files using Nanopb in the Firedancer project.
-- **[packet.options](packet.options.md)**: Defines maximum sizes for packet metadata address and packet data.
-- **[packet.pb.c](packet.pb.c.md)**: Automatically generated nanopb constant definitions for packet-related structures.
-- **[packet.pb.h](packet.pb.h.md)**: Nanopb-generated header file defining structures and encoding specifications for packet data.
-- **[packet.proto](packet.proto.md)**: Defines Protocol Buffers for packet batching and metadata, including flags and sender information.
-- **[shared.options](shared.options.md)**: Defines a shared socket IP with a maximum size of 64.
-- **[shared.pb.c](shared.pb.c.md)**: Automatically generated nanopb constant definitions for shared_Header, shared_Heartbeat, and shared_Socket.
-- **[shared.pb.h](shared.pb.h.md)**: Defines nanopb-generated structures and encoding specifications for shared message types like Header, Heartbeat, and Socket.
-- **[shared.proto](shared.proto.md)**: Defines protobuf messages for Header, Heartbeat, and Socket with timestamp and network details.
+- **[auth.options](auth.options.md)**: The `auth.options` file in the `firedancer` codebase defines the maximum sizes for various fields in authentication-related requests and responses, such as public keys, challenges, signed challenges, refresh tokens, and token values.
+- **[auth.pb.c](auth.pb.c.md)**: The `auth.pb.c` file in the `firedancer` codebase contains automatically generated nanopb constant definitions for various authentication-related protocol buffer messages.
+- **[auth.pb.h](auth.pb.h.md)**: The `auth.pb.h` file in the `firedancer` codebase is an automatically generated nanopb header that defines structures and enumerations for handling authentication challenges and tokens, including requests and responses for generating and refreshing authentication tokens.
+- **[auth.proto](auth.proto.md)**: The `auth.proto` file defines the protocol buffer messages and service for generating and refreshing authentication tokens in the `firedancer` codebase.
+- **[block_engine.options](block_engine.options.md)**: The `block_engine.options` file specifies a configuration option for the `BlockBuilderFeeInfoResponse` public key with a maximum length of 44 characters.
+- **[block_engine.pb.c](block_engine.pb.c.md)**: The `block_engine.pb.c` file contains automatically generated nanopb constant definitions for various request and response message bindings related to block engine operations in the `firedancer` codebase.
+- **[block_engine.pb.h](block_engine.pb.h.md)**: The `block_engine.pb.h` file in the `firedancer` codebase is an automatically generated nanopb header that defines protocol buffer message structures and their associated metadata for the block engine, including requests and responses for subscribing to packets and bundles, as well as block builder fee information.
+- **[block_engine.proto](block_engine.proto.md)**: The `block_engine.proto` file defines the protocol buffer messages and services for subscribing to packet and bundle streams, as well as retrieving block builder fee information, within the `block_engine` package of the `firedancer` codebase.
+- **[bundle.options](bundle.options.md)**: The `bundle.options` file in the `firedancer` codebase specifies a configuration option for `bundle.BundleUuid.uuid` with a maximum size of 128.
+- **[bundle.pb.c](bundle.pb.c.md)**: The `bundle.pb.c` file contains automatically generated nanopb constant definitions for the `firedancer` codebase, specifically for the `bundle` protocol buffer.
+- **[bundle.pb.h](bundle.pb.h.md)**: The `bundle.pb.h` file in the `firedancer` codebase is an automatically generated nanopb header that defines the structures and encoding specifications for protocol buffer messages related to bundles and their UUIDs.
+- **[bundle.proto](bundle.proto.md)**: The `bundle.proto` file defines protocol buffer messages for a `Bundle` containing a header and repeated packets, and a `BundleUuid` that includes a bundle and a UUID.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies object files related to protocol buffers for inclusion in the `fd_disco` build target.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/disco/bundle/proto` directory automates the generation and cleanup of protocol buffer source files using `nanopb_generator.py` for a set of specified proto files.
+- **[packet.options](packet.options.md)**: The `packet.options` file in the `firedancer` codebase specifies the maximum sizes for `packet.Meta.addr` and `packet.Packet.data` as 256 and 2048, respectively.
+- **[packet.pb.c](packet.pb.c.md)**: The `packet.pb.c` file contains automatically generated nanopb constant definitions for the `firedancer` codebase, specifically binding various packet-related structures.
+- **[packet.pb.h](packet.pb.h.md)**: The `packet.pb.h` file is an automatically generated nanopb header that defines structures and field specifications for handling packet data, metadata, and flags within the `firedancer` codebase.
+- **[packet.proto](packet.proto.md)**: The `packet.proto` file defines the structure of network packets and their metadata, including flags and sender information, for the `firedancer` project.
+- **[shared.options](shared.options.md)**: The `shared.options` file in the `firedancer` codebase specifies a configuration option for a shared socket with a maximum IP size of 64.
+- **[shared.pb.c](shared.pb.c.md)**: The `shared.pb.c` file contains automatically generated nanopb constant definitions for protocol buffer bindings in the `firedancer` codebase.
+- **[shared.pb.h](shared.pb.h.md)**: The `shared.pb.h` file is an automatically generated nanopb header that defines protobuf message structures and their encoding specifications for `shared_Header`, `shared_Heartbeat`, and `shared_Socket` in the `firedancer` codebase.
+- **[shared.proto](shared.proto.md)**: The `shared.proto` file defines protocol buffer messages for a `Header` with a timestamp, a `Heartbeat` with a count, and a `Socket` with an IP and port.
 - **[timestamp.options](timestamp.options.md)**: Empty file (no analyzable contents).
-- **[timestamp.pb.c](timestamp.pb.c.md)**: Automatically generated nanopb constant definitions for `google_protobuf_Timestamp`.
-- **[timestamp.pb.h](timestamp.pb.h.md)**: Nanopb header for the `google_protobuf_Timestamp` struct with encoding specifications and initializers.
-- **[timestamp.proto](timestamp.proto.md)**: Defines a protobuf message for a timestamp with seconds and nanoseconds fields.
+- **[timestamp.pb.c](timestamp.pb.c.md)**: The `timestamp.pb.c` file contains automatically generated nanopb constant definitions for the `google_protobuf_Timestamp` structure in the `firedancer` codebase.
+- **[timestamp.pb.h](timestamp.pb.h.md)**: The `timestamp.pb.h` file is an automatically generated nanopb header for the `google_protobuf_Timestamp` struct, which includes fields for seconds and nanoseconds, and provides encoding specifications for use with nanopb in the `firedancer` codebase.
+- **[timestamp.proto](timestamp.proto.md)**: The `timestamp.proto` file defines a Protocol Buffers message for representing a timestamp with seconds and nanoseconds fields.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

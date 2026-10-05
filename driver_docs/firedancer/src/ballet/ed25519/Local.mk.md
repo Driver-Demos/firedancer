@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for cryptographic operations in the fd_ballet module.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and fuzz tests for the `ed25519` module within the `ballet` directory.
 
 # Purpose
-The Makefile content defines build and test instructions for cryptographic components related to the Curve25519 and Ed25519 algorithms. It uses macros to add header files and object files to the build process, specifically for files like `fd_ed25519.h` and `fd_curve25519_scalar`. The file also specifies unit tests for various components, such as `test_ed25519` and `test_x25519`, and includes instructions to run these tests. Additionally, if the `FD_HAS_HOSTED` condition is met, the file includes fuzz testing for Ed25519 verification functions, enhancing the robustness of the cryptographic verification process. The use of `$(call ...)` indicates a modular approach to managing build and test tasks within the Makefile.
+The provided content is from a Makefile, which is used to automate the build process of a software project. This particular Makefile snippet is focused on cryptographic components, specifically related to the Ed25519 and X25519 algorithms, as well as Curve25519 and Ristretto255. The `add-hdrs` and `add-objs` functions are used to include header files and object files, respectively, into the build process, indicating the files necessary for compiling the cryptographic modules. The `make-unit-test` and `run-unit-test` functions define and execute unit tests for these cryptographic components, ensuring their correctness and reliability. Additionally, conditional fuzz testing is set up with `make-fuzz-test` for Ed25519 verification functions, which is executed if the `FD_HAS_HOSTED` variable is defined, allowing for robustness testing under various input conditions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
