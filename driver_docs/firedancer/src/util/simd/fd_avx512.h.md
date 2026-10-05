@@ -3,10 +3,25 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-AVX512 vector wrapper constants and type-specific SIMD APIs for ints, uints, longs, ulongs, bytes, and ushorts
+API for vectorized C/C++ code using AVX512 intrinsics for various data types and operations.
 
 # Purpose
-This header file defines the AVX512 wrapper interface for vectorized programming on targets that support `FD_HAS_AVX512`. It sets common lane, size, and alignment constants such as `WW_WIDTH`, `WW_FOOTPRINT`, and `WW_ALIGN`, then includes the type-specific wrapper headers for `int`, `uint`, `long`, `ulong`, `uchar`, and `ushort` vector operations. The file acts as a single entry point for the AVX512 SIMD API and enforces a build-time error when the target does not support these wrappers.
+The code is a C header file that provides an API for writing vectorized C/C++ code using Intel's AVX512 intrinsics. It is designed to facilitate operations on 16-wide 32-bit integers, unsigned integers, and floats, as well as 8-wide 64-bit doubles, longs, and unsigned longs. The API also supports logical operations with 16- or 8-wide vectors. The purpose of this API is to offer a fast, vectorized equivalent for typical C/C++ operations on these data types, often reducing them to a single assembly instruction. This allows developers to convert scalar implementations into optimized vectorized implementations efficiently.
+
+The header file includes several components that support different data types, such as vector int, uint, long, ulong, uchar, and ushort. It acts as a thin wrapper around Intel's AVX512 intrinsics, providing a more consistent type system and semantics for mixed type and width vectorized code. The API also includes mechanisms to handle cross-lane data motion and transitions between scalar and vector code. Additionally, it is designed to be portable, allowing code written with this API to be adapted for non-Intel architectures by implementing the wrappers for the target platform. The file includes necessary headers and defines constants related to vector width, footprint, and alignment, which are crucial for aligned operations.
+# Imports and Dependencies
+
+---
+- `../bits/fd_bits.h`
+- `x86intrin.h`
+- `fd_avx512_wwi.h`
+- `fd_avx512_wwu.h`
+- `fd_avx512_wwl.h`
+- `fd_avx512_wwv.h`
+- `fd_avx512_wwb.h`
+- `fd_avx512_wwh.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

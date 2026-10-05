@@ -3,173 +3,188 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_avx512_wwv.h` file in the `firedancer` codebase provides a set of macros and inline functions for manipulating 512-bit wide vectors of unsigned 64-bit integers using AVX-512 instructions, including operations for construction, arithmetic, binary operations, comparisons, and conversions.
+Defines macros and inline functions for AVX-512 vector operations on unsigned 64-bit integers.
 
 # Purpose
-This C source code file provides a specialized set of macros and inline functions for handling vector operations using AVX-512 SIMD (Single Instruction, Multiple Data) instructions, specifically targeting operations on vectors of unsigned 64-bit integers (ulongs). The file defines a type `wwv_t` as a vector of 512 bits, which can hold eight 64-bit unsigned integers. It includes a variety of operations such as vector construction, memory loading and storing, arithmetic operations (addition, subtraction, multiplication), binary operations (bitwise AND, OR, XOR), and comparison operations. The code is designed to leverage the AVX-512 instruction set to perform these operations efficiently in parallel, which is particularly useful in high-performance computing scenarios where processing large datasets or performing complex calculations quickly is essential.
+The code defines a set of macros and inline functions for operations on 512-bit wide vectors using AVX-512 intrinsics. It focuses on handling vectors of unsigned 64-bit integers, referred to as `wwv_t`. The code provides a comprehensive API for constructing, manipulating, and performing arithmetic, binary, and comparison operations on these vectors. It includes constructors for creating vectors, predefined constants, memory operations for loading and storing vectors, and a variety of arithmetic operations such as addition, subtraction, multiplication, and more. Additionally, it provides binary operations like bitwise AND, OR, XOR, and shift operations, as well as conditional operations and conversions between different data types.
 
-The file is intended to be included indirectly through another header file (`fd_avx512.h`), as indicated by the preprocessor directive at the beginning. This suggests that it is part of a larger library or framework that provides SIMD utilities. The macros and inline functions defined here are designed to be robust and efficient, minimizing the risk of compiler optimizations interfering with the intended operations. The file does not define a public API or external interfaces directly but provides low-level building blocks that can be used to implement higher-level functionality. The use of macros over static inline functions where possible indicates a focus on performance and reducing overhead, which is critical in SIMD operations.
+The code is intended to be included indirectly through another header file, as indicated by the initial preprocessor directive. It is designed to be used in environments that support AVX-512 instructions, providing efficient vectorized operations for high-performance computing tasks. The use of macros and inline functions aims to optimize performance by reducing function call overhead and allowing the compiler to better optimize the code. The code also includes utility functions for vector permutation, selection, and transposition, which are useful for complex data manipulation tasks.
 # Global Variables
 
 ---
 ### \_wwv\_transpose\_t0
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t0` is a temporary variable of type `wwv_t`, which is defined as a vector of 64-bit unsigned integers using the AVX-512 intrinsic type `__m512i`. It is used in the process of transposing an 8x8 matrix of unsigned long integers, specifically during the outer 4x4 transpose of 2x2 blocks.
-- **Use**: This variable is used to store intermediate results during the matrix transposition operation, facilitating the rearrangement of data blocks.
+- **Type**: ``wwv_t``
+- **Description**: Holds the result of a shuffle operation on two `wwv_t` vectors, `_wwv_transpose_r0` and `_wwv_transpose_r2`, using the `_mm512_shuffle_i64x2` intrinsic with a control mask of `0x88`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
+- **Use**: Used in the `wwv_transpose_8x8` macro to perform an outer 4x4 transpose of 2x2 blocks.
 
 
 ---
 ### \_wwv\_transpose\_t1
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t1` is a vector of type `wwv_t`, which is an alias for `__m512i`, representing a 512-bit integer vector. It is initialized using the `_mm512_shuffle_i64x2` intrinsic, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r1` and `_wwv_transpose_r3`, according to the control mask `0x88`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
-- **Use**: This variable is used as an intermediate step in the outer 4x4 transpose of 2x2 blocks within the `wwv_transpose_8x8` macro.
+- **Type**: ``wwv_t``
+- **Description**: The variable `_wwv_transpose_t1` is a vector of type `wwv_t`, which is defined as `__m512i`. It is initialized using the `_mm512_shuffle_i64x2` intrinsic function, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r1` and `_wwv_transpose_r3`, according to the control mask `0x88`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
+- **Use**: Used in the process of transposing an 8x8 matrix of unsigned 64-bit integers by shuffling elements from two vectors.
 
 
 ---
 ### \_wwv\_transpose\_t2
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t2` is a global variable of type `wwv_t`, which is defined as a vector of 64-bit unsigned integers using the AVX-512 intrinsic type `__m512i`. It is initialized using the `_mm512_shuffle_i64x2` intrinsic function, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r0` and `_wwv_transpose_r2`, according to the control mask `0xdd`.
-- **Use**: This variable is used in the process of transposing an 8x8 matrix of unsigned long integers, specifically in the outer 4x4 transpose of 2x2 blocks.
+- **Type**: ``wwv_t``
+- **Description**: The `_wwv_transpose_t2` variable is a vector of type `wwv_t`, which is defined as `__m512i`. It is initialized using the `_mm512_shuffle_i64x2` intrinsic function, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r0` and `_wwv_transpose_r2`, according to the control mask `0xdd`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
+- **Use**: Used in the `wwv_transpose_8x8` macro to perform a shuffle operation as part of transposing matrix rows into columns.
 
 
 ---
 ### \_wwv\_transpose\_t3
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t3` is a vector of type `wwv_t`, which is an alias for `__m512i`, representing a 512-bit integer vector. It is initialized using the `_mm512_shuffle_i64x2` intrinsic, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r1` and `_wwv_transpose_r3`, based on the control mask `0xdd`.
-- **Use**: This variable is used in the process of transposing an 8x8 matrix of unsigned 64-bit integers, specifically during the outer 4x4 transpose of 2x2 blocks.
+- **Type**: ``wwv_t``
+- **Description**: The variable `_wwv_transpose_t3` is a vector of type `wwv_t`, which is defined as `__m512i`. It is initialized using the `_mm512_shuffle_i64x2` intrinsic function, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r1` and `_wwv_transpose_r3`, according to the control mask `0xdd`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned long integers.
+- **Use**: Used in the `wwv_transpose_8x8` macro to perform a shuffle operation on vectors as part of a matrix transposition.
 
 
 ---
 ### \_wwv\_transpose\_t4
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t4` is a vector of type `wwv_t`, which is an alias for `__m512i`, representing a 512-bit integer vector. It is initialized using the `_mm512_shuffle_i64x2` intrinsic, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r4` and `_wwv_transpose_r6`, according to the control mask `0x88`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
-- **Use**: This variable is used in the process of transposing an 8x8 matrix of unsigned 64-bit integers by shuffling elements between vectors.
+- **Type**: ``wwv_t``
+- **Description**: A vector data type where each adjacent pair of 32-bit wide lanes holds an unsigned 64-bit integer. It is used to perform SIMD operations on 64-bit unsigned integers.
+- **Use**: Used to store the result of a shuffle operation on vectors `_wwv_transpose_r4` and `_wwv_transpose_r6` with a control mask `0x88`.
 
 
 ---
 ### \_wwv\_transpose\_t5
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t5` is a vector of type `wwv_t`, which is an alias for `__m512i`, representing a 512-bit integer vector. It is initialized using the `_mm512_shuffle_i64x2` intrinsic, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r5` and `_wwv_transpose_r7`, according to the control mask `0x88`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
-- **Use**: `_wwv_transpose_t5` is used in the process of transposing an 8x8 matrix by shuffling elements from two vectors to form part of the transposed matrix.
+- **Type**: ``wwv_t``
+- **Description**: The variable `_wwv_transpose_t5` is a vector of type `wwv_t`, which is defined as `__m512i`. It is initialized using the `_mm512_shuffle_i64x2` intrinsic function, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r5` and `_wwv_transpose_r7`, according to the control mask `0x88`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
+- **Use**: Used in the process of transposing an 8x8 matrix of unsigned 64-bit integers by shuffling elements from two vectors.
 
 
 ---
 ### \_wwv\_transpose\_t6
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t6` is a vector of type `wwv_t`, which is defined as `__m512i`, a 512-bit integer vector type used in AVX-512 operations. It is initialized using the `_mm512_shuffle_i64x2` intrinsic, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r4` and `_wwv_transpose_r6`, according to the control mask `0xdd`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
-- **Use**: This variable is used in the process of transposing an 8x8 matrix of unsigned 64-bit integers by shuffling elements from two source vectors.
+- **Type**: ``wwv_t``
+- **Description**: Holds the result of a shuffle operation on two `wwv_t` vectors, `_wwv_transpose_r4` and `_wwv_transpose_r6`, using the `_mm512_shuffle_i64x2` intrinsic with a control mask of `0xdd`. This operation is part of a larger process to transpose an 8x8 matrix of unsigned 64-bit integers.
+- **Use**: Used in the `wwv_transpose_8x8` macro to assist in transposing matrix rows into columns.
 
 
 ---
 ### \_wwv\_transpose\_t7
-- **Type**: `wwv_t`
-- **Description**: The variable `_wwv_transpose_t7` is a global variable of type `wwv_t`, which is defined as a vector of 64-bit unsigned integers using the AVX-512 intrinsic type `__m512i`. It is initialized using the `_mm512_shuffle_i64x2` intrinsic function, which shuffles 64-bit integers from two source vectors, `_wwv_transpose_r5` and `_wwv_transpose_r7`, according to the control mask `0xdd`.
-- **Use**: This variable is used in the process of transposing an 8x8 matrix of unsigned long integers, specifically as part of the intermediate steps in the `wwv_transpose_8x8` macro.
+- **Type**: ``wwv_t``
+- **Description**: Holds the result of a shuffle operation on two vectors, `_wwv_transpose_r5` and `_wwv_transpose_r7`, using the `_mm512_shuffle_i64x2` intrinsic with a control mask of `0xdd`. This operation is part of a larger 8x8 matrix transpose process.
+- **Use**: Used in the `wwv_transpose_8x8` macro to assist in transposing an 8x8 matrix of unsigned long integers.
 
 
 # Functions
 
 ---
 ### wwv\_ld<!-- {{#callable:wwv_ld}} -->
-The `wwv_ld` function loads a 512-bit vector of eight 64-bit unsigned integers from a 64-byte aligned memory location.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L52>)
+
+Loads a 512-bit vector of unsigned 64-bit integers from a 64-byte aligned memory address.
 - **Inputs**:
-    - `m`: A pointer to a constant unsigned long integer array, which must be 64-byte aligned, from which the vector will be loaded.
-- **Control Flow**:
-    - The function uses the intrinsic `_mm512_load_epi64` to load a 512-bit vector from the memory location pointed to by `m`.
-- **Output**: The function returns a `wwv_t` type, which is a 512-bit vector containing eight 64-bit unsigned integers loaded from the specified memory location.
+    - `m`: A pointer to a constant unsigned long integer array, which must be 64-byte aligned.
+- **Logic and Control Flow**:
+    - Calls the `_mm512_load_epi64` intrinsic function to load data from the memory address pointed to by `m`.
+- **Output**: Returns a `wwv_t` type, which is a 512-bit vector containing the loaded unsigned 64-bit integers.
 
 
 ---
 ### wwv\_st<!-- {{#callable:wwv_st}} -->
-The `wwv_st` function stores the contents of a vector of unsigned 64-bit integers into a memory location.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L53>)
+
+Stores the elements of a `wwv_t` vector into a memory location.
 - **Inputs**:
-    - `m`: A pointer to a memory location where the vector's contents will be stored; it should be 64-byte aligned.
-    - `x`: A vector of type `wwv_t` containing eight unsigned 64-bit integers to be stored.
-- **Control Flow**:
-    - The function uses the intrinsic `_mm512_store_epi64` to store the vector `x` into the memory location pointed to by `m`.
-- **Output**: The function does not return a value; it performs a side effect by storing data in the memory location pointed to by `m`.
+    - ``m``: A pointer to a memory location where the elements of the vector will be stored. It must be 64-byte aligned.
+    - ``x``: A `wwv_t` vector containing the elements to store.
+- **Logic and Control Flow**:
+    - Uses the `_mm512_store_epi64` intrinsic to store the 64-bit integer elements of the `wwv_t` vector `x` into the memory location pointed to by `m`.
+    - The operation stores the elements in the order `m[0] = x0, m[1] = x1, ..., m[7] = x7`.
+- **Output**: No return value; the function performs a side effect by modifying the memory location pointed to by `m`.
 
 
 ---
 ### wwv\_ldu<!-- {{#callable:wwv_ldu}} -->
-The `wwv_ldu` function loads a 512-bit vector of unsigned 64-bit integers from an unaligned memory address.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L55>)
+
+Loads a 512-bit vector of unsigned 64-bit integers from memory with arbitrary alignment.
 - **Inputs**:
-    - `m`: A pointer to the memory location from which the 512-bit vector of unsigned 64-bit integers is to be loaded.
-- **Control Flow**:
-    - The function uses the `_mm512_loadu_epi64` intrinsic to load a 512-bit vector from the memory address pointed to by `m`.
-    - The intrinsic allows loading from an unaligned memory address, which means `m` does not need to be 64-byte aligned.
-- **Output**: A `wwv_t` type, which is a 512-bit vector containing eight unsigned 64-bit integers loaded from the specified memory location.
+    - `m`: A pointer to the memory location from which to load the vector.
+- **Logic and Control Flow**:
+    - Uses the `_mm512_loadu_epi64` intrinsic to load a 512-bit vector from the memory location pointed to by `m`.
+- **Output**: Returns a `wwv_t` type, which is a 512-bit vector containing eight unsigned 64-bit integers loaded from the specified memory location.
 
 
 ---
 ### wwv\_stu<!-- {{#callable:wwv_stu}} -->
-The `wwv_stu` function stores a 512-bit vector of unsigned 64-bit integers into a memory location with arbitrary alignment.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L56>)
+
+Stores the 512-bit vector `x` into memory at location `m` without alignment restrictions.
 - **Inputs**:
-    - `m`: A pointer to the memory location where the vector will be stored; it can have arbitrary alignment.
-    - `x`: A `wwv_t` type, which is a 512-bit vector containing eight unsigned 64-bit integers to be stored.
-- **Control Flow**:
-    - The function uses the `_mm512_storeu_epi64` intrinsic to store the vector `x` into the memory location pointed to by `m`.
-- **Output**: The function does not return any value; it performs a side effect by storing data into the memory location pointed to by `m`.
+    - `m`: A pointer to the memory location where the vector `x` will be stored. The memory does not need to be aligned.
+    - `x`: A `wwv_t` type vector containing eight 64-bit unsigned integers to be stored in memory.
+- **Logic and Control Flow**:
+    - Uses the `_mm512_storeu_epi64` intrinsic to store the vector `x` into the memory location pointed to by `m`.
+- **Output**: No return value; the function performs a memory store operation.
 
 
 ---
 ### wwv\_rol\_variable<!-- {{#callable:wwv_rol_variable}} -->
-The `wwv_rol_variable` function performs a variable left rotation on each 64-bit lane of a 512-bit vector of unsigned long integers.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L98>)
+
+Performs a variable left rotation on each 64-bit lane of a vector of unsigned 64-bit integers.
 - **Inputs**:
-    - `a`: A 512-bit vector (`wwv_t`) containing eight 64-bit unsigned long integers to be rotated.
-    - `n`: An unsigned long integer specifying the number of positions to rotate each 64-bit lane to the left.
-- **Control Flow**:
-    - The function calculates `n & 63UL` to ensure the rotation amount is within the range of 0 to 63, as each lane is 64 bits wide.
-    - It performs a left shift on the vector `a` by `n & 63UL` positions using `wwv_shl`.
-    - It performs a right shift on the vector `a` by `(-n) & 63UL` positions using `wwv_shr`, effectively calculating the equivalent right shift for the left rotation.
-    - The results of the left and right shifts are combined using a bitwise OR operation (`wwv_or`) to complete the rotation.
-- **Output**: A 512-bit vector (`wwv_t`) where each 64-bit lane has been left-rotated by `n` positions.
+    - `a`: A vector of unsigned 64-bit integers (`wwv_t`) to rotate.
+    - `n`: An unsigned long integer specifying the number of positions to rotate left.
+- **Logic and Control Flow**:
+    - Compute the left shift of `a` by `n & 63UL` positions using `wwv_shl`.
+    - Compute the right shift of `a` by `(-n) & 63UL` positions using `wwv_shr`.
+    - Combine the results of the left and right shifts using a bitwise OR operation with `wwv_or`.
+- **Output**: Returns a `wwv_t` vector where each 64-bit lane is rotated left by `n` positions.
 
 
 ---
 ### wwv\_ror\_variable<!-- {{#callable:wwv_ror_variable}} -->
-The `wwv_ror_variable` function performs a variable right rotation on a vector of unsigned 64-bit integers.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L99>)
+
+Performs a variable right rotation on a vector of unsigned 64-bit integers.
 - **Inputs**:
-    - `a`: A vector of unsigned 64-bit integers (wwv_t) to be rotated.
-    - `n`: An unsigned long integer specifying the number of positions to rotate the vector to the right.
-- **Control Flow**:
-    - The function calculates the effective number of positions to rotate by taking the bitwise AND of n with 63 (n & 63UL).
-    - It performs a right shift on the vector 'a' by the calculated number of positions using `wwv_shr`.
-    - It performs a left shift on the vector 'a' by the negative of the calculated number of positions using `wwv_shl`.
-    - The results of the right and left shifts are combined using a bitwise OR operation with `wwv_or`.
-    - The combined result is returned as the output of the function.
-- **Output**: A vector of unsigned 64-bit integers (wwv_t) that is the result of rotating the input vector 'a' to the right by 'n' positions.
+    - `a`: A `wwv_t` vector containing unsigned 64-bit integers to rotate.
+    - `n`: An `ulong` value specifying the number of positions to rotate the vector elements to the right.
+- **Logic and Control Flow**:
+    - Calculates `n & 63UL` to ensure the rotation amount is within the range of 0 to 63.
+    - Performs a right logical shift on vector `a` by `n & 63UL` positions using `wwv_shr`.
+    - Performs a left logical shift on vector `a` by `(-n) & 63UL` positions using `wwv_shl`.
+    - Combines the results of the two shifts using a bitwise OR operation with `wwv_or`.
+- **Output**: Returns a `wwv_t` vector where each element is right-rotated by `n` positions.
 
 
 ---
 ### wwv\_rol\_vector<!-- {{#callable:wwv_rol_vector}} -->
-The `wwv_rol_vector` function performs a bitwise left rotation on each 64-bit lane of a vector `a` by the corresponding amount specified in vector `b`, using AVX-512 intrinsics.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L101>)
+
+Performs a bitwise left rotation on each 64-bit element of vector `a` by the corresponding amount specified in vector `b`.
 - **Inputs**:
-    - `a`: A vector of type `wwv_t` containing 64-bit unsigned integers to be rotated.
-    - `b`: A vector of type `wwv_t` containing the rotation amounts for each corresponding lane in vector `a`.
-- **Control Flow**:
-    - Create a mask `m` with all lanes set to 63 using `wwv_bcast(63UL)` to ensure rotation amounts are within valid range.
-    - Compute the bitwise AND of vector `b` and mask `m` to get valid left rotation amounts for each lane.
-    - Compute the bitwise AND of the negation of vector `b` and mask `m` to get valid right rotation amounts for each lane.
-    - Perform a left shift on vector `a` by the computed left rotation amounts using `wwv_shl_vector`.
-    - Perform a right shift on vector `a` by the computed right rotation amounts using `wwv_shr_vector`.
-    - Combine the results of the left and right shifts using a bitwise OR operation with `wwv_or` to achieve the final rotated vector.
-- **Output**: The function returns a vector of type `wwv_t` where each 64-bit lane has been left-rotated by the corresponding amount specified in vector `b`.
+    - `a`: A vector of type `wwv_t` containing 64-bit unsigned integers to rotate.
+    - `b`: A vector of type `wwv_t` containing the rotation amounts for each corresponding element in `a`.
+- **Logic and Control Flow**:
+    - Broadcasts the constant value `63UL` to all elements of a vector `m` using `wwv_bcast` to ensure rotation amounts are within 0 to 63.
+    - Performs a bitwise AND operation between vector `b` and `m` to limit the rotation amounts to the range 0-63.
+    - Shifts each element of vector `a` to the left by the corresponding element in the modified `b` using `wwv_shl_vector`.
+    - Negates each element of vector `b` using `wwv_neg` and performs a bitwise AND with `m` to prepare for the right shift operation.
+    - Shifts each element of vector `a` to the right by the corresponding element in the modified negated `b` using `wwv_shr_vector`.
+    - Combines the results of the left and right shifts using a bitwise OR operation with `wwv_or` to complete the rotation.
+- **Output**: Returns a vector of type `wwv_t` where each element is the result of rotating the corresponding element in `a` left by the amount specified in `b`.
 
 
 ---
 ### wwv\_ror\_vector<!-- {{#callable:wwv_ror_vector}} -->
-The `wwv_ror_vector` function performs a bitwise right rotation on each 64-bit integer in a vector by a variable amount specified by another vector.
+[View Source →](<../../../../../src/util/simd/fd_avx512_wwv.h#L106>)
+
+Performs a bitwise right rotation on each 64-bit element of vector `a` by the corresponding element in vector `b`.
 - **Inputs**:
-    - `a`: A vector of 64-bit unsigned integers to be rotated.
-    - `b`: A vector specifying the number of positions to rotate each corresponding integer in vector 'a'.
-- **Control Flow**:
-    - Create a mask vector 'm' with all elements set to 63, which is used to ensure the rotation amount is within the valid range of 0 to 63 bits.
-    - Perform a bitwise AND between vector 'b' and the mask 'm' to get the effective right rotation amounts for each element.
-    - Shift each element in vector 'a' to the right by the effective rotation amounts using `wwv_shr_vector`.
-    - Negate vector 'b', perform a bitwise AND with the mask 'm', and shift each element in vector 'a' to the left by these amounts using `wwv_shl_vector`.
-    - Combine the results of the right and left shifts using a bitwise OR to complete the rotation.
-- **Output**: A vector of 64-bit unsigned integers, where each element is the result of rotating the corresponding element in 'a' to the right by the amount specified in 'b'.
+    - `a`: A vector of type `wwv_t` containing 64-bit unsigned integers to be rotated.
+    - `b`: A vector of type `wwv_t` containing 64-bit unsigned integers that specify the number of positions to rotate each corresponding element in `a`.
+- **Logic and Control Flow**:
+    - Broadcasts the constant value `63UL` to all elements of a vector `m` using `wwv_bcast` to ensure shifts are within 0-63 range.
+    - Performs a bitwise AND operation between `b` and `m` to mask the shift amount, ensuring it is within the valid range.
+    - Shifts each element of `a` right by the masked amount using `wwv_shr_vector`.
+    - Negates each element of `b` and performs a bitwise AND with `m` to calculate the left shift amount.
+    - Shifts each element of `a` left by the calculated amount using `wwv_shl_vector`.
+    - Combines the results of the right and left shifts using a bitwise OR operation with `wwv_or` to complete the rotation.
+- **Output**: Returns a vector of type `wwv_t` where each element is the result of the right rotation of the corresponding element in `a` by the amount specified in `b`.
 
 
 

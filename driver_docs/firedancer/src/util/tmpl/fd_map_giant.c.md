@@ -3,30 +3,48 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header-only giant dynamic key-value map with IPC, persistence, and iteration support.
+Generates high-performance dynamic key-value maps of large size with features for persistence, concurrency, and memory efficiency.
 
 # Purpose
-This file defines a macro-based template for a giant dynamic key-value map in C. It generates a named map type and a set of APIs for creation, join and leave of shared memory, deletion, insert, remove, query, iteration, and verification. The map is designed for large data sets and supports use across process boundaries, relocation in memory, and persistence. It stores elements in a flat array and uses hash chains plus a free stack to manage entries with low memory overhead.
+The code is a template for generating high-performance dynamic key-value maps in C, designed to handle large data sizes and support various advanced features. It provides a mechanism to create, manage, and manipulate maps that can persist beyond the lifetime of the creating process, be used concurrently, and support inter-process communication (IPC). The maps are memory-efficient and can be serialized, deserialized, and relocated in memory. The code allows for the customization of key types, hashing functions, and comparison functions, making it flexible for different use cases.
 
-The file also provides inline helper functions and implementation code, depending on `MAP_IMPL_STYLE`. It exposes key operations such as `MAP_KEY_EQ`, `MAP_KEY_HASH`, and `MAP_KEY_COPY` through generated wrappers, and it can memoize hashes when `MAP_MEMOIZE` is enabled. The implementation uses a private metadata block before the element array, a magic value for validation, and tagged `next` values to distinguish free and used entries. Iteration support scans the full key space in a stable random order, and `verify` checks the internal structure for obvious corruption.
-# Function Declarations (Public API)
+The template defines a set of macros and functions to manage the lifecycle of the map, including creation (`mymap_new`), joining (`mymap_join`), leaving (`mymap_leave`), and deletion (`mymap_delete`). It also provides functions for inserting (`mymap_insert`), removing (`mymap_remove`), and querying (`mymap_query`) keys in the map. The map supports iteration over keys and includes safety checks to ensure data integrity. The code is structured to allow for header-only usage or separate compilation units, making it suitable for integration into larger projects. The template uses macros to define the map's behavior, allowing users to generate different types of maps by including the template with specific configurations.
+# Imports and Dependencies
 
 ---
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
-- `MAP_`
+- `../log/fd_log.h`
+
+
+# Global Variables
+
+---
+### MAP\_
+- **Type**: `MAP_`
+- **Description**: `MAP_` is a macro used to generate function and type names for a dynamic key-value map implementation. It is used to concatenate the `MAP_NAME` with other identifiers to create unique names for map-related functions and types.
+- **Use**: Used to create unique identifiers for map functions and types by concatenating `MAP_NAME` with other components.
+
+
+# Functions
+
+---
+### MAP\_<!-- {{#callable:MAP_}} -->
+[View Source →](<../../../../../src/util/tmpl/fd_map_giant.c#L1018>)
+
+Removes a key from a map and returns the corresponding element if found.
+- **Inputs**:
+    - ``join``: A pointer to the map from which to remove the key.
+    - ``key``: A pointer to the key to remove from the map.
+- **Logic and Control Flow**:
+    - Retrieve the map's private structure using the `join` pointer.
+    - Calculate the hash of the key using `MAP_KEY_HASH` and the map's seed.
+    - Determine the head of the list where the key might be located using the hash and the map's list count.
+    - Iterate through the list starting from the head to find the element with the matching key.
+    - If the element is found, remove it from the list by updating the current pointer to skip the element.
+    - Push the removed element onto the free stack and decrement the map's key count.
+    - Return the removed element if found, otherwise return `NULL`.
+- **Output**: Returns a pointer to the removed element if the key is found, otherwise returns `NULL`.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
