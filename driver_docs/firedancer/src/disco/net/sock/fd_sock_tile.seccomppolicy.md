@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp policy for socket tile network I/O and logging syscalls.
+Defines seccomp policy rules for logging and network packet transmission and reception.
 
 # Purpose
-This file defines file descriptor variables and syscall filters used to control network and logging activity. The `logfile_fd`, `tx_fd`, `rx_fd0`, and `rx_fd1` values identify the descriptors used for log output, packet transmit, and packet receive operations. The `ppoll`, `recvmmsg`, and `sendmmsg` rules restrict network calls by checking descriptor ranges, message count limits, and required flags such as `MSG_DONTWAIT`. The `write` and `fsync` rules allow log messages to go to the STDERR pipe or the log file, and they force log data to be written to disk through the log file descriptor.
+The content defines a set of rules and configurations for handling network communication and logging within a software system. It specifies file descriptors for logging (`logfile_fd`), transmission (`tx_fd`), and reception (`rx_fd0`, `rx_fd1`) of data. The `ppoll` function is used to check for network completions, while `recvmmsg` and `sendmmsg` functions manage the receipt and transmission of network packets, respectively, with specific conditions on arguments such as file descriptors and message flags. Logging is configured to write all messages to a log file, with messages of 'WARNING' level and above also directed to the STDERR pipe. The `write` function ensures that log messages are written to the correct file descriptors, and the `fsync` function is used to immediately synchronize 'WARNING' level messages and above to disk, ensuring data integrity.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

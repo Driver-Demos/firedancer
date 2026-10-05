@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Signs replayed transactions and sends them to leader, gossip, and dedup outputs.
+Signs and sends single-signature transactions to the current leader.
 
 
 ## Files
-- **[fd_sender_tile.c](fd_sender_tile.c.md)**: Signs replayed transactions and sends them to the leader, gossip, and dedup outputs.
+- **[fd_sender_tile.c](fd_sender_tile.c.md)**: Signs and sends transactions to the current leader, supporting only single-signature transactions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
