@@ -3,83 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a transaction cost model for consensus, detailing cost components and computing total transaction costs.
+Transaction cost model constants and cost computation for signatures, writes, instructions, and votes.
 
 # Purpose
-The code in this file is a C header file that defines a transaction cost model for a blockchain consensus mechanism. It includes several components that contribute to the total transaction cost, such as per-signature costs, per-write-lock costs, instruction data length costs, built-in execution costs, BPF execution costs, and loaded accounts data costs. These components are summed to determine the total transaction cost. The file also defines constants and structures necessary for calculating these costs, including a perfect hash table for efficient lookup of built-in program costs.
+`fd_pack_cost.h` defines the transaction cost model used by the pack stage. It contains the constants and lookup data needed to price transaction signatures, writable accounts, instruction data, built-in programs, BPF execution, and loaded account data. The file also defines the consensus-related cost limits and the fixed cost for simple vote transactions. A perfect hash table is built in the header to map known built-in program IDs to their per-instruction cost.
 
-The file provides a function, [`fd_pack_compute_cost`](<#fd_pack_compute_cost>), which calculates the total cost of a transaction. This function considers various factors, such as the number of signatures, writable accounts, instruction data size, and execution costs. It also handles special cases, such as simple vote transactions, which have a fixed cost. The function returns the total transaction cost and can optionally provide additional details, such as execution cost and precompile signature count. The header file includes several macros and constants that are critical for maintaining consensus and ensuring that transaction costs are calculated consistently across the network.
-# Imports and Dependencies
-
----
-- `../../ballet/fd_ballet_base.h`
-- `fd_compute_budget_program.h`
-- `../../flamenco/runtime/fd_system_ids_pp.h`
-- `../../ballet/txn/fd_txn.h`
-- `../../util/tmpl/fd_map_perfect.c`
-
-
-# Global Variables
-
----
-### FD\_PACK\_SIMPLE\_VOTE\_COST
-- **Type**: ``ulong``
-- **Description**: Represents the fixed cost of a simple vote transaction in the transaction cost model. It is calculated by summing the costs of a signature, two writable accounts, default compute units for a vote, and an instruction data cost of 8.
-- **Use**: Used to determine the cost of simple vote transactions, which have a fixed cost regardless of execution or account data loaded.
-
-
-# Data Structures
-
----
-### fd\_pack\_builtin\_prog\_cost
-- **Type**: ``struct``
-- **Members**:
-    - ``program_id``: An array of 32 unsigned characters that identifies the program.
-    - ``cost_per_instr``: An unsigned long integer that represents the cost per instruction for the program.
-- **Description**: Defines a structure that aligns to 32 bytes and contains information about a built-in program's cost model, specifically the program's unique identifier and the cost associated with executing each instruction of the program.
-
-
----
-### fd\_pack\_builtin\_prog\_cost\_t
-- **Type**: ``struct``
-- **Members**:
-    - ``program_id``: An array of 32 unsigned characters representing the program identifier.
-    - ``cost_per_instr``: An unsigned long integer representing the cost per instruction for the program.
-- **Description**: Defines a structure to store the cost information for built-in programs, including a 32-byte program identifier and the associated cost per instruction. This structure is used in the transaction cost model to compute the built-in execution cost by referencing a pre-defined table of program costs.
-
-
-# Functions
-
----
-### fd\_pack\_compute\_cost<!-- {{#callable:fd_pack_compute_cost}} -->
-[View Source →](<../../../../../src/disco/pack/fd_pack_cost.h#L233>)
-
-Calculates the total cost of a transaction, including execution, signature, and data costs, while handling special cases for simple vote transactions.
-- **Inputs**:
-    - ``txn``: A pointer to a `fd_txn_t` structure representing the transaction to be processed.
-    - ``payload``: A pointer to an array of unsigned characters representing the transaction payload.
-    - ``flags``: A pointer to an unsigned integer where the function will set or clear the `FD_TXN_P_FLAGS_IS_SIMPLE_VOTE` flag.
-    - ``opt_execution_cost``: An optional pointer to an unsigned long where the function will store the execution cost if provided.
-    - ``opt_fee``: An optional pointer to an unsigned long where the function will store the priority fee if provided.
-    - ``opt_precompile_sig_cnt``: An optional pointer to an unsigned long where the function will store the count of precompile signatures if provided.
-    - ``opt_loaded_accounts_data_cost``: An optional pointer to an unsigned long where the function will store the loaded accounts data cost if provided.
-- **Logic and Control Flow**:
-    - Checks if the transaction is a simple vote transaction using `fd_txn_is_simple_vote_transaction`; if true, sets the simple vote flag, assigns default costs, and returns the simple vote cost.
-    - Clears the simple vote flag if the transaction is not a simple vote.
-    - Calculates the signature cost based on the number of signer accounts and the writable account cost based on the number of writable accounts.
-    - Initializes a compute budget program state and iterates over each instruction in the transaction to accumulate instruction data size and count non-builtin instructions.
-    - For each instruction, checks if it matches specific program IDs (compute budget, ED25519, SECP256K1) and updates the signature cost and precompile signature count accordingly.
-    - Finalizes the compute budget program state to calculate the execution cost, fee, and loaded account data cost.
-    - Stores the calculated costs in the provided optional pointers if they are not null.
-    - Logs detailed information if `DETAILED_LOGGING` is enabled.
-    - Returns the total transaction cost, which is the sum of signature, writable, execution, instruction data, and loaded account data costs.
-- **Output**: Returns the total transaction cost as an unsigned long, or 0 on failure.
-- **Functions Called**:
-    - [`fd_compute_budget_program_init`](<fd_compute_budget_program.h.md#fd_compute_budget_program_init>)
-    - [`fd_compute_budget_program_parse`](<fd_compute_budget_program.h.md#fd_compute_budget_program_parse>)
-    - [`fd_compute_budget_program_finalize`](<fd_compute_budget_program.h.md#fd_compute_budget_program_finalize>)
-
-
+The main API is the inline function `fd_pack_compute_cost()`. It reads a `fd_txn_t` transaction and its payload, detects simple vote transactions, parses compute budget instructions, counts precompile signatures, and computes the total transaction cost. It can also return related values through optional output arguments, including execution cost, fee, precompile signature count, and loaded accounts data cost. This header is intended for use by other C code that needs to evaluate transaction cost during transaction packing and consensus-related processing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
