@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for various sorting algorithms, including insertion, stable, and in-place sorts, using random data.
+The `test_sort.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various sorting algorithms, including insertion sort, stable sort, and in-place sort, for both ascending and descending order using floating-point numbers.
 
 # Purpose
-The code is a C program designed to test various sorting algorithms. It includes functionality for sorting arrays of `float` type in both ascending and descending order using different methods. The program defines several sorting functions by including the `fd_sort.c` file with different configurations, such as `sort_up` and `sort_dn`, which sort in ascending and descending order, respectively. The code also includes a [`shuffle`](<#shuffle>) function to randomize the order of elements in an array, which is used to test the robustness of the sorting algorithms.
+This C source code file is designed to test various sorting algorithms on arrays of floating-point numbers. It includes functionality for sorting arrays in both ascending and descending order using different methods, such as insertion sort, stable sort, and in-place sort. The code defines macros to facilitate the inclusion of sorting logic from an external file (`fd_sort.c`) and uses these macros to create specific sorting functions like `sort_up` and `sort_dn` for ascending and descending order, respectively. The file also includes a [`shuffle`](#shuffle) function to randomize the order of elements in an array, which is used to test the robustness of the sorting algorithms under different initial conditions.
 
-The [`main`](<#main>) function initializes a random number generator and sets up arrays to test the sorting functions. It performs a series of tests on different sorting methods, including insertion sort, stable sort, and in-place sort, for various array sizes. The tests verify that the sorting functions correctly sort arrays by comparing the sorted output to a reference array. The program logs the results of each test and ensures that the sorting functions behave as expected under different conditions. The code also includes a test for a search function, `sort_up_search_geq`, which finds the first element in a sorted array that is greater than or equal to a given value. The program concludes by cleaning up resources and exiting.
+The main function orchestrates a series of tests to validate the correctness of the sorting functions. It initializes random number generation, sets up test arrays, and performs sorting operations on these arrays, checking the results against expected outcomes using assertions. The tests cover various scenarios, including sorting already sorted arrays, reverse-sorted arrays, and randomly shuffled arrays. Additionally, the code tests the performance of the sorting algorithms with different array sizes and configurations, logging the results of each test case. This file serves as a comprehensive test suite for ensuring the reliability and efficiency of the sorting algorithms implemented in the included `fd_sort.c` file.
 # Imports and Dependencies
 
 ---
@@ -21,41 +21,37 @@ The [`main`](<#main>) function initializes a random number generator and sets up
 
 ---
 ### shuffle<!-- {{#callable:shuffle}} -->
-[View Source →](<../../../../../src/util/tmpl/test_sort.c#L19>)
-
-Randomly shuffles elements from the source array `x` into the destination array `y` using a given random number generator.
+The `shuffle` function randomly shuffles elements from an input array `x` into an output array `y` using a given random number generator `rng`.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random indices.
-    - `y`: A pointer to the destination array of type `TYPE` where the shuffled elements will be stored.
-    - `x`: A pointer to the source array of type `TYPE` containing the elements to shuffle.
-    - `cnt`: An unsigned long integer representing the number of elements to shuffle.
-- **Logic and Control Flow**:
-    - Iterates over each element in the source array `x` up to `cnt` elements.
-    - Copies the current element from `x` to the corresponding position in `y`.
-    - Generates a random index `j` using the random number generator `rng`, ensuring `j` is within the range of already processed elements.
-    - Swaps the element at the current index `i` in `y` with the element at the random index `j`.
-- **Output**: Returns a pointer to the shuffled destination array `y`.
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random indices for shuffling.
+    - `y`: A pointer to the output array of type `TYPE` where the shuffled elements will be stored.
+    - `x`: A pointer to the input array of type `TYPE` containing the elements to be shuffled.
+    - `cnt`: An unsigned long integer representing the number of elements in the arrays `x` and `y` to be shuffled.
+- **Control Flow**:
+    - Iterate over each element index `i` from 0 to `cnt-1`.
+    - Copy the element from `x[i]` to `y[i]`.
+    - Generate a random index `j` using the random number generator `rng`, ensuring `j` is within the range [0, i].
+    - Swap the elements `y[i]` and `y[j]` to shuffle the array.
+- **Output**: Returns a pointer to the shuffled output array `y`.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/tmpl/test_sort.c#L35>)
-
-Tests various sorting algorithms on arrays of floats using different methods and logs the results.
+The `main` function initializes a random number generator and tests various sorting algorithms on arrays of floats, logging the results of each test.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Initializes the random number generator and sets up arrays for reference, test, and temporary data.
-    - Iterates over different array sizes and tests sorting algorithms `sort_up_insert`, `sort_dn_insert`, `sort_up_stable_fast`, `sort_dn_stable_fast`, `sort_up_stable`, `sort_dn_stable`, `sort_up_inplace`, `sort_dn_inplace`, `sort_up_select`, and `sort_dn_select`.
-    - For each sorting algorithm, tests are conducted on arrays initialized in ascending, descending, and shuffled order.
-    - Uses `FD_TEST` to verify that the sorted arrays match the expected reference arrays.
-    - Logs the results of each test using `FD_LOG_NOTICE`.
-    - Performs additional tests with random data to ensure sorting algorithms work under various conditions.
-    - Cleans up by deleting the random number generator and halting the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`shuffle`](<#shuffle>)
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program with `fd_boot` and set up a random number generator `rng`.
+    - Declare arrays `ref`, `tst`, and `tmp` of type `TYPE` with size `MAX`.
+    - Iterate over different counts (`cnt`) and test the `sort_up_insert` and `sort_dn_insert` functions with various initializations of `tst` and `ref`, logging results.
+    - Repeat similar tests for `sort_up_stable_fast`, `sort_dn_stable_fast`, `sort_up_stable`, `sort_dn_stable`, `sort_up_inplace`, `sort_dn_inplace`, `sort_up_select`, and `sort_dn_select` functions, logging results for each.
+    - Perform additional tests with random data for `sort_up_stable_fast`, `sort_up_stable`, `sort_up_inplace`, `sort_dn_stable_fast`, `sort_dn_stable`, and `sort_dn_inplace` functions.
+    - Test the `sort_up_search_geq` function with various inputs and log results.
+    - Clean up by deleting the random number generator and halting the program.
+- **Output**: The function returns an integer `0` to indicate successful execution.
+- **Functions called**:
+    - [`shuffle`](#shuffle)
 
 
 

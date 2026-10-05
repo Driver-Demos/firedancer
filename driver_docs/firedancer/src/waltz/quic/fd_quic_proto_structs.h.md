@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for including common QUIC protocol structures and templates in the Firedancer project.
+The `fd_quic_proto_structs.h` file is a header file in the `firedancer` codebase that includes common definitions and templates related to QUIC protocol structures.
 
 # Purpose
-This code is a C header file that uses include guards to prevent multiple inclusions of the same file, which can cause compilation errors. The file includes several other header files: `fd_quic_common.h`, `fd_quic_types.h`, and a series of template headers located in the `templ` directory. These included files likely define common constants, types, and templates used in the QUIC protocol implementation. The purpose of this header file is to aggregate these dependencies, ensuring that any source file including it has access to the necessary definitions and declarations for working with QUIC protocol structures.
+This code is a C header file that serves as an inclusion guard for a set of QUIC protocol-related definitions and templates. It prevents multiple inclusions of the same header file, which can lead to compilation errors. The file includes several other headers, such as `fd_quic_common.h` and `fd_quic_types.h`, which likely contain common definitions and type declarations used across the QUIC protocol implementation. Additionally, it includes a series of template headers (`fd_quic_defs.h`, `fd_quic_templ.h`, `fd_quic_frames_templ.h`, and `fd_quic_undefs.h`), suggesting that it is part of a templated system for defining and managing QUIC protocol structures and frames. This header file is likely part of a larger library or application that implements the QUIC protocol, a modern transport layer network protocol.
 # Imports and Dependencies
 
 ---

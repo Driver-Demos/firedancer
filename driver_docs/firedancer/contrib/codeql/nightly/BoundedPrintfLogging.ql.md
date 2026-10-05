@@ -3,21 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Checks that custom runtime logging format strings do not exceed their fixed size target buffers.
+CodeQL checks for custom printf format strings that exceed fixed-size log buffers.
 
 # Purpose
-The code is a static analysis rule designed to check the size of format strings used in custom runtime logging functions. It ensures that these format strings do not exceed the fixed size of their target buffers. The rule is implemented using a query that identifies function calls to specific logging functions and evaluates the potential size of the formatted output.
-
-The code imports necessary modules, `cpp` and `filter`, and defines a query that operates on `FunctionCall` objects. It checks calls to three specific functions: `fd_log_collector_printf_dangerous_max_127`, `fd_log_collector_printf_dangerous_128_to_2k`, and `fd_log_collector_printf_inefficient_max_512`. For each function, it calculates the maximum converted length of the format string using `getMaxConvertedLengthLimitedWithReason`. The rule then compares this length against predefined limits to determine if the format string might exceed the buffer size.
-
-If the analysis finds that the format string could exceed the buffer size, it selects the function call and generates a warning message. This message includes the estimated size of the formatted string and the reason for the estimation. The rule is intended to prevent buffer overflows by ensuring that format strings remain within safe limits.
-# Imports and Dependencies
-
----
-- `cpp`
-- `filter`
-
-
+This CodeQL query defines a warning rule named `memory bounded custom printf check` that finds calls to specific logging functions when the formatted output can exceed the target buffer size. It imports `cpp` and `filter`, then examines `FunctionCall` nodes whose target names match `fd_log_collector_printf_dangerous_max_127`, `fd_log_collector_printf_dangerous_128_to_2k`, or `fd_log_collector_printf_inefficient_max_512`. For each match, it uses `getMaxConvertedLengthLimitedWithReason` on the format literal to estimate the formatted length and compares that value against fixed limits such as `127`, `512`, and `2000`. When a call meets one of the conditions, the query reports the call site with a message that states the estimated byte size and the reason used for the estimate.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
