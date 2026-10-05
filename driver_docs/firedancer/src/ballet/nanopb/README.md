@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Nanopb 0.4.9.1 source, config, and fetch scripts for Protocol Buffers in C.
+Makefile rules, scripts, headers, and source files for nanopb version 0.4.9.1 in the fd_ballet module.
 
 
 ## Files
-- **[fetch.sh](fetch.sh.md)**: The `fetch.sh` file in the `firedancer` codebase is a Bash script that downloads specific files from a specified version of the `nanopb` repository and modifies the include statements in those files.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies header and object files for the `fd_ballet` component, including `pb_firedancer.h`, `pb_common.h`, `pb_decode.h`, `pb_encode.h`, and `pb.h`.
-- **[nanopb_tag.txt](nanopb_tag.txt.md)**: The `nanopb_tag.txt` file specifies the version of the nanopb library being used, which is 0.4.9.1.
-- **[pb.h](pb.h.md)**: The `pb.h` file in the `firedancer` codebase provides low-level components and configuration options for the nanopb library, which is used for encoding and decoding Protocol Buffers in C.
-- **[pb_common.c](pb_common.c.md)**: The `pb_common.c` file in the `firedancer` codebase provides common support functions for encoding and decoding protocol buffers, including functions for iterating over fields, handling extensions, and validating UTF-8 strings.
-- **[pb_common.h](pb_common.h.md)**: The `pb_common.h` file in the `firedancer` codebase provides common support functions for field iteration and extension handling in Protocol Buffers encoding and decoding, primarily used by `pb_encode.c` and `pb_decode.c`.
-- **[pb_decode.c](pb_decode.c.md)**: The `pb_decode.c` file in the `firedancer` codebase provides functionality for decoding Protocol Buffers (protobuf) messages using minimal resources, with support for various data types, extensions, and memory management options.
-- **[pb_decode.h](pb_decode.h.md)**: The `pb_decode.h` file in the `firedancer` codebase provides functions and structures for decoding protocol buffers, including the main `pb_decode` function and support for custom input streams and various decoding options.
-- **[pb_encode.c](pb_encode.c.md)**: The `pb_encode.c` file in the `firedancer` codebase provides functionality for encoding Protocol Buffers (protobuf) messages using minimal resources, including various helper functions and encoding strategies for different data types and field configurations.
-- **[pb_encode.h](pb_encode.h.md)**: The `pb_encode.h` file in the `firedancer` codebase provides functions and structures for encoding protocol buffers, including main encoding functions, stream manipulation, and helper functions for writing field callbacks.
-- **[pb_firedancer.h](pb_firedancer.h.md)**: Nanopb configuration header with buffer-only, 32-bit fields, and malloc enabled.
-- **[README.txt](README.txt.md)**: The `README.txt` file in the `firedancer/src/ballet/nanopb` directory explains that it contains an unmodified copy of the Nanopb library C source code from tag "nanopb-0.4.9.1" and provides instructions for updating and licensing information.
+- **[fetch.sh](fetch.sh.md)**: Fetches and modifies specific files from the nanopb repository based on a specified tag.
+- **[Local.mk](Local.mk.md)**: Makefile rules to add headers and objects for nanopb in the fd_ballet module.
+- **[nanopb_tag.txt](nanopb_tag.txt.md)**: Specifies the version of nanopb used, which is 0.4.9.1.
+- **[pb.h](pb.h.md)**: Low-level components and configuration options for the nanopb library, including macros and data structures.
+- **[pb_common.c](pb_common.c.md)**: Common support functions for Protocol Buffers encoding and decoding, including field iteration and UTF-8 validation.
+- **[pb_common.h](pb_common.h.md)**: Common support functions for field iteration and UTF-8 validation in nanopb encoding and decoding.
+- **[pb_decode.c](pb_decode.c.md)**: Decodes protobuf messages using minimal resources, with functions for reading and handling various data types.
+- **[pb_decode.h](pb_decode.h.md)**: Functions and structures for decoding protocol buffers using custom input streams.
+- **[pb_encode.c](pb_encode.c.md)**: Implementation of protobuf encoding functions using minimal resources, with support for various data types and extensions.
+- **[pb_encode.h](pb_encode.h.md)**: Functions and structures for encoding protocol buffers, including custom output streams and field callbacks.
+- **[pb_firedancer.h](pb_firedancer.h.md)**: Header file for configuring nanopb with specific settings and including necessary dependencies.
+- **[README.txt](README.txt.md)**: A copy of the Nanopb library C source code, unmodified from tag "nanopb-0.4.9.1".
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

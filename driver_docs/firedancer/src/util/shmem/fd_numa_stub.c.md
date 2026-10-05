@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_numa_stub.c` file in the `firedancer` codebase provides stub implementations for NUMA-related functions, logging warnings and returning error codes due to lack of NUMA support for the build target.
+Stub implementations for NUMA functions that log warnings and return error codes when NUMA support is unavailable.
 
 # Purpose
-This C source code file provides a set of functions related to Non-Uniform Memory Access (NUMA) operations, but it is specifically designed for a build target that does not support NUMA. Each function in the file is a placeholder that logs a warning message indicating the lack of NUMA support and returns a default error value. The functions include operations for counting NUMA nodes and CPUs, locking and unlocking memory, getting and setting memory policies, binding memory, and moving pages. These functions are intended to be part of a broader system that would normally handle NUMA-related tasks, but in this context, they serve as stubs to ensure that the code can compile and run without NUMA support.
+The code provides a set of functions related to Non-Uniform Memory Access (NUMA) operations. However, these functions are implemented as stubs that do not perform any actual NUMA operations. Instead, each function logs a warning message indicating that there is no NUMA support for the current build target. The functions return default values or error codes, such as `0UL`, `ULONG_MAX`, `-1`, or `-1L`, and set the `errno` to `EINVAL` where applicable. This indicates that the functions are placeholders for systems where NUMA support is not available or not implemented.
 
-The file includes a private header, "fd_shmem_private.h," suggesting that it is part of a larger library or application dealing with shared memory or similar low-level operations. The functions return standard error codes and set the `errno` variable to `EINVAL` (Invalid Argument) to indicate that the operations are not supported. This approach allows the rest of the application to handle these functions gracefully, even when NUMA is not available. The file does not define public APIs or external interfaces but rather provides internal functionality that can be conditionally compiled based on the target environment's capabilities.
+The functions include [`fd_numa_node_cnt`](<#fd_numa_node_cnt>), [`fd_numa_cpu_cnt`](<#fd_numa_cpu_cnt>), [`fd_numa_node_idx`](<#fd_numa_node_idx>), [`fd_numa_mlock`](<#fd_numa_mlock>), [`fd_numa_munlock`](<#fd_numa_munlock>), [`fd_numa_get_mempolicy`](<#fd_numa_get_mempolicy>), [`fd_numa_set_mempolicy`](<#fd_numa_set_mempolicy>), [`fd_numa_mbind`](<#fd_numa_mbind>), and [`fd_numa_move_pages`](<#fd_numa_move_pages>). Each function is designed to handle specific NUMA-related tasks, such as counting NUMA nodes or CPUs, locking and unlocking memory, and setting or getting memory policies. The inclusion of the header file `fd_shmem_private.h` suggests that these functions are part of a larger system dealing with shared memory, but the lack of NUMA support in this build target limits their functionality to logging warnings and returning error codes.
 # Imports and Dependencies
 
 ---
@@ -20,130 +20,144 @@ The file includes a private header, "fd_shmem_private.h," suggesting that it is 
 
 ---
 ### fd\_numa\_node\_cnt<!-- {{#callable:fd_numa_node_cnt}} -->
-The `fd_numa_node_cnt` function logs a warning about the lack of NUMA support and returns zero.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L3>)
+
+Returns the number of NUMA nodes, which is always zero for this build target.
 - **Inputs**: None
-- **Control Flow**:
-    - Logs a warning message indicating that there is no NUMA support for the current build target.
-    - Returns the value 0UL, indicating that no NUMA nodes are available.
-- **Output**: The function returns an unsigned long integer value of 0, representing the count of NUMA nodes, which is zero due to lack of support.
+- **Logic and Control Flow**:
+    - Logs a warning message indicating no NUMA support for the build target.
+    - Returns the value `0UL`.
+- **Output**: Returns `0UL`, indicating zero NUMA nodes.
 
 
 ---
 ### fd\_numa\_cpu\_cnt<!-- {{#callable:fd_numa_cpu_cnt}} -->
-The `fd_numa_cpu_cnt` function logs a warning about the lack of NUMA support and returns zero.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L9>)
+
+Returns the number of CPUs available in a NUMA node, but always returns 0 due to lack of NUMA support.
 - **Inputs**: None
-- **Control Flow**:
-    - Logs a warning message indicating that there is no NUMA support for the current build target.
-    - Returns the value 0UL, indicating that no CPUs are counted due to the lack of NUMA support.
-- **Output**: The function returns an unsigned long integer value of 0, representing the count of CPUs, which is zero due to the absence of NUMA support.
+- **Logic and Control Flow**:
+    - Logs a warning message indicating no NUMA support for the build target.
+    - Returns 0UL as the number of CPUs.
+- **Output**: Returns an unsigned long integer value of 0.
 
 
 ---
 ### fd\_numa\_node\_idx<!-- {{#callable:fd_numa_node_idx}} -->
-The `fd_numa_node_idx` function logs a warning about the lack of NUMA support and returns the maximum unsigned long value.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L15>)
+
+Returns `ULONG_MAX` and logs a warning indicating no NUMA support for the build target.
 - **Inputs**:
-    - `cpu_idx`: An unsigned long integer representing the CPU index, which is not used in the function.
-- **Control Flow**:
-    - The function takes an input parameter `cpu_idx` but does not use it, as indicated by the cast to void.
-    - A warning message is logged stating that there is no NUMA support for the current build target.
-    - The function returns `ULONG_MAX`, which is the maximum value for an unsigned long integer, indicating an error or unsupported operation.
-- **Output**: The function returns `ULONG_MAX`, which is typically used to indicate an error or unsupported operation in this context.
+    - `cpu_idx`: The index of the CPU for which the NUMA node index is requested.
+- **Logic and Control Flow**:
+    - Ignore the input `cpu_idx` by casting it to void.
+    - Log a warning message using `FD_LOG_WARNING` to indicate that there is no NUMA support for the build target.
+    - Return `ULONG_MAX` as the function result.
+- **Output**: Returns `ULONG_MAX` to indicate the absence of NUMA support.
 
 
 ---
 ### fd\_numa\_mlock<!-- {{#callable:fd_numa_mlock}} -->
-The `fd_numa_mlock` function attempts to lock a memory range in RAM but logs a warning and returns an error due to lack of NUMA support.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L24>)
+
+Logs a warning about lack of NUMA support and returns an error.
 - **Inputs**:
-    - `addr`: A pointer to the starting address of the memory range to be locked.
-    - `len`: The length in bytes of the memory range to be locked.
-- **Control Flow**:
-    - The function begins by casting the input parameters `addr` and `len` to void to indicate they are unused.
-    - A warning message is logged stating that there is no NUMA support for the build target.
-    - The global variable `errno` is set to `EINVAL` to indicate an invalid argument error.
-    - The function returns -1 to signal failure.
-- **Output**: The function returns -1 to indicate failure, and sets `errno` to `EINVAL`.
+    - `addr`: A pointer to the starting address of the memory region to lock.
+    - `len`: The length of the memory region to lock, in bytes.
+- **Logic and Control Flow**:
+    - Ignore the input parameters `addr` and `len` by casting them to void.
+    - Log a warning message indicating no NUMA support for the build target.
+    - Set the global variable `errno` to `EINVAL` to indicate an invalid argument error.
+    - Return -1 to signal failure.
+- **Output**: Returns -1 to indicate failure and sets `errno` to `EINVAL`.
 
 
 ---
 ### fd\_numa\_munlock<!-- {{#callable:fd_numa_munlock}} -->
-The `fd_numa_munlock` function attempts to unlock a memory region from NUMA policy but always fails due to lack of NUMA support in the build target.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L33>)
+
+Logs a warning and returns an error indicating lack of NUMA support for unlocking memory.
 - **Inputs**:
-    - `addr`: A pointer to the starting address of the memory region to be unlocked.
-    - `len`: The length of the memory region to be unlocked, in bytes.
-- **Control Flow**:
-    - The function takes two parameters, `addr` and `len`, but does not use them due to lack of NUMA support.
-    - A warning message is logged indicating that NUMA support is not available for the build target.
-    - The global variable `errno` is set to `EINVAL` to indicate an invalid argument error.
-    - The function returns `-1` to signal failure.
-- **Output**: The function returns `-1` to indicate failure and sets `errno` to `EINVAL`.
+    - `addr`: A pointer to the starting address of the memory region to unlock.
+    - `len`: The length of the memory region to unlock.
+- **Logic and Control Flow**:
+    - Logs a warning message indicating no NUMA support for the build target using `FD_LOG_WARNING`.
+    - Sets the global variable `errno` to `EINVAL` to indicate an invalid argument error.
+    - Returns `-1` to signal failure.
+- **Output**: Returns `-1` to indicate failure due to lack of NUMA support.
 
 
 ---
 ### fd\_numa\_get\_mempolicy<!-- {{#callable:fd_numa_get_mempolicy}} -->
-The `fd_numa_get_mempolicy` function is a placeholder that logs a warning about the lack of NUMA support and returns an error.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L42>)
+
+Handles NUMA memory policy retrieval but returns an error due to lack of NUMA support.
 - **Inputs**:
-    - `mode`: A pointer to an integer where the memory policy mode would be stored.
-    - `nodemask`: A pointer to an unsigned long where the node mask would be stored.
-    - `maxnode`: An unsigned long representing the maximum number of nodes.
-    - `addr`: A pointer to a memory address, typically used to determine the policy for a specific address.
-    - `flags`: An unsigned integer representing flags that modify the behavior of the function.
-- **Control Flow**:
-    - All input parameters are cast to void to indicate they are unused.
-    - A warning is logged stating that there is no NUMA support for the build target.
-    - The global variable `errno` is set to `EINVAL` to indicate an invalid argument error.
-    - The function returns -1L to signal an error.
-- **Output**: The function returns -1L to indicate an error due to lack of NUMA support.
+    - `mode`: Pointer to an integer where the memory policy mode would be stored.
+    - `nodemask`: Pointer to an unsigned long where the nodemask would be stored.
+    - `maxnode`: Maximum number of nodes that the nodemask can represent.
+    - `addr`: Address for which the memory policy is queried.
+    - `flags`: Flags that modify the behavior of the function.
+- **Logic and Control Flow**:
+    - Ignores all input parameters by casting them to void.
+    - Logs a warning message indicating no NUMA support for the build target.
+    - Sets the global variable `errno` to `EINVAL` to indicate an invalid argument error.
+    - Returns -1L to signal failure.
+- **Output**: Returns -1L to indicate failure and sets `errno` to `EINVAL`.
 
 
 ---
 ### fd\_numa\_set\_mempolicy<!-- {{#callable:fd_numa_set_mempolicy}} -->
-The `fd_numa_set_mempolicy` function attempts to set the NUMA memory policy but always fails due to lack of NUMA support in the build target.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L54>)
+
+Sets the memory policy for NUMA, but returns an error due to lack of NUMA support.
 - **Inputs**:
-    - `mode`: An integer representing the desired NUMA memory policy mode.
-    - `nodemask`: A pointer to an array of unsigned long integers representing the nodes to which the policy applies.
-    - `maxnode`: An unsigned long integer indicating the maximum node number plus one.
-- **Control Flow**:
-    - The function begins by explicitly ignoring the input parameters using the `(void)` cast to suppress unused variable warnings.
-    - A warning message is logged indicating that there is no NUMA support for the current build target.
-    - The `errno` is set to `EINVAL` to indicate an invalid argument error.
-    - The function returns `-1L` to signal failure.
-- **Output**: The function returns a long integer value of `-1L` to indicate failure, and sets `errno` to `EINVAL`.
+    - `mode`: The memory policy mode to set.
+    - `nodemask`: A pointer to a bitmask representing the nodes to which the policy applies.
+    - `maxnode`: The maximum node number plus one.
+- **Logic and Control Flow**:
+    - Log a warning message indicating no NUMA support for the build target.
+    - Set the `errno` to `EINVAL` to indicate an invalid argument error.
+    - Return -1L to signal failure.
+- **Output**: Returns -1L to indicate failure due to lack of NUMA support.
 
 
 ---
 ### fd\_numa\_mbind<!-- {{#callable:fd_numa_mbind}} -->
-The `fd_numa_mbind` function is a placeholder for NUMA memory binding that logs a warning and returns an error due to lack of NUMA support.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L64>)
+
+Logs a warning and returns an error indicating no NUMA support for the build target.
 - **Inputs**:
-    - `addr`: A pointer to the starting address of the memory range to bind.
-    - `len`: The length of the memory range to bind.
-    - `mode`: The memory binding mode to apply.
-    - `nodemask`: A pointer to a nodemask specifying the NUMA nodes to bind the memory to.
-    - `maxnode`: The maximum node number plus one in the nodemask.
-    - `flags`: Flags to modify the behavior of the memory binding.
-- **Control Flow**:
-    - All input parameters are cast to void to indicate they are unused.
-    - A warning message is logged indicating no NUMA support for the build target.
-    - The global variable `errno` is set to `EINVAL` to indicate an invalid argument error.
-    - The function returns -1L to signal failure.
-- **Output**: The function returns -1L to indicate failure due to lack of NUMA support.
+    - `addr`: A pointer to the starting address of the memory range.
+    - `len`: The length of the memory range.
+    - `mode`: The memory binding mode.
+    - `nodemask`: A pointer to a nodemask that specifies the NUMA nodes.
+    - `maxnode`: The maximum node number plus one.
+    - `flags`: Flags that modify the behavior of the function.
+- **Logic and Control Flow**:
+    - Logs a warning message indicating no NUMA support for the build target using `FD_LOG_WARNING`.
+    - Sets the `errno` to `EINVAL` to indicate an invalid argument error.
+    - Returns `-1L` to signal failure.
+- **Output**: Returns `-1L` to indicate failure due to lack of NUMA support.
 
 
 ---
 ### fd\_numa\_move\_pages<!-- {{#callable:fd_numa_move_pages}} -->
-The `fd_numa_move_pages` function is a placeholder that logs a warning about the lack of NUMA support and returns an error.
+[View Source →](<../../../../../src/util/shmem/fd_numa_stub.c#L77>)
+
+Logs a warning about lack of NUMA support and returns an error.
 - **Inputs**:
-    - `pid`: The process ID for which the pages are to be moved.
-    - `count`: The number of pages to be moved.
-    - `pages`: An array of pointers to the pages to be moved.
-    - `nodes`: An array of node IDs where the pages should be moved.
-    - `status`: An array to store the status of each page after the move attempt.
-    - `flags`: Flags to modify the behavior of the page move operation.
-- **Control Flow**:
-    - All input parameters are cast to void to indicate they are unused.
-    - A warning is logged stating that there is no NUMA support for the build target.
-    - The global variable `errno` is set to `EINVAL` to indicate an invalid argument error.
-    - The function returns -1L to signal failure.
-- **Output**: The function returns -1L to indicate failure due to lack of NUMA support.
+    - `pid`: Process ID for which to move pages.
+    - `count`: Number of pages to move.
+    - `pages`: Array of pointers to the pages to move.
+    - `nodes`: Array of node IDs where pages should be moved.
+    - `status`: Array to store the status of each page move.
+    - `flags`: Flags to modify the behavior of the function.
+- **Logic and Control Flow**:
+    - Logs a warning message indicating no NUMA support for the build target.
+    - Sets the `errno` to `EINVAL` to indicate an invalid argument.
+    - Returns -1L to signal an error.
+- **Output**: Returns -1L to indicate an error due to lack of NUMA support.
 
 
 

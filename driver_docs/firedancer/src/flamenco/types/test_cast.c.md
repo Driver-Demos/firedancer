@@ -3,10 +3,35 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests double-to-ulong cast behavior for inf, NaN, negative, and large values.
+Tests the `fd_rust_cast_double_to_ulong` function with various double values.
 
 # Purpose
-This file is a small C test program for `fd_rust_cast_double_to_ulong`. It builds several `double` values, including positive and negative infinity, NaN, a negative number, a normal positive number, and values at and above `ULONG_MAX`, then checks the cast result with `FD_TEST`. The test verifies that special floating-point values and out-of-range values map to `ULONG_MAX` or `0` as expected. The program starts with `fd_boot` and ends with `fd_halt`, which shows that it uses the standard test harness from `fd_flamenco.h`.
+This code is a C program that tests the behavior of the function `fd_rust_cast_double_to_ulong`, which converts `double` values to `unsigned long` integers. The program initializes several `double` variables, including positive and negative infinity, NaN (Not a Number), a negative value, a positive value, and the maximum possible `unsigned long` value. It then uses the `FD_TEST` macro to verify that the conversion function produces the expected `unsigned long` results for each `double` value. The program begins by calling `fd_boot` to initialize the environment and ends with `fd_halt` to clean up before exiting.
+# Imports and Dependencies
+
+---
+- `../fd_flamenco.h`
+
+
+# Functions
+
+---
+### main<!-- {{#callable:main}} -->
+[View Source →](<../../../../../src/flamenco/types/test_cast.c#L3>)
+
+Initializes the environment, tests the `fd_rust_cast_double_to_ulong` function with various double values, and then halts the program.
+- **Inputs**:
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Defines several double precision floating-point variables representing special values like infinity, negative infinity, NaN, negative, positive, and maximum unsigned long values.
+    - Uses `FD_TEST` to verify that `fd_rust_cast_double_to_ulong` correctly casts these double values to unsigned long values, checking against expected results.
+    - Calls `fd_halt` to terminate the program.
+    - Returns 0 to indicate successful execution.
+- **Output**: Returns 0 to indicate successful execution.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
