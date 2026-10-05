@@ -3,10 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Doxygen settings for HTML API docs from README.md and selected source paths.
+Configuration file for Doxygen documentation generation in the Firedancer project.
 
 # Purpose
-This Doxygen configuration file defines how API documentation is built for the `Firedancer` project. It sets `README.md` as the main page, lists the source trees and header files to scan, and excludes one header from the generated output. The file also enables preprocessing, macro expansion, and extraction of all documented and static items, while it hides undocumented members, classes, and scope names to keep the output focused on public material. It configures the HTML output, search, tree view, and symbol filtering rules so the generated documentation matches the project naming and source layout.
+This configuration file is used to set up the documentation generation process for a project named `Firedancer`. It specifies various parameters for the documentation tool, such as the main page file (`README.md`), the output directory, and the file patterns to include (`*.md` and `fd_*.h`). The `INPUT` section lists the directories and files to be processed, while the `EXCLUDE` section specifies files to omit from the documentation. The file also includes settings for optimizing output for C, enabling preprocessing, macro expansion, and controlling the visibility of undocumented members and classes. Additionally, it defines symbols to exclude and predefine during the documentation process, and it configures the generation of HTML output with dynamic sections and a search engine.
+# Content Summary
+This configuration file is used to generate documentation for a project named "Firedancer." The file specifies various settings and parameters for the documentation generation process, likely using a tool such as Doxygen.
+
+Key details include:
+
+1. **Project and Main Page**: The project is named "Firedancer," and the main page of the documentation is set to `README.md`.
+
+2. **Output and Input**: The output directory is specified by the variable `$(OUTPUT_DIRECTORY)`. The documentation will include files matching the patterns `*.md` and `fd_*.h`, and it will process a comprehensive list of source directories and files, including various subdirectories under `src`, such as `ballet`, `tango`, `util`, and `waltz`.
+
+3. **Exclusions**: The file `src/waltz/tls/fd_tls_proto.h` is explicitly excluded from the documentation. Additionally, a list of symbols is excluded from the documentation, such as those starting with underscores, specific macros, and certain predefined symbols.
+
+4. **Preprocessing and Macros**: Preprocessing is enabled, with macro expansion and predefined macros specified. This includes macros like `FD_PROTOTYPES_BEGIN`, `FD_PROTOTYPES_END`, and others related to system architecture and compiler attributes.
+
+5. **Documentation Options**: The configuration enables optimization for C, extraction of all elements including static ones, and distribution of group documentation. It hides undocumented members, classes, and scope names, and generates a deprecated list. The configuration also specifies that typedefs hide structs and that an alphabetical index and tree view are generated.
+
+6. **Output Formats**: The documentation is generated in HTML format, with dynamic sections and a search engine enabled. LaTeX and man page outputs are not generated.
+
+7. **Miscellaneous Settings**: Full path names are included in the documentation, and certain warnings are not treated as errors. The configuration does not use the Graphviz `dot` tool for generating diagrams.
+
+This configuration file is essential for developers to understand how the documentation for the "Firedancer" project is structured and generated, ensuring that all relevant source files and documentation elements are included or excluded as needed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

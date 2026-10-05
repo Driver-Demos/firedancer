@@ -3,10 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Historical transaction filtering pipeline for block production and validator block packing.
+Documentation of the Frankendancer transaction filtering pipeline for block production, including architecture and operational details.
 
 # Purpose
-This document describes the `Frankendancer` transaction filtering pipeline used for block production and block packing. It defines the flow of data from external NIC inputs through packet handling, `SIG VERIFY`, transaction tagging, deduplication, metadata sequencing, and final block assembly for delivery to the `Agave` validator. The content also states the system design rules for NUMA placement, named workspaces, live inspection, replay, and component swapping, and it explains how the pipeline can run in one process or across multiple processes. It serves as an architecture note for the codebase and gives the constraints that guide implementation of the filtering and block production path.
+The document describes a transaction filtering pipeline for block production, focusing on the processing of network packets from external network interface cards (NICs) to the Agave validator. The pipeline uses a mixture of technologies such as AF_XDP, sockets, and DPDK to handle raw packets, which are then processed through a series of workspaces (`wksp`) and cores. These components perform functions like signature verification (`SIG VERIFY`), deduplication (`DEDUP TAG`), and metadata caching (`MCACHE`, `DCACHE`). The pipeline is designed to operate on high core count x86 CPUs, with an emphasis on minimizing NUMA node interactions to optimize performance. The architecture supports dynamic inspection, monitoring, and debugging, and allows for hotswapping components to adapt to load changes or hardware failures. The system can run in various configurations, including single or multi-process models, and is designed to be reliable and reproducible, with potential for future acceleration using FPGA, ASIC, or GPU technologies.
+# Content Summary
+The document describes the transaction filtering pipeline for block production, specifically focusing on the Frankendancer Filtering system. This system processes raw packets from network interfaces using a variety of technologies such as AF_XDP, sockets, and DPDK. The pipeline is designed to handle high-throughput data processing, leveraging high core count x86 CPUs and NUMA nodes for optimal performance.
+
+The pipeline begins with raw packet intake from network interfaces, which are then processed through a series of workspaces (wksp) and cores. Each core performs specific tasks such as NIC/QUIC handling, signature verification (SIG VERIFY), and deduplication tagging (DEDUP TAG). The system uses a randomized tagging scheme for transaction deduplication, which is essential for maintaining data integrity and performance.
+
+The architecture supports dynamic inspection, monitoring, and debugging through named workspaces, allowing for non-invasive capture of component inputs. It also allows for hotswapping components to manage load changes or hardware failures. The system can operate in a single-process or multi-process model, with the current implementation being single-process with named workspaces.
+
+The pipeline ensures reliable communication from network interfaces to the Agave validator, which is responsible for block distribution and execution. The design also considers potential future enhancements, such as moving components to FPGA, ASIC, or GPU acceleration, provided they adhere to the Tango ABI.
+
+The document emphasizes the importance of performing deduplication after signature verification due to encryption requirements. It also highlights the use of the Tango metadata signature field for transaction tagging, which aids in parallelizing deduplication calculations and supports horizontal scaling. The system is designed to handle high bandwidth and high core count environments, ensuring efficient processing of transactions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
