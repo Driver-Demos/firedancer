@@ -3,44 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Logs backtrace information for given addresses using dynamic linking and logging utilities.
+Formats and logs backtrace addresses with symbol and offset data.
 
 # Purpose
-The code defines a function [`fd_backtrace_log`](<#fd_backtrace_log>) that logs backtrace information for a given set of addresses. It is part of a C source file that includes headers for utility functions and logging, as well as standard libraries for dynamic linking and symbol resolution. The function iterates over an array of addresses and uses the `dladdr1` function to retrieve information about each address, such as the shared object file name and symbol name. If the information is available, it logs the file name, symbol name, and offset from the symbol's address. If the information is not available, it logs the address directly.
+[`fd_backtrace_log`](<#fd_backtrace_log>) formats and writes a list of return addresses to standard error. For each address in the `addrs` array, it uses `dladdr1` with `RTLD_DL_LINKMAP` to resolve the shared object name, symbol name, and load base address. When symbol information is available, it prints the file name, symbol name, and the offset from the symbol address. When symbol data is not available, it prints the file name and raw address, or only the raw address if no dynamic loader data exists.
 
-The code is designed to be used in environments where detailed backtrace information is necessary for debugging purposes. It uses the GNU-specific `dladdr1` function to obtain extended information about the addresses, which is useful for understanding the context of each address in the backtrace. The function outputs the information to the standard error stream using a private logging function, `fd_log_private_fprintf_0`, which suggests that it is part of a larger logging framework. This code is likely intended to be part of a library or utility that provides diagnostic capabilities for applications.
-# Imports and Dependencies
-
----
-- `fd_backtrace.h`
-- `../fd_util_base.h`
-- `../log/fd_log.h`
-- `unistd.h`
-- `string.h`
-- `dlfcn.h`
-- `link.h`
-
-
-# Functions
-
----
-### fd\_backtrace\_log<!-- {{#callable:fd_backtrace_log}} -->
-[View Source →](<../../../../../src/util/log/fd_backtrace.c#L11>)
-
-Logs the backtrace information for a list of addresses to the standard error output.
-- **Inputs**:
-    - `addrs`: A pointer to an array of addresses to log.
-    - `addrs_cnt`: The number of addresses in the `addrs` array.
-- **Logic and Control Flow**:
-    - Iterates over each address in the `addrs` array.
-    - For each address, calls `dladdr1` to retrieve dynamic linking information.
-    - If `dladdr1` succeeds and the file name is valid, retrieves the base address from the link map.
-    - If the symbol name is not available, sets the symbol address to the base address.
-    - Logs the file name, symbol name, and address offset if available; otherwise, logs the address only.
-    - If `dladdr1` fails, logs the address directly.
-- **Output**: No return value; outputs log information to standard error.
-
-
+This file is a small C source file that provides one backtrace logging function for use with the project logging and utility code. It depends on GNU dynamic loader interfaces from `<dlfcn.h>` and `<link.h>`, and it writes output through `fd_log_private_fprintf_0` to `STDERR_FILENO`. The function is intended for diagnostic use when code needs to convert a captured stack trace into readable text.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

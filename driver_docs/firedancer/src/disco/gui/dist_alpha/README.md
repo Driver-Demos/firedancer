@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-HTML GUI entry point, dependency licenses, and assets for UI and grid management.
+React UI assets, entry page, and third-party dependency licenses for validator and slot views
 
 ## Folders
-- **[assets](assets/README.md)**: JavaScript modules for UI and grid management, CSS for AG Grid themes, design system, and responsive UI.
+- **[assets](assets/README.md)**: React UI, AG Grid runtime, and theme CSS for validator and slot views
 
 ## Files
-- **[index.html](index.html.md)**: HTML document for the Firedancer GUI with preloaded assets and a root div for content rendering.
-- **[LICENSE_DEPENDENCIES](LICENSE_DEPENDENCIES.md)**: A list of software dependencies with their licenses, versions, and descriptions.
+- **[index.html](index.html.md)**: HTML entry page that preloads assets and loads the Firedancer app bundle.
+- **[LICENSE_DEPENDENCIES](LICENSE_DEPENDENCIES.md)**: Third-party dependency license list for React-related packages and libraries.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for a CodeQL package with C++ extractor and dependencies for nightly queries.
+The `qlpack.yml` file specifies the configuration for a CodeQL package named `asymmetric-research/fd-nightly-queries`, including its version, extractor, and dependencies.
 
 # Purpose
-The file defines metadata for a software package. It specifies the package name as `asymmetric-research/fd-nightly-queries` and version `0.0.1`. The `extractor` field indicates that the package uses the `cpp` extractor. The `warnOnImplicitThis` field is set to `true`, which configures the package to issue warnings when implicit `this` is used in C++ code. The `dependencies` section lists `codeql/cpp-all` with a version constraint of `"*"`, indicating a dependency on all available versions of the `codeql/cpp-all` package.
+This YAML file is a configuration file for a software package named "asymmetric-research/fd-nightly-queries" with version "0.0.1". It specifies that the package uses a C++ extractor and has a setting to warn on implicit 'this' usage. Additionally, it declares a dependency on the "codeql/cpp-all" package, allowing any version.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

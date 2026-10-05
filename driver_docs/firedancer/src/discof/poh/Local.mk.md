@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile logic to add objects `fd_poh_tile` and `fd_poh` if `FD_HAS_ALLOCA` is defined.
+Build rules that add fd_poh_tile and fd_poh objects when FD_HAS_ALLOCA is set.
 
 # Purpose
-The `Makefile` snippet uses a conditional directive to check if the macro `FD_HAS_ALLOCA` is defined. If it is defined, the `add-objs` function is called to add the object files `fd_poh_tile`, `fd_poh`, and `fd_discof` to the build process. This configuration helps manage the inclusion of specific object files based on the presence of the `FD_HAS_ALLOCA` macro.
+This makefile fragment adds the `fd_poh_tile` and `fd_poh` object files to the `fd_discof` target only when `FD_HAS_ALLOCA` is defined. The `ifdef` and `endif` directives control conditional build inclusion based on that build-time flag.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
