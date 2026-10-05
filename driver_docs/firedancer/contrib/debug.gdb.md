@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A GDB script to set a breakpoint at `fd_log_private_2`, run the program, and exit if successful.
+GDB script that breaks on fd_log_private_2, runs, and quits on exit code 0
 
 # Purpose
-The file contains a script for a debugger that sets a breakpoint at the function `fd_log_private_2`. It then runs the program and checks if the exit code is 0. If the exit code is 0, the script instructs the debugger to quit.
+This file defines a GDB command sequence that sets a breakpoint at `fd_log_private_2`, runs the program, and exits when the program ends with exit code `0`. The `if $_exitcode == 0` block stops the debugger session after a successful run.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

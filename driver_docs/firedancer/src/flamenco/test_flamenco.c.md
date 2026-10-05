@@ -3,41 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests Base58 encoding functionality in the Firedancer codebase using predefined byte arrays.
+Base58 encoding tests for 32-byte and 64-byte buffers, including NULL handling.
 
 # Purpose
-The code is an executable C program that tests the functionality of Base58 encoding. It includes the header file `fd_flamenco.h` and defines a [`main`](<#main>) function. The program initializes with `fd_boot`, which sets up the environment using the command-line arguments. It then defines two static byte arrays, `buf32` and `buf64`, which contain 32 and 64 bytes of data, respectively. These arrays are used as input for Base58 encoding.
-
-The program uses the `fd_cstr_printf` function to format and store the Base58 encoded results of `buf32` and `buf64` into a buffer `buf`. It also attempts to encode `NULL` values, which are expected to produce specific `<NULL>` strings in the output. The formatted string is compared against an `expected` string using `FD_TEST` to verify the correctness of the encoding process. If the output matches the expected result, the program logs a "pass" message and then halts using `fd_halt`. The program is designed to validate the Base58 encoding implementation by ensuring that the encoded output matches the predefined expected output.
-# Imports and Dependencies
-
----
-- `fd_flamenco.h`
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/flamenco/test_flamenco.c#L3>)
-
-Initializes the program, encodes data using Base58, formats the encoded strings, and verifies the output against an expected result.
-- **Inputs**:
-    - `argc`: The count of command-line arguments.
-    - `argv`: The array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the program with command-line arguments.
-    - Defines two static byte arrays `buf32` and `buf64` with predefined values.
-    - Defines a format string and an expected output string for comparison.
-    - Declares a buffer `buf` and a variable `len` to store the formatted output and its length.
-    - Uses `fd_cstr_printf` to format the Base58 encoded values of `buf32`, `buf64`, and `NULL` pointers into `buf`.
-    - Compares the formatted output in `buf` with the `expected` string using `FD_TEST`.
-    - Verifies that the length of the formatted output matches the length of the `expected` string.
-    - Logs a notice message indicating success if tests pass.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-
-
+This file is a small C test program for the Base58 encoding helpers in `fd_flamenco.h`. It defines fixed 32-byte and 64-byte input buffers, converts them with `FD_BASE58_ENC_32_ALLOCA` and `FD_BASE58_ENC_64_ALLOCA`, and formats the results into a string with `fd_cstr_printf`. The program then checks that the output matches the expected Base58 text and that the reported length is correct. It also verifies the null input case, where the encoding macros return `"<NULL>"`, before logging `pass` and exiting.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

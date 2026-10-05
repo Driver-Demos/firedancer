@@ -3,29 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a structure for Zstandard decompression streams with specific alignment and magic number.
+Zstd dstream alignment, magic value, and private stream layout definitions.
 
 # Purpose
-This code is a C header file that defines a private structure and constants for a Zstandard decompression stream. It includes the header file `fd_zstd.h` and defines two constants: `FD_ZSTD_DSTREAM_ALIGN`, which specifies the alignment requirement for the decompression stream structure, and `FD_ZSTD_DSTREAM_MAGIC`, a magic number used for validation or identification purposes. The `fd_zstd_dstream` structure is defined with an alignment attribute to ensure it is aligned to 32 bytes. This structure contains a `magic` field for validation, a `mem_sz` field for memory size, a padding array `pad` to maintain alignment, and a flexible array member `mem` for additional memory allocation.
-# Imports and Dependencies
-
----
-- `fd_zstd.h`
-
-
-# Data Structures
-
----
-### fd\_zstd\_dstream
-- **Type**: ``struct fd_zstd_dstream``
-- **Members**:
-    - ``magic``: A unique identifier for the data stream, used for validation or identification.
-    - ``mem_sz``: The size of the memory allocated for the data stream.
-    - ``pad``: A padding array to ensure proper memory alignment.
-    - ``mem``: A flexible array member for additional memory allocation, starting at zero size.
-- **Description**: Defines a data structure for a Zstandard decompression stream with specific memory alignment requirements. It includes a magic number for stream identification, a memory size indicator, padding for alignment, and a flexible array member for dynamic memory allocation.
-
-
+Defines private Zstandard decompression stream data used by the `fd_zstd` code. The file sets the alignment and magic value for `fd_zstd_dstream`, then declares a structure with a `magic` field, a memory size field, padding, and a zero-length `mem` array used as a flexible storage area. The `__attribute__((aligned(FD_ZSTD_DSTREAM_ALIGN)))` declaration ensures that the structure starts on a 32-byte boundary, which matches the layout expected by the decompression code.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
