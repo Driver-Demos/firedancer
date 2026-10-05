@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_store_tile.c` file in the `firedancer` codebase implements the initialization and management of a storage context for processing and inserting data fragments into a blockstore, including handling memory alignment and footprint calculations.
+Implements a store tile for managing and processing data fragments in a distributed system.
 
 # Purpose
-This C source code file is designed to manage and process data storage operations within a distributed system, specifically focusing on handling "shreds" of data. The code defines structures and functions that facilitate the initialization and management of a storage context (`fd_store_ctx_t`), which is used to handle data chunks and their associated metadata. The file includes functions for initializing external block storage ([`fd_ext_store_initialize`](#fd_ext_store_initialize)), processing data fragments during and after their reception ([`during_frag`](#during_frag) and [`after_frag`](#after_frag)), and setting up the storage context in an unprivileged environment ([`unprivileged_init`](#unprivileged_init)). The code is structured to ensure data integrity and efficient memory management, with checks and logging for error conditions.
+The code defines a module for managing data storage and processing within a distributed system. It includes structures and functions to handle memory contexts (`fd_store_ctx_t` and `fd_store_in_ctx_t`) and provides mechanisms to initialize and manage data fragments. The module interfaces with an external blockstore, which is a storage system for data blocks, through the [`fd_ext_store_initialize`](<#fd_ext_store_initialize>) function and the [`fd_ext_blockstore_insert_shreds`](<#fd_ext_blockstore_insert_shreds>) function. These functions facilitate the initialization and insertion of data shreds into the blockstore.
 
-The file is part of a larger system, as indicated by the inclusion of headers from a "disco" directory, suggesting a modular architecture. It defines both static and external functions, indicating that it provides internal functionality as well as interfaces for interaction with other components of the system. The use of macros and inline functions suggests a focus on performance optimization, particularly in the context of data alignment and memory footprint management. The file also integrates with a broader framework by including another source file (`fd_stem.c`) and defining a `fd_topo_run_tile_t` structure, which encapsulates the storage tile's operational parameters and functions, indicating its role as a component in a larger execution topology.
+The code also includes callback functions [`during_frag`](<#during_frag>) and [`after_frag`](<#after_frag>), which are used during the processing of data fragments. These functions perform operations such as data validation, memory copying, and insertion of data into the blockstore. The [`unprivileged_init`](<#unprivileged_init>) function initializes the storage context and waits for the blockstore to become available. The module is designed to be part of a larger system, as indicated by the inclusion of external headers and the use of macros for configuration. The `fd_tile_store` structure defines the entry points for running this module within a distributed topology, specifying functions for alignment, footprint calculation, initialization, and execution.
 # Imports and Dependencies
 
 ---
@@ -21,137 +21,149 @@ The file is part of a larger system, as indicated by the inclusion of headers fr
 
 ---
 ### fd\_ext\_blockstore
-- **Type**: `static void const *`
-- **Description**: `fd_ext_blockstore` is a static global pointer to a constant void type, indicating it is used to reference a blockstore object without modifying it. It is initialized in the `fd_ext_store_initialize` function and is used throughout the code to interact with the blockstore.
-- **Use**: This variable is used to store a reference to a blockstore object, which is accessed by various functions to perform operations on the blockstore.
+- **Type**: ``void const *``
+- **Description**: A pointer to a constant memory location that represents an external blockstore. This variable is used to store the address of the blockstore that is initialized by the `fd_ext_store_initialize` function.
+- **Use**: Used to hold the address of the blockstore for operations that require access to the blockstore, such as inserting shreds.
 
 
 ---
 ### fd\_tile\_store
-- **Type**: `fd_topo_run_tile_t`
-- **Description**: The `fd_tile_store` is a global variable of type `fd_topo_run_tile_t`, which is a structure used to define a tile in a topology. It is initialized with specific function pointers and parameters that dictate its behavior and alignment requirements.
-- **Use**: This variable is used to configure and manage a tile's execution within a larger system topology, including its initialization and runtime operations.
+- **Type**: ``fd_topo_run_tile_t``
+- **Description**: Defines a tile configuration for a store operation in a distributed system. It includes function pointers for alignment, footprint calculation, initialization, and execution.
+- **Use**: Used to configure and manage the execution of a store tile in a distributed topology.
 
 
 # Data Structures
 
 ---
 ### fd\_store\_in\_ctx\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `mem`: A pointer to an fd_wksp_t structure, representing a memory workspace.
-    - `chunk0`: An unsigned long integer representing the starting chunk index.
-    - `wmark`: An unsigned long integer representing the watermark or upper limit for chunk indices.
-- **Description**: The `fd_store_in_ctx_t` structure is designed to manage a memory workspace within a specific range of chunk indices. It contains a pointer to an `fd_wksp_t` memory workspace, a starting chunk index (`chunk0`), and a watermark (`wmark`) that defines the upper limit of the chunk range. This structure is used to track and manage memory allocation and usage within a defined range, ensuring that operations stay within the allocated bounds.
+    - ``mem``: A pointer to an `fd_wksp_t` structure, representing a memory workspace.
+    - ``chunk0``: An unsigned long integer representing the starting chunk index.
+    - ``wmark``: An unsigned long integer representing the watermark or upper limit for chunk indices.
+- **Description**: `fd_store_in_ctx_t` is a structure that holds context information for a memory workspace, including a pointer to the workspace, a starting chunk index, and a watermark indicating the upper limit for chunk indices. This structure is used to manage and track memory allocation and usage within a specific range of chunks.
 
 
 ---
 ### fd\_store\_ctx\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `mem`: A memory buffer aligned to 32 bytes with a size defined by FD_SHRED_STORE_MTU.
-    - `disable_blockstore_from_slot`: A flag indicating from which slot the blockstore should be disabled.
-    - `in`: An array of 32 fd_store_in_ctx_t structures, each representing an input context.
-- **Description**: The `fd_store_ctx_t` structure is designed to manage the context for storing data in a blockstore system. It includes a memory buffer `mem` for temporary data storage, a control flag `disable_blockstore_from_slot` to manage blockstore operations based on slot numbers, and an array `in` of `fd_store_in_ctx_t` structures to handle multiple input contexts. This structure is integral to the operation of the blockstore, facilitating data management and storage operations.
+    - ``mem``: An array of unsigned characters aligned to 32 bytes with a size defined by `FD_SHRED_STORE_MTU`.
+    - ``disable_blockstore_from_slot``: An unsigned long integer that indicates whether to disable the blockstore from a specific slot.
+    - ``in``: An array of 32 `fd_store_in_ctx_t` structures.
+- **Description**: `fd_store_ctx_t` is a structure that manages memory and input contexts for a store operation. It contains a memory buffer `mem` for storing data, a flag `disable_blockstore_from_slot` to control blockstore operations, and an array `in` of `fd_store_in_ctx_t` structures to handle input contexts.
 
 
 # Functions
 
 ---
 ### scratch\_align<!-- {{#callable:scratch_align}} -->
-The `scratch_align` function returns a constant alignment value of 128 bytes.
+[View Source →](<../../../../../src/discoh/store/fd_store_tile.c#L18>)
+
+Returns a constant alignment value of 128.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined as a static inline function, meaning it is intended for use only within the file it is defined and suggests to the compiler to attempt to embed the function code at each call site for performance reasons.
-    - The function is marked with `FD_FN_CONST`, indicating that it has no side effects and its return value is determined only by its input parameters, which in this case are none.
-    - The function simply returns the constant value `128UL`.
-- **Output**: The function returns an unsigned long integer with the value 128, representing a memory alignment size.
+- **Logic and Control Flow**:
+    - Returns the constant value `128UL`.
+- **Output**: The function returns an unsigned long integer with the value `128UL`.
 
 
 ---
 ### scratch\_footprint<!-- {{#callable:scratch_footprint}} -->
-The `scratch_footprint` function calculates the memory footprint required for a `fd_store_ctx_t` structure with specific alignment constraints.
+[View Source →](<../../../../../src/discoh/store/fd_store_tile.c#L23>)
+
+Calculates the memory footprint required for a scratch space aligned to a specific boundary.
 - **Inputs**:
     - `tile`: A pointer to a `fd_topo_tile_t` structure, which is not used in the function.
-- **Control Flow**:
-    - The function begins by initializing a variable `l` with `FD_LAYOUT_INIT`.
-    - It then appends the size and alignment of `fd_store_ctx_t` to `l` using `FD_LAYOUT_APPEND`.
-    - Finally, it returns the finalized layout size by calling `FD_LAYOUT_FINI` with `l` and the alignment value from `scratch_align()`.
-- **Output**: The function returns an `ulong` representing the calculated memory footprint for the `fd_store_ctx_t` structure with the specified alignment.
-- **Functions called**:
-    - [`scratch_align`](#scratch_align)
+- **Logic and Control Flow**:
+    - Initialize a variable `l` with `FD_LAYOUT_INIT`.
+    - Append the layout of `fd_store_ctx_t` to `l` using `FD_LAYOUT_APPEND`, considering its alignment and size.
+    - Finalize the layout with `FD_LAYOUT_FINI`, aligning it to the value returned by `scratch_align()`.
+- **Output**: Returns an `ulong` representing the calculated memory footprint for the scratch space.
+- **Functions Called**:
+    - [`scratch_align`](<#scratch_align>)
 
 
 ---
 ### fd\_ext\_store\_initialize<!-- {{#callable:fd_ext_store_initialize}} -->
-The `fd_ext_store_initialize` function sets a global blockstore pointer and ensures memory ordering with a memory fence.
+[View Source →](<../../../../../src/discoh/store/fd_store_tile.c#L33>)
+
+Initializes the external blockstore pointer and enforces a memory fence.
 - **Inputs**:
-    - `blockstore`: A constant pointer to a blockstore object that will be stored globally.
-- **Control Flow**:
-    - Assigns the input `blockstore` to the global variable `fd_ext_blockstore`.
-    - Calls `FD_COMPILER_MFENCE()` to enforce a memory fence, ensuring memory operations are completed in order.
-- **Output**: This function does not return any value.
+    - `blockstore`: A pointer to the blockstore that will be stored in the `fd_ext_blockstore` variable.
+- **Logic and Control Flow**:
+    - Assigns the input `blockstore` to the static variable `fd_ext_blockstore`.
+    - Calls `FD_COMPILER_MFENCE()` to ensure memory ordering and prevent reordering of memory operations.
+- **Output**: No output is returned as the function has a `void` return type.
 
 
 ---
 ### during\_frag<!-- {{#callable:during_frag}} -->
-The `during_frag` function checks the validity of a data chunk and copies it to a specified memory location if valid.
+[View Source →](<../../../../../src/discoh/store/fd_store_tile.c#L39>)
+
+Copies a fragment of data from a source memory location to a destination memory location within a context, after validating the fragment's size and chunk range.
 - **Inputs**:
-    - `ctx`: A pointer to an `fd_store_ctx_t` structure containing context information for the data store.
-    - `in_idx`: An index specifying which input context to use from the `ctx->in` array.
-    - `seq`: An unused parameter, likely intended for sequence number tracking.
-    - `sig`: An unused parameter, possibly intended for signature verification.
-    - `chunk`: The chunk identifier to be validated and copied.
-    - `sz`: The size of the data to be copied.
-    - `ctl`: An unused parameter, possibly intended for control flags.
-- **Control Flow**:
-    - Check if the `chunk` is within the valid range defined by `ctx->in[in_idx].chunk0` and `ctx->in[in_idx].wmark`, and if `sz` is within the valid size range (greater than 32 and less than or equal to `FD_SHRED_STORE_MTU`).
-    - If the chunk or size is invalid, log an error message indicating the corruption and the expected range.
-    - Convert the chunk identifier to a memory address using `fd_chunk_to_laddr`.
-    - Copy the data from the source memory address to the destination memory (`ctx->mem`) using `fd_memcpy`.
-- **Output**: The function does not return a value; it performs a memory copy operation if the input parameters are valid.
+    - `ctx`: A pointer to `fd_store_ctx_t`, which contains memory and input context information.
+    - `in_idx`: An index to select the input context from the `ctx->in` array.
+    - `seq`: An unused parameter, marked with `FD_PARAM_UNUSED`.
+    - `sig`: An unused parameter, marked with `FD_PARAM_UNUSED`.
+    - `chunk`: The chunk identifier to locate the source memory within the input context.
+    - `sz`: The size of the data fragment to copy.
+    - `ctl`: An unused parameter, marked with `FD_PARAM_UNUSED`.
+- **Logic and Control Flow**:
+    - Checks if `chunk` is within the valid range defined by `ctx->in[in_idx].chunk0` and `ctx->in[in_idx].wmark`, and if `sz` is within the valid size range (greater than or equal to 32 and less than or equal to `FD_SHRED_STORE_MTU`).
+    - Logs an error and exits if the above conditions are not met.
+    - Converts the `chunk` identifier to a source memory address using `fd_chunk_to_laddr`.
+    - Copies `sz` bytes of data from the source memory address to the destination memory (`ctx->mem`) using `fd_memcpy`.
+- **Output**: No return value; performs operations directly on the provided context.
 
 
 ---
 ### after\_frag<!-- {{#callable:after_frag}} -->
-The `after_frag` function processes and inserts shreds into an external blockstore if certain conditions are met.
+[View Source →](<../../../../../src/discoh/store/fd_store_tile.c#L64>)
+
+Inserts shreds into an external blockstore after performing validation checks.
 - **Inputs**:
-    - `ctx`: A pointer to a `fd_store_ctx_t` structure containing context information for the store operation.
-    - `in_idx`: An unsigned long integer representing the index of the input context, though it is not used in the function.
-    - `seq`: An unsigned long integer representing the sequence number, though it is not used in the function.
-    - `sig`: An unsigned long integer representing the signature, used to determine if the shreds are trusted.
-    - `sz`: An unsigned long integer representing the size of the data to be processed.
-    - `tsorig`: An unsigned long integer representing the original timestamp, though it is not used in the function.
-    - `tspub`: An unsigned long integer representing the publication timestamp, though it is not used in the function.
-    - `stem`: A pointer to a `fd_stem_context_t` structure, though it is not used in the function.
-- **Control Flow**:
-    - The function begins by casting the memory in the context to a `fd_shred34_t` pointer.
-    - Several assertions are made to ensure the integrity and validity of the shred data, such as checking the size and count of shreds.
-    - If the `disable_blockstore_from_slot` condition is met, the function returns early without processing.
-    - If the conditions are not met, the function calls `fd_ext_blockstore_insert_shreds` to insert the shreds into the external blockstore.
-    - Finally, a metric counter is incremented to track the number of transactions inserted.
-- **Output**: The function does not return a value; it performs operations on the provided context and external blockstore.
+    - `ctx`: A pointer to `fd_store_ctx_t`, which contains context information including memory and blockstore settings.
+    - `in_idx`: An unused index of the input context.
+    - `seq`: An unused sequence number.
+    - `sig`: A signature flag used to indicate if the shreds are trusted.
+    - `sz`: The size of the data to be processed.
+    - `tsorig`: An unused original timestamp.
+    - `tspub`: An unused publication timestamp.
+    - `stem`: An unused pointer to `fd_stem_context_t`.
+- **Logic and Control Flow**:
+    - Casts `ctx->mem` to a `fd_shred34_t` pointer named `shred34`.
+    - Performs validation checks on `shred34` to ensure `shred_sz` is less than or equal to `stride`, `offset` is less than `sz`, `shred_cnt` is less than or equal to 34, and the calculated memory range does not exceed `sz`.
+    - Checks if `disable_blockstore_from_slot` is set and if the current slot is greater than or equal to it, in which case the function returns early.
+    - Calls `fd_ext_blockstore_insert_shreds` to insert shreds into the external blockstore using the validated parameters.
+    - Increments the transaction count metric `TRANSACTIONS_INSERTED` by `shred34->est_txn_cnt`.
+- **Output**: No return value; performs operations on external resources and updates metrics.
 
 
 ---
 ### unprivileged\_init<!-- {{#callable:unprivileged_init}} -->
-The `unprivileged_init` function initializes a context for a tile in a topology, setting up memory and waiting for a blockstore to be available.
+[View Source →](<../../../../../src/discoh/store/fd_store_tile.c#L97>)
+
+Initializes the unprivileged context for a tile by setting up memory and waiting for blockstore availability.
 - **Inputs**:
-    - `topo`: A pointer to an `fd_topo_t` structure representing the topology configuration.
-    - `tile`: A pointer to an `fd_topo_tile_t` structure representing the specific tile to initialize.
-- **Control Flow**:
+    - ``topo``: A pointer to an `fd_topo_t` structure representing the topology of the system.
+    - ``tile``: A pointer to an `fd_topo_tile_t` structure representing the specific tile to initialize.
+- **Logic and Control Flow**:
     - Obtain a local address for the tile's object ID using `fd_topo_obj_laddr` and store it in `scratch`.
-    - Initialize a scratch allocation context `l` with `FD_SCRATCH_ALLOC_INIT`.
-    - Allocate memory for a `fd_store_ctx_t` structure using `FD_SCRATCH_ALLOC_APPEND` and store the pointer in `ctx`.
-    - Log a message indicating the function is waiting to acquire a blockstore.
-    - Enter a loop that pauses until `fd_ext_blockstore` is non-null, indicating the blockstore is available.
-    - Log a message indicating the blockstore has been acquired.
-    - Set `ctx->disable_blockstore_from_slot` to the value from `tile->store.disable_blockstore_from_slot`.
-    - Iterate over each input link of the tile, setting up memory, chunk0, and watermark for each link in `ctx->in`.
-    - Finalize the scratch allocation with `FD_SCRATCH_ALLOC_FINI` and check for overflow, logging an error if overflow occurs.
-- **Output**: The function does not return a value; it initializes the context for a tile and logs information about the process.
-- **Functions called**:
-    - [`scratch_footprint`](#scratch_footprint)
+    - Initialize scratch memory allocation with `FD_SCRATCH_ALLOC_INIT`.
+    - Allocate memory for `fd_store_ctx_t` using `FD_SCRATCH_ALLOC_APPEND`.
+    - Log a message indicating the start of blockstore acquisition.
+    - Enter a loop that pauses until `fd_ext_blockstore` is available, then break the loop.
+    - Use `FD_COMPILER_MFENCE` to ensure memory ordering after acquiring the blockstore.
+    - Log a message indicating successful acquisition of the blockstore.
+    - Set `ctx->disable_blockstore_from_slot` from `tile->store.disable_blockstore_from_slot`.
+    - Iterate over each input link of the tile, setting up memory, chunk0, and watermark for each link using `fd_dcache_compact_chunk0` and `fd_dcache_compact_wmark`.
+    - Finalize the scratch memory allocation with `FD_SCRATCH_ALLOC_FINI`.
+    - Check for scratch memory overflow and log an error if it occurs.
+- **Output**: No return value; the function initializes the context and sets up memory for the tile.
+- **Functions Called**:
+    - [`scratch_footprint`](<#scratch_footprint>)
 
 
 

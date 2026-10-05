@@ -3,47 +3,48 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `sha512_sch.sv` file in the `firedancer` codebase implements a SystemVerilog module for managing SHA-512 block scheduling, including input and output block handling, cycle management, and memory operations.
+Implements a SHA-512 scheduler module in SystemVerilog with input/output logic and RAM management.
 
 # Purpose
-The provided Verilog code defines a module named `sha512_sch`, which appears to be part of a hardware implementation for processing data blocks, potentially related to a SHA-512 hashing algorithm. This module is designed to handle data transactions, managing input and output blocks with associated metadata such as transaction IDs and block validity. The module includes several parameters for configuration, such as block width (`W_BLK`), transaction block count (`BLKS_PER_TR`), and RAM dimensions (`RAM_D`), which are used to tailor the module's operation to specific requirements. The code features a series of logic signals and registers to manage the flow of data through different stages, ensuring that blocks are processed in a sequence and that the necessary control signals are generated for each stage.
+The `sha512_sch` module is a Verilog hardware description that implements a scheduling mechanism for processing SHA-512 hash blocks. It is designed to handle data transactions in a pipelined manner, managing input and output blocks with associated metadata such as transaction IDs and block validity. The module uses parameters to define the width of blocks (`W_BLK`), the width of transaction IDs (`W_M`), and the number of blocks per transaction (`BLKS_PER_TR`). It also defines the depth of RAM (`RAM_D`) and the number of cycles (`N_CYCLES`) for processing.
 
-The module integrates several key components, including dual-port RAMs (`cycle_ram_inst` and `blk_ram_inst`) and a FIFO (`idx_fifo_inst`), which are used to store and manage data and metadata as it moves through the pipeline. The RAMs are responsible for storing cycle metadata and block data, while the FIFO manages indices for free blocks. The module's logic includes mechanisms for handling backpressure, ensuring that data is only processed when resources are available, and for managing the state of transactions, such as identifying the first, middle, and last blocks in a sequence. The design is structured to operate synchronously with a clock signal and includes reset functionality to initialize or clear the state as needed. Overall, this module provides a focused functionality for managing data block transactions, likely as part of a larger system for cryptographic processing or data integrity verification.
+The module includes several key components: two instances of `simple_dual_port_ram` for storing cycle metadata and block data, and a `showahead_fifo` for managing free address indices. The module processes input blocks (`iblk_*` signals) and outputs processed blocks (`oblk_*` signals) while maintaining control over the flow of data using backpressure (`iblk_p`). The design uses a state machine approach with multiple stages (`c00`, `c01`, `c02`, `c03`) to manage the reading, processing, and writing of data blocks. The module also includes logic to handle reset conditions and initialize internal counters.
 # Modules
 
 ---
 ### sha512\_sch
-The `sha512_sch` module is designed to handle SHA-512 hashing operations by managing data blocks and transaction IDs through a series of cycles. It uses dual-port RAMs and a FIFO to manage data flow and ensure proper sequencing of input and output blocks.
+Implements a SHA-512 scheduling module that manages data blocks and transactions. It uses dual-port RAM and FIFO for data handling and synchronization.
 - **Constants**:
-    - `W_BLK`: Defines the width of a block, set to 64 bits.
-    - `W_M`: Defines the width of a transaction ID, set to 64 bits.
-    - `BLKS_PER_TR`: Specifies the number of blocks per transaction, set to 10.
-    - `RAM_D`: Defines the depth of the RAM, set to 512.
-    - `N_CYCLES`: Specifies the number of cycles, set to 100.
-    - `RAM_E`: Calculated as RAM_D divided by BLKS_PER_TR, representing the number of entries in the RAM.
-    - `N_CYCLES_L`: Calculated as the ceiling of the log base 2 of N_CYCLES, representing the number of bits needed to address the cycles.
-    - `RAM_D_L`: Calculated as the ceiling of the log base 2 of RAM_D, representing the number of bits needed to address the RAM depth.
+    - ``W_BLK``: Defines the width of a block, set to 64 bits.
+    - ``W_M``: Defines the width of a transaction ID, set to 64 bits.
+    - ``BLKS_PER_TR``: Specifies the number of blocks per transaction, set to 10.
+    - ``RAM_D``: Defines the depth of the RAM, set to 512.
+    - ``N_CYCLES``: Specifies the number of cycles, set to 100.
+    - ``RAM_E``: Calculates the effective RAM depth per transaction, as `RAM_D / BLKS_PER_TR`.
+    - ``N_CYCLES_L``: Calculates the log base 2 of `N_CYCLES` for addressing.
+    - ``RAM_D_L``: Calculates the log base 2 of `RAM_D` for addressing.
 - **Ports**:
-    - `oblk_v`: Output logic signal indicating the validity of the output block.
-    - `oblk_d`: Output logic signal carrying the data of the output block.
-    - `oblk_t`: Output logic signal carrying the transaction ID of the output block.
-    - `oblk_f`: Output logic signal indicating if the output block is the first block.
-    - `oblk_m`: Output logic signal indicating if the output block is a middle block.
-    - `oblk_l`: Output logic signal indicating if the output block is the last block.
-    - `iblk_v`: Input wire signal indicating the validity of the input block.
-    - `iblk_f`: Input wire signal indicating if the input block is the first block.
-    - `iblk_c`: Input wire signal indicating the number of blocks.
-    - `iblk_d`: Input wire signal carrying the data of the input block.
-    - `iblk_t`: Input wire signal carrying the transaction ID of the input block.
-    - `iblk_p`: Output logic signal indicating backpressure, applied only for the first block.
-    - `clk`: Input wire signal for the clock.
-    - `rst`: Input wire signal for the reset.
-- **Logic And Control Flow**:
-    - The module uses several logic signals to manage addresses and control flow, such as `c00_c_addr`, `c01_c_addr`, `c02_c_addr`, and `c03_c_addr`, which are used to track cycle addresses.
-    - The `always_comb` block calculates the backpressure signal `iblk_p` based on the validity and position of the input block, and determines when to pop from the free FIFO.
-    - The `always_ff` block, triggered on the positive edge of the clock, updates cycle addresses, manages the validity and state of blocks, and handles the initialization of the free counter.
-    - The module instantiates two `simple_dual_port_ram` components for cycle metadata and block data, and a `showahead_fifo` for managing free addresses.
-    - The `always_ff` block also handles reset conditions, initializing various control signals and counters to zero when reset is asserted.
+    - ``oblk_v``: Indicates if the output block is valid.
+    - ``oblk_d``: Carries the output block data.
+    - ``oblk_t``: Carries the output transaction ID.
+    - ``oblk_f``: Indicates if the output block is the first block.
+    - ``oblk_m``: Indicates if the output block is a middle block.
+    - ``oblk_l``: Indicates if the output block is the last block.
+    - ``iblk_v``: Indicates if the input block is valid.
+    - ``iblk_f``: Indicates if the input block is the first block.
+    - ``iblk_c``: Specifies the number of input blocks.
+    - ``iblk_d``: Carries the input block data.
+    - ``iblk_t``: Carries the input transaction ID.
+    - ``iblk_p``: Indicates backpressure, applied only for the first block.
+    - ``clk``: Clock signal for synchronization.
+    - ``rst``: Reset signal to initialize the module.
+- **Logic and Control Flow**:
+    - Uses `always_comb` block to calculate backpressure (`iblk_p`) and free pop signal (`c02_free_pop`).
+    - Uses `always_ff` block on the positive edge of `clk` to manage cycle addresses and data flow through the pipeline stages (`c00`, `c01`, `c02`, `c03`).
+    - Initializes and increments `free_init_cnt` to manage free space in the FIFO.
+    - Resets internal states and counters when `rst` is asserted.
+    - Instantiates `simple_dual_port_ram` for cycle metadata and block data storage.
+    - Instantiates `showahead_fifo` for managing free address space.
 
 
 

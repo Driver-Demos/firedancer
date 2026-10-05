@@ -3,51 +3,51 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SIMD headers and unit tests for SSE, AVX, and AVX-512 vector operations.
+APIs and tests for SIMD operations using AVX, AVX512, and SSE intrinsics on various data types.
 
 
 ## Files
-- **[fd_avx.h](fd_avx.h.md)**: The `fd_avx.h` file provides an API for writing vectorized C/C++ code using AVX intrinsics, offering a thin wrapper to facilitate operations on various data types and enabling easy porting to non-Intel architectures.
-- **[fd_avx512.h](fd_avx512.h.md)**: AVX512 vector wrapper constants and type-specific SIMD APIs for ints, uints, longs, ulongs, bytes, and ushorts
-- **[fd_avx512_wwb.h](fd_avx512_wwb.h.md)**: AVX-512 byte-vector constructors, bit ops, and load/store helpers.
-- **[fd_avx512_wwh.h](fd_avx512_wwh.h.md)**: AVX-512 ushort vector macros and load/store, add, and sub operations.
-- **[fd_avx512_wwi.h](fd_avx512_wwi.h.md)**: The `fd_avx512_wwi.h` file in the `firedancer` codebase provides a set of macros and inline functions for operations on 512-bit wide vector integers using AVX-512 intrinsics, including arithmetic, binary, comparison, and memory operations.
-- **[fd_avx512_wwl.h](fd_avx512_wwl.h.md)**: The `fd_avx512_wwl.h` file in the `firedancer` codebase provides a set of macros and inline functions for manipulating 512-bit wide vectors of 64-bit integers using AVX-512 instructions, including operations for arithmetic, binary, comparison, and conditional logic.
-- **[fd_avx512_wwu.h](fd_avx512_wwu.h.md)**: AVX-512 uint32 vector ops, loads, rotates, compares, and transpose macros.
-- **[fd_avx512_wwv.h](fd_avx512_wwv.h.md)**: The `fd_avx512_wwv.h` file in the `firedancer` codebase provides a set of macros and inline functions for manipulating 512-bit wide vectors of unsigned 64-bit integers using AVX-512 instructions, including operations for construction, arithmetic, binary operations, comparisons, and conversions.
-- **[fd_avx_wb.h](fd_avx_wb.h.md)**: The `fd_avx_wb.h` file in the `firedancer` codebase provides a set of macros and inline functions for handling 256-bit wide vector operations on unsigned 8-bit integers using AVX instructions, including constructors, memory operations, arithmetic, bitwise, logical, and conversion operations.
-- **[fd_avx_wc.h](fd_avx_wc.h.md)**: The `fd_avx_wc.h` file in the `firedancer` codebase provides a vector conditional API for AVX SIMD operations, defining macros and inline functions for constructing, manipulating, and converting vector conditionals, with a focus on 32-bit lanes and support for various logical and binary operations.
-- **[fd_avx_wd.h](fd_avx_wd.h.md)**: The `fd_avx_wd.h` file in the `firedancer` codebase provides a comprehensive API for handling vector double operations using AVX instructions, including constructors, arithmetic, logical, conditional, conversion, and reduction operations, while ensuring proper handling of vector conditionals and memory operations.
-- **[fd_avx_wf.h](fd_avx_wf.h.md)**: The `fd_avx_wf.h` file in the `firedancer` codebase provides a comprehensive API for operations on AVX vector floats, including constructors, arithmetic, logical, and conversion operations, as well as memory and reduction operations, specifically designed for handling 8-lane single-precision floating-point vectors.
-- **[fd_avx_wh.h](fd_avx_wh.h.md)**: The `fd_avx_wh.h` file in the `firedancer` codebase provides a SIMD vector API for operations on 16-bit unsigned integers using AVX instructions, including constructors, memory operations, arithmetic, binary, and logical operations.
-- **[fd_avx_wi.h](fd_avx_wi.h.md)**: The `fd_avx_wi.h` file in the `firedancer` codebase provides a comprehensive API for handling 256-bit wide vector integers using AVX instructions, including operations for construction, arithmetic, logical, memory, and conversion operations, as well as predefined constants and reduction operations.
-- **[fd_avx_wl.h](fd_avx_wl.h.md)**: The `fd_avx_wl.h` file in the `firedancer` codebase provides a set of macros and inline functions for operations on AVX vector long data types, including construction, arithmetic, logical, and conversion operations, as well as memory and element manipulation.
-- **[fd_avx_ws.h](fd_avx_ws.h.md)**: The `fd_avx_ws.h` file in the `firedancer` codebase provides a set of macros and inline functions for handling 256-bit AVX vector operations on 16-bit signed integers, including construction, memory operations, arithmetic, binary, and logical operations.
-- **[fd_avx_wu.h](fd_avx_wu.h.md)**: AVX2 unsigned 32-bit vector operations, loads, stores, conversions, and reductions.
-- **[fd_avx_wv.h](fd_avx_wv.h.md)**: The `fd_avx_wv.h` file in the `firedancer` codebase provides a set of macros and inline functions for operations on 256-bit vectors of unsigned 64-bit integers using AVX instructions, including construction, arithmetic, logical, and conversion operations.
-- **[fd_sse.h](fd_sse.h.md)**: The `fd_sse.h` file in the `firedancer` codebase provides a thin wrapper around Intel's SSE intrinsics, offering a robust API for writing vectorized C/C++ code with support for various data types and operations, while facilitating portability to non-Intel architectures.
-- **[fd_sse_vb.h](fd_sse_vb.h.md)**: The `fd_sse_vb.h` file in the `firedancer` codebase provides a comprehensive API for handling 128-bit SIMD vector operations on unsigned 8-bit integers, including constructors, arithmetic, bitwise, logical, and memory operations, as well as conversion and reduction functions.
-- **[fd_sse_vc.h](fd_sse_vc.h.md)**: The `fd_sse_vc.h` file in the `firedancer` codebase provides a vector conditional API for SIMD operations, defining macros and inline functions for constructing, manipulating, and converting vector conditionals using 32-bit lanes, with support for logical, binary, and memory operations.
-- **[fd_sse_vd.h](fd_sse_vd.h.md)**: The `fd_sse_vd.h` file in the `firedancer` codebase provides a comprehensive API for handling vector double operations using SIMD (Single Instruction, Multiple Data) instructions, including constructors, arithmetic, logical, and conversion operations, specifically designed for double precision floating point values.
-- **[fd_sse_vf.h](fd_sse_vf.h.md)**: The `fd_sse_vf.h` file in the `firedancer` codebase provides a comprehensive API for operations on vector floats using SSE instructions, including constructors, arithmetic, logical, and conversion operations, as well as memory and reduction operations.
-- **[fd_sse_vi.h](fd_sse_vi.h.md)**: The `fd_sse_vi.h` file in the `firedancer` codebase provides a comprehensive API for handling 128-bit SIMD vector operations on signed 32-bit integers, including construction, arithmetic, logical, and conversion operations, as well as memory and reduction operations.
-- **[fd_sse_vl.h](fd_sse_vl.h.md)**: The `fd_sse_vl.h` file in the `firedancer` codebase provides a set of macros and inline functions for handling vector operations on 64-bit signed integers using SSE intrinsics, including arithmetic, logical, and conversion operations, as well as memory and element manipulation.
-- **[fd_sse_vu.h](fd_sse_vu.h.md)**: SIMD unsigned 32-bit vector API with arithmetic, logic, conversion, and transpose operations.
-- **[fd_sse_vv.h](fd_sse_vv.h.md)**: The `fd_sse_vv.h` file in the `firedancer` codebase provides a set of macros and inline functions for operations on 128-bit SIMD vectors, specifically handling pairs of 64-bit unsigned integers, including arithmetic, logical, and conversion operations, as well as memory and element manipulation.
-- **[Local.mk](Local.mk.md)**: Build rules for SIMD headers and SSE, AVX, and AVX512 unit tests.
-- **[test_avx512.h](test_avx512.h.md)**: AVX-512 unit test macros, static checks, and compile-time expansion helpers.
-- **[test_avx512_16x32.c](test_avx512_16x32.c.md)**: The `test_avx512_16x32.c` file in the `firedancer` codebase contains a comprehensive set of tests for AVX-512 SIMD operations on 16x32-bit integer vectors, including construction, arithmetic, bitwise, comparison, and conversion operations.
-- **[test_avx512_64x8.c](test_avx512_64x8.c.md)**: AVX-512 64x8 byte vector tests for constructors, broadcasts, shifts, and bit ops.
-- **[test_avx512_8x64.c](test_avx512_8x64.c.md)**: The `test_avx512_8x64.c` file in the `firedancer` codebase contains a comprehensive suite of tests for AVX-512 SIMD operations on 8x64-bit vectors, including construction, arithmetic, bitwise, comparison, and conversion operations.
-- **[test_avx_16x16.c](test_avx_16x16.c.md)**: The `test_avx_16x16.c` file in the `firedancer` codebase contains tests for AVX SIMD operations on 16-element vectors of short and unsigned short integers, including arithmetic, bitwise, and logical operations.
-- **[test_avx_32x8.c](test_avx_32x8.c.md)**: The `test_avx_32x8.c` file in the `firedancer` codebase contains a comprehensive set of tests for various SIMD operations using AVX instructions, including arithmetic, bitwise, logical, conversion, and reduction operations on 32-byte vectors.
-- **[test_avx_4x64.c](test_avx_4x64.c.md)**: The `test_avx_4x64.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various AVX SIMD operations, including arithmetic, logical, bit manipulation, and conversion operations on different data types such as double, long, and unsigned long.
-- **[test_avx_8x32.c](test_avx_8x32.c.md)**: The `test_avx_8x32.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various SIMD operations using AVX instructions, including tests for constructors, arithmetic, logical, bit manipulation, and conversion operations on different data types such as integers, floats, and doubles.
-- **[test_avx_common.c](test_avx_common.c.md)**: The `test_avx_common.c` file in the `firedancer` codebase contains a series of test functions for verifying the correctness of various SIMD operations on different data types, including integers, floats, doubles, and vectors, using AVX instructions.
-- **[test_sse_16x8.c](test_sse_16x8.c.md)**: The `test_sse_16x8.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various SIMD operations on 16x8 vectors, including arithmetic, bitwise, logical, conversion, and reduction operations, using the SSE (Streaming SIMD Extensions) instruction set.
-- **[test_sse_2x64.c](test_sse_2x64.c.md)**: The `test_sse_2x64.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various SIMD operations on double, long, and unsigned long data types, including arithmetic, logical, bit manipulation, and conversion operations, using SSE intrinsics.
-- **[test_sse_4x32.c](test_sse_4x32.c.md)**: The `test_sse_4x32.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various SIMD operations, including constructors, arithmetic, logical, bit manipulation, and conversion operations for different data types using SSE instructions.
-- **[test_sse_common.c](test_sse_common.c.md)**: The `test_sse_common.c` file in the `firedancer` codebase contains a series of test functions for verifying the correctness of SIMD operations on various data types, including vectors of integers, floats, doubles, and bytes, using SSE instructions.
+- **[fd_avx.h](fd_avx.h.md)**: An API for vectorized C/C++ code using AVX intrinsics for various data types and operations.
+- **[fd_avx512.h](fd_avx512.h.md)**: API for vectorized C/C++ code using AVX512 intrinsics for various data types and operations.
+- **[fd_avx512_wwb.h](fd_avx512_wwb.h.md)**: Defines macros and inline functions for AVX-512 vector operations on 8-bit unsigned integers.
+- **[fd_avx512_wwh.h](fd_avx512_wwh.h.md)**: Defines a vector ushort API using AVX-512 intrinsics for operations on 16-bit unsigned integers.
+- **[fd_avx512_wwi.h](fd_avx512_wwi.h.md)**: Macros and inline functions for AVX-512 vector operations on 32-bit integers, including arithmetic, binary, and memory operations.
+- **[fd_avx512_wwl.h](fd_avx512_wwl.h.md)**: Defines macros and functions for AVX-512 vector operations on 64-bit integers using `wwl_t` type.
+- **[fd_avx512_wwu.h](fd_avx512_wwu.h.md)**: Defines macros and inline functions for AVX-512 vector operations on 32-bit unsigned integers.
+- **[fd_avx512_wwv.h](fd_avx512_wwv.h.md)**: Defines macros and inline functions for AVX-512 vector operations on unsigned 64-bit integers.
+- **[fd_avx_wb.h](fd_avx_wb.h.md)**: AVX2 SIMD vector byte API for 256-bit wide operations on unsigned 8-bit integers, including constructors, arithmetic, bitwise, logical, and conversion operations.
+- **[fd_avx_wc.h](fd_avx_wc.h.md)**: Vector conditional API for AVX SIMD operations, including constructors, memory, and logical operations.
+- **[fd_avx_wd.h](fd_avx_wd.h.md)**: AVX-based vector double API for operations on 256-bit wide vectors of double precision floating point values.
+- **[fd_avx_wf.h](fd_avx_wf.h.md)**: AVX-based vector float API for operations on 256-bit wide vectors of single-precision floats.
+- **[fd_avx_wh.h](fd_avx_wh.h.md)**: Header file for AVX SIMD operations on vectors of 16 unsigned 16-bit integers, including constructors, memory, arithmetic, binary, and logical operations.
+- **[fd_avx_wi.h](fd_avx_wi.h.md)**: AVX-based vector integer operations for 32-bit signed integers, including arithmetic, logical, and memory operations.
+- **[fd_avx_wl.h](fd_avx_wl.h.md)**: AVX-based vector long API for 64-bit integer operations, including constructors, arithmetic, and logical functions.
+- **[fd_avx_ws.h](fd_avx_ws.h.md)**: Defines macros and functions for AVX vector operations on 16-bit signed integers, including arithmetic, memory, and logical operations.
+- **[fd_avx_wu.h](fd_avx_wu.h.md)**: Defines macros and functions for AVX-based operations on vectors of unsigned 32-bit integers.
+- **[fd_avx_wv.h](fd_avx_wv.h.md)**: Header file for AVX vector operations on unsigned 64-bit integers, including constructors, arithmetic, and logical operations.
+- **[fd_sse.h](fd_sse.h.md)**: An API for vectorized C/C++ code using SSE intrinsics with support for various data types and operations.
+- **[fd_sse_vb.h](fd_sse_vb.h.md)**: Header file for vector byte operations using SSE, defining macros and functions for vector construction, manipulation, arithmetic, and logical operations on 128-bit vectors of unsigned 8-bit integers.
+- **[fd_sse_vc.h](fd_sse_vc.h.md)**: Defines a vector conditional API for SIMD operations with constructors, memory, element, binary, logical, conditional, conversion, reduction, and miscellaneous operations.
+- **[fd_sse_vd.h](fd_sse_vd.h.md)**: Vector double API for SIMD operations on double precision floating point values using SSE instructions.
+- **[fd_sse_vf.h](fd_sse_vf.h.md)**: Defines a vector float API using SSE intrinsics for operations on 128-bit vectors of single-precision floats.
+- **[fd_sse_vi.h](fd_sse_vi.h.md)**: Header file for vector integer operations using SSE intrinsics, including arithmetic, logical, and memory operations.
+- **[fd_sse_vl.h](fd_sse_vl.h.md)**: Defines macros and functions for vector long operations using SSE intrinsics, including arithmetic, logical, and memory operations.
+- **[fd_sse_vu.h](fd_sse_vu.h.md)**: Header file for vector operations on 128-bit unsigned integer vectors using SSE intrinsics.
+- **[fd_sse_vv.h](fd_sse_vv.h.md)**: Header file for vector operations on 64-bit unsigned integers using SSE intrinsics.
+- **[Local.mk](Local.mk.md)**: Defines headers and unit tests for SSE, AVX, and AVX512 SIMD operations based on availability.
+- **[test_avx512.h](test_avx512.h.md)**: Common functionality for AVX-512 unit tests, including macros for testing and assertions.
+- **[test_avx512_16x32.c](test_avx512_16x32.c.md)**: Tests for AVX-512 16x32 SIMD operations, including arithmetic, bitwise, and comparison functions.
+- **[test_avx512_64x8.c](test_avx512_64x8.c.md)**: Tests AVX-512 64x8 SIMD operations using random data and various bit manipulation functions.
+- **[test_avx512_8x64.c](test_avx512_8x64.c.md)**: Tests for AVX-512 8x64 SIMD operations, including arithmetic, bitwise, and comparison functions.
+- **[test_avx_16x16.c](test_avx_16x16.c.md)**: Tests for AVX 16x16 SIMD operations, including arithmetic, bit, and logical operations on short and ushort data types.
+- **[test_avx_32x8.c](test_avx_32x8.c.md)**: Tests for AVX 32x8 SIMD operations, including arithmetic, bit, logical, and conversion operations.
+- **[test_avx_4x64.c](test_avx_4x64.c.md)**: Tests for AVX 4x64 SIMD operations, including arithmetic, logical, and conversion functions.
+- **[test_avx_8x32.c](test_avx_8x32.c.md)**: Tests for AVX 8x32 SIMD operations, including constructors, arithmetic, logical, and conversion functions.
+- **[test_avx_common.c](test_avx_common.c.md)**: Tests for AVX SIMD operations on various data types, including extraction, insertion, and memory operations.
+- **[test_sse_16x8.c](test_sse_16x8.c.md)**: Tests for SSE 16x8 vector operations, including arithmetic, bit, logical, and conversion operations.
+- **[test_sse_2x64.c](test_sse_2x64.c.md)**: Tests for SSE 2x64 SIMD operations, including arithmetic, logical, and conversion functions.
+- **[test_sse_4x32.c](test_sse_4x32.c.md)**: Tests for SSE 4x32 vector operations, including constructors, arithmetic, logical, and conversion functions.
+- **[test_sse_common.c](test_sse_common.c.md)**: Tests for SIMD operations on various data types, including vector extraction, insertion, and storage.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
