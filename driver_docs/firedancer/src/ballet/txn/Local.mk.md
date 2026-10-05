@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and conditional fuzz tests for the transaction parsing component in the `ballet/txn` directory.
+Makefile for adding headers, objects, and running unit and fuzz tests for transaction parsing.
 
 # Purpose
-The file is a Makefile script used for automating the build and test processes in a software project. It defines rules to add header files and object files, create unit tests, and conditionally create a fuzz test if the `FD_HAS_HOSTED` variable is set. Additionally, it specifies commands to run the defined unit tests, ensuring the software components are correctly built and tested.
+This Makefile script automates the build and test processes for a software project. It adds header files and object files using the `add-hdrs` and `add-objs` functions. It defines unit tests for `test_txn_parse`, `test_txn`, and `test_compact_u16` using the `make-unit-test` function, specifying dependencies on `fd_ballet` and `fd_util`. If the `FD_HAS_HOSTED` condition is true, it also defines a fuzz test for `fuzz_txn_parse`. The script concludes by running the defined unit tests with the `run-unit-test` function.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
