@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_deduplication.c` file in the `firedancer` codebase implements tests for deduplication and validation of transactions using various methods such as sorting, hashing, and AVX instructions.
+Tests for deduplication and validation of transactions using sorting, hashing, and AVX operations.
 
 # Purpose
-This C source code file is designed to perform performance benchmarking and validation of various transaction processing functions, specifically focusing on sorting, hashing, and AVX (Advanced Vector Extensions) operations. The file includes several key components: it imports binary transaction data, defines sorting and hashing mechanisms for transaction account addresses, and implements functions to validate these operations. The main function orchestrates the execution of these validation functions over a large number of iterations to measure their performance, logging the average time taken for each operation. The code utilizes SIMD (Single Instruction, Multiple Data) operations for efficient data processing and includes custom hash map implementations to manage transaction account addresses.
+The code is an executable C program that performs various validation checks on transaction data using different methods. It includes functions to parse transaction payloads, sort account addresses, and check for unique account addresses using hash maps and AVX (Advanced Vector Extensions) operations. The program imports binary transaction data and uses it to test the performance and correctness of these validation methods. The main function executes these checks in a loop, measuring the time taken for each validation method and logging the results. The program uses SIMD (Single Instruction, Multiple Data) operations to optimize certain checks, and it includes custom sorting and hashing implementations to handle transaction account addresses.
 
-The file is structured to be an executable C program, as indicated by the presence of a [`main`](#main) function. It does not define public APIs or external interfaces but rather focuses on internal validation and performance testing. The code leverages several utility headers and templates for sorting and hashing, indicating a modular design where specific functionalities are abstracted into reusable components. The use of macros and templates for sorting and hashing suggests a focus on flexibility and efficiency, allowing the code to handle different data types and operations with minimal overhead.
+The code defines several key components, including [`check_sort`](<#check_sort>), [`check_hash`](<#check_hash>), [`check_hash64`](<#check_hash64>), and [`check_avx`](<#check_avx>) functions, each implementing a different validation strategy. It uses macros to define sorting and hashing behaviors, and it includes binary data for sample transactions. The program is structured to measure the performance of these validation methods by running them repeatedly and calculating the average time taken. The use of `fd_txn_parse` and related functions indicates that the program is part of a larger framework for handling financial transactions, likely involving account address management and validation.
 # Imports and Dependencies
 
 ---
@@ -26,197 +26,207 @@ The file is structured to be an executable C program, as indicated by the presen
 ---
 ### \_txn
 - **Type**: `uchar array`
-- **Description**: The `_txn` variable is a global array of unsigned characters with a size defined by `FD_TXN_MAX_SZ`. It is used to store transaction data that is parsed and processed by various functions in the code.
-- **Use**: This variable is used to hold transaction data after parsing, allowing functions to access and manipulate the transaction details.
+- **Description**: An array of unsigned characters with a size defined by the macro `FD_TXN_MAX_SZ`. This array is used to store transaction data after parsing.
+- **Use**: Used to hold parsed transaction data for further processing in various functions.
 
 
 ---
 ### scratch1
-- **Type**: `fd_acct_addr_t[]`
-- **Description**: The variable `scratch1` is a global array of type `fd_acct_addr_t` with a size defined by `FD_TXN_ACCT_ADDR_MAX`. It is aligned to a 32-byte boundary for performance optimization, likely to take advantage of SIMD operations or cache line alignment.
-- **Use**: `scratch1` is used as a temporary storage buffer for account addresses during transaction processing, particularly in sorting operations.
+- **Type**: ``fd_acct_addr_t` array`
+- **Description**: An array named `scratch1` of type `fd_acct_addr_t` with a size defined by `FD_TXN_ACCT_ADDR_MAX`. The array is aligned to a 32-byte boundary using the `__attribute__((aligned(32)))` directive.
+- **Use**: Used to temporarily store account addresses during transaction processing, particularly in sorting operations.
 
 
 ---
 ### scratch2
-- **Type**: `fd_acct_addr_t array`
-- **Description**: The variable `scratch2` is a global array of type `fd_acct_addr_t` with a size defined by `FD_TXN_ACCT_ADDR_MAX`. It is aligned to a 32-byte boundary for performance optimization, likely to take advantage of SIMD operations or cache line alignment.
-- **Use**: `scratch2` is used as a temporary buffer to store account addresses during transaction processing, particularly in sorting operations.
+- **Type**: ``fd_acct_addr_t` array`
+- **Description**: An array named `scratch2` of type `fd_acct_addr_t` with a size defined by `FD_TXN_ACCT_ADDR_MAX`. The array is aligned to a 32-byte boundary using the `__attribute__((aligned(32)))` directive.
+- **Use**: Used as a temporary storage buffer for account addresses during transaction processing, particularly in sorting operations.
 
 
 ---
 ### null\_addr
 - **Type**: ``fd_acct_addr_t``
-- **Description**: The `null_addr` is a static constant of type `fd_acct_addr_t`, initialized with a specific value of `{{ 1, 0 }}`. This structure likely represents an account address with a predefined null or invalid state.
-- **Use**: It is used as a sentinel value in hash map operations to represent a null or invalid key.
+- **Description**: Defines a constant account address with a specific value of `{{ 1, 0 }}`. This structure is used to represent a null or invalid account address in the context of the program.
+- **Use**: Used as a sentinel value to indicate a null or invalid key in hash map operations.
 
 
 ---
 ### \_map
-- **Type**: `uchar array`
-- **Description**: The `_map` variable is a global array of unsigned characters (`uchar`) with a size determined by the product of the size of `fd_pack_addr_use_t` and `2^9` (512). It is aligned to a 32-byte boundary for optimized memory access.
-- **Use**: This variable is used as a memory buffer for hash map operations involving account addresses, facilitating efficient storage and retrieval of address usage records.
+- **Type**: ``uchar[]``
+- **Description**: An array of unsigned characters (`uchar`) that is used to store data for a hash map. The size of the array is determined by the size of `fd_pack_addr_use_t` multiplied by 512 (2^9), and it is aligned to a 32-byte boundary for performance optimization.
+- **Use**: Used as a memory buffer for hash map operations involving account addresses.
 
 
 # Data Structures
 
 ---
 ### fd\_pack\_private\_addr\_use\_record
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `key`: Holds the account address as a key.
-- **Description**: The `fd_pack_private_addr_use_record` structure is a simple data structure designed to store an account address, encapsulated in the `fd_acct_addr_t` type, as its key. This structure is used to represent a record of address usage within a larger system, likely for tracking or mapping purposes. It is typedef'd to `fd_pack_addr_use_t` for ease of use in the codebase.
+    - `key`: Stores an account address of type `fd_acct_addr_t`.
+- **Description**: Defines a structure that holds a single member `key`, which is an account address. This structure is used to represent the usage record of a private address in the context of the application. The `typedef` creates an alias `fd_pack_addr_use_t` for this structure, simplifying its usage in the code.
 
 
 ---
 ### fd\_pack\_addr\_use\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `key`: Represents an account address.
-- **Description**: The `fd_pack_addr_use_t` is a structure that encapsulates a single field, `key`, which is of type `fd_acct_addr_t`. This structure is used to represent an account address within the context of a hash map, as indicated by its use in the `hash_pubkeys` map. The structure is designed to facilitate operations on account addresses, such as insertion, removal, and querying within a hash map, which is part of a larger system for processing transactions.
+    - `key`: Stores the account address as an `fd_acct_addr_t` type.
+- **Description**: Defines a structure that holds a single account address, represented by the `key` member. This structure is used in hash map operations to manage and query account addresses efficiently.
 
 
 ---
 ### wrap\_ul
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `key`: An unsigned long integer used as the key in the data structure.
-- **Description**: The `wrap_ul` structure is a simple data structure that encapsulates a single unsigned long integer, `key`, which is used as a key in various operations, such as hashing or mapping. This structure is typically used in contexts where a single numeric key is needed to represent or identify an entity or object within a larger system, such as a hash map or a sorting algorithm.
+    - `key`: Stores an unsigned long integer value.
+- **Description**: Encapsulates a single unsigned long integer (`ulong`) in a structure, providing a type definition `wrap_ul_t` for ease of use in applications that require a simple wrapper around an unsigned long integer.
 
 
 ---
 ### wrap\_ul\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `key`: A field of type 'ulong' used as a key in the data structure.
-- **Description**: The `wrap_ul_t` is a simple data structure defined as a struct with a single member, `key`, which is of type `ulong`. This structure is likely used to encapsulate a key value for operations such as hashing or mapping, as indicated by its usage in the `hash_ul` map implementation. The simplicity of the structure suggests it is designed for efficient storage and retrieval of a single key value.
+    - `key`: Stores an unsigned long integer value.
+- **Description**: Represents a structure that contains a single member, `key`, which is an unsigned long integer. This structure is used in the context of hash maps, as indicated by its use in the `hash_ul` map implementation, where it serves as the type for the map's elements.
 
 
 # Functions
 
 ---
 ### check\_sort<!-- {{#callable:check_sort}} -->
-The `check_sort` function verifies if the account addresses extracted from a transaction payload are sorted uniquely in a stable manner.
+[View Source →](<../../../../../src/disco/pack/test_deduplication.c#L21>)
+
+Checks if the account addresses in a transaction payload are sorted and unique.
 - **Inputs**:
-    - `payload`: A pointer to the transaction payload data, represented as an array of unsigned characters.
-    - `sz`: The size of the transaction payload in bytes, represented as an unsigned long integer.
-- **Control Flow**:
-    - The function begins by parsing the transaction payload using `fd_txn_parse` and stores the result in a global buffer `_txn`.
-    - It retrieves the transaction object from the parsed data and calculates the number of account addresses using `fd_txn_account_cnt`.
-    - The account addresses are copied from the transaction into a scratch buffer `scratch1` using `memcpy`.
-    - The addresses in `scratch1` are then sorted using `sort_pubkeys_stable_fast`, with the sorted result stored in `scratch2`.
-    - A loop iterates over the sorted addresses to check for duplicates by comparing each address with the previous one using `memcmp`.
-    - If any duplicate addresses are found, the function returns 0, indicating the addresses are not uniquely sorted.
-    - If no duplicates are found, the function returns 1, indicating the addresses are uniquely sorted.
-- **Output**: The function returns an integer: 1 if the account addresses are uniquely sorted, and 0 if there are duplicates.
+    - `payload`: A pointer to the transaction payload data.
+    - `sz`: The size of the transaction payload data.
+- **Logic and Control Flow**:
+    - Parse the transaction from the `payload` using `fd_txn_parse` and store it in `_txn`.
+    - Retrieve the transaction object `txn` from `_txn`.
+    - Get the count of immediate account addresses in the transaction using `fd_txn_account_cnt`.
+    - Copy the account addresses from the transaction into `scratch1` using `memcpy`.
+    - Sort the account addresses in `scratch1` using `sort_pubkeys_stable_fast`, storing the result in `sorted`.
+    - Iterate over the sorted account addresses starting from the second address.
+    - Compare each address with the previous one using `memcmp` to check for duplicates.
+    - If a duplicate is found, return 0 indicating the addresses are not unique.
+    - If no duplicates are found, return 1 indicating the addresses are sorted and unique.
+- **Output**: Returns 1 if the account addresses are sorted and unique, otherwise returns 0.
 
 
 ---
 ### check\_hash<!-- {{#callable:check_hash}} -->
-The `check_hash` function verifies if any account addresses in a transaction payload have been previously encountered by using a hash map to track them.
+[View Source →](<../../../../../src/disco/pack/test_deduplication.c#L70>)
+
+Checks if any account addresses in a transaction payload have been previously used by querying and updating a hash map.
 - **Inputs**:
-    - `payload`: A pointer to an unsigned character array representing the transaction payload to be parsed and checked.
-    - `sz`: An unsigned long integer representing the size of the payload.
-- **Control Flow**:
-    - Parse the transaction from the payload using `fd_txn_parse` and store it in `_txn`.
-    - Retrieve the transaction object from `_txn` and determine the number of immediate account addresses using `fd_txn_account_cnt`.
-    - Get the list of account addresses from the transaction using `fd_txn_get_acct_addrs`.
-    - Join the hash map using `hash_pubkeys_join` to prepare for querying and inserting addresses.
+    - `payload`: A pointer to the transaction payload data.
+    - `sz`: The size of the transaction payload data.
+- **Logic and Control Flow**:
+    - Parse the transaction from the `payload` using `fd_txn_parse` and store it in `_txn`.
+    - Retrieve the transaction object `txn` from `_txn`.
+    - Get the count of immediate account addresses in the transaction using `fd_txn_account_cnt`.
+    - Retrieve the account addresses from the transaction using `fd_txn_get_acct_addrs`.
+    - Join the hash map using `hash_pubkeys_join` to get a pointer to the map.
     - Initialize `retval` to 1, indicating no duplicate addresses found initially.
-    - Iterate over each account address and check if it already exists in the hash map using `hash_pubkeys_query`; if found, set `retval` to 0 and break the loop.
-    - If not found, insert the address into the hash map using `hash_pubkeys_insert`.
-    - After checking all addresses, iterate again to remove each address from the hash map using `hash_pubkeys_remove`.
+    - Iterate over each account address and check if it is already in the map using `hash_pubkeys_query`.
+    - If a duplicate address is found, set `retval` to 0 and break the loop.
+    - Insert each account address into the map using `hash_pubkeys_insert`.
+    - After checking, remove each account address from the map using `hash_pubkeys_remove`.
     - Return `retval`, which indicates whether any duplicate addresses were found.
-- **Output**: An integer value, where 1 indicates no duplicate account addresses were found, and 0 indicates at least one duplicate was detected.
+- **Output**: Returns an integer `retval`, which is 1 if no duplicate account addresses are found, and 0 if duplicates are detected.
 
 
 ---
 ### dummy<!-- {{#callable:dummy}} -->
-The `dummy` function parses a transaction payload, retrieves account addresses, and accesses the first byte of each address in a loop, returning a constant value.
+[View Source →](<../../../../../src/disco/pack/test_deduplication.c#L93>)
+
+Parses a transaction payload, retrieves account addresses, and accesses the first byte of each address.
 - **Inputs**:
-    - `payload`: A pointer to an array of unsigned characters representing the transaction payload.
-    - `sz`: An unsigned long integer representing the size of the payload.
-- **Control Flow**:
-    - The function begins by parsing the transaction payload using `fd_txn_parse`, storing the result in a global transaction buffer `_txn`.
-    - It casts the global buffer `_txn` to a `fd_txn_t` pointer named `txn`.
-    - The function retrieves the count of immediate category accounts in the transaction using `fd_txn_account_cnt`.
-    - It obtains the account addresses from the transaction using `fd_txn_get_acct_addrs`.
-    - A loop iterates over each account address, accessing the first byte of each address and storing it in a volatile variable `d`.
-    - The function concludes by returning the constant integer value `1`.
-- **Output**: The function returns a constant integer value `1`, indicating successful execution.
+    - `payload`: A pointer to the transaction payload data.
+    - `sz`: The size of the transaction payload in bytes.
+- **Logic and Control Flow**:
+    - Call `fd_txn_parse` to parse the transaction payload and store the result in `_txn`.
+    - Cast `_txn` to a `fd_txn_t` pointer and assign it to `txn`.
+    - Retrieve the count of immediate category accounts using `fd_txn_account_cnt`.
+    - Get the account addresses from the transaction using `fd_txn_get_acct_addrs`.
+    - Iterate over each account address, accessing the first byte of each address and storing it in the volatile variable `d`.
+- **Output**: Always returns 1.
 
 
 ---
 ### check\_hash64<!-- {{#callable:check_hash64}} -->
-The `check_hash64` function verifies that no duplicate 64-bit hash keys, derived from transaction account addresses, exist within a given payload.
+[View Source →](<../../../../../src/disco/pack/test_deduplication.c#L109>)
+
+Validates that no duplicate 64-bit hash keys exist in the transaction account addresses.
 - **Inputs**:
-    - `payload`: A pointer to an array of unsigned characters representing the transaction data to be parsed and checked.
-    - `sz`: An unsigned long integer representing the size of the payload in bytes.
-- **Control Flow**:
-    - The function begins by parsing the transaction data from the payload using `fd_txn_parse` and stores it in a global buffer `_txn`.
-    - It retrieves the transaction object and the count of immediate category accounts using `fd_txn_account_cnt`.
-    - The function obtains the account addresses from the transaction using `fd_txn_get_acct_addrs`.
-    - A hash map is joined using `hash_ul_join` to manage the 64-bit keys derived from the account addresses.
-    - The function initializes a return value `retval` to 1, indicating no duplicates found initially.
-    - It iterates over each account address, computes a 64-bit key by loading 8 bytes from the address and adding 1, and checks if this key already exists in the hash map using `hash_ul_query`.
-    - If a duplicate key is found, `retval` is set to 0, and the loop breaks.
-    - If no duplicate is found, the key is inserted into the hash map using `hash_ul_insert`.
-    - After checking all addresses, the function iterates again to remove all keys from the hash map using `hash_ul_remove`.
-    - Finally, the function returns `retval`, indicating whether duplicates were found.
-- **Output**: The function returns an integer value, 1 if no duplicate keys were found, and 0 if any duplicates were detected.
+    - `payload`: A pointer to the transaction data to parse and check.
+    - `sz`: The size of the transaction data in bytes.
+- **Logic and Control Flow**:
+    - Parse the transaction from the `payload` using `fd_txn_parse` and store it in `_txn`.
+    - Retrieve the transaction account count using `fd_txn_account_cnt`.
+    - Get the account addresses from the transaction using `fd_txn_get_acct_addrs`.
+    - Join the hash map using `hash_ul_join` to prepare for key operations.
+    - Initialize `retval` to 1, indicating no duplicates found initially.
+    - Iterate over each account address, compute a 64-bit key from the address, and check for duplicates using `hash_ul_query`.
+    - If a duplicate is found, set `retval` to 0 and break the loop.
+    - If no duplicate is found, insert the key into the hash map using `hash_ul_insert`.
+    - After checking, remove all keys from the hash map using `hash_ul_remove`.
+    - Return `retval`, which indicates whether duplicates were found.
+- **Output**: Returns 1 if no duplicate keys are found, otherwise returns 0.
 
 
 ---
 ### check\_avx<!-- {{#callable:check_avx}} -->
-The `check_avx` function verifies if a transaction's account addresses are unique by using AVX vector operations to check for duplicate bits in specific byte positions.
+[View Source →](<../../../../../src/disco/pack/test_deduplication.c#L133>)
+
+Validates account addresses in a transaction payload using AVX instructions to ensure no duplicate addresses exist.
 - **Inputs**:
-    - `payload`: A pointer to the transaction data to be parsed and checked.
-    - `sz`: The size of the transaction data in bytes.
-- **Control Flow**:
-    - Parse the transaction from the payload using `fd_txn_parse` and store it in a global buffer `_txn`.
-    - Retrieve the transaction object and count the number of immediate accounts using `fd_txn_account_cnt`.
-    - Get the account addresses from the transaction using `fd_txn_get_acct_addrs`.
-    - Initialize several bit vector variables (`bv8`, `bv9`, `bv14`, `bv17`, `bv21`, `bv26`, `bv28`, `bv31`) to zero, which will be used to track unique bits for specific byte positions.
-    - Define a `shift_mask` vector to assist in bit manipulation for different byte positions.
-    - Iterate over each account address, and for each address, perform the `CHECK_AND_UPDATE` macro for specific byte positions (8, 9, 14, 17, 21, 26, 28, 31).
-    - In the `CHECK_AND_UPDATE` macro, broadcast the byte at the specified position, subtract the `shift_mask`, create a bitmask, and check for intersections with the corresponding bit vector.
-    - Update the bit vector with the new bitmask and check if the intersection is zero, indicating no duplicate bits.
-    - Sum the results of the `CHECK_AND_UPDATE` operations and check if the sum equals -24, which indicates a duplicate was found, returning 0 in this case.
-    - If no duplicates are found after checking all addresses, return 1.
-- **Output**: Returns 1 if all account addresses are unique, otherwise returns 0 if a duplicate is detected.
+    - `payload`: A pointer to the transaction payload data.
+    - `sz`: The size of the transaction payload.
+- **Logic and Control Flow**:
+    - Parse the transaction from the `payload` using `fd_txn_parse` and store it in `_txn`.
+    - Retrieve the transaction object `txn` from `_txn`.
+    - Get the count of accounts in the transaction using `fd_txn_account_cnt`.
+    - Retrieve the account addresses from the transaction using `fd_txn_get_acct_addrs`.
+    - Initialize several `wu_t` bit vectors to zero for tracking address uniqueness.
+    - Define a macro `CHECK_AND_UPDATE` to check and update bit vectors for each address byte.
+    - Iterate over each account address, applying the `CHECK_AND_UPDATE` macro to specific bytes (8, 9, 14, 17, 21, 26, 28, 31) and summing the results.
+    - Sum all results and check if the sum equals -24, indicating a duplicate address, and return 0 if true.
+    - Return 1 if no duplicates are found after checking all addresses.
+- **Output**: Returns 1 if all account addresses are unique; otherwise, returns 0 if a duplicate is detected.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function benchmarks various transaction validation methods by measuring the time taken to process a million iterations of different validation functions on sample transactions.
+[View Source →](<../../../../../src/disco/pack/test_deduplication.c#L179>)
+
+Executes performance tests on various transaction validation methods and logs the results.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Declare and initialize a variable `sum` to 0 and `dummyt` to the negative value of the current wall clock time.
-    - Run a loop 1,000,000 times calling the [`dummy`](#dummy) function on four different transaction samples, summing their results, and updating `sum`.
-    - Calculate the elapsed time for the dummy operations and log the mean time per validation.
-    - Run another loop 1,000,000 times calling the [`check_sort`](#check_sort) function on the same four transaction samples, summing their results, and updating `sum`.
-    - Calculate the elapsed time for the sort operations, excluding overhead, and log the mean time per validation.
-    - Initialize a hash map using `hash_pubkeys_new`.
-    - Run a loop 1,000,000 times calling the [`check_hash`](#check_hash) function on the transaction samples, summing their results, and updating `sum`.
-    - Calculate the elapsed time for the hash operations, excluding overhead, and log the mean time per validation.
-    - Delete the hash map using `hash_pubkeys_delete`.
-    - Run a loop 1,000,000 times calling the [`check_avx`](#check_avx) function on the transaction samples, summing their results, and updating `sum`.
-    - Calculate the elapsed time for the AVX operations, excluding overhead, and log the mean time per validation.
-    - Initialize another hash map using `hash_ul_new`.
-    - Run a loop 1,000,000 times calling the [`check_hash64`](#check_hash64) function on the transaction samples, summing their results, and updating `sum`.
-    - Calculate the elapsed time for the hash64 operations, excluding overhead, and log the mean time per validation.
-    - Delete the hash map using `hash_ul_delete`.
-    - Terminate the environment using `fd_halt` and return 0.
-- **Output**: The function returns 0, indicating successful execution.
-- **Functions called**:
-    - [`dummy`](#dummy)
-    - [`check_sort`](#check_sort)
-    - [`check_hash`](#check_hash)
-    - [`check_avx`](#check_avx)
-    - [`check_hash64`](#check_hash64)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Initializes `sum` to 0 and `dummyt` to the negative value of the current wall clock time.
+    - Runs a loop 1,000,000 times to call the [`dummy`](<#dummy>) function on four different transaction samples and updates `sum` with the results.
+    - Calculates the elapsed time for the [`dummy`](<#dummy>) function calls and logs the mean time per validation.
+    - Runs a loop 1,000,000 times to call the [`check_sort`](<#check_sort>) function on four different transaction samples and updates `sum` with the results.
+    - Calculates the elapsed time for the [`check_sort`](<#check_sort>) function calls and logs the mean time per validation, excluding overhead.
+    - Initializes a hash map with `hash_pubkeys_new` and runs a loop 1,000,000 times to call the [`check_hash`](<#check_hash>) function on four different transaction samples, updating `sum` with the results.
+    - Calculates the elapsed time for the [`check_hash`](<#check_hash>) function calls and logs the mean time per validation, excluding overhead, then deletes the hash map with `hash_pubkeys_delete`.
+    - Runs a loop 1,000,000 times to call the [`check_avx`](<#check_avx>) function on four different transaction samples and updates `sum` with the results.
+    - Calculates the elapsed time for the [`check_avx`](<#check_avx>) function calls and logs the mean time per validation, excluding overhead.
+    - Initializes a hash map with `hash_ul_new` and runs a loop 1,000,000 times to call the [`check_hash64`](<#check_hash64>) function on four different transaction samples, updating `sum` with the results.
+    - Calculates the elapsed time for the [`check_hash64`](<#check_hash64>) function calls and logs the mean time per validation, excluding overhead, then deletes the hash map with `hash_ul_delete`.
+    - Calls `fd_halt` to clean up and terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`dummy`](<#dummy>)
+    - [`check_sort`](<#check_sort>)
+    - [`check_hash`](<#check_hash>)
+    - [`check_avx`](<#check_avx>)
+    - [`check_hash64`](<#check_hash64>)
 
 
 

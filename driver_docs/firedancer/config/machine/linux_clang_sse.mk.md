@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Clang x86_64 SSE-only build settings with native march flags and feature defines.
+Makefile for building with Clang on x86_64 with SSE support, including various configuration options.
 
 # Purpose
-This build file defines a Clang-based x86_64 target that uses SSE support and sets `BUILDDIR` to `linux/clang/sse`. It includes shared build settings from `config/base.mk` and several feature files that enable Clang, x86-64, debug, security, brutality, optimization, and threads support. The file also adds native CPU tuning flags through `CPPFLAGS` and defines feature macros for `FD_HAS_INT128`, `FD_HAS_DOUBLE`, `FD_HAS_ALLOCA`, `FD_HAS_X86`, and `FD_HAS_SSE`. These settings select the compile-time capabilities used by the build and mark the target as a synthetic configuration that does not produce stable binaries.
+The Makefile configuration defines a build environment for compiling software using the Clang compiler targeting the x86_64 architecture with SSE (Streaming SIMD Extensions) support. The `BUILDDIR` variable specifies the directory for build outputs, indicating a Linux environment with Clang and SSE. The file includes several other configuration files, such as `config/base.mk` and various `config/extra/*.mk` files, to extend the build setup with additional features like debugging, security, optimization, and threading. The `CPPFLAGS` are set to optimize the build for the native architecture and enable specific features, such as support for 128-bit integers, double precision, and stack allocation. The file also defines several feature flags, such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, and `FD_HAS_SSE`, to ensure these capabilities are available during the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
