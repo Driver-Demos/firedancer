@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the fd_alloc component in the firedancer codebase.
+The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `fd_alloc` and `fd_util` components, including object files, headers, binaries, unit tests, and test scripts.
 
 # Purpose
-The file uses a series of function calls to manage the build process for a software component. It adds object files and header files using `add-objs` and `add-hdrs` functions, respectively. It creates a binary named `fd_alloc_ctl` with dependencies on `fd_alloc_ctl` and `fd_util` using `make-bin`. It also sets up a unit test named `test_alloc` with dependencies on `test_alloc` and `fd_util` using `make-unit-test`, and executes the test with `run-unit-test`. Additionally, it includes test scripts for `test_alloc_ctl` using `add-test-scripts`.
+This file is a Makefile script used for building and testing components of a software project. It defines build rules and dependencies by adding object files (`fd_alloc`, `fd_util`), header files (`fd_alloc.h`), and specifies the creation of a binary (`fd_alloc_ctl`). It also sets up a unit test (`test_alloc`) and includes a command to execute the test, as well as adding test scripts for `test_alloc_ctl`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
