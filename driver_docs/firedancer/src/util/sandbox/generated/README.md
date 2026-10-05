@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for sandboxing with architecture-specific checks and syscall rules.
+The `generated` folder in the `firedancer` codebase contains a single generated header file, `test_sandbox_seccomp.h`, which defines a seccomp filter policy for sandboxing by specifying allowed system calls.
 
 
 ## Files
-- **[test_sandbox_seccomp.h](test_sandbox_seccomp.h.md)**: Defines a seccomp filter policy for sandboxing with architecture-specific checks and syscall rules.
+- **[test_sandbox_seccomp.h](test_sandbox_seccomp.h.md)**: The `test_sandbox_seccomp.h` file in the `firedancer` codebase is a generated header file that defines a seccomp filter policy for sandboxing, specifying which system calls are allowed or should result in process termination based on the architecture.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

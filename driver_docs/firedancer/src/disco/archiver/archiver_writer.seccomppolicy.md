@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging and file writing in the archiver writer component.
+The `archiver_writer.seccomppolicy` file in the `firedancer` codebase defines security policies for logging and writing operations, specifying conditions under which file descriptors for log and archive files can be written to and synchronized.
 
 # Purpose
-The configuration file defines the logging behavior for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above also being directed to the `STDERR` pipe. The file descriptors `logfile_fd` and `archive_fd` are used to identify the log file and archive file, respectively. The `write` operation checks if the file descriptor is either `STDERR`, `archive_fd`, or `logfile_fd` to determine where to write the log messages. Additionally, the `fsync` operation ensures that log messages of 'WARNING' level and above are immediately synchronized to disk when written to the log file, using the `logfile_fd` descriptor.
+The provided content appears to be a configuration file that outlines the logging behavior for a software system. It defines two unsigned integer file descriptors, `logfile_fd` and `archive_fd`, which are used to manage log files and archive files, respectively. The configuration specifies that all log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above being directed to the STDERR pipe, while all messages are consistently logged to the log file. Additionally, the configuration ensures that the archiver writer tile outputs to the archive file. The `write` directive checks if the file descriptor is either STDERR, the archive file, or the log file, while the `fsync` directive ensures that log files are immediately synchronized to disk when a 'WARNING' or higher level message is logged. This setup is crucial for maintaining robust logging and archiving mechanisms within the software.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

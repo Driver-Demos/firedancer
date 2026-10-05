@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements the core function for the Keccak-256 hash algorithm with constants and transformation steps.
+The `fd_keccak256_private.h` file contains a private implementation of the Keccak-256 cryptographic hash function core, including the theta, rho, pi, chi, and iota steps, as derived from the original Keccak specification.
 
 # Purpose
-The code is a C header file that defines a private implementation of the Keccak-256 cryptographic hash function core. It includes the function [`fd_keccak256_core`](<#fd_keccak256_core>), which performs the core operations of the Keccak-256 algorithm on a given state. The function is implemented as a static inline function, indicating that it is intended for use within the same translation unit and is optimized for performance. The implementation follows the Keccak specification and includes the main steps of the algorithm: Theta, Rho, Pi, Chi, and Iota. These steps are executed in a loop for a fixed number of 24 rounds, using predefined constants for each step.
+This C header file, `fd_keccak256_private.h`, provides a private implementation of the core function for the Keccak-256 cryptographic hash function, which is the basis for the SHA-3 standard. The file defines a static inline function, [`fd_keccak256_core`](#fd_keccak256_core), which performs the Keccak permutation on a given state array. This function is designed to be highly efficient and can be replaced with high-performance computing (HPC) implementations tailored to specific machine capabilities without altering the interface for the caller code. The implementation follows the Keccak specification, utilizing constants and operations such as bitwise rotations and XORs to perform the cryptographic transformations.
 
-The file includes necessary constants such as `round_consts`, `rho_consts`, and `pi_consts`, which are used in the transformation steps. The use of macros like `NUM_ROUNDS` and `ROTATE` helps in managing the number of rounds and bit rotations, respectively. The header file is protected by include guards to prevent multiple inclusions, and it includes a reference to a base header file `fd_ballet_base.h`, suggesting that it is part of a larger library or framework. The file does not define public APIs or external interfaces, as it is intended for internal use within the library, focusing on the core cryptographic operations of the Keccak-256 algorithm.
+The file is structured to be included in other C source files, as indicated by the inclusion guards and the `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` macros, which suggest a modular design. The function is not intended to be part of a public API, as it is marked static, meaning it is private to the translation unit in which it is included. The code is focused on the internal workings of the Keccak-256 algorithm, specifically implementing the theta, rho, pi, chi, and iota steps of the Keccak permutation. This file is part of a broader cryptographic library, likely providing foundational cryptographic operations for higher-level functions or applications.
 # Imports and Dependencies
 
 ---
@@ -19,20 +19,18 @@ The file includes necessary constants such as `round_consts`, `rho_consts`, and 
 
 ---
 ### fd\_keccak256\_core<!-- {{#callable:fd_keccak256_core}} -->
-[View Source →](<../../../../../src/ballet/keccak256/fd_keccak256_private.h#L6>)
-
-Performs the core Keccak-256 permutation on a given state array.
+The `fd_keccak256_core` function performs the core transformation steps of the Keccak-256 cryptographic hash function on a given state array.
 - **Inputs**:
-    - `state`: A pointer to an array of 25 unsigned long integers representing the state to be permuted.
-- **Logic and Control Flow**:
-    - Defines constants for the 24 rounds of the Keccak permutation, including `round_consts`, `rho_consts`, and `pi_consts`.
-    - Initializes temporary variables `b` and `t` for intermediate calculations.
-    - Iterates over 24 rounds, performing the following steps in each round:
-    - Theta step: Computes parity of columns and updates the state based on these parities.
-    - Rho and Pi steps: Rotates and permutes the state using predefined constants.
-    - Chi step: Applies a non-linear transformation to the state.
-    - Iota step: XORs the first element of the state with a round constant.
-- **Output**: The function modifies the input `state` array in place, applying the Keccak-256 permutation.
+    - `state`: A pointer to an array of unsigned long integers representing the state of the Keccak-256 hash function, which will be transformed in place.
+- **Control Flow**:
+    - Initialize constants for the 24 rounds of the Keccak permutation, including round constants, rho offsets, and pi indices.
+    - Define the number of rounds and a macro for left rotation of unsigned long integers.
+    - Iterate over 24 rounds, performing the following steps in each round:
+    - Theta step: Calculate parity of columns and update the state based on these parities.
+    - Rho and Pi steps: Rotate and permute the state according to predefined constants.
+    - Chi step: Apply a non-linear transformation to each row of the state.
+    - Iota step: XOR the first element of the state with a round constant.
+- **Output**: The function modifies the input state array in place, applying the Keccak-256 permutation to it.
 
 
 
