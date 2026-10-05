@@ -3,10 +3,36 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Entry point that builds a default config list and calls fd_dev_main with fd_topo_initialize.
+Initializes and runs the main function with default configuration and topology setup.
 
 # Purpose
-This file defines the program entry point in [`main`](<#main>). It creates a default configuration file descriptor named `default` and stores the configuration data in `fdctl_default_config` with its size in `fdctl_default_config_sz`. The `configs` array passes that configuration to `fd_dev_main`, along with the command-line arguments, a zero value for the third parameter, and the `fd_topo_initialize` function used for topology setup.
+This code is a C program that serves as the entry point for an application. It includes several header files: `main.h`, `fd_dev_boot.h`, `topology.h`, and `config.h`, which provide necessary declarations and configurations. The [`main`](<#main>) function initializes a configuration file structure, `_default`, with default configuration data and size, and stores it in an array of configuration pointers. The program then calls the `fd_dev_main` function, passing command-line arguments, the configuration array, and a topology initialization function, `fd_topo_initialize`, to execute the main application logic.
+# Imports and Dependencies
+
+---
+- `main.h`
+- `../shared_dev/boot/fd_dev_boot.h`
+- `../fdctl/topology.h`
+- `../fdctl/config.h`
+
+
+# Functions
+
+---
+### main<!-- {{#callable:main}} -->
+[View Source →](<../../../../../src/app/fddev/main.c#L7>)
+
+Initializes a default configuration and calls `fd_dev_main` with command-line arguments and configuration data.
+- **Inputs**:
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Logic and Control Flow**:
+    - Creates a `fd_config_file_t` structure named `_default` with predefined configuration data.
+    - Initializes an array `configs` with a pointer to `_default` and a `NULL` terminator.
+    - Calls the `fd_dev_main` function with `argc`, `argv`, a zero flag, the `configs` array, and the `fd_topo_initialize` function.
+- **Output**: The return value of the `fd_dev_main` function.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

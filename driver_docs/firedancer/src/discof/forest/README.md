@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Block repair forest API, tree repair logic, and unit tests for insert, publish, iterator, and FEC handling.
+Functions and API for forest data structures, Makefile logic, and tests for `fd_forest`.
 
 
 ## Files
-- **[fd_forest.c](fd_forest.c.md)**: Tree repair and traversal logic for block slots, shreds, and consumed frontier management.
-- **[fd_forest.h](fd_forest.h.md)**: Block repair forest API with tree, frontier, insert, publish, iterate, and verify functions.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `fd_forest` and unit tests for `test_forest` when `FD_HAS_INT128` is defined.
-- **[test_forest.c](test_forest.c.md)**: Tests forest insert, publish, iterator, frontier, and FEC handling.
+- **[fd_forest.c](fd_forest.c.md)**: Implements functions for managing and manipulating a data structure called `fd_forest`, including creation, deletion, and traversal operations.
+- **[fd_forest.h](fd_forest.h.md)**: An API for repairing and managing block data structures in a distributed system, using a tree model to track and repair missing data.
+- **[Local.mk](Local.mk.md)**: Makefile logic for building and testing components if 128-bit integer support is available.
+- **[test_forest.c](test_forest.c.md)**: Tests for various functionalities of the `fd_forest` data structure, including insertion, publishing, and iteration.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
