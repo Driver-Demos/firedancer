@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall verification on different architectures.
+Generated seccomp filter allowing write and fsync only for fd 2 or logfile_fd.
 
 
 ## Files
-- **[fd_verify_tile_seccomp.h](fd_verify_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall verification on different architectures.
+- **[fd_verify_tile_seccomp.h](fd_verify_tile_seccomp.h.md)**: Generated seccomp filter allowing write and fsync only for fd 2 or logfile_fd.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

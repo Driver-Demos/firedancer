@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines Protocol Buffers for packet batching and metadata, including flags and sender information.
+The `packet.proto` file defines the structure of network packets and their metadata, including flags and sender information, for the `firedancer` project.
 
 # Purpose
-The `proto3` syntax defines a protocol buffer schema for handling network packets. The `packet` package contains several message types. The `PacketBatch` message represents a collection of `Packet` messages, using the `repeated` keyword to allow multiple packets. Each `Packet` message contains `bytes` data and a `Meta` message. The `Meta` message includes metadata fields such as `size`, `addr`, `port`, `flags`, and `sender_stake`. The `PacketFlags` message defines boolean flags that indicate specific properties or actions related to the packet, such as `discard`, `forwarded`, `repair`, `simple_vote_tx`, `tracer_packet`, and `from_staked_node`.
+This file is a Protocol Buffers (proto3) schema definition for a package named "packet." It defines the structure of messages related to network packets, including a `PacketBatch` that contains multiple `Packet` messages. Each `Packet` includes binary data and metadata (`Meta`), which details attributes such as size, address, port, flags, and sender stake, with `PacketFlags` specifying various boolean flags related to packet handling and status.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
