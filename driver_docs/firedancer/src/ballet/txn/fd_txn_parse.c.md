@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Parses Solana transaction payloads with safety checks and updates transaction structures.
+The `fd_txn_parse.c` file in the `firedancer` codebase implements a function to parse Solana transaction payloads, ensuring safety and correctness through a series of checks and validations.
 
 # Purpose
-The code defines a function [`fd_txn_parse_core`](<#fd_txn_parse_core>) that parses a transaction payload in the context of the Solana blockchain. The function takes a payload, its size, an output buffer, optional counters, and an optional payload size pointer as parameters. It processes the payload to extract and validate transaction details such as signatures, account addresses, and instructions. The function ensures that the parsing is safe by maintaining strict invariants to prevent out-of-bounds access and by using macros like `CHECK`, `CHECK_LEFT`, and `READ_CHECKED_COMPACT_U16` to validate the payload's structure and content.
+The provided C code is a function named [`fd_txn_parse_core`](#fd_txn_parse_core), which is designed to parse a transaction payload in the context of the Solana blockchain. This function is part of a broader library or application that deals with transaction processing, likely within a Solana validator or a similar system. The function takes a payload, which is a byte array representing a transaction, and extracts various components such as signatures, account addresses, and instructions. It ensures the integrity and validity of the transaction data by implementing strict checks and balances, such as verifying byte availability before reading and validating field values after reading. The function is structured to handle potentially untrusted input safely, adhering to specific invariants to prevent buffer overflows and other common vulnerabilities.
 
-The function is designed to handle both legacy and versioned transactions, with specific checks for transaction version, signature count, and account address limits. It also supports offline replay scenarios with a different instruction count limit. The parsed transaction data is stored in a `fd_txn_t` structure, which includes fields for transaction version, signature count, account addresses, and instructions. The function also manages address table lookups for versioned transactions, ensuring that all indices are within valid ranges. The function returns the footprint of the transaction, which is calculated based on the number of instructions and address tables.
+The function is highly specialized, focusing on the parsing of Solana transactions, which involves reading compact unsigned 16-bit integers and handling variable-length data structures. It uses several macros to streamline the parsing process and ensure safety, such as `CHECK`, `CHECK_LEFT`, and `READ_CHECKED_COMPACT_U16`. The function also updates optional counters for tracking parsing successes and failures, and it returns the footprint of the parsed transaction. The code is part of a larger system, as indicated by the inclusion of headers like "fd_txn.h" and "fd_compact_u16.h", and it is likely intended to be used as a core component in transaction processing pipelines, rather than as a standalone executable.
 # Imports and Dependencies
 
 ---
@@ -20,32 +20,29 @@ The function is designed to handle both legacy and versioned transactions, with 
 
 ---
 ### fd\_txn\_parse\_core<!-- {{#callable:fd_txn_parse_core}} -->
-[View Source →](<../../../../../src/ballet/txn/fd_txn_parse.c#L6>)
-
-Parses a transaction payload, validates its structure, and stores the parsed data into an output buffer.
+The `fd_txn_parse_core` function parses a transaction payload, validates its structure, and populates an output buffer with the parsed transaction data while maintaining safety checks against buffer overflows.
 - **Inputs**:
-    - `payload`: A pointer to the transaction payload data to parse.
-    - `payload_sz`: The size of the transaction payload in bytes.
+    - `payload`: A pointer to the transaction payload data to be parsed.
+    - `payload_sz`: The size of the payload data in bytes.
     - `out_buf`: A pointer to a buffer where the parsed transaction data will be stored.
     - `counters_opt`: An optional pointer to a structure for tracking parsing success and failure counts.
-    - `payload_sz_opt`: An optional pointer to store the number of bytes processed from the payload.
-- **Logic and Control Flow**:
-    - Initialize index `i` to 0 and define macros for checking conditions and reading data safely.
-    - Check if `payload_sz` is within the maximum transaction size limit.
-    - Read and validate the number of signatures, ensuring at least one signer exists.
-    - Store the message offset and read the transaction version, validating it against known versions.
-    - Read and validate the number of read-only signed and unsigned accounts, ensuring constraints are met.
-    - Read the account address count using a safe read macro and validate it against signature constraints.
-    - Store offsets for account addresses and recent blockhash, ensuring enough bytes are available.
-    - Read the instruction count and validate it against maximum allowed instructions, considering offline replay mode.
-    - Iterate over each instruction, parsing program ID, account count, and data size, and validate constraints.
-    - If the transaction is versioned, read and validate address table lookups, ensuring constraints are met.
-    - Perform final validation checks on account address indices and store parsed data into `out_buf` if provided.
-    - Increment success counter if parsing is successful and store processed payload size if `payload_sz_opt` is provided.
-    - Return the transaction footprint calculated from instruction and address table counts.
-- **Output**: Returns the transaction footprint as an unsigned long, which is calculated based on the number of instructions and address table lookups.
-- **Functions Called**:
-    - [`fd_txn_footprint`](<fd_txn.h.md#fd_txn_footprint>)
+    - `payload_sz_opt`: An optional pointer to store the size of the parsed payload.
+- **Control Flow**:
+    - Initialize index `i` to 0 and define macros for safety checks and reading operations.
+    - Check if the payload size is within the maximum transaction size limit.
+    - Read and validate the signature count from the payload, ensuring it is within valid bounds.
+    - Determine the transaction version and validate it, adjusting parsing logic accordingly.
+    - Read and validate the number of read-only signed and unsigned accounts.
+    - Parse the account address count and validate it against constraints.
+    - Read offsets for account addresses and recent blockhash, ensuring sufficient payload size for each.
+    - Parse the instruction count and validate it, considering offline replay conditions if applicable.
+    - Iterate over each instruction, parsing program ID, account count, and data size, while ensuring all indices are within valid ranges.
+    - If the transaction version is V0, parse address table lookups and validate their counts and sizes.
+    - Perform final validation checks on account address indices and update optional counters and payload size.
+    - Return the footprint of the parsed transaction.
+- **Output**: Returns the footprint of the parsed transaction, which is a measure of the transaction's size and complexity.
+- **Functions called**:
+    - [`fd_txn_footprint`](fd_txn.h.md#fd_txn_footprint)
 
 
 

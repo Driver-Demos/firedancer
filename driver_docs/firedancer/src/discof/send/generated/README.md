@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall restrictions based on architecture and specific syscalls.
+Generated seccomp filter allowing write, fsync, and getrandom syscalls only.
 
 
 ## Files
-- **[fd_send_tile_seccomp.h](fd_send_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall restrictions based on architecture and specific syscalls.
+- **[fd_send_tile_seccomp.h](fd_send_tile_seccomp.h.md)**: Generated seccomp filter allowing write, fsync, and getrandom syscalls only.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

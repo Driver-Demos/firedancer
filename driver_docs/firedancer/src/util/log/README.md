@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Wrappers for trace points, logging system implementation, logging utilities, makefile rules, and tests.
+Logging, backtrace, and trace-point helpers with build rules and unit tests.
 
 
 ## Files
-- **[fd_backtrace.c](fd_backtrace.c.md)**: Logs backtrace information for given addresses using dynamic linking and logging utilities.
-- **[fd_backtrace.h](fd_backtrace.h.md)**: Function to print a simple backtrace to stderr.
-- **[fd_dtrace.h](fd_dtrace.h.md)**: Wrappers for software-defined trace points with conditional support for SystemTap SDT on Linux.
-- **[fd_log.c](fd_log.c.md)**: Implementation of a logging system with support for application and thread identification, wallclock management, and signal handling, including features for log deduplication, colorization, and backtrace integration.
-- **[fd_log.h](fd_log.h.md)**: Header file for logging utilities, defining log levels, macros, and functions for managing log streams and metadata.
-- **[Local.mk](Local.mk.md)**: Makefile rules for adding headers, objects, and unit tests for logging utilities.
-- **[test_log.c](test_log.c.md)**: Tests for logging functionality, including log levels, hexdump logging, and wallclock operations.
+- **[fd_backtrace.c](fd_backtrace.c.md)**: Formats and logs backtrace addresses with symbol and offset data.
+- **[fd_backtrace.h](fd_backtrace.h.md)**: Prints a simple backtrace to stderr from an address list.
+- **[fd_dtrace.h](fd_dtrace.h.md)**: Wrappers for software-defined trace points with no-op fallbacks when SDT is unavailable.
+- **[fd_log.c](fd_log.c.md)**: Logging setup, timestamps, IDs, signal handlers, and boot/halt support.
+- **[fd_log.h](fd_log.h.md)**: Logging macros, identifiers, wallclock helpers, and runtime controls for log output.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_log headers, objects, and the test_log unit test.
+- **[test_log.c](test_log.c.md)**: Unit tests for logging macros, levels, wallclock, hexdump, and thread metadata.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

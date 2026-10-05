@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for nightly CodeQL analysis on C/C++ code using a matrix strategy.
+Nightly CodeQL analysis workflow for C/C++ builds and security-event upload.
 
 # Purpose
-The YAML configuration file defines a GitHub Actions workflow named `CodeQL Nightly Analysis`. This workflow is triggered manually or by other workflows using `workflow_call` and `workflow_dispatch`. It sets permissions to write security events and defines a job named `analyze` that runs on a specified runner group. The job uses a matrix strategy to perform analysis on different programming languages, specifically C and C++, with specified compilers and build configurations. The workflow includes steps to check out the repository, set up dependencies, initialize the CodeQL tool, and perform a CodeQL analysis. The analysis results are uploaded with a category based on the language being analyzed.
+This workflow defines a nightly CodeQL security scan for the repository and can run either from another workflow through `workflow_call` or by manual trigger through `workflow_dispatch`. It grants `security-events: write` permission so the analysis results can be uploaded, then runs an `analyze` job on the `fd-public-repo-codeql` runner group with a matrix that selects the `c-cpp` language, manual build mode, the `clang` compiler, and the `fddev` and `firedancer-dev` targets. The job checks out the source with submodules, installs build dependencies and the Rust toolchain, cleans prior build outputs, and initializes CodeQL with a custom query set from `./contrib/codeql/nightly` while disabling the default queries. It then builds the selected targets with `make` and runs `github/codeql-action/analyze@v4` to upload the results for the `c-cpp` analysis category.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
