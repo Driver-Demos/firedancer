@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing ChaCha and ChaCha-RNG components with optional SSE and AVX support.
+Build rules for ChaCha and ChaCha-RNG headers, objects, and unit tests.
 
 # Purpose
-The Makefile content configures the build process for the ChaCha cryptographic functions and their associated random number generator (RNG) support. It includes conditional compilation directives to add headers and object files based on the availability of specific CPU instruction sets, such as SSE, AVX, and AVX512. The `add-hdrs` and `add-objs` functions are used to include the necessary header and object files for both the base ChaCha and ChaCha-RNG functionalities. Additionally, the file defines unit tests for these components using `make-unit-test` and executes them with `run-unit-test` to ensure the correctness of the implementations.
+This build file defines the source and test targets for ChaCha support in the `fd_ballet` library. It adds the `fd_chacha.h` and `fd_chacha_rng.h` headers, then selects the correct object files based on CPU feature flags such as `FD_HAS_SSE`, `FD_HAS_AVX`, and `FD_HAS_AVX512`. It also registers unit tests for `test_chacha`, `test_chacha_rng`, and `test_chacha_rng_roll`, and it configures `test_chacha` and `test_chacha_rng` to run during the build. The `fd_chacha_rng` section provides ChaCha-based random number generator support that is compatible with Rust `rand_chacha`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
