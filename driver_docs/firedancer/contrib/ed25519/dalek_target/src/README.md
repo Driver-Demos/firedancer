@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for signing and verifying messages using the ed25519_dalek library.
+The `src` folder in the `firedancer` codebase contains the `lib.rs` file, which provides functions for signing and verifying messages using the ed25519_dalek library and interfaces with C through FFI.
 
 
 ## Files
-- **[lib.rs](lib.rs.md)**: Functions for signing and verifying messages using the ed25519_dalek library.
+- **[lib.rs](lib.rs.md)**: The `lib.rs` file in the `firedancer` codebase provides functions for signing and verifying messages using the ed25519_dalek library, interfacing with C through FFI.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

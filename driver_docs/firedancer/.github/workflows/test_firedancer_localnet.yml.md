@@ -3,31 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for setting up and testing a Firedancer local network environment.
+Workflow for building and testing a local Firedancer cluster with Agave validators.
 
 # Purpose
-This file is a GitHub Actions workflow configuration file written in YAML. It automates the process of setting up and testing a local network environment for the `Firedancer` project. The workflow is triggered by a `workflow_call` or `workflow_dispatch` event and defines a job named `firedancer-localnet`. This job runs on a self-hosted runner with specific hardware labels and environment variables, such as `CC`, `MACHINE`, and `AGAVE_VERSION`. The workflow includes several steps: checking out the repository, setting up dependencies, configuring CPU and memory settings, building the project, setting up the Agave repository, and managing the lifecycle of the local cluster and nodes. It also includes cleanup steps to remove any artifacts and terminate processes after the tests are complete. The workflow ensures that all validators in the network have been leaders before concluding the test.
-# Content Summary
-The provided file is a GitHub Actions workflow configuration for a project named "Firedancer." This workflow is triggered by two events: `workflow_call` and `workflow_dispatch`. It defines a single job, `firedancer-localnet`, which has a timeout of 30 minutes and runs on a self-hosted runner with specific labels and group settings.
-
-Key technical details include:
-
-1. **Inputs and Environment Variables**:
-   - The workflow accepts an input named `machine` with a default value of `linux_gcc_zen2`.
-   - Environment variables are set for the job, including `CC` (compiler set to `gcc`), `MACHINE` (set to the input value), and `AGAVE_VERSION` (set to `v2.0.3`).
-
-2. **Job Steps**:
-   - **Checkout**: The repository is checked out with submodules included recursively.
-   - **Dependencies**: Dependencies are set up with additional development extras.
-   - **System Configuration**: Actions are used to configure CPU settings and huge pages, with specific counts for gigantic and huge pages.
-   - **Build Process**: The `firedancer-dev` target is built using `make`.
-   - **Environment Setup**: The `OBJDIR` is determined and stored in the GitHub environment. The Agave repository is cloned, checked out to a specific version, and built.
-   - **Cluster Management**: Any existing processes related to Solana, Agave, and Firedancer are terminated. Ledger and cluster artifacts are removed if they exist.
-   - **Cluster and Node Initialization**: Scripts are executed to set up the Agave cluster and start the Firedancer node, with resource limits adjusted using `prlimit`.
-   - **Validation Check**: A script checks if all validators have been leaders by querying the local RPC server and processing the leader schedule and epoch information.
-   - **Cleanup**: The workflow ensures cleanup of processes, artifacts, and logs, regardless of the job's success or failure.
-
-This configuration is designed to automate the setup, execution, and cleanup of a local network environment for the Firedancer project, ensuring that all validators participate as leaders during the test.
+This GitHub Actions workflow runs a Firedancer local network test on a self-hosted Linux runner. It accepts an optional `machine` input, sets build and runtime environment variables such as `CC`, `MACHINE`, and `AGAVE_VERSION`, and then checks out the repository with submodules before installing dependencies and preparing CPU and huge page settings. The workflow builds `firedancer-dev`, clones and builds the `agave` repository at version `v2.0.3`, starts an Agave cluster and a Firedancer node, and then polls the local RPC endpoint until all validators have been leader at least once. It also includes cleanup steps that stop background processes and remove ledger and cluster artifacts after the test finishes, even if a step fails.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

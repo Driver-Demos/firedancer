@@ -3,23 +3,23 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration settings, callback functions, main function, network topology, versioning, and build files for the Firedancer application.
+Topology, callbacks, config, version, and build files for app startup and tile setup.
 
 ## Folders
-- **[commands](commands/README.md)**: Retrieves the current shred version from entrypoints using a client in a command function.
-- **[config](config/README.md)**: Configuration files for Firedancer with settings for instance management, networks, and Solana parameters.
+- **[commands](commands/README.md)**: Retrieves the current shred version from gossip entrypoints and prints it.
+- **[config](config/README.md)**: Default, devnet, mainnet, and testnet validator configuration files for paths, networking, snapshots, tiles, and limits.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: Specifies files to ignore in version control, including `version.h` and `version2.h`.
-- **[callbacks.c](callbacks.c.md)**: Defines callback functions for various components like banks, bank hash comparison, funk, fec sets, store, txncache, and exec spad in the Firedancer application.
-- **[config.c](config.c.md)**: Imports binary configuration files for different network environments in the Firedancer application.
-- **[config.h](config.h.md)**: Defines configuration data and functions for default, testnet, devnet, and mainnet environments.
-- **[Local.mk](Local.mk.md)**: Makefile for managing versioning and build configurations in the Firedancer application.
-- **[main.c](main.c.md)**: Defines the main function for the Firedancer application, including configuration, callbacks, tiles, and actions.
-- **[topology.c](topology.c.md)**: Implements functions for setting up and configuring network topology and tiles in the Firedancer application.
-- **[topology.h](topology.h.md)**: APIs for constructing and configuring a Firedancer topology, including setup functions for various components.
-- **[version.c](version.c.md)**: Defines version and commit reference constants for the Firedancer application.
-- **[version.mk](version.mk.md)**: Makefile variables for versioning and Git commit hash retrieval.
+- **[.gitignore](.gitignore.md)**: The `.gitignore` file in the `firedancer/src/app/fdctl/` directory specifies that `version.h` and `version2.h` should be ignored by Git.
+- **[callbacks.c](callbacks.c.md)**: Topology object callbacks for banks, hash compare, funk, fec_sets, store, txncache, and exec_spad.
+- **[config.c](config.c.md)**: Embeds default, testnet, devnet, and mainnet TOML config binaries.
+- **[config.h](config.h.md)**: Config file descriptors for default, testnet, devnet, and mainnet embedded data.
+- **[Local.mk](Local.mk.md)**: Makefile rules for version generation, config dependencies, and firedancer build targets.
+- **[main.c](main.c.md)**: Main entry point that registers topology callbacks, stages, tiles, and actions, then calls fd_main.
+- **[topology.c](topology.c.md)**: Builds and configures the Firedancer tile topology, links, workspaces, and tile settings.
+- **[topology.h](topology.h.md)**: APIs for constructing a Firedancer topology and configuring tiles.
+- **[version.c](version.c.md)**: The `version.c` file in the `firedancer` codebase defines versioning information for the application, including major, minor, and patch versions, as well as commit reference strings and numbers.
+- **[version.mk](version.mk.md)**: Version variables and the current Git commit hash.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
