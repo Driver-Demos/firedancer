@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_crypto_suites.c` file in the `firedancer` codebase implements cryptographic operations for QUIC, including key generation, encryption, and decryption of packets using AES and HMAC.
+Implements cryptographic operations for QUIC, including key generation, encryption, and decryption.
 
 # Purpose
-This C source code file is part of a QUIC (Quick UDP Internet Connections) implementation, specifically focusing on cryptographic operations necessary for secure communication. The file provides functions to generate initial secrets, derive keys, and perform encryption and decryption of QUIC packets. It includes cryptographic operations such as HKDF (HMAC-based Key Derivation Function) extraction and expansion, AES-GCM (Advanced Encryption Standard in Galois/Counter Mode) encryption, and header protection, which are essential for maintaining the confidentiality and integrity of data transmitted over a QUIC connection.
+The code is a C module that implements cryptographic operations for the QUIC protocol, specifically focusing on key derivation and packet encryption/decryption. It includes functions to generate initial secrets and keys using HMAC-based Key Derivation Function (HKDF) as specified in the QUIC protocol. The module uses AES-GCM for encryption and decryption, which is a common choice for secure communication protocols due to its efficiency and security properties.
 
-The code is structured around several key functions that handle different aspects of QUIC cryptography. [`fd_quic_gen_initial_secrets`](#fd_quic_gen_initial_secrets) and [`fd_quic_key_update_derive`](#fd_quic_key_update_derive) are responsible for generating and updating cryptographic secrets used in the QUIC protocol. [`fd_quic_crypto_encrypt`](#fd_quic_crypto_encrypt) and [`fd_quic_crypto_decrypt`](#fd_quic_crypto_decrypt) manage the encryption and decryption of packet payloads, ensuring data security during transmission. Additionally, [`fd_quic_crypto_decrypt_hdr`](#fd_quic_crypto_decrypt_hdr) deals with decrypting packet headers, which is crucial for processing incoming packets correctly. The file imports several headers related to cryptographic algorithms and utilities, indicating its reliance on external libraries for low-level cryptographic operations. Overall, this file is a specialized component of a larger QUIC implementation, providing essential cryptographic functionality to support secure data exchange.
+Key functions in the module include [`fd_quic_gen_initial_secrets`](<#fd_quic_gen_initial_secrets>), which derives initial secrets from a connection ID and a predefined salt, and [`fd_quic_gen_keys`](<#fd_quic_gen_keys>), which generates encryption keys and initialization vectors (IVs) from a secret. The [`fd_quic_crypto_encrypt`](<#fd_quic_crypto_encrypt>) and [`fd_quic_crypto_decrypt`](<#fd_quic_crypto_decrypt>) functions handle the encryption and decryption of QUIC packets, respectively, using the derived keys and IVs. The module also includes header protection and decryption functions, [`fd_quic_crypto_decrypt_hdr`](<#fd_quic_crypto_decrypt_hdr>), which manage the encryption and decryption of packet headers. The code relies on external libraries for AES and HMAC operations, as indicated by the included headers, and is designed to be integrated into a larger QUIC implementation.
 # Imports and Dependencies
 
 ---
@@ -24,164 +24,180 @@ The code is structured around several key functions that handle different aspect
 
 ---
 ### FD\_QUIC\_CRYPTO\_V1\_INITIAL\_SALT
-- **Type**: ``uchar const[20]``
-- **Description**: `FD_QUIC_CRYPTO_V1_INITIAL_SALT` is a static constant array of 20 unsigned characters. It represents the initial salt used in the key derivation process for QUIC version 1, as specified in the QUIC protocol RFC.
-- **Use**: This variable is used as the initial salt in the HKDF (HMAC-based Extract-and-Expand Key Derivation Function) to derive initial secrets for QUIC connections.
+- **Type**: ``uchar const[20UL]``
+- **Description**: A constant array of unsigned characters that represents the initial salt used in the HKDF (HMAC-based Extract-and-Expand Key Derivation Function) for QUIC version 1. This array contains 20 bytes of hexadecimal values.
+- **Use**: Used as the initial salt in the `fd_quic_gen_initial_secrets` function to derive initial secrets for QUIC connections.
 
 
 # Functions
 
 ---
 ### fd\_quic\_hkdf\_extract<!-- {{#callable:fd_quic_hkdf_extract}} -->
-The `fd_quic_hkdf_extract` function performs an HMAC-SHA256 operation to derive a key from a given connection ID and salt.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L17>)
+
+Performs HKDF extract operation using HMAC-SHA256 on a connection ID and salt to produce a pseudorandom key.
 - **Inputs**:
-    - `output`: A pointer to the memory location where the derived key will be stored.
-    - `salt`: A pointer to the salt value used in the HMAC operation.
+    - `output`: A pointer to the buffer where the extracted pseudorandom key will be stored.
+    - `salt`: A pointer to the salt value used in the HMAC-SHA256 operation.
     - `salt_sz`: The size of the salt in bytes.
-    - `conn_id`: A pointer to the connection ID used in the HMAC operation.
+    - `conn_id`: A pointer to the connection ID used in the HMAC-SHA256 operation.
     - `conn_id_sz`: The size of the connection ID in bytes.
-- **Control Flow**:
-    - The function calls `fd_hmac_sha256` with the connection ID, its size, the salt, its size, and the output buffer.
-    - The `fd_hmac_sha256` function computes the HMAC-SHA256 of the connection ID using the salt and stores the result in the output buffer.
-- **Output**: The function does not return a value; it writes the derived key to the memory location pointed to by `output`.
+- **Logic and Control Flow**:
+    - Calls `fd_hmac_sha256` with the connection ID, its size, the salt, its size, and the output buffer to perform the HMAC-SHA256 operation.
+- **Output**: The function does not return a value; it writes the result of the HMAC-SHA256 operation to the `output` buffer.
 
 
 ---
 ### fd\_quic\_hkdf\_expand\_label<!-- {{#callable:fd_quic_hkdf_expand_label}} -->
-The `fd_quic_hkdf_expand_label` function is a wrapper that calls `fd_tls_hkdf_expand_label` to expand a given secret using a specified label and output size.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L24>)
+
+Expands a given secret using a label to produce a derived key material.
 - **Inputs**:
-    - `out`: A pointer to the output buffer where the expanded key will be stored.
-    - `out_sz`: The size of the output buffer, indicating how many bytes should be written.
-    - `secret`: A 32-byte array representing the secret key to be expanded.
-    - `label`: A pointer to a character array representing the label used in the expansion process.
-    - `label_sz`: The size of the label in bytes.
-- **Control Flow**:
-    - The function directly calls `fd_tls_hkdf_expand_label` with the provided arguments, passing `NULL` and `0UL` for the context and context size parameters, respectively.
-- **Output**: The function does not return a value; it writes the expanded key to the provided output buffer.
+    - ``out``: A pointer to the output buffer where the expanded key material will be stored.
+    - ``out_sz``: The size of the output buffer in bytes.
+    - ``secret``: A 32-byte array containing the secret to expand.
+    - ``label``: A pointer to a character array representing the label used in the expansion process.
+    - ``label_sz``: The size of the label in bytes.
+- **Logic and Control Flow**:
+    - Calls the `fd_tls_hkdf_expand_label` function with the provided `out`, `out_sz`, `secret`, `label`, and `label_sz` parameters.
+    - Passes `NULL` and `0UL` as additional parameters to `fd_tls_hkdf_expand_label`, indicating no context or context length is used.
+- **Output**: No direct output is returned; the function writes the expanded key material to the `out` buffer.
 
 
 ---
 ### fd\_quic\_gen\_initial\_secrets<!-- {{#callable:fd_quic_gen_initial_secrets}} -->
-The `fd_quic_gen_initial_secrets` function generates initial cryptographic secrets for QUIC connections based on the connection ID and whether the endpoint is a server or client.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L33>)
+
+Generates initial cryptographic secrets for QUIC connections using HKDF operations.
 - **Inputs**:
-    - `secrets`: A pointer to an `fd_quic_crypto_secrets_t` structure where the generated secrets will be stored.
-    - `conn_id`: A constant pointer to an array of unsigned characters representing the connection ID.
-    - `conn_id_sz`: An unsigned long representing the size of the connection ID.
-    - `is_server`: An integer indicating whether the endpoint is a server (non-zero) or a client (zero).
-- **Control Flow**:
-    - Retrieve the initial salt value from a predefined constant `FD_QUIC_CRYPTO_V1_INITIAL_SALT`.
-    - Calculate the size of the initial salt using `sizeof` on the constant.
-    - Call [`fd_quic_hkdf_extract`](#fd_quic_hkdf_extract) to derive the initial secret using the initial salt and the connection ID.
-    - Determine the read and write secrets based on whether the endpoint is a server or client.
-    - Use [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label) to expand the initial secret into client and server secrets using predefined labels for client and server input.
-- **Output**: The function does not return a value; it modifies the `secrets` structure in place to store the generated initial secrets.
-- **Functions called**:
-    - [`fd_quic_hkdf_extract`](#fd_quic_hkdf_extract)
-    - [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label)
+    - `secrets`: A pointer to `fd_quic_crypto_secrets_t` where the generated secrets will be stored.
+    - `conn_id`: A pointer to the connection ID used in the HKDF extraction process.
+    - `conn_id_sz`: The size of the connection ID in bytes.
+    - `is_server`: An integer flag indicating if the function is being called on the server side (non-zero) or client side (zero).
+- **Logic and Control Flow**:
+    - Set `initial_salt` to `FD_QUIC_CRYPTO_V1_INITIAL_SALT` and determine its size.
+    - Call [`fd_quic_hkdf_extract`](<#fd_quic_hkdf_extract>) to derive the `initial_secret` using `initial_salt` and `conn_id`.
+    - Determine `client_secret` and `server_secret` based on the `is_server` flag.
+    - Call [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>) to expand the `client_secret` using the `initial_secret` and client label.
+    - Call [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>) to expand the `server_secret` using the `initial_secret` and server label.
+- **Output**: No direct output; modifies the `secrets` structure to store the generated secrets.
+- **Functions Called**:
+    - [`fd_quic_hkdf_extract`](<#fd_quic_hkdf_extract>)
+    - [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>)
 
 
 ---
 ### fd\_quic\_key\_update\_derive<!-- {{#callable:fd_quic_key_update_derive}} -->
-The `fd_quic_key_update_derive` function derives new cryptographic keys for QUIC key updates using HKDF expansion.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L66>)
+
+Derives new cryptographic keys for QUIC key update using HKDF expansion.
 - **Inputs**:
-    - `secrets`: A pointer to an `fd_quic_crypto_secrets_t` structure containing the current cryptographic secrets.
-    - `new_keys`: An array of two `fd_quic_crypto_keys_t` structures where the newly derived keys will be stored.
-- **Control Flow**:
-    - Retrieve the encryption level identifier for application data.
-    - Iterate over two elements (j=0 and j=1) to derive new secrets using [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label) with the current secrets and a key update label.
-    - For each new secret, derive a new packet key and IV using [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label) with appropriate labels for QUIC key and IV.
-- **Output**: The function does not return a value; it updates the `new_keys` array with newly derived cryptographic keys.
-- **Functions called**:
-    - [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label)
+    - `secrets`: A pointer to `fd_quic_crypto_secrets_t` structure containing the current cryptographic secrets.
+    - `new_keys`: An array of two `fd_quic_crypto_keys_t` structures to store the newly derived keys.
+- **Logic and Control Flow**:
+    - Set `enc_level` to `fd_quic_enc_level_appdata_id` to identify the encryption level.
+    - Iterate over two elements (index `j` from 0 to 1) to derive new secrets using [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>) with the current secret and the label for key update.
+    - For each new secret, derive a new packet key and IV using [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>) with the appropriate labels for QUIC key and IV.
+- **Output**: The function does not return a value; it updates the `new_keys` array with the derived keys.
+- **Functions Called**:
+    - [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>)
 
 
 ---
 ### fd\_quic\_gen\_keys<!-- {{#callable:fd_quic_gen_keys}} -->
-The `fd_quic_gen_keys` function generates cryptographic keys for QUIC protocol operations using a given secret.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L98>)
+
+Generates QUIC cryptographic keys using a given secret.
 - **Inputs**:
-    - `keys`: A pointer to an `fd_quic_crypto_keys_t` structure where the generated keys will be stored.
-    - `secret`: A 32-byte array containing the secret used to derive the keys.
-- **Control Flow**:
-    - The function calls [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label) to generate the packet key (`pkt_key`) using the provided secret and the label `FD_QUIC_CRYPTO_LABEL_QUIC_KEY`.
-    - It then calls [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label) again to generate the header protection key (`hp_key`) using the same secret and the label `FD_QUIC_CRYPTO_LABEL_QUIC_HP`.
-    - Finally, it calls [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label) to generate the initialization vector (`iv`) using the secret and the label `FD_QUIC_CRYPTO_LABEL_QUIC_IV`.
-- **Output**: The function does not return a value; it populates the `keys` structure with the derived cryptographic keys.
-- **Functions called**:
-    - [`fd_quic_hkdf_expand_label`](#fd_quic_hkdf_expand_label)
+    - `keys`: A pointer to `fd_quic_crypto_keys_t` where the generated keys will be stored.
+    - `secret`: A 32-byte array used as the input secret for key generation.
+- **Logic and Control Flow**:
+    - Calls [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>) to generate the packet key (`pkt_key`) using the `FD_QUIC_CRYPTO_LABEL_QUIC_KEY` label.
+    - Calls [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>) to generate the header protection key (`hp_key`) using the `FD_QUIC_CRYPTO_LABEL_QUIC_HP` label.
+    - Calls [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>) to generate the initialization vector (`iv`) using the `FD_QUIC_CRYPTO_LABEL_QUIC_IV` label.
+- **Output**: Populates the `keys` structure with the generated packet key, header protection key, and initialization vector.
+- **Functions Called**:
+    - [`fd_quic_hkdf_expand_label`](<#fd_quic_hkdf_expand_label>)
 
 
 ---
 ### fd\_quic\_crypto\_encrypt<!-- {{#callable:fd_quic_crypto_encrypt}} -->
-The `fd_quic_crypto_encrypt` function encrypts a QUIC packet using AEAD_AES_128_GCM and applies header protection.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L158>)
+
+Encrypts a QUIC packet using AEAD_AES_128_GCM and applies header protection.
 - **Inputs**:
-    - `out`: A pointer to the output buffer where the encrypted packet will be stored.
-    - `out_sz`: A pointer to the size of the output buffer, which will be updated to the size of the encrypted data.
-    - `hdr`: A pointer to the packet header data to be encrypted.
-    - `hdr_sz`: The size of the packet header in bytes.
-    - `pkt`: A pointer to the packet data to be encrypted.
-    - `pkt_sz`: The size of the packet data in bytes.
-    - `pkt_keys`: A pointer to the cryptographic keys used for packet encryption.
-    - `hp_keys`: A pointer to the cryptographic keys used for header protection.
-    - `pkt_number`: The packet number used to derive the nonce for encryption.
-- **Control Flow**:
-    - Calculate the required buffer size for the encrypted output and check if the provided buffer is sufficient.
-    - Check if the header size is within valid bounds and if the packet size is not too large.
-    - Copy the header data into the output buffer.
-    - Determine the packet number size and its position in the header.
-    - Generate a nonce using the packet number and the IV from `pkt_keys`.
-    - Initialize the AEAD_AES_128_GCM cipher with the packet key and nonce.
+    - `out`: Pointer to the output buffer where the encrypted packet will be stored.
+    - `out_sz`: Pointer to the size of the output buffer, which will be updated with the size of the encrypted data.
+    - `hdr`: Pointer to the packet header data to be encrypted.
+    - `hdr_sz`: Size of the packet header in bytes.
+    - `pkt`: Pointer to the packet data to be encrypted.
+    - `pkt_sz`: Size of the packet data in bytes.
+    - `pkt_keys`: Pointer to the cryptographic keys used for packet encryption.
+    - `hp_keys`: Pointer to the cryptographic keys used for header protection.
+    - `pkt_number`: Packet number used to create the nonce for encryption.
+- **Logic and Control Flow**:
+    - Calculate the required output buffer size and check if the provided buffer is sufficient.
+    - Check if the header size is within valid bounds.
+    - Copy the header data to the output buffer.
+    - Determine the packet number size and pointer within the header.
+    - Generate a nonce using the packet keys and packet number.
+    - Initialize the AEAD_AES_128_GCM cipher with the packet keys and nonce.
     - Encrypt the packet data and append the authentication tag to the output buffer.
-    - Update the output size to reflect the total size of the encrypted data.
-    - Calculate the sample position for header protection based on the packet number size.
-    - Initialize the AES encryption key for header protection using `hp_keys`.
+    - Update the output size with the total number of bytes written.
+    - Calculate the sample start position for header protection.
+    - Initialize the AES encryption key for header protection using the header protection keys.
     - Encrypt the sample to generate a mask for header protection.
     - Apply the mask to the first byte of the header and the packet number to protect the header.
     - Return success status.
-- **Output**: Returns `FD_QUIC_SUCCESS` on successful encryption or `FD_QUIC_FAILED` if an error occurs, such as insufficient buffer size.
-- **Functions called**:
-    - [`fd_quic_get_nonce`](fd_quic_crypto_suites.h.md#fd_quic_get_nonce)
+- **Output**: Returns `FD_QUIC_SUCCESS` on successful encryption or `FD_QUIC_FAILED` if an error occurs.
+- **Functions Called**:
+    - [`fd_quic_get_nonce`](<fd_quic_crypto_suites.h.md#fd_quic_get_nonce>)
 
 
 ---
 ### fd\_quic\_crypto\_decrypt<!-- {{#callable:fd_quic_crypto_decrypt}} -->
-The `fd_quic_crypto_decrypt` function decrypts a QUIC packet using AES-GCM with the provided cryptographic keys and packet number.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L244>)
+
+Decrypts a QUIC packet using AES-GCM with the provided keys and packet number.
 - **Inputs**:
-    - `buf`: A pointer to the buffer containing the encrypted packet data.
-    - `buf_sz`: The size of the buffer in bytes.
-    - `pkt_number_off`: The offset in the buffer where the packet number starts.
-    - `pkt_number`: The packet number used to derive the nonce for decryption.
-    - `keys`: A pointer to the cryptographic keys used for decryption.
-- **Control Flow**:
-    - Check if the packet number offset is within the buffer size and if the buffer size is at least the minimum required for a QUIC packet; return failure if not.
-    - Derive the header size using the first byte of the buffer to determine the packet number length.
-    - Calculate the nonce by XORing the QUIC IV with the reconstructed packet number.
-    - Check if the buffer size is sufficient for the header and the GCM tag; return failure if not.
+    - ``buf``: A pointer to the buffer containing the encrypted packet data.
+    - ``buf_sz``: The size of the buffer in bytes.
+    - ``pkt_number_off``: The offset in the buffer where the packet number starts.
+    - ``pkt_number``: The packet number used to derive the nonce for decryption.
+    - ``keys``: A pointer to the `fd_quic_crypto_keys_t` structure containing the decryption keys.
+- **Logic and Control Flow**:
+    - Check if `pkt_number_off` is greater than or equal to `buf_sz` or if `buf_sz` is less than `FD_QUIC_SHORTEST_PKT`; if so, log a warning and return `FD_QUIC_FAILED`.
+    - Derive the header size using the first byte of the buffer and calculate the packet number size.
+    - Calculate the nonce by XORing the IV from `keys` with the reconstructed packet number.
+    - Check if `buf_sz` is less than the derived header size or the header size plus `FD_QUIC_CRYPTO_TAG_SZ`; if so, return `FD_QUIC_FAILED`.
     - Calculate the offsets for the header, payload, and GCM tag within the buffer.
     - Initialize the AES-GCM cipher with the packet key and nonce.
-    - Attempt to decrypt the payload using the AES-GCM cipher; return failure if decryption fails.
-    - Return success if decryption is successful.
-- **Output**: Returns `FD_QUIC_SUCCESS` on successful decryption or `FD_QUIC_FAILED` if any checks fail or decryption is unsuccessful.
-- **Functions called**:
-    - [`fd_quic_get_nonce`](fd_quic_crypto_suites.h.md#fd_quic_get_nonce)
+    - Attempt to decrypt the payload using `fd_aes_gcm_decrypt`; if decryption fails, log a warning and return `FD_QUIC_FAILED`.
+    - Return `FD_QUIC_SUCCESS` if decryption is successful.
+- **Output**: Returns `FD_QUIC_SUCCESS` if decryption is successful, otherwise returns `FD_QUIC_FAILED`.
+- **Functions Called**:
+    - [`fd_quic_get_nonce`](<fd_quic_crypto_suites.h.md#fd_quic_get_nonce>)
 
 
 ---
 ### fd\_quic\_crypto\_decrypt\_hdr<!-- {{#callable:fd_quic_crypto_decrypt_hdr}} -->
-The `fd_quic_crypto_decrypt_hdr` function decrypts the header of a QUIC packet using header protection keys.
+[View Source →](<../../../../../../src/waltz/quic/crypto/fd_quic_crypto_suites.c#L307>)
+
+Decrypts the header of a QUIC packet using header protection keys.
 - **Inputs**:
-    - `buf`: A pointer to the buffer containing the encrypted packet header.
-    - `buf_sz`: The size of the buffer in bytes.
-    - `pkt_number_off`: The offset in the buffer where the packet number starts.
-    - `keys`: A pointer to the `fd_quic_crypto_keys_t` structure containing the header protection keys.
-- **Control Flow**:
-    - Check if the buffer size is less than the crypto tag size or if the packet number offset is out of bounds; if so, log a warning and return failure.
-    - Extract the first byte of the buffer to determine if it is a long header and calculate the sample offset.
-    - Check if there are enough bytes for a sample; if not, log a warning and return failure.
-    - Set up AES-128 encryption using the header protection key and encrypt the sample to get the mask.
-    - Use the mask to decrypt the first byte of the buffer.
-    - Calculate the packet number size based on the decrypted first byte and check if it fits within the buffer; if not, log a warning and return failure.
-    - Decrypt the packet number using the mask.
-- **Output**: Returns `FD_QUIC_SUCCESS` on successful decryption of the header, or `FD_QUIC_FAILED` if any checks fail.
+    - ``buf``: A pointer to the buffer containing the packet data to decrypt.
+    - ``buf_sz``: The size of the buffer in bytes.
+    - ``pkt_number_off``: The offset in the buffer where the packet number starts.
+    - ``keys``: A pointer to the `fd_quic_crypto_keys_t` structure containing the header protection keys.
+- **Logic and Control Flow**:
+    - Check if the buffer size is less than `FD_QUIC_CRYPTO_TAG_SZ` or if `pkt_number_off` is greater than or equal to `buf_sz`; if so, log a warning and return `FD_QUIC_FAILED`.
+    - Extract the first byte from the buffer and determine if it is a long header by checking the most significant bit.
+    - Calculate the sample offset as `pkt_number_off + 4` and check if there are enough bytes for a sample; if not, log a warning and return `FD_QUIC_FAILED`.
+    - Set the encryption key using `fd_aes_set_encrypt_key` and encrypt the sample to produce a mask using `fd_aes_encrypt`.
+    - Undo the mask on the first byte of the buffer using the mask and update the buffer.
+    - Calculate the packet number size using `fd_quic_h0_pkt_num_len` and check if the packet number size exceeds the buffer size; if so, log a warning and return `FD_QUIC_FAILED`.
+    - Undo the packet number encryption by XORing each byte of the packet number with the corresponding byte in the mask.
+- **Output**: Returns `FD_QUIC_SUCCESS` if the decryption is successful, otherwise returns `FD_QUIC_FAILED`.
 
 
 

@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-In-memory FEC set store with insert, query, link, publish, clear, and tree-print operations.
+Functions for memory-backed store management, high-performance in-memory storage, build configuration, and tests.
 
 
 ## Files
-- **[fd_store.c](fd_store.c.md)**: Store initialization, linking, publishing, clearing, verification, and tree printing functions.
-- **[fd_store.h](fd_store.h.md)**: In-memory FEC set store with insert, query, link, publish, clear, and tree-print operations.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_store headers, objects, and unit tests when int128 and hosted support are enabled.
-- **[test_store.c](test_store.c.md)**: Tests store insert, link, query, map, publish, clear, and concurrent tile access.
+- **[fd_store.c](fd_store.c.md)**: Implements functions for managing a memory-backed store with partitioned data and Merkle tree operations.
+- **[fd_store.h](fd_store.h.md)**: High-performance in-memory storage engine for FEC set payloads, supporting concurrent access and validation.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing components in the `firedancer` codebase with conditional checks.
+- **[test_store.c](test_store.c.md)**: Tests for the `fd_store` functionality, including simple, multi-root, map function, and parallel scenarios.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

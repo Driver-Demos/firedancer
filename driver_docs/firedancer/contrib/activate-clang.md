@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `activate-clang` file is a Bash script used internally to install and activate Clang version 15.0 on development hosts within the `firedancer` codebase.
+Bash script to install and activate Clang 15.0 for development environments.
 
 # Purpose
-This Bash script is designed for internal use, likely within a development environment, to manage software packages and modules. It provides narrow functionality, specifically focusing on the installation and configuration of the Clang 15.0 module. The script checks if the first argument passed is "install" and, if so, uses the `yum` package manager to install the `jump_module_clang-15.0` package, which is necessary for development hosts. After installation, it purges any currently loaded modules and loads the Clang 15.0 module, ensuring that the environment is set up correctly for development tasks. This script is not an executable or a library but rather a utility script for configuring development environments.
+This script is a Bash executable intended for internal use, specifically for managing development environments. It provides narrow functionality by checking if the first argument is "install" and, if so, installs the `jump_module_clang-15.0` package using the `yum` package manager. After the installation, or if no arguments are provided, the script purges all currently loaded modules and loads the `clang-15.0` module. Finally, it lists all currently loaded modules to confirm the environment setup.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

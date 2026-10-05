@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase configures the build process for secp256k1-related headers, objects, unit tests, and fuzz tests, with conditional inclusion based on the presence of the `libsecp256k1` library.
+Makefile for building and testing secp256k1 components with conditional library checks.
 
 # Purpose
-This Makefile snippet conditionally includes and tests the secp256k1 cryptographic library if it is available. If the `FD_HAS_SECP256K1` flag is defined, it adds the necessary headers and object files, sets up unit and fuzz tests for secp256k1, and runs the unit test. If the library is not available, it issues a warning indicating that secp256k1 functionality is disabled due to the absence of `libsecp256k1`.
+The content is a Makefile segment that conditionally includes and tests the `secp256k1` cryptographic library. If the `FD_HAS_SECP256K1` flag is defined, it adds the header `fd_secp256k1.h` and the object files `fd_secp256k1` and `fd_ballet`. It also sets up a unit test `test_secp256k1` and a fuzz test `fuzz_secp256k1_recover`, linking them with `fd_ballet`, `fd_util`, and any libraries specified in `SECP256K1_LIBS`. The unit test `test_secp256k1` is then executed. If the flag is not defined, a warning is issued indicating that `secp256k1` is disabled due to the absence of `libsecp256k1`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

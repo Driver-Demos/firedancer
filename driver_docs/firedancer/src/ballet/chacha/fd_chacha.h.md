@@ -3,15 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-ChaCha20 block function prototypes and size constants.
+Defines constants and functions for the ChaCha20 block cipher, including block and key sizes.
 
 # Purpose
-This header file defines the public interface for ChaCha block functions. It declares the `FD_CHACHA_BLOCK_SZ` and `FD_CHACHA20_KEY_SZ` constants, which give the block size and key size used by the cipher. It also declares the [`fd_chacha8_block`](<#fd_chacha8_block>) and [`fd_chacha20_block`](<#fd_chacha20_block>) functions, which generate one 64-byte ChaCha block from a key and an index-plus-nonce input. The file does not define encryption or decryption routines, and it notes that support for multiple blocks is not yet implemented.
-# Function Declarations (Public API)
+This C header file defines constants and function prototypes related to the ChaCha20 encryption algorithm. It specifies the size of the ChaCha20 block (`FD_CHACHA_BLOCK_SZ`) as 64 bytes and the size of the encryption key (`FD_CHACHA20_KEY_SZ`) as 32 bytes. The file declares two functions, [`fd_chacha8_block`](<#fd_chacha8_block>) and [`fd_chacha20_block`](<#fd_chacha20_block>), which are intended to perform the ChaCha20 block function. These functions take pointers to an output block, an encryption key, and a block index with a nonce. The header includes a note that encryption and decryption functions are not implemented, as they are not currently required.
+# Imports and Dependencies
 
 ---
-- `fd_chacha8_block`
-- `fd_chacha20_block`
+- `../fd_ballet_base.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
