@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-gRPC client, codec, tests, fuzzers, and build rules for HTTP/2, TLS, and header handling.
+gRPC client and codec implementation with HTTP/2, TLS support, and related tests and build configuration.
 
 
 ## Files
-- **[fd_grpc_client.c](fd_grpc_client.c.md)**: gRPC client over HTTP/2 with request, response, timeout, and TLS/socket I/O handling.
-- **[fd_grpc_client.h](fd_grpc_client.h.md)**: API for unary and server-streaming gRPC over HTTP/2+TLS, with callbacks, metrics, and deadlines.
-- **[fd_grpc_client_private.h](fd_grpc_client_private.h.md)**: Private gRPC client state, stream pool, and HTTP/2 callback declarations.
-- **[fd_grpc_codec.c](fd_grpc_codec.c.md)**: gRPC HTTP/2 header encoding and response parsing helpers, plus gRPC status strings.
-- **[fd_grpc_codec.h](fd_grpc_codec.h.md)**: gRPC over HTTP/2 helpers, status codes, header structs, and request and response frame functions.
-- **[fuzz_grpc_client.c](fuzz_grpc_client.c.md)**: Fuzzer for gRPC client header callback and stream state checks.
-- **[fuzz_grpc_codec.c](fuzz_grpc_codec.c.md)**: Fuzzer for gRPC response header decoding and validation.
-- **[fuzz_grpc_h2_gen_req_hdr.c](fuzz_grpc_h2_gen_req_hdr.c.md)**: Fuzzer for gRPC HTTP/2 request header generation and HPACK decoding checks.
-- **[Local.mk](Local.mk.md)**: Build rules for gRPC codec and client headers, objects, unit tests, and fuzz tests.
-- **[test_grpc_client.c](test_grpc_client.c.md)**: gRPC client unit tests for deadlines, stream quota, release, and header handling.
-- **[test_grpc_codec.c](test_grpc_codec.c.md)**: Tests gRPC HTTP/2 request header generation and HPACK encoding.
+- **[fd_grpc_client.c](fd_grpc_client.c.md)**: Implementation of a gRPC client with support for HTTP/2 communication, stream management, and optional OpenSSL integration.
+- **[fd_grpc_client.h](fd_grpc_client.h.md)**: API for dispatching unary and server-streaming gRPC requests over HTTP/2+TLS with metrics and callbacks.
+- **[fd_grpc_client_private.h](fd_grpc_client_private.h.md)**: Defines internal structures and functions for managing gRPC client streams and connections.
+- **[fd_grpc_codec.c](fd_grpc_codec.c.md)**: Implements gRPC codec functions for generating and parsing HTTP/2 headers in the Firedancer project.
+- **[fd_grpc_codec.h](fd_grpc_codec.h.md)**: Helpers for gRPC over HTTP/2, including status codes, header structures, and request/response handling.
+- **[fuzz_grpc_client.c](fuzz_grpc_client.c.md)**: Fuzz testing implementation for a gRPC client with mock connection setup and callback handling.
+- **[fuzz_grpc_codec.c](fuzz_grpc_codec.c.md)**: Fuzz testing for gRPC codec response headers with initialization and validation logic.
+- **[fuzz_grpc_h2_gen_req_hdr.c](fuzz_grpc_h2_gen_req_hdr.c.md)**: Fuzz testing for generating and validating gRPC HTTP/2 request headers.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing gRPC components, including unit and fuzz tests, with OpenSSL support.
+- **[test_grpc_client.c](test_grpc_client.c.md)**: Unit tests for a gRPC client, including tests for connection state, deadlines, stream quotas, and headers.
+- **[test_grpc_codec.c](test_grpc_codec.c.md)**: Tests for generating and validating gRPC HTTP/2 request headers using the Firedancer library.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

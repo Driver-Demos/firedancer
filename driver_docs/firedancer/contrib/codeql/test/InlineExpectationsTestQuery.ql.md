@@ -3,10 +3,34 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Test postprocessing for inline expectations, with a relative URL formatter for locations.
+Defines a test post-processing module for inline expectations in CodeQL queries.
 
 # Purpose
-This file defines a CodeQL test postprocessing helper that formats source locations as relative file paths with line and column numbers. It imports the test postprocessing framework and creates a private `Input` module that implements `T::TestPostProcessing::InputSig<Impl>`. The `getRelativeUrl` predicate reads the file from a `Location`, extracts its location info, and builds a string in the form `path:startline:startcolumn:endline:endcolumn`. This code has narrow scope and supports test output generation rather than general analysis or executable behavior.
+This code is a test module for post-processing operations in a CodeQL environment. It imports necessary components from the CodeQL library, specifically for inline expectations testing. The module defines an `Input` implementation that adheres to the `T::TestPostProcessing::InputSig<Impl>` signature. The `getRelativeUrl` function within the `Input` module constructs a relative URL string from a given `Location` object by extracting file and line information. This functionality is used to verify the correctness of code analysis results by comparing expected and actual outcomes in a structured format.
+# Imports and Dependencies
+
+---
+- `cpp`
+- `codeql.util.test.InlineExpectationsTest`
+- `utils.test.internal.InlineExpectationsTestImpl`
+- `T::TestPostProcessing`
+- `T::TestPostProcessing::Make`
+
+
+# Functions
+
+---
+### getRelativeUrl
+Generates a relative URL string for a given `Location` object based on its file and position information.
+- **Inputs**:
+    - `location`: A `Location` object that contains information about a file and its position.
+- **Logic and Control Flow**:
+    - Checks if there exists a `File` object `f` and integer values `startline`, `startcolumn`, `endline`, and `endcolumn` such that the `location` has location information matching these values.
+    - Retrieves the file associated with the `location` using `location.getFile()`.
+    - If the conditions are met, constructs a string `result` by concatenating the relative path of the file and the start and end line and column numbers, separated by colons.
+- **Output**: A string representing the relative URL, which includes the file's relative path and the start and end line and column numbers.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
