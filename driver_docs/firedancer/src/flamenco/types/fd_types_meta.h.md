@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Reflection APIs for `fd_types` with type identifiers and functions to check node types in data structures.
+The `fd_types_meta.h` file in the `firedancer` codebase provides reflection APIs for `fd_types`, defining various node types for bincode/borsh data structure graphs and functions to determine if a type is primitive or part of a collection.
 
 # Purpose
-The `fd_types_meta.h` file is a C header file that provides reflection APIs for `fd_types` in the context of bincode/borsh data structure graphs. It defines a series of macros that identify different types of nodes, such as primitive types (`FD_FLAMENCO_TYPE_NULL`, `FD_FLAMENCO_TYPE_BOOL`, etc.) and collection types (`FD_FLAMENCO_TYPE_ARR`, `FD_FLAMENCO_TYPE_MAP`, etc.). The file includes utility functions to determine if a type is primitive or part of a collection, and whether a collection type marks the beginning or end of a collection. These functions use bitwise operations to evaluate the type identifiers. The header file also includes necessary dependencies from `fd_util_base.h` and `fd_bincode.h`.
+This C header file, `fd_types_meta.h`, defines a set of constants and inline functions for handling and identifying types within a bincode/borsh data structure graph, which is likely used for serialization and deserialization tasks. The file includes a series of macro definitions that represent various data types and collection markers, such as primitive types (e.g., `FD_FLAMENCO_TYPE_BOOL`, `FD_FLAMENCO_TYPE_UINT`) and collection types (e.g., `FD_FLAMENCO_TYPE_ARR`, `FD_FLAMENCO_TYPE_MAP`). It provides reflection APIs that allow the user to determine whether a type is primitive or part of a collection, and whether a collection type marks the beginning or end of a collection. The use of inline functions like [`fd_flamenco_type_is_primitive`](#fd_flamenco_type_is_primitive) and [`fd_flamenco_type_is_collection`](#fd_flamenco_type_is_collection) suggests an emphasis on performance, as these functions are designed to be efficient by avoiding function call overhead. Overall, this file serves as a utility for type identification and reflection in data serialization contexts.
 # Imports and Dependencies
 
 ---
@@ -18,63 +18,53 @@ The `fd_types_meta.h` file is a C header file that provides reflection APIs for 
 
 ---
 ### fd\_flamenco\_type\_is\_primitive<!-- {{#callable:fd_flamenco_type_is_primitive}} -->
-[View Source →](<../../../../../src/flamenco/types/fd_types_meta.h#L42>)
-
-Determines if a given type is primitive by checking if it does not contain any child nodes.
+The function `fd_flamenco_type_is_primitive` checks if a given type is a primitive type without child nodes.
 - **Inputs**:
-    - `type`: An integer representing the type to check.
-- **Logic and Control Flow**:
-    - Perform a bitwise AND operation between `type` and `0xe0`.
-    - Check if the result of the bitwise operation is equal to `0x00`.
-    - Return 1 if the result is `0x00`, indicating a primitive type.
-    - Return 0 otherwise, indicating a non-primitive type.
-- **Output**: Returns 1 if the type is primitive (does not contain child nodes), otherwise returns 0.
+    - `type`: An integer representing the type to be checked, typically a constant defined in the Flamenco type system.
+- **Control Flow**:
+    - The function performs a bitwise AND operation between the input `type` and the hexadecimal value `0xe0`.
+    - It then checks if the result of the bitwise operation is equal to `0x00`.
+    - If the result is `0x00`, the function returns `1`, indicating the type is primitive.
+    - Otherwise, it returns `0`, indicating the type is not primitive.
+- **Output**: The function returns an integer `1` if the type is primitive (i.e., it does not contain any child nodes), and `0` otherwise.
 
 
 ---
 ### fd\_flamenco\_type\_is\_collection<!-- {{#callable:fd_flamenco_type_is_collection}} -->
-[View Source →](<../../../../../src/flamenco/types/fd_types_meta.h#L55>)
-
-Determines if a given type represents the beginning or end of a collection in a data structure graph.
+The function `fd_flamenco_type_is_collection` checks if a given type represents the beginning or end of a collection in a data structure graph.
 - **Inputs**:
-    - `type`: An integer representing the type of a node in a data structure graph.
-- **Logic and Control Flow**:
-    - Perform a bitwise AND operation between `type` and `0xe0`.
-    - Compare the result of the bitwise operation to `0x20`.
-    - Return 1 if the result matches `0x20`, indicating a collection type; otherwise, return 0.
-- **Output**: Returns 1 if the type is a collection type, otherwise returns 0.
+    - `type`: An integer representing a node type in a bincode/borsh data structure graph.
+- **Control Flow**:
+    - The function performs a bitwise AND operation between the input `type` and the hexadecimal value `0xe0`.
+    - It then checks if the result of the bitwise operation is equal to `0x20`.
+    - If the result is `0x20`, the function returns 1, indicating the type is a collection; otherwise, it returns 0.
+- **Output**: The function returns an integer: 1 if the type is a collection, and 0 otherwise.
 
 
 ---
 ### fd\_flamenco\_type\_is\_collection\_begin<!-- {{#callable:fd_flamenco_type_is_collection_begin}} -->
-[View Source →](<../../../../../src/flamenco/types/fd_types_meta.h#L63>)
-
-Determines if a given type marks the beginning of a collection in a data structure graph.
+The function `fd_flamenco_type_is_collection_begin` checks if a given type represents the beginning of a collection in a data structure graph.
 - **Inputs**:
-    - `type`: An integer representing the type of a node in a data structure graph.
-- **Logic and Control Flow**:
-    - Calls [`fd_flamenco_type_is_collection`](<#fd_flamenco_type_is_collection>) with `type` to check if it is a collection type.
-    - Performs a bitwise AND operation between `type` and `1` to check if the least significant bit is `0`.
-    - Returns `1` if both conditions are true, indicating the type marks the beginning of a collection; otherwise, returns `0`.
-- **Output**: Returns `1` if the type marks the beginning of a collection, otherwise returns `0`.
-- **Functions Called**:
-    - [`fd_flamenco_type_is_collection`](<#fd_flamenco_type_is_collection>)
+    - `type`: An integer representing a node type in a bincode/borsh data structure graph.
+- **Control Flow**:
+    - The function first calls [`fd_flamenco_type_is_collection`](#fd_flamenco_type_is_collection) to check if the type is a collection type.
+    - It then checks if the least significant bit of the type is 0, indicating the beginning of a collection.
+- **Output**: Returns 1 if the type is a collection type and marks the beginning of a collection; otherwise, returns 0.
+- **Functions called**:
+    - [`fd_flamenco_type_is_collection`](#fd_flamenco_type_is_collection)
 
 
 ---
 ### fd\_flamenco\_type\_is\_collection\_end<!-- {{#callable:fd_flamenco_type_is_collection_end}} -->
-[View Source →](<../../../../../src/flamenco/types/fd_types_meta.h#L68>)
-
-Determines if a given type marks the end of a collection in a data structure graph.
+The function `fd_flamenco_type_is_collection_end` checks if a given type represents the end of a collection in a data structure graph.
 - **Inputs**:
-    - `type`: An integer representing the type to check.
-- **Logic and Control Flow**:
-    - Calls [`fd_flamenco_type_is_collection`](<#fd_flamenco_type_is_collection>) to check if `type` is a collection type.
-    - Performs a bitwise AND operation with `type` and `1` to check if the least significant bit is not zero.
-    - Returns 1 if both conditions are true, indicating the type is a collection end; otherwise, returns 0.
-- **Output**: Returns 1 if the type marks the end of a collection, otherwise returns 0.
-- **Functions Called**:
-    - [`fd_flamenco_type_is_collection`](<#fd_flamenco_type_is_collection>)
+    - `type`: An integer representing a node type in a bincode/borsh data structure graph.
+- **Control Flow**:
+    - The function first calls [`fd_flamenco_type_is_collection`](#fd_flamenco_type_is_collection) to check if the type is a collection type.
+    - It then checks if the least significant bit of the type is set (i.e., `type & 1 != 0`) to determine if it is an end type.
+- **Output**: Returns 1 if the type is a collection end type, otherwise returns 0.
+- **Functions called**:
+    - [`fd_flamenco_type_is_collection`](#fd_flamenco_type_is_collection)
 
 
 

@@ -3,22 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for including various modules like fd_choreo_base, fd_epoch, fd_eqvoc, and others.
+Includes choreo base, epoch, eqvoc, ghost, notar, tower, and voter headers.
 
 # Purpose
-This code is a C header file that uses include guards to prevent multiple inclusions of the same file, which can cause compilation errors. The header file includes several other header files: `fd_choreo_base.h`, `fd_epoch.h`, `fd_eqvoc.h`, `fd_ghost.h`, `fd_notar.h`, `fd_tower.h`, and `fd_voter.h`. These included files suggest that the header file is part of a larger system, possibly related to choreography or orchestration, involving components like epochs, voting, and notarization. The include guard is defined by `HEADER_fd_src_choreo_fd_choreo_h`, ensuring that the file's contents are only included once in a single compilation unit.
-# Imports and Dependencies
-
----
-- `fd_choreo_base.h`
-- `epoch/fd_epoch.h`
-- `eqvoc/fd_eqvoc.h`
-- `ghost/fd_ghost.h`
-- `notar/fd_notar.h`
-- `tower/fd_tower.h`
-- `voter/fd_voter.h`
-
-
+This header file is an include guard for the `fd_choreo` interface. It includes the main dependency headers for the choreo subsystem: `fd_choreo_base.h`, `fd_epoch.h`, `fd_eqvoc.h`, `fd_ghost.h`, `fd_notar.h`, `fd_tower.h`, and `fd_voter.h`. The file does not define functions or data; it only groups the required headers so other source files can include one file to get the full choreo API set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

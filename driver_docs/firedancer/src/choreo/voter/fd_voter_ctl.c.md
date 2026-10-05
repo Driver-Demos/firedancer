@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Reads a JSON file, parses data, and logs a base58-encoded vote account address.
+The `fd_voter_ctl.c` file in the `firedancer` codebase reads a JSON file to extract and encode a vote account address using base58 encoding.
 
 # Purpose
-This code is an executable C program that reads a JSON file, processes its contents, and logs a Base58-encoded address. The program begins by initializing the environment with `fd_boot`, which prepares the command-line arguments. It then opens a specific JSON file located at `/home/chali/.firedancer/fd1/vote-1.json` and reads a line from it. The line is expected to contain a sequence of numbers, which the program tokenizes and parses into an array of unsigned characters (`uchar`). The program processes 64 tokens, but only the last 32 are converted into bytes.
+This C source code file is an executable program designed to read a JSON file, parse specific data from it, and then encode that data using Base58 encoding. The program begins by initializing the environment with `fd_boot`, which suggests it is part of a larger framework or application, likely related to the "firedancer" project, as indicated by the file path. The program opens a JSON file located at a specific path, reads a line from it, and expects the line to contain a series of numbers. It then parses these numbers, converts them into bytes, and encodes the resulting byte array into a Base58 string, which is logged as a "vote account address."
 
-After parsing, the program encodes these bytes into a Base58 string using the `fd_base58_encode_32` function from the `fd_base58` library. The resulting Base58-encoded string represents a vote account address, which is logged using `FD_LOG_NOTICE`. The program concludes by calling `fd_halt` to perform any necessary cleanup before exiting. This code is designed to be executed directly and does not define any public APIs or external interfaces.
+The code relies on several key components, including file handling, string manipulation, and the use of a custom Base58 encoding function from the "ballet" library. The use of `FD_TEST` and `FD_LOG_NOTICE` macros suggests a framework that provides testing and logging utilities, enhancing robustness and traceability. The program is narrowly focused on processing a specific file format and encoding scheme, indicating it is likely a utility within a larger system, possibly for handling blockchain or cryptocurrency-related data, given the use of Base58 encoding, which is common in such contexts. The code does not define public APIs or external interfaces, as it is structured as a standalone executable with a [`main`](#main) function.
 # Imports and Dependencies
 
 ---
@@ -22,22 +22,22 @@ After parsing, the program encodes these bytes into a Base58 string using the `f
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/choreo/voter/fd_voter_ctl.c#L6>)
-
-Reads a JSON file, extracts numeric data, converts it to bytes, and logs a Base58 encoded vote account address.
+The `main` function reads a JSON file, extracts and processes numeric data, encodes it in Base58, and logs the result.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Opens the file `/home/chali/.firedancer/fd1/vote-1.json` for reading and checks if the file is successfully opened using `FD_TEST`.
-    - Reads a line from the file into the `line` buffer and checks for successful read using `FD_TEST`, then closes the file.
-    - Initializes a `bytes` array to store 32 bytes of data.
-    - Uses `strtok` to tokenize the `line` string, iterating over 64 tokens.
-    - For tokens with index 32 and above, converts the token to an integer, checks if it is within the valid range for an unsigned char, and stores it in the `bytes` array.
-    - Encodes the `bytes` array into a Base58 string and logs the result as a vote account address using `FD_LOG_NOTICE`.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
+    - `argc`: The count of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program environment using `fd_boot` with the command-line arguments.
+    - Open the file "/home/chali/.firedancer/fd1/vote-1.json" for reading and check if it was successfully opened using `FD_TEST`.
+    - Read a line from the file into a buffer `line` and verify the read operation was successful using `FD_TEST`.
+    - Close the file after reading the line.
+    - Initialize a `bytes` array to store 32 unsigned characters.
+    - Tokenize the `line` using `strtok` to extract numbers separated by '[, ]'.
+    - Iterate over the first 64 tokens, parsing them as integers, and store the last 32 parsed values as unsigned characters in the `bytes` array, ensuring each parsed value is within the valid range using `FD_TEST`.
+    - Encode the `bytes` array into a Base58 string and store it in `vote_acc_addr`.
+    - Log the encoded vote account address using `FD_LOG_NOTICE`.
+    - Terminate the program using `fd_halt` and return 0.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 
