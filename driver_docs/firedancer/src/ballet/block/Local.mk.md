@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers and running unit tests for `test_microblock`.
+The `Local.mk` file in the `firedancer` codebase is a makefile that adds headers, compiles, and runs unit tests for the `test_microblock` component.
 
 # Purpose
-The `Makefile` content defines build and test instructions for a software project. It uses a function `add-hdrs` to include the header file `fd_microblock.h`. It then defines a unit test named `test_microblock` using the `make-unit-test` function, specifying dependencies on `fd_ballet` and `fd_util`. Finally, it executes the unit test `test_microblock` with the `run-unit-test` function.
+The file is a Makefile snippet used for automating the build and test process of a software project. It includes a header file `fd_microblock.h` using a custom function `add-hdrs`, defines a unit test `test_microblock` with dependencies on `fd_ballet` and `fd_util` using `make-unit-test`, and executes the unit test with `run-unit-test`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

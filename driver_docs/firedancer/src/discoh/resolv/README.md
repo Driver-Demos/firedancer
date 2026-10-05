@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a transaction resolution system and Makefile logic for conditional object addition.
+Transaction resolution tile and build rules for fd_discoh.
 
 
 ## Files
-- **[fd_resolv_tile.c](fd_resolv_tile.c.md)**: Implements a transaction resolution system with blockhash management, transaction stashing, and metrics tracking.
-- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects `fd_resolv_tile` and `fd_discoh` if `FD_HAS_ALLOCA` is defined.
+- **[fd_resolv_tile.c](fd_resolv_tile.c.md)**: Transaction resolution tile that stashes unknown blockhashes, resolves lookup tables, and publishes transactions.
+- **[Local.mk](Local.mk.md)**: Build rules to add fd_resolv_tile to fd_discoh when FD_HAS_ALLOCA is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
