@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Base64 encoding and decoding functions, fuzz testing, and performance benchmarks with a Makefile for builds.
+Base64 encode/decode functions, tests, fuzzing, and build rules.
 
 
 ## Files
-- **[fd_base64.c](fd_base64.c.md)**: Base64 encoding and decoding functions with an inverse lookup table for ASCII to Base64 conversion.
-- **[fd_base64.h](fd_base64.h.md)**: Methods for encoding and decoding data between binary and Base64 using the standard Base64 alphabet.
-- **[fuzz_base64_dec.c](fuzz_base64_dec.c.md)**: Verifies the safety of Base64 decoding against untrusted inputs using fuzz testing.
-- **[fuzz_base64_enc.c](fuzz_base64_enc.c.md)**: Verifies that base64 decoding of encoded data returns the original input using fuzz testing.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, unit tests, and fuzz tests for base64 functionality.
-- **[test_base64.c](test_base64.c.md)**: Tests Base64 encoding and decoding against predefined vectors and benchmarks performance.
+- **[fd_base64.c](fd_base64.c.md)**: The `fd_base64.c` file in the `firedancer` codebase provides functions for encoding and decoding data using the Base64 encoding scheme.
+- **[fd_base64.h](fd_base64.h.md)**: The `fd_base64.h` file provides functions for encoding and decoding data between binary and Base64 format, using the standard Base64 alphabet with padding as specified in RFC 4648.
+- **[fuzz_base64_dec.c](fuzz_base64_dec.c.md)**: The `fuzz_base64_dec.c` file implements a fuzz testing harness to ensure the safety of Base64 decoding against untrusted inputs in the `firedancer` codebase.
+- **[fuzz_base64_enc.c](fuzz_base64_enc.c.md)**: The `fuzz_base64_enc.c` file in the `firedancer` codebase implements a fuzz test to verify that decoding the result of encoding a data input with Base64 returns the original data, ensuring the encode-decode process is an identity function.
+- **[Local.mk](Local.mk.md)**: Build rules for base64 headers, object, unit test, and fuzz tests.
+- **[test_base64.c](test_base64.c.md)**: Base64 encode and decode tests with vectors, corrupt inputs, round trips, and throughput benchmarks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
