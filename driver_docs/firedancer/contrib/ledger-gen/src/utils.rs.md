@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Utility functions for reading and verifying ELF files, creating and signing transactions, and slot waiting.
+The `utils.rs` file in the `firedancer` codebase provides utility functions for reading and verifying ELF files, creating and signing Solana transactions, and waiting for a specified number of slots using the Solana RPC client.
 
 # Purpose
-This Rust code provides utility functions and configurations for interacting with the Solana blockchain. It includes functions to read and verify an ELF (Executable and Linkable Format) file, create and sign a Solana transaction, and wait for a specified number of slots on the blockchain. The `read_and_verify_elf` function reads an ELF file from a given location, verifies it using the Solana BPF (Berkeley Packet Filter) loader program, and returns the program data if successful. The `create_message_and_sign` function constructs a Solana transaction message from a list of instructions, signs it with the provided keypairs, and returns the signed transaction. The `wait_atleast_n_slots` function pauses execution until the blockchain has advanced by a specified number of slots, using the `RpcClient` to query the current slot.
+This Rust source code file provides a set of utility functions and configurations for interacting with the Solana blockchain, specifically focusing on handling and verifying ELF (Executable and Linkable Format) files, creating and signing transactions, and managing slot-based timing. The code is structured to facilitate operations that are common in blockchain environments, such as reading and verifying program binaries, constructing and signing transactions, and synchronizing operations with the blockchain's slot progression. The use of the Solana SDK and related libraries indicates that this code is intended to be part of a larger application or library that interacts with the Solana network.
 
-Additionally, the code defines a static configuration `SKIP_PREFLIGHT_CONFIG` using the `lazy_static` macro. This configuration is used to skip preflight checks when sending transactions, which can be useful for testing or specific use cases where preflight checks are not necessary. The code imports several modules from the Solana ecosystem, such as `solana_client`, `solana_sdk`, and `solana_rbpf`, indicating its reliance on Solana's libraries for blockchain interaction and program execution. This code is likely intended to be part of a larger application or library that interacts with the Solana blockchain, providing essential functions for program verification, transaction creation, and blockchain synchronization.
+The file defines several key functions and a static configuration. The `read_and_verify_elf` function reads an ELF file from a specified location, verifies its integrity using Solana's runtime environment, and returns the program data if successful. The `create_message_and_sign` function constructs a Solana transaction from a set of instructions, signs it with the provided keypairs, and prepares it for submission to the network. The `wait_atleast_n_slots` function is a utility for pausing execution until a specified number of slots have passed, ensuring synchronization with the blockchain's state. Additionally, the file uses the `lazy_static` crate to define a static configuration, `SKIP_PREFLIGHT_CONFIG`, which is used to configure transaction submission to skip preflight checks, optimizing for scenarios where such checks are unnecessary. Overall, this code provides essential building blocks for applications that need to interact programmatically with the Solana blockchain.
 # Imports and Dependencies
 
 ---
@@ -27,48 +27,47 @@ Additionally, the code defines a static configuration `SKIP_PREFLIGHT_CONFIG` us
 
 ---
 ### create\_message\_and\_sign
-Creates a Solana transaction message from given instructions, signs it with specified keypairs, and returns the signed transaction.
+The `create_message_and_sign` function constructs a Solana transaction from given instructions, a payer, and a list of signers, and signs it using the provided blockhash.
 - **Inputs**:
-    - `instructions`: A reference to a vector of `Instruction` objects that define the operations to include in the transaction.
-    - `payer`: A reference to a `Keypair` that represents the payer of the transaction fees.
-    - `signers`: A vector of references to `Keypair` objects that will sign the transaction.
-    - `blockhash`: A `Hash` representing the recent blockhash to use for the transaction.
-- **Logic and Control Flow**:
-    - Creates a `Message` object using the provided instructions, payer's public key, and blockhash.
-    - Initializes an unsigned `Transaction` with the created message.
-    - Attempts to sign the transaction with the provided signers and blockhash.
-    - Returns the signed `Transaction`.
-- **Output**: A `Transaction` object that is signed and ready to be sent to the Solana network.
+    - `instructions`: A vector of `Instruction` objects that define the operations to be included in the transaction.
+    - `payer`: A `Keypair` representing the account that will pay for the transaction fees.
+    - `signers`: A vector of references to `Keypair` objects that will be used to sign the transaction.
+    - `blockhash`: A `Hash` representing the recent blockhash to be used for the transaction.
+- **Control Flow**:
+    - Create a `Message` object using the provided instructions, payer's public key, and blockhash.
+    - Initialize an unsigned `Transaction` object with the created message.
+    - Attempt to sign the transaction using the provided signers and blockhash.
+    - Return the signed transaction.
+- **Output**: A `Transaction` object that has been signed with the provided signers and blockhash.
 
 
 ---
 ### read\_and\_verify\_elf
-Reads an ELF file from a specified location and verifies its integrity using a program runtime environment.
+The `read_and_verify_elf` function reads an ELF file from a specified location, verifies its integrity, and returns the program data if successful.
 - **Inputs**:
-    - `program_location`: A string slice that specifies the file path of the ELF program to read and verify.
-- **Logic and Control Flow**:
-    - Open the file at the specified `program_location` and handle any errors that occur during this process.
-    - Read the entire contents of the file into a `Vec<u8>` and handle any errors that occur during this process.
-    - Create a program runtime environment using `create_program_runtime_environment_v1` with all features enabled and a default compute budget.
-    - Create an `Executable` from the ELF data using the program runtime environment and handle any errors that occur during this process.
-    - Verify the `Executable` using `RequisiteVerifier` and handle any errors that occur during this process.
-    - Return the program data as a `Vec<u8>` if all operations succeed.
-- **Output**: Returns a `Result` containing a `Vec<u8>` with the program data if successful, or an error message encapsulated in a `Box<dyn std::error::Error>` if any step fails.
+    - `program_location`: A string slice representing the file path to the ELF program that needs to be read and verified.
+- **Control Flow**:
+    - Attempt to open the file at the given `program_location` and handle any errors by returning a formatted error message.
+    - Read the entire contents of the file into a `Vec<u8>` and handle any read errors similarly.
+    - Create a program runtime environment using `create_program_runtime_environment_v1` with default feature set and compute budget settings.
+    - Attempt to create an `Executable` from the ELF data using the runtime environment, returning an error if this fails.
+    - Verify the `Executable` using `RequisiteVerifier`, returning an error if verification fails.
+    - Return the program data as a `Vec<u8>` if all steps are successful.
+- **Output**: Returns a `Result` containing a `Vec<u8>` of the program data if successful, or a boxed error if any step fails.
 
 
 ---
 ### wait\_atleast\_n\_slots
-Waits until the blockchain reaches at least a specified number of slots beyond the current slot.
+The `wait_atleast_n_slots` function pauses execution until the Solana blockchain has advanced by at least a specified number of slots.
 - **Inputs**:
-    - `client`: An `RpcClient` instance used to interact with the Solana blockchain.
-    - `n`: A `u64` integer representing the number of slots to wait beyond the current slot.
-- **Logic and Control Flow**:
-    - Get the current slot from the blockchain using the `client.get_slot()` method.
-    - Calculate the `target_slot` by adding `n` to the `current_slot`.
-    - Enter a loop that continuously gets the current slot from the blockchain.
-    - Check if the current slot is greater than or equal to the `target_slot`.
-    - Break the loop if the current slot is greater than or equal to the `target_slot`.
-- **Output**: No output is returned; the function waits until the condition is met.
+    - `client`: An instance of `RpcClient` used to interact with the Solana blockchain and retrieve the current slot number.
+    - `n`: A `u64` integer representing the number of slots to wait for before resuming execution.
+- **Control Flow**:
+    - Retrieve the current slot number from the Solana blockchain using the `client.get_slot()` method.
+    - Calculate the target slot by adding the input `n` to the current slot number.
+    - Enter a loop that continuously retrieves the current slot number.
+    - Break out of the loop once the current slot number is greater than or equal to the target slot number.
+- **Output**: This function does not return any value; it simply pauses execution until the specified number of slots have passed.
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A copy of the picohttpparser library with a build-time patch for compatibility.
+The `README.txt` file in the `firedancer` codebase explains that the directory contains a patched version of the picohttpparser library, originally from commit `66534e6`, and provides instructions for updating the patch.
 
 # Purpose
-The directory contains a copy of the `picohttpparser` library, specifically from commit `66534e6`. The code from this commit does not compile with the current compilation options, so a small patch is applied during the build process. To update the patch, edit `fd_picohttpparser.c` and generate a new patch file using the `diff` command. Licensing information is available in the `NOTICE` file located in the root of the repository.
+This file provides instructions for managing a local copy of the picohttpparser library within the directory. It specifies that the library is based on a specific commit (`66534e6`) and requires a patch to be applied at build time to ensure compatibility with the project's compilation options. The file also outlines the process for updating the patch and directs users to the root repository's NOTICE file for licensing details.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
