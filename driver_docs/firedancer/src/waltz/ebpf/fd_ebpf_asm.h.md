@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-eBPF instruction encoding macros for loads, ALU ops, jumps, calls, and exit.
+Macros for eBPF assembly instruction encoding and register definitions.
 
 # Purpose
-This header file defines a small set of C preprocessor macros for building eBPF instructions as encoded integer values. It provides register names `FD_EBPF_ASM_r0` through `FD_EBPF_ASM_r5` and helper macros for load, move, arithmetic, jump, call, and exit instructions such as `FD_EBPF_ASM_ldxb`, `FD_EBPF_ASM_mov64_imm`, and `FD_EBPF_ASM_jeq_imm`. The macros combine opcode, register, offset, and immediate fields into the bit layout expected by eBPF bytecode. The `FD_EBPF` macro offers a simple dispatch form that expands to the matching `FD_EBPF_ASM_*` macro for a given operation name.
+This code is a C header file that defines macros for assembling eBPF (extended Berkeley Packet Filter) instructions. It provides symbolic names for eBPF registers (`FD_EBPF_ASM_r0` to `FD_EBPF_ASM_r5`) and macros to construct eBPF instructions for various operations, such as load, arithmetic, and jump instructions. The macros like `FD_EBPF_ASM_ldxb`, `FD_EBPF_ASM_mov64_imm`, and `FD_EBPF_ASM_jeq_imm` simplify the creation of eBPF bytecode by encoding operation codes, destination and source registers, immediate values, and offsets into a single instruction. The file uses preprocessor directives to prevent multiple inclusions and ensure that the macros are only defined once.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
