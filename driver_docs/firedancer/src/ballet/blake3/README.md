@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-BLAKE3 hashing, XOF, LtHash, SIMD compression, tests, and fuzzing.
+BLAKE3 cryptographic hash function implementations, optimizations, tests, and build configurations.
 
 
 ## Files
-- **[fd_blake3.c](fd_blake3.c.md)**: BLAKE3 hashing, XOF, and LtHash routines with SIMD batch support.
-- **[fd_blake3.h](fd_blake3.h.md)**: BLAKE3 hashing APIs, state structs, constants, and batch LtHash functions.
-- **[fd_blake3_avx2.c](fd_blake3_avx2.c.md)**: AVX2 BLAKE3 compression for batched hashing and LtHash output.
-- **[fd_blake3_avx512.c](fd_blake3_avx512.c.md)**: AVX512 BLAKE3 compression for 16 lanes, with LtHash and fast-path support.
-- **[fd_blake3_private.h](fd_blake3_private.h.md)**: BLAKE3 tracing, constants, flags, and compression function prototypes.
-- **[fd_blake3_ref.c](fd_blake3_ref.c.md)**: Reference BLAKE3 compression and round mixing functions.
-- **[fd_blake3_sse41.c](fd_blake3_sse41.c.md)**: SSE4.1 BLAKE3 compression and chaining-value update routines.
-- **[fd_blake3_test_vector.c](fd_blake3_test_vector.c.md)**: BLAKE3 test vectors for message hashes.
-- **[fuzz_blake3.c](fuzz_blake3.c.md)**: The `fuzz_blake3.c` file in the `firedancer` codebase implements a fuzz testing harness for the BLAKE3 hashing algorithm, ensuring consistent hash outputs for identical inputs.
-- **[Local.mk](Local.mk.md)**: Build rules for BLAKE3 headers, objects, unit test, and fuzz test with SIMD variants.
-- **[test_blake3.c](test_blake3.c.md)**: BLAKE3 tests and benchmarks, including AVX, AVX512, SSE, and LtHash checks.
+- **[fd_blake3.c](fd_blake3.c.md)**: Implements the BLAKE3 cryptographic hash function with support for parallel processing and various optimizations.
+- **[fd_blake3.h](fd_blake3.h.md)**: APIs for BLAKE3 hashing with SIMD parallelism, supporting variable output sizes and batch processing.
+- **[fd_blake3_avx2.c](fd_blake3_avx2.c.md)**: Optimized BLAKE3 hash function implementation using AVX2 for parallel processing of data batches.
+- **[fd_blake3_avx512.c](fd_blake3_avx512.c.md)**: Optimized BLAKE3 hash function implementation using AVX-512 instructions for batch processing.
+- **[fd_blake3_private.h](fd_blake3_private.h.md)**: Private header for BLAKE3 hash function implementation with tracing, protocol constants, and compression functions.
+- **[fd_blake3_ref.c](fd_blake3_ref.c.md)**: Reference implementation of the BLAKE3 compression function with support for chaining values.
+- **[fd_blake3_sse41.c](fd_blake3_sse41.c.md)**: Optimized SSE4.1 implementation of the BLAKE3 hash function compression routine.
+- **[fd_blake3_test_vector.c](fd_blake3_test_vector.c.md)**: Defines BLAKE3 test vectors for use in cryptographic validation.
+- **[fuzz_blake3.c](fuzz_blake3.c.md)**: Fuzz testing for the BLAKE3 hash function using LLVM's libFuzzer.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing BLAKE3 components with optional SSE, AVX, and AVX512 optimizations.
+- **[test_blake3.c](test_blake3.c.md)**: Tests and benchmarks for the BLAKE3 hash function implementation, including various compression and hashing methods.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
