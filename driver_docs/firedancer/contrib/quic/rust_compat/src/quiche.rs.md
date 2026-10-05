@@ -3,12 +3,65 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC interoperability test between quiche and Firedancer with optional PCAP logging.
+Integrates Firedancer components with the quiche library for QUIC protocol handling.
 
 # Purpose
-This code is an integration test that connects a `quiche` QUIC client to a Firedancer `fd_quic` server over UDP on `127.0.0.1`. It creates the Firedancer workspace, UDP socket wrapper, and QUIC server state, then starts a service thread that runs `fd_udpsock_service` and `fd_quic_service` until the test ends. The code also sets up optional PCAP capture when the `PCAP` environment variable is set, and it installs a TLS key log callback so packet and key data can be written to the capture file.
+The code defines a function `quiche_to_fdquic` that integrates the `quiche` library with the Firedancer framework to establish a QUIC (Quick UDP Internet Connections) server-client communication. The function sets up a UDP socket and initializes Firedancer components, including a QUIC server and a UDP socket, using the Firedancer API. It configures the QUIC server to handle network traffic and optionally logs packet data to a PCAP file if the `PCAP` environment variable is set. The function also sets up a QUIC client using the `quiche` library, which connects to the server and exchanges packets until the connection is established. The function ensures that the server and client components are properly initialized and that the communication metrics are within expected limits.
 
-The second part of the file drives a `quiche::Connection` as a client and performs the handshake against the Firedancer server. After the connection is established, it closes the connection, stops the service thread, and checks Firedancer QUIC metrics such as packet counts, connection counts, retry count, and error counts. The file therefore serves as a cross-stack interoperability test for QUIC transport, packet handling, and handshake behavior between `quiche` and Firedancer.
+The function is designed to be executed in an unsafe Rust context, as it involves direct memory manipulation and interaction with C libraries. It uses several external libraries and components, such as `libc` for file operations and `quiche` for QUIC protocol handling. The function also spawns a separate thread to service the Firedancer QUIC and UDP socket components, ensuring continuous packet processing. Once the client-server communication is complete, the function gracefully shuts down the QUIC server and halts the Firedancer components. This code is intended for use in environments where low-level network protocol handling and performance testing are required.
+# Imports and Dependencies
+
+---
+- `crate::bindings`
+- `libc`
+- `quiche`
+- `std::ffi`
+- `std::mem`
+- `std::net`
+- `std::sync::atomic`
+- `std::alloc`
+- `std::env`
+- `std::ptr`
+- `std::thread`
+
+
+# Functions
+
+---
+### quiche\_to\_fdquic
+Integrates Firedancer and quiche components to establish a QUIC connection and manage network communication.
+- **Inputs**: None
+- **Logic and Control Flow**:
+    - Create a new UDP socket and Firedancer workspace.
+    - Initialize a random number generator and allocate memory for a UDP socket.
+    - Join the UDP socket and set its layer to IP.
+    - Create a new anonymous small QUIC instance and configure it for server role.
+    - Check for the presence of a PCAP environment variable to determine if packet capture is enabled.
+    - If packet capture is enabled, open a PCAP file, start L3 capture, and set up AIO for both UDP socket transmission and QUIC network reception.
+    - Set a TLS keylog callback if packet capture is enabled.
+    - If packet capture is not enabled, directly set AIO network transmission and reception between the UDP socket and QUIC.
+    - Initialize the QUIC instance and spawn a thread to service UDP socket and QUIC operations until a stop signal is received.
+    - Set up a quiche configuration and bind a UDP socket to a local address.
+    - Establish a QUIC connection using quiche and set up QLOG with a specified level.
+    - Enter a loop to send and receive data until the connection is established.
+    - Close the connection and signal the stop condition to terminate the service thread.
+    - Join the service thread and halt Firedancer operations.
+- **Output**: No output is returned as the function is `unsafe` and performs network operations and side effects.
+
+
+---
+### tls\_keylog\_cb
+Logs TLS key information to a PCAP file for debugging purposes.
+- **Inputs**:
+    - `_ctx`: A pointer to a context, which is not used in this function.
+    - `line`: A pointer to a C-style string containing the TLS key log line to write.
+- **Logic and Control Flow**:
+    - The function is defined as an unsafe external C function, indicating it is intended to be used as a callback from C code.
+    - It calls `fd_pcapng_fwrite_tls_key_log` to write the TLS key log line to a global PCAP file pointer `PCAP_FILE_GLOB`.
+    - The length of the line is calculated using `strlen` and passed to the write function.
+- **Output**: No return value, as it is a callback function.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

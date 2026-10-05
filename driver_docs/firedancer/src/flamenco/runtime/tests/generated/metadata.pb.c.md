@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `metadata.pb.c` file contains automatically generated nanopb constant definitions for the `FD_EXEC_TEST_FIXTURE_METADATA` structure in the `firedancer` codebase.
+Automatically generated nanopb constant definitions for FD_EXEC_TEST_FIXTURE_METADATA.
 
 # Purpose
-This code is a C header file that contains automatically generated constant definitions for use with the nanopb library, a small code-size Protocol Buffers implementation in C. It includes a generated header file, `metadata.pb.h`, which likely contains Protocol Buffers definitions. The file checks for compatibility with a specific version of the nanopb generator by comparing `PB_PROTO_HEADER_VERSION` to ensure it matches the expected version (40), and it raises a compilation error if there is a mismatch, prompting regeneration with the correct version. The `PB_BIND` macro is used to bind a Protocol Buffers message type, `FD_EXEC_TEST_FIXTURE_METADATA`, to a corresponding C structure, `fd_exec_test_fixture_metadata_t`, with automatic field handling. This file is part of a system that uses Protocol Buffers for data serialization and deserialization.
+This code is an automatically generated C source file that defines constants for use with the nanopb library, a protocol buffers implementation in C. It includes the header file `metadata.pb.h` and checks if the `PB_PROTO_HEADER_VERSION` is equal to 40. If the version does not match, it triggers a compilation error instructing the user to regenerate the file with the current version of the nanopb generator. The `PB_BIND` macro is used to bind the protocol buffer message `FD_EXEC_TEST_FIXTURE_METADATA` to the C structure `fd_exec_test_fixture_metadata_t`, with the binding mode set to `AUTO`.
 # Imports and Dependencies
 
 ---
