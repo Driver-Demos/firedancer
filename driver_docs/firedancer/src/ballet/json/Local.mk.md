@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the inclusion of the `cJSON.h` header and the `cJSON` object file for the `fd_ballet` module.
+Makefile for adding cJSON headers and objects to the fd_ballet target.
 
 # Purpose
-The file is a Makefile snippet used in a build system to manage dependencies. It utilizes the `add-hdrs` and `add-objs` macros to include the `cJSON.h` header file and the `cJSON` and `fd_ballet` object files in the build process. This configuration ensures that these components are correctly compiled and linked during the software build.
+The `Makefile` content defines build instructions for a project. It uses the `add-hdrs` function to include the header file `cJSON.h` and the `add-objs` function to add the object file `cJSON` to the `fd_ballet` target. This setup helps manage dependencies and compile the project components correctly.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

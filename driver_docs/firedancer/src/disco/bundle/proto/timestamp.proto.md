@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `timestamp.proto` file defines a Protocol Buffers message for representing a timestamp with seconds and nanoseconds fields.
+Defines a protobuf message for a timestamp with seconds and nanoseconds fields.
 
 # Purpose
-This file defines a Protocol Buffers (proto3) message schema for a `Timestamp` within the `google.protobuf` package. The `Timestamp` message consists of two fields: `seconds`, an `int64` representing the number of seconds since the Unix epoch, and `nanos`, an `int32` representing the fractional seconds in nanoseconds. This schema is used to serialize and deserialize timestamp data in a language-agnostic manner.
+The `proto3` syntax defines a protocol buffer message named `Timestamp` within the `google.protobuf` package. This message contains two fields: `seconds`, which is a 64-bit integer representing the number of seconds since the Unix epoch, and `nanos`, which is a 32-bit integer representing the fractional seconds in nanoseconds. This structure is used to represent precise time points.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

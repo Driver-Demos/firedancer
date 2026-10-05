@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_wksp.c` file in the `firedancer` codebase implements a torture test for same-thread memory allocation and deallocation using a workspace, including validation of memory usage and alignment.
+A torture test for same-thread memory allocation and deallocation in a workspace environment.
 
 # Purpose
-This C source code file is designed to perform a "torture test" on memory allocation and deallocation within a shared workspace, specifically focusing on same-thread allocation. The code is structured as an executable program, with a [`main`](#main) function that initializes the environment and sets up the parameters for the test, and a [`test_main`](#test_main) function that executes the core logic of the test. The primary functionality of this code is to rigorously test the allocation and deallocation of memory blocks with varying sizes and alignments, ensuring that the memory management system can handle a large number of allocations and deallocations efficiently and correctly. The test involves random allocation and deallocation of memory blocks, checking for correct alignment, size, and tag management, and verifying that the memory content remains consistent throughout the process.
+The code is a C program designed to perform a "torture test" for memory allocation and deallocation within the same thread. It uses a workspace (`fd_wksp_t`) to manage memory allocations, testing the allocation and deallocation of memory blocks with varying sizes and alignments. The program defines a maximum number of outstanding allocations (`OUTSTANDING_MAX`) and uses a random number generator to decide whether to allocate or free memory in each iteration. The test ensures that memory usage statistics are consistent and that allocated memory is correctly aligned and tagged. The program also verifies that the data integrity of allocated memory is maintained by checking bit patterns before and after allocations.
 
-The code utilizes several key components, including a workspace (`fd_wksp_t`) for memory management, a random number generator (`fd_rng_t`) for simulating random allocation patterns, and various utility functions for workspace operations. The test is designed to run on multiple tiles (or threads), with synchronization mechanisms in place to coordinate the start and end of the test across these tiles. The program also includes command-line argument parsing to customize the test parameters, such as the number of allocations, maximum alignment, and maximum size. The use of macros and conditional compilation directives (e.g., `FD_HAS_DEEPASAN`) indicates that the code is designed to be flexible and adaptable to different testing environments and configurations. Overall, this file serves as a robust testing tool for evaluating the performance and correctness of memory allocation systems in a multi-threaded context.
+The [`main`](<#main>) function initializes the environment, parses command-line arguments to configure the test parameters, and sets up the workspace. It then launches the test on multiple tiles (or threads) using `fd_tile_exec_new` to simulate concurrent execution. The test waits for a signal to start (`go` variable) and then performs the allocation and deallocation operations. After the test completes, the program cleans up by detaching or deleting the workspace and halting the execution. The code is structured to be executed as a standalone program, with the [`main`](<#main>) function serving as the entry point.
 # Imports and Dependencies
 
 ---
@@ -19,82 +19,86 @@ The code utilizes several key components, including a workspace (`fd_wksp_t`) fo
 
 ---
 ### go
-- **Type**: `int`
-- **Description**: The `go` variable is a static integer initialized to 0, indicating that it is a global variable with file scope and internal linkage. It is used as a flag to control the execution flow of the program, particularly to signal when certain operations should commence.
-- **Use**: The `go` variable is used to signal the start of the test operations by being set to 1, allowing the while loop in `test_main` to proceed.
+- **Type**: ``int``
+- **Description**: A static integer variable initialized to 0.
+- **Use**: Used as a flag to control the execution flow in the `test_main` function.
 
 
 ---
 ### \_wksp
-- **Type**: `fd_wksp_t *`
-- **Description**: The `_wksp` variable is a static pointer to an `fd_wksp_t` structure, which represents a workspace used for memory allocation and management in the program. It is initialized either by attaching to an existing workspace or by creating a new anonymous workspace, depending on the command-line arguments provided.
-- **Use**: This variable is used to manage memory allocations and deallocations within the program, facilitating the testing of same-thread allocation operations.
+- **Type**: ``fd_wksp_t *``
+- **Description**: A pointer to a workspace object of type `fd_wksp_t`. This variable is used to manage memory allocations and deallocations within the program.
+- **Use**: Used to reference the workspace for memory operations such as allocation and deallocation.
 
 
 ---
 ### \_alloc\_cnt
 - **Type**: `ulong`
-- **Description**: The `_alloc_cnt` variable is a static global variable of type `ulong` that represents the number of allocations to be performed during the execution of the program. It is initialized with a default value of 1048576UL, which can be overridden by a command-line argument.
-- **Use**: This variable is used to control the number of memory allocations in the torture test for same-thread allocation.
+- **Description**: Represents the number of memory allocations to perform during the test.
+- **Use**: Used to control the number of allocation iterations in the `test_main` function.
 
 
 ---
 ### \_align\_max
-- **Type**: `ulong`
-- **Description**: The `_align_max` variable is a static global variable of type `ulong` that represents the maximum alignment constraint for memory allocations in the program. It is initialized with a default value of 4096UL, which is a power of two, ensuring that memory allocations adhere to this alignment requirement.
-- **Use**: This variable is used to determine the alignment of memory allocations within the workspace, ensuring they meet the specified alignment constraints.
+- **Type**: ``ulong``
+- **Description**: Stores the maximum alignment value for memory allocations in the workspace. It is initialized from the command line argument `--align-max` and must be a power of 2.
+- **Use**: Used to determine the alignment constraints for memory allocations in the workspace.
 
 
 ---
 ### \_sz\_max
-- **Type**: `ulong`
-- **Description**: The `_sz_max` variable is a static global variable of type `ulong` that represents the maximum size for memory allocations in the test program. It is initialized with a default value of 262144UL, which can be overridden by a command-line argument `--sz-max`. This variable is used to determine the upper limit for the size of memory blocks that can be allocated during the test.
-- **Use**: It is used to set the maximum size for memory allocations in the test program.
+- **Type**: ``ulong``
+- **Description**: A static global variable that stores the maximum size for memory allocations in the test program.
+- **Use**: Used to determine the maximum size of memory allocations during the torture test for same thread allocation.
 
 
 # Functions
 
 ---
 ### test\_main<!-- {{#callable:test_main}} -->
-The `test_main` function performs a stress test on memory allocation and deallocation within a workspace, ensuring correct usage and alignment while validating memory integrity.
+[View Source →](<../../../../../src/util/wksp/test_wksp.c#L14>)
+
+Performs a stress test on memory allocation and deallocation in a shared workspace, ensuring data integrity and alignment.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize variables and constants, including workspace and random number generator setup.
-    - Check initial workspace usage and validate its state with assertions.
-    - Wait for a volatile flag `go` to be set before proceeding with the main loop.
-    - Iterate over a loop twice the number of `alloc_cnt`, deciding randomly whether to allocate or free memory based on current state and constraints.
-    - For allocation, determine size and alignment, allocate memory, and fill it with a unique pattern for later validation.
-    - For deallocation, select a random outstanding allocation, validate its integrity, and free it.
-    - After the loop, clean up by deleting the random number generator and return 0.
-- **Output**: The function returns an integer, 0, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Initialize variables and constants, including workspace and random number generator.
+    - Check initial workspace usage and validate its state.
+    - Wait for a signal to start the test loop.
+    - Iterate over twice the allocation count, deciding randomly whether to allocate or free memory.
+    - For allocation, determine size and alignment, allocate memory, and fill it with a unique pattern.
+    - For deallocation, select a random outstanding allocation, verify its integrity, and free it.
+    - Repeat the allocation and deallocation process, ensuring workspace usage remains consistent.
+    - Clean up by deleting the random number generator and returning 0.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and configures a workspace for memory allocation testing across multiple tiles, executing a test function on each tile and managing workspace resources.
+[View Source →](<../../../../../src/util/wksp/test_wksp.c#L182>)
+
+Initializes the environment, processes command-line arguments, sets up a workspace, and executes a multi-threaded test for memory allocation and deallocation.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
+    - `argc`: The number of command-line arguments.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Parse command-line arguments to configure workspace parameters such as `--wksp`, `--page-sz`, `--page-cnt`, `--near-cpu`, `--seed`, `--part-max`, `--alloc-cnt`, `--align-max`, and `--sz-max`.
-    - Validate parsed parameters, ensuring they meet specific criteria (e.g., positive values, power of two).
-    - Determine the number of tiles available using `fd_tile_cnt`.
-    - If a workspace name is provided, attach to it using `fd_wksp_attach`; otherwise, create an anonymous workspace using `fd_wksp_new_anon`.
-    - Log the configuration details for the test.
-    - Check if the workspace alignment is valid; log an error if not.
-    - Initialize remote tiles for execution using `fd_tile_exec_new` for each tile except the first one.
-    - Pause for a short duration using `fd_log_sleep`.
-    - Set a volatile flag `go` to 1 to signal the start of the test.
-    - Execute the [`test_main`](#test_main) function on the main tile.
-    - Wait for remote tiles to complete their execution using `fd_tile_exec_delete`.
-    - Detach or delete the workspace based on whether it was attached or created anonymously.
-    - Log a success message and halt the program using `fd_halt`.
-- **Output**: The function returns an integer value `0`, indicating successful execution.
-- **Functions called**:
-    - [`test_main`](#test_main)
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Extracts various configuration parameters from the command-line arguments using `fd_env_strip_cmdline_cstr`, `fd_env_strip_cmdline_ulong`, and `fd_env_strip_cmdline_uint`.
+    - Validates the extracted parameters, logging errors if any constraints are violated.
+    - Determines the number of tiles available using `fd_tile_cnt`.
+    - Checks if a workspace name is provided; if so, attaches to it using `fd_wksp_attach`, otherwise creates an anonymous workspace with `fd_wksp_new_anon`.
+    - Logs the configuration details for the test.
+    - Verifies the alignment of the workspace with `fd_ulong_is_aligned` and logs an error if it is not aligned.
+    - Initializes remote tiles for execution using `fd_tile_exec_new` and stores the execution contexts in an array.
+    - Pauses for a short duration using `fd_log_sleep` before starting the tests.
+    - Sets a volatile flag `go` to 1 to signal the start of the test and calls [`test_main`](<#test_main>) to execute the test on the main tile.
+    - Waits for remote tiles to complete their execution using `fd_tile_exec_delete`.
+    - Detaches or deletes the workspace based on whether it was attached or created anonymously.
+    - Logs a success message and calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`test_main`](<#test_main>)
 
 
 
