@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_keyload.c` file in the `firedancer` codebase tests the functionality of protected memory pages allocation and access, including handling segmentation faults and verifying memory content after forking processes.
+Tests for memory protection and fork behavior in the `fd_keyload` module.
 
 # Purpose
-This C source code file is designed to test the functionality of memory protection mechanisms, specifically focusing on the allocation and handling of protected memory pages. The code includes a function `test_protected_pages` that performs a series of tests to ensure that memory protection is correctly enforced. It uses the `fd_keyload_alloc_protected_pages` function to allocate memory pages that are expected to be protected, and then deliberately attempts to access memory outside the allocated bounds to trigger segmentation faults. This is done to verify that the memory protection is functioning as intended. The code also tests the behavior of memory pages across process forks, ensuring that memory is wiped in child processes but remains intact in the parent process.
+The code is a C program designed to test memory protection mechanisms, specifically focusing on the behavior of protected memory pages. It includes the header `fd_keyload.h` and uses system calls and macros to manage processes and handle signals. The program defines a macro `TEST_FORK_OK` to facilitate the creation of child processes using `fork()`, and it checks the exit status of these processes to ensure they terminate correctly without errors or signals.
 
-The file includes a macro `TEST_FORK_OK` to facilitate testing of child processes created via `fork()`, ensuring that they exit successfully without errors or signals. The `main` function initializes logging, runs the `test_protected_pages` function, and logs the results. This file is primarily a test suite for verifying the robustness of memory protection features, and it is likely part of a larger system where memory security is critical. The inclusion of headers like `<signal.h>`, `<unistd.h>`, and `<sys/wait.h>` indicates that the code relies on POSIX system calls for process control and signal handling. The file does not define public APIs or external interfaces but rather serves as an internal testing utility.
+The function `test_protected_pages` is the core component of the program. It tests the allocation and protection of memory pages using the function `fd_keyload_alloc_protected_pages`. The function verifies that accessing memory outside the allocated range triggers a segmentation fault, as expected. It also checks that memory is correctly initialized to zero and that changes to memory in a child process do not affect the parent process due to memory protection. The `main` function initializes logging, calls `test_protected_pages`, and logs the test results. This program is intended to be executed as a standalone test suite to validate the behavior of memory protection features.
 # Imports and Dependencies
 
 ---
