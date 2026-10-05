@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SHA-1 implementation, header, build rules, and unit tests.
+SHA-1 hash function implementation, computation, testing, and related Makefile.
 
 
 ## Files
-- **[fd_sha1.c](fd_sha1.c.md)**: The `fd_sha1.c` file in the `firedancer` codebase provides an implementation of the SHA-1 hashing algorithm, adapted from the teeny sha1 library.
-- **[fd_sha1.h](fd_sha1.h.md)**: SHA1 hash function declaration for input data and 20-byte output buffer.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the SHA-1 implementation, including running the `test_sha1` unit test.
-- **[test_sha1.c](test_sha1.c.md)**: The `test_sha1.c` file in the `firedancer` codebase contains a test suite for verifying the correctness of the SHA-1 hash function implementation by comparing computed hashes of predefined inputs against expected output values.
+- **[fd_sha1.c](fd_sha1.c.md)**: SHA-1 hash function implementation with data pre-processing and main loop logic.
+- **[fd_sha1.h](fd_sha1.h.md)**: Function to compute the SHA1 hash of input data and store it in a 20-byte buffer.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for SHA1 in the firedancer codebase.
+- **[test_sha1.c](test_sha1.c.md)**: Tests the SHA-1 hash function implementation with predefined input and output pairs.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
