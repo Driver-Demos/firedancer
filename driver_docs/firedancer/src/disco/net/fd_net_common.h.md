@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Common definitions for net tile implementations, including REPAIR_PING_SZ.
+Common definitions for network tile implementations, including the size of a repair protocol ping packet.
 
 # Purpose
-`fd_net_common.h` is a small C header file that defines common network constants used by net tile implementations. It provides the `REPAIR_PING_SZ` macro, which sets the packet size for a repair protocol ping. The comment explains that ping packets share the same port as shreds, so code must use the packet size to identify the payload type.
+The `fd_net_common.h` file is a C header file that provides common definitions for network tile implementations. It defines a constant, `REPAIR_PING_SZ`, which specifies the size of a ping packet used in the repair protocol. This size is important because ping packets are routed to the same port as shreds, and the packet size is used to interpret the payload. The definition ensures that the size of a ping packet does not conflict with the sizes of valid shreds, which are defined elsewhere as `FD_SHRED_MAX_SZ` and `FD_SHRED_MIN_SZ`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,41 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Builds gRPC server code from protos and sets PROTOC when needed.
+Build script for compiling protocol buffer files into server code using Tonic and Prost.
 
 # Purpose
-This file is a build script entry point that prepares and compiles Protocol Buffers definitions for a Rust project. It checks whether the `PROTOC` environment variable is set, and on non-Windows systems it sets `PROTOC` to the path returned by `protobuf_src::protoc()` when needed. It then collects a fixed list of `.proto` files from the `protos` directory and prints `cargo:rerun-if-changed` lines so Cargo rebuilds when any of those files change.
+This code is a build script for a Rust project that uses Protocol Buffers (protobuf) to define data structures and services. The script is executed during the build process to generate Rust code from `.proto` files, which are located in the `protos` directory. The script checks for the presence of the `PROTOC` environment variable, which specifies the path to the Protocol Buffers compiler. If the variable is not set and the code is not running on a Windows system, it sets the variable using the `protobuf_src::protoc()` function.
 
-The script uses `tonic_prost_build` to generate Rust code from the proto files. It disables client generation with `build_client(false)`, enables server generation with `build_server(true)`, and adds test-only `enum_iterator::Sequence` derives to `TransactionErrorType` and `InstructionErrorType`. The final `compile_protos` call performs the code generation and uses `protos` as the include path for the proto imports.
+The script defines a list of `.proto` files and constructs their paths relative to the `protos` directory. It then uses the `tonic_prost_build` crate to configure the code generation process. The configuration specifies that only server code should be generated (`build_client(false)` and `build_server(true)`). Additionally, it applies conditional compilation attributes to certain types, such as `TransactionErrorType` and `InstructionErrorType`, to derive the `enum_iterator::Sequence` trait when running tests. Finally, the script compiles the `.proto` files into Rust code, ensuring that the build process will rerun if any of the `.proto` files change.
+# Imports and Dependencies
+
+---
+- `std::io`
+- `std::env`
+- `protobuf_src`
+- `std::path`
+- `tonic_prost_build`
+- `enum_iterator`
+
+
+# Functions
+
+---
+### main
+Configures and compiles Protocol Buffers for a Rust project using the `tonic_prost_build` library.
+- **Inputs**: None
+- **Logic and Control Flow**:
+    - Defines a constant `PROTOC_ENVAR` with the value "PROTOC".
+    - Checks if the environment variable `PROTOC_ENVAR` is set; if not and the platform is not Windows, sets it using `protobuf_src::protoc()`.
+    - Creates a `PathBuf` for the base path "protos".
+    - Defines an array `proto_files` with the names of the Protocol Buffer files.
+    - Initializes an empty vector `protos` to store the full paths of the Protocol Buffer files.
+    - Iterates over `proto_files`, joins each file name with `proto_base_path`, prints a message to rerun the build if the file changes, and adds the path to `protos`.
+    - Configures the `tonic_prost_build` to not build a client, to build a server, and to add type attributes for `TransactionErrorType` and `InstructionErrorType`.
+    - Compiles the Protocol Buffer files in `protos` with the base path "protos".
+- **Output**: Returns a `Result` indicating success or an I/O error.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
