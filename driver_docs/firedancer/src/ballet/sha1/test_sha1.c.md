@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the SHA-1 hash function implementation with predefined input and output pairs.
+The `test_sha1.c` file in the `firedancer` codebase contains a test suite for verifying the correctness of the SHA-1 hash function implementation by comparing computed hashes of predefined inputs against expected output values.
 
 # Purpose
-The code is a test suite for verifying the functionality of the SHA-1 hashing algorithm. It includes the `fd_sha1_hash` function from the `fd_sha1.h` header file to compute SHA-1 hashes for a set of predefined input strings. The code compares the computed hash values against expected hash outputs to ensure correctness. The test inputs include various strings, such as "abc" and "The quick brown fox jumps over the lazy dog", which are common test cases for hash functions.
+This C source code file is an executable program designed to test the functionality of the SHA-1 hashing algorithm. It includes the necessary headers, such as "fd_sha1.h", which likely contains the implementation or interface for the SHA-1 hashing function. The program initializes by calling `fd_boot`, which is presumably a setup function for the environment or framework being used. It then defines a set of input strings and their corresponding expected SHA-1 hash outputs. The main functionality of the program is a loop that iterates over each input string, computes its SHA-1 hash using the `fd_sha1_hash` function, and then compares the computed hash against the expected output. The comparison is done by converting the hash to a hexadecimal string and using `FD_TEST` to assert that the computed and expected hashes match. If all tests pass, the program logs a "pass" message and gracefully exits using `fd_halt`.
 
-The program initializes by calling `fd_boot` and concludes with `fd_halt`, which are likely functions for setting up and tearing down the test environment. The main loop iterates over the input strings, computes their SHA-1 hashes, and formats the results into hexadecimal strings. It uses `fd_cstr_printf_check` to format the hash and `FD_TEST` to assert that the computed hash matches the expected output. If all tests pass, the program logs a "pass" message and exits successfully. This code is intended to be executed as a standalone program to validate the SHA-1 implementation.
+The code provides a narrow functionality focused on validating the correctness of the SHA-1 hashing implementation. It does not define public APIs or external interfaces but rather serves as a self-contained test suite for the SHA-1 algorithm. The use of `fd_cstr_printf_check` and `fd_uint_bswap` suggests that the program is part of a larger framework or library, possibly providing utilities for string formatting and byte order manipulation. The inclusion of `fd_ballet.h` indicates that this file might be part of a broader collection of cryptographic or data processing utilities. Overall, the file is a specialized test harness ensuring the integrity and correctness of the SHA-1 hash function within its intended application context.
 # Imports and Dependencies
 
 ---
@@ -20,23 +20,21 @@ The program initializes by calling `fd_boot` and concludes with `fd_halt`, which
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/sha1/test_sha1.c#L5>)
-
-Executes SHA-1 hashing on predefined input strings and verifies the results against expected output hashes.
+The `main` function initializes the environment, computes SHA-1 hashes for a set of predefined input strings, and verifies the computed hashes against expected outputs.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: The array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Defines two arrays, `inputs` and `outputs`, containing test strings and their expected SHA-1 hash results respectively.
-    - Iterates over each input string, computes its SHA-1 hash using [`fd_sha1_hash`](<fd_sha1.c.md#fd_sha1_hash>), and stores the result in `digest`.
-    - Converts the `digest` to a hexadecimal string `hexdigest` using `fd_cstr_printf_check` and byte-swapping with `fd_uint_bswap`.
-    - Compares `hexdigest` with the expected hash in `outputs` using `FD_TEST` to ensure correctness.
-    - Logs a notice message "pass" if all tests succeed.
-    - Calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_sha1_hash`](<fd_sha1.c.md#fd_sha1_hash>)
+    - `argc`: The count of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - Define arrays `inputs` and `outputs` containing test strings and their expected SHA-1 hash results, respectively.
+    - Iterate over each input string, compute its SHA-1 hash using [`fd_sha1_hash`](fd_sha1.c.md#fd_sha1_hash), and store the result in `digest`.
+    - Convert the `digest` to a hexadecimal string `hexdigest` using `fd_cstr_printf_check`.
+    - Verify that `hexdigest` matches the expected hash in `outputs` using `FD_TEST` and `strcmp`.
+    - Log a success message with `FD_LOG_NOTICE` if all tests pass.
+    - Call `fd_halt` to clean up and terminate the program.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`fd_sha1_hash`](fd_sha1.c.md#fd_sha1_hash)
 
 
 

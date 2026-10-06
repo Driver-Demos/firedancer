@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-NUMA-related functions for parsing node indices, counting nodes and CPUs, and managing memory policies using syscalls.
+The `fd_numa_linux.c` file in the `firedancer` codebase provides functions for interacting with NUMA (Non-Uniform Memory Access) configurations on Linux systems, including parsing node indices, counting NUMA nodes and CPUs, and managing memory policies using syscalls.
 
 # Purpose
-The code provides functionality related to Non-Uniform Memory Access (NUMA) systems in a Linux environment. It includes functions to interact with the system's NUMA configuration and manage memory policies. The code defines several functions that utilize system calls to perform operations such as locking memory pages ([`fd_numa_mlock`](<#fd_numa_mlock>) and [`fd_numa_munlock`](<#fd_numa_munlock>)), getting and setting memory policies ([`fd_numa_get_mempolicy`](<#fd_numa_get_mempolicy>) and [`fd_numa_set_mempolicy`](<#fd_numa_set_mempolicy>)), and moving pages between nodes ([`fd_numa_move_pages`](<#fd_numa_move_pages>)). These functions use direct system calls to ensure compatibility with tools like AddressSanitizer, which may intercept standard library calls.
+This C source code file provides a set of functions for interacting with the Non-Uniform Memory Access (NUMA) configuration of a Linux system. The code is designed to parse and manage NUMA node indices, count the number of NUMA nodes and CPUs, and perform memory locking and policy operations using system calls. The file includes functions such as [`fd_numa_node_cnt`](#fd_numa_node_cnt), [`fd_numa_cpu_cnt`](#fd_numa_cpu_cnt), and [`fd_numa_node_idx`](#fd_numa_node_idx) to retrieve the number of NUMA nodes, the number of CPUs, and the NUMA node index for a given CPU, respectively. These functions utilize the sysfs interface to access system configuration details, ensuring compatibility with Linux systems that support NUMA.
 
-The code also includes utility functions to parse and count NUMA nodes and CPUs. The [`fd_numa_private_parse_node_idx`](<#fd_numa_private_parse_node_idx>) function parses strings to extract NUMA node indices, while [`fd_numa_node_cnt`](<#fd_numa_node_cnt>) and [`fd_numa_cpu_cnt`](<#fd_numa_cpu_cnt>) functions determine the number of NUMA nodes and CPUs, respectively, by reading from the sysfs filesystem. The [`fd_numa_node_idx`](<#fd_numa_node_idx>) function retrieves the NUMA node index for a given CPU. The code is intended to be part of a larger system, providing low-level access to NUMA-related information and operations, and it includes considerations for compatibility with memory sanitization tools.
+Additionally, the file provides low-level interfaces to memory management functions using direct system calls, such as [`fd_numa_mlock`](#fd_numa_mlock), [`fd_numa_munlock`](#fd_numa_munlock), [`fd_numa_get_mempolicy`](#fd_numa_get_mempolicy), [`fd_numa_set_mempolicy`](#fd_numa_set_mempolicy), [`fd_numa_mbind`](#fd_numa_mbind), and [`fd_numa_move_pages`](#fd_numa_move_pages). These functions bypass the standard library's AddressSanitizer (ASan) interceptors to ensure that memory operations are performed directly, which is crucial for applications that require precise control over memory allocation and locking. The code is structured to handle potential errors gracefully, logging warnings when operations fail, and it includes considerations for future improvements, such as handling ASan compatibility and enhancing the parsing logic for sysfs paths.
 # Imports and Dependencies
 
 ---
@@ -25,178 +25,153 @@ The code also includes utility functions to parse and count NUMA nodes and CPUs.
 
 ---
 ### fd\_numa\_private\_parse\_node\_idx<!-- {{#callable:fd_numa_private_parse_node_idx}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L20>)
-
-Parses a string of the form `node[0-9]+` to extract a non-negative integer index, returning -1 if parsing fails.
+The `fd_numa_private_parse_node_idx` function parses a string of the form 'node[0-9]+' to extract a non-negative integer index, returning -1 if parsing fails.
 - **Inputs**:
-    - `s`: A constant character pointer to the string to be parsed.
-- **Logic and Control Flow**:
+    - `s`: A constant character pointer to a string that is expected to start with 'node' followed by a numeric index.
+- **Control Flow**:
     - Check if the input string `s` is NULL; if so, return -1.
-    - Check if the string starts with the prefix 'node'; if not, return -1.
+    - Check if the string starts with 'node'; if not, return -1.
     - Advance the pointer `s` past the 'node' prefix.
-    - Initialize a long integer `val` to 0 to store the parsed index.
-    - Iterate over the remaining characters in the string `s`.
-    - For each character, check if it is a digit; if not, return -1.
-    - Convert the character to its numeric value and update `val`.
-    - Check if `val` exceeds `INT_MAX`; if so, return -1.
-    - If no characters were processed after the prefix, return -1.
+    - Initialize a long integer `val` to 0 to accumulate the numeric index.
+    - Iterate over the characters in the string starting from `s` to parse the numeric index.
+    - If a non-digit character is encountered, return -1.
+    - Accumulate the numeric value by converting each character to its numeric value and adding it to `val`, multiplied by 10.
+    - Check for overflow; if `val` exceeds `INT_MAX`, return -1.
+    - If no digits were found after 'node', return -1.
     - Return the parsed integer value as an int.
-- **Output**: Returns the parsed node index as an integer, or -1 if parsing fails.
+- **Output**: Returns an integer representing the parsed node index, or -1 if the input is invalid or parsing fails.
 
 
 ---
 ### fd\_numa\_node\_cnt<!-- {{#callable:fd_numa_node_cnt}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L42>)
-
-Counts the number of NUMA nodes available on the system by reading the sysfs directory.
+The `fd_numa_node_cnt` function counts the number of NUMA nodes available on the system by reading the directory entries in the sysfs path `/sys/devices/system/node`.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Open the sysfs directory at `/sys/devices/system/node` to access NUMA configuration.
-    - If opening the directory fails, log a warning and return 0.
-    - Initialize `node_idx_max` to `INT_MIN` to track the highest NUMA node index found.
-    - Iterate over each directory entry in the opened directory.
-    - For each entry, parse the node index using [`fd_numa_private_parse_node_idx`](<#fd_numa_private_parse_node_idx>) and update `node_idx_max` with the maximum value found.
-    - After reading all entries, close the directory and log a warning if closing fails.
-    - If no valid NUMA node index was found (`node_idx_max < 0`), log a warning and return 0.
+- **Control Flow**:
+    - Open the directory at the path `/sys/devices/system/node` using `opendir`; if it fails, log a warning and return 0.
+    - Initialize `node_idx_max` to `INT_MIN` to track the highest node index found.
+    - Iterate over each directory entry using `readdir`; for each entry, parse the node index using [`fd_numa_private_parse_node_idx`](#fd_numa_private_parse_node_idx) and update `node_idx_max` with the maximum value found.
+    - Close the directory using `closedir`; if it fails, log a warning but continue execution.
+    - If no valid node index was found (`node_idx_max < 0`), log a warning and return 0.
     - Return the count of NUMA nodes as `node_idx_max + 1`.
-- **Output**: Returns the count of NUMA nodes as an unsigned long integer, or 0 if no nodes are found or an error occurs.
-- **Functions Called**:
-    - [`fd_numa_private_parse_node_idx`](<#fd_numa_private_parse_node_idx>)
+- **Output**: The function returns an `ulong` representing the count of NUMA nodes found, or 0 if none are found or an error occurs.
+- **Functions called**:
+    - [`fd_numa_private_parse_node_idx`](#fd_numa_private_parse_node_idx)
 
 
 ---
 ### fd\_numa\_cpu\_cnt<!-- {{#callable:fd_numa_cpu_cnt}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L78>)
-
-Retrieves the number of processors available on the system.
+The `fd_numa_cpu_cnt` function returns the number of processors available on the system.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Calls the `get_nprocs` function to get the number of processors.
-    - Checks if the returned `cpu_cnt` is less than or equal to zero, which indicates an error.
-    - Logs a warning message if `cpu_cnt` is less than or equal to zero and returns 0.
-    - Returns the number of processors as an unsigned long integer if `cpu_cnt` is valid.
-- **Output**: Returns the number of processors as an unsigned long integer, or 0 if an error occurs.
+- **Control Flow**:
+    - The function calls `get_nprocs()` to retrieve the number of processors configured by the operating system.
+    - It checks if the returned value is less than or equal to zero, which is considered an unexpected result.
+    - If the result is unexpected, it logs a warning message and returns 0.
+    - If the result is valid, it casts the integer count to an unsigned long and returns it.
+- **Output**: The function returns the number of processors as an unsigned long integer, or 0 if an error occurs.
 
 
 ---
 ### fd\_numa\_node\_idx<!-- {{#callable:fd_numa_node_idx}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L93>)
-
-Finds the NUMA node index for a given CPU index by reading the sysfs directory.
+The `fd_numa_node_idx` function retrieves the NUMA node index associated with a given CPU index by examining the system's sysfs directory structure.
 - **Inputs**:
-    - `cpu_idx`: The index of the CPU for which to find the NUMA node index.
-- **Logic and Control Flow**:
+    - `cpu_idx`: An unsigned long integer representing the index of the CPU for which the NUMA node index is to be determined.
+- **Control Flow**:
     - Constructs a path to the sysfs directory for the specified CPU using `fd_cstr_printf`.
-    - Attempts to open the directory at the constructed path using `opendir`.
-    - If opening the directory fails, logs a warning and returns `ULONG_MAX`.
-    - Iterates over the directory entries using `readdir` to find a symlink to the NUMA configuration.
-    - Parses each directory entry name using [`fd_numa_private_parse_node_idx`](<#fd_numa_private_parse_node_idx>) to find a valid NUMA node index.
-    - If a valid NUMA node index is found, breaks out of the loop.
+    - Attempts to open the directory at the constructed path using `opendir`; logs a warning and returns `ULONG_MAX` if it fails.
+    - Iterates over the directory entries using `readdir`, searching for a symlink that indicates the NUMA node configuration.
+    - Uses [`fd_numa_private_parse_node_idx`](#fd_numa_private_parse_node_idx) to parse the directory entry names to find a valid NUMA node index; breaks the loop if a valid index is found.
     - Closes the directory using `closedir`, logging a warning if it fails.
-    - If no valid NUMA node index is found, logs a warning and returns `ULONG_MAX`.
-    - Returns the found NUMA node index as an unsigned long.
-- **Output**: The NUMA node index as an unsigned long, or `ULONG_MAX` if the index cannot be determined.
-- **Functions Called**:
-    - [`fd_numa_private_parse_node_idx`](<#fd_numa_private_parse_node_idx>)
+    - Checks if a valid NUMA node index was found; logs a warning and returns `ULONG_MAX` if not.
+    - Returns the found NUMA node index as an unsigned long integer.
+- **Output**: Returns the NUMA node index as an unsigned long integer associated with the specified CPU index, or `ULONG_MAX` if the index cannot be determined.
+- **Functions called**:
+    - [`fd_numa_private_parse_node_idx`](#fd_numa_private_parse_node_idx)
 
 
 ---
 ### fd\_numa\_mlock<!-- {{#callable:fd_numa_mlock}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L162>)
-
-Locks the memory pages in the specified address range into RAM, preventing them from being paged out.
+The `fd_numa_mlock` function locks a specified range of memory pages, preventing them from being swapped out to disk.
 - **Inputs**:
-    - `addr`: A pointer to the starting address of the memory region to lock.
-    - `len`: The length in bytes of the memory region to lock.
-- **Logic and Control Flow**:
-    - Calls the `syscall` function with `SYS_mlock`, `addr`, and `len` as arguments.
-    - Casts the result of the `syscall` to an `int` and returns it.
-- **Output**: Returns an integer indicating the success or failure of the `mlock` system call.
+    - `addr`: A pointer to the starting address of the memory region to be locked.
+    - `len`: The length in bytes of the memory region to be locked.
+- **Control Flow**:
+    - The function directly calls the `syscall` function with `SYS_mlock`, passing the `addr` and `len` parameters.
+    - The result of the `syscall` is cast to an `int` and returned.
+- **Output**: The function returns an integer which is the result of the `mlock` system call, typically 0 on success or -1 on failure with `errno` set appropriately.
 
 
 ---
 ### fd\_numa\_munlock<!-- {{#callable:fd_numa_munlock}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L168>)
-
-Unlocks a specified memory range from RAM, allowing it to be swapped out.
+The `fd_numa_munlock` function attempts to unlock a specified range of memory pages, making them pageable again, using a system call.
 - **Inputs**:
-    - ``addr``: A pointer to the starting address of the memory range to unlock.
-    - ``len``: The length in bytes of the memory range to unlock.
-- **Logic and Control Flow**:
-    - Calls the `syscall` function with `SYS_mlock`, `addr`, and `len` as arguments.
-    - Casts the result of the `syscall` to an `int` and returns it.
-- **Output**: Returns an `int` indicating the success or failure of the unlock operation, where 0 typically indicates success and -1 indicates an error.
+    - `addr`: A pointer to the starting address of the memory region to be unlocked.
+    - `len`: The length in bytes of the memory region to be unlocked.
+- **Control Flow**:
+    - The function directly calls the `syscall` function with `SYS_mlock`, `addr`, and `len` as arguments.
+    - The result of the `syscall` is cast to an `int` and returned.
+- **Output**: The function returns an `int` which is the result of the `syscall`, indicating success or failure of the memory unlock operation.
 
 
 ---
 ### fd\_numa\_get\_mempolicy<!-- {{#callable:fd_numa_get_mempolicy}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L174>)
-
-Retrieves the NUMA memory policy for a specified address and unpoisons the memory if successful.
+The `fd_numa_get_mempolicy` function retrieves the NUMA memory policy for a process or memory address and unpoisons the memory if successful.
 - **Inputs**:
-    - `mode`: A pointer to an integer where the function will store the current memory policy mode.
-    - `nodemask`: A pointer to an unsigned long where the function will store the nodemask of the current memory policy.
-    - `maxnode`: An unsigned long indicating the maximum number of nodes that the nodemask can represent.
-    - `addr`: A pointer to a memory address for which the memory policy is queried.
-    - `flags`: An unsigned integer specifying additional options for the `get_mempolicy` system call.
-- **Logic and Control Flow**:
-    - Calls the `syscall` function with `SYS_get_mempolicy` to retrieve the memory policy for the specified address.
-    - Checks if the return code `rc` is 0, indicating success.
-    - If successful and `mode` is not NULL, calls `fd_msan_unpoison` to unpoison the memory at `mode`.
-    - If successful and `nodemask` is not NULL, calls `fd_msan_unpoison` to unpoison the memory at `nodemask` with a size calculated based on `maxnode`.
-    - Returns the result of the `syscall` function.
-- **Output**: Returns a long integer which is the result of the `syscall` function, indicating success (0) or failure (non-zero).
+    - `mode`: A pointer to an integer where the current memory policy mode will be stored.
+    - `nodemask`: A pointer to a bitmask representing the set of NUMA nodes, which will be filled with the current policy's nodemask.
+    - `maxnode`: The maximum number of nodes that the nodemask can represent.
+    - `addr`: A pointer to a memory address for which the policy is queried, or NULL to query the process's policy.
+    - `flags`: Flags that modify the behavior of the syscall, such as MPOL_F_NODE or MPOL_F_ADDR.
+- **Control Flow**:
+    - Invoke the `syscall` function with `SYS_get_mempolicy` and the provided arguments to retrieve the memory policy.
+    - Check if the syscall was successful (i.e., `rc == 0`).
+    - If successful and `mode` is not NULL, call `fd_msan_unpoison` to unpoison the memory at `mode`.
+    - If successful and `nodemask` is not NULL, call `fd_msan_unpoison` to unpoison the memory at `nodemask` with a size calculated based on `maxnode`.
+    - Return the result of the syscall.
+- **Output**: Returns a long integer which is the result of the `syscall` function, indicating success (0) or an error code.
 
 
 ---
 ### fd\_numa\_set\_mempolicy<!-- {{#callable:fd_numa_set_mempolicy}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L188>)
-
-Sets the NUMA memory policy for the calling process using a system call.
+The `fd_numa_set_mempolicy` function sets the NUMA memory policy for the calling process using a system call.
 - **Inputs**:
-    - `mode`: An integer that specifies the memory policy mode to set.
-    - `nodemask`: A pointer to an array of unsigned long integers that represents the node mask for the memory policy.
-    - `maxnode`: An unsigned long integer that specifies the maximum node number plus one.
-- **Logic and Control Flow**:
-    - Calls the `syscall` function with `SYS_set_mempolicy` and the provided arguments `mode`, `nodemask`, and `maxnode`.
-- **Output**: Returns a long integer which is the result of the `syscall` function call.
+    - `mode`: An integer specifying the memory policy mode to be set.
+    - `nodemask`: A pointer to an array of unsigned long integers representing the nodemask, which specifies the NUMA nodes to be used.
+    - `maxnode`: An unsigned long integer indicating the maximum node number plus one that can be set in the nodemask.
+- **Control Flow**:
+    - The function directly calls the `syscall` function with `SYS_set_mempolicy` and the provided arguments `mode`, `nodemask`, and `maxnode`.
+- **Output**: The function returns a long integer which is the result of the `syscall` function, indicating success or failure of setting the memory policy.
 
 
 ---
 ### fd\_numa\_mbind<!-- {{#callable:fd_numa_mbind}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L195>)
-
-Calls the `syscall` function to bind a memory range to a specific NUMA node or set of nodes.
+The `fd_numa_mbind` function binds a range of memory to a specific NUMA node or set of nodes using the `mbind` system call.
 - **Inputs**:
-    - `addr`: A pointer to the starting address of the memory range to bind.
-    - `len`: The length of the memory range to bind.
-    - `mode`: The memory binding mode, which determines how the memory should be bound to the nodes.
-    - `nodemask`: A pointer to a bitmask that specifies the NUMA nodes to which the memory should be bound.
-    - `maxnode`: The maximum node number plus one, indicating the size of the `nodemask`.
-    - `flags`: Flags that modify the behavior of the memory binding operation.
-- **Logic and Control Flow**:
-    - Calls the `syscall` function with `SYS_mbind` and the provided arguments to perform the memory binding operation.
-- **Output**: Returns the result of the `syscall` function, which is a long integer indicating success or failure of the operation.
+    - `addr`: A pointer to the starting address of the memory range to be bound.
+    - `len`: The length of the memory range to be bound, in bytes.
+    - `mode`: An integer specifying the memory binding policy.
+    - `nodemask`: A pointer to a bitmask specifying the NUMA nodes to which the memory should be bound.
+    - `maxnode`: The maximum node number plus one, indicating the size of the nodemask.
+    - `flags`: Flags that modify the behavior of the `mbind` system call.
+- **Control Flow**:
+    - The function directly calls the `syscall` function with `SYS_mbind` and the provided arguments to perform the memory binding operation.
+- **Output**: The function returns a `long` value which is the result of the `mbind` system call, typically 0 on success or -1 on failure with `errno` set appropriately.
 
 
 ---
 ### fd\_numa\_move\_pages<!-- {{#callable:fd_numa_move_pages}} -->
-[View Source →](<../../../../../src/util/shmem/fd_numa_linux.c#L205>)
-
-Moves memory pages of a process to specified NUMA nodes and updates their status.
+The `fd_numa_move_pages` function moves memory pages of a process to specified NUMA nodes and updates the status of each page.
 - **Inputs**:
-    - `pid`: The process ID of the target process whose pages are to be moved.
-    - `count`: The number of pages to move.
-    - `pages`: An array of pointers to the pages to be moved.
-    - `nodes`: An array of integers specifying the target NUMA nodes for each page.
-    - `status`: An array to store the status of each page after the move operation.
-    - `flags`: Flags to modify the behavior of the `move_pages` syscall.
-- **Logic and Control Flow**:
-    - Calls the `syscall` function with `SYS_move_pages` to move the specified pages to the target NUMA nodes.
-    - Checks if the syscall returns 0, indicating success.
-    - If successful, calls `fd_msan_unpoison` to unpoison the `status` array for memory sanitization purposes.
-    - Returns the result of the syscall.
-- **Output**: Returns a long integer indicating the result of the `move_pages` syscall, where 0 indicates success and a negative value indicates an error.
+    - `pid`: The process ID of the process whose pages are to be moved.
+    - `count`: The number of pages to be moved.
+    - `pages`: An array of pointers to the pages that need to be moved.
+    - `nodes`: An array of integers specifying the target NUMA node for each page.
+    - `status`: An array where the status of each page after the move will be stored.
+    - `flags`: Flags that modify the behavior of the `move_pages` syscall.
+- **Control Flow**:
+    - Invoke the `move_pages` syscall with the provided arguments to move the pages to the specified NUMA nodes.
+    - Check if the syscall returns 0, indicating success.
+    - If successful, call `fd_msan_unpoison` to unpoison the `status` array, marking it as initialized for memory sanitization tools.
+- **Output**: Returns a long integer which is the result of the `move_pages` syscall, indicating success or failure of the operation.
 
 
 

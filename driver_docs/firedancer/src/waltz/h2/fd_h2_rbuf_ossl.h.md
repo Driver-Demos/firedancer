@@ -3,12 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Utilities for I/O operations between rbuf and OpenSSL BIO, including read and write functions.
+The `fd_h2_rbuf_ossl.h` file provides utility functions for reading from and writing to OpenSSL SSL objects using a ring buffer (rbuf) in the Firedancer codebase.
 
 # Purpose
-The code in `fd_h2_rbuf_ossl.h` provides utility functions for handling input and output operations between a ring buffer (`rbuf`) and OpenSSL's `BIO` (Basic Input/Output) interface. It is a C header file that includes functionality specifically for environments where OpenSSL is available, as indicated by the `FD_HAS_OPENSSL` preprocessor directive. The file includes the necessary OpenSSL headers and defines two static inline functions: [`fd_h2_rbuf_ssl_read`](<#fd_h2_rbuf_ssl_read>) and [`fd_h2_rbuf_ssl_write`](<#fd_h2_rbuf_ssl_write>).
-
-The [`fd_h2_rbuf_ssl_read`](<#fd_h2_rbuf_ssl_read>) function reads data from an `SSL` object and places it into a ring buffer. It uses the `SSL_read_ex` function to perform the read operation and handles potential errors by clearing the error queue and retrieving the error code if the read fails. The [`fd_h2_rbuf_ssl_write`](<#fd_h2_rbuf_ssl_write>) function writes data from a ring buffer into an `SSL` object using `SSL_write_ex`. It manages the data transfer by checking the available data in the buffer and handling the case where the buffer is split into two segments. Both functions are designed to work with the `fd_h2_rbuf_t` type, which is assumed to be defined in the included `fd_h2_rbuf.h` file.
+This C header file, `fd_h2_rbuf_ossl.h`, provides utility functions for facilitating I/O operations between a ring buffer (`rbuf`) and OpenSSL's `SSL` objects. It includes two main inline functions: [`fd_h2_rbuf_ssl_read`](#fd_h2_rbuf_ssl_read) and [`fd_h2_rbuf_ssl_write`](#fd_h2_rbuf_ssl_write). The [`fd_h2_rbuf_ssl_read`](#fd_h2_rbuf_ssl_read) function reads data from an `SSL` connection and stores it into a ring buffer, handling potential errors by updating an error variable. Conversely, [`fd_h2_rbuf_ssl_write`](#fd_h2_rbuf_ssl_write) writes data from a ring buffer to an `SSL` connection, with a note indicating the need for handling fatal errors. The file is conditionally compiled only if OpenSSL support is available, as indicated by the `FD_HAS_OPENSSL` macro. This header is part of a larger system that likely deals with secure data transmission using OpenSSL, providing a bridge between buffered data and SSL communication.
 # Imports and Dependencies
 
 ---
@@ -21,48 +19,45 @@ The [`fd_h2_rbuf_ssl_read`](<#fd_h2_rbuf_ssl_read>) function reads data from an 
 
 ---
 ### fd\_h2\_rbuf\_ssl\_read<!-- {{#callable:fd_h2_rbuf_ssl_read}} -->
-[View Source →](<../../../../../src/waltz/h2/fd_h2_rbuf_ossl.h#L16>)
-
-Reads bytes from an SSL connection and places them into a ring buffer.
+The `fd_h2_rbuf_ssl_read` function reads data from an SSL connection into a ring buffer, handling potential SSL errors.
 - **Inputs**:
-    - `rbuf_out`: A pointer to the ring buffer where the function will store the read bytes.
-    - `ssl`: A pointer to the SSL connection from which the function will read bytes.
-    - `ssl_err`: A pointer to an integer where the function will store the SSL error code if an error occurs during reading.
-- **Logic and Control Flow**:
-    - Call [`fd_h2_rbuf_peek_free`](<fd_h2_rbuf.h.md#fd_h2_rbuf_peek_free>) to get the free space in the ring buffer and store the sizes in `sz0` and `sz1`.
-    - If `sz0` is zero, return 0 as there is no space to read data into.
-    - Clear any existing SSL errors using `ERR_clear_error`.
-    - Attempt to read data from the SSL connection into the ring buffer using `SSL_read_ex`.
-    - If `SSL_read_ex` fails, store the SSL error code in `ssl_err` using `SSL_get_error` and return 0.
-    - If reading is successful, allocate the read size in the ring buffer using [`fd_h2_rbuf_alloc`](<fd_h2_rbuf.h.md#fd_h2_rbuf_alloc>).
-    - Return the number of bytes read.
-- **Output**: The number of bytes successfully read from the SSL connection and stored in the ring buffer, or 0 if an error occurs or there is no space to read data into.
-- **Functions Called**:
-    - [`fd_h2_rbuf_peek_free`](<fd_h2_rbuf.h.md#fd_h2_rbuf_peek_free>)
-    - [`fd_h2_rbuf_alloc`](<fd_h2_rbuf.h.md#fd_h2_rbuf_alloc>)
+    - `rbuf_out`: A pointer to the ring buffer (`fd_h2_rbuf_t`) where the read data will be stored.
+    - `ssl`: A pointer to the SSL connection (`SSL *`) from which data is to be read.
+    - `ssl_err`: A pointer to an integer where any SSL error code will be stored if the read operation fails.
+- **Control Flow**:
+    - Initialize two variables `sz0` and `sz1` to hold the sizes of free space in the ring buffer.
+    - Call [`fd_h2_rbuf_peek_free`](fd_h2_rbuf.h.md#fd_h2_rbuf_peek_free) to get a pointer to the free space in the ring buffer and update `sz0` and `sz1`.
+    - Check if `sz0` is zero, indicating no space is available in the buffer; if so, return 0.
+    - Clear any existing SSL errors using `ERR_clear_error()`.
+    - Attempt to read data from the SSL connection into the buffer using `SSL_read_ex`.
+    - If the read operation fails, retrieve the SSL error code using `SSL_get_error` and store it in `ssl_err`, then return 0.
+    - If the read operation succeeds, allocate the read size in the ring buffer using [`fd_h2_rbuf_alloc`](fd_h2_rbuf.h.md#fd_h2_rbuf_alloc).
+    - Return the number of bytes successfully read.
+- **Output**: The function returns the number of bytes successfully read from the SSL connection into the ring buffer, or 0 if the read operation fails or if there is no space available in the buffer.
+- **Functions called**:
+    - [`fd_h2_rbuf_peek_free`](fd_h2_rbuf.h.md#fd_h2_rbuf_peek_free)
+    - [`fd_h2_rbuf_alloc`](fd_h2_rbuf.h.md#fd_h2_rbuf_alloc)
 
 
 ---
 ### fd\_h2\_rbuf\_ssl\_write<!-- {{#callable:fd_h2_rbuf_ssl_write}} -->
-[View Source →](<../../../../../src/waltz/h2/fd_h2_rbuf_ossl.h#L37>)
-
-Writes bytes from a ring buffer into an SSL connection.
+The `fd_h2_rbuf_ssl_write` function writes data from a ring buffer to an SSL connection using OpenSSL.
 - **Inputs**:
-    - `rbuf_in`: A pointer to the `fd_h2_rbuf_t` structure representing the ring buffer from which data is written.
-    - `ssl`: A pointer to the `SSL` structure representing the SSL connection to which data is written.
-- **Logic and Control Flow**:
-    - Call [`fd_h2_rbuf_peek_used`](<fd_h2_rbuf.h.md#fd_h2_rbuf_peek_used>) to get pointers to the used portions of the ring buffer and their sizes `sz0` and `sz1`.
-    - If `sz0` is zero, return 0, indicating no data to write.
+    - `rbuf_in`: A pointer to an `fd_h2_rbuf_t` structure representing the ring buffer containing data to be written.
+    - `ssl`: A pointer to an `SSL` structure representing the SSL connection to which data will be written.
+- **Control Flow**:
+    - Retrieve the used portion of the ring buffer using [`fd_h2_rbuf_peek_used`](fd_h2_rbuf.h.md#fd_h2_rbuf_peek_used), obtaining two sizes `sz0` and `sz1`.
+    - Check if `sz0` is zero, indicating no data to write, and return 0 if true.
     - Attempt to write `sz0` bytes from the ring buffer to the SSL connection using `SSL_write_ex`.
     - If the write fails, return 0.
     - If there is a second segment (`sz1` is non-zero) and the first write was successful, attempt to write the second segment using `SSL_write_ex`.
     - Add the size of the second write to the total written size if successful.
-    - Call [`fd_h2_rbuf_skip`](<fd_h2_rbuf.h.md#fd_h2_rbuf_skip>) to advance the ring buffer by the total number of bytes written.
+    - Advance the ring buffer's read position by the total number of bytes written using [`fd_h2_rbuf_skip`](fd_h2_rbuf.h.md#fd_h2_rbuf_skip).
     - Return the total number of bytes written.
-- **Output**: The total number of bytes successfully written to the SSL connection.
-- **Functions Called**:
-    - [`fd_h2_rbuf_peek_used`](<fd_h2_rbuf.h.md#fd_h2_rbuf_peek_used>)
-    - [`fd_h2_rbuf_skip`](<fd_h2_rbuf.h.md#fd_h2_rbuf_skip>)
+- **Output**: The function returns the total number of bytes successfully written to the SSL connection as an unsigned long integer.
+- **Functions called**:
+    - [`fd_h2_rbuf_peek_used`](fd_h2_rbuf.h.md#fd_h2_rbuf_peek_used)
+    - [`fd_h2_rbuf_skip`](fd_h2_rbuf.h.md#fd_h2_rbuf_skip)
 
 
 

@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for socket operations with architecture-specific configurations.
+Generated seccomp BPF filter for ppoll, recvmmsg, sendmmsg, write, and fsync.
 
 
 ## Files
-- **[fd_sock_tile_seccomp.h](fd_sock_tile_seccomp.h.md)**: Defines a seccomp filter policy for socket operations with architecture-specific checks and syscall allowances.
+- **[fd_sock_tile_seccomp.h](fd_sock_tile_seccomp.h.md)**: Generated seccomp BPF filter for ppoll, recvmmsg, sendmmsg, write, and fsync.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
