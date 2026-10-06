@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Specifies the version of nanopb used, which is 0.4.9.1.
+The `nanopb_tag.txt` file specifies the version of the nanopb library being used, which is 0.4.9.1.
 
 # Purpose
-The content specifies the version of the `nanopb` library being used, which is `0.4.9.1`. This information is important for dependency management and ensures compatibility with other components in the software codebase that rely on this specific version of `nanopb`.
+The file content specifies a version identifier for the Nanopb library, which is a Protocol Buffers implementation in C. This version number, "nanopb-0.4.9.1," is used to track and manage the specific release of the library being utilized in the software project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
