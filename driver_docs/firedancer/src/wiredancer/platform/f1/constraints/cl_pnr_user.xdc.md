@@ -3,20 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `cl_pnr_user.xdc` file in the `firedancer` codebase specifies constraints for the top-level place and route (PNR) process, including the creation and configuration of partition blocks (pblocks) for various components within the design.
+Defines CL-specific constraints for top-level PNR by creating and configuring pblocks.
 
 # Purpose
-This file is a configuration script used in the context of FPGA (Field-Programmable Gate Array) design, specifically for defining placement constraints during the Place and Route (PNR) process. The script is written in a format that is likely used by a tool such as Xilinx Vivado, which is a common FPGA design suite. The file defines several "pblocks" (physical blocks), which are regions on the FPGA where specific logic cells are to be placed. These pblocks are created and populated with cells that match certain hierarchical and naming patterns, ensuring that related components are grouped together physically on the chip. The script also specifies the resizing of these pblocks to fit within designated clock regions and other resource types like DSPs, RAMs, and URAMs. The purpose of this file is to optimize the physical layout of the design on the FPGA to meet performance and resource utilization goals, making it a critical component in the hardware design process.
+The file configures physical constraints for a top-level place-and-route (PNR) process in a hardware design, specifically for a design using programmable logic devices. It defines partition blocks, known as `pblocks`, which are used to group and manage the placement of specific cells within the design hierarchy. The file creates three main `pblocks`: `pblock_CL_top`, `pblock_CL_mid`, and `pblock_CL_bot`, each containing specific cells filtered by their hierarchical names. These `pblocks` are resized to fit within specified regions of the hardware, such as clock regions and slices, to optimize the design's performance and resource utilization. The file also sets properties like `SNAPPING_MODE` and assigns parent-child relationships between `pblocks` to ensure proper hierarchical organization and placement within the design.
 # Content Summary
-This file is a configuration script for defining placement constraints in a Field Programmable Gate Array (FPGA) design, specifically for the top-level Place and Route (PNR) process. The script uses a series of commands to create and manage partition blocks (pblocks) within the FPGA, which are used to group and constrain the placement of logic cells.
+The provided content is a configuration script for defining and managing physical block (pblock) constraints in a top-level place-and-route (PNR) process for a hardware design. The script is written in a format typically used for FPGA design tools, where pblocks are used to group and constrain logic cells to specific regions of the FPGA fabric.
 
-The script defines three main pblocks: `pblock_CL_top`, `pblock_CL_mid`, and `pblock_CL_bot`. Each pblock is created using the `create_pblock` command and is populated with specific cells using the `add_cells_to_pblock` command. The cells are selected based on hierarchical names and filters, which target specific components within the design, such as DMA interfaces, DDR memory controllers, and various test and synchronization registers.
+Key functional details include:
 
-For `pblock_CL_top`, cells related to the top-level DDR and PCIe slave interfaces are added, and the pblock is resized to cover a specific clock region range. The `pblock_CL_mid` includes cells from mid-level DDR interfaces and PCIe master interfaces, with additional resizing to include specific slices, DSPs, and RAM blocks. The `pblock_CL_bot` is configured with cells from bottom-level DDR interfaces and other slave interfaces, with similar resizing to cover necessary resources.
+1. **Pblock Creation and Management**: The script creates three main pblocks: `pblock_CL_top`, `pblock_CL_mid`, and `pblock_CL_bot`. Each pblock is associated with specific logic cells and is assigned to distinct regions of the FPGA.
 
-The script also sets properties such as `PARENT` to establish hierarchical relationships between pblocks and `SNAPPING_MODE` to ensure precise placement. Some sections of the script are commented out, indicating potential configurations for clock groups and additional pblocks that are not currently active.
+2. **Cell Assignment**: Logic cells are added to each pblock using the `add_cells_to_pblock` command. The cells are selected based on hierarchical names and filters that match specific patterns. This ensures that related logic is grouped together within the same pblock.
 
-Overall, this configuration file is crucial for optimizing the placement of logic within the FPGA, ensuring efficient use of resources and meeting design constraints for timing and performance.
+3. **Pblock Resizing**: The script resizes each pblock to cover specific regions of the FPGA. This is done using the `resize_pblock` command, which specifies the coordinates of the regions, such as `CLOCKREGION`, `SLICE`, `DSP48E2`, `LAGUNA`, `RAMB18`, `RAMB36`, and `URAM288`.
+
+4. **Hierarchy and Parent-Child Relationships**: The script sets parent-child relationships between pblocks using the `set_property PARENT` command. This organizes the pblocks into a hierarchy, which can be important for managing complex designs.
+
+5. **Snapping Mode**: The `set_property SNAPPING_MODE ON` command is used for `pblock_CL_mid` and `pblock_CL_bot`, which may help align the pblocks to specific grid boundaries within the FPGA.
+
+6. **Selective Cell Reassignment**: Some cells are reassigned to the parent pblock `pblock_CL` for better quality of results (QoR). This is done using the `add_cells_to_pblock` command with specific cell lists.
+
+7. **Commented Out Sections**: The script contains several commented-out sections, indicating potential configurations or constraints that are not currently active. These include additional pblock definitions, clock group settings, and placement exclusions.
+
+This script is crucial for developers working on FPGA designs, as it defines how the logic is physically organized and constrained within the FPGA, impacting performance and resource utilization.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
