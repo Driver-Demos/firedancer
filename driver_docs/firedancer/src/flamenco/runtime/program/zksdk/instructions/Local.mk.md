@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile instructions for adding object files related to ZK-SDK functionalities if 128-bit integers are supported.
+The `Local.mk` file in the `firedancer` codebase specifies the inclusion of various object files related to zero-knowledge SDK instructions, contingent on the presence of 128-bit integer support.
 
 # Purpose
-The provided content is a section of a Makefile that conditionally adds object files to a build process. The `ifdef FD_HAS_INT128` directive checks if the `FD_HAS_INT128` macro is defined, indicating support for 128-bit integers. If this condition is true, the `add-objs` function is called multiple times to include various object files related to zero-knowledge SDK (ZKSDK) functionalities, such as zero ciphertext, ciphertext equality, commitment equality, public key validity, and various batched range proofs. Each call to `add-objs` associates these object files with the `fd_flamenco` target, which is likely a component or module within the build system. This setup ensures that these specific object files are only included in the build when the system supports 128-bit integer operations.
+The provided content is a segment from a Makefile, which is a build automation tool used to compile and link programs. This specific section is conditional, executed only if the macro `FD_HAS_INT128` is defined, indicating that the system supports 128-bit integers. Within this block, the `add-objs` function is called multiple times to add object files related to various cryptographic operations, such as zero-knowledge proofs and ciphertext validity checks, to the `fd_flamenco` target. These object files, prefixed with `fd_zksdk`, suggest they are part of a zero-knowledge software development kit (SDK) and are likely used to ensure the correctness and security of cryptographic operations within the project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
