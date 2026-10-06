@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_secp256k1.c` file in the `firedancer` codebase contains tests for the `fd_secp256k1_recover` function, including correctness checks against known public keys and performance benchmarks.
+Tests for the `fd_secp256k1_recover` function, including performance benchmarks and correctness checks.
 
 # Purpose
-This C source code file is designed to test the functionality and performance of the `fd_secp256k1_recover` function, which is part of a cryptographic library dealing with the secp256k1 elliptic curve. This curve is widely used in blockchain technologies, such as Bitcoin and Ethereum, for public key cryptography. The file includes several test cases to verify the correctness of the public key recovery from a given message and signature, using both Solana and Ethereum test vectors. It also includes performance benchmarking to measure the execution speed of the recovery function under different conditions.
+The code is a C program that tests the functionality of the `fd_secp256k1_recover` function, which is part of a cryptographic library for handling secp256k1 elliptic curve operations. The program includes a main function that initializes a random number generator and calls the [`test_recover`](<#test_recover>) function. The [`test_recover`](<#test_recover>) function performs a series of tests to verify the correctness of the `fd_secp256k1_recover` function by comparing the recovered public keys against expected values for given message and signature pairs. These tests include cases derived from Solana and Ethereum cryptographic operations.
 
-The file is structured as an executable C program, with a [`main`](#main) function that initializes a random number generator and calls the [`test_recover`](#test_recover) function. The [`test_recover`](#test_recover) function contains multiple test scenarios, including both successful and failing cases, to ensure the robustness of the `fd_secp256k1_recover` function. Additionally, the file includes a benchmarking section that logs the performance of the recovery function, both in typical and erroneous scenarios. The inclusion of logging and benchmarking indicates a focus on both functional correctness and performance efficiency, making this file a comprehensive test suite for the secp256k1 recovery functionality.
+The program also includes performance benchmarking for the `fd_secp256k1_recover` function. It measures the execution time for a specified number of iterations, both for valid and invalid signature recovery scenarios. The results are logged using the [`log_bench`](<#log_bench>) function, which calculates and displays the performance metrics in terms of calls per second and nanoseconds per call. The program is structured to ensure that the `fd_secp256k1_recover` function behaves correctly under various conditions and provides performance insights for its execution.
 # Imports and Dependencies
 
 ---
@@ -21,55 +21,57 @@ The file is structured as an executable C program, with a [`main`](#main) functi
 
 ---
 ### log\_bench<!-- {{#callable:log_bench}} -->
-The `log_bench` function logs the performance metrics of a benchmark test, specifically the throughput in KHz per core and the average time per call in nanoseconds.
+[View Source →](<../../../../../src/ballet/secp256k1/test_secp256k1.c#L5>)
+
+Logs the performance metrics of a benchmark test, including the rate of iterations per second and the average time per call.
 - **Inputs**:
-    - `descr`: A constant character pointer representing the description of the benchmark being logged.
-    - `iter`: An unsigned long integer representing the number of iterations performed in the benchmark.
-    - `dt`: A long integer representing the total time taken for the benchmark in microseconds.
-- **Control Flow**:
-    - Calculate the throughput in KHz per core by multiplying 1e6 with the ratio of iterations to time (iter/dt).
-    - Calculate the average time per call in nanoseconds by dividing the total time by the number of iterations (dt/iter).
-    - Log the description, throughput, and average time per call using the FD_LOG_NOTICE macro.
-- **Output**: The function does not return any value; it logs the benchmark results using a logging macro.
+    - ``descr``: A constant character pointer that describes the benchmark being logged.
+    - ``iter``: An unsigned long integer representing the number of iterations performed in the benchmark.
+    - ``dt``: A long integer representing the total time taken for the benchmark in microseconds.
+- **Logic and Control Flow**:
+    - Calculate `khz` as the number of iterations per second per core, scaled to kilohertz, using the formula `1e6f * (float)iter / (float)dt`.
+    - Calculate `tau` as the average time per call in nanoseconds, using the formula `(float)dt / (float)iter`.
+    - Log the benchmark description, iterations per second per core, and average time per call using the `FD_LOG_NOTICE` macro.
+- **Output**: No return value; the function logs the output using `FD_LOG_NOTICE`.
 
 
 ---
 ### test\_recover<!-- {{#callable:test_recover}} -->
-The `test_recover` function tests the correctness and performance of the [`fd_secp256k1_recover`](fd_secp256k1.c.md#fd_secp256k1_recover) function using predefined test cases and benchmarks.
+[View Source →](<../../../../../src/ballet/secp256k1/test_secp256k1.c#L14>)
+
+Tests the correctness and performance of the [`fd_secp256k1_recover`](<fd_secp256k1.c.md#fd_secp256k1_recover>) function using predefined test cases and benchmarks.
 - **Inputs**:
-    - `rng`: An unused random number generator pointer, marked as unused with FD_FN_UNUSED.
-- **Control Flow**:
-    - Initialize expected public key, message, signature, and recovery ID for Solana test cases.
-    - Call [`fd_secp256k1_recover`](fd_secp256k1.c.md#fd_secp256k1_recover) and verify the output matches the expected public key using `FD_TEST` and `memcmp`.
-    - Repeat the above steps for another Solana test case with different inputs.
-    - Initialize expected public key, message, signature, and recovery ID for Ethereum test cases.
-    - Call [`fd_secp256k1_recover`](fd_secp256k1.c.md#fd_secp256k1_recover) and verify the output matches the expected public key using `FD_TEST` and `memcmp`.
-    - Test signature recovery with a modified message to ensure it returns an incorrect public key.
-    - Test signature recovery with a modified signature to ensure it fails and returns NULL.
-    - Test invalid recovery IDs to ensure they fail and return NULL without causing a panic.
-    - Benchmark the [`fd_secp256k1_recover`](fd_secp256k1.c.md#fd_secp256k1_recover) function with valid inputs and log the performance.
-    - Benchmark the [`fd_secp256k1_recover`](fd_secp256k1.c.md#fd_secp256k1_recover) function with invalid signature inputs and log the performance.
-- **Output**: The function does not return any value; it performs tests and logs results to verify the correctness and performance of the [`fd_secp256k1_recover`](fd_secp256k1.c.md#fd_secp256k1_recover) function.
-- **Functions called**:
-    - [`fd_secp256k1_recover`](fd_secp256k1.c.md#fd_secp256k1_recover)
-    - [`log_bench`](#log_bench)
+    - `rng`: A pointer to an `fd_rng_t` structure, which is unused in this function.
+- **Logic and Control Flow**:
+    - Initializes expected public keys, messages, and signatures for Solana and Ethereum test cases.
+    - Calls [`fd_secp256k1_recover`](<fd_secp256k1.c.md#fd_secp256k1_recover>) with the test data and checks if the recovered public key matches the expected public key using `FD_TEST`.
+    - Modifies the message and signature to test recovery failure scenarios and checks the results with `FD_TEST`.
+    - Tests invalid recovery IDs to ensure the function handles them without errors.
+    - Performs benchmarking by calling [`fd_secp256k1_recover`](<fd_secp256k1.c.md#fd_secp256k1_recover>) multiple times and logs the performance metrics using [`log_bench`](<#log_bench>).
+- **Output**: No output is returned as the function is `void`, but it performs internal tests and logs results.
+- **Functions Called**:
+    - [`fd_secp256k1_recover`](<fd_secp256k1.c.md#fd_secp256k1_recover>)
+    - [`log_bench`](<#log_bench>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, runs a test for the `fd_secp256k1_recover` function, logs a success message, and then halts the program.
+[View Source →](<../../../../../src/ballet/secp256k1/test_secp256k1.c#L137>)
+
+Initializes the environment, runs a test for cryptographic signature recovery, logs the result, and halts the program.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
+    - `argc`: The number of command-line arguments.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Create a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Call [`test_recover`](#test_recover) with the `rng` to test the `fd_secp256k1_recover` function.
-    - Log a notice message 'pass' using `FD_LOG_NOTICE`.
-    - Call `fd_halt` to terminate the program.
-- **Output**: The function returns an integer `0`, indicating successful execution.
-- **Functions called**:
-    - [`test_recover`](#test_recover)
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Calls [`test_recover`](<#test_recover>) with `rng` to perform cryptographic signature recovery tests.
+    - Logs a notice message 'pass' using `FD_LOG_NOTICE`.
+    - Calls `fd_halt` to terminate the program.
+    - Returns 0 to indicate successful execution.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`test_recover`](<#test_recover>)
 
 
 

@@ -3,15 +3,46 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Streaming AR archive reader API and file metadata structure.
+A simple streaming AR archive reader with functions to initialize and read archive files.
 
 # Purpose
-Defines the public interface for a streaming reader for `ar` archive files. It declares the `fd_ar_meta_t` structure, which stores file metadata such as `mtime`, `uid`, `gid`, `mode`, `filesz`, and the file name in `ident`, and it sets the fixed size used for the name field with `FD_AR_META_IDENT_SZ`. The functions [`fd_ar_read_init`](<#fd_ar_read_init>) and [`fd_ar_read_next`](<#fd_ar_read_next>) initialize archive parsing and advance through each archive entry while returning metadata and stream position rules for the caller. The comments also document the `ar` file layout, expected stream state, and the error codes returned for invalid input, end of file, or I/O failure.
-# Function Declarations (Public API)
+The code is a C header file that defines a simple streaming reader for AR archive files, which are used to combine multiple files into a single archive. The AR format is structurally similar to the TAR format. The header file provides the necessary structures and function prototypes to read and process AR archives. It includes the `fd_ar_meta` structure, which holds metadata about each file in the archive, such as modification time, user ID, group ID, file mode, file size, and an identifier. The identifier is a null-terminated string with a maximum size defined by `FD_AR_META_IDENT_SZ`.
+
+The file defines two main functions: [`fd_ar_read_init`](<#fd_ar_read_init>) and [`fd_ar_read_next`](<#fd_ar_read_next>). The [`fd_ar_read_init`](<#fd_ar_read_init>) function initializes the reading of an AR archive from a given stream, ensuring the stream is positioned correctly at the start of the archive. The [`fd_ar_read_next`](<#fd_ar_read_next>) function reads the next file in the archive, populating the provided metadata structure with details from the archive header. Both functions return error codes to indicate success or failure, with specific codes for different error conditions such as invalid input, end-of-file, I/O failure, or malformed archive files. The header file also includes a reference to a more detailed implementation in `fd_ar.c` and suggests potential improvements, such as a function to move the stream pointer to the end of the AR file.
+# Imports and Dependencies
 
 ---
-- `fd_ar_read_init`
-- `fd_ar_read_next`
+- `../fd_util_base.h`
+
+
+# Data Structures
+
+---
+### fd\_ar\_meta
+- **Type**: ``struct``
+- **Members**:
+    - `mtime`: Modification time of the file.
+    - `uid`: User ID of the file owner.
+    - `gid`: Group ID of the file owner.
+    - `mode`: File mode (permissions).
+    - `filesz`: Size of the file, guaranteed to be non-negative.
+    - `ident`: File identifier, guaranteed to be null-terminated.
+- **Description**: Represents metadata for a file in an AR archive, including modification time, user and group IDs, file mode, file size, and a null-terminated identifier.
+
+
+---
+### fd\_ar\_meta\_t
+- **Type**: ``struct``
+- **Members**:
+    - ``mtime``: Modification time of the file.
+    - ``uid``: User ID of the file owner.
+    - ``gid``: Group ID of the file owner.
+    - ``mode``: File mode (permissions).
+    - ``filesz``: Size of the file content, guaranteed to be non-negative.
+    - ``ident``: Null-terminated identifier string for the file, with a maximum size of 16 characters plus a null terminator.
+- **Description**: `fd_ar_meta_t` is a `struct` that stores metadata for a file within an AR archive, including modification time, user and group IDs, file mode, file size, and a null-terminated identifier string.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

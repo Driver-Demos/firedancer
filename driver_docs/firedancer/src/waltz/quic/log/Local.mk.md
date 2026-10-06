@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies header and object files for the QUIC log component and includes a commented-out line for a unit test.
+Makefile for adding headers and objects, and defining a unit test for QUIC logging.
 
 # Purpose
-The file is a Makefile snippet used for build automation. It defines targets and dependencies for a project, specifically adding header files (`fd_quic_log.h`, `fd_quic_log_user.h`) and object files (`fd_quic_log`, `fd_quic`) to the build process. The commented line suggests a unit test target (`test_quic_log`) that depends on `fd_quic` and `fd_util` components, but it is currently not active.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` function to include header files `fd_quic_log.h` and `fd_quic_log_user.h`. The `add-objs` function adds object files `fd_quic_log` and `fd_quic` to the build process. The line for `make-unit-test` is commented out, indicating that the unit test `test_quic_log` is not currently part of the build process, but it specifies dependencies on `fd_quic` and `fd_util` if uncommented.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
