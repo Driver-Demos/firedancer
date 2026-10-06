@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for triggering jobs on main branch push, including book, clusterfuzz, and solfuzz CI.
+The `on_main_push.yml` file in the `firedancer` codebase defines a GitHub Actions workflow that triggers on pushes to the main branch, executing jobs related to book generation, cluster fuzzing, and dispatching a CI event to the `solfuzz` repository.
 
 # Purpose
-The YAML configuration file defines a GitHub Actions workflow that triggers on pushes to the `main` branch. It specifies three jobs: `book`, `clusterfuzz`, and `trigger`. The `book` job uses a workflow defined in `book.yml`, inherits secrets, and has permissions to read contents and write to pages and id-token. The `clusterfuzz` job uses a workflow defined in `clusterfuzz.yml` and also inherits secrets. The `trigger` job depends on the completion of the `clusterfuzz` job, runs on the latest Ubuntu environment, and includes a step to dispatch a custom event to the `solfuzz` repository using a POST request to the GitHub API, authenticated with a personal access token.
+The provided content is a GitHub Actions workflow configuration file written in YAML. This file is designed to automate tasks in a software project when changes are pushed to the 'main' branch of the repository. It defines three jobs: 'book', 'clusterfuzz', and 'trigger'. The 'book' job uses a separate workflow file located at `./.github/workflows/book.yml` and requires specific permissions to read contents and write to pages and id-token. The 'clusterfuzz' job also uses its own workflow file, `./.github/workflows/clusterfuzz.yml`, and inherits secrets for its execution. The 'trigger' job depends on the completion of the 'clusterfuzz' job and runs on the latest Ubuntu environment. It includes a step to dispatch a custom event to the 'solfuzz' repository using a POST request, authenticated with a personal access token (PAT) stored in the repository's secrets.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

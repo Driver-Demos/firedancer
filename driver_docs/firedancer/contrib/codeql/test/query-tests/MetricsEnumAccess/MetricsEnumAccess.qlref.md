@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-References a query and a postprocess script for testing metrics enumeration access.
+Query reference for MetricsEnumAccess test and its postprocess query.
 
 # Purpose
-The file specifies a query configuration for a software codebase. It defines `query` as `MetricsEnumAccess.ql`, indicating the primary query to execute. The `postprocess` field is set to `InlineExpectationsTestQuery.ql`, which specifies a post-processing step to apply after the main query execution.
+Maps the `MetricsEnumAccess.ql` query to the `InlineExpectationsTestQuery.ql` postprocess step. This file defines the query input and the follow-up processing file used for the test or analysis flow.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

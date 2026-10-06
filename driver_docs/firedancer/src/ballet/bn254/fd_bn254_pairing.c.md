@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements BN254 pairing operations, including Miller loop and final exponentiation, for elliptic curve cryptography.
+The `fd_bn254_pairing.c` file in the `firedancer` codebase implements functions for BN254 pairing operations, including projection doubling, addition/subtraction, Miller loop, and final exponentiation.
 
 # Purpose
-The code is a C implementation of cryptographic pairing operations on the BN254 elliptic curve. It includes functions for performing the Miller loop and final exponentiation, which are key steps in computing pairings. The functions [`fd_bn254_pairing_proj_dbl`](<#fd_bn254_pairing_proj_dbl>) and [`fd_bn254_pairing_proj_add_sub`](<#fd_bn254_pairing_proj_add_sub>) handle the doubling and addition/subtraction of points on the elliptic curve in projective coordinates. These operations are essential for the Miller loop, which is implemented in the [`fd_bn254_miller_loop`](<#fd_bn254_miller_loop>) function. The Miller loop computes an intermediate result used in the pairing calculation.
+This C source code file is focused on implementing cryptographic pairing operations over the BN254 elliptic curve, which is widely used in cryptographic protocols such as zero-knowledge proofs and blockchain technologies. The file includes functions for performing the Miller loop and final exponentiation, which are key components of the pairing computation process. The functions [`fd_bn254_pairing_proj_dbl`](#fd_bn254_pairing_proj_dbl) and [`fd_bn254_pairing_proj_add_sub`](#fd_bn254_pairing_proj_add_sub) are used to handle the doubling and addition steps in the projective coordinates during the pairing computation. The [`fd_bn254_miller_loop`](#fd_bn254_miller_loop) function orchestrates the Miller loop, which is a critical step in computing the pairing by iteratively applying the doubling and addition operations. The [`fd_bn254_fp12_pow_x`](#fd_bn254_fp12_pow_x) and [`fd_bn254_final_exp`](#fd_bn254_final_exp) functions are responsible for the final exponentiation step, which is necessary to obtain a unique and non-degenerate result from the pairing operation.
 
-The code also includes the [`fd_bn254_fp12_pow_x`](<#fd_bn254_fp12_pow_x>) and [`fd_bn254_final_exp`](<#fd_bn254_final_exp>) functions, which perform exponentiation in the finite field extension and the final exponentiation step, respectively. The final exponentiation is necessary to obtain a unique and non-degenerate pairing result. The code references external resources and libraries, such as the `gnark-crypto` library, for further optimization and theoretical background. The functions are designed to be used in cryptographic protocols that require efficient and secure pairing computations, such as those used in zero-knowledge proofs and other advanced cryptographic schemes.
+The code is structured to provide a specialized and narrow functionality focused on BN254 pairing operations, which are essential for cryptographic applications requiring efficient and secure elliptic curve pairings. The file does not define a public API or external interfaces directly but rather implements internal functions that are likely part of a larger cryptographic library. The use of inline functions and static declarations suggests that these functions are intended for use within this compilation unit, optimizing performance by reducing function call overhead. The code references external resources and optimizations, indicating a reliance on established cryptographic research and existing implementations to ensure correctness and efficiency.
 # Imports and Dependencies
 
 ---
@@ -19,132 +19,95 @@ The code also includes the [`fd_bn254_fp12_pow_x`](<#fd_bn254_fp12_pow_x>) and [
 
 ---
 ### fd\_bn254\_pairing\_proj\_dbl<!-- {{#callable:fd_bn254_pairing_proj_dbl}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_bn254_pairing.c#L5>)
-
-Performs a doubling operation on a point in the projective coordinates of the BN254 curve and updates the result in the pairing context.
+The `fd_bn254_pairing_proj_dbl` function performs a doubling operation on a point in the projective coordinates of the BN254 curve, updating the point and computing a related pairing value.
 - **Inputs**:
-    - ``r``: A pointer to `fd_bn254_fp12_t` where the result of the pairing operation will be stored.
-    - ``t``: A pointer to `fd_bn254_g2_t` representing the point in projective coordinates to be doubled.
-    - ``p``: A constant pointer to `fd_bn254_g1_t` representing a point on the BN254 curve.
-- **Logic and Control Flow**:
-    - Initialize pointers `X`, `Y`, `Z` to the coordinates of `t` and `x`, `y` to the coordinates of `p`.
-    - Compute intermediate values `a`, `b`, `c`, `d`, `e`, `f`, `g`, `h` using field operations such as multiplication, squaring, addition, and halving.
-    - Calculate the pairing function `g(P)` using the intermediate values and store the result in `r`.
-    - Set specific elements of `r` to zero as part of the pairing function calculation.
-    - Update the coordinates of `t` using the computed intermediate values to reflect the doubling operation.
-- **Output**: The function does not return a value but updates the `r` and `t` structures with the results of the pairing and doubling operations, respectively.
+    - `r`: A pointer to an `fd_bn254_fp12_t` structure where the result of the pairing computation will be stored.
+    - `t`: A pointer to an `fd_bn254_g2_t` structure representing the point in projective coordinates to be doubled.
+    - `p`: A constant pointer to an `fd_bn254_g1_t` structure representing a point on the BN254 curve used in the pairing computation.
+- **Control Flow**:
+    - Initialize pointers to the X, Y, and Z coordinates of the point `t` and the x and y coordinates of the point `p`.
+    - Compute intermediate values A, B, C, D, E, F, G, and H using field arithmetic operations such as multiplication, squaring, addition, and subtraction.
+    - Calculate the pairing value `g(P)` by setting specific elements of the result `r` using the computed intermediate values and the y coordinate of `p`.
+    - Update the coordinates of the point `t` by computing new values for X, Y, and Z using the intermediate values and field arithmetic operations.
+- **Output**: The function does not return a value but updates the `r` structure with the computed pairing value and modifies the `t` structure with the new doubled point coordinates.
 
 
 ---
 ### fd\_bn254\_pairing\_proj\_add\_sub<!-- {{#callable:fd_bn254_pairing_proj_add_sub}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_bn254_pairing.c#L79>)
-
-Performs addition or subtraction of projective points in the BN254 pairing context, updating the result and optionally the input point.
+The `fd_bn254_pairing_proj_add_sub` function performs an addition or subtraction operation on elliptic curve points in projective coordinates and updates the result in a pairing context.
 - **Inputs**:
-    - ``r``: Pointer to `fd_bn254_fp12_t` where the result will be stored.
-    - ``t``: Pointer to `fd_bn254_g2_t` representing the projective point to be updated.
-    - ``q``: Pointer to `fd_bn254_g2_t` representing the projective point to add or subtract.
-    - ``p``: Pointer to `fd_bn254_g1_t` representing the affine point used in calculations.
-    - ``is_add``: Integer flag indicating whether to add (`1`) or subtract (`0`) the point `q`.
-    - ``add_point``: Integer flag indicating whether to update the point `t` with the result of the addition or subtraction (`1`) or not (`0`).
-- **Logic and Control Flow**:
-    - Check if `is_add` is true; if so, set `Y2` to `q->Y`, otherwise negate `q->Y` and store in `Y2`.
-    - Calculate intermediate values `a`, `b`, `o`, and `l` using `fd_bn254_fp2_mul` and `fd_bn254_fp2_sub`.
-    - Compute `j` and `k` using `fd_bn254_fp2_mul`.
-    - Update `r` with calculated values using `fd_bn254_fp_mul`, `fd_bn254_fp2_neg`, and `fd_bn254_fp2_sub`.
-    - If `add_point` is true, perform additional calculations to update `t` using `fd_bn254_fp2_sqr`, `fd_bn254_fp2_mul`, `fd_bn254_fp2_add`, and `fd_bn254_fp2_sub`.
-- **Output**: Updates the `fd_bn254_fp12_t` result `r` and optionally the projective point `t` based on the addition or subtraction operation.
+    - `r`: A pointer to an `fd_bn254_fp12_t` structure where the result of the operation will be stored.
+    - `t`: A pointer to an `fd_bn254_g2_t` structure representing a point in the G2 group, which will be updated if `add_point` is true.
+    - `q`: A constant pointer to an `fd_bn254_g2_t` structure representing another point in the G2 group.
+    - `p`: A constant pointer to an `fd_bn254_g1_t` structure representing a point in the G1 group.
+    - `is_add`: An integer flag indicating whether to perform addition (if true) or subtraction (if false) of the points.
+    - `add_point`: An integer flag indicating whether to update the point `t` with the result of the addition/subtraction.
+- **Control Flow**:
+    - Initialize pointers to the X, Y, and Z coordinates of the point `t` and the X coordinate of the point `q`.
+    - Depending on the `is_add` flag, set or negate the Y coordinate of `q` and store it in `Y2`.
+    - Compute intermediate values `a`, `b`, `o`, and `l` using the coordinates of `t` and `q`.
+    - Calculate `j` and `k` using the intermediate values and the coordinates of `q`.
+    - Update the result `r` with computed values involving `l`, `o`, `x`, and `y`.
+    - If `add_point` is true, compute additional intermediate values `c`, `d`, `e`, `f`, `g`, `h`, and `i` to update the coordinates of `t`.
+- **Output**: The function updates the `fd_bn254_fp12_t` structure pointed to by `r` with the result of the pairing operation, and optionally updates the `fd_bn254_g2_t` structure pointed to by `t` if `add_point` is true.
 
 
 ---
 ### fd\_bn254\_miller\_loop<!-- {{#callable:fd_bn254_miller_loop}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_bn254_pairing.c#L154>)
-
-Computes the Miller loop for BN254 pairing, iterating over input points to accumulate results in a finite field.
+The `fd_bn254_miller_loop` function performs the Miller loop operation for BN254 pairing, which is a key step in elliptic curve pairings used in cryptographic protocols.
 - **Inputs**:
-    - `f`: A pointer to an `fd_bn254_fp12_t` structure where the result will be stored.
-    - `p`: An array of `fd_bn254_g1_t` structures representing the G1 points.
-    - `q`: An array of `fd_bn254_g2_t` structures representing the G2 points.
-    - `sz`: The number of elements in the `p` and `q` arrays.
-- **Logic and Control Flow**:
-    - Initialize `f` to the identity element of the field.
-    - Copy each element of `q` into a temporary array `t`.
-    - For each element in `t`, double the point and multiply the result into `f`.
-    - Square `f` after processing all elements.
-    - Iterate over each element in `t` to perform addition and subtraction operations, updating `f` with the results.
-    - Iterate over a predefined sequence `s` to conditionally perform addition and subtraction operations based on the sequence values, updating `f`.
-    - Apply Frobenius endomorphisms to elements of `q`, perform addition and subtraction operations, and update `f` with the results.
-    - Return the updated `f`.
-- **Output**: A pointer to the updated `fd_bn254_fp12_t` structure containing the result of the Miller loop computation.
-- **Functions Called**:
-    - [`fd_bn254_pairing_proj_dbl`](<#fd_bn254_pairing_proj_dbl>)
-    - [`fd_bn254_pairing_proj_add_sub`](<#fd_bn254_pairing_proj_add_sub>)
+    - `f`: A pointer to an `fd_bn254_fp12_t` structure where the result of the Miller loop will be stored.
+    - `p`: An array of `fd_bn254_g1_t` structures representing the G1 group elements.
+    - `q`: An array of `fd_bn254_g2_t` structures representing the G2 group elements.
+    - `sz`: An unsigned long integer representing the size of the arrays `p` and `q`.
+- **Control Flow**:
+    - Initialize the result `f` to the identity element of the field extension `fd_bn254_fp12_t`.
+    - Copy each element of the `q` array into a temporary array `t`.
+    - For each element in the arrays, perform a projective doubling operation and multiply the result into `f`.
+    - Square the result `f`.
+    - Perform a series of projective addition and subtraction operations on each element, updating `f` with the results.
+    - Iterate over a pre-defined sequence `s` to perform conditional operations based on its values, updating `f` accordingly.
+    - Apply Frobenius endomorphisms to elements of `q` and perform additional projective operations, updating `f` with the results.
+    - Return the updated `f` as the result of the Miller loop.
+- **Output**: A pointer to the `fd_bn254_fp12_t` structure `f`, which contains the result of the Miller loop operation.
+- **Functions called**:
+    - [`fd_bn254_pairing_proj_dbl`](#fd_bn254_pairing_proj_dbl)
+    - [`fd_bn254_pairing_proj_add_sub`](#fd_bn254_pairing_proj_add_sub)
 
 
 ---
 ### fd\_bn254\_fp12\_pow\_x<!-- {{#callable:fd_bn254_fp12_pow_x}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_bn254_pairing.c#L223>)
-
-Computes the power of a 12th-degree extension field element using a specific exponentiation algorithm.
+The function `fd_bn254_fp12_pow_x` computes a specific power of an element in the finite field extension Fp12 using a series of squaring and multiplication operations.
 - **Inputs**:
-    - `r`: A pointer to a `fd_bn254_fp12_t` structure where the result will be stored.
-    - `a`: A constant pointer to a `fd_bn254_fp12_t` structure representing the base element to be exponentiated.
-- **Logic and Control Flow**:
-    - Initialize an array `t` of 7 `fd_bn254_fp12_t` elements for intermediate calculations.
-    - Square the input `a` and store the result in `t[3]`.
-    - Square `t[3]` and store the result in `t[5]`.
-    - Square `t[5]` and store the result in `r`.
-    - Square `r` and store the result in `t[0]`.
-    - Multiply `t[0]` by `a` and store the result in `t[2]`.
-    - Multiply `t[2]` by `t[3]` and store the result in `t[0]`.
-    - Multiply `t[0]` by `a` and store the result in `t[1]`.
-    - Multiply `t[2]` by `r` and store the result in `t[4]`.
-    - Square `t[2]` and store the result in `t[6]`.
-    - Multiply `t[1]` by `t[0]` and store the result in `t[1]`.
-    - Multiply `t[1]` by `t[3]` and store the result in `t[0]`.
-    - Perform 6 fast squarings on `t[6]`.
-    - Multiply `t[5]` by `t[6]` and store the result in `t[5]`.
-    - Multiply `t[5]` by `t[4]` and store the result in `t[5]`.
-    - Perform 7 fast squarings on `t[5]`.
-    - Multiply `t[4]` by `t[5]` and store the result in `t[4]`.
-    - Perform 8 fast squarings on `t[4]`.
-    - Multiply `t[4]` by `t[0]` and store the result in `t[4]`.
-    - Multiply `t[3]` by `t[4]` and store the result in `t[3]`.
-    - Perform 6 fast squarings on `t[3]`.
-    - Multiply `t[2]` by `t[3]` and store the result in `t[2]`.
-    - Perform 8 fast squarings on `t[2]`.
-    - Multiply `t[2]` by `t[0]` and store the result in `t[2]`.
-    - Perform 6 fast squarings on `t[2]`.
-    - Multiply `t[2]` by `t[0]` and store the result in `t[2]`.
-    - Perform 10 fast squarings on `t[2]`.
-    - Multiply `t[1]` by `t[2]` and store the result in `t[1]`.
-    - Perform 6 fast squarings on `t[1]`.
-    - Multiply `t[0]` by `t[1]` and store the result in `t[0]`.
-    - Multiply `r` by `t[0]` and store the result in `r`.
-- **Output**: A pointer to the `fd_bn254_fp12_t` structure `r` containing the result of the exponentiation.
+    - `r`: A pointer to an `fd_bn254_fp12_t` structure where the result will be stored.
+    - `a`: A constant pointer to an `fd_bn254_fp12_t` structure representing the base element to be exponentiated.
+- **Control Flow**:
+    - Initialize an array `t` of 7 `fd_bn254_fp12_t` elements for intermediate computations.
+    - Perform a series of fast squaring operations on `a` and store results in `t[3]`, `t[5]`, and `r`.
+    - Continue with additional squaring and multiplication operations to compute intermediate results stored in `t[0]`, `t[1]`, `t[2]`, `t[4]`, and `t[6]`.
+    - Use loops to perform repeated squaring operations on `t[6]`, `t[5]`, `t[4]`, `t[3]`, `t[2]`, and `t[1]` with varying iteration counts.
+    - Perform final multiplication operations to combine intermediate results and store the final result in `r`.
+- **Output**: The function returns a pointer to the `fd_bn254_fp12_t` structure `r` containing the result of the exponentiation.
 
 
 ---
 ### fd\_bn254\_final\_exp<!-- {{#callable:fd_bn254_final_exp}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_bn254_pairing.c#L261>)
-
-Computes the final exponentiation in the BN254 pairing process.
+The `fd_bn254_final_exp` function performs the final exponentiation step in the BN254 pairing-based cryptography, transforming an element of the field extension to its final form.
 - **Inputs**:
     - `r`: A pointer to an `fd_bn254_fp12_t` structure where the result will be stored.
-    - `x`: A constant pointer to an `fd_bn254_fp12_t` structure representing the input value to be exponentiated.
-- **Logic and Control Flow**:
-    - Initialize temporary variables `t` and `s` for intermediate computations.
-    - Compute the conjugate of `x` and store it in `t[0]`.
-    - Compute the inverse of `x` and store it in `t[1]`.
-    - Multiply `t[0]` by `t[1]` to get `x^(p^6-1)` and store it back in `t[0]`.
-    - Apply the Frobenius map squared to `t[0]` and store the result in `t[2]`.
-    - Multiply `t[0]` by `t[2]` to get `x^(p^6-1)(p^2+1)` and store it in `s`.
-    - Perform a series of exponentiations and multiplications using the [`fd_bn254_fp12_pow_x`](<#fd_bn254_fp12_pow_x>), `fd_bn254_fp12_conj`, `fd_bn254_fp12_sqr_fast`, and `fd_bn254_fp12_mul` functions to further process `s` and intermediate results in `t`.
-    - Apply the Frobenius map and its powers to intermediate results and multiply them to accumulate the final result.
-    - Store the final result in `r` and return `r`.
-- **Output**: A pointer to the `fd_bn254_fp12_t` structure `r` containing the result of the final exponentiation.
-- **Functions Called**:
-    - [`fd_bn254_fp12_pow_x`](<#fd_bn254_fp12_pow_x>)
+    - `x`: A constant pointer to an `fd_bn254_fp12_t` structure representing the input element to be exponentiated.
+- **Control Flow**:
+    - Initialize temporary variables `t` and `s` for intermediate calculations.
+    - Compute the conjugate of `x` and store it in `t[0]`, representing `x^(p^6)`.
+    - Compute the inverse of `x` and store it in `t[1]`, representing `x^(-1)`.
+    - Multiply `t[0]` and `t[1]` to get `x^(p^6-1)` and store it back in `t[0]`.
+    - Apply the Frobenius map twice to `t[0]` and store the result in `t[2]`, representing `x^(p^6-1)(p^2)`.
+    - Multiply `t[0]` and `t[2]` to get `x^(p^6-1)(p^2+1)` and store it in `s`.
+    - Perform a series of exponentiations, conjugations, and multiplications using a fast chain method to further transform `s` and intermediate results in `t`.
+    - Apply Frobenius maps and multiplications to combine results and store the final result in `r`.
+- **Output**: The function returns a pointer to the `fd_bn254_fp12_t` structure `r`, which contains the result of the final exponentiation.
+- **Functions called**:
+    - [`fd_bn254_fp12_pow_x`](#fd_bn254_fp12_pow_x)
 
 
 
