@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Deduplication service, seccomp filter policy, security policy, Makefile config, and unit tests.
+Dedup tile source, build rules, seccomp policy, generated filter, and unit tests.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync on logfile_fd only.
 
 ## Files
-- **[fd_dedup_tile.c](fd_dedup_tile.c.md)**: Implements a deduplication service for input streams, managing context and metrics, and ensuring secure processing.
-- **[fd_dedup_tile.seccomppolicy](fd_dedup_tile.seccomppolicy.md)**: Security policy for logging, specifying file descriptor usage for writing and syncing log messages.
-- **[Local.mk](Local.mk.md)**: Makefile configuration for conditional object addition and unit test setup in the deduplication module.
-- **[test_dedup.c](test_dedup.c.md)**: Unit tests for deduplication functionality using multiple tiles and synthetic traffic in a hosted AVX environment.
+- **[fd_dedup_tile.c](fd_dedup_tile.c.md)**: Deduplicates transaction streams and publishes unique transactions to downstream consumers.
+- **[fd_dedup_tile.seccomppolicy](fd_dedup_tile.seccomppolicy.md)**: The `fd_dedup_tile.seccomppolicy` file defines security policies for logging in the Firedancer deduplication tile, specifying conditions for writing and syncing log messages to a file or STDERR.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_dedup_tile when FD_HAS_ALLOCA is set.
+- **[test_dedup.c](test_dedup.c.md)**: The `test_dedup.c` file in the `firedancer` codebase implements a unit test for the deduplication functionality, involving the setup and execution of multiple tiles for transmitting, deduplicating, and receiving test traffic, with configurations for various parameters such as packet size, burst characteristics, and duplication thresholds.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
