@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `wd_f1.c` file in the `firedancer` codebase provides functions for managing PCIe interactions and data streaming, including initialization, reading, writing, and handling requests for the AWS F1 FPGA environment.
+Implements PCIe communication and management functions for FPGA-based operations, including data streaming and Ed25519 verification.
 
 # Purpose
-This C source code file is designed to manage and interact with PCIe (Peripheral Component Interconnect Express) devices, specifically in the context of FPGA (Field-Programmable Gate Array) management on AWS F1 instances. The file provides a set of functions to initialize, configure, and communicate with PCIe slots, handling tasks such as attaching to FPGA interfaces, reading and writing data, and managing data streams. The code includes both private and public functions, with private functions prefixed by an underscore to indicate their intended internal use. The primary public functions include [`wd_init_pci`](#wd_init_pci), which initializes PCIe slots, and [`wd_ed25519_verify_req`](#wd_ed25519_verify_req), which appears to handle requests for Ed25519 signature verification, a cryptographic operation.
+The code is a C source file that provides functionality for managing PCIe (Peripheral Component Interconnect Express) interactions, specifically for FPGA (Field-Programmable Gate Array) management and data streaming. It includes functions for initializing and freeing PCIe resources, reading from and writing to PCIe addresses, and handling data streams. The file defines both private and public functions, with private functions prefixed by an underscore (`_`) to indicate their intended internal use.
 
-The file is structured to support high-performance data streaming and processing, leveraging AVX (Advanced Vector Extensions) for efficient data handling. It includes mechanisms for managing memory-mapped I/O, setting up DMA (Direct Memory Access) operations, and handling backpressure in data streams. The code also provides utility functions for resetting and reading counters, managing virtual DIP switches, and converting virtual addresses to physical addresses. The presence of functions like [`wd_ed25519_verify_init_req`](#wd_ed25519_verify_init_req) and [`wd_ed25519_verify_req`](#wd_ed25519_verify_req) suggests that the code is part of a larger system that performs cryptographic operations, possibly for secure data processing or verification tasks. Overall, this file is a specialized component of a broader system, focusing on efficient PCIe communication and FPGA management.
+The primary focus of the code is to facilitate communication with FPGA devices through PCIe slots. It includes functions such as [`wd_init_pci`](<#wd_init_pci>) and [`wd_free_pci`](<#wd_free_pci>) for setting up and releasing PCIe resources, and [`_wd_read_32`](<#_wd_read_32>) and [`_wd_write_32`](<#_wd_write_32>) for reading and writing 32-bit values to specific addresses. The code also includes functions for managing data streams, such as [`_wd_stream_256`](<#_wd_stream_256>) and [`_wd_stream_flush`](<#_wd_stream_flush>), which handle the transfer of data in 256-bit chunks. Additionally, the file provides functions for managing and verifying Ed25519 cryptographic signatures, such as [`wd_ed25519_verify_req`](<#wd_ed25519_verify_req>), which prepares and sends requests for signature verification. The code is designed to be part of a larger system, likely involving FPGA-based applications, and it interfaces with other components through defined APIs and data structures.
 # Imports and Dependencies
 
 ---
@@ -19,383 +19,436 @@ The file is structured to support high-performance data streaming and processing
 
 ---
 ### wd\_init\_pci<!-- {{#callable:wd_init_pci}} -->
-The `wd_init_pci` function initializes PCI slots for a given workspace by mapping memory, setting up PCI bars, and configuring streams for each active slot.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L32>)
+
+Initializes PCI slots and attaches them to the FPGA application, setting up memory mappings and stream configurations.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace to be initialized.
-    - `slots`: A 64-bit unsigned integer representing the bitmask of PCI slots to be initialized.
-- **Control Flow**:
-    - Set the `pci_slots` field of the `wd` structure to the provided `slots` bitmask.
-    - Map a 32-byte memory region for `stream_buf` using `mmap` with read/write permissions and specific flags.
-    - Set the `initialized` flag of `fpga_mgmt_state` to true, indicating that FPGA management is initialized.
-    - Iterate over each possible PCI slot (up to `WD_N_PCI_SLOTS`).
-    - For each slot, initialize the `bar0`, `bar4`, and `bar4_addr` fields of the `pci` structure to default values.
-    - Check if the current slot is active by testing the corresponding bit in `pci_slots`. If not active, continue to the next slot.
-    - Attempt to attach to the AFI on the current slot for both BAR0 and BAR4 using `fpga_pci_attach`. If either attachment fails, log an error and return -1.
-    - Retrieve the address for BAR4 using `fpga_pci_get_address`.
-    - Initialize the stream configuration for each stream in the current PCI slot by setting specific fields (`a`, `b`, `m`).
-    - Return 0 to indicate successful initialization.
-- **Output**: Returns 0 on successful initialization of the PCI slots, or -1 if an error occurs during attachment to the AFI.
+    - `wd`: A pointer to a `wd_wksp_t` structure that holds workspace data for PCI slots.
+    - `slots`: A 64-bit integer representing the slots to initialize, with each bit corresponding to a slot.
+- **Logic and Control Flow**:
+    - Set `wd->pci_slots` to the value of `slots`.
+    - Map a 32-byte memory region to `wd->stream_buf` using `mmap` with read, write, private, anonymous, and locked flags.
+    - Set `fpga_mgmt_state.initialized` to true, indicating that FPGA management is initialized.
+    - Iterate over each slot from 0 to `WD_N_PCI_SLOTS`.
+    - For each slot, initialize `pci->bar0`, `pci->bar4`, and `pci->bar4_addr` to `PCI_BAR_HANDLE_INIT` and 0, respectively.
+    - Set `fpga_mgmt_state.slots[slot].handle` to `PCI_BAR_HANDLE_INIT`.
+    - Check if the current slot is enabled in `wd->pci_slots`. If not, continue to the next slot.
+    - Attach to the FPGA application on the current slot for `APP_PF_BAR0` and `APP_PF_BAR4`. If attachment fails, log an error and return -1.
+    - Get the address for `pci->bar4` and store it in `pci->bar4_addr`.
+    - Initialize stream configurations for each stream in the current slot, setting `a`, `b`, and `m` values.
+- **Output**: Returns 0 on successful initialization of all specified PCI slots, or -1 if an error occurs during attachment.
 
 
 ---
 ### wd\_free\_pci<!-- {{#callable:wd_free_pci}} -->
-The `wd_free_pci` function is a placeholder function that takes a workspace pointer as input and returns 0 without performing any operations.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L81>)
+
+Returns 0 without performing any operations on the input `wd_wksp_t` pointer.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure, representing the workspace for PCI operations.
-- **Control Flow**:
-    - The function takes a single argument, `wd`, which is a pointer to a `wd_wksp_t` structure.
-    - The function explicitly ignores the `wd` argument using `(void)wd;`, indicating that it is not used.
-    - The function returns the integer value 0.
-- **Output**: The function returns an integer value of 0, indicating successful completion without performing any operations.
+    - `wd`: A pointer to a `wd_wksp_t` structure, which is not used in the function.
+- **Logic and Control Flow**:
+    - Casts the input `wd` to void to suppress unused variable warnings.
+    - Returns 0.
+- **Output**: An integer value 0, indicating successful completion without any operations.
 
 
 ---
 ### \_wd\_read\_32<!-- {{#callable:_wd_read_32}} -->
-The function `_wd_read_32` reads a 32-bit value from a specified address on a PCI device's BAR0 memory space.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L87>)
+
+Reads a 32-bit value from a specified address on a PCI device and logs an error if the read operation fails.
 - **Inputs**:
     - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device from which to read.
-    - `addr`: A 32-bit unsigned integer representing the address offset within the PCI device's BAR0 memory space to read from.
-- **Control Flow**:
-    - Declare an integer `rc` and a 32-bit unsigned integer `value` to store the return code and the read value, respectively.
-    - Call `fpga_pci_peek` with `pci->bar0`, `addr`, and `&value` to attempt to read a 32-bit value from the specified address in the PCI device's BAR0 memory space.
-    - Check if `rc` (the return code from `fpga_pci_peek`) is non-zero, indicating an error occurred during the read operation.
-    - If an error occurred, log an error message using `FD_LOG_ERR`.
-    - Return the read `value`.
-- **Output**: Returns a 32-bit unsigned integer representing the value read from the specified address in the PCI device's BAR0 memory space.
+    - `addr`: A 32-bit unsigned integer representing the address to read from on the PCI device.
+- **Logic and Control Flow**:
+    - Declare an integer `rc` and a 32-bit unsigned integer `value` to store the result of the read operation.
+    - Call `fpga_pci_peek` with `pci->bar0`, `addr`, and `&value` to attempt to read a 32-bit value from the specified address.
+    - Check if `rc` is non-zero, indicating a failure in the read operation.
+    - If the read operation fails, log an error message using `FD_LOG_ERR`.
+    - Return the `value` read from the PCI device.
+- **Output**: Returns the 32-bit unsigned integer value read from the specified address on the PCI device.
 
 
 ---
 ### \_wd\_write\_32<!-- {{#callable:_wd_write_32}} -->
-The function `_wd_write_32` writes a 32-bit value to a specified address on a PCI device's BAR0 memory space.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L97>)
+
+Writes a 32-bit value to a specified address in the PCIe BAR0 space of a given PCI device.
 - **Inputs**:
     - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device.
-    - `addr`: A 32-bit unsigned integer representing the address offset within the PCI device's BAR0 memory space.
-    - `v`: A 32-bit unsigned integer value to be written to the specified address.
-- **Control Flow**:
-    - The function calls `fpga_pci_poke` with the PCI device's BAR0 handle, the specified address, and the value to be written.
-- **Output**: The function does not return any value.
+    - `addr`: A 32-bit unsigned integer representing the address offset within the PCIe BAR0 space.
+    - `v`: A 32-bit unsigned integer value to write to the specified address.
+- **Logic and Control Flow**:
+    - Calls the `fpga_pci_poke` function with the PCI device's BAR0 handle, the specified address, and the value to write.
+- **Output**: No return value (void function).
 
 
 ---
 ### \_wd\_write\_256<!-- {{#callable:_wd_write_256}} -->
-The function `_wd_write_256` writes a 256-bit block of data from a buffer to a specified offset in a PCI device's memory space using AVX instructions for efficient data transfer.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L102>)
+
+Writes a 256-bit data block to a specified offset in PCIe memory using either direct memory access or AVX streaming.
 - **Inputs**:
-    - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device to which data will be written.
-    - `off`: A 64-bit unsigned integer representing the offset in the PCI device's memory space where the data will be written.
+    - `pci`: A pointer to a `wd_pci_t` structure representing the PCIe device.
+    - `off`: A 64-bit unsigned integer representing the offset in the PCIe memory where the data will be written.
     - `buf`: A constant pointer to the buffer containing the data to be written, expected to be at least 256 bits (32 bytes) in size.
-- **Control Flow**:
-    - Cast the `buf` pointer to a `uint32_t` pointer to access the data as 32-bit integers.
-    - Calculate the target address in the PCI device's memory by adding the offset (divided by 4) to the base address `bar4_addr` from the `pci` structure.
-    - Use an `if` statement with a condition that is always false (0) to provide an alternative method of writing data, which is not executed.
-    - In the `else` block, load the 256-bit data from the buffer into an AVX register using `_mm256_load_si256`.
-    - Stream the 256-bit data from the AVX register to the calculated address in the PCI device's memory using `_mm256_stream_si256`.
-- **Output**: The function does not return a value; it performs a side effect by writing data to the PCI device's memory.
+- **Logic and Control Flow**:
+    - Casts the `buf` pointer to a `uint32_t` pointer to access the data as 32-bit integers.
+    - Calculates the target address in PCIe memory by adding the offset (divided by 4) to the base address `pci->bar4_addr`.
+    - Checks a condition (currently always false) to decide between two methods of writing data.
+    - If the condition were true, writes each of the eight 32-bit integers from `data` to the calculated address sequentially.
+    - Otherwise, loads the 256-bit data from `buf` into an AVX register and streams it to the calculated address using AVX instructions.
+- **Output**: No return value; the function performs a write operation to PCIe memory.
 
 
 ---
 ### \_wd\_stream\_256<!-- {{#callable:_wd_stream_256}} -->
-The `_wd_stream_256` function writes a 256-bit data block to a specified PCI slot and manages the stream buffer's state, flushing it when necessary.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L125>)
+
+Writes a 256-bit data block to a specified PCI slot and manages the stream state.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure, which represents the workspace containing PCI slot information.
-    - `slot`: A `uint32_t` representing the index of the PCI slot to which the data will be written.
-    - `buf`: A constant pointer to the data buffer containing the 256-bit data to be written.
-- **Control Flow**:
-    - Retrieve the stream state for the specified PCI slot from the workspace.
-    - Call [`_wd_write_256`](#_wd_write_256) to write the 256-bit data from `buf` to the PCI slot, using the current offset and stream identifier.
-    - Increment the stream's offset `a` by 32.
-    - Check if the offset `a` has reached the maximum value `m`; if so, flush the stream and reset `a` to 0.
-    - If the lower 6 bits of `a` are all set (i.e., `a & 0xFC0 == 0xFC0`), flush the stream.
-- **Output**: The function does not return a value; it performs operations on the PCI stream buffer and may flush the buffer as a side effect.
-- **Functions called**:
-    - [`_wd_write_256`](#_wd_write_256)
-    - [`_wd_stream_flush`](#_wd_stream_flush)
+    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace.
+    - `slot`: An unsigned 32-bit integer representing the PCI slot index.
+    - `buf`: A constant pointer to the data buffer to be written.
+- **Logic and Control Flow**:
+    - Retrieve the stream state for the specified slot from the `wd` workspace.
+    - Call [`_wd_write_256`](<#_wd_write_256>) to write the 256-bit data block to the PCI slot using the current stream state.
+    - Increment the stream offset `a` by 32.
+    - Check if the stream offset `a` equals the maximum offset `m`; if true, call [`_wd_stream_flush`](<#_wd_stream_flush>) and reset `a` to 0.
+    - Check if the lower 6 bits of `a` are all set (i.e., `a & 0xFC0 == 0xFC0`); if true, call [`_wd_stream_flush`](<#_wd_stream_flush>).
+- **Output**: No return value (void function).
+- **Functions Called**:
+    - [`_wd_write_256`](<#_wd_write_256>)
+    - [`_wd_stream_flush`](<#_wd_stream_flush>)
 
 
 ---
 ### \_wd\_stream\_flush<!-- {{#callable:_wd_stream_flush}} -->
-The `_wd_stream_flush` function ensures memory ordering by executing a store fence operation.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L141>)
+
+Ensures that all previous streaming operations to memory are completed before proceeding.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure, which represents the workspace context.
-    - `slot`: A `uint32_t` representing the slot number, which is part of the workspace context.
-- **Control Flow**:
+    - ``wd``: A pointer to a `wd_wksp_t` structure, which represents the workspace context.
+    - ``slot``: An unsigned 32-bit integer representing the slot number in the workspace.
+- **Logic and Control Flow**:
     - The function takes two parameters, `wd` and `slot`, but does not use them in its logic.
-    - It calls the `_mm_sfence()` intrinsic function to issue a store fence, ensuring that all previous store operations are completed before any subsequent store operations.
-- **Output**: The function does not return any value.
+    - Calls the `_mm_sfence()` intrinsic function to ensure that all previous streaming operations are completed.
+- **Output**: No output is returned as the function has a `void` return type.
 
 
 ---
 ### wd\_rst\_cntrs<!-- {{#callable:wd_rst_cntrs}} -->
-The `wd_rst_cntrs` function resets the counters for a specified PCI slot if it is enabled.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L165>)
+
+Resets the counters for a specified PCI slot if it is active.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure, which contains information about the PCI workspace, including the slots and their configurations.
-    - `slot`: A 32-bit unsigned integer representing the specific PCI slot to reset the counters for.
-- **Control Flow**:
-    - Check if the specified slot is enabled by verifying if the corresponding bit in `wd->pci_slots` is set.
-    - If the slot is not enabled, return immediately without performing any action.
-    - If the slot is enabled, call the [`_wd_write_32`](#_wd_write_32) function to write the value `1` to the address `0x20<<2` of the specified slot's PCI configuration.
-- **Output**: The function does not return any value; it performs an action to reset the counters for the specified PCI slot.
-- **Functions called**:
-    - [`_wd_write_32`](#_wd_write_32)
+    - `wd`: A pointer to a `wd_wksp_t` structure, which contains information about the PCI workspace.
+    - `slot`: An unsigned 32-bit integer representing the PCI slot number to reset the counters for.
+- **Logic and Control Flow**:
+    - Check if the specified `slot` is active by verifying if the corresponding bit in `wd->pci_slots` is set.
+    - If the slot is not active, return immediately without performing any operation.
+    - If the slot is active, call [`_wd_write_32`](<#_wd_write_32>) to write the value `1` to the address `0x20<<2` of the specified slot's PCI configuration space.
+- **Output**: No output is returned as the function has a `void` return type.
+- **Functions Called**:
+    - [`_wd_write_32`](<#_wd_write_32>)
 
 
 ---
 ### wd\_snp\_cntrs<!-- {{#callable:wd_snp_cntrs}} -->
-The `wd_snp_cntrs` function writes a specific value to a PCI slot register to snapshot the counters if the slot is enabled.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L171>)
+
+Writes a specific value to a PCI slot if the slot is active.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace containing PCI slot information.
-    - `slot`: A 32-bit unsigned integer representing the specific PCI slot to operate on.
-- **Control Flow**:
-    - Check if the specified slot is enabled by verifying if the corresponding bit in `wd->pci_slots` is set.
-    - If the slot is not enabled, the function returns immediately without performing any operation.
-    - If the slot is enabled, call [`_wd_write_32`](#_wd_write_32) to write the value `2` to the address `0x20<<2` of the specified PCI slot's register.
-- **Output**: The function does not return any value.
-- **Functions called**:
-    - [`_wd_write_32`](#_wd_write_32)
+    - `wd`: A pointer to a `wd_wksp_t` structure, which contains information about PCI slots.
+    - `slot`: An unsigned 32-bit integer representing the PCI slot number to be checked and potentially written to.
+- **Logic and Control Flow**:
+    - Checks if the specified `slot` is active by performing a bitwise AND operation between `wd->pci_slots` and `1UL << slot`.
+    - If the slot is not active, the function returns immediately without performing any operation.
+    - If the slot is active, calls [`_wd_write_32`](<#_wd_write_32>) to write the value `2` to the address `0x20<<2` of the specified PCI slot.
+- **Output**: No output is returned as the function has a `void` return type.
+- **Functions Called**:
+    - [`_wd_write_32`](<#_wd_write_32>)
 
 
 ---
 ### wd\_rd\_cntr<!-- {{#callable:wd_rd_cntr}} -->
-The `wd_rd_cntr` function reads a counter value from a specified PCI slot and counter index in a workspace structure.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L177>)
+
+Reads a counter value from a specified PCI slot if the slot is enabled.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace containing PCI slot information.
-    - `slot`: A `uint32_t` representing the specific PCI slot to access.
-    - `ci`: A `uint32_t` representing the counter index to be read from the specified slot.
-- **Control Flow**:
-    - Check if the specified slot is enabled in the `pci_slots` bitmask of the workspace; if not, return 0.
-    - Write the counter index `ci` to the address `0x10<<2` of the specified slot using [`_wd_write_32`](#_wd_write_32).
-    - Read and return the counter value from the address `0x20<<2` of the specified slot using [`_wd_read_32`](#_wd_read_32).
-- **Output**: Returns a `uint32_t` representing the counter value read from the specified PCI slot and counter index, or 0 if the slot is not enabled.
-- **Functions called**:
-    - [`_wd_write_32`](#_wd_write_32)
-    - [`_wd_read_32`](#_wd_read_32)
+    - `wd`: A pointer to a `wd_wksp_t` structure that contains workspace information, including PCI slot data.
+    - `slot`: An unsigned 32-bit integer representing the PCI slot number to access.
+    - `ci`: An unsigned 32-bit integer representing the counter index to read.
+- **Logic and Control Flow**:
+    - Check if the specified `slot` is enabled by verifying if the corresponding bit in `wd->pci_slots` is set.
+    - If the slot is not enabled, return 0 immediately.
+    - If the slot is enabled, write the counter index `ci` to the address `0x10<<2` of the specified slot using [`_wd_write_32`](<#_wd_write_32>).
+    - Read the counter value from the address `0x20<<2` of the specified slot using [`_wd_read_32`](<#_wd_read_32>).
+    - Return the read counter value.
+- **Output**: Returns the counter value as a 32-bit unsigned integer if the slot is enabled; otherwise, returns 0.
+- **Functions Called**:
+    - [`_wd_write_32`](<#_wd_write_32>)
+    - [`_wd_read_32`](<#_wd_read_32>)
 
 
 ---
 ### wd\_rd\_ts<!-- {{#callable:wd_rd_ts}} -->
-The `wd_rd_ts` function reads a 64-bit timestamp from a specified PCI slot if it is enabled.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L185>)
+
+Reads a 64-bit timestamp from a specified PCI slot if it is enabled.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace containing PCI slot information.
-    - `slot`: A 32-bit unsigned integer representing the PCI slot number from which to read the timestamp.
-- **Control Flow**:
-    - Check if the specified slot is enabled by verifying if the corresponding bit in `wd->pci_slots` is set.
-    - If the slot is not enabled, return 0 immediately.
-    - Read a 32-bit value from the PCI slot at address `(0x12+0)<<2` and store it in the higher 32 bits of the `ts` variable.
-    - Shift the `ts` variable left by 32 bits to make room for the lower 32 bits.
-    - Read another 32-bit value from the PCI slot at address `(0x11+0)<<2` and store it in the lower 32 bits of the `ts` variable.
+    - `wd`: A pointer to a `wd_wksp_t` structure that contains PCI slot information.
+    - `slot`: A 32-bit unsigned integer representing the PCI slot number to read the timestamp from.
+- **Logic and Control Flow**:
+    - Check if the specified `slot` is enabled by verifying if the corresponding bit in `wd->pci_slots` is set.
+    - If the slot is not enabled, return 0.
+    - Read a 32-bit value from the PCI slot at address `(0x12+0)<<2` and store it in the higher 32 bits of `ts`.
+    - Shift `ts` left by 32 bits to make room for the lower 32 bits.
+    - Read another 32-bit value from the PCI slot at address `(0x11+0)<<2` and store it in the lower 32 bits of `ts`.
     - Return the combined 64-bit timestamp `ts`.
 - **Output**: A 64-bit unsigned integer representing the timestamp read from the specified PCI slot, or 0 if the slot is not enabled.
-- **Functions called**:
-    - [`_wd_read_32`](#_wd_read_32)
+- **Functions Called**:
+    - [`_wd_read_32`](<#_wd_read_32>)
 
 
 ---
 ### wd\_zprintf<!-- {{#callable:wd_zprintf}} -->
-The `wd_zprintf` function formats a string with variable arguments, replaces all '0' characters with underscores, and prints the result.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L195>)
+
+Formats a string with variable arguments, replaces '0' characters with '_', and prints the result.
 - **Inputs**:
-    - `format`: A C-style string that contains the text to be written, optionally including embedded format specifiers that are replaced by the values specified in subsequent additional arguments.
-    - `...`: A variable number of arguments that are formatted according to the format specifiers in the format string.
-- **Control Flow**:
-    - Initialize a character array `s` of size 512 to store the formatted string.
-    - Start processing the variable arguments using `va_start` with the format string.
-    - Use `vsnprintf` to format the string with the provided arguments and store it in `s`.
-    - Iterate over each character in the string `s`.
-    - If a character is '0', replace it with '_'.
-    - Print the modified string `s` using `printf`.
-    - End processing of the variable arguments using `va_end`.
-- **Output**: The function does not return a value; it outputs the formatted and modified string directly to the standard output.
+    - `format`: A format string that specifies how to format the subsequent arguments.
+    - `...`: A variable number of arguments to format according to the format string.
+- **Logic and Control Flow**:
+    - Initializes a character array `s` with a size of 512 to store the formatted string.
+    - Starts processing the variable arguments using `va_start` and the provided `format`.
+    - Formats the string using `vsnprintf`, storing the result in `s`.
+    - Iterates over each character in `s`, replacing any '0' character with '_'.
+    - Prints the modified string `s` using `printf`.
+    - Ends processing of the variable arguments with `va_end`.
+- **Output**: No return value; the function outputs the formatted and modified string to the standard output.
 
 
 ---
 ### \_wd\_next\_slot<!-- {{#callable:_wd_next_slot}} -->
-The function `_wd_next_slot` finds the next available PCI slot in a circular manner from a given starting slot.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L206>)
+
+Finds the next available PCI slot in a circular manner starting from a given slot.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure, which contains information about the PCI slots.
-    - `slot`: A `uint32_t` representing the current slot index from which to start searching for the next available slot.
-- **Control Flow**:
-    - The function iterates over a fixed number of PCI slots, defined by `WD_N_PCI_SLOTS`.
-    - In each iteration, it increments the `slot` index by one.
-    - If the incremented `slot` index exceeds or equals `WD_N_PCI_SLOTS`, it wraps around to 0.
-    - It checks if the slot is available by performing a bitwise AND operation between `wd->pci_slots` and a bitmask with a single bit set at the `slot` position.
-    - If an available slot is found, the loop breaks and the function returns the current `slot` index.
-- **Output**: The function returns a `uint32_t` representing the index of the next available PCI slot.
+    - `wd`: A pointer to a `wd_wksp_t` structure that contains the PCI slot information.
+    - `slot`: The current slot index from which to start searching for the next available slot.
+- **Logic and Control Flow**:
+    - Iterate over the number of PCI slots defined by `WD_N_PCI_SLOTS`.
+    - Increment the `slot` index by one.
+    - If `slot` exceeds or equals `WD_N_PCI_SLOTS`, reset `slot` to 0 to wrap around.
+    - Check if the slot is available by evaluating if the bit corresponding to `slot` is set in `wd->pci_slots`.
+    - Break the loop if an available slot is found.
+- **Output**: Returns the index of the next available PCI slot.
 
 
 ---
 ### \_wd\_set\_vdip\_64<!-- {{#callable:_wd_set_vdip_64}} -->
-The function `_wd_set_vdip_64` sets privileged bytes for a specified slot by iteratively configuring and sending 8-byte values to the FPGA management interface.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L219>)
+
+Sets the virtual DIP switch values for a specified slot and virtual interface using a 64-bit value.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure, which is not used in the function.
-    - `slot`: A `uint32_t` representing the slot ID where the vDIP is to be set.
-    - `vi`: A `uint32_t` representing the virtual interface index used in calculating the vDIP value.
-    - `v`: A `uint64_t` value that is split into bytes and used to set the vDIP.
-- **Control Flow**:
-    - The function begins by casting the `wd` parameter to void, indicating it is unused.
-    - A loop iterates 8 times, corresponding to the 8 bytes of the 64-bit value `v`.
-    - In each iteration, a `vdip` value is initialized to 0xf.
-    - The `vdip` is modified by shifting and adding the current byte of `v` and the calculated index based on `vi`.
-    - The least significant byte of `v` is extracted and shifted into the `vdip`, and `v` is right-shifted by 8 bits to prepare for the next iteration.
-    - The function `fpga_mgmt_set_vDIP` is called with the current `slot` and `vdip` value.
-    - If `fpga_mgmt_set_vDIP` returns a non-zero value, an error is logged, and the function returns -1.
-    - If all iterations complete without error, the function returns 0.
-- **Output**: The function returns 0 on success, or -1 if an error occurs while setting the vDIP.
+    - `wd`: A pointer to a `wd_wksp_t` structure, which is not used in this function.
+    - `slot`: The slot identifier for which the virtual DIP switch values are set.
+    - `vi`: The virtual interface identifier used in calculating the DIP switch values.
+    - `v`: A 64-bit value used to set the virtual DIP switch values.
+- **Logic and Control Flow**:
+    - Ignores the `wd` parameter as it is not used in the function.
+    - Iterates over 8 iterations to set the virtual DIP switch values.
+    - In each iteration, initializes `vdip` to 0xf.
+    - Calculates the DIP switch value by combining the virtual interface and iteration index, and shifts it left by 4 bits.
+    - Extracts the least significant byte of `v`, shifts it left by 8 bits, and combines it with `vdip`.
+    - Shifts `v` right by 8 bits to prepare for the next iteration.
+    - Calls `fpga_mgmt_set_vDIP` to set the DIP switch value for the specified slot.
+    - Logs an error and returns -1 if `fpga_mgmt_set_vDIP` fails.
+    - Returns 0 if all DIP switch values are set successfully.
+- **Output**: Returns 0 on success, or -1 if setting the DIP switch values fails.
 
 
 ---
 ### \_wd\_get\_phys<!-- {{#callable:_wd_get_phys}} -->
-The function `_wd_get_phys` retrieves the physical address corresponding to a given virtual address in memory.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L255>)
+
+Converts a virtual memory address to its corresponding physical address.
 - **Inputs**:
-    - `p`: A pointer to the virtual address whose physical address is to be retrieved.
-- **Control Flow**:
-    - Retrieve the system's page size using `sysconf` with `_SC_PAGESIZE`.
-    - Open the `/proc/self/pagemap` file in read-only mode to access the process's page table entries.
+    - `p`: A pointer to the virtual memory address that needs conversion to a physical address.
+- **Logic and Control Flow**:
+    - Retrieve the system's page size using `sysconf(_SC_PAGESIZE)` and store it in `PAGE_SIZE`.
+    - Open the `/proc/self/pagemap` file in read-only mode to access the pagemap of the current process.
     - Check if the file descriptor `pagemap_fd` is valid; if not, log an error and return 0.
-    - Calculate the virtual page number (`vpn`) by dividing the virtual address by the page size.
-    - Read the page frame number (`pfn`) from the pagemap file using `pread`, handling partial reads in a loop.
-    - Mask the `pfn` to extract the relevant bits for the physical address.
-    - Calculate the physical address by multiplying the `pfn` by the page size and adding the offset within the page.
+    - Calculate the virtual page number `vpn` by dividing the virtual address `vaddr` by `PAGE_SIZE`.
+    - Read the physical frame number `pfn` from the pagemap file using `pread`, handling partial reads in a loop.
+    - If `pread` fails, log an error, close the file descriptor, and return 0.
+    - Mask the `pfn` to extract the physical frame number by applying a bitmask `(1UL << 55) - 1`.
+    - Calculate the physical address by multiplying `pfn` by `PAGE_SIZE` and adding the offset within the page.
     - Close the pagemap file descriptor.
     - Return the calculated physical address.
-- **Output**: The function returns a `uint64_t` representing the physical address corresponding to the input virtual address, or 0 if an error occurs.
+- **Output**: Returns the physical address corresponding to the given virtual address as a `uint64_t`. If an error occurs, returns 0.
 
 
 ---
 ### wd\_ed25519\_verify\_init\_req<!-- {{#callable:wd_ed25519_verify_init_req}} -->
-The `wd_ed25519_verify_init_req` function initializes a request for ED25519 verification by setting up PCI slots and configuring DMA and threshold levels.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L308>)
+
+Initializes the request for ED25519 verification by setting up PCI slots and configuring DMA addresses.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace context.
-    - `send_fails`: A `uint8_t` value indicating the number of send failures to be configured.
-    - `mcache_depth`: A `uint64_t` value representing the depth of the memory cache.
-    - `mcache_addr`: A pointer to the memory cache address.
-- **Control Flow**:
-    - The function begins by setting the request slot and depth in the workspace structure using [`_wd_next_slot`](#_wd_next_slot) and the provided `mcache_depth`.
-    - It calculates the physical address of the memory cache using [`_wd_get_phys`](#_wd_get_phys).
-    - The function iterates over all possible PCI slots, checking if each slot is enabled in `wd->pci_slots`.
-    - For each enabled slot, it sets up threshold levels for a pipe-chain by writing specific values to the PCI configuration space using [`_wd_write_32`](#_wd_write_32).
-    - It configures SHA padding thresholds and writes the `send_fails` value to the PCI configuration space.
-    - The function sets up virtual DIP (vDIP) configurations for DMA using [`_wd_set_vdip_64`](#_wd_set_vdip_64) with the calculated physical address and request depth.
-- **Output**: The function does not return a value; it modifies the `wd` structure and configures the PCI slots.
-- **Functions called**:
-    - [`_wd_next_slot`](#_wd_next_slot)
-    - [`_wd_get_phys`](#_wd_get_phys)
-    - [`_wd_write_32`](#_wd_write_32)
-    - [`_wd_set_vdip_64`](#_wd_set_vdip_64)
+    - ``wd``: A pointer to a `wd_wksp_t` structure that holds workspace data.
+    - ``send_fails``: A `uint8_t` value indicating the number of send failures to be configured.
+    - ``mcache_depth``: A `uint64_t` value representing the depth of the memory cache.
+    - ``mcache_addr``: A pointer to the memory cache address.
+- **Logic and Control Flow**:
+    - Set `wd->sv.req_slot` to the next available slot using [`_wd_next_slot`](<#_wd_next_slot>) function.
+    - Set `wd->sv.req_depth` to `mcache_depth`.
+    - Convert `mcache_addr` to a physical address using [`_wd_get_phys`](<#_wd_get_phys>).
+    - Iterate over each PCI slot up to `WD_N_PCI_SLOTS`.
+    - Check if the current slot is enabled in `wd->pci_slots`.
+    - For each enabled slot, configure threshold levels for pipe-chain using [`_wd_write_32`](<#_wd_write_32>).
+    - Set SHA pad thresholds using [`_wd_write_32`](<#_wd_write_32>).
+    - Write `send_fails` to the PCI slot using [`_wd_write_32`](<#_wd_write_32>).
+    - Set virtual DIP (VDIP) values using [`_wd_set_vdip_64`](<#_wd_set_vdip_64>) with the physical address and request depth.
+- **Output**: No return value; the function modifies the `wd` structure and configures PCI slots.
+- **Functions Called**:
+    - [`_wd_next_slot`](<#_wd_next_slot>)
+    - [`_wd_get_phys`](<#_wd_get_phys>)
+    - [`_wd_write_32`](<#_wd_write_32>)
+    - [`_wd_set_vdip_64`](<#_wd_set_vdip_64>)
 
 
 ---
 ### wd\_ed25519\_verify\_init\_resp<!-- {{#callable:wd_ed25519_verify_init_resp}} -->
-The function `wd_ed25519_verify_init_resp` is a placeholder function that takes a workspace pointer as an argument but performs no operations.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L342>)
+
+Does nothing with the input parameter `wd`.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure, representing the workspace context for the operation.
-- **Control Flow**:
-    - The function takes a single argument, `wd`, which is a pointer to a `wd_wksp_t` structure.
-    - The function explicitly casts the `wd` argument to void to indicate that it is unused.
+    - `wd`: A pointer to a `wd_wksp_t` structure, which is not used in the function.
+- **Logic and Control Flow**:
+    - The function takes a single argument `wd` of type `wd_wksp_t*`.
+    - The function explicitly casts `wd` to void to indicate that it does not use this parameter.
     - No operations or logic are performed within the function body.
-- **Output**: The function does not return any value or produce any output.
+- **Output**: No output is produced as the function body is empty.
 
 
 ---
 ### wd\_ed25519\_verify\_req<!-- {{#callable:wd_ed25519_verify_req}} -->
-The `wd_ed25519_verify_req` function sends a request to verify an Ed25519 signature using a PCIe interface, handling backpressure and data streaming to the FPGA.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L348>)
+
+Processes an ED25519 verification request by managing PCIe slots and streaming data to the FPGA.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace, which includes PCIe slot information and stream buffers.
-    - `msg`: A pointer to the message data that needs to be verified.
+    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace.
+    - `msg`: A pointer to the message data to verify.
     - `sz`: The size of the message in bytes.
-    - `sig`: A pointer to the signature data to be verified.
-    - `public_key`: A pointer to the public key used for verification.
-    - `m_seq`: A 64-bit sequence number used for managing request order and backpressure checks.
+    - `sig`: A pointer to the signature data.
+    - `public_key`: A pointer to the public key data.
+    - `m_seq`: A 64-bit sequence number for the message.
     - `m_chunk`: A 32-bit chunk identifier for the message.
-    - `m_ctrl`: A 16-bit control parameter for the request.
-    - `m_sz`: A 16-bit size parameter for the request.
-- **Control Flow**:
-    - Initialize the PCIe slot and source variables from the workspace structure.
-    - Check for backpressure every 16 requests by examining PCIe buffer levels and pending transactions.
-    - If backpressure is detected, cycle through available PCIe slots to find one that is not backpressured.
-    - If no suitable slot is found within the try limit, return -1 indicating a timeout.
-    - Calculate the DMA address using the sequence number and request depth.
-    - Prepare the stream buffer with magic numbers, size, control, DMA address, sequence number, and chunk information.
-    - Stream the prepared buffer to the PCIe slot using [`_wd_stream_256`](#_wd_stream_256).
-    - Copy the signature and public key into the stream buffer and send them to the PCIe slot.
-    - Iterate over the message in 32-byte chunks, copying each chunk into the stream buffer and sending it to the PCIe slot.
-    - If the number of chunks is odd, send an additional empty buffer to pad the stream for 512-bit alignment.
-    - Flush the write-combining buffers to ensure all data is sent.
-    - Update the request slot in the workspace structure.
-- **Output**: Returns 0 on success, or -1 if a timeout occurs due to backpressure.
-- **Functions called**:
-    - [`_wd_next_slot`](#_wd_next_slot)
-    - [`_wd_read_32`](#_wd_read_32)
-    - [`_wd_stream_256`](#_wd_stream_256)
-    - [`_wd_stream_flush`](#_wd_stream_flush)
+    - `m_ctrl`: A 16-bit control parameter for the message.
+    - `m_sz`: A 16-bit size parameter for the message.
+- **Logic and Control Flow**:
+    - Initialize `slot` with the current request slot from `wd` and set `src` to 0.
+    - Check for backpressure every 16 requests by examining `m_seq`.
+    - If backpressure is detected, iterate through PCIe slots to find one that is not backpressured, using [`_wd_next_slot`](<#_wd_next_slot>) to cycle through slots.
+    - If no suitable slot is found within `WD_TRY_LIMIT` attempts, return -1 indicating a timeout.
+    - Calculate `dma_addr` using `fd_mcache_line_idx` and shift it left by 5 bits.
+    - Prepare the `stream_buf` with magic number, size, control, DMA address, sequence number, and chunk information.
+    - Stream the `stream_buf` to the FPGA using [`_wd_stream_256`](<#_wd_stream_256>).
+    - Copy the signature and public key into `stream_buf` in 32-byte chunks and stream them to the FPGA.
+    - Stream the message data in 32-byte chunks to the FPGA.
+    - If the number of 32-byte chunks is odd, stream an additional buffer to pad the stream for 512-bit alignment.
+    - Flush the write-combining buffers using [`_wd_stream_flush`](<#_wd_stream_flush>).
+    - Update the request slot in `wd` to the current `slot`.
+- **Output**: Returns 0 on success or -1 if a timeout occurs due to backpressure.
+- **Functions Called**:
+    - [`_wd_next_slot`](<#_wd_next_slot>)
+    - [`_wd_read_32`](<#_wd_read_32>)
+    - [`_wd_stream_256`](<#_wd_stream_256>)
+    - [`_wd_stream_flush`](<#_wd_stream_flush>)
 
 
 # Function Declarations (Public API)
 
 ---
 ### \_wd\_read\_32<!-- {{#callable_declaration:_wd_read_32}} -->
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L8>)
+
 Reads a 32-bit value from a specified address on a PCI device.
-- **Description**: This function retrieves a 32-bit value from a given address on a PCI device specified by the `pci` parameter. It is typically used when direct access to the PCI device's memory-mapped registers is required. The function assumes that the PCI device has been properly initialized and is ready for read operations. If the read operation fails, an error is logged, but the function still returns the value read from the address, which may be undefined in case of an error.
+- **Description**: Use this function to read a 32-bit value from a given address on a PCI device specified by the `pci` parameter. This function is typically used in environments where direct interaction with PCI devices is necessary. Ensure that the `pci` parameter is properly initialized and points to a valid PCI device structure before calling this function. The function logs an error if it cannot read from the FPGA, but it still returns the value read, which may be undefined in case of an error.
 - **Inputs**:
-    - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device. Must not be null, and the device should be properly initialized before calling this function.
-    - `addr`: A 32-bit unsigned integer representing the address to read from within the PCI device's memory space. The address should be valid and within the accessible range of the device.
-- **Output**: Returns the 32-bit value read from the specified address. If the read operation fails, the returned value may be undefined.
-- **See also**: [`_wd_read_32`](#_wd_read_32)  (Implementation)
+    - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device. Must not be null and must point to a valid, initialized PCI device structure.
+    - `addr`: The 32-bit address from which to read the value. Must be a valid address within the addressable range of the PCI device.
+- **Output**: Returns the 32-bit value read from the specified address. The value may be undefined if an error occurs during the read operation.
+- **See Also**: [`_wd_read_32`](<#_wd_read_32>)  (Implementation)
 
 
 ---
 ### \_wd\_write\_32<!-- {{#callable_declaration:_wd_write_32}} -->
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L9>)
+
 Writes a 32-bit value to a specified address on a PCI device.
-- **Description**: Use this function to write a 32-bit value to a specific address on a PCI device represented by the `wd_pci_t` structure. This function is typically used in environments where direct interaction with PCI devices is required, such as in FPGA or other hardware interfacing applications. Ensure that the `wd_pci_t` structure is properly initialized and that the address is valid for the intended operation. This function does not perform any error checking on the address or the value being written.
+- **Description**: Use this function to write a 32-bit value to a specific address on a PCI device. It is important to ensure that the `pci` parameter is correctly initialized and points to a valid PCI device structure before calling this function. This function does not perform any error checking on the input parameters, so invalid inputs may lead to undefined behavior. It is typically used in low-level hardware interaction scenarios where direct memory access to PCI devices is required.
 - **Inputs**:
-    - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device. Must not be null and should be properly initialized before calling this function.
-    - `addr`: A 32-bit unsigned integer representing the address on the PCI device where the value will be written. The address should be valid and within the range supported by the device.
-    - `v`: A 32-bit unsigned integer representing the value to be written to the specified address on the PCI device.
+    - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device. Must not be null and must point to a valid, initialized PCI device structure.
+    - `addr`: The 32-bit address on the PCI device where the value will be written. The address must be valid for the device.
+    - `v`: The 32-bit value to write to the specified address on the PCI device.
 - **Output**: None
-- **See also**: [`_wd_write_32`](#_wd_write_32)  (Implementation)
+- **See Also**: [`_wd_write_32`](<#_wd_write_32>)  (Implementation)
 
 
 ---
 ### \_wd\_write\_256<!-- {{#callable_declaration:_wd_write_256}} -->
-Writes 256 bytes of data to a specified offset in PCI memory.
-- **Description**: This function is used to write a block of 256 bytes from a buffer to a specified offset in the PCI memory space associated with a given PCI device. It is typically used in scenarios where large data transfers to PCI devices are required, such as in high-performance computing or FPGA applications. The function assumes that the buffer contains at least 256 bytes of data and that the PCI device has been properly initialized and configured. The offset is specified in bytes and must be aligned to a 256-byte boundary for correct operation. The function does not perform any error checking on the input parameters, so it is the caller's responsibility to ensure that the inputs are valid.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L10>)
+
+Writes 256 bits of data to a specified offset in PCI memory.
+- **Description**: Use this function to write a block of 256 bits (32 bytes) to a specific offset in the PCI memory space associated with a given PCI device. This function is typically used in environments where high-performance data transfer to PCI devices is required. Ensure that the `pci` parameter is properly initialized and that the `buf` parameter points to a valid memory location containing at least 32 bytes of data. The function does not perform any validation on the input parameters, so incorrect usage may lead to undefined behavior.
 - **Inputs**:
-    - `pci`: A pointer to a wd_pci_t structure representing the PCI device. Must not be null and should be properly initialized before calling this function.
-    - `off`: A 64-bit unsigned integer specifying the offset in the PCI memory space where the data should be written. Must be aligned to a 256-byte boundary.
-    - `buf`: A pointer to a buffer containing at least 256 bytes of data to be written. Must not be null.
+    - `pci`: A pointer to a `wd_pci_t` structure representing the PCI device. Must be properly initialized and must not be null.
+    - `off`: A 64-bit unsigned integer specifying the offset in the PCI memory space where the data will be written. The offset is in bytes and should be aligned to 32 bytes.
+    - `buf`: A pointer to a constant memory location containing the data to write. Must point to at least 32 bytes of valid data and must not be null.
 - **Output**: None
-- **See also**: [`_wd_write_256`](#_wd_write_256)  (Implementation)
+- **See Also**: [`_wd_write_256`](<#_wd_write_256>)  (Implementation)
 
 
 ---
 ### \_wd\_stream\_256<!-- {{#callable_declaration:_wd_stream_256}} -->
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L11>)
+
 Writes a 256-byte data block to a specified PCI slot stream.
-- **Description**: This function is used to write a 256-byte block of data to a specific stream within a PCI slot in the workspace. It should be called when there is a need to transfer data to a PCI slot, ensuring that the workspace and slot are properly initialized and valid. The function handles the increment of the stream's address and automatically flushes the stream if certain conditions are met, such as reaching the maximum address or specific address boundaries. This ensures data integrity and proper stream management.
+- **Description**: Use this function to write a 256-byte block of data to a specific stream within a PCI slot. It is important to ensure that the `wd` workspace is properly initialized and that the `slot` index is valid and corresponds to an active PCI slot. The function automatically manages the stream offset and flushes the stream when necessary to maintain data integrity. This function is typically used in environments where data needs to be streamed efficiently to a PCI device.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace. It must be a valid, non-null pointer initialized with the PCI slots.
-    - `slot`: An unsigned 32-bit integer representing the PCI slot index. It must be within the valid range of slots initialized in the workspace.
-    - `buf`: A constant pointer to the data buffer containing the 256 bytes to be written. The buffer must not be null and should contain at least 256 bytes of data.
+    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace. Must not be null and should be properly initialized before calling this function.
+    - `slot`: An unsigned 32-bit integer representing the PCI slot index. Must be a valid slot index within the range of initialized slots.
+    - `buf`: A pointer to a constant buffer containing the data to write. The buffer must contain at least 256 bytes of data.
 - **Output**: None
-- **See also**: [`_wd_stream_256`](#_wd_stream_256)  (Implementation)
+- **See Also**: [`_wd_stream_256`](<#_wd_stream_256>)  (Implementation)
 
 
 ---
 ### \_wd\_stream\_flush<!-- {{#callable_declaration:_wd_stream_flush}} -->
-Flushes the write-combining buffers for a specified PCIe slot.
-- **Description**: This function is used to ensure that all previous writes to a PCIe slot are completed and visible to other components. It should be called when it is necessary to guarantee that all data has been written out from the write-combining buffers, typically after a series of write operations to a PCIe slot. This function does not perform any operations on the provided parameters and is safe to call with any values.
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L12>)
+
+Flushes the write-combining buffers for a specified slot.
+- **Description**: Use this function to ensure that all pending writes to a specified slot in the workspace are completed. This is important in scenarios where data consistency and order of operations are critical. It must be called when you need to guarantee that all previous writes have been committed before proceeding with further operations. This function does not perform any operations on the workspace or slot parameters themselves, as they are not used in the function body.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure. The function does not use this parameter, so it can be any value, including null.
-    - `slot`: A `uint32_t` representing the PCIe slot number. The function does not use this parameter, so it can be any value.
+    - `wd`: A pointer to a `wd_wksp_t` structure. The function does not use this parameter, so it can be any valid pointer.
+    - `slot`: A `uint32_t` representing the slot to flush. The function does not use this parameter, so it can be any valid value.
 - **Output**: None
-- **See also**: [`_wd_stream_flush`](#_wd_stream_flush)  (Implementation)
+- **See Also**: [`_wd_stream_flush`](<#_wd_stream_flush>)  (Implementation)
 
 
 ---
 ### \_wd\_next\_slot<!-- {{#callable_declaration:_wd_next_slot}} -->
+[View Source →](<../../../../../src/wiredancer/c/wd_f1.c#L13>)
+
 Finds the next available PCI slot.
-- **Description**: This function is used to find the next available PCI slot in a workspace, starting from a given slot index. It is useful when iterating over PCI slots to perform operations only on those that are available. The function will wrap around if it reaches the end of the slot list, ensuring that all slots are checked. It should be called when a valid workspace is initialized and the current slot index is known.
+- **Description**: Use this function to find the next available PCI slot in a workspace. It starts searching from the given slot and wraps around if necessary. The function checks each slot in sequence and returns the first available one. This function is useful when you need to cycle through PCI slots and find one that is currently active or available for use.
 - **Inputs**:
-    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace. Must not be null, and should be properly initialized before calling this function.
-    - `slot`: A `uint32_t` representing the current slot index. It should be within the range of available slots, but the function will handle wrapping around if it exceeds the maximum slot index.
-- **Output**: Returns a `uint32_t` representing the index of the next available PCI slot.
-- **See also**: [`_wd_next_slot`](#_wd_next_slot)  (Implementation)
+    - `wd`: A pointer to a `wd_wksp_t` structure representing the workspace. Must not be null.
+    - `slot`: The starting slot index to search from. Must be a valid slot index within the range of available PCI slots.
+- **Output**: Returns the index of the next available PCI slot as a `uint32_t`. If no slots are available, it returns the starting slot.
+- **See Also**: [`_wd_next_slot`](<#_wd_next_slot>)  (Implementation)
 
 
 

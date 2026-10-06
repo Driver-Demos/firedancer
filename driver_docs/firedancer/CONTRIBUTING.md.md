@@ -3,10 +3,48 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Code style rules for Firedancer C, macros, portability, security, and documentation.
+Guidelines for code style, spacing, alignment, type system, documentation, macros, portability, and security in the Firedancer project.
 
 # Purpose
-This document defines code style rules for the Firedancer codebase and gives examples for formatting, spacing, type use, macro design, portability, and security practices. It is a guidance file for contributors, but it is not the final source of truth because the code in `src/tango` defines the actual style. The content sets rules for comment wrap width, file organization, include guards, function prototype layout, integer and boolean types, and macro safety, so it helps keep source files consistent across the repository. It also records build and runtime constraints such as supported compiler targets, seccomp use, file I/O rules, and fuzzing and cleanup patterns that affect safe and portable code.
+The Firedancer Code Style Guide provides guidelines for writing and organizing code within the Firedancer project. It covers various aspects of code style, including text word wrapping, file organization, and file extensions. The guide specifies the use of include guards in header files and discourages the use of `#pragma once`. It emphasizes vertical alignment for readability and provides specific rules for spacing in function calls and control flow statements. The guide also outlines the preferred use of types from `fd_util_base.h` over `stdint.h` and advises against using `bool`, recommending `int` instead. Function documentation is encouraged to be placed before function prototypes for clarity and potential automated extraction. The guide includes recommendations for macro usage, such as enclosing arguments in braces and using `do/while(0)` scopes. It also addresses portability, specifying compatibility with various build environments and platforms, and highlights security practices like fuzz testing and resource management in complex control flows.
+# Content Summary
+The "Firedancer Code Style Guide" is a document that outlines coding conventions for contributors working on the Firedancer project. It is not an authoritative source, as the code style is primarily defined by the code in `src/tango`. The guide provides specific rules and recommendations to ensure consistency and readability across the codebase.
+
+### Key Sections and Rules:
+
+1. **General Guidelines**:
+   - **Text Word Wrap**: Comments should be wrapped at 72 columns for readability.
+   - **Organization**: Avoid cluttering the repository root and refer to `organization.txt` for more details.
+   - **File Extensions**: Defines the purpose of various file extensions like `.c` for C translation units and `.h` for header files.
+   - **Include Guards**: Use `ifndef` include guards in header files instead of `#pragma once`.
+
+2. **Vertical Alignment**:
+   - Encourages vertical alignment of code elements for better readability, especially in macro definitions and function calls.
+
+3. **Spacing Rules**:
+   - **Function Calls**: No spaces for zero-argument functions; spaces inside brackets for functions with arguments.
+   - **Control Flow**: Use `FD_UNLIKELY` for uncommon error paths and follow specific spacing rules for `if` statements.
+   - **Function Prototypes**: Separate modifiers and return types onto different lines and align function arguments vertically.
+
+4. **Type System**:
+   - Use types from `fd_util_base.h` instead of `stdint.h`.
+   - Avoid `bool` and use `int` for boolean values, with `1` as "true" and `0` as "false".
+
+5. **Function Documentation**:
+   - Document functions before their prototypes, especially for public APIs, to facilitate automated documentation extraction.
+
+6. **Macros**:
+   - Enclose macro arguments in braces and use `do/while(0)` for macro bodies to ensure safe execution.
+
+7. **Portability**:
+   - Firedancer aims to compile in any LP64 environment and supports various platforms and architectures.
+   - Stick to ISO C17 and ensure compatibility with GCC, Clang, and CBMC.
+
+8. **Security**:
+   - Emphasizes fuzz testing and error handling.
+   - Provides guidelines for managing complex function exits and resource cleanup.
+
+The guide also includes specific instructions for handling file I/O, using `fd_io` over `stdio.h`, and managing system calls with seccomp on Linux platforms. It aims to maintain code quality and security while ensuring the codebase is accessible and maintainable for all contributors.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

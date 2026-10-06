@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated seccomp filter allowing write and fsync on selected file descriptors.
+Defines a seccomp filter policy for syscall access control based on architecture and file descriptors.
 
 
 ## Files
-- **[fd_shredcap_tile_seccomp.h](fd_shredcap_tile_seccomp.h.md)**: Generated seccomp filter allowing write and fsync on selected file descriptors.
+- **[fd_shredcap_tile_seccomp.h](fd_shredcap_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall access control based on architecture and file descriptors.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
