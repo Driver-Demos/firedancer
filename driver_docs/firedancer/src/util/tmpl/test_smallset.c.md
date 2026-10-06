@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_smallset.c` file contains a comprehensive suite of tests for the `fd_smallset` module, verifying the functionality of set operations such as union, intersection, complement, and range manipulation within the `firedancer` codebase.
+Tests for the `fd_smallset` implementation, verifying set operations and properties.
 
 # Purpose
-This C source code file is a comprehensive test suite for a small set data structure, which is implemented in the included "fd_smallset.c" file. The code is designed to verify the correctness and functionality of various set operations, such as creation, manipulation, and comparison of sets. It includes tests for operations like union, intersection, complement, subset, and element insertion/removal, among others. The file defines a maximum set size of 63 and uses integer indices to manage set elements. The test suite is thorough, covering edge cases and ensuring that the set operations behave as expected under different conditions.
+The code is a C program that serves as a test suite for a small set data structure. It includes various operations on sets, such as creation, manipulation, and validation of set properties. The program uses a set of macros and functions defined in the included `fd_smallset.c` file to perform operations like union, intersection, complement, and subset checks on sets. The code tests these operations by creating different types of sets (e.g., null, full, and element-specific sets) and verifying their properties through assertions.
 
-The code is structured as an executable program, with a [`main`](#main) function that initializes a random number generator and performs a series of tests on the set operations. It uses a variety of macros and functions to manipulate sets and validate their properties, such as checking if a set is null or full, counting elements, and iterating over elements. The file also includes conditional compilation directives to handle different environments, such as hosted systems, and uses logging and assertions to report test results. The purpose of this file is to ensure the reliability and correctness of the small set implementation by systematically testing all its functionalities.
+The program begins by initializing a random number generator and defining a maximum set size. It then performs a series of tests to ensure that the set operations behave as expected. These tests include checking the equality of sets, validating set contents, and iterating over set elements. The code also includes conditional compilation directives to handle different environments, such as hosted systems. The main function concludes by cleaning up resources and logging the test results. This program is intended to verify the correctness and reliability of the set operations provided by the `fd_smallset.c` library.
 # Imports and Dependencies
 
 ---
@@ -23,22 +23,25 @@ The code is structured as an executable program, with a [`main`](#main) function
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a random number generator, performs a series of tests on set operations, and validates the correctness of these operations using assertions.
+[View Source →](<../../../../../src/util/tmpl/test_smallset.c#L17>)
+
+Initializes the environment, performs a series of set operations and tests, and then cleans up before exiting.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program with `fd_boot` and set up a random number generator `rng`.
-    - Determine the maximum index `max` using `set_max` and verify it matches the defined `MAX`.
-    - Calculate the sum of all indices from 1 to `max` and store it in `sum_full`.
-    - Initialize several sets (`null`, `f0`, `f1`, `full`, `n0`, `n1`) and verify their initial states (null or full).
-    - Perform a series of tests on set operations (e.g., `set_ele`, `set_complement`, `set_union`, `set_intersect`, `set_subtract`, `set_xor`, `set_if`) within a loop iterating over all indices up to `max`.
-    - For each index, test various properties and operations on sets, including equality, subset, and validity checks.
-    - Iterate over ranges of indices to test range-based set operations (`set_range`, `set_insert_range`, `set_select_range`, `set_remove_range`) and verify their correctness.
-    - If hosted environment and handholding are enabled, test critical logging behavior for certain operations that should trigger critical logs.
-    - Verify final states of sets `n0`, `n1`, `f0`, and `f1` to ensure they are null or full as expected.
-    - Clean up by deleting the random number generator and log a success message before halting the program.
-- **Output**: The function returns an integer value `0` indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Initializes a random number generator `rng`.
+    - Sets `max` to the maximum index value using `set_max` and verifies it with `FD_TEST`.
+    - Calculates `sum_full` as the sum of all indices from 1 to `max`.
+    - Initializes several sets (`null`, `f0`, `f1`, `full`, `n0`, `n1`) and verifies their states using `FD_TEST`.
+    - Performs a series of set operations and tests within a loop iterating over indices from 0 to `max`.
+    - Tests set operations such as `set_ele`, `set_complement`, `set_union`, `set_intersect`, `set_subtract`, `set_xor`, `set_insert`, `set_remove`, and their conditional variants.
+    - Iterates over set elements using `set_iter_t` and verifies sums of indices.
+    - Performs range-based set operations and tests their correctness.
+    - Optionally tests critical logging behavior if hosted environment is available.
+    - Cleans up by deleting the random number generator and halting the environment.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 
