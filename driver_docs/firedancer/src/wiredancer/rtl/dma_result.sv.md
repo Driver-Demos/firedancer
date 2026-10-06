@@ -3,51 +3,50 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a DMA result module for PCIe data handling with various input and output signals.
+The `dma_result.sv` file in the `firedancer` codebase implements a SystemVerilog module for handling DMA results, including interfacing with PCIe and managing data flow through various logic and FIFO structures.
 
 # Purpose
-The `dma_result` module is a Verilog hardware description that manages Direct Memory Access (DMA) operations across multiple PCIe interfaces. It is parameterized by `N_PCIE`, which defines the number of PCIe interfaces it supports. The module handles input and output signals related to DMA requests and responses, including control and data signals. It processes external PCIe signals (`ext_v`, `ext_r`, `ext_e`, `ext_m`) and result signals (`res_v`, `res_t`, `res_d`) to generate DMA control signals (`dma_v`, `dma_a`, `dma_b`, `dma_d`) and result control signals (`res_c`, `res_f`, `res_p`).
+The provided Verilog code defines a module named `dma_result`, which is designed to handle Direct Memory Access (DMA) operations in a system with multiple PCIe interfaces. The module is parameterized by `N_PCIE`, which specifies the number of PCIe interfaces it supports, allowing for scalable integration into systems with varying numbers of PCIe connections. The primary functionality of this module is to manage the flow of data between external PCIe interfaces and internal system components, ensuring data integrity and synchronization through various control signals and data paths.
 
-The module uses several internal components to manage data flow and control logic. It includes a `generate` block that iterates over each PCIe interface, creating instances of `piped_wire`, `showahead_fifo`, and `tid_inorder` modules to handle signal processing and data buffering. The `rrb_merge` module is used to merge the results from multiple PCIe interfaces into a single output. The module also includes logic to adjust DMA addresses based on a private base and mask, ensuring secure and correct memory access. The design is synchronized with a clock (`clk`) and can be reset using a reset signal (`rst`).
+Key components of the `dma_result` module include the use of pipelined wires and FIFOs to manage data flow and buffering, as well as a round-robin merge mechanism (`rrb_merge`) to consolidate data from multiple PCIe interfaces into a single output stream. The module also incorporates address manipulation and control signal generation to facilitate DMA operations, with specific attention to address masking and base address adjustments for privacy and security. The use of `always_ff` blocks ensures that operations are synchronized with the system clock, maintaining data consistency across clock cycles. Overall, this module provides a focused and efficient solution for managing DMA transactions in a multi-PCIe environment, making it a critical component in systems requiring high-speed data transfer and processing.
 # Modules
 
 ---
 ### dma\_result
-Manages data transfer between PCIe interfaces and internal components. Uses pipelining and FIFO structures to handle data flow and control signals.
+The `dma_result` module is responsible for handling Direct Memory Access (DMA) operations, interfacing with PCIe and managing data flow through various input and output ports. It includes logic for data processing, control signal management, and integration with external modules for data handling and synchronization.
 - **Constants**:
-    - ``N_PCIE``: Defines the number of PCIe interfaces, set to 2.
+    - `N_PCIE`: Defines the number of PCIe interfaces, set to 2 by default.
 - **Ports**:
-    - ``dma_r``: Input signal for DMA read request.
-    - ``dma_v``: Output signal indicating DMA valid data.
-    - ``dma_a``: Output address for DMA operations.
-    - ``dma_b``: Output auxiliary address for DMA operations.
-    - ``dma_f``: Input signal for DMA fail condition.
-    - ``dma_d``: Output data for DMA operations.
-    - ``ext_v``: Input valid signal from external PCIe interfaces.
-    - ``ext_r``: Input ready signal from external PCIe interfaces.
-    - ``ext_e``: Input enable signal from external PCIe interfaces.
-    - ``ext_m``: Input metadata from external PCIe interfaces.
-    - ``res_v``: Input valid signal for result data.
-    - ``res_t``: Input timestamp or tag for result data.
-    - ``res_d``: Input data signal for result data.
-    - ``res_c``: Output control signal for result data.
-    - ``res_f``: Output fail signal for result data.
-    - ``res_p``: Output processed signal for result data.
-    - ``priv_base``: Input base address for private data.
-    - ``priv_mask``: Input mask for private data address.
-    - ``send_fails``: Input signal indicating send failures.
-    - ``clk``: Clock signal for synchronization.
-    - ``rst``: Reset signal to initialize the module.
-- **Logic and Control Flow**:
-    - Uses a `generate` block to create instances of logic for each PCIe interface defined by `N_PCIE`.
-    - Assigns `dma_a` by masking the lower bits of `dma_aa` to zero.
-    - In the `generate` block, assigns `dma_p_v` based on several conditions including `res_o_v`, `dma_m_v`, and `send_fails`.
-    - Uses `always_ff` blocks to update `res_p` and process `ext_p_v` and `ext_p_m` on the rising edge of `clk`.
-    - Implements a `piped_wire` instance to handle pipelined data from external PCIe interfaces.
-    - Uses a `showahead_fifo` instance to buffer and manage data flow with a depth of 512.
-    - Implements a `tid_inorder` instance to manage transaction IDs in order with a depth of 2048.
-    - Uses an `rrb_merge` instance to merge data from multiple PCIe interfaces into a single output stream.
-    - Includes a `$display` statement to log the state of `dma_p_r`, `dma_p_v`, `dma_r`, and `dma_v` when `dma_p_v` is active.
+    - `dma_r`: Input wire for DMA read signal.
+    - `dma_v`: Output logic for DMA valid signal.
+    - `dma_a`: Output logic for DMA address A.
+    - `dma_b`: Output logic for DMA address B.
+    - `dma_f`: Input wire for DMA flag signal.
+    - `dma_d`: Output logic for DMA data.
+    - `ext_v`: Input wire array for external valid signals for each PCIe interface.
+    - `ext_r`: Input wire array for external ready signals for each PCIe interface.
+    - `ext_e`: Input wire array for external enable signals for each PCIe interface.
+    - `ext_m`: Input wire array for external metadata for each PCIe interface.
+    - `res_v`: Input wire array for result valid signals for each PCIe interface.
+    - `res_t`: Input wire array for result tag signals for each PCIe interface.
+    - `res_d`: Input wire array for result data signals for each PCIe interface.
+    - `res_c`: Output logic array for result control signals for each PCIe interface.
+    - `res_f`: Output logic array for result flag signals for each PCIe interface.
+    - `res_p`: Output logic array for result parity signals for each PCIe interface.
+    - `priv_base`: Input wire for private base address.
+    - `priv_mask`: Input wire for private mask address.
+    - `send_fails`: Input wire for send failure signal.
+    - `clk`: Input wire for clock signal.
+    - `rst`: Input wire for reset signal.
+- **Logic And Control Flow**:
+    - The module uses a `generate` block to create instances of logic for each PCIe interface, iterating over `N_PCIE`.
+    - Within the `generate` block, it assigns control and data signals for each PCIe interface, using logic to determine valid and ready states.
+    - The `piped_wire` instance is used to pipeline external signals, ensuring synchronization with the clock and reset signals.
+    - A `showahead_fifo` is instantiated to buffer and manage data flow, with a depth of 512 entries.
+    - The `tid_inorder` instance manages transaction IDs in order, ensuring data integrity and order across PCIe interfaces.
+    - The `rrb_merge` instance merges read and valid signals from multiple PCIe interfaces, outputting combined results.
+    - An `always_ff` block is used to update result parity signals based on the clock, ensuring data consistency.
+    - A `$display` statement is used for debugging, printing the state of DMA signals when any valid signal is active.
 
 
 
