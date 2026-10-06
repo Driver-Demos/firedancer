@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_retry_private.h` file defines constants and a function related to the encoding and handling of QUIC Retry packets in the Firedancer project.
+Defines constants and a function for handling QUIC Retry packet encoding and pseudo-header generation.
 
 # Purpose
-This C header file, `fd_quic_retry_private.h`, is part of a QUIC protocol implementation, specifically dealing with the Retry packet mechanism. It defines constants and a function prototype related to the encoding and handling of QUIC Retry packets. The file includes other headers and a source file, suggesting it relies on shared definitions and implementations for QUIC protocol operations. Key constants defined include `FD_QUIC_RETRY_MAX_PSEUDO_SZ` and `FD_QUIC_RETRY_MAX_SZ`, which specify the maximum sizes for encoded Retry pseudo headers and packets, respectively. Additionally, `FD_QUIC_RETRY_EXPIRE_SHIFT` is defined to manage timestamp precision by right-shifting expiry timestamps, although it notes a potential issue with slower clocks. The function [`fd_quic_retry_pseudo`](#fd_quic_retry_pseudo) is declared to generate a pseudo header for a Retry packet, indicating its role in packet processing.
+This C header file defines constants and a function related to the handling of QUIC Retry packets in a network protocol implementation. It includes other headers and a source file that provide necessary dependencies for QUIC protocol operations. The file defines maximum sizes for encoded Retry pseudo headers and Retry packets using macros `FD_QUIC_RETRY_MAX_PSEUDO_SZ` and `FD_QUIC_RETRY_MAX_SZ`, respectively. It also defines a macro `FD_QUIC_RETRY_EXPIRE_SHIFT` to manage the precision of expiry timestamps by right-shifting them, which reduces the risk of leaking high-precision timing information. The function [`fd_quic_retry_pseudo`](<#fd_quic_retry_pseudo>) is declared to generate a pseudo header for a Retry packet, taking parameters such as the output buffer, the Retry packet, its size, and the original destination connection ID.
 # Imports and Dependencies
 
 ---
@@ -19,15 +19,17 @@ This C header file, `fd_quic_retry_private.h`, is part of a QUIC protocol implem
 
 ---
 ### fd\_quic\_retry\_pseudo<!-- {{#callable_declaration:fd_quic_retry_pseudo}} -->
-Constructs a QUIC Retry pseudo-packet.
-- **Description**: This function constructs a QUIC Retry pseudo-packet and writes it to the provided output buffer. It should be used when a Retry pseudo-packet needs to be generated for a QUIC connection, typically during the handling of a Retry packet. The function requires a valid Retry packet and the original destination connection ID. The size of the Retry packet must be greater than the size of a QUIC crypto tag and less than or equal to the maximum allowed Retry packet size. The function returns the size of the constructed pseudo-packet.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_retry_private.h#L32>)
+
+Generates a QUIC Retry pseudo-packet.
+- **Description**: Use this function to create a QUIC Retry pseudo-packet from a given retry packet and original destination connection ID. Ensure that the size of the retry packet is greater than `FD_QUIC_CRYPTO_TAG_SZ` and does not exceed `FD_QUIC_RETRY_MAX_SZ`. The function writes the pseudo-packet to the provided output buffer and returns the size of the generated pseudo-packet. Callers must ensure that the output buffer is large enough to hold the maximum possible pseudo-packet size, defined by `FD_QUIC_RETRY_MAX_PSEUDO_SZ`.
 - **Inputs**:
-    - `out`: A buffer where the constructed pseudo-packet will be written. It must have a size of at least FD_QUIC_RETRY_MAX_PSEUDO_SZ bytes. The caller retains ownership.
-    - `retry_pkt`: A pointer to the Retry packet data. It must not be null, and the data should be valid and properly formatted.
-    - `retry_pkt_sz`: The size of the Retry packet in bytes. It must be greater than FD_QUIC_CRYPTO_TAG_SZ and less than or equal to FD_QUIC_RETRY_MAX_SZ. If the size is outside this range, the function will return FD_QUIC_PARSE_FAIL.
-    - `orig_dst_conn_id`: A pointer to the original destination connection ID structure. It must not be null, and the structure should contain a valid connection ID.
-- **Output**: The function returns the size of the constructed pseudo-packet in bytes. If the input Retry packet size is invalid, it returns FD_QUIC_PARSE_FAIL.
-- **See also**: [`fd_quic_retry_pseudo`](fd_quic_retry.c.md#fd_quic_retry_pseudo)  (Implementation)
+    - `out`: A buffer where the function writes the generated pseudo-packet. The buffer must have a size of at least `FD_QUIC_RETRY_MAX_PSEUDO_SZ`. The caller retains ownership.
+    - `retry_pkt`: A pointer to the retry packet data. The data must be valid and the size must be within the specified range. The caller retains ownership.
+    - `retry_pkt_sz`: The size of the retry packet. It must be greater than `FD_QUIC_CRYPTO_TAG_SZ` and less than or equal to `FD_QUIC_RETRY_MAX_SZ`. If not, the function returns `FD_QUIC_PARSE_FAIL`.
+    - `orig_dst_conn_id`: A pointer to the original destination connection ID structure. It must not be null and must contain valid connection ID data. The caller retains ownership.
+- **Output**: Returns the size of the generated pseudo-packet, or `FD_QUIC_PARSE_FAIL` if the input size is invalid.
+- **See Also**: [`fd_quic_retry_pseudo`](<fd_quic_retry.c.md#fd_quic_retry_pseudo>)  (Implementation)
 
 
 
