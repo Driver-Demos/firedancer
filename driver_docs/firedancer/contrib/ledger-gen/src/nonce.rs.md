@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `nonce.rs` file in the `firedancer` codebase provides functionality for creating and managing nonce accounts on the Solana blockchain, including creating transactions with nonce blockhashes and confirming them.
+Creates and manages Solana nonce accounts using RPC client interactions and transaction handling.
 
 # Purpose
-This Rust source code file defines a function `create_nonce_account` that interacts with the Solana blockchain to create and manage nonce accounts. The primary purpose of this code is to facilitate the creation of a nonce account, which is a special type of account used in Solana to ensure transaction uniqueness and prevent replay attacks. The function utilizes the Solana SDK and client libraries to perform blockchain operations such as fetching the latest blockhash, creating and signing transactions, and sending them to the network. It also handles the retrieval and verification of nonce account states to ensure they are properly initialized before use.
+The code defines a function `create_nonce_account` that interacts with the Solana blockchain to create and manage nonce accounts. It uses the `RpcClient` to communicate with the Solana network and perform operations such as fetching the latest blockhash, sending transactions, and confirming them. The function first creates a nonce account using instructions from the `instructions` module and signs the transaction with the provided `payer` keypair. It then retrieves and prints the nonce blockhash from the initialized nonce account.
 
-The code is structured to perform a series of operations: it first creates a nonce account with a specified balance, then opens a new account using the nonce account for transaction signing. It repeatedly checks and updates the nonce blockhash to ensure the transactions are valid and can be confirmed by the network. The function makes use of utility functions from the `instructions` and `utils` modules, indicating a modular design where specific tasks are delegated to these components. This file is likely part of a larger application or library that interacts with the Solana blockchain, providing a specific functionality related to nonce account management.
+The function also demonstrates how to open a new account with a minimum balance for rent exemption, using the nonce account for transaction signing. It includes logic to wait for a certain number of slots to pass, ensuring that the nonce blockhash is updated before sending further transactions. The code uses utility functions from the `utils` module to handle message creation, signing, and waiting for slot confirmations. This function is part of a broader system that manages nonce accounts and transactions on the Solana blockchain.
 # Imports and Dependencies
 
 ---
@@ -23,25 +23,27 @@ The code is structured to perform a series of operations: it first creates a non
 
 ---
 ### create\_nonce\_account
-The `create_nonce_account` function creates a nonce account on the Solana blockchain, initializes it, and uses it to open new accounts with nonce-based transactions.
+Creates a nonce account and performs transactions using the Solana blockchain client.
 - **Inputs**:
-    - `client`: An instance of `RpcClient` used to interact with the Solana blockchain.
-    - `payer`: A `Keypair` representing the account that will pay for the transactions and account creation fees.
-- **Control Flow**:
-    - Retrieve the latest blockhash from the Solana blockchain using the `client`.
-    - Generate nonce account creation instructions using the `instructions::create_nonce_account_instructions` function.
-    - Create and sign a transaction with the nonce account creation instructions and send it to the blockchain using the `client`.
-    - Print the public key of the created nonce account and the current slot number.
-    - Retrieve the nonce blockhash from the initialized nonce account using `get_account_with_commitment` and `nonblocking::state_from_account`.
-    - Create a new `Keypair` for a new account and determine the minimum balance required for rent exemption.
-    - Create an account creation instruction for the new account and construct a nonce-based message using `Message::new_with_nonce`.
-    - Sign the transaction with the payer and new account keypairs, then send and confirm the transaction using the `client`.
-    - Print the public key of the newly opened account.
+    - `client`: An `RpcClient` instance used to interact with the Solana blockchain.
+    - `payer`: A `Keypair` instance representing the payer of the transaction fees.
+- **Logic and Control Flow**:
+    - Get the latest blockhash from the `client`.
+    - Call `instructions::create_nonce_account_instructions` to get the nonce account and instructions for creating it.
+    - Create and sign a transaction with the nonce account creation instructions and send it using the `client`.
+    - Print the created nonce account's public key and the current slot.
+    - Retrieve the nonce blockhash from the initialized nonce account state.
+    - Create a new keypair for a new account.
+    - Get the minimum balance required for rent exemption for a nonce account.
+    - Create an account creation instruction for the new account with the minimum balance and system program ID.
+    - Create a message with the nonce and sign it with the payer and new account keypairs.
+    - Send and confirm the transaction using the `client`.
+    - Print the opened account's public key.
     - Wait for at least two slots to pass using `utils::wait_atleast_n_slots`.
-    - Repeat the process of retrieving the nonce blockhash, creating a new account, and sending a nonce-based transaction to open the account.
-    - Print the transaction details and wait for additional slots to pass before sending and confirming the transaction again.
-    - Retrieve and print the nonce blockhash from the nonce account after the final transaction.
-- **Output**: The function does not return any value, but it prints the public keys of the created nonce and new accounts, the nonce blockhash, and transaction details to the console.
+    - Repeat the process of retrieving the nonce blockhash, creating a new account, and sending a transaction.
+    - Print the transaction details and wait for at least two slots again.
+    - Retrieve and print the nonce blockhash again.
+- **Output**: No return value; the function performs actions on the Solana blockchain and prints information to the console.
 
 
 

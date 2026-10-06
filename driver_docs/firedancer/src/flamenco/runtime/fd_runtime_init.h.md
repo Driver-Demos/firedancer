@@ -3,14 +3,33 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-APIs for restoring Solana runtime feature accounts from the accounts database.
+APIs for backing up and restoring a Solana runtime environment without depending on fd_executor.h.
 
 # Purpose
-This header defines the interface for runtime initialization support in the Flamenco runtime. It declares constants for runtime encoding formats, including `FD_RUNTIME_ENC_BINCODE` and `FD_RUNTIME_ENC_ARCHIVE`, and it defines `FD_FEATURE_SIZEOF` for feature account data size. The file also declares [`fd_features_restore`](<#fd_features_restore>), which loads all known feature accounts from the accounts database when a bank is initialized from a snapshot. The include guard and header comment also state that the file must not depend on `fd_executor.h`, which keeps the initialization interface separate from executor code.
+The `fd_runtime_init.h` file is a C header file that provides APIs for backing up and restoring a Solana runtime environment. It includes necessary dependencies from `fd_flamenco_base.h` and `fd_funk_rec.h` but explicitly avoids dependencies on `fd_executor.h`. The file defines constants for encoding types, such as `FD_RUNTIME_ENC_BINCODE` for classic bincode encoding and `FD_RUNTIME_ENC_ARCHIVE` for archival encoding. It also specifies the size of a feature with `FD_FEATURE_SIZEOF`. The function [`fd_features_restore`](<#fd_features_restore>) is declared to load all known feature accounts from the accounts database, which is used during the initialization of a bank from a snapshot.
+# Imports and Dependencies
+
+---
+- `../fd_flamenco_base.h`
+- `../../funk/fd_funk_rec.h`
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_features_restore`
+### fd\_features\_restore<!-- {{#callable_declaration:fd_features_restore}} -->
+[View Source →](<../../../../../src/flamenco/runtime/fd_runtime_init.h#L16>)
+
+Loads all known feature accounts from the accounts database.
+- **Description**: Use this function to initialize a bank from a snapshot by loading all known feature accounts. It is important to call this function during the initialization phase to ensure that the bank has access to the necessary feature accounts. The function iterates over all feature IDs and restores them into the provided bank and funk context. Ensure that the bank and funk pointers are valid and properly initialized before calling this function.
+- **Inputs**:
+    - `bank`: A pointer to an `fd_bank_t` structure where the feature accounts will be restored. Must not be null and should be properly initialized before calling.
+    - `funk`: A pointer to an `fd_funk_t` structure representing the funk context. Must not be null and should be properly initialized before calling.
+    - `xid`: A pointer to a constant `fd_funk_txn_xid_t` structure representing the transaction ID. Must not be null.
+- **Output**: None
+- **See Also**: [`fd_features_restore`](<fd_runtime_init.c.md#fd_features_restore>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

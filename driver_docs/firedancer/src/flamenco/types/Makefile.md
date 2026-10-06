@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/flamenco/types` directory orchestrates the build process, cleaning, and generation of stubs and fuzz types using Python scripts.
+Makefile for building, cleaning, and generating stubs in the Flamenco types directory.
 
 # Purpose
-This Makefile is used to automate tasks in a software project. It defines targets for building (`all`), cleaning (`clean`), and generating stubs (`stubs`) using Python scripts. The `stubs` target depends on `fd_types.json` and executes Python scripts to generate code from header files, facilitating code maintenance and testing.
+This Makefile defines several targets for building and cleaning a project. The `PYTHON` variable specifies the Python interpreter to use, defaulting to `python3`. The `all` target runs a make command in the parent directory, while the `clean` target runs a make clean command in the parent directory to remove build artifacts. The `stubs` target generates stub files by executing Python scripts `gen_stubs.py` and `gen_fuzz.py` with specified input files, using the Python interpreter defined by the `PYTHON` variable. The `.PHONY` directive marks the `all`, `clean`, and `stubs` targets as phony, indicating they do not correspond to actual files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
