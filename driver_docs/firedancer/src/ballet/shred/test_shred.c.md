@@ -3,81 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for parsing and validating different types of shreds, including legacy and Merkle variants.
+Unit tests for shred parsing, type checks, size checks, and legacy shred fixtures.
 
 # Purpose
-The code is a C program designed to test the parsing and validation of different types of data structures referred to as "shreds." It includes static assertions to verify the memory layout of the `fd_shred_t` structure, ensuring that specific fields are located at expected offsets. The program defines several static byte arrays representing different types of legacy shreds, which are used as test fixtures. The main function initializes the environment and iterates over possible shred variants, creating test shreds and validating their properties based on their type. It checks for various shred characteristics, such as whether they are legacy, merkle, data, or code shreds, and performs size calculations for headers, merkle nodes, and payloads.
+This file is a unit test for the `fd_shred` API. It checks the memory layout of `fd_shred_t` with `FD_STATIC_ASSERT`, then verifies shred parsing rules for all possible variant bytes. The test builds fake shred buffers, checks which type values are valid, and confirms that `fd_shred_parse`, `fd_shred_type`, `fd_shred_merkle_cnt`, `fd_shred_header_sz`, `fd_shred_payload_sz`, and `fd_shred_merkle_sz` return the expected results for legacy and Merkle shred forms.
 
-The program uses a series of tests to ensure that shreds are correctly parsed and validated. It checks the validity of shred types, calculates expected sizes for different components of the shreds, and verifies that the parsed shreds match expected properties. The code also includes tests for specific legacy shreds, comparing parsed results against known values. Additionally, it tests the functionality of swapping shred types using the `fd_shred_swap_type` function. The program logs the results of these tests and concludes by halting the environment. This code is intended to be executed as a standalone test suite for verifying the correctness of shred parsing and validation logic.
-# Imports and Dependencies
-
----
-- `fd_shred.h`
-- `stddef.h`
-
-
-# Global Variables
-
----
-### fixture\_legacy\_coding\_shred
-- **Type**: ``static uchar const``
-- **Description**: An array of unsigned characters that represents a legacy coding shred. The array is initialized with a sequence of hexadecimal values.
-- **Use**: Used to store a predefined set of data for testing or processing legacy coding shreds.
-
-
----
-### fixture\_legacy\_data\_shred
-- **Type**: ``static uchar const``
-- **Description**: An array of unsigned characters that represents a legacy data shred fixture. It is initialized with a sequence of hexadecimal values and has a size defined by `FD_SHRED_MAX_SZ`. This array is used to test the parsing and validation of legacy data shreds in the program.
-- **Use**: Used as a test fixture for parsing and validating legacy data shreds.
-
-
----
-### fixture\_legacy\_data\_shred\_empty
-- **Type**: ``static uchar const``
-- **Description**: An array of unsigned characters that represents a predefined set of data bytes for a legacy data shred. The array is initialized with a specific sequence of hexadecimal values.
-- **Use**: Used as a fixture for testing or processing legacy data shreds in the program.
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/shred/test_shred.c#L59>)
-
-Tests shred parsing rules and validates different shred types using predefined fixtures.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Iterates over 256 possible shred variants to test parsing rules.
-    - Creates a fake shred buffer and sets its type based on the loop index.
-    - Checks if the buffer size is sufficient for the largest shred variant using `FD_STATIC_ASSERT`.
-    - Determines shred type characteristics (legacy, merkle, data, code, resigned, chained, valid) based on the loop index.
-    - Calculates header, merkle, chained root, resigned, and payload sizes based on shred type.
-    - Writes the data size to the buffer if the shred is a data type.
-    - Performs type-specific bounds checks and logs the shred variant details if valid.
-    - Parses the shred using [`fd_shred_parse`](<fd_shred.c.md#fd_shred_parse>) and verifies its properties against expected values.
-    - Parses predefined legacy data and coding shreds using the `PARSE` macro and verifies their properties.
-    - Tests shred type swapping using [`fd_shred_swap_type`](<fd_shred.h.md#fd_shred_swap_type>).
-    - Logs a success message and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_shred_merkle_cnt`](<fd_shred.h.md#fd_shred_merkle_cnt>)
-    - [`fd_shred_parse`](<fd_shred.c.md#fd_shred_parse>)
-    - [`fd_shred_variant`](<fd_shred.h.md#fd_shred_variant>)
-    - [`fd_shred_type`](<fd_shred.h.md#fd_shred_type>)
-    - [`fd_shred_header_sz`](<fd_shred.h.md#fd_shred_header_sz>)
-    - [`fd_shred_payload_sz`](<fd_shred.h.md#fd_shred_payload_sz>)
-    - [`fd_shred_merkle_sz`](<fd_shred.h.md#fd_shred_merkle_sz>)
-    - [`fd_shred_is_data`](<fd_shred.h.md#fd_shred_is_data>)
-    - [`fd_shred_is_code`](<fd_shred.h.md#fd_shred_is_code>)
-    - [`fd_shred_is_chained`](<fd_shred.h.md#fd_shred_is_chained>)
-    - [`fd_shred_is_resigned`](<fd_shred.h.md#fd_shred_is_resigned>)
-    - [`fd_shred_swap_type`](<fd_shred.h.md#fd_shred_swap_type>)
-
-
+The file also contains fixed byte fixtures for legacy data and code shreds, including an empty legacy data shred. It parses each fixture and checks that the fields in `fd_shred_t` match the expected values, such as `signature`, `slot`, `idx`, `version`, `fec_set_idx`, and the data or code subfields. At the end, it verifies `fd_shred_swap_type` for each supported shred type and exits after logging `pass`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

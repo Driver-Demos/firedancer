@@ -3,52 +3,52 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A Bash script to test inter-process communication (IPC) using shared memory and NUMA node configuration.
+The `test_ipc_full` file is a Bash script used to test inter-process communication (IPC) by setting up and running transmitter and receiver processes on specified CPU cores, utilizing shared memory objects, and then halting them after a set duration.
 
 # Purpose
-This script is a Bash executable designed to facilitate inter-process communication (IPC) testing. It requires a configuration file, `tmp/test_ipc.conf`, to be present and initialized with shared memory objects. The script sets up and manages the execution of receiver and transmitter processes, using CPU core and NUMA node configurations to optimize performance. It uses the `taskset` command to assign specific CPU cores to these processes, ensuring they run on the desired hardware resources. After starting the processes, the script allows them to run for a specified duration before sending halt commands to terminate them gracefully.
+This Bash script is designed to facilitate inter-process communication (IPC) testing by orchestrating the execution of receiver and transmitter processes on a system with specific CPU and NUMA configurations. It provides a narrow functionality focused on setting up and managing the execution environment for these processes, ensuring they run on designated CPU cores and NUMA nodes. The script checks for necessary prerequisites, such as the existence of a configuration file (`tmp/test_ipc.conf`) and the initialization of shared memory objects, before proceeding. It dynamically constructs and executes commands to start receiver and transmitter processes using `taskset` to bind them to specific CPU cores, and it manages their execution lifecycle by sending halt signals after a predefined duration. This script is not an executable in the traditional sense but rather a utility script intended to be run in a testing environment to validate IPC mechanisms.
 # Global Variables
 
 ---
 ### FD\_LOG\_PATH
-- **Type**: ``string``
-- **Description**: `FD_LOG_PATH` is a global variable that is initialized as an empty string. It is intended to store the path for log files, but in the current script, it is not assigned any specific value or used further.
-- **Use**: Stores the path for log files, but remains unused in the current script.
+- **Type**: `string`
+- **Description**: The `FD_LOG_PATH` variable is a global string variable initialized to an empty string. It is intended to store the path to a log file or directory for logging purposes.
+- **Use**: This variable is used to define and export the log path for the script, although it is not actively used within the provided code.
 
 
 ---
 ### rx\_cnt
-- **Type**: ``int``
-- **Description**: The `rx_cnt` variable is an integer that represents the number of receiver instances to start. It is initialized with the first command-line argument passed to the script.
-- **Use**: Controls the number of iterations in loops that start receiver processes and configure their settings.
+- **Type**: `integer`
+- **Description**: The variable `rx_cnt` is a global integer variable that represents the number of receiver instances to be started. It is initialized with the first command-line argument passed to the script.
+- **Use**: `rx_cnt` is used to control the number of iterations in loops that start receiver processes and configure their settings.
 
 
 ---
 ### CORE\_FIRST
-- **Type**: ``CORE_FIRST``
-- **Description**: `CORE_FIRST` is a global variable that is set to the value of `NUMA_IDX`. It represents the starting core index for CPU allocation in a NUMA (Non-Uniform Memory Access) architecture. This variable is used to determine the first core to be used for task assignment in the script.
-- **Use**: Used to set the initial core index for task assignment in a NUMA environment.
+- **Type**: `integer`
+- **Description**: CORE_FIRST is a global variable that is initialized with the value of NUMA_IDX. It represents the starting core index for CPU affinity settings in a NUMA (Non-Uniform Memory Access) architecture.
+- **Use**: CORE_FIRST is used to determine the initial CPU core for task assignment, ensuring processes are run on the appropriate cores for optimal performance in a NUMA environment.
 
 
 ---
 ### NUMA\_STRIDE
-- **Type**: ``NUMA_STRIDE``
-- **Description**: `NUMA_STRIDE` is a global variable that determines the increment step for CPU core allocation across NUMA nodes. It is set to the value of `NUMA_CNT`, which likely represents the number of NUMA nodes or a related configuration parameter.
-- **Use**: Used to calculate the next CPU core to allocate for tasks by incrementing the current core index by `NUMA_STRIDE`.
+- **Type**: `integer`
+- **Description**: NUMA_STRIDE is a global variable that determines the increment step for CPU core allocation across NUMA nodes. It is set to the value of NUMA_CNT, which likely represents the number of NUMA nodes or a related configuration parameter. This variable is used to adjust the core allocation strategy based on the system's NUMA architecture, either assigning cores in blocks or striping them across nodes.
+- **Use**: NUMA_STRIDE is used to calculate the next CPU core to allocate for tasks, ensuring they are distributed according to the NUMA configuration.
 
 
 ---
 ### HALT\_ALL
 - **Type**: `string`
-- **Description**: Contains a sequence of commands to send halt signals to both transmitter and receiver components in an inter-process communication (IPC) setup. The variable is initialized as an empty string and is appended with halt commands for each receiver and the transmitter based on the number of receivers specified by `rx_cnt`. The commands are formatted to use the `signal-cnc` utility with the respective control names from `TX_CNC` and `RX_CNC` arrays.
-- **Use**: Used to construct and store the halt command sequence that is executed to stop all IPC components.
+- **Description**: The `HALT_ALL` variable is a string that accumulates commands to send halt signals to various components in the script. It is initially an empty string and is appended with 'signal-cnc' commands for both the transmitter and each receiver based on the number of receivers specified by `rx_cnt`. This variable is used to construct a command that will be executed to stop all running processes at the end of the script.
+- **Use**: `HALT_ALL` is used to store and execute halt commands for the transmitter and receivers in the script.
 
 
 ---
 ### CORE\_NEXT
 - **Type**: `integer`
-- **Description**: `CORE_NEXT` is an integer variable that represents the next CPU core index to be used for task assignment. It is initialized with the value of `CORE_FIRST`, which is derived from the `NUMA_IDX` variable.
-- **Use**: `CORE_NEXT` is used to assign CPU cores to receiver and transmitter tasks in a round-robin fashion, incrementing by `NUMA_STRIDE` after each assignment.
+- **Description**: CORE_NEXT is a global integer variable that is initialized to the value of CORE_FIRST. It is used to keep track of the next CPU core to be assigned for running tasks in a multi-core environment.
+- **Use**: CORE_NEXT is incremented by NUMA_STRIDE after each task assignment to ensure tasks are distributed across CPU cores.
 
 
 

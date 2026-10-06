@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A test program for receiving and processing metadata fragments with flow control and diagnostics.
+The `test_meta_rx.c` file in the `firedancer` codebase implements a test for receiving and processing metadata fragments with flow control and diagnostics, utilizing AVX instructions if available.
 
 # Purpose
-The code is an executable C program that functions as a unit test for a system that involves command-and-control (CNC) signaling, memory caching, and flow control in a networked environment. It is designed to run on systems with hosted and AVX capabilities, as indicated by the preprocessor directives. The program initializes various components such as random number generators, CNC, and memory caches, and it processes command-line arguments to configure its operation. It uses these components to manage and validate the reception of data fragments, handle overrun conditions, and maintain flow control by sending credits back to a transmitter.
+This C source code file is an executable program designed to manage and process data fragments in a high-performance computing environment. The program is structured to operate under specific conditions, requiring both hosted and AVX (Advanced Vector Extensions) capabilities, as indicated by the preprocessor directives. The main functionality revolves around joining various shared memory resources, such as command-and-control (CNC) structures, memory caches (mcache), and flow sequence (fseq) structures, which are essential for managing data flow and synchronization in concurrent systems. The program initializes these resources, processes data fragments in a loop, and performs housekeeping tasks such as sending flow control credits, monitoring system performance, and handling command-and-control signals.
 
-The main loop of the program waits for data fragments, performs housekeeping tasks such as sending flow control credits and monitoring information, and handles command-and-control signals. It uses different methods to wait for and validate fragment metadata, depending on the defined `WAIT_STYLE`. The program logs performance metrics and handles overrun conditions by adjusting the sequence of data fragments. Upon completion or receipt of a halt signal, the program cleans up by unmapping and deleting resources before exiting. If the required capabilities are not present, the program logs a warning and exits without performing the test.
+The code is highly specialized, focusing on efficient data handling and synchronization in environments that support AVX instructions, which are used for high-speed data processing. It includes mechanisms for error handling, such as logging errors when resources cannot be joined, and it provides diagnostic information about the system's performance. The program also supports both reliable and unreliable modes of operation, depending on whether flow control information is sent to the transmitter. The use of macros and conditional compilation allows for flexibility in how the program handles data fragments, making it adaptable to different hardware capabilities and performance requirements. Overall, this code is a critical component of a larger system that requires precise control over data flow and synchronization in a high-performance computing context.
 # Imports and Dependencies
 
 ---
@@ -19,27 +19,25 @@ The main loop of the program waits for data fragments, performs housekeeping tas
 
 ---
 ### fseq\_mem
-- **Type**: ``uchar[]``
-- **Description**: An array of unsigned characters (`uchar`) with a size defined by the macro `FD_FSEQ_FOOTPRINT`. The array is aligned in memory according to the alignment specified by `FD_FSEQ_ALIGN`.
-- **Use**: Used to store memory for flow sequence operations, particularly when creating or joining a flow sequence (`fseq`) in unreliable mode.
+- **Type**: `uchar array`
+- **Description**: The `fseq_mem` is a static array of unsigned characters with a size defined by the macro `FD_FSEQ_FOOTPRINT`. It is aligned in memory according to the alignment specified by `FD_FSEQ_ALIGN`. This array is used to store flow sequence data.
+- **Use**: This variable is used to initialize a flow sequence in unreliable mode when no external flow sequence is provided.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../src/tango/test_meta_rx.c#L238>)
-
-Initializes the environment and logs a warning if the required capabilities are not present, then halts execution.
+The `main` function initializes the environment and logs a warning if the required capabilities are not present, then halts execution.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
+    - `argc`: The count of command-line arguments passed to the program.
     - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with the command-line arguments.
-    - Logs a warning message indicating that the unit test requires `FD_HAS_HOSTED` and `FD_HAS_AVX` capabilities.
-    - Calls `fd_halt` to stop the execution of the program.
-    - Returns 0 to indicate successful execution.
-- **Output**: Returns 0, indicating successful execution.
+- **Control Flow**:
+    - Call `fd_boot` to initialize the environment with the command-line arguments.
+    - Log a warning message indicating that the unit test requires `FD_HAS_HOSTED` and `FD_HAS_AVX` capabilities.
+    - Call `fd_halt` to terminate the program.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

@@ -3,91 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines structures and functions for handling QUIC connection IDs and network endpoints.
+QUIC connection ID and network endpoint definitions, plus helpers for creation, randomization, and comparison.
 
 # Purpose
-This C header file defines structures and functions related to QUIC connection IDs. It includes the definition of `fd_quic_conn_id_t`, a structure that represents a QUIC connection ID with a size ranging from 0 to 20 bytes, and ensures unused bytes are zeroed for proper comparison. The file provides inline functions such as [`fd_quic_conn_id_new`](<#fd_quic_conn_id_tfd_quic_conn_id_new>) to create a new connection ID from a given input and [`fd_quic_conn_id_rand`](<#fd_quic_conn_id_rand>) to generate a random 8-byte connection ID using a random number generator. It also defines macros for checking the validity of a connection ID (`FD_QUIC_CONN_ID_INVAL`) and for comparing two connection IDs (`FD_QUIC_CONN_ID_EQUAL`). Additionally, the file defines a structure `fd_quic_net_endpoint_t` to identify a UDP/IP network endpoint, which may change during the connection's lifetime.
-# Imports and Dependencies
-
----
-- `../../util/fd_util_base.h`
-- `../../util/rng/fd_rng.h`
-- `string.h`
-
-
-# Data Structures
-
----
-### fd\_quic\_conn\_id
-- **Type**: ``struct``
-- **Members**:
-    - `sz`: Stores the size of the connection ID in bytes.
-    - `conn_id`: Holds the connection ID with a maximum size defined by `FD_QUIC_MAX_CONN_ID_SZ`.
-    - `pad`: Provides padding for alignment purposes.
-- **Description**: Represents a QUIC connection ID structure that includes a size field, a connection ID array, and padding for alignment. The `sz` field indicates the number of bytes used in the `conn_id` array, which can hold up to `FD_QUIC_MAX_CONN_ID_SZ` bytes. The `pad` array ensures proper memory alignment of the structure.
-
-
----
-### fd\_quic\_conn\_id\_t
-- **Type**: ``struct``
-- **Members**:
-    - ``sz``: Size of the connection ID in bytes, ranging from 0 to 20.
-    - ``conn_id``: Array storing the connection ID, with a maximum size of 20 bytes.
-    - ``pad``: Padding array to ensure proper alignment of the structure.
-- **Description**: Represents a QUIC connection ID with a size between 0 and 20 bytes, where unused high bytes in the `conn_id` array must be zeroed. The structure includes padding to maintain alignment, and it is used to uniquely identify connections in the QUIC protocol. The `fd_quic_conn_id_t` can be initialized with specific connection IDs or generated randomly, and it includes utility macros for checking validity and equality of connection IDs.
-
-
----
-### fd\_quic\_net\_endpoint
-- **Type**: ``struct``
-- **Members**:
-    - `ip_addr`: Stores the IP address of the network endpoint as an unsigned integer.
-    - `udp_port`: Stores the UDP port number of the network endpoint as an unsigned short.
-- **Description**: Identifies a UDP/IP network endpoint with fields for an IP address and a UDP port number, which may change during the lifetime of a connection.
-
-
----
-### fd\_quic\_net\_endpoint\_t
-- **Type**: ``struct``
-- **Members**:
-    - `ip_addr`: Stores the IP address of the network endpoint in network byte order.
-    - `udp_port`: Stores the UDP port number of the network endpoint in host byte order.
-- **Description**: Identifies a UDP/IP network endpoint, which can change during the lifetime of a connection. It contains an IP address and a UDP port number, facilitating the identification and communication with a specific network endpoint.
-
-
-# Functions
-
----
-### fd\_quic\_conn\_id\_new<!-- {{#callable:fd_quic_conn_id_t::fd_quic_conn_id_new}} -->
-[View Source →](<../../../../../src/waltz/quic/fd_quic_conn_id.h#L29>)
-
-Creates a new QUIC connection ID structure with a specified size and connection ID data.
-- **Inputs**:
-    - ``conn_id``: A pointer to the connection ID data to copy into the new connection ID structure.
-    - ``sz``: The size of the connection ID data, which must be in the range [0, 20].
-- **Logic and Control Flow**:
-    - Initialize a `fd_quic_conn_id_t` structure with the size `sz` cast to `uchar`.
-    - Copy `sz` bytes from the source `conn_id` to the `conn_id` field of the `fd_quic_conn_id_t` structure using `fd_memcpy`.
-    - Return the initialized `fd_quic_conn_id_t` structure.
-- **Output**: A `fd_quic_conn_id_t` structure containing the specified connection ID data and size.
-- **See also**: [`fd_quic_conn_id_t`](<#fd_quic_conn_id_t>)  (Data Structure)
-
-
----
-### fd\_quic\_conn\_id\_rand<!-- {{#callable:fd_quic_conn_id_rand}} -->
-[View Source →](<../../../../../src/waltz/quic/fd_quic_conn_id.h#L43>)
-
-Generates a random 8-byte QUIC connection ID and initializes its structure.
-- **Inputs**:
-    - ``conn_id``: A pointer to an `fd_quic_conn_id_t` structure where the generated connection ID will be stored.
-    - ``rng``: A pointer to an `fd_rng_t` structure used to generate random numbers.
-- **Logic and Control Flow**:
-    - Initialize the `conn_id` structure with a size of 8 bytes, zeroed `conn_id` array, and zeroed padding.
-    - Use the `fd_rng_ulong` function to generate a random unsigned long integer and store it in the `conn_id->conn_id` array.
-    - Return the pointer to the initialized `conn_id` structure.
-- **Output**: A pointer to the initialized `fd_quic_conn_id_t` structure containing the random connection ID.
-
-
+Defines the `fd_quic_conn_id_t` type and related helpers for QUIC connection IDs. The file sets the maximum connection ID size, the Firedancer default size, and the storage layout used to keep unused bytes zeroed for safe comparison and hash use. It provides [`fd_quic_conn_id_new`](<#fd_quic_conn_id_new>) to build a connection ID from raw bytes and [`fd_quic_conn_id_rand`](<#fd_quic_conn_id_rand>) to create a random 8-byte connection ID with zeroed padding. The file also defines `FD_QUIC_CONN_ID_NULL`, `FD_QUIC_CONN_ID_INVAL`, and `FD_QUIC_CONN_ID_EQUAL`, and it declares `fd_quic_net_endpoint_t` for a UDP/IP endpoint with an IP address and port.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

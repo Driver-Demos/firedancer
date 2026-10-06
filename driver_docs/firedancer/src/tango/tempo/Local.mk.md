@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for the fd_tempo and fd_tango components.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `tempo` component, including the `fd_tempo.h` header and `test_tempo` unit test.
 
 # Purpose
-The `Makefile` content defines build and test instructions for a software project. It adds the header file `fd_tempo.h` and object files `fd_tempo` and `fd_tango` to the build process. It also specifies a unit test named `test_tempo`, which depends on the `fd_tango` and `fd_util` components, and includes a command to execute this unit test.
+The file is a Makefile script used for building and testing components in a software project. It defines build rules by adding header files (`fd_tempo.h`) and object files (`fd_tempo`, `fd_tango`) to the build process. Additionally, it specifies the creation and execution of a unit test named `test_tempo`, which depends on the `fd_tango` and `fd_util` components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
