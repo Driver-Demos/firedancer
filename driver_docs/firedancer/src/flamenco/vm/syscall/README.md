@@ -3,26 +3,26 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Syscall management and testing for a virtual machine, including cryptographic, hash, and curve operations.
+VM syscall registration, CPI, crypto, hash, PDA, runtime, utility handlers, and tests.
 
 
 ## Files
-- **[fd_vm_cpi.h](fd_vm_cpi.h.md)**: Type definitions for the cross-program-invocation (CPI) API in both C and Rust ABIs for a virtual machine.
-- **[fd_vm_syscall.c](fd_vm_syscall.c.md)**: Registers and manages system calls for a virtual machine, including feature-based conditional registration.
-- **[fd_vm_syscall.h](fd_vm_syscall.h.md)**: Header file defining virtual machine syscalls for the Firedancer project, including syscall declarations and related constants.
-- **[fd_vm_syscall_cpi.c](fd_vm_syscall_cpi.c.md)**: Implements cross-program invocation logic for a virtual machine, including account management and privilege checks.
-- **[fd_vm_syscall_cpi_common.c](fd_vm_syscall_cpi_common.c.md)**: Common logic for C and Rust CPI syscalls, including macros to handle ABI differences and functions for translating and updating accounts.
-- **[fd_vm_syscall_crypto.c](fd_vm_syscall_crypto.c.md)**: Implements cryptographic syscalls for BN254 operations, Poseidon hashing, and secp256k1 recovery.
-- **[fd_vm_syscall_curve.c](fd_vm_syscall_curve.c.md)**: Implements syscalls for validating points, performing group operations, and multi-scalar multiplication on Curve25519 and Ristretto255 curves.
-- **[fd_vm_syscall_hash.c](fd_vm_syscall_hash.c.md)**: Implements syscalls for SHA256, Keccak256, and Blake3 hash functions in a virtual machine.
-- **[fd_vm_syscall_macros.h](fd_vm_syscall_macros.h.md)**: Macros for managing virtual machine compute units and memory address translations in syscall implementations.
-- **[fd_vm_syscall_pda.c](fd_vm_syscall_pda.c.md)**: Functions for deriving and validating program-derived addresses (PDAs) using seeds and program IDs in a virtual machine environment.
-- **[fd_vm_syscall_runtime.c](fd_vm_syscall_runtime.c.md)**: Implements various system call functions for a virtual machine, handling sysvar retrieval and instruction processing.
-- **[fd_vm_syscall_util.c](fd_vm_syscall_util.c.md)**: Utility functions for virtual machine syscalls, including memory operations and logging.
-- **[Local.mk](Local.mk.md)**: Build configuration for compiling and testing VM syscalls with specific dependencies and conditions.
-- **[test_vm_syscall_cpi.c](test_vm_syscall_cpi.c.md)**: Static assertions for structure layouts and a main function template for runtime tests.
-- **[test_vm_syscall_curve.c](test_vm_syscall_curve.c.md)**: Tests for virtual machine syscalls related to curve operations, including multiscalar multiplication and group operations.
-- **[test_vm_syscalls.c](test_vm_syscalls.c.md)**: Tests for virtual machine syscalls, including memory operations and logging, with direct mapping toggling.
+- **[fd_vm_cpi.h](fd_vm_cpi.h.md)**: CPI ABI type definitions, VM layout constants, and caller account translation state.
+- **[fd_vm_syscall.c](fd_vm_syscall.c.md)**: Registers VM syscalls by name or slot, with feature-gated syscall selection.
+- **[fd_vm_syscall.h](fd_vm_syscall.h.md)**: Syscall declarations, constants, and helpers for VM logging, runtime, PDA, crypto, and CPI.
+- **[fd_vm_syscall_cpi.c](fd_vm_syscall_cpi.c.md)**: CPI account checks and ABI adapters for C and Rust VM instruction handling.
+- **[fd_vm_syscall_cpi_common.c](fd_vm_syscall_cpi_common.c.md)**: CPI syscall translation, account update, and execution logic for C and Rust ABIs.
+- **[fd_vm_syscall_crypto.c](fd_vm_syscall_crypto.c.md)**: Syscalls for BN128, Poseidon, and secp256k1 crypto operations in the VM.
+- **[fd_vm_syscall_curve.c](fd_vm_syscall_curve.c.md)**: Curve25519 syscall handlers for point validation, group ops, and multiscalar multiplication.
+- **[fd_vm_syscall_hash.c](fd_vm_syscall_hash.c.md)**: Syscalls for sha256, keccak256, and blake3 hashing in the VM.
+- **[fd_vm_syscall_macros.h](fd_vm_syscall_macros.h.md)**: VM syscall macros for CU charging and virtual-to-host memory translation.
+- **[fd_vm_syscall_pda.c](fd_vm_syscall_pda.c.md)**: PDA derivation and syscall handlers for creating and finding program addresses.
+- **[fd_vm_syscall_runtime.c](fd_vm_syscall_runtime.c.md)**: Sysvar and return-data syscalls for the VM, plus sibling-instruction queries.
+- **[fd_vm_syscall_util.c](fd_vm_syscall_util.c.md)**: Syscalls for logging, panic, memory ops, and heap allocation in the VM.
+- **[Local.mk](Local.mk.md)**: Build rules and unit tests for VM syscall headers, objects, and tests.
+- **[test_vm_syscall_cpi.c](test_vm_syscall_cpi.c.md)**: The `test_vm_syscall_cpi.c` file in the `firedancer` codebase contains static assertions to verify the memory layout of various virtual machine structures and includes a main function intended for future runtime tests.
+- **[test_vm_syscall_curve.c](test_vm_syscall_curve.c.md)**: Tests VM curve syscall multiscalar mul and group ops for valid and invalid cases.
+- **[test_vm_syscalls.c](test_vm_syscalls.c.md)**: Tests VM syscall memory and log operations under direct mapping and input region cases.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
