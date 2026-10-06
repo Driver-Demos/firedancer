@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `hex` folder in the `firedancer` codebase contains source and header files for encoding and decoding hexadecimal strings, a fuzz testing utility for validation, and a makefile for build configuration.
+Functions for hex encoding/decoding, conversion methods, fuzz testing, and a Makefile for build configuration.
 
 
 ## Files
-- **[fd_hex.c](fd_hex.c.md)**: The `fd_hex.c` file in the `firedancer` codebase provides functions for encoding and decoding hexadecimal strings, including a lookup table for encoding and a function for converting characters to their hexadecimal values.
-- **[fd_hex.h](fd_hex.h.md)**: The `fd_hex.h` file provides functions for encoding binary data to hexadecimal and decoding hexadecimal data back to binary, with case-insensitive decoding.
-- **[fuzz_hex.c](fuzz_hex.c.md)**: The `fuzz_hex.c` file in the `firedancer` codebase implements a fuzz testing utility for validating and decoding hexadecimal strings, ensuring they are correctly encoded and meet specified size constraints.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and conditional fuzz test setup for the `fd_hex` and `fd_ballet` components.
+- **[fd_hex.c](fd_hex.c.md)**: Functions for encoding and decoding hexadecimal strings.
+- **[fd_hex.h](fd_hex.h.md)**: Methods for converting between binary and hexadecimal representations.
+- **[fuzz_hex.c](fuzz_hex.c.md)**: Fuzz testing for hex encoding and decoding with initialization and validation functions.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and conditional fuzz testing in the `firedancer` codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,44 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-DDR DMA and PCIe bridge logic with reset sync, FIFOs, and top-level wiring.
+Implements a DDR DRAM Direct Memory Access (DMA) module for FPGA hardware with address mapping and reset synchronization.
 
 # Purpose
-`cl_dram_dma` is a top-level integration file for an FPGA design that connects the shell interfaces to the user logic in `top_f1`. It sets up clock and reset synchronization, assigns fixed status and ID values, and ties off unused shell interfaces with the included template files. The file also defines local control logic for the OCL AXI-Lite path, where reads and writes are translated into a single AVMM master interface, and it manages a small status register path through `sh_cl_status_vdip` and `cl_sh_status_vled`.
+The `cl_dram_dma` module is part of the Amazon FPGA Hardware Development Kit and is designed to manage Direct Memory Access (DMA) operations between a host and DRAM. It uses a parameterized approach to handle multiple DDR interfaces, with the parameter `NUM_DDR` indicating the number of DDR interfaces supported. The module includes several `include` directives to incorporate common definitions and templates, which help manage unused interfaces and define constants for various configurations.
 
-The file also contains the PCIe and DMA data path glue logic. It buffers PCIe write address and data beats with `showahead_fifo` instances, then forwards them to `top_f1` through the `pcie_*` signals. In the same way, it buffers DMA request address and data fields before sending them to the PCIe master interface. The `top_f1` instance receives the AVMM control port, PCIe transaction streams, DMA control and data signals, debug wires, and the synchronized clocks and resets, so this file acts as the bridge between the AWS FPGA shell and the user design.
+The module implements a state machine to handle read and write operations through the AXI interface, managing address and data transactions. It uses FIFOs to buffer addresses and data for DMA operations, ensuring efficient data transfer. The module also includes logic for reset synchronization and status signal assignments. The `cl_dram_dma` module interfaces with a top-level module, defined by the `TOP_NAME` macro, which integrates the DMA functionality with other system components. The design is structured to support simulation and real hardware environments, with conditional parameters to adjust the scrubbing of DRAM during simulations.
+# Modules
+
+---
+### cl\_dram\_dma
+Implements a Direct Memory Access (DMA) controller for DRAM interfacing, handling data transfers and synchronization with various interfaces. Manages reset synchronization, address and data handling, and includes unused interface tie-offs for customization.
+- **Constants**:
+    - ``NUM_DDR``: Defines the number of DDR interfaces, defaulting to 4.
+    - ``NUM_CFG_STGS_CL_DDR_ATG``: Specifies the number of configuration stages for CL DDR ATG, set to 8.
+    - ``NUM_CFG_STGS_SH_DDR_ATG``: Specifies the number of configuration stages for SH DDR ATG, set to 4.
+    - ``NUM_CFG_STGS_PCIE_ATG``: Specifies the number of configuration stages for PCIe ATG, set to 4.
+    - ``DDR_SCRB_MAX_ADDR``: Defines the maximum address for DRAM scrubbing, set to 8KiB in simulation and 16GB otherwise.
+    - ``DDR_SCRB_BURST_LEN_MINUS1``: Defines the burst length minus one for DRAM scrubbing, set to 15.
+    - ``NO_SCRB_INST``: Indicates whether the scrubber instance is disabled, set based on `NO_CL_TST_SCRUBBER`.
+    - ``DMA_N``: Defines the number of DMA channels, set to 1.
+    - ``NO_AVMM_MASTERS``: Defines the number of AVMM masters, set to 1.
+    - ``NO_BASE_ENGINES``: Defines the number of base engines, set to 1.
+    - ``NO_DBG_TAPS``: Defines the number of debug taps, set to 1.
+    - ``DBG_WIDTH``: Defines the width of debug wires, set to 2048.
+    - ``DDR_SIM``: Indicates whether DDR simulation is enabled, set to 0.
+- **Ports**:
+    - ``cl_ports.vh``: Includes the port definitions for the module.
+- **Logic and Control Flow**:
+    - Includes various header files for common definitions, ID definitions, and DMA-specific definitions.
+    - Ties off unused interfaces using included templates to ensure they do not interfere with the design.
+    - Defines local parameters for configuration stages and scrubbing settings, adjusting for simulation conditions.
+    - Implements a reset synchronizer using a `lib_pipe` instance to manage reset signals across clock domains.
+    - Handles OpenCL (OCL) interface state transitions using an `always_ff` block, managing read and write operations.
+    - Implements address and data FIFOs for DMA operations, using `showahead_fifo` instances to manage data flow.
+    - Assigns default values to various control signals, ensuring proper initialization and operation.
+    - Instantiates a top-level module `top_f1` with connections to AVMM, PCIe, and DMA interfaces, as well as debug and clock/reset signals.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

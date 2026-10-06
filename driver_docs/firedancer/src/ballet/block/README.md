@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `block` folder in the `firedancer` codebase contains files related to the definition, compilation, and testing of a microblock header structure.
+Defines a microblock header structure, a Makefile for tests, and tests for `fd_microblock_hdr_t`.
 
 
 ## Files
-- **[fd_microblock.h](fd_microblock.h.md)**: The `fd_microblock.h` file defines a packed structure for a microblock header, including fields for PoH hash count, hash state, and transaction count, in the `firedancer` codebase.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile that adds headers, compiles, and runs unit tests for the `test_microblock` component.
-- **[test_microblock.c](test_microblock.c.md)**: The `test_microblock.c` file contains tests to verify the layout and offsets of the `fd_microblock_hdr_t` structure in the `firedancer` codebase.
+- **[fd_microblock.h](fd_microblock.h.md)**: Defines a packed structure for a microblock header with fields for hash count, hash, and transaction count.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and running unit tests for `test_microblock`.
+- **[test_microblock.c](test_microblock.c.md)**: Tests for the layout and size of `fd_microblock_hdr_t` in the `firedancer` codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

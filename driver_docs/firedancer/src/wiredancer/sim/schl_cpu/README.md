@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `schl_cpu` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog-based CPU module with Questa and a `test.py` script for verifying the CPU simulation using the cocotb framework.
+Makefile and tests for simulating Verilog sources and CPU simulation using cocotb.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/schl_cpu` directory is configured to simulate a Verilog-based CPU module using Questa, specifying various Verilog source files and compilation arguments.
-- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase is a test script using the cocotb framework to verify the functionality of a CPU simulation, including mathematical operations and memory management, within the `wiredancer` module.
+- **[Makefile](Makefile.md)**: Makefile for simulating Verilog sources with Questa and Cocotb in the Firedancer project.
+- **[test.py](test.py.md)**: Tests for a CPU simulation using cocotb, including mathematical operations and input/output monitoring.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
