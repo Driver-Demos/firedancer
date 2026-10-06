@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-AF_XDP networking, packet routing, and netlink integration guides.
+Documentation for Firedancer's net tile and netlink integration, focusing on networking and data flows.
 
 
 ## Files
-- **[net_tile.md](net_tile.md.md)**: AF_XDP networking and packet routing between IPv4 and tango.
-- **[netlink.md](netlink.md.md)**: The `netlink.md` file in the `firedancer` codebase provides a detailed guide on how Firedancer's userland networking stack integrates with netlink to achieve zero configuration interoperability with Linux, focusing on security and performance improvements through a separate netlink tile and shared memory caches.
+- **[net_tile.md](net_tile.md.md)**: Documentation of the net tile in Firedancer, detailing its role as a fast networking layer using Linux AF_XDP APIs to interface between the Internet and Firedancer's messaging subsystem.
+- **[netlink.md](netlink.md.md)**: Documentation of Firedancer's netlink integration for userland networking, detailing configuration, security, and data flows.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

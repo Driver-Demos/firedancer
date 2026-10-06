@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_proto.h` file in the `firedancer` codebase provides functions for encoding and decoding IPv4 and UDP headers for QUIC protocol operations.
+Header file for encoding and decoding IPv4 and UDP headers in the QUIC protocol.
 
 # Purpose
-This C header file, `fd_quic_proto.h`, is part of a larger library or application that deals with the QUIC protocol, specifically focusing on the encoding and decoding of network protocol headers such as IPv4 and UDP. The file provides inline functions for parsing and encoding these headers, converting them between network byte order and host byte order. This functionality is crucial for network communication, ensuring that data is correctly interpreted regardless of the underlying hardware architecture. The file includes several other headers, indicating that it is part of a modular system, likely providing a broad range of functionalities related to the QUIC protocol.
+The code is a C header file that provides functions for encoding and decoding IPv4 and UDP headers. It includes several other header files that define structures and types used in the QUIC protocol implementation. The file defines inline functions such as `fd_quic_decode_ip4`, [`fd_quic_encode_ip4`](<#fd_quic_encode_ip4>), `fd_quic_decode_udp`, and [`fd_quic_encode_udp`](<#fd_quic_encode_udp>). These functions handle the conversion of network headers between host byte order and network byte order, which is necessary for network communication.
 
-The file defines static inline functions, which suggests that it is intended to be included in other C source files rather than being compiled on its own. This approach allows for efficient code reuse and inlining by the compiler, reducing function call overhead. The use of macros and templates, as indicated by the included template files, suggests a design that emphasizes flexibility and reusability, allowing the same code to be adapted for different data structures or protocols. The file does not define public APIs or external interfaces directly but rather provides low-level utilities that are likely used internally within the broader QUIC implementation.
+The functions in this file are designed to work with IPv4 and UDP headers, ensuring that they are correctly formatted for transmission over a network. The file uses macros and types defined in the included headers to perform operations like byte-swapping and memory copying. The functions return the size of the processed header or a failure code if the provided buffer size is insufficient. This header file is part of a larger QUIC protocol implementation, as indicated by the inclusion of other QUIC-related headers.
 # Imports and Dependencies
 
 ---
@@ -31,49 +31,54 @@ The file defines static inline functions, which suggests that it is intended to 
 ---
 ### fd\_quic\_decode\_ip4
 - **Type**: `function`
-- **Description**: `fd_quic_decode_ip4` is a static inline function that decodes an IPv4 header from a buffer into a structure of type `fd_ip4_hdr_t`. It checks if the buffer size is sufficient and if the version and header length are valid before performing the decoding.
-- **Use**: This function is used to parse an IPv4 header from a network buffer into a host byte order structure for further processing.
+- **Description**: Parses an IPv4 header from a buffer and stores it in host byte order in the `out` parameter. The function checks if the buffer size is sufficient and if the version and header length are valid before performing the parsing.
+- **Use**: Used to decode an IPv4 header from a network buffer into a host byte order structure.
 
 
 ---
 ### fd\_quic\_decode\_udp
 - **Type**: `function`
-- **Description**: The `fd_quic_decode_udp` function is a static inline function that decodes a UDP header from a buffer into a `fd_udp_hdr_t` structure. It checks if the buffer size is sufficient to contain a UDP header and then copies and byte-swaps the header data into the output structure.
-- **Use**: This function is used to parse UDP headers from network data into a host byte order format for further processing.
+- **Description**: Decodes a UDP header from a buffer into a `fd_udp_hdr_t` structure in host byte order. The function checks if the buffer size is sufficient to contain a UDP header and performs a byte swap to convert the header to host byte order.
+- **Use**: Used to parse UDP headers from network byte order to host byte order.
 
 
 # Functions
 
 ---
 ### fd\_quic\_encode\_ip4<!-- {{#callable:fd_quic_encode_ip4}} -->
-The `fd_quic_encode_ip4` function encodes an IPv4 header from host byte order to network byte order and writes it to a buffer for transmission.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_proto.h#L61>)
+
+Encodes an IPv4 header into a buffer for network transmission.
 - **Inputs**:
-    - `buf`: A pointer to a buffer where the encoded IPv4 header will be written.
-    - `sz`: The size of the buffer `buf` in bytes.
-    - `frame`: A pointer to an `fd_ip4_hdr_t` structure representing the IPv4 header in host byte order.
-- **Control Flow**:
-    - Check if the buffer size `sz` is smaller than the size of an IPv4 header; if so, return `FD_QUIC_PARSE_FAIL`.
-    - Copy the IPv4 header from `frame` to a local variable `netorder`.
-    - Convert the byte order of `netorder` from host to network using `fd_ip4_hdr_bswap`.
-    - Copy the converted `netorder` to the buffer `buf`.
-    - Return the size of the IPv4 header, indicating the number of bytes written.
-- **Output**: The function returns the number of bytes written to the buffer, which is the size of an IPv4 header, or `FD_QUIC_PARSE_FAIL` if the buffer size is insufficient.
+    - ``buf``: A pointer to a buffer where the encoded IPv4 header will be stored.
+    - ``sz``: The size of the buffer `buf` in bytes.
+    - ``frame``: A pointer to an `fd_ip4_hdr_t` structure representing the IPv4 header in host byte order.
+- **Logic and Control Flow**:
+    - Check if `sz` is less than the size of `fd_ip4_hdr_t`; if true, return `FD_QUIC_PARSE_FAIL`.
+    - Copy the `frame` into a local variable `netorder`.
+    - Convert `netorder` to network byte order using `fd_ip4_hdr_bswap`.
+    - Copy the network byte order `netorder` into the buffer `buf`.
+    - Return the size of `fd_ip4_hdr_t`.
+- **Output**: Returns the size of the IPv4 header written to `buf` or `FD_QUIC_PARSE_FAIL` if the buffer size `sz` is insufficient.
 
 
 ---
 ### fd\_quic\_encode\_udp<!-- {{#callable:fd_quic_encode_udp}} -->
-The `fd_quic_encode_udp` function encodes a UDP header from host byte order to network byte order and writes it to a buffer for transmission.
+[View Source →](<../../../../../src/waltz/quic/fd_quic_proto.h#L94>)
+
+Encodes a UDP header into a buffer for transmission over the network.
 - **Inputs**:
-    - `buf`: A pointer to a buffer where the encoded UDP header will be written.
-    - `sz`: The size of the buffer `buf` in bytes.
-    - `frame`: A pointer to a `fd_udp_hdr_t` structure representing the UDP header in host byte order.
-- **Control Flow**:
-    - Check if the buffer size `sz` is smaller than the size of a UDP header; if so, return `FD_QUIC_PARSE_FAIL`.
+    - ``buf``: A pointer to a buffer where the encoded UDP header will be stored.
+    - ``sz``: The size of the buffer `buf` in bytes.
+    - ``frame``: A pointer to a `fd_udp_hdr_t` structure representing the UDP header in host byte order.
+- **Logic and Control Flow**:
+    - Check if the buffer size `sz` is smaller than the size of a UDP header (`sizeof(fd_udp_hdr_t)`).
+    - If the buffer size is insufficient, return `FD_QUIC_PARSE_FAIL`.
     - Copy the UDP header from `frame` to a temporary variable `netorder`.
-    - Convert the byte order of `netorder` from host to network using `fd_udp_hdr_bswap`.
-    - Copy the network byte order UDP header from `netorder` to the buffer `buf`.
-    - Return the size of the UDP header, indicating the number of bytes written to the buffer.
-- **Output**: The function returns the number of bytes written to the buffer, which is the size of a UDP header, or `FD_QUIC_PARSE_FAIL` if the buffer size is insufficient.
+    - Convert the byte order of `netorder` to network byte order using `fd_udp_hdr_bswap`.
+    - Copy the converted UDP header from `netorder` to the buffer `buf`.
+    - Return the size of the UDP header (`sizeof(fd_udp_hdr_t)`).
+- **Output**: Returns the number of bytes written to the buffer, or `FD_QUIC_PARSE_FAIL` if the buffer size is too small.
 
 
 

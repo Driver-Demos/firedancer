@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Bank tile execution, error mapping, seccomp policy, generated filters, and build rules.
+Functions for bank operations, error code mapping, security policies, and Makefile logic for build configuration.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only for fd 2 or logfile_fd.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
 
 ## Files
-- **[fd_bank_err.h](fd_bank_err.h.md)**: Maps runtime transaction errors to transaction result metric indexes.
-- **[fd_bank_tile.c](fd_bank_tile.c.md)**: Executes bank microblocks and bundles, updates fees, rebates, metrics, and PoH mixins.
-- **[fd_bank_tile.seccomppolicy](fd_bank_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
-- **[Local.mk](Local.mk.md)**: Build rules that add fd_bank_tile objects when FD_HAS_ATOMIC and FD_HAS_INT128 are set.
+- **[fd_bank_err.h](fd_bank_err.h.md)**: Maps runtime error codes to transaction result metrics indices and logs unknown errors.
+- **[fd_bank_tile.c](fd_bank_tile.c.md)**: Implements a bank tile for processing transactions, including functions for transaction handling, hashing, and metrics management.
+- **[fd_bank_tile.seccomppolicy](fd_bank_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
+- **[Local.mk](Local.mk.md)**: Makefile logic for adding objects to `fd_bank_tile` if `FD_HAS_ATOMIC` and `FD_HAS_INT128` are defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
