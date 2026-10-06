@@ -3,100 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generates prototypes and implementations for concurrent shared element pools using a lock-free stack.
+Concurrent persistent shared element pool APIs with lock-free acquire and release.
 
 # Purpose
-The code defines a template for creating concurrent persistent shared element pools in C. These pools can store a large number of elements and allow for fast acquisition and release of elements, typically in constant time. The implementation uses a lock-free stack with atomic compare-and-swap operations to manage the stack top, making it suitable for concurrent usage on platforms that support atomic operations. The code also includes mechanisms to handle the ABA problem through stack top versioning and supports both locked and lock-free operations.
+This file is a C template that generates a concurrent persistent shared element pool API. It is intended for inclusion with macros such as `POOL_NAME` and `POOL_ELE_T` defined, so the same source can produce different pool types. The generated API provides constructors, join and leave functions, element index translation, acquire and release operations, lock and unlock control, reset, verify, and error string conversion. It also supports header-only use or separate library implementation, based on `POOL_IMPL_STYLE`.
 
-The template is designed to be flexible and can be used to generate different types of concurrent pools by including the file with specific macro definitions for `POOL_NAME` and `POOL_ELE_T`. It provides a set of APIs for pool management, including functions for creating, joining, leaving, and deleting pools, as well as acquiring and releasing elements. The code also supports features like lazy initialization, index compression, and memory relocation, making it suitable for high-reliability and high-security environments. The template can be used to generate both header declarations and implementations, allowing for integration across multiple compilation units.
-# Imports and Dependencies
-
----
-- `../bits/fd_bits.h`
-- `../log/fd_log.h`
-
-
-# Global Variables
+The implementation uses a lock-free stack design for the free element list, with atomic compare-and-swap on the stack top and versioned indices to handle ABA cases. It supports optional lazy initialization, optional index compression, and a lock mode for serialized pool operations. The code also performs alignment checks, bounds checks, magic-number validation, and corruption detection so the pool can be used in persistent memory, inter-process use, and other environments where integrity checks are required.
+# Function Declarations (Public API)
 
 ---
-### ver\_top
-- **Type**: `ulong`
-- **Description**: `ver_top` is a global variable of type `ulong` that stores the versioned index of the free stack top in a concurrent persistent shared element pool. It indicates the top of the stack, which is used to manage the pool's elements.
-- **Use**: Used to track the top of the free stack in the pool for element acquisition and release operations.
-
-
----
-### ver\_lazy
-- **Type**: `ulong`
-- **Description**: `ver_lazy` is a versioned index used for lazy initialization in a concurrent pool data structure. It represents the index of the lazy initialization point within the pool, which is used to optimize the initialization process by deferring it until necessary.
-- **Use**: Used to track the lazy initialization state of the pool, allowing for efficient allocation logic by reducing the cost of pool reset operations.
-
-
----
-### top\_idx
-- **Type**: `ulong`
-- **Description**: `top_idx` is a global variable of type `ulong` that stores the index of the top element in a versioned stack used for managing a pool of elements. It is derived from the `ver_top` field of the `POOL_(shmem_t)` structure, which represents the versioned index of the free stack top.
-- **Use**: Used to determine the current top index of the stack in the pool management system.
-
-
----
-### ele\_max
-- **Type**: `ulong`
-- **Description**: `ele_max` is a global variable of type `ulong` that stores the maximum capacity of the element store in a pool.
-- **Use**: Used to define the capacity of the element store in a pool, ensuring it does not exceed the maximum allowed.
-
-
----
-### lazy\_idx
-- **Type**: `ulong`
-- **Description**: `lazy_idx` is a variable of type `ulong` that stores the index extracted from a versioned index `ver_lazy` using the function `POOL_(private_vidx_idx)`. It is used in the context of lazy initialization in a concurrent pool implementation.
-- **Use**: Used to determine if the lazy initialization index is within the bounds of the element store capacity `ele_max`.
-
-
----
-### ele
-- **Type**: `POOL_ELE_T *`
-- **Description**: `ele` is a pointer to the element store location in the local address space. It is part of the `POOL_(private)` structure, which represents a join to a pool.
-- **Use**: Used to access the element store in the local address space for pool operations.
-
-
----
-### ele\_top
-- **Type**: `ulong`
-- **Description**: `ele_top` is a global variable of type `ulong` that is initialized using the `POOL_(idx_null)()` function. This function likely returns a special index value representing a null or empty state in the context of a pool data structure.
-- **Use**: Used to store the top index of a pool's free stack, indicating the current top element or a null state if the pool is empty.
-
-
----
-### ver
-- **Type**: `ulong`
-- **Description**: `ver` is a global variable of type `ulong` that is initialized using the function `POOL_(private_vidx_ver)` with the argument `ver_top`. This function extracts the version component from a versioned index.
-- **Use**: `ver` is used to store the version component of a versioned index in a concurrent pool implementation.
-
-
----
-### ele\_lazy
-- **Type**: `ulong`
-- **Description**: `ele_lazy` is a global variable that is initialized based on a conditional expression. It is set to `sentinel_cnt` if `sentinel_cnt` is less than `ele_max`, otherwise it is set to the result of the function `POOL_(idx_null)()`. This variable is used in the context of managing a pool of elements, specifically in the lazy initialization of the pool.
-- **Use**: Used to determine the starting index for lazy initialization in a pool of elements.
-
-
-# Functions
-
----
-### POOL\_<!-- {{#callable:POOL_}} -->
-[View Source →](<../../../../../src/util/tmpl/fd_pool_para.c#L1051>)
-
-Converts an error code into a human-readable string description.
-- **Inputs**:
-    - `err`: An integer representing the error code to be converted.
-- **Logic and Control Flow**:
-    - Use a switch statement to match the input error code `err` with predefined error codes.
-    - Return a corresponding string description for each matched error code.
-    - If the error code does not match any predefined codes, return the string "unknown".
-- **Output**: A constant character pointer to a string describing the error.
-
-
+- `POOL_`
+- `POOL_`
+- `POOL_`
+- `POOL_`
+- `POOL_`
+- `POOL_`
+- `POOL_`
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
