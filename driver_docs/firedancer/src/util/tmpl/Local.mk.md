@@ -3,10 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules and unit tests for utility data structure headers and objects.
+Makefile for adding headers, objects, and running unit tests for various data structures in `fd_util`.
 
 # Purpose
-This Makefile fragment defines the header files and object files that belong to the `fd_util` unit, then registers a set of unit test targets for many data structure modules such as `fd_bplus`, `fd_deque`, `fd_map`, `fd_pool`, `fd_queue`, `fd_redblack`, `fd_set`, `fd_sort`, `fd_stack`, `fd_treap`, `fd_vec`, and `fd_voff`. It also adds `fd_map_util` as an object built from `fd_util`, which links shared map support into the utility library. The `make-unit-test` calls create test executables for each module, and the `run-unit-test` calls define which tests run as part of the test workflow. The `ifdef FD_HAS_HOSTED` block enables the `test_map_giant_concur` test only when hosted build support is present, so the file controls both build selection and test execution for the utility package.
+This Makefile script is used to automate the process of compiling and testing a set of C source files and their corresponding unit tests. The script uses `add-hdrs` and `add-objs` functions to include header and object files necessary for the build process. It defines a series of `make-unit-test` calls to set up unit tests for various data structures and algorithms, such as `fd_bplus`, `fd_deque`, `fd_map`, and others, by associating each test with the `fd_util` utility. The `run-unit-test` calls execute these tests to verify the functionality of the components. Conditional logic, such as `ifdef FD_HAS_HOSTED`, is used to include specific tests based on the environment configuration. This file is essential for ensuring that the codebase is correctly built and that all components function as expected through automated testing.
+# Content Summary
+The provided content is a Makefile script used in a software codebase to manage the compilation and testing of various components. The script uses custom functions to streamline the process of adding headers, objects, and unit tests, as well as running these tests.
+
+1. **Header and Object Management**: The script uses the `add-hdrs` function to include a list of C source files, such as `fd_bplus.c`, `fd_deque.c`, and others. These files are likely part of the project's data structures or algorithms. The `add-objs` function is used to add object files `fd_map_util` and `fd_util`, which are essential for the build process.
+
+2. **Unit Test Creation**: The `make-unit-test` function is called multiple times to define unit tests for various components. Each call specifies a test name, the corresponding test file, and the utility file `fd_util` required for the test. This setup ensures that each component, such as `test_bplus`, `test_deque`, and `test_heap`, has an associated unit test.
+
+3. **Conditional Test Inclusion**: The script includes a conditional block using `ifdef FD_HAS_HOSTED` to conditionally compile the `test_map_giant_concur` unit test. This indicates that this test is only included if the `FD_HAS_HOSTED` flag is defined, suggesting it may depend on specific hosted environment features.
+
+4. **Running Unit Tests**: The `run-unit-test` function is used to execute the defined unit tests. Each test, such as `test_bplus`, `test_deque`, and `test_map`, is run to verify the functionality of the corresponding component. Some tests, like `test_map_perfect`, are noted with comments indicating potential issues or areas for further attention.
+
+Overall, this Makefile script automates the process of compiling and testing various components of the software, ensuring that each part is verified through unit tests. The use of custom functions helps maintain a structured and organized build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
