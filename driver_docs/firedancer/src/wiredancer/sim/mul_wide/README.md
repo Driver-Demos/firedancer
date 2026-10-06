@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for simulating Verilog modules and a test script for verifying wide multiplication logic.
+The `mul_wide` folder in the `firedancer` codebase contains a `Makefile` for simulating a Verilog module using Questa and a `test.py` script for testing wide multiplication functionality with cocotb.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: Makefile for simulating Verilog modules with Questa and Cocotb in the mul_wide directory.
-- **[test.py](test.py.md)**: A test script for verifying wide multiplication logic using the cocotb framework.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/mul_wide` directory is configured to simulate a Verilog module named `mul_wide` using the Questa simulator, with source files specified from Xilinx Vivado and a local RTL directory.
+- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase is a cocotb-based test script for verifying a hardware module's wide multiplication functionality by generating random inputs and checking the outputs against expected results.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
