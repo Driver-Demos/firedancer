@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Seccomp filter policy, transaction verification, security policies, build logic, and test programs.
+Transaction verification tile, helpers, tests, build rules, and seccomp policy.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall verification on different architectures.
+- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only for fd 2 or logfile_fd.
 
 ## Files
-- **[fd_verify_tile.c](fd_verify_tile.c.md)**: Implements a verification tile for processing and verifying transactions, including handling different input kinds and managing metrics.
-- **[fd_verify_tile.h](fd_verify_tile.h.md)**: Verifies cryptographic signatures of transactions, filtering out those with invalid signatures.
-- **[fd_verify_tile.seccomppolicy](fd_verify_tile.seccomppolicy.md)**: Defines security policies for logging behavior, including file descriptor usage and message handling.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing components with conditional logic based on FD_HAS_ALLOCA.
-- **[test_verify.c](test_verify.c.md)**: Tests for transaction verification functions, including scenarios with valid and invalid signatures.
-- **[test_verify_tile.c](test_verify_tile.c.md)**: Tests for the verify tile using mock inputs and custom memory allocation for sanitization checks.
-- **[verify_synth_load.c](verify_synth_load.c.md)**: A C program for verifying synthetic load tasks, including configuration loading, flow control, and message verification.
+- **[fd_verify_tile.c](fd_verify_tile.c.md)**: Transaction verification tile with fragment filtering, parsing, dedup, and publish logic.
+- **[fd_verify_tile.h](fd_verify_tile.h.md)**: Transaction signature verification and deduplication helpers for incoming transactions.
+- **[fd_verify_tile.seccomppolicy](fd_verify_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
+- **[Local.mk](Local.mk.md)**: Build rules and unit tests for verify and verify_tile, enabled when FD_HAS_ALLOCA is set
+- **[test_verify.c](test_verify.c.md)**: Tests transaction verification, signature dedup, and invalid signature handling.
+- **[test_verify_tile.c](test_verify_tile.c.md)**: Tests verify tile seccomp setup and load balancing logic.
+- **[verify_synth_load.c](verify_synth_load.c.md)**: The `verify_synth_load.c` file in the `firedancer` codebase implements a task for verifying synthetic load by setting up configurations, joining necessary IPC objects, and performing signature verification on synthetic messages.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

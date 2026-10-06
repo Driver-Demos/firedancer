@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for verifying system and program IDs using base58 decoding and public key comparison.
+The `test_system_ids.c` file in the `firedancer` codebase contains tests for verifying the correctness of public key decoding and classification functions related to Solana system IDs.
 
 # Purpose
-The code is a C program that tests the functionality of public key validation and classification within a Solana-based system. It includes functions to check if a given public key is active, pending, or associated with a specific cryptographic program, such as `secp256r1`. The program uses a series of `memcmp` operations to compare the provided public keys against known identifiers, which are likely defined in the included header file `fd_system_ids.h`. These identifiers represent various Solana system programs and sysvars.
+This C source code file is designed to validate and test the functionality of public key identification and verification within a Solana-based system. It includes functions that check whether a given public key is associated with specific reserved program IDs, such as active, pending, or secp256r1 program IDs. The file defines several static inline functions, such as [`old_fd_pubkey_is_active_reserved`](#old_fd_pubkey_is_active_reserved), [`old_fd_pubkey_is_pending_reserved`](#old_fd_pubkey_is_pending_reserved), and [`old_fd_pubkey_is_secp256r1`](#old_fd_pubkey_is_secp256r1), which compare a given public key against a set of predefined program IDs to determine its status. These functions utilize the `memcmp` function to perform byte-wise comparisons of the public keys.
 
-The [`main`](<#main>) function initializes the environment, performs assertions to verify the correctness of public key mappings, and tests the classification functions using a predefined list of public keys. The [`assert_eq`](<#assert_eq>) function is used to ensure that the base58-encoded strings match their corresponding public key identifiers. The program concludes by logging a success message if all tests pass, and then halts execution. This code is intended to be executed as a standalone program, as indicated by the presence of the [`main`](<#main>) function, and it does not define any public APIs or external interfaces.
+The [`main`](#main) function serves as a test harness, initializing the system with `fd_boot`, and then performing a series of assertions to verify that the public keys match their expected base58-encoded strings. It iterates over a list of test public keys, decodes them, and checks their status using the defined functions, ensuring that the results are consistent with expected outcomes. The file is structured to be an executable, as indicated by the presence of the [`main`](#main) function, and it relies on external functions and data structures, such as `fd_base58_decode_32`, `fd_pubkey_t`, and various `fd_solana_*` identifiers, which are likely defined in the included header file "fd_system_ids.h". The code is focused on ensuring the integrity and correctness of public key handling within the context of Solana's system program IDs.
 # Imports and Dependencies
 
 ---
@@ -19,87 +19,76 @@ The [`main`](<#main>) function initializes the environment, performs assertions 
 
 ---
 ### assert\_eq<!-- {{#callable:assert_eq}} -->
-[View Source →](<../../../../../src/flamenco/runtime/test_system_ids.c#L3>)
-
-Verifies that a Base58-encoded string decodes to a specific public key.
+The `assert_eq` function decodes a Base58-encoded string into a 32-byte array and asserts that it matches a given public key.
 - **Inputs**:
-    - `base58`: A pointer to a constant character string representing the Base58-encoded data.
-    - `key`: A `fd_pubkey_t` structure containing the expected public key to compare against.
-- **Logic and Control Flow**:
-    - Initialize a 32-byte array `decoded` to zero.
+    - `base58`: A constant character pointer representing the Base58-encoded string to be decoded.
+    - `key`: A `fd_pubkey_t` structure containing a public key to compare against the decoded result.
+- **Control Flow**:
+    - Initialize a 32-byte array `decoded` with zeros.
     - Call `fd_base58_decode_32` to decode the `base58` string into the `decoded` array.
-    - Use `FD_TEST` to assert that the decoded data matches the public key in `key`.
-- **Output**: No output is returned; the function performs an assertion to verify the equality of the decoded data and the public key.
+    - Use `FD_TEST` to assert that the `decoded` array is equal to the `key.uc` array using `fd_memeq`.
+- **Output**: The function does not return a value; it performs an assertion to ensure the decoded Base58 string matches the provided public key.
 
 
 ---
 ### old\_fd\_pubkey\_is\_active\_reserved<!-- {{#callable:old_fd_pubkey_is_active_reserved}} -->
-[View Source →](<../../../../../src/flamenco/runtime/test_system_ids.c#L11>)
-
-Checks if a given public key matches any of the predefined active reserved program IDs.
+The function `old_fd_pubkey_is_active_reserved` checks if a given public key matches any of a predefined set of active reserved Solana program IDs.
 - **Inputs**:
-    - `acct`: A pointer to a `fd_pubkey_t` structure that contains the public key to check.
-- **Logic and Control Flow**:
-    - Compare the `key` field of the `acct` structure with each predefined program ID using `memcmp`.
-    - If any comparison returns 0 (indicating a match), return 1 immediately.
-    - If no matches are found after all comparisons, return 0.
-- **Output**: Returns 1 if the public key is active and reserved, otherwise returns 0.
+    - `acct`: A pointer to a `fd_pubkey_t` structure representing the public key to be checked.
+- **Control Flow**:
+    - The function iterates through a series of `memcmp` comparisons between the input public key (`acct->key`) and a set of predefined program IDs stored in global variables.
+    - For each comparison, if the input key matches one of the predefined program IDs, the function immediately returns 1, indicating the key is active and reserved.
+    - If none of the comparisons result in a match, the function returns 0, indicating the key is not active and reserved.
+- **Output**: The function returns an integer: 1 if the public key is active and reserved, or 0 if it is not.
 
 
 ---
 ### old\_fd\_pubkey\_is\_pending\_reserved<!-- {{#callable:old_fd_pubkey_is_pending_reserved}} -->
-[View Source →](<../../../../../src/flamenco/runtime/test_system_ids.c#L36>)
-
-Checks if a given public key matches any of the predefined pending reserved program or system IDs.
+The function `old_fd_pubkey_is_pending_reserved` checks if a given public key matches any of a predefined set of reserved program IDs and returns a boolean indicating the match.
 - **Inputs**:
-    - `acct`: A pointer to a `fd_pubkey_t` structure representing the public key to check.
-- **Logic and Control Flow**:
-    - Compare the `key` field of the `acct` structure with the `key` field of each predefined program or system ID using `memcmp`.
-    - If any comparison returns 0 (indicating a match), return 1.
-    - If no matches are found after all comparisons, return 0.
-- **Output**: Returns 1 if the public key matches any of the predefined pending reserved IDs, otherwise returns 0.
+    - `acct`: A pointer to a `fd_pubkey_t` structure representing the public key to be checked against reserved program IDs.
+- **Control Flow**:
+    - The function iterates through a series of `memcmp` comparisons between the `acct->key` and various predefined program IDs stored in `fd_pubkey_t` structures.
+    - If any `memcmp` comparison returns 0, indicating a match, the function immediately returns 1.
+    - If none of the comparisons result in a match, the function returns 0.
+- **Output**: An integer value, 1 if the public key matches any of the reserved program IDs, otherwise 0.
 
 
 ---
 ### old\_fd\_pubkey\_is\_secp256r1<!-- {{#callable:old_fd_pubkey_is_secp256r1}} -->
-[View Source →](<../../../../../src/flamenco/runtime/test_system_ids.c#L51>)
-
-Checks if a given public key matches the `fd_solana_secp256r1_program_id` key.
+The function `old_fd_pubkey_is_secp256r1` checks if a given public key matches the Solana secp256r1 program ID.
 - **Inputs**:
-    - `acct`: A pointer to a `fd_pubkey_t` structure representing the public key to check.
-- **Logic and Control Flow**:
-    - Compares the `key` field of the `acct` structure with the `key` field of the `fd_solana_secp256r1_program_id` structure using `memcmp`.
-    - If the keys are equal, returns 1.
-    - If the keys are not equal, returns 0.
-- **Output**: Returns 1 if the public key matches the `fd_solana_secp256r1_program_id` key, otherwise returns 0.
+    - `acct`: A pointer to a `fd_pubkey_t` structure representing the public key to be checked.
+- **Control Flow**:
+    - The function compares the `key` field of the `acct` structure with the `key` field of the `fd_solana_secp256r1_program_id` using `memcmp`.
+    - If the keys are identical, the function returns 1.
+    - If the keys are not identical, the function returns 0.
+- **Output**: The function returns an integer: 1 if the public key matches the secp256r1 program ID, otherwise 0.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/flamenco/runtime/test_system_ids.c#L57>)
-
-Initializes the system, verifies predefined public keys against expected values, and tests the decoding and classification of public keys.
+The `main` function initializes the system, verifies a series of public key identifiers against expected values, and tests the decoding and classification of these keys.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
     - Call `fd_boot` to initialize the system with command-line arguments.
-    - Verify predefined public keys using [`assert_eq`](<#assert_eq>) to ensure they match expected values.
-    - Define an array `test_pubkeys` containing 37 predefined public keys.
-    - Iterate over each public key in `test_pubkeys`.
-    - For each public key, decode it using `fd_base58_decode_32` and store the result in `decoded`.
-    - Test if the decoded public key is active, pending, or a secp256r1 key using `FD_TEST` and compare with old functions [`old_fd_pubkey_is_active_reserved`](<#old_fd_pubkey_is_active_reserved>), [`old_fd_pubkey_is_pending_reserved`](<#old_fd_pubkey_is_pending_reserved>), and [`old_fd_pubkey_is_secp256r1`](<#old_fd_pubkey_is_secp256r1>).
+    - Use [`assert_eq`](#assert_eq) to verify that each predefined public key identifier matches its expected value.
+    - Define an array `test_pubkeys` containing 37 public key strings to be tested.
+    - Iterate over each public key in `test_pubkeys`, decode it using `fd_base58_decode_32`, and store the result in `decoded`.
+    - For each decoded key, verify that it matches the expected classification using `FD_TEST` with functions [`fd_pubkey_is_active_reserved_key`](fd_system_ids.c.md#fd_pubkey_is_active_reserved_key), [`fd_pubkey_is_pending_reserved_key`](fd_system_ids.c.md#fd_pubkey_is_pending_reserved_key), and [`fd_pubkey_is_secp256r1_key`](fd_system_ids.c.md#fd_pubkey_is_secp256r1_key).
     - Log a notice message indicating success with `FD_LOG_NOTICE`.
     - Call `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`assert_eq`](<#assert_eq>)
-    - [`fd_pubkey_is_active_reserved_key`](<fd_system_ids.c.md#fd_pubkey_is_active_reserved_key>)
-    - [`old_fd_pubkey_is_active_reserved`](<#old_fd_pubkey_is_active_reserved>)
-    - [`fd_pubkey_is_pending_reserved_key`](<fd_system_ids.c.md#fd_pubkey_is_pending_reserved_key>)
-    - [`old_fd_pubkey_is_pending_reserved`](<#old_fd_pubkey_is_pending_reserved>)
-    - [`fd_pubkey_is_secp256r1_key`](<fd_system_ids.c.md#fd_pubkey_is_secp256r1_key>)
-    - [`old_fd_pubkey_is_secp256r1`](<#old_fd_pubkey_is_secp256r1>)
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`assert_eq`](#assert_eq)
+    - [`fd_pubkey_is_active_reserved_key`](fd_system_ids.c.md#fd_pubkey_is_active_reserved_key)
+    - [`old_fd_pubkey_is_active_reserved`](#old_fd_pubkey_is_active_reserved)
+    - [`fd_pubkey_is_pending_reserved_key`](fd_system_ids.c.md#fd_pubkey_is_pending_reserved_key)
+    - [`old_fd_pubkey_is_pending_reserved`](#old_fd_pubkey_is_pending_reserved)
+    - [`fd_pubkey_is_secp256r1_key`](fd_system_ids.c.md#fd_pubkey_is_secp256r1_key)
+    - [`old_fd_pubkey_is_secp256r1`](#old_fd_pubkey_is_secp256r1)
 
 
 
