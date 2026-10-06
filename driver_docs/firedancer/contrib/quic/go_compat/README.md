@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC compatibility tests, TLS certificate generation, loopback packet simulation, and Go module files.
+Go files for QUIC protocol testing, TLS certificate generation, and module dependencies.
 
 
 ## Files
-- **[.gitignore](.gitignore.md)**: The `.gitignore` file in the `firedancer/contrib/quic/go_compat` directory specifies that the `go_compat` binary, which is the output of the "go build ." command, should be ignored by Git.
-- **[cert.go](cert.go.md)**: The `cert.go` file in the `firedancer` codebase provides functionality to generate a Solana-specific TLS certificate using the Ed25519 cryptographic algorithm.
-- **[go.mod](go.mod.md)**: Go module for quic-go compatibility with Go 1.23.0 and toolchain go1.23.6
-- **[go.sum](go.sum.md)**: Go module checksum file for QUIC Go compatibility dependencies.
-- **[loopback.go](loopback.go.md)**: The `loopback.go` file in the `firedancer` codebase implements a loopback packet connection for simulating network communication between two endpoints using Go channels.
-- **[main.go](main.go.md)**: The `main.go` file in the `firedancer` codebase implements a Go program that tests QUIC protocol compatibility between `fd_quic` and `quic-go` by setting up both client and server tests, handling packet wrapping and unwrapping, and managing QUIC connections and streams.
+- **[.gitignore](.gitignore.md)**: Specifies files and directories for Git to ignore, including the `go_compat` binary.
+- **[cert.go](cert.go.md)**: Generates a Solana-compatible TLS certificate using ed25519 keys.
+- **[go.mod](go.mod.md)**: Configuration for Go module dependencies and toolchain version for post-quantum key exchange.
+- **[go.sum](go.sum.md)**: Dependency checksums for Go modules used in the project.
+- **[loopback.go](loopback.go.md)**: Implements a loopback packet connection for testing UDP communication in Go.
+- **[main.go](main.go.md)**: A Go program that tests QUIC protocol interoperability between `fd_quic` and `quic-go` implementations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

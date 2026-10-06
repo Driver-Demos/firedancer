@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.md` file in the `firedancer/src/waltz/resolv` directory describes the `fd_resolv` module, a Linux userland DNS resolver for WAN servers, detailing its modifications from the musl libc's `getaddrinfo` implementation and its alignment with Firedancer's code style.
+Linux userland DNS resolver for WAN servers with modifications for security and compatibility.
 
 # Purpose
-The provided content is a documentation excerpt for a module named `fd_resolv`, which serves as a DNS resolver for Linux userland, specifically designed for servers on a Wide Area Network (WAN). The module is a modified version of the `getaddrinfo` implementation from musl libc, adapted to align with Firedancer's coding standards and rewritten in C17 style. Key modifications include the removal of pthread cancellation and cleanup API support, the replacement of internal musl API usages with public libc variants, and the elimination of `malloc` calls to enhance security and compatibility with sandboxing techniques like seccomp and landlock. Additionally, the module optimizes sandboxing by reusing file descriptors for `/etc/hosts` and `/etc/resolv.conf`, and it is not optimized for performance. The copyright information is referenced in a separate file, `/NOTICE`.
+The `fd_resolv` module provides a DNS resolver for Linux userland, specifically designed for servers on a Wide Area Network (WAN). It documents system calls and file system accesses to support seccomp and landlock sandboxing, although it is not optimized for performance. This module is a modified version of the `getaddrinfo` implementation from musl libc, imported in May 2025. Modifications include alignment with Firedancer's code style, rewriting in C17 style, and removal of certain features such as pthread cancellation support and malloc calls. The module also replaces internal musl API usages with public libc variants and reuses file descriptors for `/etc/hosts` and `/etc/resolv.conf` to enhance sandboxing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `avx512` folder in the `firedancer` codebase contains source files and headers implementing optimized elliptic curve and finite field arithmetic operations for the Curve25519 and ED25519 protocols using AVX-512 instructions, along with a makefile and test suite for these implementations.
+Functions, APIs, and tests for Curve25519 and ED25519 operations using AVX-512 vectorization.
 
 
 ## Files
-- **[fd_curve25519.c](fd_curve25519.c.md)**: The `fd_curve25519.c` file in the `firedancer` codebase implements various operations for elliptic curve point arithmetic on the Curve25519, including addition, subtraction, doubling, and conversion between affine and projective coordinates, with optimizations for scalar multiplication.
-- **[fd_curve25519.h](fd_curve25519.h.md)**: The `fd_curve25519.h` file provides the public API for Curve25519 operations, including point manipulation and arithmetic in Extended Twisted Edwards Coordinates, as part of the Firedancer codebase.
-- **[fd_curve25519_secure.c](fd_curve25519_secure.c.md)**: The `fd_curve25519_secure.c` file in the `firedancer` codebase implements secure operations for Curve25519, including constant-time point addition, doubling, conditional selection, and negation, ensuring that sensitive data is protected from side-channel attacks.
-- **[fd_f25519.c](fd_f25519.c.md)**: The `fd_f25519.c` file contains a function to generate a random `fd_f25519_t` element for testing purposes, using an insecure method.
-- **[fd_f25519.h](fd_f25519.h.md)**: The `fd_f25519.h` file in the `firedancer` codebase provides an implementation of operations on Curve25519 field elements, including addition, subtraction, multiplication, squaring, and serialization, with support for vectorized operations using AVX-512.
-- **[fd_r43x6.c](fd_r43x6.c.md)**: The `fd_r43x6.c` file in the `firedancer` codebase implements functions for performing repeated squaring and multiplication operations on `fd_r43x6_t` types, including calculations for inversion and exponentiation in a finite field using AVX-512 instructions.
-- **[fd_r43x6.h](fd_r43x6.h.md)**: The `fd_r43x6.h` file in the `firedancer` codebase provides an implementation of arithmetic operations on elements of the finite field GF(p) using a 6-limb radix 2^43 representation optimized for AVX-512, including functions for addition, subtraction, multiplication, inversion, and modular reduction.
-- **[fd_r43x6_ge.c](fd_r43x6_ge.c.md)**: The `fd_r43x6_ge.c` file in the `firedancer` codebase provides functions for encoding and decoding elliptic curve points using the RFC 8032 standard, optimized for AVX-512 instructions.
-- **[fd_r43x6_ge.h](fd_r43x6_ge.h.md)**: The `fd_r43x6_ge.h` file in the `firedancer` codebase provides APIs for manipulating group elements and curve points in the ED25519 elliptic curve, including operations such as addition, doubling, encoding, decoding, and scalar multiplication, optimized for AVX-512 architecture.
-- **[fd_r43x6_inl.h](fd_r43x6_inl.h.md)**: The `fd_r43x6_inl.h` file in the `firedancer` codebase provides inline implementations and macros for optimized parallel operations on finite fields, specifically targeting the ED25519 protocol using AVX-512 instructions to enhance performance.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the AVX512 implementation of the Ed25519 algorithm, conditional on the presence of AVX512 support.
-- **[test_r43x6.c](test_r43x6.c.md)**: The `test_r43x6.c` file in the `firedancer` codebase contains a comprehensive suite of tests for the `fd_r43x6` module, which includes functions for packing, unpacking, folding, modular arithmetic, and various arithmetic operations on 43-bit integers using AVX-512 instructions.
+- **[fd_curve25519.c](fd_curve25519.c.md)**: Functions for point addition, subtraction, doubling, and affine conversion on the Ed25519 curve.
+- **[fd_curve25519.h](fd_curve25519.h.md)**: Public API for Curve25519 operations, including point manipulation in Extended Twisted Edwards Coordinates.
+- **[fd_curve25519_secure.c](fd_curve25519_secure.c.md)**: Secure implementations of Ed25519 point addition, doubling, conditional selection, and negation.
+- **[fd_f25519.c](fd_f25519.c.md)**: Generates a random fd_f25519_t element for testing purposes using an insecure method.
+- **[fd_f25519.h](fd_f25519.h.md)**: Defines and implements operations for Curve25519 field elements using AVX-512 vectorization.
+- **[fd_r43x6.c](fd_r43x6.c.md)**: Functions for repeated squaring and multiplication operations on fd_r43x6_t data type in AVX-512.
+- **[fd_r43x6.h](fd_r43x6.h.md)**: Defines a GF(p) element representation using AVX-512 for arithmetic operations in the field 2^255-19.
+- **[fd_r43x6_ge.c](fd_r43x6_ge.c.md)**: Functions for encoding and decoding elliptic curve points using AVX-512 instructions based on RFC 8032.
+- **[fd_r43x6_ge.h](fd_r43x6_ge.h.md)**: APIs for manipulating ED25519 curve points using extended homogeneous coordinates with AVX-512 optimizations.
+- **[fd_r43x6_inl.h](fd_r43x6_inl.h.md)**: Macros and functions for optimized parallel GF(p) operations using AVX-512 for ED25519 protocols.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for AVX512 in the ed25519 module.
+- **[test_r43x6.c](test_r43x6.c.md)**: Tests for the `fd_r43x6` module in the `firedancer` codebase, including functions for packing, unpacking, folding, modular arithmetic, and arithmetic operations on `fd_r43x6_t` data types.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
