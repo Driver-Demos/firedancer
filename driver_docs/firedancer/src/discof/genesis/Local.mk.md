@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules that add fd_genesi_tile and fd_genesis_client objects when alloca and int128 are available.
+Makefile logic for adding objects if FD_HAS_ALLOCA and FD_HAS_INT128 are defined.
 
 # Purpose
-Build logic includes `fd_genesi_tile` and `fd_genesis_client` in the `fd_discof` object list only when both `FD_HAS_ALLOCA` and `FD_HAS_INT128` are defined. The nested `ifdef` blocks gate these object files on the required build-time feature flags.
+The `Makefile` content uses conditional directives to manage the inclusion of object files in the build process. If the macro `FD_HAS_ALLOCA` is defined, it checks if `FD_HAS_INT128` is also defined. If both conditions are true, it calls the `add-objs` function to add the object files `fd_genesi_tile`, `fd_genesis_client`, and `fd_discof` to the build. This setup allows for conditional compilation based on the presence of specific features or capabilities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
