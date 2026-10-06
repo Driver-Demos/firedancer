@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Bootstrapping, process execution, benchmarking, configuration, packet generation, QUIC tracing, network command utilities, RPC client programs, and a Makefile for building shared development components.
+Development command tools, RPC client, and makefile rules for shared objects and configure stages.
 
 ## Folders
-- **[boot](boot/README.md)**: Bootstraps and executes development environment processes with permission checks and command handling.
-- **[commands](commands/README.md)**: Benchmarking, configuration, packet generation, QUIC tracing, and network command utilities with related source and header files.
-- **[rpc_client](rpc_client/README.md)**: RPC client programs, implementations, headers, private structures, a Makefile, and test functionality.
+- **[boot](boot/README.md)**: Development command dispatcher with config parsing, permission checks, and sudo rerun.
+- **[commands](commands/README.md)**: Benchmark, configuration, packet generation, QUIC trace, UDP echo, and development command tools.
+- **[rpc_client](rpc_client/README.md)**: HTTP JSON-RPC client, request/state structs, tests, and build files for block hash and tx count requests.
 
 ## Files
-- **[Local.mk](Local.mk.md)**: Makefile for building and configuring shared development components in the Firedancer project.
+- **[Local.mk](Local.mk.md)**: Makefile rules for fddev shared objects, actions, tiles, and configure stages.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

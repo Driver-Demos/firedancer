@@ -3,16 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Wrappers for software-defined trace points with conditional support for SystemTap SDT on Linux.
+Wrappers for software-defined trace points with no-op fallbacks when SDT is unavailable.
 
 # Purpose
-The `fd_dtrace.h` file is a C header file that provides macros for software-defined trace points, which are used for debugging and performance analysis. It checks for the availability of the `<sys/sdt.h>` header and whether the code is being compiled on a Linux system to determine if SystemTap's static tracepoints are supported (`FD_HAS_SDT`). If supported, it includes `<sys/sdt.h>` and defines macros like `FD_DTRACE_PROBE` and `FD_DTRACE_PROBE_1` to `FD_DTRACE_PROBE_5`, which map to SystemTap's `DTRACE_PROBE` macros, allowing for up to five arguments. If SystemTap is not available, the macros are defined as no-operations, ensuring that the code can compile without errors while ignoring the trace points. The file also includes a workaround for a known incompatibility between Clang version 19 and SystemTap SDT.
-# Imports and Dependencies
-
----
-- `sys/sdt.h`
-
-
+This header defines wrapper macros for software-defined trace points used by the logging code. It checks whether `<sys/sdt.h>` is available on Linux and sets `FD_HAS_SDT` to enable or disable SystemTap SDT support. When SDT is available, the `FD_DTRACE_PROBE` macros expand to `DTRACE_PROBE` calls for the `Firedancer` provider; when SDT is not available, the macros expand to no-op expressions that still evaluate their arguments. The file also includes a Clang 19 diagnostic workaround for a known SDT compatibility issue.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

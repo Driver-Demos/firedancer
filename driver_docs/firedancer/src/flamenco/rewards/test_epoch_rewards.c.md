@@ -3,59 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the functionality of epoch rewards, including memory alignment, insertion, and iteration of accounts.
+Tests epoch rewards allocation, join/leave, hashing, insertion, and partition iteration.
 
 # Purpose
-The code is a C program that tests the functionality of the `fd_epoch_rewards` module. It is designed to verify the correct behavior of operations related to epoch rewards, which are likely used in a blockchain or distributed ledger context. The program initializes a workspace using shared memory, checks memory alignment, and ensures that the static footprint of the epoch rewards structure is sufficient. It then performs a series of tests to validate the creation, joining, and manipulation of epoch rewards data structures.
-
-The program includes tests for inserting and hashing accounts, iterating through partitions, and verifying that each public key appears exactly once with the correct associated data. It also tests the ability to leave and rejoin the epoch rewards structure, as well as the deletion of the structure. The use of `FD_TEST` macros indicates that the program is structured to assert the correctness of each operation, and it logs a notice upon successful completion of all tests. The code is intended to be executed as a standalone program, as indicated by the presence of the [`main`](<#main>) function.
-# Imports and Dependencies
-
----
-- `fd_epoch_rewards.h`
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/flamenco/rewards/test_epoch_rewards.c#L3>)
-
-Initializes and tests the functionality of epoch rewards management, including memory allocation, insertion, hashing, and iteration over stake accounts.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Determines the NUMA index and creates a new anonymous workspace with a specified page size.
-    - Checks alignment and footprint requirements for epoch rewards structures using `FD_TEST`.
-    - Attempts to create a new epoch rewards structure with no memory, expecting failure.
-    - Allocates memory for epoch rewards and verifies successful creation.
-    - Attempts to join an epoch rewards structure with incorrect magic value, expecting failure.
-    - Successfully joins a valid epoch rewards structure and verifies initial state values.
-    - Sets the number of partitions for the epoch rewards structure.
-    - Defines and inserts several stake accounts with associated rewards.
-    - Hashes the accounts into partitions using a parent block hash.
-    - Iterates over partitions to verify that each public key appears exactly once with correct reward values.
-    - Tests the ability to leave and rejoin the epoch rewards structure.
-    - Deletes the epoch rewards structure and verifies that it cannot be joined again.
-    - Logs a success message and halts the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_epoch_rewards_align`](<fd_epoch_rewards.c.md#fd_epoch_rewards_align>)
-    - [`fd_epoch_rewards_footprint`](<fd_epoch_rewards.c.md#fd_epoch_rewards_footprint>)
-    - [`fd_epoch_rewards_new`](<fd_epoch_rewards.c.md#fd_epoch_rewards_new>)
-    - [`fd_epoch_rewards_join`](<fd_epoch_rewards.c.md#fd_epoch_rewards_join>)
-    - [`fd_epoch_rewards_insert`](<fd_epoch_rewards.c.md#fd_epoch_rewards_insert>)
-    - [`fd_epoch_rewards_hash_into_partitions`](<fd_epoch_rewards.c.md#fd_epoch_rewards_hash_into_partitions>)
-    - [`fd_epoch_rewards_iter_init`](<fd_epoch_rewards.c.md#fd_epoch_rewards_iter_init>)
-    - [`fd_epoch_rewards_iter_done`](<fd_epoch_rewards.c.md#fd_epoch_rewards_iter_done>)
-    - [`fd_epoch_rewards_iter_next`](<fd_epoch_rewards.c.md#fd_epoch_rewards_iter_next>)
-    - [`fd_epoch_rewards_iter_ele`](<fd_epoch_rewards.c.md#fd_epoch_rewards_iter_ele>)
-    - [`fd_epoch_rewards_leave`](<fd_epoch_rewards.c.md#fd_epoch_rewards_leave>)
-    - [`fd_epoch_rewards_delete`](<fd_epoch_rewards.c.md#fd_epoch_rewards_delete>)
-
-
+This file is a C test program for the `fd_epoch_rewards` data structure and its related API. It checks memory alignment, footprint limits, object creation with `fd_epoch_rewards_new`, object access with `fd_epoch_rewards_join`, and error handling for invalid or `NULL` input. It also inserts stake reward records, hashes them into partitions, and iterates through the partitions to verify that each `fd_pubkey_t` appears once with the expected `lamports` and `credits_observed` values. The program then tests leave, rejoin, and delete operations, and ends by reporting `pass` if all `FD_TEST` checks succeed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

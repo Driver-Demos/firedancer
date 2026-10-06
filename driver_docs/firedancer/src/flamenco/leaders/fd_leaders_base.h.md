@@ -3,46 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines structures and constants for managing stake weights and leader schedules in epochs.
+Stake weight message layout, size constants, and a message size helper.
 
 # Purpose
-This C header file defines constants, a structure, and functions related to stake weight messaging in a leader selection system. It includes a custom type header file and defines several constants such as `MAX_SLOTS_PER_EPOCH`, `MAX_PUB_CNT`, and `MAX_STAKED_LEADERS`, which set limits for various parameters in the system. The `fd_stake_weight_msg_t` structure is defined to represent a message containing stake weights, including fields for epoch information, the number of staked nodes, and other relevant data. The file also defines macros for calculating message sizes, such as `FD_STAKE_CI_STAKE_MSG_SZ`, and provides an inline function [`fd_stake_weight_msg_sz`](<#fd_stake_weight_msg_sz>) to compute the size of a stake weight message based on the number of staked nodes. This header is essential for managing and transmitting stake weight data in the system.
-# Imports and Dependencies
-
----
-- `../types/fd_types_custom.h`
-
-
-# Data Structures
-
----
-### fd\_stake\_weight\_msg\_t
-- **Type**: ``struct``
-- **Members**:
-    - `epoch`: Epoch for which the stake weights are valid.
-    - `staked_cnt`: Number of staked nodes.
-    - `start_slot`: Start slot of the epoch.
-    - `slot_cnt`: Number of slots in the epoch.
-    - `excluded_stake`: Total stake that is excluded from leader selection.
-    - `vote_keyed_lsched`: 1=use vote-keyed leader schedule, 0=use old leader schedule.
-    - `weights`: Stake weights for each staked node.
-- **Description**: Defines a message structure that contains information about stake weights for a specific epoch, including the number of staked nodes, the start slot, the number of slots, and the total excluded stake. It also indicates whether to use a vote-keyed leader schedule or an old leader schedule, and includes an array of stake weights for each staked node.
-
-
-# Functions
-
----
-### fd\_stake\_weight\_msg\_sz<!-- {{#callable:fd_stake_weight_msg_sz}} -->
-[View Source →](<../../../../../src/flamenco/leaders/fd_leaders_base.h#L28>)
-
-Calculates the size of a stake weight message based on the number of staked nodes.
-- **Inputs**:
-    - `cnt`: The number of staked nodes for which the stake weights are calculated.
-- **Logic and Control Flow**:
-    - Compute the total size by adding `FD_STAKE_CI_STAKE_MSG_HEADER_SZ` to the product of `cnt` and `FD_STAKE_CI_STAKE_MSG_RECORD_SZ`.
-- **Output**: Returns the total size of the stake weight message as an unsigned long integer.
-
-
+This header defines shared constants and a message layout for stake weight data used by leader selection code. It sets limits for slots, public keys, and staked leaders, and it declares the `fd_stake_weight_msg_t` structure with a flexible array of `fd_vote_stake_weight_t` records. The file also defines size macros for the message header, one record, and the full message buffer, including `FD_STAKE_OUT_MTU`. The inline function [`fd_stake_weight_msg_sz`](<#fd_stake_weight_msg_sz>) returns the byte size for a message that contains a given number of stake weight records.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

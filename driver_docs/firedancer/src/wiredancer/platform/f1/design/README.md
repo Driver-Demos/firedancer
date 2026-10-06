@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a DDR DRAM DMA module for FPGA with address mapping and reset synchronization.
+DDR DMA and PCIe bridge logic with reset sync, FIFOs, and top-level wiring.
 
 
 ## Files
-- **[cl_dram_dma.sv](cl_dram_dma.sv.md)**: Implements a DDR DRAM Direct Memory Access (DMA) module for FPGA hardware with address mapping and reset synchronization.
+- **[cl_dram_dma.sv](cl_dram_dma.sv.md)**: DDR DMA and PCIe bridge logic with reset sync, FIFOs, and top-level wiring.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
