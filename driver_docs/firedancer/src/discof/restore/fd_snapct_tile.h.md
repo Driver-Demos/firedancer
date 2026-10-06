@@ -3,10 +3,44 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Snapshot restore state constants, state-to-string mapping, and update metadata.
+Defines a state machine for downloading or reading snapshots and managing snapshot states.
 
 # Purpose
-This header defines the state values and helper types used by the `snapct` tile, which manages snapshot restore work. The `FD_SNAPCT_STATE_*` constants describe the tile state machine for waiting for peers, collecting peers, reading snapshot files from disk, downloading snapshots over HTTP, flushing data, and shutting down. The `fd_snapct_state_str()` function maps each state value to a text name for logging or diagnostics. The file also defines snapshot type constants and the `fd_snapct_update_t` structure, which stores the snapshot type, whether the update is a download, and the file path used for reading.
+This C header file defines constants, a function, and a data structure related to the operation of a "snapct tile," which is a state machine for handling snapshot data. The snapct tile can download snapshots from a network or read them from disk, producing a byte stream for downstream processing. The file defines several states, such as `FD_SNAPCT_STATE_WAITING_FOR_PEERS` and `FD_SNAPCT_STATE_READING_FULL_HTTP`, which represent different stages in the snapshot handling process. The [`fd_snapct_state_str`](<#fd_snapct_state_str>) function converts these state constants into human-readable strings. Additionally, the `fd_snapct_update_t` structure is defined to store information about snapshot updates, including the type of snapshot and whether it is downloaded or read from a local path.
+# Imports and Dependencies
+
+---
+- `../../util/fd_util_base.h`
+
+
+# Data Structures
+
+---
+### fd\_snapct\_update\_t
+- **Type**: ``struct``
+- **Members**:
+    - `type`: Indicates the type of snapshot, either full or incremental.
+    - `is_download`: Indicates if the snapshot is downloaded (1) or read from disk (0).
+    - `read_path`: Stores the file path from which the snapshot is read.
+- **Description**: Defines a structure to manage snapshot updates, specifying the type of snapshot, whether it is downloaded or read from disk, and the path to the snapshot file.
+
+
+# Functions
+
+---
+### fd\_snapct\_state\_str<!-- {{#callable:fd_snapct_state_str}} -->
+[View Source →](<../../../../../src/discof/restore/fd_snapct_tile.h#L33>)
+
+Maps a given state code to its corresponding string representation for the snapct tile state machine.
+- **Inputs**:
+    - `state`: An unsigned long integer representing the state code of the snapct tile.
+- **Logic and Control Flow**:
+    - Use a switch statement to match the input `state` with predefined state codes.
+    - Return the corresponding string for each matched state code.
+    - If the `state` does not match any predefined state code, return "unknown".
+- **Output**: A constant character pointer to the string representation of the input state code.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

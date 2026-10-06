@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_msan.h` file in the `firedancer` codebase provides functions for marking memory as uninitialized or initialized and checking memory initialization status, leveraging MemorySanitizer (MSan) to detect uninitialized memory access.
+Header file for MemorySanitizer integration, providing functions to mark and check memory initialization.
 
 # Purpose
-This C header file, `fd_msan.h`, is designed to interface with MemorySanitizer (MSan), a tool used to detect uninitialized memory accesses in C and C++ programs. The file provides macros and inline functions that facilitate the use of MSan's capabilities, such as marking memory regions as uninitialized or initialized and checking if memory is initialized. The header checks if the MemorySanitizer feature is available using the `__has_feature` macro and defines the `FD_HAS_MSAN` macro accordingly. If MSan is available, it provides function prototypes for internal use, such as [`__msan_poison`](#__msan_poison), [`__msan_unpoison`](#__msan_unpoison), and [`__msan_check_mem_is_initialized`](#__msan_check_mem_is_initialized), which are used to manipulate the memory state for MSan's analysis.
+The code is a C header file that provides an interface for integrating with MemorySanitizer (MSan), a tool used to detect uninitialized memory accesses in C and C++ programs. The file defines macros and inline functions that facilitate the use of MSan's capabilities. It checks if the MemorySanitizer feature is available using the `__has_feature` macro and defines `FD_HAS_MSAN` accordingly. If MSan is available, the code provides inline functions such as [`fd_msan_poison`](<#fd_msan_poison>), [`fd_msan_unpoison`](<#fd_msan_unpoison>), and [`fd_msan_check`](<#fd_msan_check>) to mark memory regions as uninitialized, initialized, and to check if memory is initialized, respectively. These functions call the corresponding MSan functions to perform their operations.
 
-The file defines three main inline functions: [`fd_msan_poison`](#fd_msan_poison), [`fd_msan_unpoison`](#fd_msan_unpoison), and [`fd_msan_check`](#fd_msan_check). These functions are used to mark memory as uninitialized, mark memory as initialized, and check if memory is initialized, respectively. These operations are crucial for ensuring that MSan can accurately detect and report uninitialized memory usage, which is a common source of bugs in software. The header is part of a larger utility library, as indicated by the inclusion of `fd_util_base.h`, and is intended to be used internally within a project to enhance memory safety during development and debugging. The file is structured to be compatible with environments where MSan is not available, providing no-op implementations of the functions in such cases.
+The header file includes conditional compilation to ensure compatibility with environments where MSan is not available. In such cases, the inline functions are defined as no-operations, effectively bypassing MSan checks. The file also defines `FD_FN_NO_MSAN` to disable memory sanitization for specific functions when MSan is enabled. The header is part of a larger project and is intended to be included in other source files to provide MSan functionality where needed. The file references the MSan documentation and the LLVM project for further information on the MemorySanitizer tool.
 # Imports and Dependencies
 
 ---
@@ -19,39 +19,44 @@ The file defines three main inline functions: [`fd_msan_poison`](#fd_msan_poison
 
 ---
 ### fd\_msan\_poison<!-- {{#callable:fd_msan_poison}} -->
-The `fd_msan_poison` function marks a region of memory as uninitialized for MemorySanitizer (MSan) to detect uninitialized memory usage.
+[View Source →](<../../../../../src/util/sanitize/fd_msan.h#L71>)
+
+Marks a region of memory as uninitialized when MemorySanitizer is enabled.
 - **Inputs**:
-    - `addr`: A pointer to the start of the memory region to be marked as uninitialized.
-    - `sz`: The size of the memory region to be marked as uninitialized, in bytes.
-- **Control Flow**:
-    - If MemorySanitizer (MSan) is enabled (`FD_HAS_MSAN` is true), the function calls `__msan_poison` with the provided address and size to mark the memory as uninitialized.
-    - If MSan is not enabled, the function does nothing with the size and simply returns the address.
-- **Output**: The function returns the same address that was passed in as the input.
+    - `addr`: A pointer to the start of the memory region to mark as uninitialized.
+    - `sz`: The size of the memory region to mark as uninitialized, in bytes.
+- **Logic and Control Flow**:
+    - If `FD_HAS_MSAN` is defined, calls `__msan_poison` with `addr` and `sz` to mark the memory as uninitialized.
+    - If `FD_HAS_MSAN` is not defined, the function does nothing with `sz` and simply returns `addr`.
+- **Output**: Returns the original `addr` pointer.
 
 
 ---
 ### fd\_msan\_unpoison<!-- {{#callable:fd_msan_unpoison}} -->
-The `fd_msan_unpoison` function marks a region of memory as initialized, effectively telling MemorySanitizer (MSan) to ignore uninitialized memory warnings for that region.
+[View Source →](<../../../../../src/util/sanitize/fd_msan.h#L72>)
+
+Marks a region of memory as initialized to avoid false positives in MemorySanitizer (MSAN) checks.
 - **Inputs**:
-    - `addr`: A pointer to the start of the memory region to be marked as initialized.
-    - `sz`: The size of the memory region to be marked as initialized, in bytes.
-- **Control Flow**:
-    - If MemorySanitizer (MSan) is enabled (`FD_HAS_MSAN` is true), the function calls `__msan_unpoison` with the provided address and size to mark the memory as initialized.
-    - If MSan is not enabled, the function simply returns the address without performing any operation, as the `sz` parameter is cast to void to avoid unused variable warnings.
-- **Output**: The function returns the same address that was passed in as the `addr` parameter.
+    - `addr`: A pointer to the start of the memory region to mark as initialized.
+    - `sz`: The size of the memory region to mark as initialized, in bytes.
+- **Logic and Control Flow**:
+    - If `FD_HAS_MSAN` is defined, calls `__msan_unpoison` to mark the memory region as initialized.
+    - If `FD_HAS_MSAN` is not defined, the function does nothing with `sz` and simply returns `addr`.
+- **Output**: Returns the pointer `addr` to the start of the memory region.
 
 
 ---
 ### fd\_msan\_check<!-- {{#callable:fd_msan_check}} -->
-The `fd_msan_check` function is a no-op placeholder that checks if a region of memory is initialized when MemorySanitizer is enabled, but does nothing otherwise.
+[View Source →](<../../../../../src/util/sanitize/fd_msan.h#L73>)
+
+Checks if a region of memory is initialized when MemorySanitizer is enabled.
 - **Inputs**:
-    - `addr`: A pointer to the start of the memory region to be checked.
-    - `sz`: The size of the memory region to be checked, in bytes.
-- **Control Flow**:
-    - The function is defined as a static inline function, meaning it is intended for use within the same translation unit and suggests inlining by the compiler.
-    - If MemorySanitizer (MSan) is enabled (`FD_HAS_MSAN` is true), the function calls `__msan_check_mem_is_initialized` to check if the memory region is initialized.
-    - If MSan is not enabled, the function does nothing, as indicated by the casting of `addr` and `sz` to void to suppress unused variable warnings.
-- **Output**: The function does not return any value.
+    - `addr`: A pointer to the start of the memory region to check.
+    - `sz`: The size of the memory region to check, in bytes.
+- **Logic and Control Flow**:
+    - If `FD_HAS_MSAN` is defined, calls `__msan_check_mem_is_initialized` to verify the memory region is initialized.
+    - If `FD_HAS_MSAN` is not defined, the function does nothing with the inputs.
+- **Output**: No output is returned; the function performs a check or no operation based on the `FD_HAS_MSAN` definition.
 
 
 

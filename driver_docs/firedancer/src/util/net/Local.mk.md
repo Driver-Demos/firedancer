@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and fuzz tests for network-related components such as Ethernet, IP, IGMP, UDP, and PCAP within the `fd_util` directory.
+Makefile for adding headers, building objects, and running unit and fuzz tests for network utilities.
 
 # Purpose
-The provided content is from a Makefile, which is a build automation tool used to manage the build process of software projects. This particular Makefile snippet is designed to automate the compilation and testing of various components related to network protocols, such as Ethernet (fd_eth), IPv4 (fd_ip4), IPv6 (fd_ip6), IGMP (fd_igmp), UDP (fd_udp), and packet capture formats (fd_pcap, fd_pcapng). The `add-hdrs` and `add-objs` functions are used to include header files and object files necessary for building these components. The `make-unit-test` and `run-unit-test` functions are employed to create and execute unit tests for each protocol component, ensuring their functionality is verified. Additionally, conditional logic is used with `ifdef FD_HAS_HOSTED` to include tests and fuzz testing for the pcapng format if the hosted environment is available, enhancing the robustness of the software by testing its resilience to unexpected inputs.
+The provided content is a Makefile script used to automate the build and testing process for a software project. It defines a series of commands to add header files and object files, and to create and run unit tests for various components such as `fd_eth`, `fd_ip4`, `fd_ip6`, `fd_igmp`, `fd_udp`, and `fd_pcap`. The script uses the `add-hdrs` and `add-objs` functions to manage dependencies and compile the necessary files. It also includes conditional logic with `ifdef FD_HAS_HOSTED` to execute additional tests, such as `test_pcapng` and fuzz tests for `fuzz_pcap` and `fuzz_pcapng`, if the `FD_HAS_HOSTED` variable is defined. This setup ensures that the software components are correctly built and tested in a consistent manner.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

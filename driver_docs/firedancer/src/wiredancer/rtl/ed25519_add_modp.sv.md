@@ -3,33 +3,33 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ed25519_add_modp.sv` file implements a hardware module for performing modular addition of two 255-bit numbers using the Ed25519 prime, with pipelined adders and support for clock and reset signals.
+Implements a module for modular addition of ED25519 numbers using piped adders.
 
 # Purpose
-The provided Verilog code defines a module named `ed25519_add_modp`, which is designed to perform modular addition operations specifically tailored for the Ed25519 elliptic curve cryptography. This module takes two wide input operands (`in0` and `in1`) and a modulus input (`m_i`), and it outputs the result of the modular addition (`out0`) along with an updated modulus output (`m_o`). The module is parameterized by the width of the operands (`W`) and the modulus (`M`), allowing for flexibility in the bit-width of the operations. The core functionality is implemented using two instances of a `piped_adder` module, which handles the addition and conditional subtraction based on the Ed25519 prime (`ED25519_P`), ensuring the result stays within the desired modular range.
+The `ed25519_add_modp` module performs modular addition operations specific to the Ed25519 elliptic curve, which is commonly used in cryptographic applications. The module takes two `W`-bit wide input operands, `in0` and `in1`, and a modulus input `m_i` of `M` bits. It outputs a `W`-bit result `out0` and a modified modulus `m_o`. The module uses two instances of a `piped_adder` to perform the addition and modular reduction operations. The first `piped_adder` instance computes the sum of the inputs `in0` and `in1`, while the second instance adjusts the result based on whether the intermediate sum exceeds the Ed25519 prime `ED25519_P`.
 
-This code provides a specific functionality focused on cryptographic operations, particularly for the Ed25519 curve, which is widely used in secure communications. The use of `piped_adder` instances suggests a pipelined approach to handle the arithmetic operations efficiently, which is crucial for high-performance cryptographic computations. The module is not a collection of disparate components but rather a cohesive implementation aimed at a specific cryptographic task, making it a specialized component likely used within a larger cryptographic library or system.
+The module is designed to operate synchronously with a clock signal `clk` and can be reset using the `rst` signal. The `piped_adder` instances are parameterized to handle the bit-widths and modular arithmetic requirements. The logic `c_2_AB_ge_p` determines if the intermediate sum `c_2_AB` is greater than or equal to the Ed25519 prime, and this condition is used to adjust the final output. The module is part of a broader cryptographic library, as indicated by the import statement `import wd_sigverify::*`, which suggests that it relies on external definitions and constants related to signature verification.
 # Modules
 
 ---
 ### ed25519\_add\_modp
-The `ed25519_add_modp` module performs modular addition of two inputs, `in0` and `in1`, with respect to a modulus `ED25519_P`. It uses two instances of a `piped_adder` to compute the sum and conditionally subtract the modulus if necessary.
+Performs modular addition of two inputs `in0` and `in1` with respect to a modulus `ED25519_P`. Uses two instances of a `piped_adder` module to compute the result and adjust it based on the modulus.
 - **Constants**:
-    - `W`: Defines the bit-width of the primary input operands, set to 255.
-    - `M`: Defines the bit-width of the modulus input and output, set to 128.
+    - ``W``: Defines the bit-width of the input operands, set to 255.
+    - ``M``: Defines the bit-width of the modulus input and output, set to 128.
 - **Ports**:
-    - `clk`: Clock signal input for synchronization.
-    - `rst`: Reset signal input to initialize the module.
-    - `in0`: First input operand for the addition, with a width of W bits.
-    - `in1`: Second input operand for the addition, with a width of W bits.
-    - `m_i`: Input modulus value with a width of M bits.
-    - `m_o`: Output modulus value after processing, with a width of M bits.
-    - `out0`: Output result of the modular addition, with a width of W bits.
-- **Logic And Control Flow**:
-    - The module uses two `piped_adder` instances to perform the addition and conditional subtraction.
-    - The first `piped_adder` instance, `c0_addmodp_inst`, adds the inputs `in0` and `in1` and outputs the result to `c_2_AB`.
-    - The second `piped_adder` instance, `c2_addmodp_inst`, conditionally subtracts the modulus `ED25519_P` if the result `c_2_AB` is greater than or equal to `ED25519_P`.
-    - The `assign` statement computes `c_2_AB_ge_p` to determine if the subtraction is necessary.
+    - ``clk``: Clock signal for synchronization.
+    - ``rst``: Reset signal to initialize the module.
+    - ``in0``: First input operand for the addition.
+    - ``in1``: Second input operand for the addition.
+    - ``m_i``: Input modulus value.
+    - ``m_o``: Output modulus value after processing.
+    - ``out0``: Result of the modular addition.
+- **Logic and Control Flow**:
+    - Defines internal logic signals `m_o_p`, `c_2_AB`, `c_2_AB_ge_p`, and `out0_` for intermediate calculations.
+    - Assigns `c_2_AB_ge_p` to check if `c_2_AB` is greater than or equal to `ED25519_P`.
+    - Instantiates `c0_addmodp_inst` to perform the initial addition of `in0` and `in1` with zero carry-in.
+    - Instantiates `c2_addmodp_inst` to adjust the result based on the comparison with `ED25519_P`, using `ED25519_P_N` if necessary.
 
 
 

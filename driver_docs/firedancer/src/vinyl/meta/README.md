@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Metadata cache and lookup helpers with concurrent tests and build rules.
+Fast query and removal operations for metadata in a hash map, lock-free caching, and unit tests.
 
 
 ## Files
-- **[fd_vinyl_meta.c](fd_vinyl_meta.c.md)**: Fast meta-map lookup and removal with probe-sequence repair and lock updates.
-- **[fd_vinyl_meta.h](fd_vinyl_meta.h.md)**: Metadata cache for key pairs with lockfree queries and fast writer update helpers.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_vinyl_meta and its unit test.
-- **[test_vinyl_meta.c](test_vinyl_meta.c.md)**: Concurrent tests for vinyl meta insert, remove, query, lock, and iteration operations.
+- **[fd_vinyl_meta.c](fd_vinyl_meta.c.md)**: Implements fast query and removal operations for metadata elements in a hash map structure.
+- **[fd_vinyl_meta.h](fd_vinyl_meta.h.md)**: Header file for managing lock-free concurrent metadata caching and querying of key-value pairs in DRAM.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for `fd_vinyl_meta`.
+- **[test_vinyl_meta.c](test_vinyl_meta.c.md)**: Tests for concurrent operations on vinyl metadata, including insert, remove, modify, and query functions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
