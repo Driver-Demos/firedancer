@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Instruction error kinds and negative error codes for executor runtime.
+Defines instruction error types and codes for the Firedancer executor runtime.
 
 # Purpose
-This header file defines the error model used by the executor runtime. It groups errors into kinds with `FD_EXECUTOR_ERR_KIND_NONE`, `FD_EXECUTOR_ERR_KIND_EBPF`, `FD_EXECUTOR_ERR_KIND_SYSCALL`, and `FD_EXECUTOR_ERR_KIND_INSTR`, then lists instruction error codes as negative integer constants and one success value with `FD_EXECUTOR_INSTR_SUCCESS`. Each `FD_EXECUTOR_INSTR_ERR_*` symbol maps a specific runtime or program failure case, such as invalid arguments, missing signatures, account access violations, compute budget limits, and serialization errors. The file gives the codebase a shared set of stable error values for reporting, handling, and testing instruction execution failures.
+This C header file defines a set of constants used to represent error types and error codes for an executor in a runtime environment. The file includes definitions for different kinds of instruction errors, such as `FD_EXECUTOR_ERR_KIND_NONE`, `FD_EXECUTOR_ERR_KIND_EBPF`, `FD_EXECUTOR_ERR_KIND_SYSCALL`, and `FD_EXECUTOR_ERR_KIND_INSTR`. It also provides a comprehensive list of error codes that describe various failure conditions that can occur during the execution of instructions, such as `FD_EXECUTOR_INSTR_ERR_INVALID_ARG` for invalid arguments, `FD_EXECUTOR_INSTR_ERR_INSUFFICIENT_FUNDS` for insufficient account balance, and `FD_EXECUTOR_INSTR_ERR_COMPUTE_BUDGET_EXCEEDED` for exceeding computational budget. These constants are used to standardize error reporting and handling within the executor's operation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

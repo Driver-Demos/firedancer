@@ -3,12 +3,73 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fuzzes QUIC transport parameter decode/encode round trips and checks dump equality.
+Fuzz testing for QUIC transport parameters encoding and decoding.
 
 # Purpose
-This file defines a libFuzzer entry point for `fd_quic_transport_params` encode and decode testing. [`LLVMFuzzerInitialize`](<#llvmfuzzerinitialize>) sets up the `fd` runtime, disables backtrace output, registers `fd_halt` at exit, and sets the core log level so that warning logs stop the run. [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>) then tries to decode the input buffer with `fd_quic_decode_transport_params`, and only continues when decode succeeds.
+The code is a fuzz testing module for the QUIC transport parameters. It uses the LLVM libFuzzer framework to test the robustness of the `fd_quic_decode_transport_params` and `fd_quic_encode_transport_params` functions. The [`LLVMFuzzerInitialize`](<#llvmfuzzerinitialize>) function sets up the environment by disabling signal handlers, initializing the system with `fd_boot`, and setting the log level to crash on warnings. The [`LLVMFuzzerTestOneInput`](<#llvmfuzzertestoneinput>) function takes input data, decodes it into a `fd_quic_transport_params_t` structure, re-encodes it, and then decodes it again to verify consistency. It compares the pretty-printed dumps of the original and re-decoded structures to ensure they match, logging any discrepancies.
 
-When decode succeeds, the code checks a round-trip path: it encodes the decoded `fd_quic_transport_params_t` with `fd_quic_encode_transport_params`, decodes the result again, and compares the pretty-printed output from `fd_quic_dump_transport_params` for both structures. The file uses string comparison instead of raw structure comparison because the decoder can accept repeated transport parameters and can leave stale bytes in fixed-size fields. If the dumps differ, the code logs both dumps and hexdumps, then stops with an error. This file is therefore a fuzz test for QUIC transport parameter parsing and serialization consistency.
+The module includes error handling and logging to capture mismatches between the original and re-decoded transport parameters. It uses memory streams to capture the pretty-printed output of the transport parameters for comparison. The code also addresses potential issues with duplicate parameter overwrites and stale bytes in the decoding process. The module is designed to be part of a larger testing framework, as indicated by its inclusion of utility headers and its use of functions like `fd_boot`, `fd_halt`, and `fd_log_level_core_set`.
+# Imports and Dependencies
+
+---
+- `stddef.h`
+- `stdlib.h`
+- `string.h`
+- `stdio.h`
+- `../../../util/fd_util.h`
+- `../../../util/sanitize/fd_fuzz.h`
+- `fd_quic_transport_params.h`
+
+
+# Functions
+
+---
+### LLVMFuzzerInitialize<!-- {{#callable:LLVMFuzzerInitialize}} -->
+[View Source →](<../../../../../../src/waltz/quic/templ/fuzz_quic_parse_transport_params.c#L10>)
+
+Initializes the fuzzer environment by setting environment variables, booting the system, registering an exit function, and setting the log level.
+- **Inputs**:
+    - `argc`: A pointer to the argument count, typically from the command line.
+    - `argv`: A pointer to the argument vector, typically from the command line.
+- **Logic and Control Flow**:
+    - Set the environment variable `FD_LOG_BACKTRACE` to `0` to disable backtrace logging.
+    - Call `fd_boot` with `argc` and `argv` to initialize the system.
+    - Register `fd_halt` to be called at program exit using `atexit`.
+    - Set the core log level to `3` using `fd_log_level_core_set`, which will cause the program to crash on warning logs.
+    - Return `0` to indicate successful initialization.
+- **Output**: Returns `0` to indicate successful initialization.
+
+
+---
+### LLVMFuzzerTestOneInput<!-- {{#callable:LLVMFuzzerTestOneInput}} -->
+[View Source →](<../../../../../../src/waltz/quic/templ/fuzz_quic_parse_transport_params.c#L22>)
+
+Tests the encoding and decoding of QUIC transport parameters to ensure data integrity.
+- **Inputs**:
+    - `data`: A pointer to the input data to be decoded, of type `uchar const *`.
+    - `size`: The size of the input data, of type `ulong`.
+- **Logic and Control Flow**:
+    - Initialize a `fd_quic_transport_params_t` structure `tp1` to zero.
+    - Decode the input data into `tp1` using [`fd_quic_decode_transport_params`](<fd_quic_transport_params.c.md#fd_quic_decode_transport_params>).
+    - If decoding is successful (`rc == 0`), proceed with further operations.
+    - Encode the decoded transport parameters from `tp1` into a buffer `buf1` using [`fd_quic_encode_transport_params`](<fd_quic_transport_params.c.md#fd_quic_encode_transport_params>).
+    - Ensure the encoded size `sz1` does not exceed the buffer size.
+    - Initialize another `fd_quic_transport_params_t` structure `tp2` to zero.
+    - Decode the encoded data from `buf1` back into `tp2`.
+    - Ensure the second decoding is successful (`rc2 == 0`).
+    - Open memory streams `m1` and `m2` to capture pretty-printed dumps of `tp1` and `tp2`.
+    - Dump the transport parameters of `tp1` and `tp2` into `m1` and `m2` respectively.
+    - Flush and close the memory streams.
+    - Compare the pretty-printed dumps `s1` and `s2` for equality.
+    - If the dumps do not match, log the differences and raise an error.
+    - Free the memory allocated for `s1` and `s2`.
+- **Output**: Returns 0 after testing the encoding and decoding process.
+- **Functions Called**:
+    - [`fd_quic_decode_transport_params`](<fd_quic_transport_params.c.md#fd_quic_decode_transport_params>)
+    - [`fd_quic_encode_transport_params`](<fd_quic_transport_params.c.md#fd_quic_encode_transport_params>)
+    - [`fd_quic_dump_transport_params`](<fd_quic_transport_params.c.md#fd_quic_dump_transport_params>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
