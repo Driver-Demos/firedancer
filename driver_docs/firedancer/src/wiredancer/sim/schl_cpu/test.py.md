@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for a CPU simulation using cocotb, including mathematical operations and input/output monitoring.
+The `test.py` file in the `firedancer` codebase is a test script using the cocotb framework to verify the functionality of a CPU simulation, including mathematical operations and memory management, within the `wiredancer` module.
 
 # Purpose
-The code is a test suite for a digital design verification environment using the Cocotb framework. It is designed to test a hardware module, likely a digital signal processor (DSP) or a similar computational unit, by simulating its behavior and verifying its outputs against expected results. The code imports several modules from Cocotb, which is a coroutine-based co-simulation library for writing testbenches in Python. It defines several utility functions and classes to facilitate the testing process.
+This Python file is a testbench script designed for use with the Cocotb framework, which is a coroutine-based co-simulation library for testing digital designs. The script is specifically tailored to test a digital design that involves cryptographic operations, likely related to the Ed25519 elliptic curve, as indicated by the imports from `ref_ed25519` and `ed25519_lib`. The script includes several utility functions for bit manipulation and memory address calculations, which are used to simulate and verify the behavior of the digital design under test. The core components of the script include the `MathMonitor` and `OutMonitor` classes, which are responsible for monitoring and verifying the internal state and outputs of the design, respectively. The `MathMonitor` class handles the setup and checking of memory operations, while the `OutMonitor` class tracks the completion of the test and logs the results.
 
-The `MathMonitor` and `OutMonitor` classes are central components of the test suite. `MathMonitor` is responsible for monitoring and verifying the internal state and memory operations of the device under test (DUT). It checks the results of arithmetic operations and ensures they match expected values. `OutMonitor` tracks the output of the DUT, ensuring that the results are produced correctly and in a timely manner. The [`run_test`](<#run_test>) function orchestrates the test by initializing the DUT, sending random input data, and coordinating the monitors to validate the DUT's behavior. The test suite uses asynchronous coroutines to simulate clock cycles and manage the timing of operations, ensuring that the DUT is tested under realistic conditions.
+The script defines a Cocotb test, [`run_test`](#run_test), which orchestrates the simulation by initializing the clock, resetting the design, and sending random input data to the design under test. The testbench uses the [`send_rand_input`](#send_rand_input) coroutine to generate and send input data, while the monitors ensure that the design's outputs are correct and that the internal operations are performed as expected. The testbench is designed to handle multiple input sets and verify the results against expected values, making it a comprehensive tool for validating the functionality of the digital design. The use of Cocotb allows for a high level of abstraction and flexibility in testing, enabling the integration of Python's rich ecosystem for test automation and data analysis.
 # Imports and Dependencies
 
 ---
@@ -35,253 +35,227 @@ The `MathMonitor` and `OutMonitor` classes are central components of the test su
 
 ---
 ### sent\_in
-- **Type**: ``list``
-- **Description**: A global list variable that is initially empty. It is intended to store input values that are sent during the execution of the `send_rand_input` function.
-- **Use**: Used to append input values (`in_vals`) that are sent to the device under test (DUT) during the `send_rand_input` function.
+- **Type**: `list`
+- **Description**: The `sent_in` variable is a global list that is initially empty. It is used to store tuples of input values that are sent to the device under test (DUT) during the execution of the test.
+- **Use**: This variable is used to keep track of the input values that have been sent to the DUT for verification purposes.
 
 
 # Classes
 
 ---
 ### MathMonitor<!-- {{#class:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L86>)
-
 - **Members**:
-    - `dut`: Stores the device under test (DUT) object.
-    - `total_tags`: Holds the total number of tags from the DUT's CPU.
-    - `mem`: Stores memory values with addresses as keys.
-    - `verbose`: Indicates if verbose logging is enabled.
-- **Description**: Monitors and manages memory operations and tag-based calculations for a device under test (DUT). It initializes memory with constants, checks results against expected values, and logs operations if verbose mode is enabled. The class also runs an asynchronous loop to handle input and output operations based on the DUT's state and clock signals.
+    - `dut`: Reference to the device under test (DUT) object.
+    - `total_tags`: Total number of tags available in the DUT's CPU.
+    - `mem`: Dictionary to store memory addresses and their values.
+    - `verbose`: Flag to control the verbosity of logging output.
+- **Description**: The MathMonitor class is designed to monitor and manage memory operations for a device under test (DUT) in a simulation environment. It initializes memory with constant values, checks the correctness of operations by comparing expected and observed results, and logs memory read and write operations. The class also includes an asynchronous run method that continuously processes input data and verifies computation results against expected outcomes, ensuring the DUT's operations are performed correctly.
 - **Methods**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.__init__`](<#mathmonitor__init__>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.check`](<#mathmonitorcheck>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setIn`](<#mathmonitorsetin>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setMem`](<#mathmonitorsetmem>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](<#mathmonitorgetphyaddr>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getMem`](<#mathmonitorgetmem>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.run`](<#mathmonitorrun>)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.__init__`](#mathmonitor__init__)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.check`](#mathmonitorcheck)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setIn`](#mathmonitorsetin)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setMem`](#mathmonitorsetmem)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](#mathmonitorgetphyaddr)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getMem`](#mathmonitorgetmem)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.run`](#mathmonitorrun)
 
 **Methods**
 
 ---
 #### MathMonitor\.\_\_init\_\_<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.__init__}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L88>)
-
-Initializes the `MathMonitor` object with a given device under test (DUT) and sets up memory and constants.
+The `__init__` method initializes a `MathMonitor` object by setting up its attributes and preloading memory with constant values.
 - **Inputs**:
-    - `dut`: The device under test (DUT) object that the `MathMonitor` will monitor.
-- **Logic and Control Flow**:
-    - Assigns the `dut` parameter to the instance variable `self.dut`.
-    - Calculates the total number of tags from the DUT's CPU and assigns it to `self.total_tags`.
+    - `dut`: A device under test (DUT) object that provides access to the hardware simulation environment.
+- **Control Flow**:
+    - Assigns the provided `dut` to the instance variable `self.dut`.
+    - Retrieves the number of tags from `dut.cpu0.NUM_TAGS` and assigns it to `self.total_tags`.
     - Initializes an empty dictionary `self.mem` to store memory values.
     - Sets the `self.verbose` flag to `True` for logging purposes.
-    - Initializes memory addresses from 0 to 0x3FE with a value of 0 in `self.mem`.
-    - Sets specific memory addresses from 0x04 to 0x0F with constant values obtained from the [`get_const`](<#get_const>) function.
-- **Output**: No return value; initializes the `MathMonitor` instance.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setMem`](<#mathmonitorsetmem>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.get_const`](<#get_const>)
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)  (Base Class)
+    - Fills the `self.mem` dictionary with zero values for addresses ranging from 0 to 0x3FE.
+    - Preloads the first 12 memory addresses starting from 0x04 with constant values obtained from the [`get_const`](#get_const) function.
+- **Output**: This method does not return any value; it initializes the state of the `MathMonitor` instance.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setMem`](#mathmonitorsetmem)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.get_const`](#get_const)
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)  (Base Class)
 
 
 ---
 #### MathMonitor\.check<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.check}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L98>)
-
-Compares expected and observed values and logs a failure if they do not match.
+The `check` method verifies if the expected value matches the observed value and logs a failure message if they do not match.
 - **Inputs**:
-    - `tag`: An identifier for the operation being checked.
-    - `errstr`: A string describing the error context.
-    - `expected`: The expected value for comparison.
-    - `observed`: The observed value to compare against the expected value.
-- **Logic and Control Flow**:
+    - `tag`: An identifier used for logging purposes to indicate the context or source of the check.
+    - `errstr`: A string describing the error or context of the check, used in logging.
+    - `expected`: The expected integer value that the observed value is compared against.
+    - `observed`: The actual integer value that is being checked against the expected value.
+- **Control Flow**:
     - Convert both `expected` and `observed` to integers and compare them.
-    - If they are equal, return from the function without any action.
-    - If they are not equal, log a failure message with the `tag`, `errstr`, `expected`, and `observed` values.
-    - Call the [`FAIL`](<#fail>) function to assert a failure.
-- **Output**: No output is returned if the values match; otherwise, it logs a failure and asserts.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.FAIL`](<#fail>)
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)  (Base Class)
+    - If they are equal, the function returns immediately, indicating success.
+    - If they are not equal, log a failure message with the tag, error string, expected, and observed values.
+    - Call the [`FAIL`](#fail) function to assert failure.
+- **Output**: The method does not return any value; it either logs a failure and asserts or returns silently on success.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.FAIL`](#fail)
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)  (Base Class)
 
 
 ---
 #### MathMonitor\.setIn<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setIn}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L105>)
-
-Writes a value to a specific memory address calculated from a tag and address.
+The `setIn` method writes a value to a specific memory address calculated from a tag and address, and logs the operation if verbose mode is enabled.
 - **Inputs**:
-    - `tag`: An identifier used to calculate the physical memory address.
-    - `addr`: The address used in conjunction with the tag to determine the physical memory address.
-    - `val`: The value to write to the calculated memory address.
-- **Logic and Control Flow**:
-    - Calls [`getPhyAddr`](<#mathmonitorgetphyaddr>) with `tag` and `addr` to calculate the physical memory address `wr_addr`.
-    - Writes the value `val` to the memory location `self.mem[wr_addr]`.
-    - If `self.verbose` is `True`, logs the write operation with the tag, address, and value.
-- **Output**: No return value; the function modifies the memory dictionary `self.mem`.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](<#mathmonitorgetphyaddr>)
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)  (Base Class)
+    - `tag`: An integer representing the tag used to calculate the physical memory address.
+    - `addr`: An integer representing the address used to calculate the physical memory address.
+    - `val`: The value to be written to the calculated memory address.
+- **Control Flow**:
+    - Calculate the physical memory address using the [`getPhyAddr`](#mathmonitorgetphyaddr) method with the provided `tag` and `addr`.
+    - Assign the provided `val` to the calculated memory address in the `mem` dictionary.
+    - If `verbose` is set to `True`, log the operation using the `dut._log.info` method.
+- **Output**: The method does not return any value; it performs a side effect by modifying the `mem` dictionary and potentially logging the operation.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](#mathmonitorgetphyaddr)
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)  (Base Class)
 
 
 ---
 #### MathMonitor\.setMem<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setMem}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L111>)
-
-Writes a value to a specific memory address after calculating the physical address.
+The `setMem` method writes a given value to a specific memory address calculated from a tag and address, and logs the operation if verbose mode is enabled.
 - **Inputs**:
-    - `tag`: An identifier used to calculate the physical address.
-    - `addr`: The address offset used to calculate the physical address.
-    - `val`: The value to write to the calculated memory address.
-- **Logic and Control Flow**:
-    - Calculate the physical address using [`getPhyAddr`](<#mathmonitorgetphyaddr>) with `tag` and `addr` as inputs.
-    - Convert `val` to an integer and store it in the memory dictionary at the calculated address.
-    - If `verbose` is True, log the write operation with details of the tag, address, and value.
-- **Output**: None
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](<#mathmonitorgetphyaddr>)
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)  (Base Class)
+    - `tag`: An integer representing a tag used to calculate the physical memory address.
+    - `addr`: An integer representing the address used to calculate the physical memory address.
+    - `val`: The value to be written to the calculated memory address, which is converted to an integer.
+- **Control Flow**:
+    - Calculate the physical memory address using the [`getPhyAddr`](#mathmonitorgetphyaddr) method with the provided `tag` and `addr`.
+    - Convert the `val` to an integer and store it in the `mem` dictionary at the calculated address.
+    - If `verbose` is set to `True`, log the memory write operation with details including the tag, address, and value.
+- **Output**: The method does not return any value; it performs a side effect by modifying the `mem` dictionary and potentially logging information.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](#mathmonitorgetphyaddr)
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)  (Base Class)
 
 
 ---
 #### MathMonitor\.getPhyAddr<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L116>)
-
-Calculates a physical memory address based on a given tag and address.
+The `getPhyAddr` method calculates a physical memory address based on a given tag and address.
 - **Inputs**:
-    - `tag`: An integer representing the tag used in address calculation.
-    - `addr`: An integer representing the address to be converted to a physical address.
-- **Logic and Control Flow**:
-    - If `addr` is 0x00, return `tag + 0x000`.
-    - If `addr` is 0x01, return `tag + 0x020`.
-    - If `addr` is 0x02, return `tag + 0x040`.
-    - If `addr` is 0x03, return `tag + 0x060`.
-    - If `addr` is between 0x04 and 0x23 inclusive, return `0x080 + addr - 0x04`.
-    - For all other values of `addr`, return `0x0A0 + scratch_offset(tag) + addr - 0x24`.
-- **Output**: An integer representing the calculated physical memory address.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.scratch_offset`](<#scratch_offset>)
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)  (Base Class)
+    - `tag`: An integer representing the tag used in the address calculation.
+    - `addr`: An integer representing the address offset to be used in the calculation.
+- **Control Flow**:
+    - Checks if the address is 0x00 and returns the tag plus 0x000 if true.
+    - Checks if the address is 0x01 and returns the tag plus 0x020 if true.
+    - Checks if the address is 0x02 and returns the tag plus 0x040 if true.
+    - Checks if the address is 0x03 and returns the tag plus 0x060 if true.
+    - Checks if the address is between 0x04 and 0x23 inclusive, and returns 0x080 plus the address minus 0x04 if true.
+    - For any other address, returns 0x0A0 plus the result of `scratch_offset(tag)` plus the address minus 0x24.
+- **Output**: Returns an integer representing the calculated physical memory address.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.scratch_offset`](#scratch_offset)
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)  (Base Class)
 
 
 ---
 #### MathMonitor\.getMem<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getMem}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L124>)
-
-Retrieves a value from memory using a physical address derived from a tag and address.
+The `getMem` method retrieves a value from a memory address calculated based on a given tag and address, and logs the operation if verbose mode is enabled.
 - **Inputs**:
-    - `tag`: An identifier used to calculate the physical memory address.
-    - `addr`: The address used in conjunction with the tag to calculate the physical memory address.
-- **Logic and Control Flow**:
-    - Calculate the physical address by calling [`getPhyAddr`](<#mathmonitorgetphyaddr>) with `tag` and `addr` as arguments.
-    - Retrieve the value from the memory dictionary `mem` using the calculated physical address as the key.
-    - If `verbose` is True, log the read operation with the tag, physical address, and retrieved value.
+    - `tag`: An integer representing the tag used to calculate the physical memory address.
+    - `addr`: An integer representing the address used to calculate the physical memory address.
+- **Control Flow**:
+    - Calculate the physical memory address by calling [`getPhyAddr`](#mathmonitorgetphyaddr) with the provided `tag` and `addr`.
+    - Retrieve the value stored at the calculated memory address from the `mem` dictionary.
+    - If `verbose` is set to `True`, log the read operation with details including the tag, address, and retrieved value.
     - Return the retrieved value.
-- **Output**: The value stored in memory at the calculated physical address.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](<#mathmonitorgetphyaddr>)
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)  (Base Class)
+- **Output**: The method returns the value stored at the calculated memory address.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](#mathmonitorgetphyaddr)
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)  (Base Class)
 
 
 ---
 #### MathMonitor\.run<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.run}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L130>)
-
-Executes a continuous loop to monitor and process CPU states, manage memory operations, and validate results based on CPU instructions.
-- **Decorators**: `@cocotb.test`
+The `run` method in the `MathMonitor` class continuously monitors and processes CPU states, performing memory operations and evaluations based on CPU instructions and states.
+- **Decorators**: `@cocotb.coroutine`
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Initialize variables and lists to store instruction data, addresses, values, and expected results for each tag.
-    - Enter an infinite loop that waits for a rising edge of the clock signal.
-    - Iterate over each tag to check the CPU state and perform operations based on the state.
-    - If the CPU state is 1 and conditions are met, call [`setIn`](<#mathmonitorsetin>) to insert data and update `init_vals` and `next_tag`.
-    - If the CPU state is 3, retrieve and calculate expected results using memory addresses and operations, and log the expected result if verbose mode is enabled.
-    - If the CPU state is 5, check the result and output address against expected values, update memory if necessary, and mark the result as checked.
-- **Output**: No explicit return value; operates asynchronously and performs logging and memory updates.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setIn`](<#mathmonitorsetin>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemAAddr`](<#getmemaaddr>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemBAddr`](<#getmembaddr>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemTAddr`](<#getmemtaddr>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemOAddr`](<#getmemoaddr>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getMem`](<#mathmonitorgetmem>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.evalOp`](<#evalop>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getOP`](<#getop>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.check`](<#mathmonitorcheck>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](<#mathmonitorgetphyaddr>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setMem`](<#mathmonitorsetmem>)
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)  (Base Class)
+- **Control Flow**:
+    - Initialize variables and lists to store instruction data, addresses, values, expected results, and result check flags for each tag.
+    - Enter an infinite loop that waits for a rising edge of the clock signal from the DUT (Device Under Test).
+    - Iterate over each tag, checking the CPU state and performing operations based on the current state and conditions.
+    - If the CPU state is 1 and certain conditions are met, insert input data into memory and update the `init_vals` and `next_tag` counters.
+    - If the CPU state is 3, retrieve and calculate expected results based on the current instruction and memory values, logging the expected results if verbose mode is enabled.
+    - If the CPU state is 5 and certain conditions are met, check the results against expected values, update memory, and mark the result as checked.
+- **Output**: The method does not return any value; it performs operations and updates internal state and memory based on CPU instructions and states.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setIn`](#mathmonitorsetin)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemAAddr`](#getmemaaddr)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemBAddr`](#getmembaddr)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemTAddr`](#getmemtaddr)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getMemOAddr`](#getmemoaddr)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getMem`](#mathmonitorgetmem)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.evalOp`](#evalop)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.getOP`](#getop)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.check`](#mathmonitorcheck)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.getPhyAddr`](#mathmonitorgetphyaddr)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.setMem`](#mathmonitorsetmem)
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)  (Base Class)
 
 
 
 ---
 ### OutMonitor<!-- {{#class:firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L193>)
-
 - **Members**:
-    - `dut`: Stores the device under test (DUT) object.
-    - `done`: Indicates if the monitoring process is complete.
-    - `in_vals`: Holds a list of input values received.
-    - `out_vals`: Holds a list of output values observed.
-    - `expected`: Holds a list of expected output values.
-    - `inout_match`: Stores a dictionary mapping input values to output values.
-- **Description**: Monitors the output of a device under test (DUT) by tracking input and output values, and logs the results. It waits for a specified number of outputs to be processed before marking the monitoring as complete.
+    - `dut`: The device under test (DUT) that the monitor interacts with.
+    - `done`: A boolean flag indicating whether the monitoring process is complete.
+    - `in_vals`: A list to store input values received from the DUT.
+    - `out_vals`: A list to store output values received from the DUT.
+    - `expected`: A list to store expected output values for comparison.
+    - `inout_match`: A dictionary to map input values to their corresponding output values.
+- **Description**: The OutMonitor class is designed to monitor the output of a device under test (DUT) in a hardware simulation environment. It tracks input and output values, logs the results, and determines when the monitoring process is complete. The class uses asynchronous methods to wait for specific conditions on the DUT's clock signal, ensuring that it captures the correct timing of input and output events. The class also maintains a mapping of input to output values and logs detailed information about the timing and results of the monitored operations.
 - **Methods**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.__init__`](<#outmonitor__init__>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.is_done`](<#outmonitoris_done>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.run`](<#outmonitorrun>)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.__init__`](#outmonitor__init__)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.is_done`](#outmonitoris_done)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.run`](#outmonitorrun)
 
 **Methods**
 
 ---
 #### OutMonitor\.\_\_init\_\_<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.__init__}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L194>)
-
-Initializes an instance of the `OutMonitor` class with a given device under test (DUT) and sets the `done` attribute to `False`.
+The `__init__` method initializes an instance of the `OutMonitor` class by setting up the device under test (DUT) and a completion flag.
 - **Inputs**:
     - `dut`: The device under test (DUT) that the `OutMonitor` instance will monitor.
-- **Logic and Control Flow**:
-    - Assigns the provided `dut` to the instance's `dut` attribute.
-    - Sets the `done` attribute of the instance to `False`.
-- **Output**: None (constructor method).
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](<#outmonitor>)  (Base Class)
+- **Control Flow**:
+    - Assigns the provided `dut` argument to the instance variable `self.dut`.
+    - Initializes the `self.done` flag to `False`, indicating that the monitoring process is not yet complete.
+- **Output**: There is no return value as this is a constructor method for initializing an instance of the `OutMonitor` class.
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](#outmonitor)  (Base Class)
 
 
 ---
 #### OutMonitor\.is\_done<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.is_done}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L198>)
-
-Waits for the `done` attribute to become `True` by repeatedly awaiting a rising edge on the `dut.clk` signal.
-- **Inputs**:
-    - `self`: Instance of the `OutMonitor` class.
-- **Logic and Control Flow**:
-    - Enter a loop that continues while `self.done` is `False`.
-    - Await a rising edge on the `dut.clk` signal using `RisingEdge(self.dut.clk)`.
-- **Output**: No explicit return value; the method completes when `self.done` becomes `True`.
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](<#outmonitor>)  (Base Class)
+The `is_done` method asynchronously waits for the `done` attribute of the `OutMonitor` class to become `True`, indicating the completion of a process.
+- **Inputs**: None
+- **Control Flow**:
+    - The method enters a while loop that continues as long as the `done` attribute is `False`.
+    - Within the loop, it awaits a `RisingEdge` event on the `dut.clk`, effectively pausing execution until the clock signal rises.
+- **Output**: The method does not return any value; it simply exits when the `done` attribute becomes `True`.
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](#outmonitor)  (Base Class)
 
 
 ---
 #### OutMonitor\.run<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.run}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L202>)
-
-Monitors input and output signals of a device under test (DUT) and logs results until a specified number of outputs are collected.
-- **Decorators**: `@cocotb.test`
+The `run` method in the `OutMonitor` class asynchronously monitors input and output signals, logging results and timing information until a specified number of outputs are collected.
+- **Decorators**: `@cocotb.coroutine`
 - **Inputs**:
-    - `self`: Reference to the current instance of the class.
-    - `total`: The total number of input sets to process, default is 3.
-- **Logic and Control Flow**:
-    - Initialize variables `tic`, `start`, `in_vals`, `out_vals`, `expected`, and `inout_match` to track the state and data.
-    - Enter an infinite loop that waits for a rising edge on the DUT's clock signal.
+    - `self`: The instance of the `OutMonitor` class.
+    - `total`: An integer specifying the total number of input sets to process, defaulting to 3.
+- **Control Flow**:
+    - Initialize variables `tic`, `start`, `in_vals`, `out_vals`, `expected`, `inout_match`, and `i_cnt`.
+    - Enter an infinite loop that waits for a rising edge on the `dut.clk` signal.
     - Increment the `tic` counter on each clock cycle.
-    - Check if the input signal `i_valid` is high; if so, read the input hash value `i_hash` and store it in `in_vals` and `start` if `i_cnt` is 0.
+    - Check if `i_valid` is high; if so, capture the input hash value and append it to `in_vals` and `start` if `i_cnt` is 0.
     - Increment `i_cnt` and reset it to 0 after reaching 2.
-    - Check if the output signal `o_valid` is high; if so, read the output hash value `o_hash` and store it in `out_vals`.
-    - Log the output result, start tick, stop tick, and elapsed time using the DUT's logging mechanism.
+    - Check if `o_valid` is high; if so, capture the output hash value, log the result, and calculate elapsed time.
     - Break the loop when the number of collected outputs reaches `total * 8`.
-    - Set `self.done` to True to indicate completion.
-- **Output**: No return value; the method sets `self.done` to True when complete.
-- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](<#outmonitor>)  (Base Class)
+    - Set `self.done` to `True` to indicate completion.
+- **Output**: The method does not return a value but updates the `in_vals`, `out_vals`, and `done` attributes of the `OutMonitor` instance.
+- **See also**: [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](#outmonitor)  (Base Class)
 
 
 
@@ -289,204 +263,197 @@ Monitors input and output signals of a device under test (DUT) and logs results 
 
 ---
 ### FAIL<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.FAIL}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L21>)
-
-Always raises an AssertionError when called.
+The FAIL function is a simple assertion that always fails by raising an AssertionError.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Executes an assert statement with a condition that is always false.
-- **Output**: Raises an AssertionError.
+- **Control Flow**:
+    - The function contains a single statement, which is an assertion that evaluates to False.
+    - Since the assertion is always False, the function will raise an AssertionError whenever it is called.
+- **Output**: The function does not return any value; instead, it raises an AssertionError.
 
 
 ---
 ### clamp<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.clamp}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L24>)
-
-Performs a bitwise AND operation on the integer representation of the input value with a 256-bit mask.
+The `clamp` function ensures that a given value is constrained within a 256-bit range by applying a bitwise AND operation with a 256-bit mask.
 - **Inputs**:
-    - `val`: The input value to be clamped, which can be any type that can be converted to an integer.
-- **Logic and Control Flow**:
-    - Convert the input `val` to an integer using `int(val)`.
-    - Create a 256-bit mask by computing `(1<<256)-1`.
-    - Perform a bitwise AND operation between the integer value and the 256-bit mask.
-- **Output**: Returns the result of the bitwise AND operation, effectively clamping the input value to a 256-bit integer.
+    - `val`: The input value to be clamped, which is expected to be convertible to an integer.
+- **Control Flow**:
+    - Convert the input `val` to an integer.
+    - Apply a bitwise AND operation between the integer value and a 256-bit mask, which is `(1<<256)-1`.
+    - Return the result of the bitwise operation, effectively clamping the value to a 256-bit range.
+- **Output**: An integer that is the result of clamping the input value to a 256-bit range.
 
 
 ---
 ### getTern<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.getTern}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L27>)
-
-Extracts the top 4 bits from a 32-bit integer by right-shifting the input value by 28 bits.
+The `getTern` function extracts the top 4 bits of a 32-bit integer by right-shifting the input value by 28 bits.
 - **Inputs**:
-    - `val`: A 32-bit integer from which the top 4 bits will be extracted.
-- **Logic and Control Flow**:
-    - Right-shift the input integer `val` by 28 bits to move the top 4 bits to the least significant position.
-    - Convert the result to an integer.
-- **Output**: An integer representing the top 4 bits of the input `val`.
+    - `val`: An integer value from which the top 4 bits are to be extracted.
+- **Control Flow**:
+    - The function takes an integer input `val`.
+    - It performs a right bitwise shift operation on `val` by 28 bits.
+    - The result of the shift operation is converted to an integer and returned.
+- **Output**: An integer representing the top 4 bits of the input value after right-shifting by 28 bits.
 
 
 ---
 ### getOP<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.getOP}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L30>)
-
-Extracts a 4-bit operation code from a 32-bit integer by shifting and masking.
+The `getOP` function extracts a 4-bit operation code from a 32-bit integer by right-shifting the integer by 24 bits and applying a bitwise AND with 0xF.
 - **Inputs**:
-    - `val`: A 32-bit integer from which to extract the operation code.
-- **Logic and Control Flow**:
-    - Shift the input integer `val` right by 24 bits to isolate the operation code in the least significant bits.
-    - Apply a bitwise AND operation with `0xF` to extract the 4-bit operation code.
-- **Output**: Returns the extracted 4-bit operation code as an integer.
+    - `val`: A 32-bit integer from which the operation code is to be extracted.
+- **Control Flow**:
+    - The function takes a 32-bit integer input `val`.
+    - It right-shifts `val` by 24 bits to isolate the bits that represent the operation code.
+    - It applies a bitwise AND operation with 0xF to extract the 4 least significant bits of the shifted value.
+    - The result is converted to an integer and returned.
+- **Output**: An integer representing the 4-bit operation code extracted from the input.
 
 
 ---
 ### getMemAAddr<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.getMemAAddr}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L33>)
-
-Extracts a 6-bit memory address from a given integer by shifting and masking operations.
+The `getMemAAddr` function extracts a 6-bit memory address from a given integer by right-shifting the integer by 18 bits and applying a bitwise AND operation with 0x3F.
 - **Inputs**:
-    - `val`: An integer from which to extract the memory address.
-- **Logic and Control Flow**:
-    - Shift the input integer `val` right by 18 bits.
-    - Apply a bitwise AND operation with `0x3F` to extract the lower 6 bits of the shifted value.
-- **Output**: An integer representing the extracted 6-bit memory address.
+    - `val`: An integer value from which a 6-bit memory address is to be extracted.
+- **Control Flow**:
+    - The function takes an integer input `val`.
+    - It right-shifts `val` by 18 bits to isolate the relevant bits for the memory address.
+    - It applies a bitwise AND operation with 0x3F to extract the 6-bit memory address.
+    - The resulting integer is returned as the memory address.
+- **Output**: The function returns an integer representing a 6-bit memory address extracted from the input value.
 
 
 ---
 ### getMemBAddr<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.getMemBAddr}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L36>)
-
-Calculates the memory B address from a given integer value by extracting specific bits.
+The `getMemBAddr` function extracts and returns a 6-bit memory address from a given integer by right-shifting the integer by 12 bits and applying a bitwise AND with 0x3F.
 - **Inputs**:
-    - `val`: An integer value from which to extract the memory B address.
-- **Logic and Control Flow**:
-    - Shifts the input integer `val` 12 bits to the right.
-    - Applies a bitwise AND operation with `0x3F` to extract the relevant bits for the memory B address.
-    - Converts the result to an integer.
-- **Output**: An integer representing the memory B address extracted from the input value.
+    - `val`: An integer from which a 6-bit memory address is to be extracted.
+- **Control Flow**:
+    - The function takes an integer input `val`.
+    - It right-shifts `val` by 12 bits to discard the lower 12 bits.
+    - It applies a bitwise AND operation with 0x3F to extract the next 6 bits.
+    - The result of the bitwise operation is converted to an integer and returned.
+- **Output**: An integer representing the 6-bit memory address extracted from the input value.
 
 
 ---
 ### getMemTAddr<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.getMemTAddr}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L39>)
-
-Extracts a 6-bit memory address from a given integer value by shifting and masking operations.
+The `getMemTAddr` function extracts a 6-bit memory address from a given integer by right-shifting the integer by 6 bits and applying a bitwise AND operation with 0x3F.
 - **Inputs**:
-    - `val`: An integer value from which to extract the memory address.
-- **Logic and Control Flow**:
-    - Shift the input integer `val` right by 6 bits.
-    - Apply a bitwise AND operation with `0x3F` to extract the lower 6 bits of the shifted value.
-    - Convert the result to an integer.
+    - `val`: An integer from which a 6-bit memory address is to be extracted.
+- **Control Flow**:
+    - The function takes an integer input `val`.
+    - It right-shifts `val` by 6 bits to discard the lower 6 bits.
+    - It applies a bitwise AND operation with 0x3F to extract the next 6 bits as the memory address.
+    - The result is converted to an integer and returned.
 - **Output**: An integer representing the extracted 6-bit memory address.
 
 
 ---
 ### getMemOAddr<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.getMemOAddr}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L42>)
-
-Extracts the lower 6 bits from the input value.
+The `getMemOAddr` function extracts the memory output address from a given integer value by applying a bitwise AND operation with 0x3F.
 - **Inputs**:
-    - `val`: An integer value from which to extract the lower 6 bits.
-- **Logic and Control Flow**:
-    - Performs a bitwise AND operation between the input `val` and the hexadecimal value `0x3F` to isolate the lower 6 bits.
-    - Converts the result of the bitwise operation to an integer.
-- **Output**: An integer representing the lower 6 bits of the input value.
+    - `val`: An integer value from which the memory output address is to be extracted.
+- **Control Flow**:
+    - The function takes an integer input `val`.
+    - It performs a bitwise AND operation between `val` and 0x3F.
+    - The result of the bitwise operation is converted to an integer and returned.
+- **Output**: An integer representing the memory output address extracted from the input value.
 
 
 ---
 ### scratch\_offset<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.scratch_offset}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L45>)
-
-Returns a predefined offset value from a list based on the input tag index.
+The `scratch_offset` function returns a specific offset value from a predefined list based on the provided tag index.
 - **Inputs**:
-    - `tag`: An integer index used to access the corresponding offset value from the predefined list.
-- **Logic and Control Flow**:
-    - Defines a list `a` containing predefined offset values.
-    - Returns the offset value at the index specified by `tag` from the list `a`.
-- **Output**: The offset value from the list `a` at the index specified by `tag`.
+    - `tag`: An integer index used to access a specific offset value from the predefined list.
+- **Control Flow**:
+    - A list of predefined offset values is initialized.
+    - The function returns the offset value at the index specified by the input `tag`.
+- **Output**: The function returns an integer representing the offset value corresponding to the input `tag` from the predefined list.
 
 
 ---
 ### get\_const<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.get_const}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L50>)
-
-Retrieves a constant value from a predefined list based on the given address index.
+The `get_const` function retrieves a constant value from a predefined list based on the provided index.
 - **Inputs**:
     - `addr`: An integer index used to access a specific constant from the predefined list.
-- **Logic and Control Flow**:
-    - Defines a list of constant hexadecimal values.
-    - Returns the constant value at the index specified by the input `addr`.
-- **Output**: The constant value from the list at the specified index `addr`.
+- **Control Flow**:
+    - A list of constant hexadecimal values is defined within the function.
+    - The function returns the constant value at the index specified by the input `addr`.
+- **Output**: The function returns a constant value from the list corresponding to the input index `addr`.
 
 
 ---
 ### evalOp<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.evalOp}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L67>)
-
-Evaluates a specified operation on two input values and an optional ternary value, returning the result after clamping.
+The `evalOp` function performs a specified operation on two input values, `valA` and `valB`, and optionally a third value `valT`, based on the operation code `op`, and returns the result after clamping it to a 256-bit integer.
 - **Inputs**:
-    - `op`: An integer representing the operation to perform.
-    - `valA`: The first integer value for the operation.
-    - `valB`: The second integer value for the operation.
-    - `valT`: An integer used as a ternary condition for certain operations.
-- **Logic and Control Flow**:
-    - Checks the value of `op` to determine which operation to perform.
-    - For `op` values 0 to 10, performs bitwise, comparison, shift, or arithmetic operations on `valA` and `valB`, then clamps the result.
-    - For `op` value 11, returns `valA` if `valT` is true, otherwise returns `valB`.
-    - For `op` value 12, returns 0.
-    - If `op` does not match any specified case, returns 0.
-- **Output**: Returns the result of the operation after clamping, or 0 if the operation is not defined.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.clamp`](<#clamp>)
+    - `op`: An integer representing the operation code to be performed on the input values.
+    - `valA`: The first integer value to be used in the operation.
+    - `valB`: The second integer value to be used in the operation.
+    - `valT`: An optional integer value used in certain operations, specifically when `op` is 11.
+- **Control Flow**:
+    - Check if `op` is 0, perform bitwise AND on `valA` and `valB`, and return the clamped result.
+    - Check if `op` is 1, compare `valA` and `valB` for equality, and return the clamped result.
+    - Check if `op` is 2, compare `valA` and `valB` for inequality, and return the clamped result.
+    - Check if `op` is 3, check if `valA` is greater than or equal to `valB`, and return the clamped result.
+    - Check if `op` is 4, left shift `valA` by 1, and return the clamped result.
+    - Check if `op` is 5, right shift `valA` by 255, perform bitwise AND with 0x1, and return the clamped result.
+    - Check if `op` is 6, add `valA` and `valB`, and return the clamped result.
+    - Check if `op` is 7, subtract `valB` from `valA`, and return the clamped result.
+    - Check if `op` is 8, add `valA` and `valB`, take modulo with `ref_ed25519.p`, and return the clamped result.
+    - Check if `op` is 9, subtract `valB` from `valA`, take modulo with `ref_ed25519.p`, and return the clamped result.
+    - Check if `op` is 10, multiply `valA` and `valB`, take modulo with `ref_ed25519.p`, and return the clamped result.
+    - Check if `op` is 11, return `valA` if `valT` is true, otherwise return `valB`.
+    - Check if `op` is 12, return 0.
+    - If none of the above conditions are met, return 0.
+- **Output**: The function returns an integer result of the operation specified by `op`, clamped to a 256-bit integer.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.clamp`](#clamp)
 
 
 ---
 ### send\_rand\_input<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.send_rand_input}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L237>)
-
-Sends a sequence of predefined input values to a device under test (DUT) when the DUT is ready.
+The `send_rand_input` function asynchronously sends a sequence of predefined input values to a device under test (DUT) when it is ready, and appends these values to a global list.
+- **Decorators**: `@cocotb.test`
 - **Inputs**:
     - `dut`: The device under test (DUT) to which the input values are sent.
-    - `i`: An optional integer index, defaulting to 0, used to track the current input value being sent.
-- **Logic and Control Flow**:
-    - Imports the constant `p` from the `ref_ed25519` module.
-    - Defines a list `in_tmp` with three predefined hexadecimal values.
-    - Assigns the first three values of `in_tmp` to the tuple `in_vals`.
-    - Sets `total` to 3 and initializes `i` to 0.
-    - Enters a while loop that continues until `i` is less than `total`.
-    - Checks if `dut.i_ready` is 1; if true, assigns the current value from `in_vals` to `dut.i_hash` and sets `dut.i_valid` to 1, then increments `i`.
-    - If `dut.i_ready` is not 1, sets `dut.i_hash` and `dut.i_valid` to 0.
-    - Awaits a rising edge on `dut.clk` in each iteration of the loop.
-    - After the loop, sets `dut.i_hash` and `dut.i_valid` to 0.
-    - Appends the tuple `in_vals` to the global list `sent_in`.
-- **Output**: None, but it modifies the state of the DUT and appends input values to the global list `sent_in`.
+    - `i`: An optional integer index, defaulting to 0, used to track the number of inputs sent.
+- **Control Flow**:
+    - Import the constant `p` from the `ref_ed25519` module.
+    - Define a list `in_tmp` with three predefined hexadecimal values.
+    - Assign the first three values of `in_tmp` to a tuple `in_vals`.
+    - Initialize a variable `total` to 3 and reset `i` to 0.
+    - Enter a while loop that runs while `i` is less than `total`.
+    - Check if `dut.i_ready` is 1; if true, set `dut.i_hash.value` to `in_vals[i]` and `dut.i_valid.value` to 1, then increment `i`.
+    - If `dut.i_ready` is not 1, set `dut.i_hash.value` and `dut.i_valid.value` to 0.
+    - Await a rising edge on `dut.clk`.
+    - After the loop, set `dut.i_hash.value` and `dut.i_valid.value` to 0.
+    - Append `in_vals` to the global list `sent_in`.
+- **Output**: The function does not return a value, but it modifies the DUT's input signals and appends the sent input values to the global list `sent_in`.
 
 
 ---
 ### run\_test<!-- {{#callable:firedancer/src/wiredancer/sim/schl_cpu/test.run_test}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/schl_cpu/test.py#L262>)
-
-Executes a test for a digital design using the cocotb framework.
+The `run_test` function is an asynchronous test function that initializes and runs a simulation of a digital circuit using cocotb, sending random inputs and monitoring outputs.
 - **Decorators**: `@cocotb.test`
 - **Inputs**:
-    - `dut`: The device under test (DUT) object, representing the digital design to test.
-- **Logic and Control Flow**:
-    - Initialize `num_sent` to 0 and `num_inputs` to 64.
-    - Create instances of [`OutMonitor`](<#outmonitor>) and [`MathMonitor`](<#mathmonitor>) with `dut`.
-    - Start the clock with a period of 4000 time units and run the [`OutMonitor`](<#outmonitor>) and [`MathMonitor`](<#mathmonitor>).
-    - Set `dut.i_hash` and `dut.i_valid` to 0, then apply a reset by setting `dut.rst` to 1 and then to 0 after a few clock cycles.
-    - Wait for `dut.i_ready` to become 1, indicating readiness to receive inputs.
+    - `dut`: The device under test (DUT) object representing the digital circuit to be simulated.
+- **Control Flow**:
+    - Initialize counters `num_sent` and `num_inputs` to 0 and 64, respectively.
+    - Create instances of [`OutMonitor`](#outmonitor) and [`MathMonitor`](#mathmonitor) for monitoring outputs and mathematical operations.
+    - Start the clock for the DUT with a period of 4000 time units.
+    - Start the [`OutMonitor`](#outmonitor) and [`MathMonitor`](#mathmonitor) to run concurrently with the test.
+    - Set initial values of `i_hash` and `i_valid` to 0 and reset the DUT by setting `rst` to 1 and then back to 0 after a few clock cycles.
+    - Wait for the DUT to be ready by checking `i_ready` before proceeding.
     - Allow the DSPs to warm up by waiting for 2048 clock cycles.
-    - In a loop, while `num_sent` is less than `num_inputs`, check if `dut.i_ready` is 1, then send random input using [`send_rand_input`](<#send_rand_input>) and increment `num_sent`. Wait for a random number of clock cycles between 0 and 10 after each input.
-    - After sending all inputs, set `dut.i_hash` and `dut.i_valid` to 0 and wait for 100 clock cycles.
-    - Wait for the [`OutMonitor`](<#outmonitor>) to signal completion using `om.is_done()`.
-    - Wait for one more rising edge of the clock.
-- **Output**: No direct output is returned, but the function performs a test on the DUT and logs results.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](<#outmonitor>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](<#mathmonitor>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.run`](<#mathmonitorrun>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.send_rand_input`](<#send_rand_input>)
-    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.is_done`](<#outmonitoris_done>)
+    - In a loop, send random inputs to the DUT while `num_sent` is less than `num_inputs`, incrementing `num_sent` after each input is sent.
+    - After sending all inputs, reset `i_hash` and `i_valid` to 0 and wait for 100 clock cycles.
+    - Wait for the [`OutMonitor`](#outmonitor) to signal that it is done processing outputs.
+- **Output**: The function does not return a value but performs a series of operations to test the DUT, sending inputs and monitoring outputs.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor`](#outmonitor)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor`](#mathmonitor)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.MathMonitor.run`](#mathmonitorrun)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.send_rand_input`](#send_rand_input)
+    - [`firedancer/src/wiredancer/sim/schl_cpu/test.OutMonitor.is_done`](#outmonitoris_done)
 
 
 

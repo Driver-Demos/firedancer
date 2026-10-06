@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Strobe-128 internals, Merlin transcript functions, structures, Makefile, and tests for cryptographic operations.
+Merlin transcript implementation, headers, build rules, and unit test.
 
 
 ## Files
-- **[fd_merlin.c](fd_merlin.c.md)**: Implements Strobe-128 internals and Merlin transcript functions for cryptographic operations.
-- **[fd_merlin.h](fd_merlin.h.md)**: Defines structures and functions for managing and manipulating Merlin transcripts in the Firedancer codebase.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for the Merlin component.
-- **[test_merlin.c](test_merlin.c.md)**: Tests the equivalence of a simple protocol using the Merlin transcript in the Firedancer codebase.
+- **[fd_merlin.c](fd_merlin.c.md)**: The `fd_merlin.c` file implements the Merlin transcript protocol using Strobe-128 internals for cryptographic operations, including initialization, message appending, and challenge generation.
+- **[fd_merlin.h](fd_merlin.h.md)**: The `fd_merlin.h` file defines structures and functions for managing a cryptographic transcript using the Merlin protocol within the Firedancer project.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_merlin headers, objects, and unit test.
+- **[test_merlin.c](test_merlin.c.md)**: The `test_merlin.c` file contains a test for the Merlin transcript protocol, verifying the equivalence of generated challenge bytes against expected values.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,33 +3,35 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration file for setting compiler flags and feature detection based on the native architecture.
+The `native.mk` file in the `firedancer` codebase configures compiler settings and feature detection for native builds, including support for various CPU features and compatibility with GCC and Clang.
 
 # Purpose
-This Makefile is used to configure the build environment for a software project, specifically targeting the detection and utilization of compiler features and CPU capabilities. It defines macros to check for the presence of specific compiler and CPU features, such as `__clang__`, `__GNUC__`, and various CPU instruction sets like `__SSE4_2__`, `__AVX2__`, and `__AVX512IFMA__`. The file sets the compiler (`CC`) to either `gcc` or `clang` based on the detected environment and includes additional configuration files based on the compiler and architecture. It also adjusts compiler flags (`CPPFLAGS`, `RUSTFLAGS`) to optimize for the native architecture and conditionally includes extra configuration files to enable features like threading and security based on the detected capabilities. The Makefile ensures compatibility with different compiler versions by disabling certain features if the compiler version does not meet the required threshold.
+This file is a Makefile, which is used to automate the build process of a software project. It provides narrow functionality by configuring the compilation environment based on the detected compiler and its capabilities. The file contains several conceptual components, such as compiler detection, feature checks, and conditional inclusion of configuration files. It determines whether the GNU Compiler Collection (GCC) or Clang is being used and sets appropriate flags and variables accordingly. The file also checks for specific hardware and software features, such as AVX, SSE, and threading support, and includes additional configuration files based on these capabilities. This Makefile is crucial for ensuring that the software is built with the correct optimizations and configurations tailored to the target system's architecture and compiler capabilities.
 # Content Summary
-This configuration file is a Makefile script used to set up the build environment for a software project. It defines and checks various compiler and architecture-specific features to optimize the build process.
+This file is a Makefile script used for configuring a build environment based on the detected compiler and system capabilities. It primarily focuses on setting up compiler flags and including specific configuration files based on the compiler being used and the features supported by the system's CPU architecture.
+
+Key technical details include:
 
 1. **Compiler Detection and Configuration**: 
-   - The script uses the `CC` variable to determine the compiler, defaulting to `gcc` if not specified. It checks if the compiler is Clang or GNU using the `check-define` function.
-   - Depending on the detected compiler, it includes specific configuration files (`with-gcc.mk` or `with-clang.mk`) and sets the compiler commands (`CC`, `CXX`, `LD`) accordingly.
-   - The major version of the compiler is extracted to handle specific feature support, such as AVX512.
+   - The script uses the `CC` variable to determine the compiler, defaulting to `gcc` if not specified. It checks if the compiler is Clang or GCC using the `check-define` macro, which evaluates whether certain preprocessor macros (`__clang__`, `__GNUC__`) are defined.
+   - Depending on the detected compiler, it includes different configuration files (`config/base.mk`, `config/extra/with-gcc.mk`, `config/extra/with-clang.mk`) and sets the appropriate compiler and linker commands (`CC`, `CXX`, `LD`).
 
-2. **Feature Detection and Definition**:
-   - The `map-define` function is used to define preprocessor flags based on the presence of certain features in the compiler's predefined macros. This includes features like `FD_HAS_SHANI`, `FD_HAS_INT128`, `FD_HAS_SSE`, `FD_HAS_AVX`, `FD_HAS_GFNI`, `FD_HAS_AESNI`, and `FD_IS_X86_64`.
-   - The script conditionally enables or disables AVX512 support based on the compiler version, specifically disabling it for GCC versions less than 10.
+2. **Feature Detection**:
+   - The `map-define` macro is used to check for specific CPU features and define corresponding flags. It evaluates whether certain CPU instruction set extensions (e.g., `__SHA__`, `__SSE4_2__`, `__AVX2__`, `__AVX512IFMA__`) are supported and sets flags like `FD_HAS_SHANI`, `FD_HAS_SSE`, `FD_HAS_AVX`, etc.
+   - The script also checks for the presence of threading support (`FD_HAS_THREADS`) and 64-bit architecture (`FD_IS_X86_64`).
 
-3. **Build Configuration**:
-   - The `BUILDDIR` variable is set to a directory path that includes the compiler name, indicating where the build artifacts will be stored.
-   - Compiler flags (`CPPFLAGS`, `RUSTFLAGS`) are set to optimize for the native architecture.
+3. **Conditional Compilation**:
+   - The script conditionally includes additional configuration files based on detected features, such as threading support (`config/extra/with-threads.mk`) and 64-bit architecture (`config/extra/with-x86-64.mk`).
+   - It handles special cases for AVX512 support, disabling it for older GCC versions (less than 10) due to incomplete support.
 
-4. **Conditional Inclusions**:
-   - Additional configuration files are included based on detected features, such as threading support (`with-threads.mk`) and architecture-specific optimizations (`with-x86-64.mk`).
+4. **Build Directories and Flags**:
+   - The `BUILDDIR` variable is set to a directory path that includes the compiler name, facilitating organized build outputs.
+   - Compiler flags (`CPPFLAGS`, `RUSTFLAGS`) are set to optimize for the native architecture (`-march=native`, `-mtune=native`).
 
 5. **Informational Output**:
-   - The script outputs information about the enabled features, such as SSE, AVX, AVX512, GFNI, SHANI, and AESNI, to inform the user of the build configuration.
+   - The script provides informational messages about the features being used, such as SSE, AVX, AVX512, GFNI, SHANI, and AESNI, which can be useful for debugging and verification purposes.
 
-This Makefile script is essential for configuring the build environment to leverage specific compiler and hardware capabilities, ensuring optimized performance for the software project.
+Overall, this Makefile script is designed to dynamically configure the build environment based on the system's compiler and CPU capabilities, ensuring that the software is optimized for the target architecture.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

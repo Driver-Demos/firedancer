@@ -3,38 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration file for Firedancer, detailing settings for instance identification, user permissions, directories, network ports, logging, reporting, ledger management, consensus, CPU core management, memory allocation, network stack, tile behavior, and development options.
+Default Firedancer validator configuration with network, ledger, consensus, layout, and development settings.
 
 # Purpose
-The configuration file defines settings for a Firedancer instance, which is a software component designed to manage and optimize the operation of a Solana validator. The file includes various sections that configure the instance's behavior, such as `name`, `user`, `scratch_directory`, and `dynamic_port_range`, which are essential for setting up the environment and network parameters. The `log` section specifies logging configurations, including file paths, log levels, and colorization options. The `reporting` section configures diagnostic data reporting to remote servers, which is crucial for monitoring network health. The `ledger` section manages paths and settings related to the ledger and accounts database, ensuring proper data storage and retrieval. Additionally, the file includes sections for `gossip`, `rpc`, `snapshots`, `consensus`, `layout`, `hugetlbfs`, `net`, and `tiles`, each detailing specific operational parameters for network communication, resource allocation, and performance optimization. These configurations collectively ensure that the Firedancer instance operates efficiently, securely, and in alignment with the Solana network's requirements.
-# Content Summary
-The configuration file for Firedancer provides detailed settings for running a Firedancer instance, which is a component of a Solana validator. The file includes several sections, each specifying different aspects of the configuration:
-
-1. **Instance Identification**: The `name` parameter uniquely identifies the Firedancer instance to prevent conflicts when multiple instances run on the same system. The `user` parameter specifies the operating system user under which Firedancer will run after dropping privileges.
-
-2. **Directories and Paths**: The `scratch_directory` defines where temporary files and databases are stored, with placeholders for user and instance name. The `log` section specifies logging behavior, including file paths, log levels, and colorization options.
-
-3. **Networking**: The `dynamic_port_range` sets the range for incoming network listeners. The `gossip` and `rpc` sections configure network communication, including ports and connection settings for gossip and RPC services.
-
-4. **Ledger and Accounts**: The `ledger` section defines paths for storing ledger and accounts data, with options for managing ledger size and account indexing.
-
-5. **Snapshots**: The `snapshots` section configures snapshot creation and retention, including paths and intervals for full and incremental snapshots.
-
-6. **Consensus and Identity**: The `consensus` section manages validator identity and voting accounts, with paths for keypair files and options for snapshot and genesis fetching.
-
-7. **CPU and Task Management**: The `layout` section describes how Firedancer tasks (tiles) are distributed across CPU cores, with options for affinity and tile counts for various tasks like networking, verification, and banking.
-
-8. **Memory Management**: The `hugetlbfs` section configures memory allocation using huge and gigantic pages to optimize performance.
-
-9. **Network Stack**: The `net` section specifies the network provider and interface, with options for buffer sizes and XDP-specific settings for high-performance networking.
-
-10. **Tile Configuration**: The `tiles` section provides settings for individual tiles, such as QUIC, verify, dedup, and pack tiles, each responsible for specific tasks in the transaction processing pipeline.
-
-11. **Development Options**: The `development` section includes settings for sandboxing, cloning, and Agave subprocess management, along with network namespace and benchmarking configurations.
-
-12. **Experimental and Testing Features**: The file also contains sections for experimental features and testing tools like `pktgen` and `udpecho`, which are intended for development and should not be used in production.
-
-Overall, this configuration file is comprehensive, allowing fine-tuning of Firedancer's operation to suit different environments and requirements, from production to development and testing scenarios.
+This file defines the main runtime configuration for a Firedancer validator instance and maps each setting to the Agave client or to Firedancer internal services. It sets identity, user, storage paths, logging, gossip, RPC, snapshots, consensus, CPU layout, memory page mounts, network mode, and tile behavior so the validator can start with the correct system state and network access. The file also includes development-only options for sandboxing, network namespaces, benchmarking, and test tools, which are separated from production settings and guarded by explicit rules. Overall, it serves as the central metadata file that controls how the validator is deployed, how it uses system resources, and how it connects to the Solana cluster.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
