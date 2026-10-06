@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding QUIC trace-related objects if `FD_HAS_ALLOCA` is defined.
+Build rules for QUIC trace objects when FD_HAS_ALLOCA is set.
 
 # Purpose
-This Makefile snippet conditionally adds object files to the build process if the `FD_HAS_ALLOCA` macro is defined. The `add-objs` function is called to include `fd_quic_trace_frame`, `fd_quic_trace_main`, `fd_quic_trace_rx_tile`, and `fd_quic_trace_log_tile` into the `fddev_shared` target. This setup is used to manage the compilation of specific components based on the presence of the `FD_HAS_ALLOCA` feature.
+Builds the `fd_quic_trace_frame`, `fd_quic_trace_main`, `fd_quic_trace_rx_tile`, and `fd_quic_trace_log_tile` objects into the `fddev_shared` target only when `FD_HAS_ALLOCA` is defined. The `ifdef` guard controls whether these QUIC trace components are included in the build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
