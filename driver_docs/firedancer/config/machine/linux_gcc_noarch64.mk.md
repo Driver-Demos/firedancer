@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for configuring a Linux GCC noarch64 build with various features and optimizations.
+The `linux_gcc_noarch64.mk` file in the `firedancer` codebase sets up build configurations for a Linux GCC noarch64 environment, including flags for debugging, security, optimization, and threading.
 
 # Purpose
-The Makefile sets the build directory to `linux/gcc/noarch64` and includes several configuration files to extend the build process with additional features such as GCC support, debugging, security, optimization, and threading. It defines preprocessor flags `CPPFLAGS` to enable double precision (`FD_HAS_DOUBLE=1`) and stack allocation (`FD_HAS_ALLOCA=1`). The variables `FD_HAS_DOUBLE` and `FD_HAS_ALLOCA` are also explicitly set to `1`, indicating that these features are enabled in the build.
+This Makefile snippet sets up a build environment for a software project targeting a 64-bit Linux architecture using GCC. It specifies the build directory and includes various configuration files to enable features such as debugging, security, optimization, and threading. Additionally, it defines and appends preprocessor flags to enable double precision and dynamic memory allocation using `alloca`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

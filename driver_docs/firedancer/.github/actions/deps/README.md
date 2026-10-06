@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Action for building and caching dependencies with configurable scripts and compiler options.
+The `deps` folder in the `firedancer` codebase contains a GitHub Action configuration file, `action.yml`, which is used for building and caching dependencies with customizable options.
 
 
 ## Files
-- **[action.yml](action.yml.md)**: GitHub Action for building and caching dependencies with configurable scripts and compiler options.
+- **[action.yml](action.yml.md)**: The `action.yml` file in the `firedancer` codebase defines a GitHub Action for building and caching dependencies, with configurable options for script paths, compiler choice, and additional flags.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
