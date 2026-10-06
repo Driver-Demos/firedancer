@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_discof repair objects and headers when FD_HAS_INT128 is set.
+Makefile rules for adding object files and headers related to repair functionality if FD_HAS_INT128 is defined.
 
 # Purpose
-Build rules under `ifdef FD_HAS_INT128` add the `fd_repair_tile`, `fd_policy`, `fd_inflight`, `fd_repair`, and `fd_repair_metrics` object files to `fd_discof`, and add the matching header files `fd_policy.h`, `fd_inflight.h`, `fd_repair.h`, and `fd_repair_metrics.h`. These entries are included only when `FD_HAS_INT128` is defined.
+This Makefile snippet conditionally includes object files and header files in the build process if the macro `FD_HAS_INT128` is defined. It uses the `add-objs` and `add-hdrs` functions to add specific object files such as `fd_repair_tile`, `fd_policy`, `fd_inflight`, `fd_repair`, and `fd_repair_metrics` to the `fd_discof` target. Corresponding header files `fd_policy.h`, `fd_inflight.h`, `fd_repair.h`, and `fd_repair_metrics.h` are also included. This setup ensures that these components are only compiled and linked when the system supports 128-bit integers.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_prometheus.h` file in the `firedancer` codebase provides functions to format and render metrics in the Prometheus text-based exposition format for a given topology and individual tiles into an HTTP server's outgoing ring buffer.
+Functions to format and render metrics in Prometheus text format for an HTTP server.
 
 # Purpose
-This C header file defines the interface for rendering metrics in the Prometheus text-based exposition format, specifically for use with an HTTP server. It includes necessary headers for metrics handling, HTTP server operations, and topology management. The file declares two functions: [`fd_prometheus_render_all`](#fd_prometheus_render_all), which formats all metrics for a given topology into the Prometheus format and writes them to an HTTP server's outgoing buffer, and [`fd_prometheus_render_tile`](#fd_prometheus_render_tile), which performs a similar operation for individual tiles within the topology. This header is part of a larger system that likely involves monitoring and exporting metrics for distributed systems, leveraging Prometheus for metrics exposition.
+This C header file defines the interface for rendering metrics in the Prometheus text-based exposition format. It includes necessary dependencies such as `fd_metrics_base.h`, `fd_http_server.h`, and `fd_topo.h`. The file declares two functions: [`fd_prometheus_render_all`](<#fd_prometheus_render_all>), which formats all metrics for a given topology and writes them to an HTTP server's outgoing ring buffer, and [`fd_prometheus_render_tile`](<#fd_prometheus_render_tile>), which formats metrics for a specific tile. These functions facilitate the integration of Prometheus metrics with an HTTP server, allowing for efficient monitoring and data collection.
 # Imports and Dependencies
 
 ---
@@ -19,26 +19,30 @@ This C header file defines the interface for rendering metrics in the Prometheus
 
 ---
 ### fd\_prometheus\_render\_all<!-- {{#callable_declaration:fd_prometheus_render_all}} -->
-Format all metrics for a topology into Prometheus exposition format.
-- **Description**: This function formats all metrics associated with a given topology into the Prometheus text-based exposition format and writes them to the outgoing ring buffer of the specified HTTP server. It is intended to be used when you need to expose metrics for monitoring purposes in a format that Prometheus can scrape. The function should be called when the topology is fully initialized and ready to have its metrics exposed. Ensure that the HTTP server is properly set up to handle the outgoing data.
+[View Source →](<../../../../../src/disco/metrics/fd_prometheus.h#L8>)
+
+Formats all metrics for a topology in Prometheus text format.
+- **Description**: Use this function to convert all metrics of a given topology into the Prometheus text-based exposition format and store them in the HTTP server's outgoing ring buffer. This function is useful when you need to expose metrics for monitoring purposes using Prometheus. Ensure that the HTTP server is properly initialized and that the topology data is valid before calling this function. The function does not return any value and does not handle invalid input explicitly, so ensure that inputs are valid to avoid undefined behavior.
 - **Inputs**:
-    - `topo`: A pointer to a constant `fd_topo_t` structure representing the topology whose metrics are to be formatted. The pointer must not be null, and the topology should be fully initialized.
-    - `http`: A pointer to an `fd_http_server_t` structure representing the HTTP server where the formatted metrics will be written. The pointer must not be null, and the server should be ready to handle outgoing data.
+    - `topo`: A pointer to a `fd_topo_t` structure representing the topology whose metrics are to be formatted. Must not be null and should point to a valid topology data structure.
+    - `http`: A pointer to an `fd_http_server_t` structure representing the HTTP server where the formatted metrics will be stored. Must not be null and should be properly initialized before calling this function.
 - **Output**: None
-- **See also**: [`fd_prometheus_render_all`](fd_prometheus.c.md#fd_prometheus_render_all)  (Implementation)
+- **See Also**: [`fd_prometheus_render_all`](<fd_prometheus.c.md#fd_prometheus_render_all>)  (Implementation)
 
 
 ---
 ### fd\_prometheus\_render\_tile<!-- {{#callable_declaration:fd_prometheus_render_tile}} -->
-Format metrics for a specific topology tile into Prometheus exposition format.
-- **Description**: This function formats a set of metrics associated with a specific topology tile into the Prometheus text-based exposition format and writes the result into the HTTP server's outgoing ring buffer. It is intended to be used when you need to expose metrics for a particular tile in a topology to a Prometheus server. The function should be called with a valid HTTP server instance and a non-null tile and metrics array. The number of metrics to be formatted is specified by the metrics_cnt parameter. Ensure that the HTTP server is properly initialized before calling this function.
+[View Source →](<../../../../../src/disco/metrics/fd_prometheus.h#L19>)
+
+Formats metrics for a specific topology tile into Prometheus exposition format.
+- **Description**: Use this function to convert metrics related to a specific topology tile into the Prometheus text-based exposition format. This formatted data is then placed into the outgoing ring buffer of the specified HTTP server. This function is useful when you need to expose metrics for a particular tile in a topology to Prometheus. Ensure that the HTTP server is properly initialized before calling this function. The function processes each metric in the provided array and formats it accordingly.
 - **Inputs**:
-    - `http`: A pointer to an fd_http_server_t instance where the formatted metrics will be written. Must not be null. The caller retains ownership.
-    - `tile`: A pointer to an fd_topo_tile_t instance representing the topology tile for which metrics are being formatted. Must not be null. The caller retains ownership.
-    - `metrics`: A pointer to an array of fd_metrics_meta_t instances representing the metrics to be formatted. Must not be null. The caller retains ownership.
-    - `metrics_cnt`: The number of metrics in the metrics array to be formatted. Must be a non-negative integer.
+    - `http`: A pointer to an `fd_http_server_t` structure representing the HTTP server where the formatted metrics will be sent. Must not be null.
+    - `tile`: A pointer to an `fd_topo_tile_t` structure representing the specific topology tile for which metrics are being formatted. Must not be null.
+    - `metrics`: A pointer to an array of `fd_metrics_meta_t` structures containing the metrics to be formatted. Must not be null.
+    - `metrics_cnt`: An unsigned long integer representing the number of metrics in the `metrics` array. Must be greater than or equal to zero.
 - **Output**: None
-- **See also**: [`fd_prometheus_render_tile`](fd_prometheus.c.md#fd_prometheus_render_tile)  (Implementation)
+- **See Also**: [`fd_prometheus_render_tile`](<fd_prometheus.c.md#fd_prometheus_render_tile>)  (Implementation)
 
 
 

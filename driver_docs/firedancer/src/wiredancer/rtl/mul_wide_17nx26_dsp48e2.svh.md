@@ -3,14 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `mul_wide_17nx26_dsp48e2.svh` file in the `firedancer` codebase implements a wide multiplier using the DSP48E2 block for handling 17x26 bit multiplication with cascading support.
+Implements a wide multiplier using DSP48E2 blocks for 17x26-bit multiplication in Verilog.
 
 # Purpose
-This code is a Verilog module that implements a multi-functional arithmetic block using the DSP48E2 primitive, which is a component of Xilinx's Virtex UltraScale+ FPGA architecture. The DSP48E2 block is a highly configurable digital signal processing unit capable of performing complex arithmetic operations, including multiplication, addition, and pattern detection. The code defines a parameterized number of cascaded DSP48E2 instances, determined by the `NO_CASCADE` parameter, which is calculated based on the input widths `W0` and `W1`. This cascading allows for the processing of larger bit-width operations by chaining multiple DSP blocks together.
+The code is a Verilog module that implements a digital signal processing (DSP) block using the `DSP48E2` primitive, which is a 48-bit multi-functional arithmetic block from Xilinx's Virtex UltraScale+ series. The module is designed to perform complex arithmetic operations, such as multiplication and addition, using a cascade of DSP blocks. The `DSP48E2` block is configured with various parameters to control its operation, including input selection, pattern detection, and pipeline stage configuration.
 
-The module is structured to handle a variety of inputs and outputs, including data ports, control signals, and cascade connections. It defines logic arrays for storing intermediate results (`Ps` and `Pcouts`) and sets up a loop to instantiate and configure each DSP48E2 block. Each block is configured with specific attributes, such as input selection, rounding constants, and pattern detection settings, which are tailored to the desired operation mode. The code also includes clock enable and reset signals for managing the pipeline stages within each DSP block, allowing for precise control over the data flow and operation timing.
+The module defines several logic vectors and parameters to manage the cascading of DSP blocks. The `NO_CASCADE` parameter determines the number of cascaded DSP blocks based on the input width `W1`. The code uses a generate loop to instantiate multiple DSP blocks, each with its own set of inputs and outputs. The inputs include data ports (`A`, `B`, `C`, `D`), control signals (`ALUMODE`, `OPMODE`), and clock/reset signals. The outputs include data results (`P`, `PCOUT`) and status signals (`OVERFLOW`, `UNDERFLOW`).
 
-Overall, this Verilog file provides a specialized implementation for performing high-speed arithmetic operations using FPGA resources. It is designed to be integrated into a larger digital design, where it can be used to accelerate computational tasks that require significant processing power, such as digital signal processing, image processing, or other data-intensive applications. The use of parameterization and cascading makes the module flexible and adaptable to different bit-width requirements, enhancing its utility in various design scenarios.
+The module assigns values to the DSP block inputs and connects the outputs to form a cascade. The cascading is achieved by connecting the `PCOUT` of one block to the `PCIN` of the next block in the sequence. The final output is collected in the `out0` vector, which aggregates the results from all cascaded blocks. The code also handles leftover bits that do not fit into the cascade by assigning them separately. This module is intended for use in high-performance digital signal processing applications where multiple arithmetic operations are required in a pipelined and efficient manner.
+# Global Variables
+
+---
+### Ps
+- **Type**: ``logic [NO_CASCADE-1:0][W0+17-1:0]``
+- **Description**: Represents an array of logic vectors, where each vector has a width of `W0+17` bits. The array size is determined by the `NO_CASCADE` parameter, which is calculated as `(W1+16)/17`. This structure is used to store intermediate results of a computation.
+- **Use**: Used to store and access intermediate computation results in a cascaded manner, with each element of the array corresponding to a stage in the cascade.
+
+
+---
+### Pcouts
+- **Type**: ``logic [NO_CASCADE-1:0][48-1:0]``
+- **Description**: `Pcouts` is a two-dimensional logic array with dimensions determined by the `NO_CASCADE` parameter and a fixed width of 48 bits. It stores the cascade output values (`PCOUT`) from a series of DSP48E2 instances.
+- **Use**: Stores the cascade output values from DSP48E2 instances for further processing or cascading.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_fseq.c` file in the `firedancer` codebase implements functions for managing a shared memory region that contains a sequence number, including creating, joining, leaving, and deleting the sequence.
+Defines and manages a shared memory region for sequence numbers with functions for alignment and lifecycle operations.
 
 # Purpose
-This C source code file defines and manages a shared memory structure for a sequence number, specifically designed for use in a system called "firedancer." The primary component is the `fd_fseq_shmem_t` structure, which includes fields for a magic number (`FD_FSEQ_MAGIC`), an initial sequence number (`seq0`), and a current sequence number (`seq`). The magic number is used to verify the integrity and validity of the shared memory region. The file provides several functions to interact with this shared memory structure: [`fd_fseq_new`](#fd_fseq_new) initializes a new sequence in shared memory, [`fd_fseq_join`](#fd_fseq_join) allows access to the current sequence number, [`fd_fseq_leave`](#fd_fseq_leave) is used to leave the shared memory region, and [`fd_fseq_delete`](#fd_fseq_delete) cleans up the shared memory by resetting the magic number.
+The code defines a shared memory structure and associated functions for managing a sequence number in a shared memory region. The primary component is the `fd_fseq_shmem` structure, which includes fields for a magic number (`magic`), an initial sequence number (`seq0`), and the current sequence number (`seq`). The magic number is used to verify the integrity of the shared memory region. The code provides functions to align the shared memory ([`fd_fseq_align`](<#fd_fseq_align>)), calculate its footprint ([`fd_fseq_footprint`](<#fd_fseq_footprint>)), and manage the lifecycle of the sequence number in shared memory, including creation ([`fd_fseq_new`](<#fd_fseq_new>)), joining ([`fd_fseq_join`](<#fd_fseq_join>)), leaving ([`fd_fseq_leave`](<#fd_fseq_leave>)), and deletion ([`fd_fseq_delete`](<#fd_fseq_delete>)).
 
-The code is designed to ensure proper alignment and integrity of the shared memory region, with checks for null pointers and alignment using `fd_ulong_is_aligned`. It uses memory fences (`FD_COMPILER_MFENCE`) to ensure memory operations are completed in the correct order, which is crucial in concurrent environments. The functions provided are intended to be used as part of a larger system, likely involving multiple processes or threads that need to coordinate using shared sequence numbers. This file does not define a public API but rather provides internal functionality for managing sequence numbers in shared memory, which can be integrated into larger applications requiring such synchronization mechanisms.
+The functions ensure that the shared memory is correctly aligned and initialized, and they perform checks to validate the integrity of the memory region using the magic number. The [`fd_fseq_new`](<#fd_fseq_new>) function initializes the shared memory with a given initial sequence number, while [`fd_fseq_join`](<#fd_fseq_join>) returns a pointer to the current sequence number. The [`fd_fseq_leave`](<#fd_fseq_leave>) and [`fd_fseq_delete`](<#fd_fseq_delete>) functions handle the cleanup and removal of the sequence number from the shared memory. This code is intended to be part of a larger system where sequence numbers need to be shared and managed across different processes or threads using shared memory.
 # Imports and Dependencies
 
 ---
@@ -19,108 +19,118 @@ The code is designed to ensure proper alignment and integrity of the shared memo
 
 ---
 ### fd\_fseq\_shmem
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `magic`: A magic number used to verify the integrity of the structure.
-    - `seq0`: The initial sequence number.
-    - `seq`: The current sequence number.
-- **Description**: The `fd_fseq_shmem` structure defines a shared memory layout for a sequence number management system, primarily used to track and manage sequence numbers in a concurrent environment. It includes a magic number for integrity verification, an initial sequence number, and a current sequence number. The structure is aligned according to `FD_FSEQ_ALIGN` and includes padding for application-specific regions and alignment requirements.
+    - `magic`: Stores a magic number to verify the integrity of the structure.
+    - `seq0`: Holds the initial sequence number.
+    - `seq`: Contains the current sequence number.
+- **Description**: Defines a shared memory layout for a sequence number tracking system, ensuring alignment and integrity through a magic number, with fields for initial and current sequence numbers, and additional padding for alignment and application-specific data.
 
 
 ---
 ### fd\_fseq\_shmem\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `magic`: A magic number used to verify the integrity of the structure, expected to be FD_FSEQ_MAGIC.
+    - `magic`: A magic number used to verify the integrity of the shared memory region.
     - `seq0`: The initial sequence number for the shared memory region.
-    - `seq`: The current sequence number, which can be updated as needed.
-- **Description**: The `fd_fseq_shmem_t` structure defines the layout of a shared memory region used to manage a sequence number in a concurrent environment. It includes a magic number for integrity verification, an initial sequence number, and a current sequence number. The structure is aligned according to `FD_FSEQ_ALIGN` to ensure proper memory access and includes padding for application-specific data and alignment requirements.
+    - `seq`: The current sequence number for the shared memory region.
+- **Description**: Specifies the layout of a shared memory region that contains a sequence number (`fseq`). It includes a magic number for validation, an initial sequence number, and a current sequence number. The structure is aligned according to `FD_FSEQ_ALIGN` and includes padding for application-specific regions and alignment.
 
 
 # Functions
 
 ---
 ### fd\_fseq\_align<!-- {{#callable:fd_fseq_align}} -->
-The `fd_fseq_align` function returns the alignment requirement for the `fd_fseq_shmem` structure.
+[View Source →](<../../../../../src/tango/fseq/fd_fseq.c#L19>)
+
+Returns the alignment requirement for the `fd_fseq_shmem` structure.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined to return an unsigned long integer (`ulong`).
-    - It directly returns the value of the macro `FD_FSEQ_ALIGN`.
-- **Output**: The function outputs the alignment requirement as an unsigned long integer, which is defined by the macro `FD_FSEQ_ALIGN`.
+- **Logic and Control Flow**:
+    - Return the value of `FD_FSEQ_ALIGN`.
+- **Output**: The function returns an `ulong` value representing the alignment requirement for the `fd_fseq_shmem` structure.
 
 
 ---
 ### fd\_fseq\_footprint<!-- {{#callable:fd_fseq_footprint}} -->
-The `fd_fseq_footprint` function returns the size of the memory footprint required for an fseq shared memory region.
+[View Source →](<../../../../../src/tango/fseq/fd_fseq.c#L24>)
+
+Returns the constant `FD_FSEQ_FOOTPRINT`, which represents the footprint size of the `fd_fseq_shmem` structure.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined to return an unsigned long integer.
-    - It directly returns the value of the macro `FD_FSEQ_FOOTPRINT`.
-- **Output**: The function outputs an unsigned long integer representing the memory footprint size for an fseq shared memory region.
+- **Logic and Control Flow**:
+    - Return the value of `FD_FSEQ_FOOTPRINT`.
+- **Output**: The function returns an `ulong` value representing the footprint size of the `fd_fseq_shmem` structure.
 
 
 ---
 ### fd\_fseq\_new<!-- {{#callable:fd_fseq_new}} -->
-The `fd_fseq_new` function initializes a shared memory region for a sequence number structure, setting its initial and current sequence numbers and marking it with a magic number for validation.
+[View Source →](<../../../../../src/tango/fseq/fd_fseq.c#L29>)
+
+Initializes a shared memory region for a sequence with a given starting sequence number.
 - **Inputs**:
-    - `shmem`: A pointer to the shared memory region to be initialized.
-    - `seq0`: The initial sequence number to set in the shared memory structure.
-- **Control Flow**:
-    - Check if the `shmem` pointer is NULL and log a warning if it is, returning NULL.
-    - Check if the `shmem` pointer is properly aligned using `fd_fseq_align()` and log a warning if it is not, returning NULL.
-    - Cast the `shmem` pointer to a `fd_fseq_shmem_t` pointer.
-    - Clear the memory region using `memset` to zero out the structure up to `FD_FSEQ_FOOTPRINT`.
-    - Set the `seq0` and `seq` fields of the structure to the provided `seq0` value.
-    - Use memory fences (`FD_COMPILER_MFENCE`) to ensure memory operations are completed before and after setting the `magic` field.
-    - Set the `magic` field of the structure to `FD_FSEQ_MAGIC` to mark it as initialized.
-    - Return the original `shmem` pointer.
-- **Output**: Returns the original `shmem` pointer if successful, or NULL if there is an error with the input pointer or alignment.
-- **Functions called**:
-    - [`fd_fseq_align`](#fd_fseq_align)
+    - ``shmem``: A pointer to the shared memory region to initialize.
+    - ``seq0``: The initial sequence number to set in the shared memory region.
+- **Logic and Control Flow**:
+    - Check if `shmem` is NULL; if true, log a warning and return NULL.
+    - Check if `shmem` is aligned according to [`fd_fseq_align`](<#fd_fseq_align>); if not, log a warning and return NULL.
+    - Cast `shmem` to a `fd_fseq_shmem_t` pointer.
+    - Clear the memory region pointed to by `fseq` using `memset` with `FD_FSEQ_FOOTPRINT`.
+    - Set `fseq->seq0` and `fseq->seq` to `seq0`.
+    - Use `FD_COMPILER_MFENCE` to ensure memory ordering before and after setting `fseq->magic` to `FD_FSEQ_MAGIC`.
+    - Return the `shmem` pointer.
+- **Output**: Returns the initialized shared memory pointer or NULL if initialization fails.
+- **Functions Called**:
+    - [`fd_fseq_align`](<#fd_fseq_align>)
 
 
 ---
 ### fd\_fseq\_join<!-- {{#callable:fd_fseq_join}} -->
-The `fd_fseq_join` function validates and returns a pointer to the current sequence number within a shared memory region representing a sequence structure.
+[View Source →](<../../../../../src/tango/fseq/fd_fseq.c#L57>)
+
+Validates and returns a pointer to the current sequence number in a shared memory region if the input is valid.
 - **Inputs**:
-    - `shfseq`: A pointer to a shared memory region that is expected to contain a sequence structure (`fd_fseq_shmem_t`).
-- **Control Flow**:
-    - Check if `shfseq` is NULL; if so, log a warning and return NULL.
-    - Check if `shfseq` is aligned according to [`fd_fseq_align`](#fd_fseq_align); if not, log a warning and return NULL.
-    - Cast `shfseq` to a `fd_fseq_shmem_t` pointer named `fseq`.
-    - Check if `fseq->magic` matches `FD_FSEQ_MAGIC`; if not, log a warning and return NULL.
-    - Return a pointer to `fseq->seq`, the current sequence number.
+    - `shfseq`: A pointer to a shared memory region that is expected to contain a valid `fd_fseq_shmem_t` structure.
+- **Logic and Control Flow**:
+    - Check if `shfseq` is NULL; if true, log a warning and return NULL.
+    - Check if `shfseq` is aligned according to [`fd_fseq_align`](<#fd_fseq_align>); if not, log a warning and return NULL.
+    - Cast `shfseq` to `fd_fseq_shmem_t *` and store it in `fseq`.
+    - Check if `fseq->magic` equals `FD_FSEQ_MAGIC`; if not, log a warning and return NULL.
+    - Return a pointer to `fseq->seq`.
 - **Output**: A pointer to the `seq` field of the `fd_fseq_shmem_t` structure if all checks pass, otherwise NULL.
-- **Functions called**:
-    - [`fd_fseq_align`](#fd_fseq_align)
+- **Functions Called**:
+    - [`fd_fseq_align`](<#fd_fseq_align>)
 
 
 ---
 ### fd\_fseq\_leave<!-- {{#callable:fd_fseq_leave}} -->
-The `fd_fseq_leave` function returns a pointer to the start of the shared memory region containing the sequence number by offsetting the input pointer by two ulong positions backwards.
+[View Source →](<../../../../../src/tango/fseq/fd_fseq.c#L80>)
+
+Converts a pointer to a sequence number back to a pointer to the shared memory region.
 - **Inputs**:
-    - `fseq`: A pointer to a ulong representing the current sequence number in a shared memory region.
-- **Control Flow**:
-    - Check if the input pointer `fseq` is NULL or invalid using `FD_UNLIKELY`; if so, log a warning and return NULL.
-    - If the input is valid, return a pointer to the memory location two ulong positions before the input pointer.
-- **Output**: A void pointer to the start of the shared memory region containing the sequence number, or NULL if the input is invalid.
+    - `fseq`: A pointer to a constant unsigned long integer representing the sequence number.
+- **Logic and Control Flow**:
+    - Check if `fseq` is NULL or invalid using `FD_UNLIKELY`; if true, log a warning and return NULL.
+    - Subtract 2 from the `fseq` pointer to obtain the original shared memory pointer.
+    - Return the adjusted pointer cast to a `void *`.
+- **Output**: A `void *` pointer to the shared memory region, or NULL if the input is invalid.
 
 
 ---
 ### fd\_fseq\_delete<!-- {{#callable:fd_fseq_delete}} -->
-The `fd_fseq_delete` function invalidates a shared memory region by resetting its magic number to zero, ensuring it is no longer recognized as a valid sequence object.
+[View Source →](<../../../../../src/tango/fseq/fd_fseq.c#L91>)
+
+Removes a shared memory sequence by validating and resetting its magic number.
 - **Inputs**:
-    - `shfseq`: A pointer to the shared memory region representing the sequence object to be deleted.
-- **Control Flow**:
-    - Check if the input pointer `shfseq` is NULL and log a warning if it is, returning NULL.
-    - Verify if `shfseq` is properly aligned according to `fd_fseq_align()` and log a warning if it is not, returning NULL.
+    - `shfseq`: A pointer to the shared memory sequence to delete.
+- **Logic and Control Flow**:
+    - Check if `shfseq` is NULL; if true, log a warning and return NULL.
+    - Check if `shfseq` is aligned according to [`fd_fseq_align`](<#fd_fseq_align>); if not, log a warning and return NULL.
     - Cast `shfseq` to a `fd_fseq_shmem_t` pointer named `fseq`.
-    - Check if the `magic` field of `fseq` matches `FD_FSEQ_MAGIC` and log a warning if it does not, returning NULL.
-    - Use memory fences to ensure memory operations are completed before and after setting the `magic` field to zero.
-    - Return the pointer `fseq` after successfully resetting the `magic` field.
-- **Output**: Returns a pointer to the `fd_fseq_shmem_t` structure if successful, or NULL if any validation checks fail.
-- **Functions called**:
-    - [`fd_fseq_align`](#fd_fseq_align)
+    - Check if `fseq->magic` equals `FD_FSEQ_MAGIC`; if not, log a warning and return NULL.
+    - Use memory fences to ensure memory operations are completed before and after setting `fseq->magic` to 0.
+    - Return the `fseq` pointer.
+- **Output**: A pointer to the `fd_fseq_shmem_t` structure if successful, or NULL if any validation fails.
+- **Functions Called**:
+    - [`fd_fseq_align`](<#fd_fseq_align>)
 
 
 
