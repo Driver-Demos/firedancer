@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-YAML fixtures for repair messages, vote accounts, and file attribute rules.
+YAML configurations and fixtures for repair messages and vote accounts, with Git settings.
 
 
 ## Files
-- **[.gitattributes](.gitattributes.md)**: The `.gitattributes` file in the `firedancer` codebase marks all files in the `firedancer/src/flamenco/types/fixtures` directory as binary.
-- **[.gitignore](.gitignore.md)**: The `.gitignore` file in the `firedancer` codebase at `firedancer/src/flamenco/types/fixtures/.gitignore` is configured to ignore all files with `.actual.` in their names.
-- **[repair_highest_window_index.yml](repair_highest_window_index.yml.md)**: The `repair_highest_window_index.yml` file in the `firedancer` codebase contains configuration data for a highest window index, including details such as signature, sender, recipient, timestamp, nonce, slot, and shred index.
-- **[repair_pong.yml](repair_pong.yml.md)**: The `repair_pong.yml` file in the `firedancer` codebase contains configuration data for a pong message, including fields for the sender, token, and signature.
-- **[repair_window_index.yml](repair_window_index.yml.md)**: The `repair_window_index.yml` file in the `firedancer` codebase defines a data structure for a window index, including details such as header information, slot, and shred index.
-- **[txn_vote.yml](txn_vote.yml.md)**: The `txn_vote.yml` file in the `firedancer` codebase appears to contain a single encoded or hashed string, likely representing a transaction vote or identifier.
-- **[vote_account.yml](vote_account.yml.md)**: The `vote_account.yml` file in the `firedancer` codebase defines the configuration and state of a vote account, including details such as node public key, authorized withdrawer, commission, votes, root slot, authorized voters, prior voters, epoch credits, and last timestamp.
-- **[vote_account_two.yml](vote_account_two.yml.md)**: The `vote_account_two.yml` file in the `firedancer` codebase defines the configuration and state of a vote account, including node public key, authorized withdrawer, commission, vote history, authorized voters, prior voters, epoch credits, and the last timestamp.
+- **[.gitattributes](.gitattributes.md)**: Configures Git to treat all files as binary in the specified directory.
+- **[.gitignore](.gitignore.md)**: Specifies patterns for Git to ignore files with ".actual." in their names.
+- **[repair_highest_window_index.yml](repair_highest_window_index.yml.md)**: YAML configuration for the highest window index with header details and slot information.
+- **[repair_pong.yml](repair_pong.yml.md)**: YAML configuration for a pong message with sender, token, and signature details.
+- **[repair_window_index.yml](repair_window_index.yml.md)**: Defines a repair window index with header details including signature, sender, recipient, and timestamp.
+- **[txn_vote.yml](txn_vote.yml.md)**: A YAML fixture file with a single encoded transaction vote string.
+- **[vote_account.yml](vote_account.yml.md)**: YAML configuration for a vote account with details on public keys, votes, and epoch credits.
+- **[vote_account_two.yml](vote_account_two.yml.md)**: YAML configuration for a vote account with node public key, authorized withdrawer, and voting history.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_hex.c` file in the `firedancer` codebase provides functions for encoding and decoding hexadecimal strings, including a lookup table for encoding and a function for converting characters to their hexadecimal values.
+Functions for encoding and decoding hexadecimal strings.
 
 # Purpose
-This C source code file provides functionality for encoding and decoding hexadecimal data. It includes two primary functions: [`fd_hex_decode`](#fd_hex_decode) and [`fd_hex_encode`](#fd_hex_encode). The [`fd_hex_decode`](#fd_hex_decode) function converts a hexadecimal string into its binary representation, storing the result in a destination buffer. It uses a helper function, [`fd_hex_unhex`](#fd_hex_unhex), to convert individual hexadecimal characters to their numeric values. The [`fd_hex_encode`](#fd_hex_encode) function performs the reverse operation, converting binary data into a hexadecimal string using a lookup table (LUT) for efficient character mapping. The code is designed to handle data of arbitrary size, as indicated by the `sz` parameter in both functions, which specifies the number of bytes to process.
+The code provides functionality for encoding and decoding hexadecimal data. It includes two main functions: [`fd_hex_decode`](<#fd_hex_decode>) and [`fd_hex_encode`](<#fd_hex_encode>). The [`fd_hex_decode`](<#fd_hex_decode>) function converts a hexadecimal string into its binary representation. It takes a destination buffer, a source hexadecimal string, and the size of the data to decode. It uses the helper function [`fd_hex_unhex`](<#fd_hex_unhex>) to convert individual hexadecimal characters to their numeric values. If an invalid character is encountered, the function returns the number of successfully decoded bytes up to that point.
 
-The file is likely part of a larger library or application, as it includes a header file (`fd_hex.h`) and does not contain a `main` function, indicating it is not an executable on its own. The presence of comments such as "FIXME" and "TODO" suggests areas for potential optimization and future enhancements, such as using a lookup table for the [`fd_hex_unhex`](#fd_hex_unhex) function or adding an AVX-optimized version of the decoding process. The code is focused on providing a specific utility for hexadecimal data manipulation, which can be a common requirement in applications dealing with data serialization, cryptography, or network communication.
+The [`fd_hex_encode`](<#fd_hex_encode>) function performs the reverse operation, converting binary data into a hexadecimal string. It takes a destination buffer, a source binary data buffer, and the size of the data to encode. The function uses a lookup table (`lut`) to map binary values to their corresponding hexadecimal characters. Both functions are designed to handle data of arbitrary size, as indicated by the `ulong` type for the size parameter. The code is intended to be part of a larger system, as indicated by the inclusion of the header file `fd_hex.h`.
 # Imports and Dependencies
 
 ---
@@ -19,51 +19,59 @@ The file is likely part of a larger library or application, as it includes a hea
 
 ---
 ### fd\_hex\_unhex<!-- {{#callable:fd_hex_unhex}} -->
-The `fd_hex_unhex` function converts a single hexadecimal character to its integer value.
+[View Source →](<../../../../../src/ballet/hex/fd_hex.c#L4>)
+
+Converts a hexadecimal character to its integer value.
 - **Inputs**:
-    - `c`: An integer representing a character, expected to be a hexadecimal digit ('0'-'9', 'a'-'f', or 'A'-'F').
-- **Control Flow**:
-    - Check if the character is between '0' and '9'; if true, return the integer value by subtracting '0'.
-    - Check if the character is between 'a' and 'f'; if true, return the integer value by subtracting 'a' and adding 10.
-    - Check if the character is between 'A' and 'F'; if true, return the integer value by subtracting 'A' and adding 10.
-    - If none of the above conditions are met, return -1 indicating an invalid hexadecimal character.
-- **Output**: Returns the integer value of the hexadecimal character if valid, otherwise returns -1.
+    - `c`: An integer representing a character to convert from hexadecimal to integer.
+- **Logic and Control Flow**:
+    - Check if `c` is a digit between '0' and '9'; if true, return the integer value by subtracting '0'.
+    - Check if `c` is a lowercase letter between 'a' and 'f'; if true, return the integer value by subtracting 'a' and adding 10.
+    - Check if `c` is an uppercase letter between 'A' and 'F'; if true, return the integer value by subtracting 'A' and adding 10.
+    - If `c` does not match any of the above conditions, return -1.
+- **Output**: Returns the integer value of the hexadecimal character, or -1 if the character is not a valid hexadecimal digit.
 
 
 ---
 ### fd\_hex\_decode<!-- {{#callable:fd_hex_decode}} -->
-The `fd_hex_decode` function decodes a hexadecimal string into its binary representation, storing the result in a destination buffer.
+[View Source →](<../../../../../src/ballet/hex/fd_hex.c#L14>)
+
+Decodes a hexadecimal string into a byte array.
 - **Inputs**:
-    - `_dst`: A pointer to the destination buffer where the decoded binary data will be stored.
-    - `hex`: A constant character pointer to the hexadecimal string that needs to be decoded.
-    - `sz`: An unsigned long integer representing the number of bytes to decode from the hexadecimal string.
-- **Control Flow**:
-    - Initialize a pointer `dst` to point to the destination buffer `_dst`.
-    - Iterate over the range from 0 to `sz`, processing two characters from `hex` per iteration.
-    - For each iteration, convert the next two hexadecimal characters to their integer values using [`fd_hex_unhex`](#fd_hex_unhex).
-    - Check if either of the converted values is negative, indicating an invalid hexadecimal character, and return the current index `i` if so.
-    - Combine the two integer values into a single byte and store it in the destination buffer `dst`.
-    - Increment the `dst` pointer to store the next byte in the subsequent position.
-- **Output**: Returns the number of bytes successfully decoded, which is the same as the number of iterations completed before encountering an invalid character.
-- **Functions called**:
-    - [`fd_hex_unhex`](#fd_hex_unhex)
+    - `_dst`: A pointer to the destination buffer where the decoded bytes will be stored.
+    - `hex`: A pointer to the input hexadecimal string to decode.
+    - `sz`: The number of bytes to decode from the hexadecimal string.
+- **Logic and Control Flow**:
+    - Initialize `dst` as a pointer to the destination buffer `_dst`.
+    - Iterate over the range from 0 to `sz`, incrementing by 1 each time.
+    - For each iteration, decode two hexadecimal characters from `hex` using [`fd_hex_unhex`](<#fd_hex_unhex>) to get the high and low nibbles.
+    - If either `hi` or `lo` is negative, indicating an invalid character, return the current index `i`.
+    - Combine the high and low nibbles into a single byte and store it in the destination buffer `dst`.
+    - Increment the `dst` pointer to store the next byte in the next iteration.
+    - Return the number of bytes successfully decoded, which is `i`.
+- **Output**: Returns the number of bytes successfully decoded from the hexadecimal string.
+- **Functions Called**:
+    - [`fd_hex_unhex`](<#fd_hex_unhex>)
 
 
 ---
 ### fd\_hex\_encode<!-- {{#callable:fd_hex_encode}} -->
-The `fd_hex_encode` function converts a binary data buffer into a hexadecimal string representation.
+[View Source →](<../../../../../src/ballet/hex/fd_hex.c#L32>)
+
+Encodes a binary data source into a hexadecimal string representation.
 - **Inputs**:
     - `dst`: A pointer to the destination buffer where the hexadecimal string will be stored.
-    - `_src`: A pointer to the source buffer containing the binary data to be encoded.
-    - `sz`: The size of the source buffer in bytes.
-- **Control Flow**:
-    - The function begins by casting the `_src` pointer to a `uchar` pointer named `src`.
-    - A static lookup table `lut` is defined, containing the hexadecimal characters '0' to 'f'.
-    - A loop iterates over each byte in the source buffer, from index 0 to `sz-1`.
-    - For each byte, the high nibble (4 bits) is extracted and used to index into `lut` to get the corresponding hexadecimal character, which is then stored in `dst`.
-    - Similarly, the low nibble is extracted and used to index into `lut` to get the corresponding hexadecimal character, which is also stored in `dst`.
-    - The `dst` pointer is incremented after storing each character.
-- **Output**: The function returns a pointer to the end of the destination buffer, which is the position after the last written character.
+    - `_src`: A pointer to the source binary data to be encoded.
+    - `sz`: The size of the source data in bytes.
+- **Logic and Control Flow**:
+    - Cast the source data pointer `_src` to a `uchar` pointer `src`.
+    - Define a lookup table `lut` for hexadecimal characters '0' to 'f'.
+    - Iterate over each byte in the source data using a loop that runs `sz` times.
+    - For each byte, extract the high nibble (4 bits) and low nibble, and map them to hexadecimal characters using the lookup table `lut`.
+    - Store the resulting hexadecimal characters in the destination buffer `dst`.
+    - Increment the `dst` pointer after storing each character.
+    - Return the updated `dst` pointer after processing all bytes.
+- **Output**: Returns a pointer to the end of the encoded hexadecimal string in the destination buffer.
 
 
 
