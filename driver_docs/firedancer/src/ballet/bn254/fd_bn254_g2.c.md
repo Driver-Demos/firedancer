@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_bn254_g2.c` file in the `firedancer` codebase implements various operations for the G2 group of the BN254 elliptic curve, including point addition, doubling, negation, scalar multiplication, and subgroup membership checks, while noting that these operations are not exposed to users.
+Implements internal operations for G2 elements in the BN254 elliptic curve, including addition, doubling, negation, and subgroup checks.
 
 # Purpose
-This C source code file provides a set of functions for performing operations on elements of the G2 group in the context of elliptic curve cryptography, specifically for the BN254 curve. The file is not intended to be directly exposed to users, as indicated by the comment that G2 operations are not exposed to users, which suggests that these functions are used internally within a larger cryptographic library. The code includes functions for checking if a G2 element is zero, comparing two G2 elements for equality, setting and negating G2 elements, and performing various arithmetic operations such as doubling, addition, and scalar multiplication. Additionally, the file includes functions for handling Frobenius endomorphisms and converting byte arrays to G2 elements while checking subgroup membership.
+The code provides a set of functions for operations on elliptic curve points in the `G2` group of the BN254 curve, which is a pairing-friendly elliptic curve. The operations are not exposed to users directly, indicating that they are intended for internal use within a larger cryptographic library or system. The functions include basic operations such as checking if a point is zero ([`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>)), comparing two points for equality ([`fd_bn254_g2_eq`](<#fd_bn254_g2_eq>)), setting a point ([`fd_bn254_g2_set`](<#fd_bn254_g2_set>)), negating a point ([`fd_bn254_g2_neg`](<#fd_bn254_g2_neg>)), and setting a point to zero ([`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>)). 
 
-The technical components of this file revolve around the manipulation of G2 elements, which are represented using a structure that includes coordinates in a finite field extension (fp2). The operations are implemented using a combination of basic arithmetic functions on these coordinates, such as squaring, multiplication, and addition, as well as more complex operations like Frobenius endomorphisms and subgroup membership checks. The file also includes references to external constants and functions, such as `fd_bn254_const_frob_gamma1_mont` and `fd_bn254_fp2_*` functions, which are likely defined elsewhere in the library. Overall, this file is a specialized component of a cryptographic library, providing essential functionality for working with the G2 group on the BN254 curve.
+The code also includes more complex operations such as point doubling ([`fd_bn254_g2_dbl`](<#fd_bn254_g2_dbl>)), mixed addition ([`fd_bn254_g2_add_mixed`](<#fd_bn254_g2_add_mixed>)), and general addition ([`fd_bn254_g2_add`](<#fd_bn254_g2_add>)). Additionally, it provides functions for scalar multiplication ([`fd_bn254_g2_scalar_mul`](<#fd_bn254_g2_scalar_mul>)) and Frobenius endomorphisms ([`fd_bn254_g2_frob`](<#fd_bn254_g2_frob>) and [`fd_bn254_g2_frob2`](<#fd_bn254_g2_frob2>)). The functions [`fd_bn254_g2_frombytes_internal`](<#fd_bn254_g2_frombytes_internal>) and [`fd_bn254_g2_frombytes_check_subgroup`](<#fd_bn254_g2_frombytes_check_subgroup>) handle the conversion of byte arrays to elliptic curve points, with the latter also checking subgroup membership. The code is structured to perform efficient arithmetic operations on the BN254 curve, leveraging optimizations such as the use of inline functions and specific algorithms for elliptic curve arithmetic.
 # Imports and Dependencies
 
 ---
@@ -19,239 +19,274 @@ The technical components of this file revolve around the manipulation of G2 elem
 
 ---
 ### fd\_bn254\_g2\_is\_zero<!-- {{#callable:fd_bn254_g2_is_zero}} -->
-The function `fd_bn254_g2_is_zero` checks if a given point in the G2 group is the zero point by examining its Z coordinate.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L8>)
+
+Checks if a given point in the G2 group is the point at infinity by verifying if its Z-coordinate is zero.
 - **Inputs**:
     - `p`: A pointer to a constant `fd_bn254_g2_t` structure representing a point in the G2 group.
-- **Control Flow**:
-    - The function calls `fd_bn254_fp2_is_zero` with the Z coordinate of the point `p`.
-- **Output**: Returns an integer indicating whether the Z coordinate of the point is zero, which implies the point is the zero point in the G2 group.
+- **Logic and Control Flow**:
+    - Calls the function `fd_bn254_fp2_is_zero` with the Z-coordinate of the point `p` to check if it is zero.
+    - Returns the result of the `fd_bn254_fp2_is_zero` function call.
+- **Output**: Returns an integer indicating whether the point `p` is the point at infinity (1 if true, 0 otherwise).
 
 
 ---
 ### fd\_bn254\_g2\_eq<!-- {{#callable:fd_bn254_g2_eq}} -->
-The `fd_bn254_g2_eq` function checks if two points on the BN254 curve in the G2 group are equal.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L13>)
+
+Checks if two `fd_bn254_g2_t` points are equal by comparing their coordinates in projective space.
 - **Inputs**:
-    - `p`: A pointer to the first point on the BN254 curve in the G2 group.
-    - `q`: A pointer to the second point on the BN254 curve in the G2 group.
-- **Control Flow**:
-    - Check if the first point `p` is zero using [`fd_bn254_g2_is_zero`](#fd_bn254_g2_is_zero); if true, return whether the second point `q` is also zero.
-    - Check if the second point `q` is zero; if true, return 0 (false).
-    - Compute the square of the Z coordinates of both points and store them in `pz2` and `qz2`.
-    - Multiply the X coordinate of `p` by `qz2` and the X coordinate of `q` by `pz2`, storing results in `l` and `r` respectively; if they are not equal, return 0 (false).
-    - Multiply the Y coordinate of `p` by `qz2` and `q->Z`, and the Y coordinate of `q` by `pz2` and `p->Z`, storing results in `l` and `r` respectively; return whether `l` and `r` are equal.
+    - `p`: A pointer to the first `fd_bn254_g2_t` point to compare.
+    - `q`: A pointer to the second `fd_bn254_g2_t` point to compare.
+- **Logic and Control Flow**:
+    - Check if point `p` is zero using [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>); if true, return the result of `fd_bn254_g2_is_zero(q)`.
+    - Check if point `q` is zero; if true, return 0.
+    - Compute the square of the `Z` coordinate for both points `p` and `q`, storing the results in `pz2` and `qz2`.
+    - Multiply the `X` coordinate of `p` by `qz2` and the `X` coordinate of `q` by `pz2`, storing the results in `l` and `r` respectively.
+    - Compare `l` and `r` using `fd_bn254_fp2_eq`; if they are not equal, return 0.
+    - Multiply the `Y` coordinate of `p` by `qz2` and `q->Z`, and the `Y` coordinate of `q` by `pz2` and `p->Z`, storing the results in `l` and `r` respectively.
+    - Return the result of comparing `l` and `r` using `fd_bn254_fp2_eq`.
 - **Output**: Returns 1 if the points are equal, otherwise returns 0.
-- **Functions called**:
-    - [`fd_bn254_g2_is_zero`](#fd_bn254_g2_is_zero)
+- **Functions Called**:
+    - [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>)
 
 
 ---
 ### fd\_bn254\_g2\_set<!-- {{#callable:fd_bn254_g2_set}} -->
-The `fd_bn254_g2_set` function copies the coordinates of a G2 point from one structure to another.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L42>)
+
+Copies the coordinates of one `fd_bn254_g2_t` structure to another.
 - **Inputs**:
-    - `r`: A pointer to an `fd_bn254_g2_t` structure where the coordinates will be copied to.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure from which the coordinates will be copied.
-- **Control Flow**:
-    - The function calls `fd_bn254_fp2_set` to copy the X coordinate from `p` to `r`.
-    - It calls `fd_bn254_fp2_set` again to copy the Y coordinate from `p` to `r`.
-    - Finally, it calls `fd_bn254_fp2_set` to copy the Z coordinate from `p` to `r`.
-    - The function returns the pointer `r`.
-- **Output**: The function returns a pointer to the `fd_bn254_g2_t` structure `r` with the copied coordinates.
+    - `r`: A pointer to the `fd_bn254_g2_t` structure where the coordinates will be copied to.
+    - `p`: A pointer to the `fd_bn254_g2_t` structure from which the coordinates will be copied.
+- **Logic and Control Flow**:
+    - Call `fd_bn254_fp2_set` to copy the `X` coordinate from `p` to `r`.
+    - Call `fd_bn254_fp2_set` to copy the `Y` coordinate from `p` to `r`.
+    - Call `fd_bn254_fp2_set` to copy the `Z` coordinate from `p` to `r`.
+    - Return the pointer `r`.
+- **Output**: Returns a pointer to the `fd_bn254_g2_t` structure `r` with updated coordinates.
 
 
 ---
 ### fd\_bn254\_g2\_neg<!-- {{#callable:fd_bn254_g2_neg}} -->
-The `fd_bn254_g2_neg` function computes the negation of a point on the BN254 curve in the G2 group.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L51>)
+
+Negates the Y-coordinate of a point on the BN254 curve's G2 group while copying the X and Z coordinates.
 - **Inputs**:
     - `r`: A pointer to an `fd_bn254_g2_t` structure where the result will be stored.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the point to be negated.
-- **Control Flow**:
-    - Copy the X coordinate from point `p` to result `r` using `fd_bn254_fp2_set`.
-    - Negate the Y coordinate from point `p` and store it in result `r` using `fd_bn254_fp2_neg`.
-    - Copy the Z coordinate from point `p` to result `r` using `fd_bn254_fp2_set`.
-    - Return the pointer to the result `r`.
-- **Output**: A pointer to the `fd_bn254_g2_t` structure `r` containing the negated point.
+    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the point to negate.
+- **Logic and Control Flow**:
+    - Copy the X-coordinate from `p` to `r` using `fd_bn254_fp2_set`.
+    - Negate the Y-coordinate from `p` and store it in `r` using `fd_bn254_fp2_neg`.
+    - Copy the Z-coordinate from `p` to `r` using `fd_bn254_fp2_set`.
+    - Return the pointer `r`.
+- **Output**: Returns a pointer to the `fd_bn254_g2_t` structure `r` containing the negated point.
 
 
 ---
 ### fd\_bn254\_g2\_set\_zero<!-- {{#callable:fd_bn254_g2_set_zero}} -->
-The `fd_bn254_g2_set_zero` function sets the Z component of a `fd_bn254_g2_t` structure to zero, effectively representing the point at infinity in projective coordinates.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L60>)
+
+Sets the `Z` component of a `fd_bn254_g2_t` structure to zero and returns the modified structure.
 - **Inputs**:
-    - `r`: A pointer to a `fd_bn254_g2_t` structure that will be modified to represent the point at infinity.
-- **Control Flow**:
-    - The function calls `fd_bn254_fp2_set_zero` on the Z component of the `fd_bn254_g2_t` structure pointed to by `r`.
-    - The function returns the pointer `r`.
-- **Output**: A pointer to the modified `fd_bn254_g2_t` structure, which now represents the point at infinity.
+    - `r`: A pointer to a `fd_bn254_g2_t` structure that will be modified.
+- **Logic and Control Flow**:
+    - Calls `fd_bn254_fp2_set_zero` to set the `Z` component of the structure pointed to by `r` to zero.
+    - Returns the pointer `r`.
+- **Output**: Returns the pointer to the modified `fd_bn254_g2_t` structure.
 
 
 ---
 ### fd\_bn254\_g2\_frob<!-- {{#callable:fd_bn254_g2_frob}} -->
-The `fd_bn254_g2_frob` function performs the Frobenius endomorphism on a point in the G2 group of the BN254 curve.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L68>)
+
+Applies the Frobenius endomorphism to a point on the BN254 curve in the G2 group.
 - **Inputs**:
-    - `r`: A pointer to an `fd_bn254_g2_t` structure where the result will be stored.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the input point to be transformed.
-- **Control Flow**:
-    - Conjugate the X component of the input point `p` and store it in the X component of the result `r`.
-    - Multiply the conjugated X component by a constant `fd_bn254_const_frob_gamma1_mont[1]`.
-    - Conjugate the Y component of the input point `p` and store it in the Y component of the result `r`.
-    - Multiply the conjugated Y component by a constant `fd_bn254_const_frob_gamma1_mont[2]`.
-    - Conjugate the Z component of the input point `p` and store it in the Z component of the result `r`.
-    - Return the pointer to the result `r`.
-- **Output**: A pointer to the `fd_bn254_g2_t` structure `r` containing the result of the Frobenius endomorphism.
+    - ``r``: A pointer to an `fd_bn254_g2_t` structure where the result will be stored.
+    - ``p``: A constant pointer to an `fd_bn254_g2_t` structure representing the input point to which the Frobenius endomorphism is applied.
+- **Logic and Control Flow**:
+    - Conjugate the `X` component of `p` and store it in `r->X`.
+    - Multiply `r->X` by the constant `fd_bn254_const_frob_gamma1_mont[1]`.
+    - Conjugate the `Y` component of `p` and store it in `r->Y`.
+    - Multiply `r->Y` by the constant `fd_bn254_const_frob_gamma1_mont[2]`.
+    - Conjugate the `Z` component of `p` and store it in `r->Z`.
+    - Return the pointer `r`.
+- **Output**: Returns a pointer to the `fd_bn254_g2_t` structure `r` containing the result of the Frobenius endomorphism.
 
 
 ---
 ### fd\_bn254\_g2\_frob2<!-- {{#callable:fd_bn254_g2_frob2}} -->
-The `fd_bn254_g2_frob2` function performs a Frobenius endomorphism on a point in the G2 group of the BN254 curve, specifically applying the Frobenius map twice.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L79>)
+
+Applies the Frobenius endomorphism twice to a point in the G2 group of the BN254 curve.
 - **Inputs**:
-    - `r`: A pointer to an `fd_bn254_g2_t` structure where the result of the Frobenius endomorphism will be stored.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the input point on which the Frobenius endomorphism is applied.
-- **Control Flow**:
-    - Multiply the first element of the X coordinate of point `p` by a constant `fd_bn254_const_frob_gamma2_mont[1]` and store the result in the first element of the X coordinate of point `r`.
-    - Multiply the second element of the X coordinate of point `p` by the same constant and store the result in the second element of the X coordinate of point `r`.
-    - Multiply the first element of the Y coordinate of point `p` by a different constant `fd_bn254_const_frob_gamma2_mont[2]` and store the result in the first element of the Y coordinate of point `r`.
-    - Multiply the second element of the Y coordinate of point `p` by the same constant and store the result in the second element of the Y coordinate of point `r`.
-    - Copy the Z coordinate of point `p` to the Z coordinate of point `r`.
-- **Output**: Returns a pointer to the `fd_bn254_g2_t` structure `r`, which contains the result of the Frobenius endomorphism applied twice to the input point `p`.
+    - ``r``: A pointer to a `fd_bn254_g2_t` structure where the result will be stored.
+    - ``p``: A constant pointer to a `fd_bn254_g2_t` structure representing the input point to which the Frobenius endomorphism is applied.
+- **Logic and Control Flow**:
+    - Multiply the `X` component of `p` by the constant `fd_bn254_const_frob_gamma2_mont[1]` and store the result in the `X` component of `r`.
+    - Multiply the `Y` component of `p` by the constant `fd_bn254_const_frob_gamma2_mont[2]` and store the result in the `Y` component of `r`.
+    - Copy the `Z` component of `p` to the `Z` component of `r`.
+    - Return the pointer `r`.
+- **Output**: A pointer to the `fd_bn254_g2_t` structure `r` containing the result of the Frobenius endomorphism applied twice.
 
 
 ---
 ### fd\_bn254\_g2\_dbl<!-- {{#callable:fd_bn254_g2_dbl}} -->
-The `fd_bn254_g2_dbl` function performs point doubling on an elliptic curve point in the G2 group of the BN254 curve.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L95>)
+
+Computes the doubling of a point on the BN254 curve in the G2 group.
 - **Inputs**:
-    - `r`: A pointer to an `fd_bn254_g2_t` structure where the result of the doubling operation will be stored.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the point to be doubled.
-- **Control Flow**:
-    - Check if the input point `p` is the zero point; if so, set the result `r` to zero and return.
-    - Compute the square of the X, Y, and Z coordinates of the point `p`, storing them in `xx`, `yy`, and `zz` respectively.
-    - Compute `y4` as the square of `yy`, which is `YY^2`.
-    - Calculate `s` as `2 * ((X1 + YY)^2 - XX - YYYY)`.
-    - Calculate `m` as `3 * XX` since `a` is zero in this context.
-    - Compute the new X coordinate of the result `r` as `M^2 - 2 * S`.
-    - Compute the new Z coordinate of the result `r` as `(Y1 + Z1)^2 - YY - ZZ`.
-    - Compute the new Y coordinate of the result `r` as `M * (S - T) - 8 * YYYY`.
+    - ``r``: A pointer to a `fd_bn254_g2_t` structure where the result will be stored.
+    - ``p``: A constant pointer to a `fd_bn254_g2_t` structure representing the point to be doubled.
+- **Logic and Control Flow**:
+    - Check if the input point `p` is zero using [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>); if true, set `r` to zero using [`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>) and return `r`.
+    - Compute `XX` as the square of `p->X` using `fd_bn254_fp2_sqr`.
+    - Compute `YY` as the square of `p->Y` using `fd_bn254_fp2_sqr`.
+    - Compute `YYYY` as the square of `YY`.
+    - Compute `ZZ` as the square of `p->Z`.
+    - Calculate `S` as `2 * ((X1 + YY)^2 - XX - YYYY)` using a series of additions, subtractions, and squaring operations.
+    - Calculate `M` as `3 * XX` since `a` is zero, using addition operations.
+    - Compute `T` as `M^2 - 2 * S` and set `r->X` to `T`.
+    - Compute `Z3` as `(Y1 + Z1)^2 - YY - ZZ` and set `r->Z` to `Z3`.
+    - Compute `Y3` as `M * (S - T) - 8 * YYYY` and set `r->Y` to `Y3`.
     - Return the result `r`.
-- **Output**: A pointer to the `fd_bn254_g2_t` structure `r`, which now contains the doubled point.
-- **Functions called**:
-    - [`fd_bn254_g2_is_zero`](#fd_bn254_g2_is_zero)
-    - [`fd_bn254_g2_set_zero`](#fd_bn254_g2_set_zero)
+- **Output**: A pointer to the `fd_bn254_g2_t` structure `r` containing the doubled point.
+- **Functions Called**:
+    - [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>)
+    - [`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>)
 
 
 ---
 ### fd\_bn254\_g2\_add\_mixed<!-- {{#callable:fd_bn254_g2_add_mixed}} -->
-The `fd_bn254_g2_add_mixed` function computes the sum of two points on an elliptic curve in the Jacobian coordinate system, where the second point is assumed to have a Z-coordinate of 1.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L146>)
+
+Computes the sum of two points on an elliptic curve in the BN254 G2 group, assuming the second point is in affine coordinates.
 - **Inputs**:
-    - `r`: A pointer to an `fd_bn254_g2_t` structure where the result of the addition will be stored.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the first point on the elliptic curve.
-    - `q`: A constant pointer to an `fd_bn254_g2_t` structure representing the second point on the elliptic curve, assumed to have a Z-coordinate of 1.
-- **Control Flow**:
-    - Check if the first point `p` is zero; if so, set `r` to `q` and return `r`.
-    - Compute intermediate values `zz`, `u2`, and `s2` using the coordinates of `p` and `q`.
-    - Check if `p` is equal to `q`; if so, call [`fd_bn254_g2_dbl`](#fd_bn254_g2_dbl) to double `p` and return the result.
-    - Compute the difference `h` between `u2` and `p->X`, and its square `hh`.
-    - Calculate `i` as four times `hh`, and `j` as the product of `h` and `i`.
-    - Compute `rr` as twice the difference between `s2` and `p->Y`.
-    - Calculate `v` as the product of `p->X` and `i`.
-    - Compute the new X-coordinate `r->X` using `rr`, `j`, and `v`.
-    - Compute the new Y-coordinate `r->Y` using `rr`, `v`, `r->X`, and `j`.
-    - Compute the new Z-coordinate `r->Z` using `p->Z`, `h`, `zz`, and `hh`.
-    - Return the result `r`.
+    - ``r``: A pointer to an `fd_bn254_g2_t` structure where the result will be stored.
+    - ``p``: A pointer to a constant `fd_bn254_g2_t` structure representing the first point on the curve.
+    - ``q``: A pointer to a constant `fd_bn254_g2_t` structure representing the second point on the curve, assumed to be in affine coordinates (i.e., `q->Z == 1`).
+- **Logic and Control Flow**:
+    - Check if `p` is the zero point; if so, set `r` to `q` and return `r`.
+    - Compute `Z1Z1` as the square of `p->Z`.
+    - Compute `U2` as the product of `q->X` and `Z1Z1`.
+    - Compute `S2` as the product of `q->Y`, `p->Z`, and `Z1Z1`.
+    - Check if `p` is equal to `q`; if so, call [`fd_bn254_g2_dbl`](<#fd_bn254_g2_dbl>) to double `p` and return the result.
+    - Compute `H` as the difference between `U2` and `p->X`.
+    - Compute `HH` as the square of `H`.
+    - Compute `I` as four times `HH`.
+    - Compute `J` as the product of `H` and `I`.
+    - Compute `r` as twice the difference between `S2` and `p->Y`.
+    - Compute `V` as the product of `p->X` and `I`.
+    - Compute `r->X` as the square of `r`, subtract `J`, and subtract `2*V`.
+    - Compute `i` as twice the product of `p->Y` and `J`.
+    - Compute `r->Y` as the product of `r` and the difference between `V` and `r->X`, then subtract `i`.
+    - Compute `r->Z` as the square of the sum of `p->Z` and `H`, then subtract `Z1Z1` and `HH`.
+    - Return `r`.
 - **Output**: A pointer to the `fd_bn254_g2_t` structure `r`, which contains the result of the addition.
-- **Functions called**:
-    - [`fd_bn254_g2_is_zero`](#fd_bn254_g2_is_zero)
-    - [`fd_bn254_g2_set`](#fd_bn254_g2_set)
-    - [`fd_bn254_g2_dbl`](#fd_bn254_g2_dbl)
+- **Functions Called**:
+    - [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>)
+    - [`fd_bn254_g2_set`](<#fd_bn254_g2_set>)
+    - [`fd_bn254_g2_dbl`](<#fd_bn254_g2_dbl>)
 
 
 ---
 ### fd\_bn254\_g2\_add<!-- {{#callable:fd_bn254_g2_add}} -->
-The `fd_bn254_g2_add` function performs the addition of two points on an elliptic curve in the Jacobian coordinate system.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L207>)
+
+Computes the sum of two points `p` and `q` on an elliptic curve in the Jacobian coordinate system.
 - **Inputs**:
-    - `r`: A pointer to an `fd_bn254_g2_t` structure where the result of the addition will be stored.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the first point to be added.
-    - `q`: A constant pointer to an `fd_bn254_g2_t` structure representing the second point to be added.
-- **Control Flow**:
-    - Check if the point `p` is zero; if so, set `r` to `q` and return `r`.
-    - Compute the squares of the Z coordinates of `p` and `q` and store them in `zz1` and `zz2`, respectively.
-    - Calculate intermediate values `u1`, `s1`, `u2`, and `s2` using the X and Y coordinates of `p` and `q` and their respective Z squares.
-    - Compute the difference `h` between `u2` and `u1`.
-    - Calculate `i` as the square of twice `h`, and `j` as the product of `h` and `i`.
-    - Compute `rr` as twice the difference between `s2` and `s1`.
-    - Calculate `v` as the product of `u1` and `i`.
-    - Determine the new X coordinate of `r` by subtracting `j` and twice `v` from the square of `rr`.
-    - Compute the new Y coordinate of `r` using `rr`, `v`, and `i`.
-    - Calculate the new Z coordinate of `r` using the sum of the Z coordinates of `p` and `q`, their squares, and `h`.
-    - Return the result stored in `r`.
-- **Output**: A pointer to the `fd_bn254_g2_t` structure `r`, which contains the result of the addition of points `p` and `q`.
-- **Functions called**:
-    - [`fd_bn254_g2_is_zero`](#fd_bn254_g2_is_zero)
-    - [`fd_bn254_g2_set`](#fd_bn254_g2_set)
+    - `r`: A pointer to a `fd_bn254_g2_t` structure where the result will be stored.
+    - `p`: A constant pointer to a `fd_bn254_g2_t` structure representing the first point to add.
+    - `q`: A constant pointer to a `fd_bn254_g2_t` structure representing the second point to add.
+- **Logic and Control Flow**:
+    - Check if `p` is the point at infinity using [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>); if true, set `r` to `q` using [`fd_bn254_g2_set`](<#fd_bn254_g2_set>) and return `r`.
+    - Compute `Z1Z1` as the square of `p->Z` and `Z2Z2` as the square of `q->Z`.
+    - Calculate `U1` as `p->X` multiplied by `Z2Z2` and `U2` as `q->X` multiplied by `Z1Z1`.
+    - Calculate `S1` as `p->Y` multiplied by `q->Z` and `Z2Z2`, and `S2` as `q->Y` multiplied by `p->Z` and `Z1Z1`.
+    - Compute `H` as the difference between `U2` and `U1`.
+    - Calculate `HH` as the square of `2*H`, and `J` as `H` multiplied by `HH`.
+    - Compute `r` as `2*(S2-S1)` and `V` as `U1` multiplied by `HH`.
+    - Calculate `X3` as `r^2 - J - 2*V` and store it in `r->X`.
+    - Calculate `Y3` as `r*(V-X3) - 2*S1*J` and store it in `r->Y`.
+    - Calculate `Z3` as `((Z1+Z2)^2 - Z1Z1 - Z2Z2)*H` and store it in `r->Z`.
+    - Return `r` as the result.
+- **Output**: A pointer to the `fd_bn254_g2_t` structure `r` containing the result of the addition.
+- **Functions Called**:
+    - [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>)
+    - [`fd_bn254_g2_set`](<#fd_bn254_g2_set>)
 
 
 ---
 ### fd\_bn254\_g2\_scalar\_mul<!-- {{#callable:fd_bn254_g2_scalar_mul}} -->
-The `fd_bn254_g2_scalar_mul` function performs scalar multiplication on a point in the BN254 G2 group, multiplying the point by a scalar value.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L276>)
+
+Performs scalar multiplication on a point in the BN254 G2 group.
 - **Inputs**:
-    - `r`: A pointer to an `fd_bn254_g2_t` structure where the result of the scalar multiplication will be stored.
-    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the point to be multiplied, assumed to be in affine form (i.e., `p->Z == 1`).
-    - `s`: A constant pointer to an `fd_bn254_scalar_t` structure representing the scalar by which the point `p` is to be multiplied.
-- **Control Flow**:
-    - Initialize an integer `i` to 255, representing the bit index of the scalar `s`.
-    - Iterate from the most significant bit to the least significant bit of `s`, decrementing `i` until a set bit is found or `i` becomes negative.
-    - If `i` is negative, indicating that the scalar `s` is zero, set the result `r` to the zero point using [`fd_bn254_g2_set_zero`](#fd_bn254_g2_set_zero) and return `r`.
-    - Set the result `r` to the point `p` using [`fd_bn254_g2_set`](#fd_bn254_g2_set).
-    - For each bit from `i-1` down to 0, double the point `r` using [`fd_bn254_g2_dbl`](#fd_bn254_g2_dbl).
-    - If the current bit of `s` is set, add the point `p` to `r` using [`fd_bn254_g2_add_mixed`](#fd_bn254_g2_add_mixed).
-    - Return the result `r`.
-- **Output**: A pointer to the `fd_bn254_g2_t` structure `r`, which contains the result of the scalar multiplication.
-- **Functions called**:
-    - [`fd_bn254_g2_set_zero`](#fd_bn254_g2_set_zero)
-    - [`fd_bn254_g2_set`](#fd_bn254_g2_set)
-    - [`fd_bn254_g2_dbl`](#fd_bn254_g2_dbl)
-    - [`fd_bn254_g2_add_mixed`](#fd_bn254_g2_add_mixed)
+    - `r`: A pointer to an `fd_bn254_g2_t` structure where the result will be stored.
+    - `p`: A constant pointer to an `fd_bn254_g2_t` structure representing the point to be multiplied.
+    - `s`: A constant pointer to an `fd_bn254_scalar_t` structure representing the scalar multiplier.
+- **Logic and Control Flow**:
+    - Initialize `i` to 255 and decrement `i` until a set bit is found in the scalar `s` or `i` becomes negative.
+    - If `i` is negative, set `r` to zero using [`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>) and return `r`.
+    - Set `r` to the value of `p` using [`fd_bn254_g2_set`](<#fd_bn254_g2_set>).
+    - Iterate from `i-1` down to 0, doubling `r` using [`fd_bn254_g2_dbl`](<#fd_bn254_g2_dbl>) in each iteration.
+    - If the current bit of `s` is set, add `p` to `r` using [`fd_bn254_g2_add_mixed`](<#fd_bn254_g2_add_mixed>).
+    - Return the result stored in `r`.
+- **Output**: Returns a pointer to the `fd_bn254_g2_t` structure `r` containing the result of the scalar multiplication.
+- **Functions Called**:
+    - [`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>)
+    - [`fd_bn254_g2_set`](<#fd_bn254_g2_set>)
+    - [`fd_bn254_g2_dbl`](<#fd_bn254_g2_dbl>)
+    - [`fd_bn254_g2_add_mixed`](<#fd_bn254_g2_add_mixed>)
 
 
 ---
 ### fd\_bn254\_g2\_frombytes\_internal<!-- {{#callable:fd_bn254_g2_frombytes_internal}} -->
-The `fd_bn254_g2_frombytes_internal` function converts a 128-byte input into a G2 point on the BN254 curve, handling special cases and performing basic validity checks.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L301>)
+
+Extracts and validates the (x, y) coordinates from a byte array to initialize a `fd_bn254_g2_t` structure.
 - **Inputs**:
-    - `p`: A pointer to an `fd_bn254_g2_t` structure where the resulting G2 point will be stored.
-    - `in`: A constant 128-byte array representing the input data to be converted into a G2 point.
-- **Control Flow**:
-    - Check if the input `in` is all zeros, and if so, set the point `p` to the point at infinity using [`fd_bn254_g2_set_zero`](#fd_bn254_g2_set_zero) and return `p`.
-    - Attempt to convert the first 64 bytes of `in` into the X coordinate of the point `p` using `fd_bn254_fp2_frombytes_be_nm`; if this fails, return `NULL`.
-    - Attempt to convert the next 64 bytes of `in` into the Y coordinate of the point `p`, also checking for flags indicating infinity or negativity; if this fails, return `NULL`.
-    - If the Y coordinate indicates infinity, set the point `p` to the point at infinity using [`fd_bn254_g2_set_zero`](#fd_bn254_g2_set_zero) and return `p`.
-    - Set the Z coordinate of the point `p` to one using `fd_bn254_fp2_set_one`.
-    - Return the pointer `p` to the resulting G2 point.
-- **Output**: A pointer to the `fd_bn254_g2_t` structure `p` containing the resulting G2 point, or `NULL` if the conversion fails.
-- **Functions called**:
-    - [`fd_bn254_g2_set_zero`](#fd_bn254_g2_set_zero)
+    - `p`: A pointer to a `fd_bn254_g2_t` structure where the extracted point will be stored.
+    - `in`: A constant byte array of size 128 containing the serialized point data.
+- **Logic and Control Flow**:
+    - Check if the input byte array `in` is all zeros; if true, set `p` to the point at infinity using [`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>) and return `p`.
+    - Attempt to extract the x-coordinate from the first 64 bytes of `in` using `fd_bn254_fp2_frombytes_be_nm`; if this fails, return `NULL`.
+    - Attempt to extract the y-coordinate from the next 64 bytes of `in` using `fd_bn254_fp2_frombytes_be_nm`, also checking for infinity and negative flags; if this fails, return `NULL`.
+    - If the y-coordinate indicates infinity, set `p` to the point at infinity using [`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>) and return `p`.
+    - Set the z-coordinate of `p` to one using `fd_bn254_fp2_set_one`.
+    - Return the pointer `p`.
+- **Output**: A pointer to the initialized `fd_bn254_g2_t` structure `p`, or `NULL` if the extraction or validation fails.
+- **Functions Called**:
+    - [`fd_bn254_g2_set_zero`](<#fd_bn254_g2_set_zero>)
 
 
 ---
 ### fd\_bn254\_g2\_frombytes\_check\_subgroup<!-- {{#callable:fd_bn254_g2_frombytes_check_subgroup}} -->
-The function `fd_bn254_g2_frombytes_check_subgroup` converts a byte array to a G2 point on the BN254 curve and verifies its subgroup membership.
+[View Source →](<../../../../../src/ballet/bn254/fd_bn254_g2.c#L330>)
+
+Converts a byte array to a `fd_bn254_g2_t` point and checks if it belongs to the correct subgroup.
 - **Inputs**:
-    - `p`: A pointer to an `fd_bn254_g2_t` structure where the resulting G2 point will be stored.
-    - `in`: A constant byte array of size 128 representing the input data to be converted into a G2 point.
-- **Control Flow**:
-    - The function first attempts to convert the byte array `in` into a G2 point using [`fd_bn254_g2_frombytes_internal`](#fd_bn254_g2_frombytes_internal); if this fails, it returns NULL.
-    - If the resulting point is the zero point, it returns the point `p`.
-    - The function converts the X and Y coordinates of the point to Montgomery form and sets the Z coordinate to one.
-    - It checks if the point satisfies the curve equation `y^2 = x^3 + b`; if not, it returns NULL.
-    - The function performs a fast subgroup membership check using a series of scalar multiplications and Frobenius operations to ensure the point is in the correct subgroup.
-    - If the subgroup check fails, it returns NULL; otherwise, it returns the point `p`.
-- **Output**: Returns a pointer to the `fd_bn254_g2_t` structure `p` if the conversion and subgroup check are successful, otherwise returns NULL.
-- **Functions called**:
-    - [`fd_bn254_g2_frombytes_internal`](#fd_bn254_g2_frombytes_internal)
-    - [`fd_bn254_g2_is_zero`](#fd_bn254_g2_is_zero)
-    - [`fd_bn254_g2_scalar_mul`](#fd_bn254_g2_scalar_mul)
-    - [`fd_bn254_g2_add_mixed`](#fd_bn254_g2_add_mixed)
-    - [`fd_bn254_g2_frob`](#fd_bn254_g2_frob)
-    - [`fd_bn254_g2_add`](#fd_bn254_g2_add)
-    - [`fd_bn254_g2_frob2`](#fd_bn254_g2_frob2)
-    - [`fd_bn254_g2_dbl`](#fd_bn254_g2_dbl)
-    - [`fd_bn254_g2_eq`](#fd_bn254_g2_eq)
+    - `p`: A pointer to a `fd_bn254_g2_t` structure where the resulting point will be stored.
+    - `in`: A constant byte array of size 128 representing the input data to be converted into a point.
+- **Logic and Control Flow**:
+    - Call [`fd_bn254_g2_frombytes_internal`](<#fd_bn254_g2_frombytes_internal>) to convert the byte array to a point; return `NULL` if conversion fails.
+    - Check if the point is zero using [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>); if true, return the point.
+    - Convert the `X` and `Y` coordinates to Montgomery form using `fd_bn254_fp2_to_mont`.
+    - Set the `Z` coordinate to one using `fd_bn254_fp2_set_one`.
+    - Compute `y^2` and `x^3 + b` and check if they are equal; return `NULL` if not.
+    - Perform a fast subgroup membership check using scalar multiplication and Frobenius maps.
+    - Return `NULL` if the subgroup check fails, otherwise return the point.
+- **Output**: Returns a pointer to the `fd_bn254_g2_t` point if successful, or `NULL` if the conversion or subgroup check fails.
+- **Functions Called**:
+    - [`fd_bn254_g2_frombytes_internal`](<#fd_bn254_g2_frombytes_internal>)
+    - [`fd_bn254_g2_is_zero`](<#fd_bn254_g2_is_zero>)
+    - [`fd_bn254_g2_scalar_mul`](<#fd_bn254_g2_scalar_mul>)
+    - [`fd_bn254_g2_add_mixed`](<#fd_bn254_g2_add_mixed>)
+    - [`fd_bn254_g2_frob`](<#fd_bn254_g2_frob>)
+    - [`fd_bn254_g2_add`](<#fd_bn254_g2_add>)
+    - [`fd_bn254_g2_frob2`](<#fd_bn254_g2_frob2>)
+    - [`fd_bn254_g2_dbl`](<#fd_bn254_g2_dbl>)
+    - [`fd_bn254_g2_eq`](<#fd_bn254_g2_eq>)
 
 
 

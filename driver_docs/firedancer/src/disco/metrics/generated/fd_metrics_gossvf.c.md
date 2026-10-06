@@ -3,12 +3,27 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated metric metadata for GOSSVF message and CRDS receive counts and bytes by outcome.
+Defines metrics for GOSSVF message and CRDS outcomes with counters for success and drop events.
 
 # Purpose
-This file defines the metric metadata table `FD_METRICS_GOSSVF` for the `gossvf` subsystem. It is a generated C source file, as stated in the file comment, and it must not be edited by hand. The file includes `fd_metrics_gossvf.h` and then initializes a constant array of `fd_metrics_meta_t` entries with `DECLARE_METRIC_ENUM` macros.
+The code defines a set of metrics related to the GOSSVF (Gossip Subsystem Verification Framework) in a networked system. It is a C source file that is generated automatically by a script named `gen_metrics.py`, and it should not be edited manually. The file includes the header `fd_metrics_gossvf.h` and defines an array `FD_METRICS_GOSSVF` of type `fd_metrics_meta_t`. This array contains various metrics that track the count and byte size of received messages (`GOSSVF_MESSAGE_RX_COUNT` and `GOSSVF_MESSAGE_RX_BYTES`) and CRDS (Contact Record Dissemination System) messages (`GOSSVF_CRDS_RX_COUNT` and `GOSSVF_CRDS_RX_BYTES`).
 
-The table lists all metric variants for `GOSSVF_MESSAGE_RX_COUNT`, `GOSSVF_MESSAGE_RX_BYTES`, `GOSSVF_CRDS_RX_COUNT`, and `GOSSVF_CRDS_RX_BYTES`, each paired with a metric type and an outcome label. These entries define the public metric set used to record message and CRDS receive results, including success cases and many drop reasons such as parse errors, signature failures, inactive state, wallclock checks, and contact-info or shred-version checks.
+Each metric is declared using the macro `DECLARE_METRIC_ENUM`, which specifies the type of metric (e.g., `COUNTER`), the outcome of the message (e.g., `SUCCESS_PULL_REQUEST`, `DROPPED_UNPARSEABLE`), and the context (e.g., `GOSSVF_MESSAGE_OUTCOME`, `GOSSVF_CRDS_OUTCOME`). The metrics cover various outcomes such as successful message handling and different reasons for message drops, including signature issues, inactive states, and wallclock discrepancies. This file is part of a broader system for monitoring and analyzing the performance and reliability of the GOSSVF by providing detailed metrics on message handling.
+# Imports and Dependencies
+
+---
+- `fd_metrics_gossvf.h`
+
+
+# Global Variables
+
+---
+### FD\_METRICS\_GOSSVF
+- **Type**: ``const fd_metrics_meta_t[]``
+- **Description**: An array of `fd_metrics_meta_t` structures that defines various metrics related to message and CRDS (Contact Routing Data Structure) reception outcomes. Each element in the array is initialized using the `DECLARE_METRIC_ENUM` macro, which specifies the type of metric, its category, and the outcome it tracks.
+- **Use**: Used to store and define metrics for tracking message and CRDS reception outcomes in a system.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

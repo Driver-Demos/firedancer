@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `development.toml` file in the `firedancer` codebase configures development settings, including network namespace enabling and specifying a network interface.
+Configuration settings for development environment, including network namespace and interface options.
 
 # Purpose
-The file is a configuration file that specifies settings for a development environment. It indicates that the sandbox mode is disabled, while network namespace support is enabled. Additionally, it defines the network interface to be used as "veth_test_xdp_0".
+The configuration file defines settings for a development environment. Under the `development` section, the `sandbox` option is set to `false`, indicating that the sandbox mode is disabled. The `development.netns` subsection has an `enabled` option set to `true`, which enables network namespace features. In the `net` section, the `interface` is specified as `veth_test_xdp_0`, which sets the network interface to be used.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

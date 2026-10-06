@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Pull request workflow that checks changed files for trailing whitespace with pre-commit.
+GitHub Actions workflow to check for trailing whitespace in pull request changes.
 
 # Purpose
-This workflow runs on pull request events and checks changed files for trailing whitespace. It uses `actions/checkout` with full history, then computes the list of added, copied, modified, renamed, and type-changed files between the pull request base commit and the current commit, while excluding `src/disco/gui/dist*`. The file list is passed to `pre-commit/action`, which runs the configured pre-commit checks only on those files. The job uses `actions/setup-python` to prepare the Python environment required by the pre-commit tool.
+This GitHub Actions workflow is designed to check for trailing whitespace in files that are part of a pull request. It triggers on the `pull_request` event and runs a job named `trailing-whitespace` on the `ubuntu-latest` environment. The workflow first checks out the repository using `actions/checkout@v5` with a full fetch depth. It then identifies the files that have changed in the pull request, excluding those in the `src/disco/gui/dist*` directory, and stores the list in the `GITHUB_OUTPUT`. The workflow sets up a Python environment using `actions/setup-python@v6` and finally runs the `pre-commit` action with the specified files to check for trailing whitespace issues.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

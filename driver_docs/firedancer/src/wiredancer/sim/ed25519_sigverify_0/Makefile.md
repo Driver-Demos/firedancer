@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Makefile` in the `firedancer/src/wiredancer/sim/ed25519_sigverify_0` directory is used to configure and run simulations for the `ed25519_sigverify_0` module using Verilog sources and the Questa simulator.
+Makefile for simulating and verifying the `ed25519_sigverify_0` module using Verilog sources.
 
 # Purpose
-The provided Makefile is used to automate the build and simulation process for a hardware design project, specifically focusing on the verification of the Ed25519 signature verification module. It sets up various environment variables and paths, such as the simulation tool (`SIM`), the module name (`MODULE`), and the directory containing the RTL (Register Transfer Level) source files (`RTL_DIR`). The file lists multiple Verilog and SystemVerilog source files under `VERILOG_SOURCES`, which are necessary for the simulation, including both standard library files from Xilinx Vivado and custom RTL files related to the Ed25519 signature verification. Additionally, it specifies compilation arguments, such as the path to an instruction ROM memory initialization file. The Makefile concludes by including another Makefile from the cocotb framework, which is a coroutine-based co-simulation library for verifying VHDL and Verilog designs.
+The `Makefile` is used to automate the build process for a simulation environment. It defines several variables and paths necessary for compiling and simulating Verilog source files. The `SIM` variable specifies the simulator to use, defaulting to `questa`, while `MODULE` and `TOPLEVEL` define the test module and top-level module name, respectively. The `VERILOG_SOURCES` variable lists all the Verilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files located in the `RTL_DIR`. The `COMPILE_ARGS` variable includes additional compilation arguments, such as the path to the instruction ROM memory initialization file. The file concludes by including a makefile from the `cocotb` configuration to integrate with the `cocotb` testing framework.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
