@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `GNUmakefile` in the `firedancer` codebase provides a configuration for building the project with support for parallel builds, machine-specific configurations, and optional build features.
+Makefile for building targets with support for machine-specific configurations and optional features.
 
 # Purpose
-The provided content is from a Makefile, which is used to automate the build process of a software project. This Makefile supports parallel builds using the `-j` option and allows for customization based on the target machine through the `MACHINE` environment variable. By default, it builds for the native machine, but users can specify a different machine configuration by setting `MACHINE=my_machine`, which will use the configuration file located at `config/machine/my_machine.mk`. Additionally, the `EXTRAS` environment variable enables optional build features, such as debugging, by including extra configuration files like `with-debug.mk`. The Makefile is designed to support concurrent builds for multiple machines by organizing build artifacts in machine-specific directories, and it provides help commands to assist users in managing build targets and configurations. The file also notes considerations for systems with CPU isolation, ensuring efficient use of available resources during the build process.
+This Makefile is used to manage the build process for a software project. It supports parallel builds using the `-j` option and allows for customization based on the target machine through the `MACHINE` environment variable. By default, it builds for the native machine, but users can specify a different machine by setting `MACHINE=my_machine`, which will use the configuration defined in `config/machine/my_machine.mk`. The `EXTRAS` environment variable enables optional build features by including additional configuration files from the `config/extra` directory. The Makefile also provides a mechanism to print help information for available build targets and configurations specific to the selected machine. It is designed to work efficiently on systems with CPU isolation by using non-isolated CPUs for the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

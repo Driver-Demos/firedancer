@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `shared.proto` file defines protocol buffer messages for a `Header` with a timestamp, a `Heartbeat` with a count, and a `Socket` with an IP and port.
+Defines protobuf messages for Header, Heartbeat, and Socket with timestamp and network details.
 
 # Purpose
-This file defines a Protocol Buffers schema using version 3 syntax. It specifies a package named "shared" and includes definitions for three messages: `Header`, which contains a timestamp field; `Heartbeat`, which includes a count field; and `Socket`, which comprises an IP address and a port number. The file also imports "timestamp.proto" to utilize Google's `Timestamp` type.
+The file defines a Protocol Buffers schema using `proto3` syntax. It imports a `timestamp.proto` file and specifies a package named `shared`. The schema includes three messages: `Header`, `Heartbeat`, and `Socket`. The `Header` message contains a `google.protobuf.Timestamp` field named `ts`. The `Heartbeat` message includes a `uint64` field named `count`. The `Socket` message has a `bytes` field named `ip` and an `int64` field named `port`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

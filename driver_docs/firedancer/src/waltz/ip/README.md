@@ -3,20 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-IPv4 FIB and Linux netlink route management code with unit tests.
+IPv4 FIB management and Netlink integration with data structures, functions, headers, and tests.
 
 
 ## Files
-- **[fd_fib4.c](fd_fib4.c.md)**: IPv4 route table and lookup logic with /32 hashmap support, clear, and formatted printing.
-- **[fd_fib4.h](fd_fib4.h.md)**: IPv4 route table APIs with lookup, insert, clear, and route metadata.
-- **[fd_fib4_netlink.c](fd_fib4_netlink.c.md)**: Loads IPv4 routes from Linux netlink into a FIB and maps netlink errors to strings.
-- **[fd_fib4_netlink.h](fd_fib4_netlink.h.md)**: The `fd_fib4_netlink.h` file provides APIs for importing routing tables from Linux netlink into a fib4 object, including error handling and diagnostic logging.
-- **[fd_fib4_private.h](fd_fib4_private.h.md)**: Private IPv4 FIB key, table, and hashmap layout helpers.
-- **[fd_netlink1.c](fd_netlink1.c.md)**: The `fd_netlink1.c` file in the `firedancer` codebase provides functions for creating, managing, and iterating over netlink sockets, including handling netlink messages and translating route and attribute types to strings.
-- **[fd_netlink1.h](fd_netlink1.h.md)**: Linux netlink session, socket read, and multipart message iteration helpers.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers, object files, and unit tests for the `fd_fib4` and `fd_fib4_netlink` components, with conditional logic for Linux environments.
-- **[test_fib4.c](test_fib4.c.md)**: Tests fd_fib4 insert, lookup, clear, count, precedence, capacity, and print behavior.
-- **[test_fib4_netlink.c](test_fib4_netlink.c.md)**: Dumps the local and main IPv4 routing tables from netlink to stderr.
+- **[fd_fib4.c](fd_fib4.c.md)**: Implements a data structure and functions for managing IPv4 forwarding information bases (FIBs).
+- **[fd_fib4.h](fd_fib4.h.md)**: Header file for a query-optimized IPv4 routing table with multi-threaded support and basic route management.
+- **[fd_fib4_netlink.c](fd_fib4_netlink.c.md)**: Implements functions for loading and translating IPv4 routing tables using Netlink on Linux systems.
+- **[fd_fib4_netlink.h](fd_fib4_netlink.h.md)**: APIs for importing routes from Linux netlink with error codes and functions for route table operations.
+- **[fd_fib4_private.h](fd_fib4_private.h.md)**: Defines private data structures and functions for a 4-bit FIB (Forwarding Information Base) in a hashmap.
+- **[fd_netlink1.c](fd_netlink1.c.md)**: Implements functions for creating, reading, and managing Netlink sockets and messages in Linux.
+- **[fd_netlink1.h](fd_netlink1.h.md)**: Netlink socket management and iteration utilities for Linux, including session initialization and message handling.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for fd_fib4 and fd_fib4_netlink in fd_waltz.
+- **[test_fib4.c](test_fib4.c.md)**: Tests for the `fd_fib4` module, including insertion, lookup, and edge cases for IPv4 routing.
+- **[test_fib4_netlink.c](test_fib4_netlink.c.md)**: Tests the functionality of dumping local and main routing tables using netlink in a FIB4 context.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

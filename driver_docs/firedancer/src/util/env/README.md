@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Environment and command-line parsing helpers, source, makefile, and tests for stripping keys and converting values.
+Command-line argument and environment variable parsing, APIs, Makefile, and tests for `fd_env`.
 
 
 ## Files
-- **[fd_env.c](fd_env.c.md)**: The `fd_env.c` file in the `firedancer` codebase provides functions for stripping command-line arguments and environment variables based on specified keys, supporting various data types.
-- **[fd_env.h](fd_env.h.md)**: Environment and command-line parsing helpers that strip keys and convert values to basic types.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects, and defines a unit test for the `fd_env` and `fd_util` components.
-- **[test_env.c](test_env.c.md)**: The `test_env.c` file in the `firedancer` codebase tests the functionality of command-line argument stripping and parsing for various data types, including handling edge cases and default values.
+- **[fd_env.c](fd_env.c.md)**: Implements command-line argument and environment variable parsing for different data types.
+- **[fd_env.h](fd_env.h.md)**: APIs for extracting and converting environment and command line arguments to various data types.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for `fd_env` and `fd_util`.
+- **[test_env.c](test_env.c.md)**: Tests for environment variable command-line stripping functions in various data types.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
