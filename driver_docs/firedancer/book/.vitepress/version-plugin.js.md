@@ -3,60 +3,40 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Fetches the latest release version from GitHub and replaces placeholders in markdown files.
+The `version-plugin.js` file defines a VitePress plugin that fetches the latest release version of the `firedancer` repository from GitHub and replaces occurrences of `__FD_LATEST_VERSION__` in markdown files with this version.
 
 # Purpose
-The code provides a function to fetch the latest release version of a specified GitHub repository and integrates it into a plugin-like structure. The [`getLatestRelease`](<#vitepress/version-plugingetlatestrelease>) function constructs a URL using the provided `owner` and `repo` parameters to access the GitHub API and retrieve the latest release information. It returns the `tag_name` of the latest release after handling potential errors. The [`latestVersion`](<#vitepress/version-pluginlatestversion>) function uses [`getLatestRelease`](<#vitepress/version-plugingetlatestrelease>) to obtain the latest version of the 'firedancer' repository and returns an object with a [`transform`](<#vitepress/version-plugintransform>) method. This method replaces occurrences of `__FD_LATEST_VERSION__` in Markdown files with the fetched version number, facilitating dynamic content updates.
+This code provides a specific functionality as a module intended to be imported and used elsewhere, likely within a build or documentation generation process. It defines a function `getLatestRelease` that fetches the latest release version of a specified GitHub repository using the GitHub API. The main exported function, `latestVersion`, utilizes `getLatestRelease` to obtain the latest version of the 'firedancer-io/firedancer' repository and returns a plugin object. This plugin object is designed to transform code, specifically replacing occurrences of `__FD_LATEST_VERSION__` in markdown files with the fetched version number. The code is narrowly focused on integrating version information into markdown files, suggesting its use in a documentation or build system where dynamic versioning is required.
 # Functions
 
 ---
-### getLatestRelease<!-- {{#callable:firedancer/book/.vitepress/version-plugin.getLatestRelease}} -->
-[View Source →](<../../../../book/.vitepress/version-plugin.js#L1>)
-
-Fetches the latest release tag name from a specified GitHub repository.
+### getLatestRelease
+The function `getLatestRelease` fetches the latest release tag name from a specified GitHub repository.
 - **Inputs**:
     - `owner`: The GitHub username or organization name that owns the repository.
-    - `repo`: The name of the GitHub repository from which to fetch the latest release.
+    - `repo`: The name of the repository from which to fetch the latest release.
 - **Control Flow**:
-    - Constructs a URL to access the latest release of the specified GitHub repository.
-    - Uses the `fetch` API to send a GET request to the constructed URL with a specific Accept header for GitHub API v3.
-    - Checks if the response is not OK and throws an error with the response status and status text if so.
-    - Parses the response JSON to extract the `tag_name` of the latest release.
-    - Logs an error message to the console if there is an error during the fetch operation.
-- **Output**: The `tag_name` of the latest release from the specified GitHub repository.
+    - Constructs a URL to access the latest release of the specified GitHub repository using the provided owner and repo parameters.
+    - Performs a fetch request to the constructed URL with a header to accept GitHub's v3 API JSON format.
+    - Checks if the response is not okay (i.e., not a successful HTTP status) and throws an error if so.
+    - Parses the response as JSON if the fetch is successful.
+    - Extracts and returns the 'tag_name' from the JSON data, which represents the latest release tag.
+    - Catches any errors during the fetch or JSON parsing process and logs an error message to the console.
+- **Output**: The function returns a promise that resolves to the tag name of the latest release from the specified GitHub repository.
 
 
 ---
-### latestVersion<!-- {{#callable:firedancer/book/.vitepress/version-plugin.latestVersion}} -->
-[View Source →](<../../../../book/.vitepress/version-plugin.js#L19>)
-
-Retrieves the latest release version of a GitHub repository and returns a plugin object that transforms code by replacing placeholders with the version number.
+### latestVersion
+The `latestVersion` function retrieves the latest release version of the 'firedancer' repository and returns a plugin object that replaces a placeholder in markdown files with this version.
 - **Inputs**: None
 - **Control Flow**:
-    - Calls the [`getLatestRelease`](<#vitepress/version-plugingetlatestrelease>) function with 'firedancer-io' and 'firedancer' as arguments to fetch the latest release version from GitHub.
-    - Returns a promise that resolves to a plugin object with a `name` property set to 'version-plugin'.
-    - Defines a `transform` method within the plugin object that checks if the `id` ends with '.md'.
-    - If `id` ends with '.md', replaces all occurrences of `__FD_LATEST_VERSION__` in `code` with the fetched version.
-    - If `id` does not end with '.md', returns the `code` unchanged.
-- **Output**: A promise that resolves to an object with a `name` property and a `transform` method for code transformation.
-- **Functions Called**:
-    - [`firedancer/book/.vitepress/version-plugin.getLatestRelease`](<#vitepress/version-plugingetlatestrelease>)
-
-
----
-### transform<!-- {{#callable:firedancer/book/.vitepress/version-plugin.transform}} -->
-[View Source →](<../../../../book/.vitepress/version-plugin.js#L23>)
-
-Transforms the input code by replacing a placeholder with the latest version if the file ID ends with '.md'.
-- **Inputs**:
-    - `code`: The input code as a string that may contain the placeholder to replace.
-    - `id`: The identifier of the file, used to check if it ends with '.md'.
-- **Control Flow**:
-    - Check if the `id` ends with '.md'.
-    - If true, replace all occurrences of the placeholder `__FD_LATEST_VERSION__` in `code` with the `version`.
-    - Return the transformed `code`.
-    - If false, return the original `code` without any modifications.
-- **Output**: The transformed code with the placeholder replaced if the file ID ends with '.md', otherwise the original code.
+    - Calls `getLatestRelease` with 'firedancer-io' as the owner and 'firedancer' as the repository to fetch the latest release version.
+    - Waits for the promise returned by `getLatestRelease` to resolve with the latest version tag.
+    - Returns a plugin object with a `name` property set to 'version-plugin' and a `transform` method.
+    - The `transform` method checks if the file ID ends with '.md'.
+    - If the file is a markdown file, it replaces all occurrences of `__FD_LATEST_VERSION__` in the code with the fetched version.
+    - If the file is not a markdown file, it returns the code unchanged.
+- **Output**: A promise that resolves to a plugin object with a `name` and a `transform` method for processing markdown files.
 
 
 

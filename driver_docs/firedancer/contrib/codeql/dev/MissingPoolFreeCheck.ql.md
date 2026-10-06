@@ -3,41 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Detects missing free calls before pool acquire calls in `fd_pool.c`, issuing warnings for potential issues.
+CodeQL query for pool acquire calls missing a preceding free on all paths.
 
 # Purpose
-The code is a static analysis tool designed to detect potential issues in C or C++ code related to resource management, specifically focusing on memory pool operations. It identifies calls to pool acquire functions that are not preceded by a corresponding free function call on all execution paths within a function. This is important for ensuring that resources are properly released, preventing memory leaks.
-
-The code defines two classes, `PoolAcquire` and `PoolFree`, both of which extend the `FunctionCall` class. The `PoolAcquire` class identifies function calls that match the pattern for acquiring resources from a pool, specifically those ending in `_idx_acquire` or `_ele_acquire`, and located in the `fd_pool.c` file. The `PoolFree` class identifies function calls that match the pattern for freeing resources, specifically those ending in `_free` or `_used`, also located in the `fd_pool.c` file. Both classes provide a method `getPoolName` to extract the pool name from the function call.
-
-The analysis logic uses these classes to find instances where a `PoolAcquire` call is not dominated by a corresponding `PoolFree` call with the same pool name, indicating a potential issue. The analysis excludes files located in a `tmpl` directory and the `fd_types.c` file. The tool outputs a warning for each detected issue, along with the name of the pool involved.
-# Imports and Dependencies
-
----
-- `cpp`
-
-
-# Data Structures
-
----
-### PoolAcquire
-- **Type**: ``class``
-- **Members**:
-    - ``PoolAcquire``: Represents a function call to pool acquire functions that are not preceded by a corresponding free function call.
-    - ``getPoolName``: Returns the name of the pool by removing specific suffixes from the target function name.
-- **Description**: Represents a class that extends `FunctionCall` to detect calls to pool acquire functions in the `fd_pool.c` file, ensuring they are not preceded by a corresponding free function call on all paths. It includes a method to extract the pool name by removing specific suffixes from the function name.
-
-
----
-### PoolFree
-- **Type**: ``class``
-- **Members**:
-    - ``PoolFree``: Represents a function call that matches specific naming patterns related to freeing resources in a pool.
-    - ``PoolFree()``: Constructor that initializes the `PoolFree` object by checking if the target function name matches specific patterns and file conditions.
-    - ``getPoolName``: Returns the pool name by removing specific suffixes from the target function name.
-- **Description**: Represents a function call that is related to freeing resources in a pool, specifically targeting functions with names that match the patterns `%_free` or `%_used` in the file `fd_pool.c`, excluding paths that match `%/tmpl/%`. It provides a method to extract the pool name by removing the `_free` or `_used` suffix from the function name.
-
-
+This CodeQL query detects pool acquire calls that do not have a matching free call on all control-flow paths before the acquire site. It defines `PoolAcquire` and `PoolFree` call classes for functions in `fd_pool.c`, excludes files under `/tmpl/`, and groups calls by pool name using the function name suffix. The query reports an acquire when no dominating free call exists for the same pool name, and it also excludes acquires in `fd_types.c`. The metadata marks the query as a warning-level problem with low precision and identifies it as `asymmetric-research/fd-pool-missing-free`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
