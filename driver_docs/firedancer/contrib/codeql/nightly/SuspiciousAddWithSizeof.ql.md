@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `SuspiciousAddWithSizeof.ql` file in the `firedancer` codebase defines a CodeQL query to identify potentially dangerous pointer arithmetic expressions that could lead to buffer overflow conditions due to incorrect scaling, specifically when the pointer type is not `char*` or `void*`.
+Detects suspicious pointer arithmetic with `sizeof` that can cause buffer overflows in C++ code.
 
 # Purpose
-This code is a static analysis rule designed to identify potential security vulnerabilities in C++ code related to pointer arithmetic. Specifically, it targets expressions where the `sizeof` operator is used in conjunction with pointer arithmetic, which can lead to buffer overflow conditions if the offset is implicitly scaled. The rule is part of a broader static analysis framework, likely used to scan C++ codebases for common security issues and coding mistakes.
+This code defines a static analysis rule for identifying potential security issues related to pointer arithmetic in C++ code. The rule specifically targets expressions where the `sizeof` operator is used in conjunction with pointer arithmetic, which can lead to buffer overflow conditions if the offset is implicitly scaled. The rule is categorized as a problem with a high precision and a security severity rating of 8.8, indicating its importance in identifying critical security vulnerabilities.
 
-The code defines a private predicate `isCharSzPtrExpr` that checks if an expression is a pointer to either a `char` or `void` type. This is crucial because pointer arithmetic involving these types can be particularly error-prone when combined with `sizeof`, as the arithmetic might not behave as intended if the pointer type is not correctly accounted for. The main logic of the rule is encapsulated in a query that identifies expressions where `sizeof` is used in pointer arithmetic, but the pointer is not of type `char*` or `void*`, which is flagged as suspicious.
+The code imports necessary modules such as `cpp`, `IncorrectPointerScalingCommon`, and `filter` to facilitate the analysis. It defines a private predicate `isCharSzPtrExpr` that checks if an expression is a pointer to a `char` or `void` type. This is important because pointer arithmetic involving these types can be prone to errors if not handled correctly.
 
-This file is part of a collection of static analysis rules, likely intended to be used within a larger code analysis tool. It does not define a public API or external interface but rather contributes to the internal logic of the tool by specifying a particular pattern to detect and warn about. The rule is tagged with security-related metadata, including a severity level and a reference to a Common Weakness Enumeration (CWE) identifier, which helps categorize the type of vulnerability it addresses.
+The main logic of the rule is implemented using a query that identifies expressions involving `addWithSizeof`. It checks if the pointer expression is not of type `char*` or `void*`, which would indicate a potential mistake. If such an expression is found, the rule selects it and generates a warning message indicating the suspicious use of `sizeof` in the pointer arithmetic expression. This helps developers identify and correct potential security issues in their code.
 # Imports and Dependencies
 
 ---

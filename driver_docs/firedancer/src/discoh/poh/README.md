@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Proof-of-history leader scheduling, hashing, tick and microblock publishing, and handoff logic.
+Implementation of a Proof of History (PoH) tile and Makefile logic for object inclusion based on `FD_HAS_ALLOCA`.
 
 
 ## Files
-- **[fd_poh_tile.c](fd_poh_tile.c.md)**: Proof-of-history leader scheduling, hashing, tick and microblock publishing, and leader handoff logic.
-- **[Local.mk](Local.mk.md)**: Builds fd_poh_tile for fd_discoh when FD_HAS_ALLOCA is set.
+- **[fd_poh_tile.c](fd_poh_tile.c.md)**: An implementation of the Proof of History (PoH) tile for the Firedancer codebase, handling leader scheduling, slot management, and transaction processing in a Solana-like blockchain environment.
+- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects `fd_poh_tile` and `fd_discoh` if `FD_HAS_ALLOCA` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

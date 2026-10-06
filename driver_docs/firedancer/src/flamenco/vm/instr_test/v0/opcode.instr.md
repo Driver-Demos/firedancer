@@ -3,29 +3,35 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `opcode.instr` file in the `firedancer` codebase defines a set of opcodes with their corresponding operations, including arithmetic, logical, and control flow instructions, along with their verification and error statuses.
+Defines a set of opcodes with their corresponding operations and status for a virtual machine.
 
 # Purpose
-The file content provided appears to be a configuration or metadata file that defines a set of operations, likely for a virtual machine or a low-level software component such as an interpreter or a just-in-time compiler. Each line specifies an operation code (`op`), an immediate value (`imm`), and a status or action (`vfy`, `ok`, `err`) along with a comment describing the operation (e.g., `add32 reg, imm`). The file provides narrow functionality, focusing on defining the behavior and validation of specific operations, which include arithmetic, logical, and control flow instructions. The common theme is the categorization of operations into those that are verified (`vfy`), those that are valid (`ok`), and those that result in an error (`err`). This file is relevant to the codebase as it likely serves as a reference or configuration for validating and executing operations within a software component, ensuring that only supported and correctly implemented operations are executed.
+This file defines a set of operation codes (`op`) and their corresponding immediate values (`imm`) for a virtual machine or an assembly-like language. Each operation code is associated with a status, such as `ok`, `vfy`, or `err`, which indicates whether the operation is valid, requires verification, or results in an error. The operations include arithmetic and logical instructions like `add`, `sub`, `mul`, `div`, `or`, `and`, `xor`, `mov`, and `neg`, as well as various conditional jumps (`jeq`, `jgt`, `jge`, `jlt`, `jle`, `jslt`, `jsle`). The file also includes instructions for data movement and manipulation, such as `lddw`, `stxw`, and `call`. This configuration is crucial for defining the behavior and validation of instructions executed by the virtual machine, ensuring that only supported operations are performed and identifying those that require further verification or are erroneous.
 # Content Summary
-The provided content appears to be a configuration or metadata file that defines a set of operations, likely for a virtual machine or a low-level programming environment such as an eBPF (Extended Berkeley Packet Filter) or similar bytecode interpreter. Each line in the file specifies an operation code (`op`), an immediate value (`imm`), and a status or action (`vfy`, `ok`, or `err`), along with a comment that describes the operation.
+The content provided is a configuration file that defines a set of operations, each identified by an opcode (`op`) and an immediate value (`imm`). The file specifies the status of each operation, which can be one of the following: `ok`, `vfy`, or `err`. These statuses indicate whether the operation is valid (`ok`), requires verification (`vfy`), or is erroneous (`err`).
 
-Key technical details include:
+Key details include:
 
-1. **Operation Codes (op):** Each operation is identified by a unique hexadecimal code ranging from `00` to `ff`. These codes represent different instructions that the virtual machine or interpreter can execute.
+1. **Operation Codes (op):** Each line begins with an operation code (`op`) in hexadecimal format, ranging from `00` to `ff`. This code uniquely identifies the operation.
 
-2. **Immediate Values (imm):** The `imm` field specifies an immediate value associated with the operation. Most operations have an immediate value of `0`, but some, such as `div32 reg, imm` and `mod32 reg, imm`, have a value of `1`, indicating a special condition or requirement for these operations.
+2. **Immediate Values (imm):** Each operation has an associated immediate value (`imm`), which is typically `0` but can vary, as seen in some operations like `div32 reg, imm` and `mod32 reg, imm`.
 
-3. **Status or Action:**
-   - `vfy`: Indicates that the operation is subject to verification. This could mean that the operation requires additional checks or validation before execution.
-   - `ok`: Denotes that the operation is valid and can be executed without additional checks.
-   - `err`: Signifies an error or invalid operation, suggesting that these operations are not supported or should not be executed in the current context.
+3. **Status Indicators:**
+   - `ok`: The operation is valid and can be executed. Examples include arithmetic operations like `add32`, `sub64`, and logical operations like `or32`, `xor64`.
+   - `vfy`: The operation requires verification before execution. This status is common for many operations, indicating they need further checks.
+   - `err`: The operation is erroneous and should not be executed. Examples include certain division operations like `div32 reg, reg` and memory operations like `ldxw reg, [reg+off]`.
 
-4. **Operation Descriptions:** The comments provide a brief description of each operation, indicating the type of arithmetic or logical operation being performed, such as `add32`, `sub64`, `mul32`, `div64`, `or32`, `and64`, `xor32`, `mov64`, `arsh32`, and various conditional jumps like `jeq`, `jgt`, `jlt`, etc.
+4. **Operation Descriptions:** Comments following the status provide a brief description of the operation, such as `add32 reg, imm` for adding a 32-bit immediate value to a register.
 
-5. **Error-Prone Operations:** Certain operations, particularly those involving memory access or division/modulo by registers (e.g., `ldxw reg, [reg+off]`, `div32 reg, reg`), are marked as `err`, indicating potential issues or unsupported operations in this environment.
+5. **Categories of Operations:**
+   - **Arithmetic Operations:** Include addition (`add`), subtraction (`sub`), multiplication (`mul`), division (`div`), and modulus (`mod`).
+   - **Logical Operations:** Include bitwise operations like `or`, `and`, `xor`, and negation (`neg`).
+   - **Shift Operations:** Include left shift (`lsh`), right shift (`rsh`), and arithmetic right shift (`arsh`).
+   - **Comparison and Jump Operations:** Include operations like `jeq` (jump if equal), `jgt` (jump if greater than), and `jlt` (jump if less than).
 
-This file is crucial for developers working with this system as it outlines the permissible operations and their constraints, guiding the implementation of bytecode or instruction sequences that are compatible with the virtual machine or interpreter. Understanding these details is essential for ensuring that the code adheres to the expected operational semantics and avoids unsupported or erroneous instructions.
+6. **Memory Operations:** Some operations involve memory access, such as loading (`ldx`) and storing (`stx`) values at specific offsets. These operations often have an `err` status, indicating potential issues with memory access.
+
+This configuration file is crucial for developers working with this codebase, as it outlines the permissible operations and their statuses, guiding the implementation and debugging of the software.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
