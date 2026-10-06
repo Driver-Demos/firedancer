@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `invoke.pb.c` file contains automatically generated nanopb constant definitions for binding various test instruction structures in the `firedancer` codebase.
+Automatically generated nanopb constant definitions for binding test instruction structures.
 
 # Purpose
-This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library, specifically version 0.4.9.1. It includes a header file, `invoke.pb.h`, which likely contains protobuf message definitions. The file checks for compatibility with the nanopb generator version by comparing `PB_PROTO_HEADER_VERSION` to ensure it matches the expected version (40), and it raises an error if there is a mismatch, prompting regeneration with the correct version. The `PB_BIND` macros are used to bind C structures (`fd_exec_test_instr_acct_t`, `fd_exec_test_instr_context_t`, `fd_exec_test_instr_effects_t`, and `fd_exec_test_instr_fixture_t`) to their corresponding protobuf message types, with some bindings using an `AUTO` parameter to automatically determine field numbers, while others explicitly specify a field number (2). This file is part of a system that uses nanopb to handle serialization and deserialization of data structures defined in protobuf format.
+This code is an automatically generated C source file that defines constant bindings for Protocol Buffers (protobuf) using the nanopb library. It includes the header file `invoke.pb.h` and checks the `PB_PROTO_HEADER_VERSION` to ensure compatibility with the nanopb generator version 0.4.9.1. The file uses the `PB_BIND` macro to bind protobuf message types to their corresponding C structures, such as `fd_exec_test_instr_acct_t`, `fd_exec_test_instr_context_t`, `fd_exec_test_instr_effects_t`, and `fd_exec_test_instr_fixture_t`. The `PB_BIND` macro facilitates the serialization and deserialization of these message types, with some bindings using the `AUTO` option for automatic field numbering, while others specify a field number explicitly.
 # Imports and Dependencies
 
 ---

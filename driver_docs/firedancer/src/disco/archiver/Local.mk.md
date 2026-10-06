@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for archiver headers and objects when FD_HAS_ALLOCA is set.
+Makefile for adding headers and object files related to the archiver in the firedancer project.
 
 # Purpose
-Build rules add the `fd_archiver` header and the `fd_archiver_feeder`, `fd_archiver_writer`, and `fd_archiver_playback` object files when `FD_HAS_ALLOCA` is defined. Each object file is linked with `fd_disco`, and the `fd_archiver.h` header is included in the build only under this condition.
+The `Makefile` snippet conditionally includes headers and object files based on the presence of the `FD_HAS_ALLOCA` macro. If `FD_HAS_ALLOCA` is defined, it adds the header file `fd_archiver.h` and the object files `fd_archiver_feeder`, `fd_archiver_writer`, and `fd_archiver_playback` to the build process, associating them with `fd_disco`. This setup is used to manage dependencies and compile the necessary components when the `alloca` function is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-msan.mk` file in the `firedancer` codebase configures the build system to enable memory sanitizer (MSAN) by setting relevant compiler and linker flags.
+Makefile configuration for enabling MemorySanitizer with optional origin tracking.
 
 # Purpose
-This file is a Makefile snippet used to configure a build system for a C++ project with memory sanitization enabled. It sets a flag `FD_HAS_MSAN` to indicate the presence of MemorySanitizer, and appends the necessary compiler (`CPPFLAGS`) and linker (`LDFLAGS`) flags to enable memory error detection. It also includes an additional configuration file, `with-libcxx.mk`, which likely contains further settings related to the C++ standard library.
+The file configures the build system to enable memory sanitization using the MemorySanitizer tool. It sets the `FD_HAS_MSAN` flag to `1` and adds the `-DFD_HAS_MSAN=1` definition to `CPPFLAGS`. It also appends the `-fsanitize=memory` option to both `CPPFLAGS` and `LDFLAGS` to enable memory error detection during compilation and linking. The file includes additional configuration from `config/extra/with-libcxx.mk`. The `-fsanitize-memory-track-origins` option is present but commented out, indicating it is not currently active.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

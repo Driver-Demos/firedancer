@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Development command dispatcher with config parsing, permission checks, and sudo rerun.
+Bootstraps and executes development environment processes with permission checks and command handling.
 
 
 ## Files
-- **[fd_dev_boot.c](fd_dev_boot.c.md)**: Development command dispatcher with config parsing, permission checks, and sudo rerun.
-- **[fd_dev_boot.h](fd_dev_boot.h.md)**: Prototype for fd_dev_main with config and topology initialization arguments.
+- **[fd_dev_boot.c](fd_dev_boot.c.md)**: Bootstraps and executes a development environment process with permission checks and command handling.
+- **[fd_dev_boot.h](fd_dev_boot.h.md)**: Declares the `fd_dev_main` function for initializing Firedancer device configurations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

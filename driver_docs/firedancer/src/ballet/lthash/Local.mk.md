@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for lthash headers, object, and unit test.
+Makefile for adding headers, objects, and unit tests related to `fd_lthash` in the `firedancer` codebase.
 
 # Purpose
-Build rules add the `fd_lthash.h` and `fd_lthash_adder.h` header files to the project and add the `fd_lthash_adder` object file to the `fd_ballet` target. They also define the `test_lthash` unit test and link it with the `fd_ballet` and `fd_util` libraries.
+The file defines build instructions for a software project. It uses `add-hdrs` to include header files `fd_lthash.h` and `fd_lthash_adder.h` in the build process. The `add-objs` function adds the object file `fd_lthash_adder` to the `fd_ballet` library. The `make-unit-test` function creates a unit test named `test_lthash`, linking it with the `fd_ballet` and `fd_util` libraries.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
