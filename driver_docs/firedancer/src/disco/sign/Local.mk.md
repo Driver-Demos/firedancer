@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_sign_tile to fd_disco when FD_HAS_ALLOCA is set.
+Makefile logic to conditionally add objects for `fd_sign_tile` and `fd_disco` if `FD_HAS_ALLOCA` is defined.
 
 # Purpose
-Builds the `fd_sign_tile` object file only when `FD_HAS_ALLOCA` is defined. The `$(call add-objs,fd_sign_tile,fd_disco)` line adds `fd_sign_tile` to the `fd_disco` object list under that build condition.
+The `Makefile` snippet conditionally adds object files to the build process. If the macro `FD_HAS_ALLOCA` is defined, the `add-objs` function is called with the arguments `fd_sign_tile` and `fd_disco`, which adds these object files to the build targets. This conditional inclusion allows for flexibility in the build process based on the presence of the `FD_HAS_ALLOCA` definition.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
