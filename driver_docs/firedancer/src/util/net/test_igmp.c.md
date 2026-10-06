@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_igmp.c` file in the `firedancer` codebase contains unit tests for verifying the structure and type definitions related to IGMP (Internet Group Management Protocol) within the `fd_igmp_t` and `fd_ip4_igmp_t` data structures.
+Tests for IGMP data structures and their memory layout in the Firedancer codebase.
 
 # Purpose
-This C source code file is a unit test script designed to verify the integrity and correctness of certain data structures and constants related to the Internet Group Management Protocol (IGMP). It includes assertions to ensure that specific IGMP type constants match expected values and that the sizes of the `fd_igmp_t` and `fd_ip4_igmp_t` structures are as anticipated. The [`main`](#main) function performs a series of tests to confirm the correct memory layout of these structures by checking the offsets of their fields. The script uses utility functions like `fd_boot`, `FD_TEST`, and `fd_halt` from included headers to initialize the test environment, execute the tests, and clean up afterward. Notably, there are placeholders for additional tests (`FIXME` comments) indicating areas for future development or verification.
+This code is a C test suite designed to validate the structure and integrity of IGMP (Internet Group Management Protocol) related data types and constants. It includes static assertions to verify that specific IGMP type constants match expected values and that the sizes of the `fd_igmp_t` and `fd_ip4_igmp_t` structures are as intended. The [`main`](<#main>) function initializes the test environment and performs a series of tests to ensure that the offsets of the fields within the `fd_igmp_t` and `fd_ip4_igmp_t` structures are correct. The code includes placeholders for additional tests, indicated by `FIXME` comments, suggesting further validation is needed for `FD_IGMP_CHECK` and `FD_IP4_IGMP`. Upon successful completion of the tests, a log message indicates a pass, and the program terminates cleanly.
 # Imports and Dependencies
 
 ---
@@ -18,17 +18,19 @@ This C source code file is a unit test script designed to verify the integrity a
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, performs a series of static assertions and memory layout checks on IGMP-related structures, logs a success message, and then halts the program.
+[View Source →](<../../../../../src/util/net/test_igmp.c#L12>)
+
+Initializes the system, performs static assertions on IGMP structure offsets, logs a success message, and halts the system.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - The function begins by calling `fd_boot` to initialize the environment with the command-line arguments.
-    - It performs a series of `FD_TEST` assertions to verify the memory layout of the `fd_igmp_t` and `fd_ip4_igmp_t` structures, ensuring that the offsets of their fields match expected values.
-    - Two `FIXME` comments indicate that additional tests for `FD_IGMP_CHECK` and `FD_IP4_IGMP` are needed but not yet implemented.
-    - A log message 'pass' is recorded using `FD_LOG_NOTICE` to indicate successful completion of the tests.
-    - The function calls `fd_halt` to perform any necessary cleanup and then returns 0, indicating successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+    - `argc`: The count of command-line arguments.
+    - `argv`: The array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the system with command-line arguments.
+    - Performs a series of `FD_TEST` assertions to verify the memory offsets of fields within the `fd_igmp_t` and `fd_ip4_igmp_t` structures.
+    - Logs a notice message 'pass' using `FD_LOG_NOTICE`.
+    - Calls `fd_halt` to terminate the program.
+    - Returns 0 to indicate successful execution.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 

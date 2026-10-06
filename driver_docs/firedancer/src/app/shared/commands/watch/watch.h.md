@@ -3,15 +3,41 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Watch command prototypes and the fd_action_watch declaration.
+Header file for watch command functions and action in the Firedancer application.
 
 # Purpose
-This header file declares the interface for the `watch` command in the application command set. It includes the configuration and action definitions needed by the command and uses `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` to keep the function declarations compatible with C and C++ builds. The file declares [`watch_cmd_perm`](<#watch_cmd_perm>) for permission checks, [`watch_cmd_fn`](<#watch_cmd_fn>) for command execution, and the external `fd_action_watch` action object used to register or reference the command.
+This C header file defines the interface for a command module related to a "watch" functionality. It includes necessary configuration and action headers, `fd_config.h` and `fd_action.h`, to provide context and dependencies for the functions declared. The file declares two functions: [`watch_cmd_perm`](<#watch_cmd_perm>), which likely checks permissions using `args_t`, `fd_cap_chk_t`, and `config_t` structures, and [`watch_cmd_fn`](<#watch_cmd_fn>), which performs the main command operation using `args_t` and `config_t`. Additionally, it declares an external variable `fd_action_watch` of type `action_t`, which is likely used to represent or execute the "watch" action. The file uses include guards to prevent multiple inclusions.
+# Imports and Dependencies
+
+---
+- `../../fd_config.h`
+- `../../fd_action.h`
+
+
+# Global Variables
+
+---
+### fd\_action\_watch
+- **Type**: ``action_t``
+- **Description**: `fd_action_watch` is a global variable of type `action_t`. It is declared as an external variable, indicating that it is defined elsewhere in the program.
+- **Use**: Used to represent an action within the application, likely related to the watch command functionality.
+
+
 # Function Declarations (Public API)
 
 ---
-- `watch_cmd_perm`
-- `watch_cmd_fn`
+### watch\_cmd\_fn<!-- {{#callable_declaration:watch_cmd_fn}} -->
+[View Source →](<../../../../../../../src/app/shared/commands/watch/watch.h#L10>)
+
+Executes a command with specific configuration and arguments.
+- **Description**: Use this function to execute a command with the given arguments and configuration. It manages file descriptors, applies security policies, and handles user and group ID switching based on the configuration. This function must be called with valid pointers to `args_t` and `config_t` structures. It is important to ensure that the configuration is properly set up, especially regarding sandboxing and user permissions, before calling this function.
+- **Inputs**:
+    - `args`: A pointer to an `args_t` structure containing the command arguments. Must not be null. The structure should be properly initialized before calling the function.
+    - `config`: A pointer to a `config_t` structure containing the configuration settings. Must not be null. The configuration should include valid user and group IDs and other necessary settings for execution.
+- **Output**: None
+- **See Also**: [`watch_cmd_fn`](<watch.c.md#watch_cmd_fn>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

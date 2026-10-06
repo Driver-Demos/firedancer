@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `dump.h` file in the `firedancer` codebase declares an external action, `fd_action_dump`, and includes a configuration header.
+Header file for defining the external action `fd_action_dump`.
 
 # Purpose
-This code is a simple C header file that serves as an interface for a specific action within a larger application. It includes a guard to prevent multiple inclusions, which is a common practice in C to avoid redefinition errors. The file includes another header, `fd_config.h`, suggesting that it relies on configuration settings defined elsewhere. The primary purpose of this header is to declare an external variable, `fd_action_dump`, of type `action_t`, which is likely defined in another part of the application. This setup indicates that `fd_action_dump` is a shared resource or command that can be used across different parts of the application, facilitating modularity and reusability.
+This code is a C header file that defines an interface for a specific action related to dumping operations. It includes a configuration header file, `fd_config.h`, which is located in a shared directory, indicating that it might use or depend on shared configuration settings. The header file declares an external variable, `fd_action_dump`, of type `action_t`, which suggests that it is used to represent or trigger a dumping action within the application. The use of include guards, `HEADER_fd_src_app_shared_dev_commands_dump_h`, prevents multiple inclusions of this header file, ensuring that the declarations are only processed once during compilation.
 # Imports and Dependencies
 
 ---
@@ -17,9 +17,9 @@ This code is a simple C header file that serves as an interface for a specific a
 
 ---
 ### fd\_action\_dump
-- **Type**: `action_t`
-- **Description**: The variable `fd_action_dump` is a global variable of type `action_t`, which is declared as an external variable. This indicates that its definition is located in another source file, and it is intended to be used across multiple files within the program.
-- **Use**: `fd_action_dump` is used to represent a specific action or command that can be executed, likely related to dumping or outputting data, as suggested by its name.
+- **Type**: ``action_t``
+- **Description**: `fd_action_dump` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is located in another source file.
+- **Use**: Used to reference an action related to dumping operations across different source files.
 
 
 
