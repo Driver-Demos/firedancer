@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration and Bash scripts for offline replay settings, network parameters, and automation tasks.
+Offline replay configs and shell scripts for network setup, replay, and backtest automation.
 
 
 ## Files
-- **[offline_replay.toml](offline_replay.toml.md)**: Configuration settings for offline replay in the Firedancer codebase.
-- **[offline_replay_network_parameters.sh](offline_replay_network_parameters.sh.md)**: Sets environment variables for different Solana network configurations based on the provided network parameter.
-- **[offline_replay_template.sh](offline_replay_template.sh.md)**: Shell script for setting environment variables and executing an offline replay script in Firedancer.
-- **[run_offline_replay_backtest.sh](run_offline_replay_backtest.sh.md)**: A Bash script for running offline replay backtests, updating network parameters, and sending Slack notifications.
+- **[offline_replay.toml](offline_replay.toml.md)**: Offline replay configuration with archiver, replay, runtime, consensus, log, path, snapshot, and gossip settings.
+- **[offline_replay_network_parameters.sh](offline_replay_network_parameters.sh.md)**: Sets offline replay environment variables for mainnet, testnet, and devnet.
+- **[offline_replay_template.sh](offline_replay_template.sh.md)**: Shell template that sets offline replay environment variables and runs the replay script.
+- **[run_offline_replay_backtest.sh](run_offline_replay_backtest.sh.md)**: Offline replay backtest loop with Slack alerts, snapshot download, replay, and mismatch minimization.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
