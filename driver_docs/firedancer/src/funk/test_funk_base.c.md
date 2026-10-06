@@ -3,12 +3,113 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Unit tests for fd_funk error strings, sizes, hashes, equality, copy, and root XID handling.
+Tests for the `fd_funk` module, including static assertions and functions for unique key and transaction ID generation.
 
 # Purpose
-This file is a unit test program for the `fd_funk` API. It checks compile-time layout rules with `FD_STATIC_ASSERT` for error codes and for the size and alignment of `fd_funk_rec_key_t`, `fd_funk_txn_xid_t`, and `fd_funk_xid_key_pair_t`. It also verifies the text returned by `fd_funk_strerror` for each defined error code and for an unknown code.
+The code is a C program that serves as a test suite for validating the functionality of a library related to unique identifiers and key management, likely for a database or transaction system. It includes static assertions to verify the correctness of error codes and data structure alignments and sizes. The program defines several static functions to generate and manipulate unique record keys, transaction IDs (`xid`), and key-ID pairs. These functions ensure that each key and ID is unique by incorporating system-specific identifiers such as application ID, thread ID, and CPU ID, along with a sequence number and timestamp.
 
-The [`main`](<#main>) function runs repeated tests for the key and transaction identifier helper functions. It checks `fd_funk_rec_key_hash`, `fd_funk_rec_key_eq`, and `fd_funk_rec_key_copy`; `fd_funk_txn_xid_set_root`, `fd_funk_txn_xid_eq_root`, `fd_funk_txn_xid_hash`, `fd_funk_txn_xid_eq`, and `fd_funk_txn_xid_copy`; and `fd_funk_xid_key_pair_hash`, `fd_funk_xid_key_pair_eq`, `fd_funk_xid_key_pair_copy`, and `fd_funk_xid_key_pair_init`. The file uses generated unique values to test equality and copy behavior, then prints `pass` and stops the process when all checks succeed.
+The [`main`](<#main>) function initializes the test environment and performs a series of tests to verify the correctness of the library's functions. It checks the string representations of error codes, the uniqueness and equality of generated keys and IDs, and the functionality of copying and comparing these structures. The tests are executed in loops to ensure robustness over a large number of iterations. The program concludes by logging a success message if all tests pass and then halts the execution. This code is intended to be compiled and run as an executable to validate the integrity and correctness of the associated library functions.
+# Imports and Dependencies
+
+---
+- `fd_funk.h`
+
+
+# Global Variables
+
+---
+### unique\_tag
+- **Type**: ``ulong``
+- **Description**: `unique_tag` is a static global variable of type `ulong` initialized to 0UL. It is used to generate unique identifiers for record keys.
+- **Use**: Increments each time a unique record key is set to ensure uniqueness.
+
+
+# Functions
+
+---
+### fd\_funk\_rec\_key\_set\_unique<!-- {{#callable:fd_funk_rec_key_set_unique}} -->
+[View Source →](<../../../../src/funk/test_funk_base.c#L32>)
+
+Sets unique values in the `ul` array of a `fd_funk_rec_key_t` structure using application and thread identifiers, a unique tag, and optionally a tick count.
+- **Inputs**:
+    - `key`: A pointer to a `fd_funk_rec_key_t` structure that will be modified to contain unique values.
+- **Logic and Control Flow**:
+    - Assigns the application ID to `key->ul[0]` using `fd_log_app_id()`.
+    - Assigns the thread ID to `key->ul[1]` using `fd_log_thread_id()`.
+    - Increments the `unique_tag` and assigns it to `key->ul[2]`.
+    - If `FD_HAS_X86` is defined, assigns the tick count to `key->ul[3]` using `fd_tickcount()`; otherwise, assigns `0UL` to `key->ul[3]`.
+    - Returns the modified `key` pointer.
+- **Output**: Returns the pointer to the modified `fd_funk_rec_key_t` structure.
+
+
+---
+### fd\_funk\_generate\_xid<!-- {{#callable:fd_funk_generate_xid}} -->
+[View Source →](<../../../../src/funk/test_funk_base.c#L45>)
+
+Generates a unique transaction identifier (`xid`) using CPU and thread IDs, a sequence number, and the current tick count.
+- **Inputs**: None
+- **Logic and Control Flow**:
+    - Declare a variable `xid` of type `fd_funk_txn_xid_t`.
+    - Declare a static thread-local variable `seq` initialized to 0.
+    - Calculate `xid.ul[0]` using a combination of CPU ID, thread ID, and incremented sequence number, each multiplied by specific constants.
+    - Calculate `xid.ul[1]` using the current tick count multiplied by a constant.
+    - Return the generated `xid`.
+- **Output**: Returns a `fd_funk_txn_xid_t` structure containing a unique transaction identifier.
+
+
+---
+### fd\_funk\_xid\_key\_pair\_set\_unique<!-- {{#callable:fd_funk_xid_key_pair_set_unique}} -->
+[View Source →](<../../../../src/funk/test_funk_base.c#L57>)
+
+Sets a unique transaction ID and key for a given `fd_funk_xid_key_pair_t` structure.
+- **Inputs**:
+    - `pair`: A pointer to an `fd_funk_xid_key_pair_t` structure that will be modified to have a unique transaction ID and key.
+- **Logic and Control Flow**:
+    - Generate a unique transaction ID using [`fd_funk_generate_xid`](<#fd_funk_generate_xid>) and assign it to the first element of the `xid` array in the `pair`.
+    - Call [`fd_funk_rec_key_set_unique`](<#fd_funk_rec_key_set_unique>) to set a unique key for the `key` field in the `pair`.
+    - Return the modified `pair`.
+- **Output**: Returns the modified `fd_funk_xid_key_pair_t` pointer with a unique transaction ID and key.
+- **Functions Called**:
+    - [`fd_funk_generate_xid`](<#fd_funk_generate_xid>)
+    - [`fd_funk_rec_key_set_unique`](<#fd_funk_rec_key_set_unique>)
+
+
+---
+### main<!-- {{#callable:main}} -->
+[View Source →](<../../../../src/funk/test_funk_base.c#L64>)
+
+Executes a series of tests on various `fd_funk` functions to verify their correctness and logs the results.
+- **Inputs**:
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Verifies the string representations of various `fd_funk` error codes using [`fd_funk_strerror`](<fd_funk_base.c.md#fd_funk_strerror>) and `FD_TEST`.
+    - Performs 1,000,000 iterations of tests on `fd_funk_rec_key_t` objects, checking uniqueness, hashing, equality, and copying.
+    - Initializes a `fd_funk_txn_xid_t` object `z` as the root transaction ID and verifies its properties.
+    - Performs 1,000,000 iterations of tests on `fd_funk_txn_xid_t` objects, checking uniqueness, hashing, equality, and copying, including comparisons with the root transaction ID.
+    - Performs 1,000,000 iterations of tests on `fd_funk_xid_key_pair_t` objects, checking uniqueness, hashing, equality, and copying.
+    - Logs a notice message "pass" if all tests succeed.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_funk_strerror`](<fd_funk_base.c.md#fd_funk_strerror>)
+    - [`fd_funk_rec_key_set_unique`](<#fd_funk_rec_key_set_unique>)
+    - [`fd_funk_rec_key_eq`](<fd_funk_base.h.md#fd_funk_rec_key_eq>)
+    - [`fd_funk_rec_key_copy`](<fd_funk_base.h.md#fd_funk_rec_key_copy>)
+    - [`fd_funk_txn_xid_set_root`](<fd_funk_base.h.md#fd_funk_txn_xid_set_root>)
+    - [`fd_funk_txn_xid_eq_root`](<fd_funk_base.h.md#fd_funk_txn_xid_eq_root>)
+    - [`fd_funk_generate_xid`](<#fd_funk_generate_xid>)
+    - [`fd_funk_txn_xid_hash`](<fd_funk_base.h.md#fd_funk_txn_xid_hash>)
+    - [`fd_funk_txn_xid_eq`](<fd_funk_base.h.md#fd_funk_txn_xid_eq>)
+    - [`fd_funk_txn_xid_copy`](<fd_funk_base.h.md#fd_funk_txn_xid_copy>)
+    - [`fd_funk_xid_key_pair_set_unique`](<#fd_funk_xid_key_pair_set_unique>)
+    - [`fd_funk_xid_key_pair_hash`](<fd_funk_base.h.md#fd_funk_xid_key_pair_hash>)
+    - [`fd_funk_xid_key_pair_eq`](<fd_funk_base.h.md#fd_funk_xid_key_pair_eq>)
+    - [`fd_funk_xid_key_pair_copy`](<fd_funk_base.h.md#fd_funk_xid_key_pair_copy>)
+    - [`fd_funk_xid_key_pair_init`](<fd_funk_base.h.md#fd_funk_xid_key_pair_init>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

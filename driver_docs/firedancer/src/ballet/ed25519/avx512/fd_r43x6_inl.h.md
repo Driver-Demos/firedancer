@@ -3,166 +3,172 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_r43x6_inl.h` file in the `firedancer` codebase provides inline implementations and macros for optimized parallel operations on finite fields, specifically targeting the ED25519 protocol using AVX-512 instructions to enhance performance.
+Macros and functions for optimized parallel GF(p) operations using AVX-512 for ED25519 protocols.
 
 # Purpose
-This C header file is designed to optimize arithmetic operations in the context of the ED25519 cryptographic protocol, specifically targeting AVX-512 vector instruction sets for performance improvements. The file provides a set of macros and inline functions that facilitate efficient parallel processing of operations in the Galois Field (GF(p)), which is a common requirement in cryptographic algorithms like ED25519. The primary focus is on maximizing instruction-level parallelism (ILP) and utilizing vector lanes effectively to enhance the performance of operations such as multiplication, squaring, and exponentiation within the field.
+The code is a C header file that provides inline functions and macros for optimized arithmetic operations on elements in a finite field, specifically for protocols like ED25519. The file is designed to leverage AVX-512 vector instructions to perform operations in parallel, enhancing performance by exploiting instruction-level parallelism (ILP) and data parallelism. The primary focus is on operations such as multiplication, squaring, and exponentiation within the finite field, represented by the type `fd_r43x6_t`.
 
-The file defines a series of macros for declaring, moving, packing, unpacking, and performing arithmetic operations on data structures that represent multiple field elements in a way that is optimized for vectorized execution. These macros are designed to be robust, ensuring that they evaluate their arguments only once and behave as a single statement, which is crucial for maintaining performance and correctness in high-performance computing (HPC) environments. The file also includes specialized implementations for operations like `fd_r43x6_mul_fast` and `fd_r43x6_sqr_fast`, which are optimized to reduce computational overhead and improve execution speed on modern hardware. The header is intended to be included indirectly through another header (`fd_r43x6.h`), ensuring that it is used in the correct context and preventing direct inclusion that might lead to misuse or compilation errors.
+The file defines a series of macros for declaring and manipulating data structures (`FD_R43X6_QUAD_DECL`, `FD_R43X6_QUAD_PACK`, etc.) that facilitate efficient parallel processing of multiple field elements. These macros are used to perform operations like addition, subtraction, multiplication, and squaring in a way that minimizes computational overhead and maximizes the use of available vector lanes. The file also includes static functions for more complex operations, such as fast multiplication and squaring, which are implemented to avoid pointer escapes that could inhibit compiler optimizations. The header is intended to be included indirectly through another header (`fd_r43x6.h`), ensuring that it is used in the correct context within a larger codebase.
 # Global Variables
 
 ---
 ### \_t0
-- **Type**: `wwl_t`
-- **Description**: The variable `_t0` is of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, possibly related to SIMD (Single Instruction, Multiple Data) processing. It is initialized using the `wwl_select` function, which selects elements from two input vectors based on a specified pattern.
-- **Use**: The variable `_t0` is used to store the result of a selection operation between two vectors, `_r0` and `_r2`, based on a specific pattern, facilitating data manipulation for parallel processing.
+- **Type**: ``wwl_t``
+- **Description**: `_t0` is a variable of type `wwl_t` that is initialized using the `wwl_select` function. It selects specific elements from two input vectors `_r0` and `_r2` based on a specified pattern. The pattern used is `wwl( 0, 1, 8, 9, 4, 5, 12, 13 )`, which indicates the indices of elements to be selected from the input vectors.
+- **Use**: Used to store a transposed combination of elements from vectors `_r0` and `_r2` for further processing in data parallel operations.
 
 
 ---
 ### \_t1
-- **Type**: `wwl_t`
-- **Description**: The variable `_t1` is of type `wwl_t`, which is likely a custom data type used for handling wide word lanes or similar vectorized operations. It is initialized using the `wwl_select` function, which selects elements from two input vectors based on a specified pattern.
-- **Use**: The variable `_t1` is used to store the result of a selection operation on two vectors, `_r1` and `_r3`, using a specific pattern defined by the `wwl` function.
+- **Type**: ``wwl_t``
+- **Description**: `_t1` is a variable of type `wwl_t` that is initialized using the `wwl_select` function. It selects specific elements from two input vectors, `_r1` and `_r3`, based on the indices provided by the `wwl` function.
+- **Use**: Used to store a vector that combines elements from `_r1` and `_r3` according to a specified pattern.
 
 
 ---
 ### \_t2
-- **Type**: `wwl_t`
-- **Description**: The variable `_t2` is of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, possibly related to SIMD (Single Instruction, Multiple Data) processing. It is initialized using the `wwl_select` function, which selects elements from two input vectors `_r0` and `_r2` based on a specified pattern.
-- **Use**: The variable `_t2` is used to store the result of a vector selection operation, which is part of a larger process of transposing and organizing data for efficient parallel processing.
+- **Type**: ``wwl_t``
+- **Description**: `_t2` is a variable of type `wwl_t` that is initialized using the `wwl_select` function. It selects specific elements from two input vectors `_r0` and `_r2` based on the indices provided by the `wwl` function.
+- **Use**: Used to store a vector that is a combination of elements from `_r0` and `_r2` as part of a data transposition operation.
 
 
 ---
 ### \_t3
-- **Type**: `wwl_t`
-- **Description**: The variable `_t3` is a global variable of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, possibly related to AVX-512 instructions. It is initialized using the `wwl_select` function, which appears to perform a selection operation on vector data, using the vectors `_r1` and `_r3` as inputs.
-- **Use**: This variable is used to store the result of a vector selection operation, which is part of a larger process of transposing and packing data for efficient parallel processing in the context of ED25519 cryptographic operations.
+- **Type**: ``wwl_t``
+- **Description**: `_t3` is a variable of type `wwl_t` that is initialized using the `wwl_select` function. It is part of a sequence of operations that involve transposing and selecting elements from vectors `_r1` and `_r3`. The initialization of `_t3` is part of a larger macro `FD_R43X6_QUAD_PACK` which is used to pack four `fd_r43x6_t` values into a more efficient data structure for parallel operations.
+- **Use**: Used to store a selected and transposed combination of elements from vectors `_r1` and `_r3` as part of a data packing operation.
 
 
 ---
 ### \_c04
-- **Type**: `wwl_t`
-- **Description**: The variable `_c04` is of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, specifically with AVX-512 instructions. It is initialized using the `_mm512_unpacklo_epi64` intrinsic, which interleaves the lower 64-bit elements of two 512-bit vectors, `_t0` and `_t1`. This operation is part of a larger data manipulation process aimed at optimizing parallel GF(p) operations in cryptographic protocols like ED25519.
-- **Use**: The variable `_c04` is used to store the result of interleaving the lower 64-bit elements of two vectors, facilitating efficient data layout transformations for parallel processing.
+- **Type**: ``wwl_t``
+- **Description**: The `_c04` variable is a `wwl_t` type that is initialized using the `_mm512_unpacklo_epi64` function. This function unpacks and interleaves 64-bit integers from the lower halves of the input vectors `_t0` and `_t1`. The result is stored in `_c04`, which represents a packed vector of interleaved elements from `_t0` and `_t1`. This operation is part of a data transformation process that optimizes data layout for parallel processing.
+- **Use**: Used to store the result of interleaving the lower halves of `_t0` and `_t1` vectors for efficient data processing.
 
 
 ---
 ### \_c15
-- **Type**: `wwl_t`
-- **Description**: The variable `_c15` is of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, possibly related to AVX-512 instructions. It is initialized using the `_mm512_unpackhi_epi64` intrinsic, which unpacks and interleaves the high 64-bit integers from two 512-bit vectors `_t0` and `_t1`. This operation is part of a larger macro that appears to be optimizing data layout for parallel GF(p) operations.
-- **Use**: The variable `_c15` is used to store the result of interleaving high 64-bit elements from two vectors, facilitating efficient data manipulation for parallel processing.
+- **Type**: ``wwl_t``
+- **Description**: The `_c15` variable is a `wwl_t` type that is initialized using the `_mm512_unpackhi_epi64` intrinsic function. This function unpacks and interleaves the high 64-bit integers from two 512-bit vectors, `_t0` and `_t1`. The result is stored in `_c15`, which represents a specific arrangement of data from these vectors.
+- **Use**: Used to store the result of unpacking and interleaving high 64-bit integers from two vectors, `_t0` and `_t1`, for further data processing.
 
 
 ---
 ### \_c26
-- **Type**: `wwl_t`
-- **Description**: The variable `_c26` is of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, specifically with AVX-512 instructions. It is initialized using the `_mm512_unpacklo_epi64` intrinsic, which interleaves the lower 64-bit integers from two 512-bit vectors, `_t2` and `_t3`. This operation is part of a larger set of operations to efficiently handle data parallel GF(p) operations in the context of the ED25519 protocol.
-- **Use**: The variable `_c26` is used to store the result of interleaving the lower 64-bit integers from two vectors, facilitating efficient data manipulation for parallel operations.
+- **Type**: ``wwl_t``
+- **Description**: `_c26` is a variable of type `wwl_t` that is initialized using the `_mm512_unpacklo_epi64` intrinsic function. This function unpacks and interleaves the lower 64-bit integers from two 512-bit vectors, `_t2` and `_t3`. The result is stored in `_c26`, which represents a specific arrangement of data for further processing.
+- **Use**: Used to store the result of unpacking and interleaving lower 64-bit integers from vectors `_t2` and `_t3`.
 
 
 ---
 ### \_c37
-- **Type**: `wwl_t`
-- **Description**: The variable `_c37` is a global variable of type `wwl_t`, which is a wide vector type used for SIMD operations. It is initialized using the `_mm512_unpackhi_epi64` intrinsic, which unpacks and interleaves the high 64-bit integers from two 512-bit vectors `_t2` and `_t3`. This operation is part of a larger data manipulation process involving SIMD instructions to optimize parallel processing of data.
-- **Use**: The variable `_c37` is used to store the result of unpacking and interleaving high 64-bit integers from two vectors, facilitating efficient data processing in SIMD operations.
+- **Type**: ``wwl_t``
+- **Description**: The variable `_c37` is a `wwl_t` type, which is a wide vector type used for SIMD operations. It is initialized using the `_mm512_unpackhi_epi64` intrinsic, which unpacks and interleaves the high 64-bit integers from two input vectors, `_t2` and `_t3`. This operation is part of a data layout transformation process for parallel GF(p) operations.
+- **Use**: Used to store the result of unpacking and interleaving high 64-bit integers from vectors `_t2` and `_t3` for efficient data parallel operations.
 
 
 ---
 ### \_c0
-- **Type**: `wwl_t`
-- **Description**: The variable `_c0` is a global variable of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, possibly related to AVX-512 instructions. It is initialized using the `_mm512_unpacklo_epi64` intrinsic, which interleaves the lower 64-bit integers from two 512-bit vectors, `_r0` and `_r1`. This suggests that `_c0` is used to store a specific arrangement of data from these vectors.
-- **Use**: The variable `_c0` is used to store the result of interleaving the lower 64-bit elements of two vectors, facilitating efficient data manipulation in vectorized operations.
+- **Type**: ``wwl_t``
+- **Description**: `_c0` is a variable of type `wwl_t` that is used to store the result of unpacking the lower 64-bit integers from two `wwl_t` variables, `_r0` and `_r1`, using the `_mm512_unpacklo_epi64` intrinsic function. This operation is part of a process to transpose data for efficient parallel processing in the context of finite field arithmetic operations.
+- **Use**: Used to hold the result of unpacking lower 64-bit integers from `_r0` and `_r1` for data transposition.
 
 
 ---
 ### \_c1
-- **Type**: `wwl_t`
-- **Description**: The variable `_c1` is of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, specifically with AVX-512 instructions. It is initialized using the `_mm512_unpackhi_epi64` intrinsic, which interleaves the high 64-bit integers from two 512-bit vectors, `_r0` and `_r1`. This operation is part of a larger set of operations aimed at optimizing parallel GF(p) operations in cryptographic protocols like ED25519.
-- **Use**: The variable `_c1` is used to store the result of interleaving the high 64-bit integers from two 512-bit vectors, facilitating efficient data manipulation for cryptographic computations.
+- **Type**: ``wwl_t``
+- **Description**: `_c1` is a global variable of type `wwl_t` that is initialized using the `_mm512_unpackhi_epi64` intrinsic function. This function unpacks and interleaves the high 64-bit integers from two 512-bit vectors, `_r0` and `_r1`. The result is stored in `_c1`, which is used in the context of vectorized operations for parallel processing.
+- **Use**: Used to store the result of unpacking and interleaving high 64-bit integers from two vectors for parallel processing.
 
 
 ---
 ### \_c2
-- **Type**: `wwl_t`
-- **Description**: The variable `_c2` is a global variable of type `wwl_t`, which is likely a custom data type used for handling wide vector operations, specifically with AVX-512 instructions. It is initialized using the `_mm512_unpacklo_epi64` intrinsic, which interleaves the lower 64-bit integers from two 512-bit vectors, `_r2` and `_r3`. This operation is part of a larger set of operations designed to optimize parallel GF(p) operations in cryptographic protocols like ED25519.
-- **Use**: The variable `_c2` is used to store the result of interleaving the lower halves of two 512-bit vectors, facilitating efficient data manipulation for parallel processing.
+- **Type**: ``wwl_t``
+- **Description**: `_c2` is a variable of type `wwl_t` that is used to store the result of unpacking the lower 64-bit integers from two `wwl_t` variables, `_r2` and `_r3`, using the `_mm512_unpacklo_epi64` intrinsic.
+- **Use**: Used to hold the unpacked lower 64-bit integers from `_r2` and `_r3` for further processing.
 
 
 ---
 ### \_c3
-- **Type**: `wwl_t`
-- **Description**: The variable `_c3` is a global variable of type `wwl_t`, which is a vector type used for SIMD operations. It is initialized using the `_mm512_unpackhi_epi64` intrinsic function, which unpacks and interleaves the high 64-bit integers from two 512-bit vectors, `_r2` and `_r3`. This operation is part of a larger process to optimize parallel GF(p) operations in the context of the ED25519 protocol.
-- **Use**: The variable `_c3` is used to store the result of unpacking and interleaving high 64-bit integers from two vectors, facilitating efficient data manipulation for parallel computations.
+- **Type**: ``wwl_t``
+- **Description**: The variable `_c3` is a `wwl_t` type, which is a wide vector type used for SIMD operations. It is initialized using the `_mm512_unpackhi_epi64` intrinsic, which unpacks and interleaves the high 64-bit integers from the vectors `_r2` and `_r3`. This operation is part of a larger process to transpose and pack data for efficient parallel processing.
+- **Use**: Used to store the result of unpacking and interleaving high 64-bit integers from `_r2` and `_r3` for SIMD operations.
 
 
 ---
 ### \_zd
-- **Type**: `fd_r43x6_t`
-- **Description**: The variable `_zd` is a global variable of type `fd_r43x6_t`, which is likely a custom data type used for operations in a finite field GF(p) as part of the ED25519 protocol implementation. This variable is used in the context of unpacking a packed representation of four `fd_r43x6_t` values, which are likely used for efficient parallel processing of mathematical operations.
-- **Use**: The variable `_zd` is used as a temporary storage to hold the unpacked result of a `FD_R43X6_QUAD_UNPACK` operation, which is then discarded as indicated by the `(void)_zd;` statement.
+- **Type**: ``fd_r43x6_t``
+- **Description**: Represents a variable of type `fd_r43x6_t`, which is used in the context of finite field arithmetic operations, specifically for unpacking operations in the `FD_R43X6_QUAD_UNPACK` macro.
+- **Use**: Used to store the result of unpacking operations in the `FD_R43X6_QUAD_UNPACK` macro.
 
 
 # Functions
 
 ---
 ### fd\_r43x6\_quad\_mul\_fast<!-- {{#callable:fd_r43x6_quad_mul_fast}} -->
-The `fd_r43x6_quad_mul_fast` function performs a fast multiplication of three pairs of fd_r43x6_t vectors, optimizing for parallelism and instruction-level parallelism (ILP).
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_r43x6_inl.h#L227>)
+
+Performs a fast multiplication of two sets of three `fd_r43x6_t` vectors, producing three result vectors.
 - **Inputs**:
-    - `_z03`: Pointer to the fd_r43x6_t structure where the result of the multiplication for the first pair will be stored.
-    - `_z14`: Pointer to the fd_r43x6_t structure where the result of the multiplication for the second pair will be stored.
-    - `_z25`: Pointer to the fd_r43x6_t structure where the result of the multiplication for the third pair will be stored.
-    - `x03`: The first fd_r43x6_t vector of the first pair to be multiplied.
-    - `x14`: The first fd_r43x6_t vector of the second pair to be multiplied.
-    - `x25`: The first fd_r43x6_t vector of the third pair to be multiplied.
-    - `y03`: The second fd_r43x6_t vector of the first pair to be multiplied.
-    - `y14`: The second fd_r43x6_t vector of the second pair to be multiplied.
-    - `y25`: The second fd_r43x6_t vector of the third pair to be multiplied.
-- **Control Flow**:
-    - Initialize a zero vector _zz for use in calculations.
-    - Pack halves of input vectors to form x00, x11, x22, x33, x44, and x55 for efficient multiplication.
-    - Compute low partial products using wwl_madd52lo for each pair of packed vectors and accumulate results in p0_q3 to p7_qa.
-    - Compute high partial products using wwl_madd52hi, shift them left by 9 bits, and accumulate results in p1_q4 to p8_qb.
-    - Pack and add the results of low and high partials to form za03, za14, za25, zb03, zb14, and zb25.
-    - Combine za and zb vectors using shift-and-add techniques to form the final result vectors z03, z14, and z25.
-    - Store the results in the provided output pointers using FD_R43X6_QUAD_MOV.
-- **Output**: The function outputs the results of the vector multiplications into the provided pointers _z03, _z14, and _z25, each representing a fd_r43x6_t structure.
+    - `_z03`: Pointer to the `fd_r43x6_t` where the result of the multiplication for the first set will be stored.
+    - `_z14`: Pointer to the `fd_r43x6_t` where the result of the multiplication for the second set will be stored.
+    - `_z25`: Pointer to the `fd_r43x6_t` where the result of the multiplication for the third set will be stored.
+    - `x03`: The first `fd_r43x6_t` vector of the first operand set.
+    - `x14`: The second `fd_r43x6_t` vector of the first operand set.
+    - `x25`: The third `fd_r43x6_t` vector of the first operand set.
+    - `y03`: The first `fd_r43x6_t` vector of the second operand set.
+    - `y14`: The second `fd_r43x6_t` vector of the second operand set.
+    - `y25`: The third `fd_r43x6_t` vector of the second operand set.
+- **Logic and Control Flow**:
+    - Initialize a zero vector `_zz` for use in calculations.
+    - Pack halves of the input vectors `x03`, `x14`, and `x25` to form `x00`, `x11`, `x22`, `x33`, `x44`, and `x55`.
+    - Compute low partial products using `wwl_madd52lo` and accumulate them into `p0_q3`, `p1_q4`, `p2_q5`, `p3_q6`, `p4_q7`, `p5_q8`, `p6_q9`, and `p7_qa`.
+    - Compute high partial products using `wwl_madd52hi`, shift them left by 9 bits, and add them to the corresponding low partials.
+    - Pack and add the results to form `za03`, `za14`, `za25`, `zb03`, `zb14`, and `zb25`.
+    - Combine the results into final vectors `z03`, `z14`, and `z25` using shift-and-add techniques.
+    - Store the results in the output pointers `_z03`, `_z14`, and `_z25` using `FD_R43X6_QUAD_MOV`.
+- **Output**: The function outputs three `fd_r43x6_t` vectors stored in the locations pointed to by `_z03`, `_z14`, and `_z25`, representing the results of the multiplication.
 
 
 ---
 ### fd\_r43x6\_quad\_sqr\_fast<!-- {{#callable:fd_r43x6_quad_sqr_fast}} -->
-The `fd_r43x6_quad_sqr_fast` function performs a fast squaring operation on three fd_r43x6_t inputs, optimizing for instruction-level parallelism and minimal swizzling overhead.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_r43x6_inl.h#L402>)
+
+Performs a fast squaring operation on three `fd_r43x6_t` inputs and stores the results in three output variables.
 - **Inputs**:
-    - `_z03`: Pointer to an fd_r43x6_t where the result for the first set of limbs will be stored.
-    - `_z14`: Pointer to an fd_r43x6_t where the result for the second set of limbs will be stored.
-    - `_z25`: Pointer to an fd_r43x6_t where the result for the third set of limbs will be stored.
-    - `x03`: An fd_r43x6_t representing the first set of limbs of the input number to be squared.
-    - `x14`: An fd_r43x6_t representing the second set of limbs of the input number to be squared.
-    - `x25`: An fd_r43x6_t representing the third set of limbs of the input number to be squared.
-- **Control Flow**:
+    - `_z03`: Pointer to an `fd_r43x6_t` where the result of the squaring operation for the first input will be stored.
+    - `_z14`: Pointer to an `fd_r43x6_t` where the result of the squaring operation for the second input will be stored.
+    - `_z25`: Pointer to an `fd_r43x6_t` where the result of the squaring operation for the third input will be stored.
+    - `x03`: The first `fd_r43x6_t` input to be squared.
+    - `x14`: The second `fd_r43x6_t` input to be squared.
+    - `x25`: The third `fd_r43x6_t` input to be squared.
+- **Logic and Control Flow**:
     - Initialize a zero vector `_zz` for use in calculations.
-    - Pack input limbs into vectors `x05`, `x12`, `x34`, `x41`, `x23`, `x52`, and `x4z` to facilitate vectorized operations.
-    - Compute doubled versions of some input vectors (`two_x03`, `two_x14`, `two_x05`, `two_x12`) to optimize multiplication operations.
-    - Calculate low partial products `p0a`, `p19`, `p28`, `p37`, `p46`, `p55` using vectorized multiply-add operations.
-    - Calculate high partial products `q1b`, `q2a`, `q39`, `q48`, `q57`, `q66` and shift them left by 9 bits to align with low partials.
-    - Combine low and high partials into vectors `za03`, `za14`, `za25`, `zb03`, `zb14`, `zb25` using vectorized addition.
-    - Perform final additions and shifts to compute the result vectors `z03`, `z14`, `z25`.
-    - Store the results in the provided output pointers using the `FD_R43X6_QUAD_MOV` macro.
-- **Output**: The function outputs the squared result of the input numbers, stored in the provided pointers `_z03`, `_z14`, and `_z25` as fd_r43x6_t types.
+    - Pack input vectors into specific combinations to form `x05`, `x12`, `x34`, `x41`, `x23`, `x52`, and `x4z` for efficient computation.
+    - Compute doubled values `two_x03`, `two_x14`, `two_x05`, and `two_x12` by left-shifting the original inputs.
+    - Calculate low partial products `p0a`, `p19`, `p28`, `p37`, `p46`, and `p55` using `wwl_madd52lo` operations.
+    - Calculate high partial products `q1b`, `q2a`, `q39`, `q48`, `q57`, and `q66` using `wwl_madd52hi` operations and shift them left by 9 bits.
+    - Combine low and high partials into `za03`, `za14`, `za25`, `zb03`, `zb14`, and `zb25` using `wwl_add` and packing operations.
+    - Perform final additions and shifts to compute `z03`, `z14`, and `z25`.
+    - Store the results in the output pointers using `FD_R43X6_QUAD_MOV`.
+- **Output**: The function does not return a value but stores the squared results in the provided output pointers `_z03`, `_z14`, and `_z25`.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_r43x6\_pow22523\_2<!-- {{#callable_declaration:fd_r43x6_pow22523_2}} -->
-Computes the 2^252-3 power of two field elements in parallel.
-- **Description**: This function calculates the power of 2^252-3 for two given field elements, `za` and `zb`, in parallel, and stores the results in `_za` and `_zb` respectively. It is designed to exploit instruction-level parallelism (ILP) for performance optimization, making it suitable for high-performance computing tasks such as cryptographic operations in protocols like ED25519. The function should be used when both input field elements need to be exponentiated simultaneously, leveraging the parallel computation capabilities of the underlying hardware.
+[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_r43x6_inl.h#L722>)
+
+Calculates the 2^252-3 power of two field elements in parallel.
+- **Description**: Use this function to compute the power of 2^252-3 for two given field elements simultaneously. This function is optimized for parallel execution, allowing for increased instruction-level parallelism. It is important to ensure that the input pointers `_za` and `_zb` are valid and point to memory locations where the results will be stored. The input field elements `za` and `zb` are used as the base for the power calculation. This function does not handle null pointers, so ensure all pointers are valid before calling.
 - **Inputs**:
-    - `_za`: A pointer to an `fd_r43x6_t` where the result of `za` raised to the power of 2^252-3 will be stored. Must not be null.
-    - `za`: An `fd_r43x6_t` representing the field element to be exponentiated. The caller retains ownership.
-    - `_zb`: A pointer to an `fd_r43x6_t` where the result of `zb` raised to the power of 2^252-3 will be stored. Must not be null.
-    - `zb`: An `fd_r43x6_t` representing the second field element to be exponentiated. The caller retains ownership.
+    - `_za`: Pointer to a `fd_r43x6_t` where the result of the power calculation for `za` will be stored. Must not be null.
+    - `za`: The field element to be raised to the power of 2^252-3. Used as the base for the calculation.
+    - `_zb`: Pointer to a `fd_r43x6_t` where the result of the power calculation for `zb` will be stored. Must not be null.
+    - `zb`: The field element to be raised to the power of 2^252-3. Used as the base for the calculation.
 - **Output**: None
-- **See also**: [`fd_r43x6_pow22523_2`](fd_r43x6.c.md#fd_r43x6_pow22523_2)  (Implementation)
+- **See Also**: [`fd_r43x6_pow22523_2`](<fd_r43x6.c.md#fd_r43x6_pow22523_2>)  (Implementation)
 
 
 

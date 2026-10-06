@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build settings for clang on Zen 3 with x86, AVX, AESNI, and related flags.
+Makefile for configuring build settings with Clang on Zen 3 architecture, including optimizations and security.
 
 # Purpose
-This build configuration selects the `linux/clang/zen3` target directory and includes the base build rules together with the Clang, x86-64, debug, security, brutality, optimization, and threads settings. It adds `-march=znver3` and `-mtune=znver3` to `CPPFLAGS` so the build uses AMD Zen 3 instruction set and tuning options. The file also defines feature macros such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, `FD_HAS_ALLOCA`, `FD_HAS_X86`, `FD_HAS_SSE`, `FD_HAS_AVX`, `FD_HAS_SHANI`, and `FD_HAS_AESNI` for both the preprocessor and the build system. These settings control which platform features the source code can use during compilation.
+The configuration file defines build settings and compiler flags for a software project targeting the `zen3` architecture using the Clang compiler on a Linux system. It includes several configuration files, such as `base.mk` and various `with-*` files, to extend the build with additional features like debugging, security, optimization, and threading. The `CPPFLAGS` variable is set with specific flags to optimize the build for the `znver3` architecture and enable various processor features, such as SSE, AVX, and AES-NI. Additionally, preprocessor definitions are set to indicate the presence of certain features, such as 128-bit integers and double precision floating-point support. These settings ensure that the build process is tailored to the capabilities of the target architecture and the requirements of the software.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

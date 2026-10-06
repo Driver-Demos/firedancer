@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules that add the fd_waltz library and its header files.
+Makefile for building the `fd_waltz` library and adding headers `fd_waltz_base.h` and `fd_rtt_est.h`.
 
 # Purpose
-Registers the `fd_waltz` library in the build system and adds the `fd_waltz_base.h` and `fd_rtt_est.h` header files to the library package. The `make-lib` call defines the library target, and the `add-hdrs` calls list the public headers that belong to it.
+The `Makefile` content defines build instructions for a software library. It uses the `make-lib` function to create a library named `fd_waltz`. It also includes header files `fd_waltz_base.h` and `fd_rtt_est.h` by calling the `add-hdrs` function, which adds these headers to the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
