@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-honggfuzz.mk` file configures the Firedancer project to use Honggfuzz for fuzz testing by setting the compiler and linker to `hfuzz-clang` and enabling frame pointers.
+Makefile settings for using honggfuzz with specific compiler and linker options.
 
 # Purpose
-This file is a Makefile snippet used for configuring a build process with specific compiler settings. It sets the C and C++ compilers to `hfuzz-clang` and `hfuzz-clang++`, respectively, and uses `hfuzz-clang++` as the linker. Additionally, it appends the `-fno-omit-frame-pointer` flag to `CPPFLAGS` to ensure frame pointers are not omitted, which is useful for debugging and profiling. The `FD_HAS_FUZZ` variable is set to `1`, indicating that fuzzing capabilities are enabled in the build.
+The Makefile configuration sets the C compiler to `hfuzz-clang` and the C++ compiler and linker to `hfuzz-clang++`. It adds the `-fno-omit-frame-pointer` flag to the preprocessor options, which ensures that the frame pointer is not omitted during compilation. The variable `FD_HAS_FUZZ` is set to `1`, indicating that fuzzing capabilities are enabled.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

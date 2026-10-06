@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Captures shred, repair, gossip, and replay data to CSV and binary files.
+Seccomp filter policy, network shred capture and analysis, security policies, and Makefile logic.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync on selected file descriptors.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall access control based on architecture and file descriptors.
 
 ## Files
-- **[fd_shredcap_tile.c](fd_shredcap_tile.c.md)**: Captures shred, repair, gossip, and replay data to CSV and binary files.
-- **[fd_shredcap_tile.seccomppolicy](fd_shredcap_tile.seccomppolicy.md)**: Seccomp policy for log, shred, request, FEC, peer, and STDERR writes plus logfile fsync.
-- **[Local.mk](Local.mk.md)**: Build rule that adds fd_shredcap_tile objects when FD_HAS_INT128 is defined.
+- **[fd_shredcap_tile.c](fd_shredcap_tile.c.md)**: Implements functionalities for capturing and analyzing network shreds and bank hashes, outputting data to CSV and binary files.
+- **[fd_shredcap_tile.seccomppolicy](fd_shredcap_tile.seccomppolicy.md)**: Defines security policies for file descriptors related to logging and archiving in the Firedancer system.
+- **[Local.mk](Local.mk.md)**: Makefile logic to add objects for `fd_shredcap_tile` and `fd_discof` if `FD_HAS_INT128` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
