@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_queue.c` file in the `firedancer` codebase implements a family of functions for a single-threaded, compile-time fixed-capacity queue designed for high-performance contexts, providing both simple and advanced APIs for queue operations without error checking.
+Implements a single-threaded, compile-time fixed-capacity queue for high-performance contexts.
 
 # Purpose
-This C source code file provides a template for implementing a high-performance, single-threaded, fixed-capacity queue. The queue is designed to be used in contexts where performance is critical, and it operates without any error checking to maximize speed. The file is intended to be included in other C files, where the user defines the queue's name, element type, and maximum capacity through preprocessor directives. This approach allows for the creation of multiple queue instances with different configurations within the same application.
+The code defines a template for creating a single-threaded, compile-time fixed-capacity queue in C, designed for high-performance contexts. It allows users to define a queue with specific parameters by setting the `QUEUE_NAME`, `QUEUE_T`, and `QUEUE_MAX` macros before including the file. This setup generates a set of queue operations tailored to the specified element type and maximum capacity. The queue operations include basic functionalities such as creating, joining, and deleting a queue, as well as accessing and modifying elements within the queue. The API provides both simple operations like `push` and `pop`, and advanced zero-copy operations like `peek_insert` and `peek_remove`, which allow direct access to queue elements without additional copying.
 
-The code defines a comprehensive API for queue operations, including basic functions for creating, joining, and deleting queues, as well as accessor functions to check the queue's status (e.g., whether it is full or empty). It also provides a simple API for pushing and popping elements and an advanced API for zero-copy operations, which allows for direct manipulation of queue elements to further enhance performance. The implementation uses a circular buffer technique, with internal management of start and end indices to track the queue's state. The design ensures that overflow and underflow are practically impossible, even under extreme usage scenarios, by initializing indices to large values. This file is a utility for developers needing efficient queue operations in performance-sensitive applications.
+The queue implementation uses a circular buffer approach, where the `start` and `end` indices manage the positions for popping and pushing elements, respectively. The queue is designed to handle overflow and underflow efficiently, especially when the maximum size is a power of two. The code does not include error checking for performance reasons, and it assumes that the user will ensure the queue's constraints are respected, such as not exceeding the maximum capacity during operations. The implementation is encapsulated within a private structure, and the API functions provide access to the queue's state and operations, ensuring that the queue can be used efficiently in high-performance applications.
 # Imports and Dependencies
 
 ---
@@ -20,15 +20,17 @@ The code defines a comprehensive API for queue operations, including basic funct
 
 ---
 ### QUEUE\_<!-- {{#callable:QUEUE_}} -->
-The `QUEUE_(remove_all)` function resets the queue to an empty state by setting the start and end indices to a large value, effectively removing all elements.
+[View Source →](<../../../../../src/util/tmpl/fd_queue.c#L224>)
+
+Resets the queue to an empty state by setting the start and end indices to a large value.
 - **Inputs**:
-    - `queue`: A pointer to the queue from which all elements are to be removed.
-- **Control Flow**:
+    - `queue`: A pointer to the queue to be cleared.
+- **Logic and Control Flow**:
     - Retrieve the private header of the queue using `QUEUE_(private_hdr_from_queue)` function.
     - Set the `start` and `end` indices of the queue header to `1UL << 63`, effectively marking the queue as empty.
-- **Output**: Returns the original queue pointer, now reset to an empty state.
-- **Functions called**:
-    - [`QUEUE_`](#queue_)
+- **Output**: Returns the pointer to the queue that has been cleared.
+- **Functions Called**:
+    - [`QUEUE_`](<#queue_>)
 
 
 

@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC server tile, TPU reassembly, metrics tests, seccomp policy, and build rules.
+QUIC server tile implementation, TPU/QUIC protocol handling, seccomp policy, and QUIC metrics testing.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp BPF filter for QUIC syscalls, allowing write, fsync, and getrandom.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for QUIC with architecture-specific syscall handling.
 
 ## Files
-- **[fd_quic_tile.c](fd_quic_tile.c.md)**: TPU QUIC server tile with packet reassembly, metrics, key logging, and network I/O.
-- **[fd_quic_tile.h](fd_quic_tile.h.md)**: QUIC tile context, metrics, and runtime state definitions.
-- **[fd_tpu.h](fd_tpu.h.md)**: Server-side TPU/QUIC transaction reassembly and publish API.
-- **[fd_tpu_reasm.c](fd_tpu_reasm.c.md)**: Shared-memory TPU fragment reassembly, slot management, and mcache publish logic.
-- **[fd_tpu_reasm_private.h](fd_tpu_reasm_private.h.md)**: Reusable fd_tpu_reasm logic, slot queue helpers, and map accessors for tests.
-- **[Local.mk](Local.mk.md)**: Build rules for QUIC headers, objects, and unit tests, gated by FD_HAS_DOUBLE and FD_HAS_ALLOCA.
-- **[quic.seccomppolicy](quic.seccomppolicy.md)**: Seccomp policy for logging, fsync, and getrandom syscalls.
-- **[test_quic_metrics.c](test_quic_metrics.c.md)**: The `test_quic_metrics.c` file in the `firedancer` codebase tests the QUIC metrics functionality by setting up an HTTP server, generating fake metric values, rendering them using Prometheus, and comparing the output to a fixture file.
-- **[test_quic_metrics.txt](test_quic_metrics.txt.md)**: QUIC metrics test data for counters, gauges, and histograms.
-- **[test_tpu_reasm.c](test_tpu_reasm.c.md)**: Tests TPU reassembly acquire, cancel, fragment, publish, reset, and state invariants.
+- **[fd_quic_tile.c](fd_quic_tile.c.md)**: Implements a TPU server tile for handling transactions over TPU/UDP and TPU/QUIC protocols.
+- **[fd_quic_tile.h](fd_quic_tile.h.md)**: Defines the `fd_quic_ctx_t` structure and related constants for QUIC tile operations in Firedancer.
+- **[fd_tpu.h](fd_tpu.h.md)**: Server-side implementation of the TPU/QUIC protocol for transaction submission to a block producer.
+- **[fd_tpu_reasm.c](fd_tpu_reasm.c.md)**: Implements functions for managing and manipulating TPU reassembly slots, including initialization, querying, and publishing.
+- **[fd_tpu_reasm_private.h](fd_tpu_reasm_private.h.md)**: Reusable logic for fd_tpu_reasm, including slot management and reassembly queue operations.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for QUIC-related components in the Firedancer project.
+- **[quic.seccomppolicy](quic.seccomppolicy.md)**: Defines security policies for logging and randomness in the QUIC protocol, including file descriptor management.
+- **[test_quic_metrics.c](test_quic_metrics.c.md)**: Tests QUIC metrics rendering and validation using a mock HTTP server and Prometheus integration.
+- **[test_quic_metrics.txt](test_quic_metrics.txt.md)**: Metrics for tracking QUIC transactions, connections, packets, and performance in the Firedancer codebase.
+- **[test_tpu_reasm.c](test_tpu_reasm.c.md)**: Tests for the TPU reassembly functionality, including state verification and memory management.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

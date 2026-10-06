@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests related to checkpoint functionality, including `fd_checkpt`, `fd_restore`, and associated tests.
+Makefile for adding headers, objects, and unit tests for checkpoint functionality.
 
 # Purpose
-This file is a Makefile snippet used for managing the build process of a software project. It defines the inclusion of header files and object files, specifies unit tests to be created, and outlines the execution of these unit tests. The use of `$(call ...)` indicates the invocation of predefined Makefile functions to streamline these tasks.
+The Makefile script defines build and test instructions for a software project. It uses the `add-hdrs` function to include the header file `fd_checkpt.h`. The `add-objs` function compiles object files from the source files `fd_checkpt`, `fd_restore`, and `fd_util`. The `make-unit-test` function creates unit tests for `test_checkpt_mmio` and `test_checkpt_stream`, both of which depend on `fd_util`. The `run-unit-test` function executes the unit tests `test_checkpt_mmio` and `test_checkpt_stream`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

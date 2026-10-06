@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-clang.mk` file in the `firedancer` codebase configures the build system to use Clang as the compiler, while addressing specific issues and limitations related to strict Clang builds, such as handling packed structure elements and unused command line arguments.
+Configuration for building with Clang, including workarounds for strict build issues and library linking.
 
 # Purpose
-The provided content is a Makefile, which is a configuration file used by the `make` build automation tool to compile and link programs. This particular Makefile is configured to use the Clang compiler (`clang` for C and `clang++` for C++), as indicated by the `CC`, `CXX`, and `LD` variables. The file addresses specific issues encountered when using Clang, such as disabling strict checks that prevent obtaining the address of packed structure elements, which is necessary for real-world packet parsing. It also mentions disabling strict Clang builds that fail due to unused command line arguments when assembling `.s` files, suggesting a workaround rather than modifying the entire build system. The `CPPFLAGS` and `FD_USING_CLANG` variables are set to indicate the use of Clang, allowing other parts of the build system to adjust accordingly. Additionally, the `LDFLAGS` variable is updated to include the `-lstdc++` library, which is not automatically linked by `clang++`.
+The provided Makefile configuration sets up the build environment to use the `clang` compiler for C and C++ code by defining `CC`, `CXX`, and `LD` as `clang`, `clang++`, and `clang++`, respectively. It includes specific flags and definitions to address limitations and differences between `clang` and `gcc`, such as disabling certain strict checks that `clang` enforces, which can interfere with real-world packet parsing. The `CPPFLAGS` variable is updated to define `FD_USING_CLANG=1`, which allows other parts of the build system to adjust their behavior based on the use of `clang`. Additionally, the `LDFLAGS` variable is modified to include the `-lstdc++` library, ensuring that necessary C++ standard libraries are linked when using `clang++`. These configurations ensure compatibility and functionality when building the software with `clang`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for firedancer-dev commands and binary, gated by platform feature checks.
+Makefile for building and integrating the `firedancer-dev` application with various dependencies.
 
 # Purpose
-This Makefile fragment defines the `firedancer-dev` build target and adds several command modules to the `fd_firedancer_dev` object set, including `commands/gossip`, `commands/bench`, `commands/dev`, `commands/sim`, `commands/backtest`, `commands/snapshot_load`, `commands/repair`, `commands/ipecho_server`, and `commands/gossip_dump`. It enables the target only when the required build features are present, including `FD_HAS_HOSTED`, `FD_HAS_LINUX`, `FD_HAS_ALLOCA`, `FD_HAS_DOUBLE`, `FD_HAS_INT128`, `FD_HAS_ZSTD`, and `FD_HAS_SECP256K1`, and it emits a build warning when `zstd` support is missing. When `FD_HAS_SSE` is set, it links the `firedancer-dev` binary from the listed Firedancer libraries and external libraries such as `SECP256K1_LIBS`, `ROCKSDB_LIBS`, and `OPENSSL_LIBS`. The file also contains commented integration test rules for `test_fddev`, which show how the development binary can be exercised in the test suite.
+The `Makefile` content defines build instructions for the `firedancer-dev` target. It uses conditional compilation to check for the presence of specific features or libraries, such as `FD_HAS_HOSTED`, `FD_HAS_LINUX`, `FD_HAS_ALLOCA`, `FD_HAS_DOUBLE`, `FD_HAS_INT128`, `FD_HAS_ZSTD`, and `FD_HAS_SECP256K1`. If all these conditions are met, the file adds object files from various command directories to the `fd_firedancer_dev` target using the `add-objs` function. It also defines a `.PHONY` target for `firedancer-dev` to ensure it is always executed. If the `FD_HAS_SSE` condition is true, it compiles the `firedancer-dev` binary with specified dependencies and libraries. If the required conditions are not met, a warning is issued indicating that the `firedancer-dev` build is disabled due to the absence of `zstd`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
