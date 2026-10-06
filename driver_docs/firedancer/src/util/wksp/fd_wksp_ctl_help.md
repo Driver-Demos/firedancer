@@ -3,37 +3,54 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_wksp_ctl_help` file in the `firedancer` codebase provides detailed command-line usage instructions for managing workspaces, including creating, deleting, allocating, freeing, and checkpointing operations.
+Command-line tool for managing workspace allocations, including creation, deletion, allocation, and checkpointing.
 
 # Purpose
-The provided content is a command-line interface (CLI) usage guide for a tool named `fd_wksp_ctl`, which is used to manage memory workspaces. This file is a configuration and operational guide that provides detailed instructions on how to execute various commands related to workspace management, such as creating, deleting, allocating, and freeing memory within workspaces. The functionality is narrow, focusing specifically on memory management tasks, including setting tags, querying workspace information, and handling checkpoints for data persistence and recovery. The commands are organized into conceptual categories such as allocation, deallocation, verification, and checkpoint management, all centered around efficient and reliable memory workspace operations. This file is crucial for developers or system administrators who need to interact with the memory management system of the application, ensuring they can perform necessary operations and maintain system integrity.
+The file describes a command-line interface for managing workspace allocations in a shared memory environment. It provides a set of commands to create, delete, allocate, and free memory within workspaces, as well as to manage and query metadata associated with these allocations. Commands such as `new`, `delete`, `alloc`, and `free` allow users to manipulate memory regions, while commands like `info`, `tag-query`, and `usage` provide information about current allocations and their tags. The file also includes commands for checkpointing and restoring workspaces, which are useful for saving and recovering the state of memory allocations. Additionally, commands like `check`, `verify`, and `rebuild` are available to ensure the integrity of the workspace and to handle potential memory corruption issues.
 # Content Summary
-The provided content is a command-line interface (CLI) usage guide for a tool named `fd_wksp_ctl`, which is designed to manage and manipulate workspaces (wksp) in a shared memory environment. This tool offers a variety of commands to create, manage, and query workspaces, as well as to handle memory allocations within these workspaces.
+The provided content is a command-line interface (CLI) usage guide for a tool named `fd_wksp_ctl`. This tool manages workspaces and their memory allocations. Below is a summary of the functional details of each command:
 
-Key commands and their functionalities include:
+1. **help**: Displays the help message with available commands and their descriptions.
 
-- **help**: Displays the help message, listing all available commands and their descriptions.
-- **tag**: Sets a tag for subsequent workspace allocations, with a default value of 1.
-- **supported-styles**: Lists the supported checkpoint styles for the target system.
-- **new**: Creates a new workspace with specified parameters such as page count, page size, CPU index sequence, and permissions.
-- **delete**: Removes a workspace, prioritizing the deletion of the largest page size if multiple shared memory regions exist with the same name.
-- **alloc**: Allocates a specified number of bytes with a given alignment from a tagged workspace, outputting the allocation address on success.
-- **info**: Provides information about a workspace allocation matching a specific tag, including its global address and size.
-- **free**: Frees an allocation at a specified workspace address.
-- **tag-query**: Retrieves the tag associated with a given workspace address.
-- **tag-free**: Frees all allocations within a workspace that match a specified tag.
-- **memset**: Sets all bytes in an allocation to a specified value.
-- **check**: Verifies if any processes terminated unexpectedly during a workspace operation and attempts to rebuild if necessary.
-- **verify**: Conducts a full verification of the workspace, logging any errors found.
-- **rebuild**: Rebuilds the workspace, potentially repairing metadata corruption, using a specified seed.
-- **reset**: Frees all allocations in a workspace.
-- **usage**: Summarizes workspace usage, detailing total, used, and free space, as well as usage by allocations with a specific tag.
-- **query**: Provides detailed workspace usage information.
-- **checkpt**: Creates a checkpoint of a workspace, with options for different styles and additional user-provided information.
-- **checkpt-query**: Queries a checkpoint for metadata and usage information, with varying verbosity levels.
-- **restore**: Restores a workspace from a checkpoint, replacing current allocations and rebuilding with a specified seed.
+2. **tag val**: Sets a tag for subsequent workspace allocations. The default tag value is 1.
 
-This tool is essential for developers working with shared memory systems, providing comprehensive control over workspace creation, allocation, and management, as well as robust mechanisms for checkpointing and restoring workspace states.
+3. **supported-styles**: Lists the supported checkpoint styles for the target system.
+
+4. **new wksp page_cnt page_sz cpu_idx_seq mode**: Creates a new workspace named `wksp` using specified page count, page size, CPU index sequence, and UNIX permissions mode.
+
+5. **delete wksp**: Deletes the specified workspace. If multiple shared memory regions have the same name, it attempts to delete the one with the largest page size.
+
+6. **alloc wksp align sz**: Allocates a specified size of memory with a given alignment from the workspace tagged with the current tag value. Outputs the workspace address of the allocation.
+
+7. **info wksp tag**: Prints the global address and size of the allocation in the workspace matching the specified tag. If multiple allocations exist, it selects the one with the lowest address.
+
+8. **free wksp_gaddr**: Frees the allocation at the specified workspace address.
+
+9. **tag-query wksp_gaddr**: Outputs the tag associated with the given workspace address.
+
+10. **tag-free wksp tag**: Frees all allocations in the workspace with the specified tag.
+
+11. **memset wksp_gaddr c**: Sets all bytes in the allocation at the specified workspace address to the given byte value.
+
+12. **check wksp**: Checks for any process failures during workspace operations and attempts to verify and rebuild the workspace if necessary.
+
+13. **verify wksp**: Performs a full verification of the workspace, logging any errors found.
+
+14. **rebuild wksp seed**: Rebuilds the workspace, potentially repairing metadata corruption. The seed is a 32-bit number used in the process.
+
+15. **reset wksp**: Frees all allocations in the specified workspace.
+
+16. **usage wksp tag**: Outputs a summary of workspace usage, including total, used, free, and usage by allocations with the specified tag.
+
+17. **query wksp**: Provides detailed usage information for the workspace.
+
+18. **checkpt wksp checkpt mode style info**: Creates a checkpoint for the workspace at the specified path with given permissions, style, and additional information.
+
+19. **checkpt-query checkpt verbose**: Queries the checkpoint, providing metadata and usage information based on the verbosity level.
+
+20. **restore wksp checkpt seed**: Restores the workspace from a checkpoint, using the specified seed for rebuilding.
+
+These commands allow for comprehensive management of memory workspaces, including creation, allocation, deallocation, verification, and checkpointing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

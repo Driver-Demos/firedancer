@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_sha512.c` file in the `firedancer` codebase implements the SHA-512 and SHA-384 hashing algorithms, including functions for initialization, appending data, and finalizing the hash computation, with an option for AVX2 optimization.
+SHA-512 and SHA-384 hash function implementations, including initialization, appending, and finalization.
 
 # Purpose
-This C source code file implements the SHA-512 and SHA-384 cryptographic hash functions, providing both incremental and one-shot hashing capabilities. The file defines a set of functions to initialize, update, and finalize the hash computation, as well as to perform a complete hash operation in a single call. The code is structured to handle memory alignment and buffer management, ensuring efficient processing of input data. It includes a reference implementation of the SHA-512 core algorithm, derived from OpenSSL's implementation, and is designed to be easily replaceable with optimized versions for specific hardware capabilities, such as AVX2.
+The code implements the SHA-512 and SHA-384 cryptographic hash functions. It provides functions to initialize, update, and finalize the hash computation, as well as functions to compute the hash in a single step. The code includes memory alignment checks and uses a reference implementation derived from OpenSSL's SHA-512 implementation. The [`fd_sha512_core_ref`](<#fd_sha512_core_ref>) function is the core of the SHA-512 algorithm, processing data blocks and updating the hash state. The code supports both incremental hashing, where data is appended in chunks, and one-shot hashing, where the entire data is processed at once.
 
-The file defines several key functions, including [`fd_sha512_new`](#fd_sha512_new), [`fd_sha512_join`](#fd_sha512_join), [`fd_sha512_append`](#fd_sha512_append), and [`fd_sha512_fini`](#fd_sha512_fini), which manage the lifecycle of a SHA-512 computation. The [`fd_sha512_core_ref`](#fd_sha512_core_ref) function implements the core hashing logic, processing data blocks and updating the hash state. The code also includes conditional compilation to select between different core implementations based on available hardware features. This file is intended to be part of a larger library, as indicated by the inclusion of a header file (`fd_sha512.h`) and the use of macros for configuration and logging. The implementation is designed to be robust, with checks for null pointers and alignment, and it provides detailed logging for error conditions.
+The file defines several functions for managing SHA-512 contexts, such as [`fd_sha512_new`](<#fd_sha512_new>), [`fd_sha512_join`](<#fd_sha512_join>), [`fd_sha512_leave`](<#fd_sha512_leave>), and [`fd_sha512_delete`](<#fd_sha512_delete>), which handle memory allocation and deallocation for SHA-512 structures. The [`fd_sha512_init`](<#fd_sha512_init>), [`fd_sha512_append`](<#fd_sha512_append>), and [`fd_sha512_fini`](<#fd_sha512_fini>) functions manage the lifecycle of a hash computation, while [`fd_sha512_hash`](<#fd_sha512_hash>) and [`fd_sha384_hash`](<#fd_sha384_hash>) provide streamlined interfaces for computing hashes directly. The code also includes conditional compilation to select between a reference implementation and an AVX2-optimized implementation, depending on the availability of AVX instructions.
 # Imports and Dependencies
 
 ---
@@ -19,215 +19,251 @@ The file defines several key functions, including [`fd_sha512_new`](#fd_sha512_n
 
 ---
 ### fd\_sha512\_align<!-- {{#callable:fd_sha512_align}} -->
-The `fd_sha512_align` function returns the alignment requirement for SHA-512 operations.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L3>)
+
+Returns the alignment requirement for SHA-512 operations.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the macro `FD_SHA512_ALIGN`.
-- **Output**: The function outputs an `ulong` representing the alignment requirement for SHA-512 operations.
+- **Logic and Control Flow**:
+    - Returns the value of the macro `FD_SHA512_ALIGN`.
+- **Output**: The alignment requirement for SHA-512 operations as defined by `FD_SHA512_ALIGN`.
 
 
 ---
 ### fd\_sha512\_footprint<!-- {{#callable:fd_sha512_footprint}} -->
-The `fd_sha512_footprint` function returns the constant value `FD_SHA512_FOOTPRINT`, which represents the memory footprint required for a SHA-512 context.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L8>)
+
+Returns the constant `FD_SHA512_FOOTPRINT`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined to return an unsigned long integer (`ulong`).
-    - It directly returns the value of the macro `FD_SHA512_FOOTPRINT`.
-- **Output**: The function outputs an unsigned long integer representing the memory footprint for a SHA-512 context.
+- **Logic and Control Flow**:
+    - Return the value of `FD_SHA512_FOOTPRINT`.
+- **Output**: The function returns an `ulong` value which is the constant `FD_SHA512_FOOTPRINT`.
 
 
 ---
 ### fd\_sha512\_new<!-- {{#callable:fd_sha512_new}} -->
-The `fd_sha512_new` function initializes a new SHA-512 context in a given shared memory region, ensuring proper alignment and setting a magic number for validation.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L13>)
+
+Initializes a new SHA-512 context in shared memory, ensuring alignment and setting a magic number for validation.
 - **Inputs**:
-    - `shmem`: A pointer to a shared memory region where the SHA-512 context will be initialized.
-- **Control Flow**:
-    - Cast the `shmem` pointer to a `fd_sha512_t` pointer named `sha`.
-    - Check if `shmem` is NULL; if so, log a warning and return NULL.
-    - Check if `shmem` is properly aligned using [`fd_sha512_align`](#fd_sha512_align); if not, log a warning and return NULL.
-    - Retrieve the footprint size using [`fd_sha512_footprint`](#fd_sha512_footprint).
-    - Clear the memory region pointed to by `sha` using `fd_memset` with the footprint size.
-    - Use memory fences (`FD_COMPILER_MFENCE`) to ensure memory operations are completed before setting the magic number.
+    - `shmem`: A pointer to the shared memory where the SHA-512 context will be initialized.
+- **Logic and Control Flow**:
+    - Cast `shmem` to a `fd_sha512_t` pointer named `sha`.
+    - Check if `shmem` is NULL; if true, log a warning and return NULL.
+    - Check if `shmem` is aligned according to `fd_sha512_align()`; if not, log a warning and return NULL.
+    - Get the footprint size using `fd_sha512_footprint()`.
+    - Clear the memory at `sha` using `fd_memset` with the footprint size.
+    - Use memory fences (`FD_COMPILER_MFENCE`) to ensure memory operations are completed.
     - Set the `magic` field of `sha` to `FD_SHA512_MAGIC` using a volatile write.
-    - Return the `sha` pointer cast back to a `void *`.
-- **Output**: A pointer to the initialized SHA-512 context, or NULL if initialization fails due to NULL or misaligned input.
-- **Functions called**:
-    - [`fd_sha512_align`](#fd_sha512_align)
-    - [`fd_sha512_footprint`](#fd_sha512_footprint)
+    - Return the pointer to the initialized `sha`.
+- **Output**: A pointer to the initialized `fd_sha512_t` structure, or NULL if initialization fails.
+- **Functions Called**:
+    - [`fd_sha512_align`](<#fd_sha512_align>)
+    - [`fd_sha512_footprint`](<#fd_sha512_footprint>)
 
 
 ---
 ### fd\_sha512\_join<!-- {{#callable:fd_sha512_join}} -->
-The `fd_sha512_join` function validates and returns a pointer to a `fd_sha512_t` structure if the input shared memory is correctly aligned and initialized.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L38>)
+
+Validates and returns a pointer to a `fd_sha512_t` structure if the input is non-null, properly aligned, and has the correct magic number.
 - **Inputs**:
-    - `shsha`: A pointer to shared memory that is expected to contain a `fd_sha512_t` structure.
-- **Control Flow**:
-    - Check if `shsha` is NULL; if so, log a warning and return NULL.
-    - Check if `shsha` is aligned according to [`fd_sha512_align`](#fd_sha512_align); if not, log a warning and return NULL.
+    - `shsha`: A pointer to a memory location that is expected to be a `fd_sha512_t` structure.
+- **Logic and Control Flow**:
+    - Check if `shsha` is NULL; if true, log a warning and return NULL.
+    - Check if `shsha` is aligned according to `fd_sha512_align()`; if not, log a warning and return NULL.
     - Cast `shsha` to a `fd_sha512_t` pointer and store it in `sha`.
     - Check if `sha->magic` equals `FD_SHA512_MAGIC`; if not, log a warning and return NULL.
     - Return the `sha` pointer.
 - **Output**: A pointer to a `fd_sha512_t` structure if all checks pass, otherwise NULL.
-- **Functions called**:
-    - [`fd_sha512_align`](#fd_sha512_align)
+- **Functions Called**:
+    - [`fd_sha512_align`](<#fd_sha512_align>)
 
 
 ---
 ### fd\_sha512\_leave<!-- {{#callable:fd_sha512_leave}} -->
-The `fd_sha512_leave` function checks if the given SHA-512 context pointer is non-null and returns it as a void pointer, logging a warning if it is null.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L61>)
+
+Returns the input `fd_sha512_t` pointer if it is not NULL, otherwise logs a warning and returns NULL.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure representing the SHA-512 context.
-- **Control Flow**:
-    - Check if the `sha` pointer is null using `FD_UNLIKELY`; if it is, log a warning and return `NULL`.
-    - If the `sha` pointer is not null, cast it to a `void *` and return it.
-- **Output**: Returns the input `sha` pointer cast to a `void *`, or `NULL` if the input is null.
+    - `sha`: A pointer to an `fd_sha512_t` structure, which represents the SHA-512 state.
+- **Logic and Control Flow**:
+    - Check if the `sha` pointer is NULL using `FD_UNLIKELY`.
+    - If `sha` is NULL, log a warning message 'NULL sha' and return NULL.
+    - If `sha` is not NULL, return the `sha` pointer cast to a `void *`.
+- **Output**: A `void *` pointer to the `fd_sha512_t` structure if `sha` is not NULL, otherwise NULL.
 
 
 ---
 ### fd\_sha512\_delete<!-- {{#callable:fd_sha512_delete}} -->
-The `fd_sha512_delete` function validates and deletes a SHA-512 context by resetting its magic number to zero.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L72>)
+
+Validates and deletes a SHA-512 context by checking its alignment and magic number, then clears the magic number.
 - **Inputs**:
-    - `shsha`: A pointer to the SHA-512 context to be deleted.
-- **Control Flow**:
-    - Check if the input pointer `shsha` is NULL; if so, log a warning and return NULL.
-    - Check if `shsha` is properly aligned according to [`fd_sha512_align`](#fd_sha512_align); if not, log a warning and return NULL.
-    - Cast `shsha` to a `fd_sha512_t` pointer named `sha`.
-    - Verify that the `magic` field of `sha` matches `FD_SHA512_MAGIC`; if not, log a warning and return NULL.
-    - Use memory fence operations to ensure memory ordering, then set the `magic` field of `sha` to zero.
-    - Return the `sha` pointer cast back to a `void *`.
-- **Output**: Returns a pointer to the deleted SHA-512 context if successful, or NULL if any validation checks fail.
-- **Functions called**:
-    - [`fd_sha512_align`](#fd_sha512_align)
+    - `shsha`: A pointer to the SHA-512 context to delete.
+- **Logic and Control Flow**:
+    - Check if `shsha` is NULL; if true, log a warning and return NULL.
+    - Check if `shsha` is aligned according to [`fd_sha512_align`](<#fd_sha512_align>); if not, log a warning and return NULL.
+    - Cast `shsha` to `fd_sha512_t *` and store in `sha`.
+    - Check if `sha->magic` equals `FD_SHA512_MAGIC`; if not, log a warning and return NULL.
+    - Use memory fence operations to ensure memory ordering, then set `sha->magic` to 0.
+    - Return the pointer `sha` cast to `void *`.
+- **Output**: Returns a pointer to the deleted SHA-512 context if successful, or NULL if any validation fails.
+- **Functions Called**:
+    - [`fd_sha512_align`](<#fd_sha512_align>)
 
 
 ---
 ### fd\_sha512\_core\_ref<!-- {{#callable:fd_sha512_core_ref}} -->
-The `fd_sha512_core_ref` function processes blocks of data to update the SHA-512 hash state using a reference implementation based on OpenSSL's SHA-512 algorithm.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L128>)
+
+Processes SHA-512 hash computation on a given block of data, updating the hash state.
 - **Inputs**:
-    - `state`: A pointer to an array of 8 unsigned long integers representing the current state of the hash, which must be 64-byte aligned.
-    - `block`: A pointer to the input data block, ideally 128-byte aligned, with a size of 128 bytes multiplied by the block count.
-    - `block_cnt`: An unsigned long integer representing the number of 128-byte blocks to process, which must be positive.
-- **Control Flow**:
-    - Initialize constants and macros for SHA-512 operations, including rotation and bitwise operations.
-    - Cast the input block to an array of unsigned long integers for processing.
-    - Iterate over each block, initializing working variables a through h from the current state.
-    - For the first 16 iterations, load and byte-swap each word from the block, compute T1 and T2 using SHA-512 specific functions, and update the working variables.
-    - For the remaining 64 iterations, compute additional words using sigma functions, update T1 and T2, and continue updating the working variables.
-    - After processing all 80 iterations, update the state array by adding the working variables to the current state.
-    - Advance the block pointer by 16 words and decrement the block count, repeating the process until all blocks are processed.
-- **Output**: The function updates the input state array to reflect the processed hash state after processing the specified number of blocks.
+    - `state`: A pointer to an array of 8 `ulong` values representing the current hash state, which must be 64-byte aligned.
+    - `block`: A pointer to the input data block, ideally 128-byte aligned, with a size of 128 bytes multiplied by `block_cnt`.
+    - `block_cnt`: A positive `ulong` value indicating the number of 128-byte blocks to process.
+- **Logic and Control Flow**:
+    - Initialize working variables `a` to `h` with the current state values.
+    - Iterate over the first 16 blocks, performing byte swap on each block and computing temporary values `T1` and `T2` using SHA-512 specific functions and constants.
+    - Update the working variables `a` to `h` using `T1` and `T2`.
+    - For the remaining 64 iterations, compute `s0` and `s1` using the `sigma0` and `sigma1` functions, update the `X` array, and compute `T1` and `T2` again.
+    - Update the working variables `a` to `h` using `T1` and `T2`.
+    - Add the working variables back to the state array to update the hash state.
+    - Advance the block pointer by 16 and repeat the process for each block until `block_cnt` is exhausted.
+- **Output**: The function updates the `state` array with the new hash state after processing the input blocks.
 
 
 ---
 ### fd\_sha384\_init<!-- {{#callable:fd_sha384_init}} -->
-The `fd_sha384_init` function initializes a SHA-384 context by setting its internal state to predefined constants and resetting its buffer usage and bit count.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L247>)
+
+Initializes a `fd_sha512_t` structure for SHA-384 hashing by setting its state to predefined constants and resetting counters.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure that represents the SHA-384 context to be initialized.
-- **Control Flow**:
-    - The function sets the first eight elements of the `state` array in the `sha` structure to specific constants that are the initial hash values for SHA-384.
-    - The `buf_used` field of the `sha` structure is set to 0, indicating that no data has been buffered yet.
-    - The `bit_cnt_lo` and `bit_cnt_hi` fields of the `sha` structure are set to 0, indicating that no bits have been processed yet.
-    - The function returns the pointer to the initialized `sha` structure.
-- **Output**: A pointer to the initialized `fd_sha512_t` structure, which is ready for use in SHA-384 hashing operations.
+    - `sha`: A pointer to a `fd_sha512_t` structure that will be initialized for SHA-384 hashing.
+- **Logic and Control Flow**:
+    - Set `sha->state[0]` to `0xcbbb9d5dc1059ed8UL`.
+    - Set `sha->state[1]` to `0x629a292a367cd507UL`.
+    - Set `sha->state[2]` to `0x9159015a3070dd17UL`.
+    - Set `sha->state[3]` to `0x152fecd8f70e5939UL`.
+    - Set `sha->state[4]` to `0x67332667ffc00b31UL`.
+    - Set `sha->state[5]` to `0x8eb44a8768581511UL`.
+    - Set `sha->state[6]` to `0xdb0c2e0d64f98fa7UL`.
+    - Set `sha->state[7]` to `0x47b5481dbefa4fa4UL`.
+    - Set `sha->buf_used` to `0U`.
+    - Set `sha->bit_cnt_lo` to `0UL`.
+    - Set `sha->bit_cnt_hi` to `0UL`.
+    - Return the pointer `sha`.
+- **Output**: Returns the initialized `fd_sha512_t` pointer.
 
 
 ---
 ### fd\_sha512\_init<!-- {{#callable:fd_sha512_init}} -->
-The `fd_sha512_init` function initializes a SHA-512 context structure with predefined initial hash values and resets its buffer and bit counters.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L264>)
+
+Initializes a `fd_sha512_t` structure with the SHA-512 initial hash values and resets its buffer and bit counters.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure that will be initialized for SHA-512 hashing.
-- **Control Flow**:
-    - The function sets the `state` array of the `sha` structure to the initial hash values specified by the SHA-512 standard.
-    - The `buf_used` field of the `sha` structure is set to 0, indicating that no data is currently buffered.
-    - The `bit_cnt_lo` and `bit_cnt_hi` fields are set to 0, resetting the bit count for the hashing process.
-    - The function returns the pointer to the initialized `fd_sha512_t` structure.
+    - `sha`: A pointer to a `fd_sha512_t` structure that will be initialized.
+- **Logic and Control Flow**:
+    - Sets the `state` array of the `sha` structure to the initial hash values for SHA-512.
+    - Resets `buf_used` to 0, indicating no data is currently buffered.
+    - Resets `bit_cnt_lo` and `bit_cnt_hi` to 0, indicating no bits have been processed yet.
+    - Returns the pointer to the initialized `fd_sha512_t` structure.
 - **Output**: A pointer to the initialized `fd_sha512_t` structure.
 
 
 ---
 ### fd\_sha512\_append<!-- {{#callable:fd_sha512_append}} -->
-The `fd_sha512_append` function appends data to an ongoing SHA-512 hash computation, updating the internal state and buffer of the hash context.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L281>)
+
+Appends data to a SHA-512 hash computation, updating the internal state and buffer as needed.
 - **Inputs**:
     - `sha`: A pointer to an `fd_sha512_t` structure representing the current state of the SHA-512 hash computation.
-    - `_data`: A pointer to the data to be appended to the hash computation.
-    - `sz`: The size in bytes of the data to be appended.
-- **Control Flow**:
-    - Check if the size of the data (`sz`) is zero; if so, return the current hash state as no data needs to be appended.
-    - Unpack the current state, buffer, and bit count from the `sha` structure.
-    - Update the bit count to reflect the new data size being appended.
-    - If there are buffered bytes from previous appends, check if the new data can complete the current block; if not, buffer the new data and return.
-    - If the new data completes the current block, update the hash state using `fd_sha512_core` and reset the buffer usage.
-    - Process the bulk of the new data in blocks, updating the hash state for each block using `fd_sha512_core`.
-    - Buffer any leftover bytes that do not complete a block, updating the buffer usage in the `sha` structure.
+    - `_data`: A pointer to the data to append to the hash computation.
+    - `sz`: The size in bytes of the data to append.
+- **Logic and Control Flow**:
+    - Check if `sz` is zero; if so, return `sha` immediately.
+    - Unpack the internal state, buffer, and bit counters from `sha`.
+    - Update the bit counters to reflect the new data size.
+    - If there are buffered bytes from previous appends, check if the new data can complete the current block.
+    - If the new data is insufficient to complete the block, buffer it and update `buf_used`, then return `sha`.
+    - If the block can be completed, copy enough data to complete the block, update the hash using `fd_sha512_core`, and reset `buf_used`.
+    - Process the bulk of the data in blocks using `fd_sha512_core`.
+    - Buffer any remaining bytes that do not form a complete block and update `buf_used`.
     - Return the updated `sha` structure.
-- **Output**: A pointer to the updated `fd_sha512_t` structure, reflecting the new state of the hash computation after appending the data.
+- **Output**: Returns a pointer to the updated `fd_sha512_t` structure.
 
 
 ---
 ### fd\_sha512\_fini<!-- {{#callable:fd_sha512_fini}} -->
-The `fd_sha512_fini` function finalizes the SHA-512 hashing process by padding the message, processing any remaining data, and producing the final hash output.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L351>)
+
+Finalizes the SHA-512 hash computation and stores the result in the provided buffer.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure containing the current state of the SHA-512 hash computation.
-    - `_hash`: A pointer to a memory location where the final hash value will be stored.
-- **Control Flow**:
-    - Unpack the current state, buffer, buffer usage, and bit count from the `sha` structure.
-    - Append a terminating byte (0x80) to the buffer and increment the buffer usage counter.
-    - Check if there is enough space in the buffer to append the message length; if not, pad the buffer with zeros, process the buffer, and reset the buffer usage counter.
-    - Pad the buffer with zeros up to the last 128 bits, append the message length in bits to the last 128 bits of the buffer, and process the buffer to finalize the hash.
-    - Unpack the final hash state into the provided `_hash` memory location, performing byte swaps as necessary.
-- **Output**: Returns a pointer to the memory location where the final hash value is stored.
+    - `sha`: A pointer to an `fd_sha512_t` structure that holds the current state of the SHA-512 computation.
+    - `_hash`: A pointer to a buffer where the final hash value will be stored.
+- **Logic and Control Flow**:
+    - Unpack the state, buffer, buffer usage, and bit count from the `sha` structure.
+    - Append the terminating message byte `0x80` to the buffer and increment the buffer usage.
+    - Check if there is enough space in the buffer to append the message length; if not, clear the buffer, update the hash, and start a new block.
+    - Clear the buffer up to the last 128 bits, append the message size in bits to the last 128 bits, and update the hash to finalize it.
+    - Unpack the final hash value from the state into the `_hash` buffer, performing byte swaps as necessary.
+- **Output**: Returns a pointer to the buffer where the final hash value is stored.
 
 
 ---
 ### fd\_sha384\_fini<!-- {{#callable:fd_sha384_fini}} -->
-The `fd_sha384_fini` function finalizes a SHA-384 hash computation by completing the SHA-512 process and copying the relevant portion of the hash to the output buffer.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L401>)
+
+Finalizes the SHA-384 hash computation and stores the result in the provided buffer.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure representing the SHA-512 context that has been used for hashing.
-    - `_hash`: A pointer to a buffer where the resulting SHA-384 hash will be stored.
-- **Control Flow**:
+    - `sha`: A pointer to an `fd_sha512_t` structure that holds the SHA-512 state.
+    - `_hash`: A pointer to a buffer where the SHA-384 hash result will be stored.
+- **Logic and Control Flow**:
     - Declare a local buffer `hash` with size `FD_SHA512_HASH_SZ` and align it to 64 bytes.
-    - Call [`fd_sha512_fini`](#fd_sha512_fini) with `sha` and `hash` to finalize the SHA-512 hash computation.
-    - Copy the first `FD_SHA384_HASH_SZ` bytes from `hash` to `_hash` using `memcpy`.
+    - Call [`fd_sha512_fini`](<#fd_sha512_fini>) to finalize the SHA-512 hash computation and store the result in the local `hash` buffer.
+    - Copy the first `FD_SHA384_HASH_SZ` bytes from the local `hash` buffer to the `_hash` buffer.
     - Return the `_hash` pointer.
-- **Output**: A pointer to the buffer `_hash` containing the finalized SHA-384 hash.
-- **Functions called**:
-    - [`fd_sha512_fini`](#fd_sha512_fini)
+- **Output**: Returns a pointer to the buffer where the SHA-384 hash result is stored.
+- **Functions Called**:
+    - [`fd_sha512_fini`](<#fd_sha512_fini>)
 
 
 ---
 ### fd\_sha512\_hash<!-- {{#callable:fd_sha512_hash}} -->
-The `fd_sha512_hash` function computes the SHA-512 hash of a given data buffer and stores the result in a provided hash buffer.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L410>)
+
+Computes the SHA-512 hash of the given data.
 - **Inputs**:
-    - `_data`: A pointer to the input data buffer to be hashed.
-    - `sz`: The size of the input data buffer in bytes.
-    - `_hash`: A pointer to the buffer where the resulting SHA-512 hash will be stored.
-- **Control Flow**:
+    - `_data`: Pointer to the input data to hash.
+    - `sz`: Size of the input data in bytes.
+    - `_hash`: Pointer to the buffer where the computed hash will be stored.
+- **Logic and Control Flow**:
     - Initialize the SHA-512 state with predefined constants.
-    - Calculate the number of complete 128-byte blocks in the input data and process them using `fd_sha512_core`.
-    - Determine the number of remaining bytes after processing complete blocks and copy them to a buffer if necessary.
-    - Append the padding byte 0x80 to the buffer and increment the buffer usage counter.
-    - If the buffer usage exceeds the maximum allowed minus 16 bytes, pad the buffer with zeros, process it, and reset the buffer usage counter.
-    - Calculate the bit count of the input data and store it in the last 16 bytes of the buffer in big-endian format.
-    - Process the final buffer using `fd_sha512_core`.
-    - Convert the state to big-endian format and store it in the output hash buffer.
-- **Output**: A pointer to the buffer containing the computed SHA-512 hash.
+    - Calculate the number of complete blocks in the input data and process them using `fd_sha512_core`.
+    - Copy any remaining data into a buffer and append the padding byte `0x80`.
+    - If the buffer is too full to append the message length, process the buffer and reset it.
+    - Calculate the message length in bits and append it to the buffer.
+    - Process the final block with `fd_sha512_core`.
+    - Store the final hash value in the output buffer, converting each state value with `fd_ulong_bswap`.
+- **Output**: Returns a pointer to the buffer containing the computed SHA-512 hash.
 
 
 ---
 ### fd\_sha384\_hash<!-- {{#callable:fd_sha384_hash}} -->
-The `fd_sha384_hash` function computes the SHA-384 hash of a given data buffer and stores the result in a provided hash buffer.
+[View Source →](<../../../../../src/ballet/sha512/fd_sha512.c#L464>)
+
+Computes the SHA-384 hash of the given data.
 - **Inputs**:
-    - `_data`: A pointer to the input data buffer to be hashed.
-    - `sz`: The size of the input data buffer in bytes.
-    - `_hash`: A pointer to the buffer where the resulting SHA-384 hash will be stored.
-- **Control Flow**:
-    - Initialize the SHA-384 state with predefined constants specific to SHA-384.
-    - Calculate the number of complete 128-byte blocks in the input data and process them using `fd_sha512_core`.
-    - Copy any remaining bytes of data into a buffer, append the padding byte 0x80, and handle the padding if necessary.
-    - If the buffer is too full to append the length, process the buffer and reset it.
-    - Append the length of the input data in bits to the buffer, ensuring it is in big-endian format, and process the final block.
-    - Store the first six 64-bit words of the state into the output hash buffer, converting them to big-endian format.
-- **Output**: A pointer to the buffer containing the computed SHA-384 hash.
+    - `_data`: Pointer to the input data to hash.
+    - `sz`: Size of the input data in bytes.
+    - `_hash`: Pointer to the buffer where the computed hash will be stored.
+- **Logic and Control Flow**:
+    - Initialize the SHA-384 state with predefined constants.
+    - Calculate the number of complete blocks in the input data and process them using `fd_sha512_core`.
+    - Copy any remaining data into a buffer and append the padding byte `0x80`.
+    - If the buffer is too full to append the message length, process the buffer and reset it.
+    - Append the message length in bits to the buffer and process it.
+    - Store the final hash value in the provided `_hash` buffer after byte-swapping the state values.
+- **Output**: Returns a pointer to the buffer containing the computed SHA-384 hash.
 
 
 

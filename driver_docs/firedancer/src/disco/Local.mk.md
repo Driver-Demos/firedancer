@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase defines build and test instructions for the `fd_disco` library, including header files and a unit test for `test_disco_base`.
+Makefile for building and testing the `fd_disco` library and its unit tests.
 
 # Purpose
-This Makefile snippet is used to automate the build and testing process for a software library named `fd_disco`. It defines the creation of the library, specifies the header files `fd_disco_base.h` and `fd_disco.h` to be included, sets up a unit test named `test_disco_base` that depends on the `fd_disco`, `fd_tango`, and `fd_util` components, and finally, it runs the specified unit test.
+The `Makefile` content defines build and test instructions for the `fd_disco` library. It uses a macro `make-lib` to create the library and `add-hdrs` to include the headers `fd_disco_base.h` and `fd_disco.h`. It also specifies a unit test `test_disco_base` using the `make-unit-test` macro, which depends on the `fd_disco`, `fd_tango`, and `fd_util` libraries. Finally, it runs the unit test `test_disco_base` with the `run-unit-test` macro.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

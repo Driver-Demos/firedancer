@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase defines build rules and dependencies for the `fd_wiredancer_test` library and its associated unit test `test_wiredancer_demo` when `FD_HAS_WIREDANCER` is enabled.
+Makefile for building and testing the Wiredancer component with specific headers and objects.
 
 # Purpose
-This Makefile snippet is used to conditionally compile and link components related to the "wiredancer" feature in a software project. It defines a library target `fd_wiredancer_test`, adds specific header files and object files, and sets up a unit test named `test_wiredancer_demo` with its dependencies, all of which are executed only if the `FD_HAS_WIREDANCER` flag is defined.
+The `Makefile` content defines build instructions for a software component when the `FD_HAS_WIREDANCER` condition is true. It specifies the creation of a library named `fd_wiredancer_test` and includes headers `wd_f1_mon.h` and `fd_replay_loop.h`. It also adds object files `fd_replay_loop` and `wd_f1_mon` to the build process. Additionally, it sets up a unit test named `test_wiredancer_demo` that depends on several components, including `fd_wiredancer`, `fd_ballet`, `fd_disco`, `fd_tango`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

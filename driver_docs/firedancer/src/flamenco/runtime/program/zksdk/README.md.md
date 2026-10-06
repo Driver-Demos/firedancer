@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.md` file provides an overview of the Solana ZK SDK implementation and the `ZkE1Gama1Proof11111111111111111111111111111` program.
+Documentation for the implementation of Solana ZK SDK and ZkE1Gama1Proof11111111111111111111111111111 program.
 
 # Purpose
-This file provides a brief description of the Solana ZK SDK, referencing its implementation and linking to its GitHub repository. It also mentions the specific program `ZkE1Gama1Proof11111111111111111111111111111`, indicating its relevance or inclusion in the SDK.
+The content describes the implementation of the Solana ZK SDK and the `ZkE1Gama1Proof11111111111111111111111111111` program. The Solana ZK SDK is a software development kit for zero-knowledge proofs on the Solana blockchain. The link provided directs to the source code repository for further details on the SDK's implementation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
