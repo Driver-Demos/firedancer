@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_vinyl_bstream headers, objects, and unit test execution.
+Makefile for adding headers, objects, and unit tests for the `fd_vinyl_bstream` component.
 
 # Purpose
-This Makefile fragment adds the `fd_vinyl_bstream.h` header and the `fd_vinyl_bstream` object to the build. It also defines the `test_vinyl_bstream` unit test, links it with `fd_vinyl`, `fd_tango`, and `fd_util`, and runs that test as part of the build process.
+The Makefile content defines build and test instructions for the `fd_vinyl_bstream` component. It adds the header file `fd_vinyl_bstream.h` and the object files `fd_vinyl_bstream` and `fd_vinyl` to the build process. It also specifies a unit test named `test_vinyl_bstream`, which depends on the `fd_vinyl`, `fd_tango`, and `fd_util` components, and includes a command to execute this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

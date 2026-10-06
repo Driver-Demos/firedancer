@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_quic_metrics.c` file in the `firedancer` codebase tests the QUIC metrics functionality by setting up an HTTP server, generating fake metric values, rendering them using Prometheus, and comparing the output to a fixture file.
+Tests QUIC metrics rendering and validation using a mock HTTP server and Prometheus integration.
 
 # Purpose
-This C source code file is designed to test the functionality of a QUIC (Quick UDP Internet Connections) metrics system within a simulated HTTP server environment. The code imports several header files related to metrics and HTTP server operations, indicating its reliance on external libraries for metrics handling and HTTP server management. The main function initializes the environment, sets up an HTTP server with specific parameters, and allocates memory for both the server and metrics. It then populates the metrics with test data, simulating a scenario where metrics are collected and rendered in a Prometheus-compatible format. The rendered metrics are compared against a pre-existing fixture to ensure correctness, and discrepancies are logged and updated in the fixture file.
+The code is an executable C program designed to test the functionality of a QUIC metrics system. It imports several header files related to metrics and HTTP server operations, indicating its focus on network performance monitoring and data handling. The program initializes a deterministic test environment by setting a specific tick rate and configuring HTTP server parameters, such as maximum connection counts and buffer sizes. It then allocates memory for both the HTTP server and metrics, joining them to their respective structures.
 
-The code provides a narrow functionality focused on testing and validating the metrics collection and rendering process for QUIC within an HTTP server context. It does not define public APIs or external interfaces but rather serves as a standalone executable for testing purposes. The key technical components include the setup and teardown of the HTTP server and metrics system, the deterministic setting of test conditions, and the validation of output against expected results. The use of aligned memory allocation and the handling of HTTP server responses are critical to the operation of this test, ensuring that the metrics are accurately captured and compared.
+The program writes fake metric values to simulate real-world data and uses these metrics to render a Prometheus-compatible output. It stages an HTTP response and compares the generated metrics data against a fixture file to verify correctness. If the data does not match, it updates the fixture file and logs an error. The program concludes by cleaning up allocated resources and halting execution. This code is primarily used for testing and validating the accuracy of metrics generation and rendering in a controlled environment.
 # Imports and Dependencies
 
 ---
@@ -24,25 +24,29 @@ The code provides a narrow functionality focused on testing and validating the m
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and configures an HTTP server and metrics system, generates and renders fake metrics, compares them to a fixture, and logs any discrepancies.
+[View Source →](<../../../../../src/disco/quic/test_quic_metrics.c#L10>)
+
+Initializes and runs an HTTP server to render and verify metrics, then outputs the results.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the application environment with `fd_boot` using command-line arguments.
-    - Set the tempo tick rate to make the test deterministic using `fd_tempo_set_tick_per_ns`.
-    - Define HTTP server parameters with specific limits on connections, request lengths, and buffer sizes.
-    - Allocate memory for the HTTP server and initialize it with the defined parameters and empty callbacks.
-    - Allocate memory for the metrics system and initialize it.
-    - Populate the metrics with fake data by iterating over the metrics array and assigning incremental values.
-    - Create a tile structure with the name 'quic' and the generated metrics, then render it using Prometheus format.
-    - Prepare an HTTP response body using `fd_http_server_stage_body` and verify its success.
-    - Extract the response body and its length from the HTTP server's internal buffer.
-    - Print the response body to standard output, enclosed in triple quotes.
-    - Compare the generated metrics body with a pre-defined fixture; if they differ, update the fixture file and log an error.
-    - Clean up by freeing allocated memory for the metrics and HTTP server.
-    - Call `fd_halt` to terminate the application.
-- **Output**: The function returns an integer status code, specifically 0, indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Sets the tempo tick rate to make the test deterministic using `fd_tempo_set_tick_per_ns`.
+    - Defines HTTP server parameters in `fd_http_server_params_t` with specific limits for connections and buffer sizes.
+    - Initializes HTTP server callbacks with `fd_http_server_callbacks_t`.
+    - Allocates memory for the HTTP server using `aligned_alloc` and initializes it with `fd_http_server_new` and `fd_http_server_join`.
+    - Allocates memory for metrics and initializes them with `fd_metrics_new` and `fd_metrics_join`.
+    - Writes fake metric values into the metrics memory.
+    - Creates a `fd_topo_tile_t` structure with the name 'quic' and the metrics data.
+    - Renders the metrics into the HTTP server using `fd_prometheus_render_tile`.
+    - Prepares the HTTP server response body with `fd_http_server_stage_body`.
+    - Extracts the response body and its length from the HTTP server response.
+    - Outputs the response body to the standard output using `puts` and `fwrite`.
+    - Checks if the response body matches the expected metrics fixture; if not, writes the body to a file and logs an error.
+    - Frees the allocated memory for metrics and HTTP server using `fd_metrics_delete`, `fd_metrics_leave`, `fd_http_server_delete`, and `fd_http_server_leave`.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 
