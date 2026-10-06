@@ -3,58 +3,47 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Command-line tool for managing and querying caches, flow control, and command-control variables.
+The `fd_tango_ctl_help` file provides a command-line interface for managing various caches, flow control variables, and command and control variables within the `firedancer` codebase, including commands for creation, deletion, querying, and updating these components.
 
 # Purpose
-The `fd_tango_ctl` command-line tool provides a set of commands to manage and interact with various cache and control structures within a workspace (`wksp`). The tool allows users to create, delete, query, and update different types of caches and control variables, such as fragment meta caches (`mcache`), fragment data caches (`dcache`), flow control variables (`fseq`), command and control variables (`cnc`), and tag caches (`tcache`). Each command is designed to perform specific operations, such as setting tags, creating caches with specified parameters, querying the state of caches, and sending signals to control variables. The tool outputs the global address (`gaddr`) of created structures to standard output, enabling further operations on these structures. This functionality is essential for managing memory and control flow in applications that require dynamic allocation and synchronization of resources.
+The provided content appears to be a command-line interface (CLI) usage guide for a tool named `fd_tango_ctl`. This tool is designed to manage and interact with various types of caches and control variables within a workspace, likely in a software system that handles data fragmentation and flow control. The file provides a narrow functionality, focusing on operations such as creating, deleting, querying, and updating different types of caches (meta cache, data cache, tag cache) and control variables (flow control, command and control). Each command is associated with specific parameters and outputs, such as workspace addresses (gaddr) and sequence numbers, which are crucial for managing the lifecycle and state of these components. The relevance of this file to a codebase lies in its role as a reference for developers or system administrators to effectively utilize the `fd_tango_ctl` tool for managing data flow and cache operations within the system.
 # Content Summary
-The provided content describes the usage and commands of a command-line tool named `fd_tango_ctl`. This tool is used for managing various types of caches and control variables within a workspace (`wksp`). The commands are structured to create, delete, query, and update these entities, each identified by a global address (`gaddr`).
+The provided content is a command-line interface (CLI) usage guide for a tool named `fd_tango_ctl`. This tool is designed to manage various types of caches and control variables within a workspace (`wksp`). The commands available in this tool allow users to create, delete, query, and manipulate different types of caches and control variables, each identified by a global address (`gaddr`).
 
-Key commands and their functions include:
+Key commands include:
 
-1. **help**: Displays the help message with command details.
+1. **Tag Management**: The `tag` command sets a tag for subsequent workspace allocations, with a default value of 1.
 
-2. **tag val**: Sets a tag for workspace allocations, with a default value of 1.
+2. **Meta Cache (mcache) Operations**:
+   - `new-mcache`: Creates a fragment meta cache with specified depth, application region size, and initial sequence number.
+   - `delete-mcache`: Deletes the mcache at a specified `gaddr`.
+   - `query-mcache`: Queries the mcache, with verbosity options for detailed output.
 
-3. **new-mcache**: Creates a fragment metadata cache with specified depth, application region size, and initial sequence number. Outputs the global address of the created mcache.
+3. **Data Cache (dcache) Operations**:
+   - `new-dcache`: Creates a fragment data cache optimized for specific payload sizes and concurrency.
+   - `new-dcache-raw`: Creates a data cache with specified data and application region sizes.
+   - `delete-dcache`: Deletes the dcache at a specified `gaddr`.
+   - `query-dcache`: Queries the dcache, with verbosity options for detailed output.
 
-4. **delete-mcache**: Deletes the mcache at the specified global address.
+4. **Flow Control Variable (fseq) Operations**:
+   - `new-fseq`: Creates a flow control variable initialized to a given sequence number.
+   - `delete-fseq`: Deletes the fseq at a specified `gaddr`.
+   - `query-fseq`: Queries the fseq, with verbosity options for detailed output.
+   - `update-fseq`: Updates the flow control variable to a new sequence number.
 
-5. **query-mcache**: Queries the mcache at the specified address. Outputs sequence information or detailed data based on verbosity.
+5. **Command and Control Variable (cnc) Operations**:
+   - `new-cnc`: Creates a command and control variable with specified type, initial heartbeat, and application region size.
+   - `delete-cnc`: Deletes the cnc at a specified `gaddr`.
+   - `query-cnc`: Queries the cnc, with verbosity options for detailed output.
+   - `signal-cnc`: Sends a signal to the cnc and waits for a response, with predefined responses indicating the state of the thread.
 
-6. **new-dcache**: Creates a fragment data cache optimized for payloads up to a specified maximum transmission unit (MTU) size. It supports concurrent operations and outputs the global address of the created dcache.
+6. **Tag Cache (tcache) Operations**:
+   - `new-tcache`: Creates a tag cache with specified depth and map count.
+   - `delete-tcache`: Deletes the tcache at a specified `gaddr`.
+   - `query-tcache`: Queries the tcache, though verbosity is ignored.
+   - `reset-tcache`: Resets the tcache at a specified `gaddr`.
 
-7. **new-dcache-raw**: Creates a raw fragment data cache with specified data and application region sizes.
-
-8. **delete-dcache**: Deletes the dcache at the specified global address.
-
-9. **query-dcache**: Queries the dcache at the specified address, verifying its existence or providing detailed information.
-
-10. **new-fseq**: Creates a flow control variable initialized to a given sequence number.
-
-11. **delete-fseq**: Deletes the flow control variable at the specified address.
-
-12. **query-fseq**: Queries the flow control variable, providing sequence information or detailed data.
-
-13. **update-fseq**: Updates the flow control variable to a new sequence number.
-
-14. **new-cnc**: Creates a command and control variable with a specified type and initial heartbeat. The heartbeat can be set to the current wallclock or tick counter.
-
-15. **delete-cnc**: Deletes the command and control variable at the specified address.
-
-16. **query-cnc**: Queries the command and control variable, providing signal information or detailed data.
-
-17. **signal-cnc**: Sends a signal to the command and control variable and waits for a response, which indicates the state of the thread (running, halted, or failed).
-
-18. **new-tcache**: Creates a tag cache with specified depth and map count, outputting the global address.
-
-19. **delete-tcache**: Deletes the tag cache at the specified address.
-
-20. **query-tcache**: Queries the tag cache, though verbosity is ignored.
-
-21. **reset-tcache**: Resets the tag cache at the specified address.
-
-Each command is designed to manage specific aspects of cache and control variables, providing developers with tools to efficiently handle workspace resources.
+Each command is designed to interact with the workspace's memory management and control structures, providing a robust interface for managing resources in a concurrent environment. The tool outputs the global address of created resources to standard output, facilitating further operations on these resources.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

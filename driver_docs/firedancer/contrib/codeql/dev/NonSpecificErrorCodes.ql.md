@@ -3,14 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Identifies functions with mixed return values of constants and literals, providing a development hint.
+The `NonSpecificErrorCodes.ql` file is a CodeQL query that identifies functions returning a defined constant on one path and a literal number on another, serving as a low-precision hint during development in the `firedancer` codebase.
 
 # Purpose
-This code is a static analysis rule designed to identify functions in C++ code that return a defined constant on one execution path and a literal number on another. The purpose of this rule is to serve as a development hint by flagging potential inconsistencies in return values, which might indicate a logical issue or oversight in the function's design. The rule is not highly precise and is intended to provide warnings rather than definitive errors.
-
-The code imports several modules: `cpp`, `filter`, and `rettypes`, which are likely part of a static analysis framework. It defines a query that selects functions (`Function func`) where both a literal return (`LiteralReturn ret1`) and a macro return (`MacroReturn ret2`) occur within the same function. The condition `included(func.getLocation())` ensures that only functions within the specified scope are analyzed. The query then selects these functions and outputs a warning message "Mixed return values" to indicate the potential issue.
-
-This rule is categorized with an identifier `asymmetric-research/mixed-return-values`, and it is marked with a low precision level, indicating that it may produce false positives. The severity of the issue is set to "warning," suggesting that while the issue may not be critical, it is worth reviewing during development to ensure consistency and correctness in function return values.
+This code appears to be a script or rule definition for a static analysis tool, likely used to identify potential issues in C++ codebases. It provides a narrow functionality focused on detecting functions that return a defined constant on one execution path and a literal number on another, which can be a source of inconsistency or bugs. The code is not an executable or a library but rather a configuration or rule file that specifies a particular kind of problem to be flagged during code analysis. The purpose of this rule is to serve as a development hint, warning developers about mixed return values, although it acknowledges its low precision and potential failure cases, such as when a function returns either an error constant or a size.
 # Imports and Dependencies
 
 ---
