@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_netlink_tile_private.h` file defines the `fd_netlink_tile_ctx` structure and associated constants for managing network link, route, and neighbor updates within the Firedancer project.
+Defines the `fd_netlink_tile_ctx` structure for managing network link, route, and neighbor updates.
 
 # Purpose
-This C header file defines a private structure and associated constants for managing network link contexts within a software system. The `fd_netlink_tile_ctx` structure encapsulates various components necessary for handling network link updates, including netlink monitors, request handlers, and tables for network devices, routes, and neighbors. It includes mechanisms for rate-limiting updates and tracking metrics related to network synchronization and solicitations. The file also defines a unique magic number (`FD_NETLINK_TILE_CTX_MAGIC`) to identify instances of the `fd_netlink_tile_ctx_t` structure, ensuring integrity and version control. This header is likely part of a larger system dealing with network configuration and monitoring, providing a foundational data structure for managing network state and updates efficiently.
+This C header file defines a private context structure, `fd_netlink_tile_ctx_t`, used for managing network link and route updates in a system. It includes several header files that provide necessary types and functions for network operations, such as `fd_netlink1.h`, `fd_metrics_netlnk.h`, and others related to network devices, routing, and neighbor management. The structure contains fields for managing netlink monitors, pending actions, rate limiting of updates, and tables for network devices, routes, and neighbors. It also includes a set of metrics to track synchronization and update activities. The `FD_NETLINK_TILE_CTX_MAGIC` macro is used to uniquely identify instances of this context structure, ensuring integrity and version control.
 # Imports and Dependencies
 
 ---
@@ -23,52 +23,52 @@ This C header file defines a private structure and associated constants for mana
 
 ---
 ### fd\_netlink\_tile\_ctx
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `magic`: A unique identifier for the fd_netlink_tile_ctx structure, set to FD_NETLINK_TILE_CTX_MAGIC.
-    - `nl_monitor`: An array of fd_netlink_t structures used for monitoring netlink events.
-    - `nl_req`: An array of fd_netlink_t structures used for sending netlink requests.
-    - `action`: A bitmask representing pending actions such as route, link, or neighbor updates.
-    - `update_backoff`: A rate limit for link and route table changes, measured in ticks.
-    - `route4_update_ts`: Timestamp for the last route4 update.
-    - `link_update_ts`: Timestamp for the last link update.
-    - `netdev_local`: A pointer to a local mutable link table.
-    - `netdev_sz`: The size of the netdev table.
-    - `netdev_tbl`: An array representing a join to the local mutable link table.
-    - `netdev_buf`: A pointer to a global immutable copy of the link table.
-    - `fib4_local`: A pointer to a local route table.
-    - `fib4_main`: A pointer to the main route table.
-    - `neigh4`: An array representing a neighbor table.
-    - `neigh4_ifidx`: An index for the neighbor table interface.
-    - `idle_cnt`: A counter for idle state in the neighbor table.
-    - `prober`: An array representing a neighbor table prober.
-    - `metrics`: A structure containing various metrics such as full syncs and solicits sent or failed.
-- **Description**: The `fd_netlink_tile_ctx` structure is a comprehensive data structure used for managing and monitoring network link and route updates in a system. It includes fields for handling netlink events, managing link and route tables, and probing neighbor tables. The structure also maintains metrics for tracking synchronization and solicitations, and it uses a unique magic number for identification. This structure is designed to facilitate efficient network management by providing mechanisms for rate limiting updates and maintaining both local and global copies of network tables.
+    - `magic`: Stores a unique identifier for the `fd_netlink_tile_ctx` structure.
+    - `nl_monitor`: Holds a netlink monitor instance.
+    - `nl_req`: Holds a netlink request instance.
+    - `action`: Indicates pending actions using defined bit flags.
+    - `update_backoff`: Specifies the rate limit for link and route table changes in ticks.
+    - `route4_update_ts`: Records the timestamp for the last route4 update.
+    - `link_update_ts`: Records the timestamp for the last link update.
+    - `netdev_local`: Points to a local mutable link table.
+    - `netdev_sz`: Stores the size of the netdev table.
+    - `netdev_tbl`: Joins to the local mutable link table.
+    - `netdev_buf`: Points to a global immutable copy of the link table.
+    - `fib4_local`: Points to a local route table.
+    - `fib4_main`: Points to the main route table.
+    - `neigh4`: Holds a neighbor table instance.
+    - `neigh4_ifidx`: Stores the interface index for the neighbor table.
+    - `idle_cnt`: Counts idle cycles.
+    - `prober`: Holds a neighbor table prober instance.
+    - `metrics`: Contains various synchronization and update metrics.
+- **Description**: Manages netlink communication and synchronization for network link, route, and neighbor tables, including handling pending actions, rate limiting updates, and maintaining metrics for synchronization and solicitations.
 
 
 ---
 ### fd\_netlink\_tile\_ctx\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `magic`: A unique identifier for the fd_netlink_tile_ctx_t structure, set to FD_NETLINK_TILE_CTX_MAGIC.
-    - `nl_monitor`: An array of fd_netlink_t used for monitoring netlink events.
-    - `nl_req`: An array of fd_netlink_t used for sending netlink requests.
-    - `action`: A bitmask representing pending actions such as route, link, or neighbor updates.
-    - `update_backoff`: A rate limit for link and route table changes, measured in ticks.
-    - `route4_update_ts`: Timestamp for the last route4 update.
-    - `link_update_ts`: Timestamp for the last link update.
-    - `netdev_local`: A pointer to a local mutable network device table.
-    - `netdev_sz`: The size of the network device table.
-    - `netdev_tbl`: A join to the local mutable network device table.
-    - `netdev_buf`: A pointer to a global immutable copy of the network device table.
-    - `fib4_local`: A pointer to a local FIB4 (Forwarding Information Base) table.
-    - `fib4_main`: A pointer to the main FIB4 table.
-    - `neigh4`: An array of fd_neigh4_hmap_t representing the neighbor table.
-    - `neigh4_ifidx`: The interface index for the neighbor table.
-    - `idle_cnt`: A counter for idle operations.
-    - `prober`: An array of fd_neigh4_prober_t used for probing neighbors.
-    - `metrics`: A struct containing various metrics related to link and route synchronizations and neighbor solicitations.
-- **Description**: The `fd_netlink_tile_ctx_t` structure is a comprehensive data structure used for managing and monitoring network link and route updates in a system. It includes fields for handling netlink events, managing network device and route tables, and probing neighbor tables. The structure also contains mechanisms for rate limiting updates and maintaining metrics on synchronization and solicitation activities. This structure is essential for ensuring efficient and synchronized network operations, providing both mutable and immutable views of network data, and facilitating communication with network devices and routes.
+    - `magic`: Stores a unique identifier for the `fd_netlink_tile_ctx_t` structure.
+    - `nl_monitor`: Holds a `fd_netlink_t` object for monitoring netlink events.
+    - `nl_req`: Holds a `fd_netlink_t` object for sending netlink requests.
+    - `action`: Indicates pending actions using bit flags for route, link, and neighbor updates.
+    - `update_backoff`: Specifies the rate limit for link and route table changes in ticks.
+    - `route4_update_ts`: Stores the timestamp for the last route update.
+    - `link_update_ts`: Stores the timestamp for the last link update.
+    - `netdev_local`: Points to a local mutable network device table.
+    - `netdev_sz`: Indicates the size of the network device table.
+    - `netdev_tbl`: Provides a join to the local mutable network device table.
+    - `netdev_buf`: Points to a global immutable copy of the network device table.
+    - `fib4_local`: Points to a local route table for IPv4.
+    - `fib4_main`: Points to the main route table for IPv4.
+    - `neigh4`: Holds a neighbor table for IPv4.
+    - `neigh4_ifidx`: Stores the interface index for the neighbor table.
+    - `idle_cnt`: Counts idle cycles for the neighbor table.
+    - `prober`: Holds a prober for the neighbor table.
+    - `metrics`: Contains various metrics related to link and route synchronizations and neighbor solicitations.
+- **Description**: Manages netlink communication and synchronization for network devices, routes, and neighbors, including monitoring, requests, and updates, while maintaining metrics and rate limiting.
 
 
 
