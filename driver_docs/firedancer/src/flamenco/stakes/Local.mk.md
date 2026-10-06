@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for stakes, delegations, and vote states.
+Build rules for stake, delegation, and vote state headers, objects, and unit tests.
 
 # Purpose
-The configuration file uses conditional directives to manage the inclusion of headers and object files, as well as the creation and execution of unit tests, based on the presence of the `FD_HAS_INT128` flag. If `FD_HAS_INT128` is defined, the file adds headers and object files for `fd_stakes`, `fd_stake_delegations`, and `fd_vote_states` to the build process. It also defines unit tests for `test_stake_delegations` and `test_vote_states`, specifying dependencies on various components such as `fd_flamenco`, `fd_funk`, `fd_ballet`, and `fd_util`. The file ensures that these unit tests are executed, verifying the functionality of the respective modules.
+This Makefile fragment adds build rules for stake and vote state components when `FD_HAS_INT128` is defined. It registers the header files `fd_stakes.h`, `fd_stake_delegations.h`, and `fd_vote_states.h`, and it adds the matching object targets to `fd_flamenco`. It also defines unit test targets for `test_stake_delegations` and `test_vote_states`, links them with `fd_flamenco`, `fd_funk`, `fd_ballet`, and `fd_util`, and schedules both tests to run during the build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

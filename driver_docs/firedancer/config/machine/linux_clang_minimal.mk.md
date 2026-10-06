@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for configuring a minimal Linux build with Clang, including debug, security, and optimization.
+The `linux_clang_minimal.mk` file in the `firedancer` codebase sets up a minimal build configuration for Linux using Clang, including various features such as debugging, security, and optimization, while enabling POSIX style logging for cross-platform development.
 
 # Purpose
-The Makefile sets up a build environment for a project using the Clang compiler on a Linux platform with a minimal configuration. It includes several configuration files to extend the build with additional features such as debugging, security, and optimization. The `CPPFLAGS` variable is modified to enable POSIX-style logging, which supports cross-platform development by defining specific macros (`FD_ENV_STYLE`, `FD_IO_STYLE`, `FD_LOG_STYLE`, and `_XOPEN_SOURCE`).
+This Makefile snippet is used to configure a build environment for a software project. It sets the build directory to `linux/clang/minimal` and includes several configuration files to extend the build with additional features such as Clang support, debugging, security, brutality, and optimization. Additionally, it modifies the C preprocessor flags to enable POSIX-style logging, aiding in cross-platform development.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
