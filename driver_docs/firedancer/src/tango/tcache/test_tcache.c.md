@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_tcache.c` file in the `firedancer` codebase contains unit tests for the `tcache` component, verifying its alignment, footprint, mapping, querying, removal, reset, and insertion functionalities, as well as benchmarking its performance.
+Unit tests for the `fd_tcache` component, including alignment, footprint, query, remove, reset, and benchmarking functionalities.
 
 # Purpose
-This C source code file is a unit test for a caching mechanism, specifically a tag cache (tcache) system. The code is designed to test various functionalities of the tcache, such as alignment, footprint calculation, map count defaults, and operations like query, insert, remove, and reset. The file includes a main function that initializes the environment, sets up a random number generator, and performs a series of tests to ensure the tcache behaves as expected under different conditions. The tests cover edge cases and typical usage scenarios, including the handling of duplicate tags and the performance of the cache under a simulated workload.
+The code is a C program designed to test and benchmark a tag cache (`tcache`) system. It includes a main function that initializes the environment, sets up a random number generator, and performs a series of tests to verify the functionality of the `tcache` system. The program checks alignment, footprint calculations, and default map counts, and it performs operations such as querying, inserting, removing, and resetting tags within the cache. The code also includes a benchmarking section that measures the performance of the `tcache` system by inserting a large number of tags and calculating the average time per deduplication operation.
 
-The code is structured to be executed in a hosted environment, as indicated by the `FD_HAS_HOSTED` preprocessor directive. It uses a series of assertions and logging statements to verify the correctness of the tcache operations and to provide feedback on the test results. The file is not intended to be a standalone application but rather a test suite that validates the functionality of the tcache implementation. It includes detailed logging for each step of the testing process, making it easier to identify any issues or failures. The code also includes a benchmarking section to measure the performance of the tcache under a high volume of operations, providing insights into its efficiency and scalability.
+The program uses several command-line arguments to configure the test environment, such as page size, page count, NUMA index, cache depth, and map count. It also logs various stages of the testing process, including the creation of the workspace and `tcache`, the results of the tests, and the benchmarking results. The code is structured to run only if the `FD_HAS_HOSTED` macro is defined, indicating that it requires certain hosted capabilities to execute. If these capabilities are not available, the program logs a warning and exits.
 # Imports and Dependencies
 
 ---
@@ -19,16 +19,18 @@ The code is structured to be executed in a hosted environment, as indicated by t
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment and logs a warning if the `FD_HAS_HOSTED` capability is not available, then halts the program.
+[View Source →](<../../../../../src/tango/tcache/test_tcache.c#L253>)
+
+Initializes the environment and logs a warning if `FD_HAS_HOSTED` is not defined, then halts execution.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Call `fd_boot` to initialize the environment with `argc` and `argv`.
     - Log a warning message indicating that the unit test requires `FD_HAS_HOSTED` capabilities.
-    - Call `fd_halt` to terminate the program.
+    - Call `fd_halt` to halt the execution.
     - Return 0 to indicate successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 

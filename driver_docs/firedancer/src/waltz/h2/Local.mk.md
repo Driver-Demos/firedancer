@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the build configuration for HPACK and HTTP/2 components, including headers, object files, and tests, with conditional fuzz testing and unit testing based on the `FD_HAS_HOSTED` flag.
+Makefile for building and testing HPACK and HTTP/2 components in the Firedancer codebase.
 
 # Purpose
-The provided content is a Makefile, which is used to automate the build process of a software project. This particular Makefile is focused on managing the compilation and testing of components related to HPACK and HTTP/2 protocols. It uses macros to add header files and object files to the build process, ensuring that the necessary components are compiled and linked correctly. The file also includes conditional directives to create and run fuzz tests and unit tests, which are executed if the `FD_HAS_HOSTED` variable is defined, indicating a hosted environment. This setup helps streamline the development and testing of protocol implementations within the project.
+The Makefile content defines build instructions for components related to HPACK and HTTP/2 protocols. It uses macros to add header files and object files to the build process, such as `fd_hpack.h` and `fd_h2_base.h`, associating them with the `fd_waltz` module. The file includes conditional logic to create fuzz tests for HPACK and HTTP/2 components if the `FD_HAS_HOSTED` variable is defined. Additionally, it specifies unit tests for HTTP/2, such as `test_h2`, and includes instructions to run these tests. The use of macros like `add-hdrs`, `add-objs`, `make-unit-test`, and `run-unit-test` helps organize and automate the build and testing processes for these protocol components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
