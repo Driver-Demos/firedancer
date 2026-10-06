@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_siphash13.c` file in the `firedancer` codebase contains a test suite for the SipHash-1-3 algorithm, including validation against predefined test vectors and benchmarking of its performance.
+Tests and benchmarks the fd_siphash13 hashing function for performance and correctness.
 
 # Purpose
-This C source code file is designed to test and benchmark the performance of the SipHash-1-3 algorithm, a cryptographic hash function. The file includes a main function, indicating that it is an executable program. It initializes the SipHash-1-3 algorithm with predefined keys and tests it against a set of known test vectors to verify its correctness. The test vectors are stored in a static array, `fd_siphash13_test_vector`, and are used to ensure that the hash function produces expected results for different input sizes. The code also benchmarks the performance of the hash function in various modes, including incremental and streamlined processing, by measuring the throughput in gigabits per second (Gbps) using different message sizes and logging the results.
+The code is a C program designed to test and benchmark the `fd_siphash13` hashing function. It includes a main function that initializes the hashing context with specific keys and then performs a series of tests to verify the correctness of the `fd_siphash13` implementation against predefined test vectors. The test vectors are stored in the `fd_siphash13_test_vector` array, and the program checks that the computed hash values match these expected results using the `FD_TEST` macro.
 
-The file includes several key components: initialization of the SipHash-1-3 context, hashing of messages, and performance benchmarking. It uses functions such as `fd_siphash13_init`, `fd_siphash13_append`, `fd_siphash13_fini`, and `fd_siphash13_hash` to perform these operations. The benchmarking sections involve warming up the hash function and then measuring the time taken to process a large number of iterations, calculating the throughput based on the elapsed time. The code also logs various notices to provide feedback on the benchmarking process. Overall, this file serves as a comprehensive test and performance evaluation tool for the SipHash-1-3 algorithm, ensuring both its correctness and efficiency.
+Additionally, the program benchmarks the performance of the `fd_siphash13` function in different modes: incremental, incremental with a fast append, and streamlined. It measures the throughput in gigabits per second (Gbps) for each mode by timing the hashing of a fixed-size message over a large number of iterations. The results are logged using the `FD_LOG_NOTICE` macro. The program uses functions such as `fd_siphash13_init`, `fd_siphash13_append`, `fd_siphash13_append_fast`, and `fd_siphash13_fini` to manage the hashing process, and it concludes by calling `fd_halt` to clean up before exiting.
 # Imports and Dependencies
 
 ---
@@ -20,42 +20,38 @@ The file includes several key components: initialization of the SipHash-1-3 cont
 
 ---
 ### fd\_siphash13\_test\_vector
-- **Type**: `ulong array`
-- **Description**: The `fd_siphash13_test_vector` is a static array of unsigned long integers, containing 64 precomputed hash values. These values are used as reference outputs for testing the correctness of the SipHash-1-3 hash function implementation.
-- **Use**: This variable is used to verify that the computed hash values match the expected results during the testing of the SipHash-1-3 function.
+- **Type**: ``ulong[]``
+- **Description**: An array of unsigned long integers that contains 64 predefined test vectors for the SipHash-1-3 algorithm. Each element in the array is a 64-bit hash value.
+- **Use**: Used to verify the correctness of the SipHash-1-3 implementation by comparing computed hash values against these known test vectors.
 
 
 # Functions
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes and tests the SipHash-13 hashing algorithm, then benchmarks its performance in various modes.
+[View Source →](<../../../../../src/ballet/siphash13/test_siphash13.c#L74>)
+
+Initializes, tests, and benchmarks the `fd_siphash13` hashing algorithm.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program with `fd_boot` using command-line arguments.
-    - Define two 64-bit unsigned integers `k0` and `k1` as keys for the SipHash-13 algorithm.
-    - Initialize a SipHash-13 state with `fd_siphash13_init`.
-    - Iterate over a buffer of 64 bytes, hashing each prefix of the buffer and comparing the result to a predefined test vector.
-    - For each iteration, append the current index to the buffer and update the SipHash state.
+    - `argc`: The number of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Call `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Initialize two 64-bit keys `k0` and `k1` for the hashing algorithm.
+    - Initialize a `fd_siphash13_t` structure with `fd_siphash13_init` using the keys `k0` and `k1`.
+    - Iterate over a buffer of size 64, compute the hash for each size from 0 to 63, and verify it against a predefined test vector.
+    - Append each byte to the hash state using [`fd_siphash13_append`](<fd_siphash13.c.md#fd_siphash13_append>).
     - Log the start of benchmarking for incremental hashing.
-    - Reinitialize the SipHash state and perform a warmup by repeatedly appending and finalizing a 32-byte message.
-    - Measure and log the throughput of the incremental hashing over 10 million iterations.
-    - Log the start of benchmarking for fast incremental hashing.
-    - Reinitialize the SipHash state and perform a warmup using the fast append method.
-    - Measure and log the throughput of the fast incremental hashing over 10 million iterations.
-    - Log the start of benchmarking for streamlined hashing.
-    - Perform a warmup by hashing a 32-byte message and incrementing the first byte in each iteration.
-    - Measure and log the throughput of the streamlined hashing over 100,000 iterations.
-    - Log a 'pass' message indicating successful completion of tests and benchmarks.
-    - Call `fd_halt` to cleanly terminate the program.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_siphash13_hash`](fd_siphash13.c.md#fd_siphash13_hash)
-    - [`fd_siphash13_fini`](fd_siphash13.c.md#fd_siphash13_fini)
-    - [`fd_siphash13_append`](fd_siphash13.c.md#fd_siphash13_append)
-    - [`fd_siphash13_append_fast`](fd_siphash13.c.md#fd_siphash13_append_fast)
+    - Benchmark the incremental hashing by repeatedly appending and finalizing a 32-byte message, logging the throughput.
+    - Repeat the benchmarking process using [`fd_siphash13_append_fast`](<fd_siphash13.c.md#fd_siphash13_append_fast>) for faster appending.
+    - Benchmark the streamlined hashing by directly hashing a 32-byte message and logging the throughput.
+    - Log a 'pass' message and call `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_siphash13_hash`](<fd_siphash13.c.md#fd_siphash13_hash>)
+    - [`fd_siphash13_fini`](<fd_siphash13.c.md#fd_siphash13_fini>)
+    - [`fd_siphash13_append`](<fd_siphash13.c.md#fd_siphash13_append>)
+    - [`fd_siphash13_append_fast`](<fd_siphash13.c.md#fd_siphash13_append_fast>)
 
 
 

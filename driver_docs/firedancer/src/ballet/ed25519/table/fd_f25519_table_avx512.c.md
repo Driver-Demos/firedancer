@@ -3,96 +3,96 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_f25519_table_avx512.c` file contains auto-generated constant definitions for various mathematical values used in the Ed25519 elliptic curve operations, specifically optimized for AVX-512.
+Auto-generated constants for finite field arithmetic in the Ed25519 curve using AVX-512.
 
 # Purpose
-This C source code file is an auto-generated component that defines a set of constant values used in cryptographic computations involving the finite field \( \mathbb{F}_{25519} \). The file is not intended to be modified manually, as indicated by the comment at the top, and it is designed to be included indirectly through another header file, `fd_f25519.h`. The constants defined in this file, such as `fd_f25519_zero`, `fd_f25519_one`, `fd_f25519_minus_one`, and others, represent specific elements in the field \( \mathbb{F}_{25519} \), which is commonly used in elliptic curve cryptography, particularly in the Curve25519 and Ed25519 algorithms.
+The code defines a set of constant values used in cryptographic computations involving the finite field `fd_f25519_t`, which is based on the prime number 2^255 - 19. These constants are used in elliptic curve cryptography, specifically for operations on the Curve25519 curve. The constants include `fd_f25519_zero`, `fd_f25519_one`, `fd_f25519_minus_one`, `fd_f25519_two`, and several others that represent specific mathematical values or results of operations within the field, such as `fd_f25519_k`, `fd_f25519_d`, and `fd_f25519_sqrtm1`.
 
-The file provides narrow functionality focused on defining these constants, which are likely used in arithmetic operations and cryptographic protocols that require precise and efficient manipulation of field elements. Each constant is represented as an array of a custom type `fd_f25519_t`, which is presumably defined elsewhere in the codebase to handle the specific representation and operations of field elements. The constants include basic values like zero and one, as well as more complex values such as `fd_f25519_d` and `fd_f25519_sqrtm1`, which are often used in elliptic curve calculations. This file does not define public APIs or external interfaces directly but serves as a foundational component for higher-level cryptographic operations.
+The file is auto-generated and should not be modified manually. It is intended to be included indirectly through another header file, as indicated by the preprocessor directive that checks for the inclusion of `fd_f25519.h`. The constants are defined as static, meaning they are limited to the file scope and are not intended to be accessed directly from other files. This file is part of a larger cryptographic library and provides essential constants for performing secure mathematical operations on the Curve25519 elliptic curve.
 # Global Variables
 
 ---
 ### fd\_f25519\_zero
-- **Type**: `fd_f25519_t`
-- **Description**: The `fd_f25519_zero` is a global constant array of type `fd_f25519_t` initialized with a single element representing the zero value in the finite field F_25519. This structure is used in cryptographic operations involving the Curve25519 elliptic curve.
-- **Use**: This variable is used as a constant reference to the zero value in computations involving the F_25519 field.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant array of type `fd_f25519_t` initialized with a single element, which is a structure containing eight zero values. This structure is used to represent the zero element in the finite field arithmetic of Curve25519.
+- **Use**: Used as a constant to represent the zero value in operations involving the `fd_f25519_t` type.
 
 
 ---
 ### fd\_f25519\_one
-- **Type**: `fd_f25519_t`
-- **Description**: The `fd_f25519_one` is a static constant array of type `fd_f25519_t` with a single element, representing the value one in the finite field defined by the Curve25519 elliptic curve. It is initialized with a specific set of hexadecimal values that correspond to the number one in this field's representation.
-- **Use**: This variable is used as a constant to represent the number one in operations involving the Curve25519 elliptic curve.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant value of one in the `fd_f25519_t` data type, which is used for operations in the finite field of size 2^255-19. The value is stored as an array of 64-bit integers, with the first element set to 1 and the rest set to 0.
+- **Use**: Used as a constant for arithmetic operations in the finite field of size 2^255-19.
 
 
 ---
 ### fd\_f25519\_minus\_one
-- **Type**: `fd_f25519_t`
-- **Description**: The `fd_f25519_minus_one` is a static constant array of type `fd_f25519_t` that represents the value -1 in the finite field defined by the prime 2^255 - 19. It is initialized with a specific set of hexadecimal values that correspond to this representation in the field.
-- **Use**: This variable is used in cryptographic operations involving the finite field, particularly in the context of elliptic curve computations.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents the constant value of -1 in the finite field defined by the Curve25519 elliptic curve. It is stored as an array of 64-bit integers, with each element representing a portion of the 256-bit number.
+- **Use**: Used in cryptographic operations involving the Curve25519 elliptic curve to represent the value -1.
 
 
 ---
 ### fd\_f25519\_two
-- **Type**: `fd_f25519_t`
-- **Description**: The `fd_f25519_two` is a global constant array of type `fd_f25519_t` that represents the value 2 in the finite field defined by the Curve25519 elliptic curve. It is initialized with a single element containing a multi-limb representation of the number 2, where the first limb is set to 2 and the rest are zero.
-- **Use**: This variable is used in cryptographic computations involving the Curve25519 elliptic curve, specifically when operations require the constant value 2.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents the constant value of two in the finite field defined by the Curve25519 elliptic curve. It is stored as an array of 64-bit integers, with the first element set to 2 and the rest set to 0.
+- **Use**: Used in cryptographic operations involving the Curve25519 elliptic curve where the value of two is needed.
 
 
 ---
 ### fd\_f25519\_k
-- **Type**: `fd_f25519_t[1]`
-- **Description**: The variable `fd_f25519_k` is a static constant array of type `fd_f25519_t` with a single element. It represents a specific 255-bit value used in cryptographic operations, likely related to the Curve25519 elliptic curve.
-- **Use**: This variable is used as a constant in cryptographic computations involving the Curve25519 elliptic curve.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant array of type `fd_f25519_t` with a single element initialized to a specific set of hexadecimal values. These values are likely used in cryptographic computations related to the Curve25519 elliptic curve.
+- **Use**: Used as a constant in cryptographic operations involving the Curve25519 elliptic curve.
 
 
 ---
 ### fd\_f25519\_minus\_k
-- **Type**: `fd_f25519_t`
-- **Description**: The `fd_f25519_minus_k` is a static constant array of type `fd_f25519_t` with a single element, representing a specific 255-bit integer value in the context of the Curve25519 elliptic curve operations. The value is stored in a series of 64-bit unsigned integers, which are part of the internal representation of the field element.
-- **Use**: This variable is used as a constant in cryptographic computations involving the Curve25519 elliptic curve, specifically representing the negative of a predefined constant 'k'.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant array of type `fd_f25519_t` with a single element initialized to a specific 256-bit value. This value is the negation of the constant `fd_f25519_k`, used in finite field arithmetic operations related to the Curve25519 elliptic curve.
+- **Use**: Used in cryptographic computations involving the Curve25519 elliptic curve, specifically as the negated value of `fd_f25519_k`.
 
 
 ---
 ### fd\_f25519\_d
-- **Type**: `fd_f25519_t`
-- **Description**: The variable `fd_f25519_d` is a static constant array of type `fd_f25519_t` with a single element. It represents a specific constant value used in the context of finite field arithmetic over the 25519 prime field, commonly used in cryptographic applications such as elliptic curve cryptography.
-- **Use**: This variable is used as a constant in cryptographic computations involving the 25519 curve.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant array of type `fd_f25519_t` with a single element initialized to a specific set of hexadecimal values. These values are part of a precomputed table used in cryptographic operations related to the Curve25519 elliptic curve.
+- **Use**: Used as a constant in cryptographic computations involving the Curve25519 elliptic curve.
 
 
 ---
 ### fd\_f25519\_sqrtm1
-- **Type**: `fd_f25519_t`
-- **Description**: The variable `fd_f25519_sqrtm1` is a static constant array of type `fd_f25519_t` with a single element. It represents the square root of -1 in the finite field defined by the Curve25519 elliptic curve, which is used in cryptographic applications.
-- **Use**: This variable is used in cryptographic computations involving the Curve25519 elliptic curve, particularly when operations require the square root of -1.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents the constant value of the square root of -1 in the finite field defined by the Curve25519 elliptic curve. This value is used in cryptographic computations involving the Curve25519 curve.
+- **Use**: Used in cryptographic operations that require the square root of -1 in the context of the Curve25519 elliptic curve.
 
 
 ---
 ### fd\_f25519\_invsqrt\_a\_minus\_d
-- **Type**: `fd_f25519_t`
-- **Description**: The `fd_f25519_invsqrt_a_minus_d` is a static constant array of type `fd_f25519_t` containing a single element. It represents a precomputed value used in cryptographic operations related to the Curve25519 elliptic curve, specifically the inverse square root of a constant derived from the curve parameters.
-- **Use**: This variable is used in cryptographic computations to optimize operations involving the inverse square root of a specific constant on the Curve25519 elliptic curve.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant array of type `fd_f25519_t` with a single element. This element is initialized with a specific set of hexadecimal values that represent the inverse square root of the difference between constants 'a' and 'd' in the context of the Curve25519 elliptic curve.
+- **Use**: Used in cryptographic computations involving the Curve25519 elliptic curve.
 
 
 ---
 ### fd\_f25519\_one\_minus\_d\_sq
-- **Type**: `fd_f25519_t`
-- **Description**: The variable `fd_f25519_one_minus_d_sq` is a constant array of type `fd_f25519_t` that holds a single element representing a specific constant value in the finite field arithmetic used in Curve25519 operations. The value is expressed as a series of hexadecimal numbers, which are likely part of a precomputed table for efficient elliptic curve computations.
-- **Use**: This variable is used in cryptographic computations involving the Curve25519 elliptic curve, specifically as a precomputed constant to optimize performance.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant value in the `fd_f25519_t` type, which is an array of 64-bit integers. This specific constant is the value of one minus the square of the constant `d` in the finite field arithmetic used in Curve25519 operations.
+- **Use**: Used in cryptographic computations involving Curve25519 to represent the constant one minus `d` squared.
 
 
 ---
 ### fd\_f25519\_d\_minus\_one\_sq
-- **Type**: `fd_f25519_t`
-- **Description**: The variable `fd_f25519_d_minus_one_sq` is a constant array of type `fd_f25519_t` containing a single element. It represents a specific precomputed value used in cryptographic operations related to the Curve25519 elliptic curve, specifically the square of (d - 1), where d is a constant in the curve's equation.
-- **Use**: This variable is used in cryptographic computations involving the Curve25519 elliptic curve to optimize performance by avoiding recalculations of the square of (d - 1).
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents the square of the difference between the constant `d` and one in the finite field defined by the Curve25519 elliptic curve. The variable is a constant array of type `fd_f25519_t` with a single element, initialized with specific hexadecimal values.
+- **Use**: Used in cryptographic computations involving the Curve25519 elliptic curve.
 
 
 ---
 ### fd\_f25519\_sqrt\_ad\_minus\_one
-- **Type**: `fd_f25519_t`
-- **Description**: The variable `fd_f25519_sqrt_ad_minus_one` is a static constant array of type `fd_f25519_t` with a single element. It represents a precomputed constant value used in cryptographic operations related to the Curve25519 elliptic curve, specifically the square root of (a*d - 1) where 'a' and 'd' are constants in the curve equation.
-- **Use**: This variable is used in cryptographic computations involving the Curve25519 elliptic curve to optimize performance by providing a precomputed constant.
+- **Type**: ``fd_f25519_t``
+- **Description**: Represents a constant value in the finite field `fd_f25519_t`, specifically the square root of the expression `ad - 1`. This value is used in cryptographic computations involving the Curve25519 elliptic curve.
+- **Use**: Used as a precomputed constant in cryptographic operations to optimize calculations involving the Curve25519 elliptic curve.
 
 
 

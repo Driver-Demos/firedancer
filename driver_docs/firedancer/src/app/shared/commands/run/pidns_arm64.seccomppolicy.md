@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `pidns_arm64.seccomppolicy` file defines a seccomp policy for the child process in a PID namespace on arm64 architecture, ensuring proper logging and process termination behavior for the Firedancer application.
+Seccomp policy for managing logging and process supervision in a PID namespace on arm64.
 
 # Purpose
-The provided content is a configuration file that outlines a security policy for managing process behavior in a software system called Firedancer, specifically focusing on the child process that launches tiles within a PID namespace. This policy is crucial for ensuring that if the init process (PID 0) within the namespace is terminated, all associated Firedancer tiles are also terminated by the kernel, maintaining system integrity. The file specifies logging behavior, where log messages are directed to a file and/or STDERR, with critical messages ('WARNING' and above) being immediately synchronized to disk. It also details process supervision, using the `wait4` syscall to monitor and retrieve exit statuses of child processes, ensuring that the parent process exits appropriately when a child process terminates, thereby managing the lifecycle of the process group effectively.
+The configuration file defines security and logging policies for a child process in a PID namespace within the Firedancer system. It specifies that the child process, which is the init process of the PID namespace, will terminate all Firedancer tiles if it is killed. The file includes logging configurations, where log messages are written to a file and/or STDERR, with 'WARNING' and above messages being immediately synchronized to disk. The file also outlines the use of the `wait4` syscall to obtain the exit status of exited processes, ensuring that diagnostic information is printed before terminating the process group. Additionally, the `exit_group` syscall is used to ensure that when a child process exits, the parent process also exits, terminating all associated tiles.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
