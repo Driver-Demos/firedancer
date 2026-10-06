@@ -3,33 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Guide for monitoring the Frankendancer validator using Agave CLI, Prometheus metrics, and live tools.
+The `monitoring.md` file in the `firedancer` codebase provides a guide on monitoring the Agave validator using command line tools, Prometheus-compatible metrics, and live monitoring tools included with Firedancer.
 
 # Purpose
-This documentation provides instructions for monitoring the Frankendancer validator using various command-line tools and metrics. It explains how to use the Agave CLI to monitor the validator's status, including checking if it has joined gossip, is caught up, is voting, and is producing blocks. The document also describes how to access Prometheus-compatible metrics exposed by Firedancer at a configurable HTTP endpoint, typically on port `7999`. Additionally, it details the use of the `fdctl` tool for live monitoring of performance information on the same host as the validator. The document includes references to further configuration and API documentation for more detailed information.
+This document is a configuration and monitoring guide for a software system involving the Agave CLI and Firedancer, which are used in conjunction with the Solana blockchain validator. It provides detailed instructions on how to build and use command-line tools to monitor the performance and status of a Solana validator, including checking gossip participation, catch-up status, voting activity, and block production. The document also describes how to access Prometheus-compatible metrics exposed by Firedancer, which can be configured via a TOML file, and how to use the `fdctl` tool for live monitoring of system performance. The content is highly focused on monitoring and performance evaluation, providing both command-line and GUI options for users to track the operational status of their validator nodes. This file is crucial for developers and operators within the codebase to ensure the health and efficiency of their blockchain infrastructure.
 # Content Summary
-The provided content is a configuration and monitoring guide for a software system involving the Agave CLI and Firedancer. It outlines the steps and commands necessary for monitoring a validator using the Agave command line tools and Firedancer's monitoring capabilities.
+This document provides detailed instructions and information on monitoring the Frankendancer validator using various command-line tools and metrics. It is structured into sections that cover the use of the Agave CLI, metrics exposure, and live monitoring tools.
 
 ### Agave CLI Monitoring
-- **Building the CLI**: The `solana` CLI binary must be built using the command `make solana`. The compiled binary is placed in `./build/native/gcc/bin` by default.
-- **RPC Requirement**: Many commands require RPC to be enabled on the validator. Users should refer to the configuration guide for enabling RPC.
-- **Monitoring Commands**:
-  - **Gossip**: Use `solana -ut gossip` to check if the validator has joined the gossip network.
-  - **Catchup**: Use `solana -ut catchup --our-localhost` to verify if the validator is synchronized with the network.
-  - **Validators**: Use `solana -ut validators` to ensure the validator is actively voting.
-  - **Block Production**: Use `solana -ut block-production` to confirm the validator is producing blocks.
-- **Agave Validator**: The `agave-validator --ledger <PATH> monitor` command can be used with Frankendancer, requiring the `agave-validator` binary from the `agave` repository.
+The document begins by explaining how to monitor the Frankendancer validator using the Agave command-line interface (CLI). It instructs users to first build the `solana` CLI binary using the `make solana` command, which places the compiled binary in the `./build/native/gcc/bin` directory. The document highlights several key commands for monitoring the validator:
+
+- **gossip:** This command checks if the validator has joined the gossip network, providing details such as IP address, identity, gossip port, TPU port, RPC address, version, and feature set.
+- **catchup:** This command verifies if the validator is synchronized with the network by showing how many slots it is behind.
+- **validators:** This command ensures the validator is actively voting, displaying information about the identity, vote account, commission, last vote, root slot, skip rate, credits, version, and active stake.
+- **block-production:** This command checks if the validator is producing blocks, showing the number of leader slots, blocks produced, skipped slots, and skip rate.
+
+The document notes that many commands require RPC to be enabled on the validator and refers users to a configuration guide for more information.
 
 ### Metrics
-- **Prometheus Metrics**: Firedancer exposes metrics compatible with Prometheus at an HTTP endpoint, defaulting to port `7999`. This port can be configured in a TOML file.
-- **Metrics Access**: Metrics can be accessed using a command like `curl http://localhost:7999/metrics`. The metrics API documentation provides further details on available data.
+The document describes how Firedancer exposes a set of Prometheus-compatible metrics at an HTTP endpoint, defaulting to port `7999`, which can be configured in a TOML file. It provides an example of retrieving metrics using a `curl` command and mentions that more information is available in the metrics API documentation.
 
 ### Live Monitoring
-- **Firedancer Monitoring Tool**: Firedancer includes a monitoring tool within `fdctl`, which can be run on the same host as the validator to view performance metrics.
-- **Command Usage**: The command `fdctl monitor --config ~/config.toml` provides a snapshot of various performance metrics, such as process IDs and resource usage percentages.
-- **GUI Access**: Users can view the Firedancer GUI in a browser by enabling it through the configuration section.
+Firedancer includes a monitoring tool, `fdctl`, which can be run on the same host as the validator to view performance information. The document provides an example command to run `fdctl` with a configuration file and explains the output, which includes various performance metrics for different tiles (e.g., net, quic, verify). Additionally, it mentions the availability of a Firedancer GUI for browser-based monitoring, with instructions to enable it in the configuration section.
 
-This guide provides essential commands and configurations for developers to monitor and manage the validator effectively using the Agave CLI and Firedancer tools.
+Overall, this document serves as a comprehensive guide for developers to monitor and assess the performance and status of the Frankendancer validator using command-line tools and metrics.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

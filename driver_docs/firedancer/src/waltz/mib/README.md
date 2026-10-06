@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Double buffer and network device management implementations with related APIs, makefile, and tests.
+Double-buffer and netlink-based network device table APIs, plus a test program and build file.
 
 
 ## Files
-- **[fd_dbl_buf.c](fd_dbl_buf.c.md)**: Functions for managing a double buffer, including creation, joining, leaving, deletion, insertion, and reading.
-- **[fd_dbl_buf.h](fd_dbl_buf.h.md)**: Concurrent lock-free double buffer implementation for single producer and multiple consumer threads.
-- **[fd_netdev_netlink.c](fd_netdev_netlink.c.md)**: Implements functions to initialize and load network device tables using Linux netlink.
-- **[fd_netdev_netlink.h](fd_netdev_netlink.h.md)**: APIs for importing network interfaces from Linux netlink.
-- **[fd_netdev_tbl.c](fd_netdev_tbl.c.md)**: Manages network device tables, including creation, joining, resetting, and status reporting.
-- **[fd_netdev_tbl.h](fd_netdev_tbl.h.md)**: Defines a network interface table API with structures and functions for managing network devices and bonds.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for network device components in the Waltz module.
-- **[test_netdev_netlink.c](test_netdev_netlink.c.md)**: Tests the functionality of network device management using netlink in the Firedancer codebase.
+- **[fd_dbl_buf.c](fd_dbl_buf.c.md)**: Double-buffer shared-memory setup, insert, and read functions with alignment and magic checks.
+- **[fd_dbl_buf.h](fd_dbl_buf.h.md)**: Concurrent lock-free double buffer for one producer and many consumers.
+- **[fd_netdev_netlink.c](fd_netdev_netlink.c.md)**: Loads netlink link data into the device table and bond slave mapping.
+- **[fd_netdev_netlink.h](fd_netdev_netlink.h.md)**: The `fd_netdev_netlink.h` file provides APIs for importing network interfaces from Linux netlink in the `firedancer` codebase.
+- **[fd_netdev_tbl.c](fd_netdev_tbl.c.md)**: The `fd_netdev_tbl.c` file in the `firedancer` codebase implements functions for managing a network device table, including creating, joining, resetting, and deleting network device tables, as well as printing their status.
+- **[fd_netdev_tbl.h](fd_netdev_tbl.h.md)**: Network interface table types, status constants, and memory management APIs.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers and object files for `fd_dbl_buf` and `fd_netdev_tbl`, and conditionally includes `fd_netdev_netlink` and its unit test if `FD_HAS_LINUX` is defined.
+- **[test_netdev_netlink.c](test_netdev_netlink.c.md)**: The `test_netdev_netlink.c` file in the `firedancer` codebase is a test program that initializes and manages network device tables using netlink, including creating a workspace, loading interfaces, and dumping the interface table.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
