@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rule that adds fd_shredcap_tile objects when FD_HAS_INT128 is defined.
+Makefile logic to add objects for `fd_shredcap_tile` and `fd_discof` if `FD_HAS_INT128` is defined.
 
 # Purpose
-This makefile fragment adds `fd_shredcap_tile` to the object list for `fd_discof` only when `FD_HAS_INT128` is defined. It uses `ifdef` and `$(call add-objs,...)` to include the object file conditionally at build time.
+The `Makefile` snippet conditionally adds object files to the build process. If the macro `FD_HAS_INT128` is defined, it invokes the `add-objs` function to include the object files `fd_shredcap_tile` and `fd_discof` in the build. This conditional inclusion allows for flexibility in the build process based on the presence of the `FD_HAS_INT128` feature.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

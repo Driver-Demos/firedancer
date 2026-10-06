@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Shared-memory cache API, layout helpers, and unit tests for fragment metadata and app data.
+Functions, headers, and tests for managing and verifying memory cache alignment and operations.
 
 
 ## Files
-- **[fd_mcache.c](fd_mcache.c.md)**: Shared-memory cache creation, join, leave, delete, and access helpers for fragment metadata and app data.
-- **[fd_mcache.h](fd_mcache.h.md)**: Metadata cache API, sequence helpers, and wait/publish macros for fragment publication.
-- **[fd_mcache_private.h](fd_mcache_private.h.md)**: The `fd_mcache_private.h` file defines the structure and functions for managing the layout of a shared memory region used in the Firedancer mcache system, including constants and inline functions for accessing cache metadata.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_mcache` component within the `tango/mcache` directory.
-- **[test_mcache.c](test_mcache.c.md)**: Unit tests for mcache layout, accessors, publish/query, and error cases.
+- **[fd_mcache.c](fd_mcache.c.md)**: Functions for managing memory cache alignment, footprint calculation, creation, joining, leaving, and deletion.
+- **[fd_mcache.h](fd_mcache.h.md)**: Header file for managing a memory cache (mcache) with functions for construction, access, and synchronization.
+- **[fd_mcache_private.h](fd_mcache_private.h.md)**: Defines the structure and functions for managing the layout of a shared memory region in a memory cache.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_mcache` in the `firedancer` codebase.
+- **[test_mcache.c](test_mcache.c.md)**: Unit tests for verifying the alignment, footprint, and functionality of the mcache component.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

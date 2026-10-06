@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_minimal.mk` file in the `firedancer` codebase sets up a minimal build configuration for Linux using GCC, including various features such as debugging, security, and optimization, while enabling POSIX style logging for cross-platform development.
+Makefile for configuring a minimal Linux build with GCC, including debugging, security, and optimization.
 
 # Purpose
-This Makefile snippet sets up a build environment for a software project targeting a minimal configuration using GCC on Linux. It includes various configuration files to extend the build with additional features such as debugging, security, and optimization. Additionally, it modifies the preprocessor flags to enable POSIX-style logging, aiding in cross-platform development.
+The Makefile sets the build directory to `linux/gcc/minimal` and includes several configuration files to extend the build process with additional features such as GCC support, debugging, security, brutality, and optimization. It also modifies the `CPPFLAGS` to enable POSIX style logging by defining several macros (`FD_ENV_STYLE`, `FD_IO_STYLE`, `FD_LOG_STYLE`, and `_XOPEN_SOURCE`) to facilitate cross-platform development.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

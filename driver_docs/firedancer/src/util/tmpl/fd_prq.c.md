@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_prq.c` file in the `firedancer` codebase provides a template for creating ultra high performance priority queues with bounded run-time size, offering static inline APIs for operations such as insertion, removal, and memory management.
+Header-only template for ultra high performance priority queues with customizable event types and timeouts.
 
 # Purpose
-This C source code file is a template for creating ultra-high-performance priority queues with bounded runtime size. The code is designed to be included in other C files, allowing developers to define custom priority queues by specifying the data type and name of the queue. The template provides a set of static inline functions that implement the priority queue operations, such as inserting events, removing the minimum event, and managing the queue's memory. The priority queue is implemented as a binary heap, which ensures efficient operations with logarithmic time complexity for insertion and removal.
+The code defines a template for creating ultra-high-performance priority queues with bounded runtime size in C. It is designed to be included in other C files to generate specific priority queue implementations based on user-defined types and configurations. The code provides a set of static inline functions that operate on these priority queues, allowing for operations such as insertion, removal, and querying of events. The priority queues are implemented as binary heaps, which are efficient for maintaining a dynamically changing set of elements with a priority.
 
-The code is highly customizable, allowing users to define the data type of the queue elements, the field used for timeouts, and the comparison function for ordering elements. It also includes options for low-level optimizations, such as using vector registers for performance improvements. The template does not perform input argument checking to maintain high performance, placing the responsibility on the user to ensure correct usage. This file is intended for use in performance-critical applications where the overhead of additional checks would be detrimental. The template's flexibility and efficiency make it suitable for a wide range of applications requiring priority queue functionality.
+The template allows customization through macros such as `PRQ_NAME` and `PRQ_T`, which define the name and type of the priority queue elements, respectively. The code supports both explicit and implicit timeout fields for prioritizing elements, and it provides mechanisms for low-level optimizations, such as using vector registers for operations. The implementation is designed to be used in performance-critical contexts, and it does not perform input argument checking, requiring careful use by the programmer. The code is structured to be included multiple times in a compilation unit to create different types of priority queues, and it is suitable for use in header files due to its static inline nature.
 # Imports and Dependencies
 
 ---
@@ -21,16 +21,18 @@ The code is highly customizable, allowing users to define the data type of the q
 
 ---
 ### PRQ\_<!-- {{#callable:PRQ_}} -->
-The `PRQ_(remove_all)` function removes all events from a priority queue heap by resetting the event count to zero.
+[View Source →](<../../../../../src/util/tmpl/fd_prq.c#L448>)
+
+Removes all events from the priority queue heap by setting the event count to zero.
 - **Inputs**:
-    - `heap`: A pointer to the priority queue heap from which all events are to be removed.
-- **Control Flow**:
-    - Retrieve the private structure associated with the heap using `PRQ_(private_from_heap)` function.
-    - Set the `cnt` field of the private structure to 0, effectively removing all events from the heap.
+    - `heap`: A pointer to the priority queue heap from which all events will be removed.
+- **Logic and Control Flow**:
+    - Retrieve the private structure associated with the heap using `PRQ_(private_from_heap)`.
+    - Set the `cnt` field of the private structure to zero, effectively removing all events from the heap.
     - Return the original heap pointer.
-- **Output**: Returns the original pointer to the heap, now with all events removed.
-- **Functions called**:
-    - [`PRQ_`](#prq_)
+- **Output**: Returns the original pointer to the heap.
+- **Functions Called**:
+    - [`PRQ_`](<#prq_>)
 
 
 
