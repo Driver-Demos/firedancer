@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase defines a makefile rule to build the `fddbg` binary using `main` and `fd_util` if both `FD_HAS_HOSTED` and `FD_HAS_LINUX` are defined.
+Makefile for building the `fddbg` binary on Linux with hosted support.
 
 # Purpose
-This snippet is a Makefile configuration that conditionally compiles a binary named `fddbg` using the `make-bin` function if both `FD_HAS_HOSTED` and `FD_HAS_LINUX` are defined. It ensures that the build process for `fddbg` only occurs in environments that meet these specific conditions, likely indicating a hosted Linux environment.
+The `Makefile` snippet uses conditional directives to check if the macros `FD_HAS_HOSTED` and `FD_HAS_LINUX` are defined. If both conditions are true, it calls the `make-bin` function with the arguments `fddbg`, `main`, and `fd_util`. This likely builds a binary named `fddbg` using the specified source files or components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_gdb` file is a shell script that executes GDB with a command to source the `fd_gdb.py` script from the `contrib/gdb` directory.
+Shell script to execute GDB with a specific Python script sourced.
 
 # Purpose
-This code is a shell script that serves as a wrapper to execute the GNU Debugger (GDB) with a specific configuration. It provides narrow functionality, primarily aimed at setting up a debugging environment by automatically sourcing a Python script (`fd_gdb.py`) located in the `contrib/gdb` directory. This script is not an executable in the traditional sense but rather a utility to streamline the debugging process by preloading custom GDB commands or configurations defined in the `fd_gdb.py` file. It is intended to be run from the command line, passing any additional arguments directly to GDB, thus enhancing the debugging experience with predefined settings or extensions.
+The script is a shell script that executes the GNU Debugger (`gdb`) with a specific initialization command. It sources the `fd_gdb.py` script located in the `contrib/gdb` directory. This setup is intended to extend or customize the debugging environment by loading additional Python-based debugging utilities or configurations. The script passes any arguments it receives directly to `gdb`, allowing for flexible use in various debugging scenarios.
 # Imports and Dependencies
 
 ---
