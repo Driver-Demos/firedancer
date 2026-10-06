@@ -3,35 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Documentation of the build system and source code management for Firedancer, focusing on simplicity and robustness.
+The `build-system.md` file in the `firedancer` codebase provides a detailed explanation of the build system philosophy, process, and dependencies for building Firedancer from source, emphasizing simplicity, robustness, and minimal external dependencies.
 
 # Purpose
-The document describes the build system and source code management for the Firedancer project. It emphasizes building Firedancer from source on GNU/Linux distributions, focusing on simplicity and robustness. The build process involves transforming C/C++ and assembly source code into static objects, libraries, and executable binaries, with compile units being position-independent to support Address Space Layout Randomization (ASLR). System dependencies include the GNU C Library and the C++ standard library, which are linked dynamically. The document also notes that Firedancer does not aim for ABI stability, except for certain parts that offer a stable ABI for shared library use. Code generation tools are written in Python 3.9, and the project aims to minimize out-of-tree dependencies, using a script to fetch and build necessary external libraries. GNU Make automates the build process, generating configuration, performing compiler checks, discovering build targets, and executing build rules. Machine targets are defined in the `config/machine` directory and can be selected using the `MACHINE` variable.
+The provided content is a detailed documentation of the build system for the Firedancer project, which is a software codebase. This document serves as a guide for users to understand the philosophy and technical details behind building Firedancer from source, emphasizing simplicity and robustness for GNU/Linux distributions. It outlines the build process, which involves transforming C/C++ and assembly source code into static objects, libraries, and executable binaries, using tools like GCC or Clang. The document also discusses system dependencies, ABI stability, code generation, and out-of-tree dependencies, highlighting the project's aim to minimize external dependencies and maintain cross-compiler stability. Additionally, it describes the use of GNU Make to automate the build process, detailing steps such as generating compiler configurations, performing compiler checks, and executing build rules. This file is crucial for developers and users who need to compile Firedancer from source, ensuring they have a comprehensive understanding of the build system and its requirements.
 # Content Summary
-The document provides an overview of the build system and source code management for the Firedancer project. It emphasizes the importance of building Firedancer from source on GNU/Linux distributions, focusing on simplicity and robustness.
+The document provides a comprehensive overview of the build system and source code management for the Firedancer project. It emphasizes the importance of building Firedancer from source to ensure simplicity and robustness, particularly on GNU/Linux distributions. The build process is typical of a statically linked C application for Linux, transforming source code into release artifacts through a series of steps involving C/C++ sources, assembly sources, and embedded files, which are compiled into static objects, libraries, and executable binaries.
 
-**Build Process:**
-- Firedancer uses a typical build process for statically linked C applications on Linux.
-- The process involves transforming C/C++ source code, assembly sources, and embedded files into static objects, static libraries, and executable binaries.
-- Compile units, which consist of C/C++ files, assembly files, and embedded files, are compiled into static objects using GCC or Clang. These units support Address Space Layout Randomization (ASLR) by being position-independent and define externally linked symbols for use in other compile units.
+Compile units in Firedancer consist of C/C++ files, assembly files, and embedded files, which are compiled into static objects using GCC or Clang. These units are position-independent to support Address Space Layout Randomization (ASLR) and define externally linked symbols for use across other compile units. Embedded files are included using the `.incbin` assembler directive, facilitating the inclusion of binary content like eBPF programs and large text files.
 
-**System Dependencies:**
-- Firedancer relies on the GNU C Library (glibc) and the C++ standard library, both linked dynamically.
+Firedancer relies on system dependencies such as the GNU C Library (glibc) and the C++ standard library, which are dynamically linked. The project does not aim for ABI stability, allowing symbols to change between versions, although some parts offer a stable ABI for shared library use. Code generation tools, written in Python 3.9, generate C code that is checked into the repository to minimize tooling dependencies.
 
-**ABI Stability:**
-- Firedancer does not guarantee ABI stability, allowing symbols to change between versions. However, it aims for cross-compiler stability, enabling linking of units compiled with different versions of GCC or a mix of GCC and Clang, provided they originate from the same revision.
+The project strives for zero out-of-tree library dependencies, though some large external dependencies are still fetched externally using a `deps.sh` script. This script builds and installs these dependencies into a custom prefix, simplifying the discovery process for the compiler without the need for complex configuration scripts.
 
-**Code Generation:**
-- Generated code is included in the repository to minimize tooling dependencies, requiring code generation tools only during development. These tools are written in Python 3.9.
-
-**Out-of-tree Dependencies:**
-- Firedancer aims to eliminate out-of-tree library dependencies but currently fetches some large external dependencies using a script (`deps.sh`). This script builds and installs these dependencies into a custom prefix, with the compiler discovering them via specific include and library paths.
-
-**Make Configuration:**
-- GNU Make automates the build process, which includes generating compiler and linker configurations, performing compiler checks, discovering build targets, and executing build rules.
-- Machine targets are defined in the `config/machine` directory and can be selected using the `MACHINE` variable.
-
-This document is essential for developers working with Firedancer, providing detailed instructions on building the project from source and managing dependencies.
+GNU Make is used to automate the build process, which involves generating compiler and linker configurations, performing compiler checks, discovering build targets, and executing build rules. The `config/machine` directory allows for the selection of different machine types via the `MACHINE` variable, tailoring the build process to specific hardware configurations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

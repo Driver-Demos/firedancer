@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Checks for the presence of `s2n-bignum` library and sets compilation flags accordingly.
+The `with-s2nbignum.mk` file in the `firedancer` codebase checks for the presence of the `s2n-bignum` library and sets compilation flags accordingly, or issues a warning if the library is not installed.
 
 # Purpose
-The `Makefile` snippet checks for the existence of the `libs2nbignum.a` library in the specified `$(OPT)/lib` directory. If the library is present, it sets the `FD_HAS_S2NBIGNUM` variable to 1 and appends the `-DFD_HAS_S2NBIGNUM=1` flag to `CFLAGS` and the library path to `LDFLAGS`. If the library is not found, it issues a warning message indicating that `s2n-bignum` is not installed and will be skipped.
+This Makefile snippet checks for the existence of the `libs2nbignum.a` library file in the specified `$(OPT)/lib` directory. If the file exists, it sets a flag `FD_HAS_S2NBIGNUM` to 1, adds a preprocessor definition to `CFLAGS`, and appends the library path to `LDFLAGS`. If the file is not found, it issues a warning indicating that the `s2n-bignum` library is not installed and will be skipped.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

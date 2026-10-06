@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for building with Clang on Intel Ice Lake architecture, including optimization and security flags.
+The `linux_clang_icelake.mk` file in the `firedancer` codebase configures build settings for compiling with Clang on Ice Lake architecture, including various optimizations and feature flags.
 
 # Purpose
-The Makefile configuration specifies build settings and compiler flags for a software project targeting the `icelake` architecture using the Clang compiler. It sets the build directory to `linux/clang/icelake` and includes several configuration files to enable features such as debugging, security, optimization, and threading. The file defines preprocessor flags (`CPPFLAGS`) to optimize the build for the `icelake-server` architecture, enabling specific instruction sets like SSE, AVX, and AVX512. It also defines several macros (`FD_HAS_INT128`, `FD_HAS_DOUBLE`, etc.) to indicate the availability of certain features and optimizations in the build environment. The comments note limitations in Clang's optimization capabilities, suggesting that its use is currently limited to code hygiene purposes.
+The provided content is a Makefile, which is used to automate the build process of a software project. This particular Makefile is configured for building a project using the Clang compiler on an Intel Ice Lake architecture, as indicated by the `BUILDDIR` variable and the `CPPFLAGS` settings. It includes several configuration files that enable specific features such as debugging, security, optimization, and multithreading, as seen in the `include` statements. The file also defines several preprocessor flags and feature macros (e.g., `FD_HAS_INT128`, `FD_HAS_SSE`) to optimize the build for the Ice Lake server architecture, leveraging advanced instruction sets like AVX and AES-NI. Additionally, the comments highlight limitations of Clang regarding certain optimizations, suggesting that its current use is primarily for code hygiene.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
