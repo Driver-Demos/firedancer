@@ -3,40 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a function and an external action for handling metrics commands.
+Metrics command prototype and action declaration.
 
 # Purpose
-This code is a C header file that declares a function and an external variable related to metrics commands. The function [`metrics_cmd_fn`](<#metrics_cmd_fn>) takes two parameters, `args` of type `args_t` and `config` of type `config_t`, and is intended to perform operations related to metrics. The header file also declares an external variable `fd_action_metrics` of type `action_t`, which is likely used to represent or trigger a specific action related to metrics. The file includes a configuration header `fd_config.h` and uses include guards to prevent multiple inclusions. The `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` macros are used to manage the scope of function prototypes.
-# Imports and Dependencies
-
----
-- `../fd_config.h`
-
-
-# Global Variables
-
----
-### fd\_action\_metrics
-- **Type**: ``action_t``
-- **Description**: `fd_action_metrics` is a global variable of type `action_t`. It is declared as an external variable, indicating that its definition is located in another source file.
-- **Use**: Used to represent or perform actions related to metrics in the application.
-
-
+This header file declares the interface for a `metrics` command in the shared command set. It includes `fd_config.h`, opens and closes the `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` macros, and declares the command handler `metrics_cmd_fn( args_t * args, config_t * config )`. It also declares the external action object `fd_action_metrics`, which other source files can use to register or call the command.
 # Function Declarations (Public API)
 
 ---
-### metrics\_cmd\_fn<!-- {{#callable_declaration:metrics_cmd_fn}} -->
-[View Source →](<../../../../../../src/app/shared/commands/metrics.h#L6>)
-
-Generates and writes metrics data to standard output.
-- **Description**: Use this function to generate metrics data based on the provided configuration and arguments, and write the data to standard output. This function must be called with valid pointers to `args_t` and `config_t` structures. It initializes necessary resources and performs operations to collect and output metrics. Ensure that the system has sufficient memory and that standard output is available for writing. Handle any errors that occur during the write operation.
-- **Inputs**:
-    - `args`: A pointer to an `args_t` structure containing the arguments needed for metrics generation. Must not be null.
-    - `config`: A pointer to a `config_t` structure containing the configuration for metrics generation. Must not be null.
-- **Output**: None
-- **See Also**: [`metrics_cmd_fn`](<metrics.c.md#metrics_cmd_fn>)  (Implementation)
-
-
+- `metrics_cmd_fn`
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

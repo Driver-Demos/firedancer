@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-TCL script for synthesizing FPGA designs on Amazon's platform.
+The `scripts` folder in the `firedancer` codebase contains a script for synthesizing a custom logic design for an AWS FPGA, specifically the `synth_cl_dram_dma.tcl` file.
 
 
 ## Files
-- **[synth_cl_dram_dma.tcl](synth_cl_dram_dma.tcl.md)**: A TCL script for synthesizing FPGA designs on Amazon's platform, including reading design files and IP blocks.
+- **[synth_cl_dram_dma.tcl](synth_cl_dram_dma.tcl.md)**: The `synth_cl_dram_dma.tcl` file is a script for synthesizing a custom logic design for an AWS FPGA, including reading design files, IP blocks, and constraints, and managing the synthesis process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

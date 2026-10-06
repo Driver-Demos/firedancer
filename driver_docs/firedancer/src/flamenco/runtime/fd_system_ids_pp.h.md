@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines system and program IDs as macros for preprocessor-time use with unsigned integer representation.
+Macros for Solana program and sysvar public key byte IDs.
 
 # Purpose
-This code is a collection of macro definitions in a C source file, which represent unique identifiers as arrays of unsigned integers (`uints`). Each macro, such as `SYSVAR_PROG_ID` or `TOKEN_PROG_ID`, defines a sequence of hexadecimal values that are used to identify specific system variables, programs, or features within a software system. These identifiers are likely used at the preprocessor level to facilitate the handling of unsigned data, as the preprocessor treats literal `uints` and `ulongs` as unsigned. The file does not include an include guard, as it only contains macro definitions, which do not require one.
+This file defines a set of macro constants that hold 32-byte public keys and program IDs used by a Solana-based system. Each symbol, such as `SYSVAR_PROG_ID`, `TOKEN_PROG_ID`, `STAKE_PROG_ID`, and `NATIVE_MINT_ID`, expands to a comma-separated list of unsigned byte literals so the values can be used at preprocessor time. The file does not define functions or data structures; it serves as a central list of fixed identifiers for system accounts, native programs, token programs, and related buffer accounts. The use of `U` suffixes keeps the byte values unsigned and supports use in compile-time expressions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
