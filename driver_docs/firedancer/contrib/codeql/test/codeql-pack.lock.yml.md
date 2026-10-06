@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Specifies dependencies and their versions for a CodeQL package.
+CodeQL pack lock file listing dependency versions.
 
 # Purpose
-The YAML configuration file specifies the dependencies and their respective versions for a project using CodeQL, a tool for code analysis. The `lockVersion` field indicates the version of the lock file format, ensuring compatibility with the tool's versioning system. Each dependency is listed under the `dependencies` section, with its name and version number, ensuring that the correct versions of CodeQL libraries are used. The `compiled` field, set to `false`, indicates that the dependencies have not been compiled, which may be relevant for build or deployment processes. This configuration ensures that the project uses consistent and specific versions of the CodeQL libraries for analysis tasks.
+This lock file records the exact versions of CodeQL dependencies that the project uses. The `dependencies` section lists each imported library, such as `codeql/controlflow`, `codeql/cpp-all`, `codeql/dataflow`, and `codeql/xml`, together with the version that must be used. The `lockVersion` field identifies the format version of the lock file, and `compiled: false` marks the file as not built into a compiled artifact. By fixing these dependency versions, the file keeps CodeQL analysis inputs consistent across runs and environments.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
