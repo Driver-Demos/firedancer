@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Test instructions for bitwise, integer math, jump, load, opcode, and shift operations.
+Tests for bitwise, integer arithmetic, jump, load, opcode, and shift operations in a virtual machine.
 
 
 ## Files
-- **[bitwise.instr](bitwise.instr.md)**: The `bitwise.instr` file in the `firedancer` codebase contains test cases for various bitwise operations, including OR and AND operations on 32-bit and 64-bit registers with both immediate values and other registers, as well as validation checks for invalid source and destination registers.
-- **[int_math.instr](int_math.instr.md)**: The `int_math.instr` file in the `firedancer` codebase contains a series of test instructions for integer arithmetic operations, including addition, subtraction, multiplication, division, and remainder calculations for both 32-bit and 64-bit registers, with various scenarios such as overflow, underflow, and invalid operations.
-- **[jump.instr](jump.instr.md)**: The `jump.instr` file in the `firedancer` codebase tests various jump instruction conditions in a virtual machine, using an oracle to verify correct evaluation of jump conditions, including scenarios like jumping to itself, the next instruction, or out of bounds.
-- **[load.instr](load.instr.md)**: Tests load instructions and verifier checks for byte, halfword, word, and doubleword loads.
-- **[opcode.instr](opcode.instr.md)**: The `opcode.instr` file in the `firedancer` codebase defines a set of opcodes with their corresponding operations and status, such as `ok`, `vfy`, and `err`, for a virtual machine instruction set.
-- **[shift.instr](shift.instr.md)**: The `shift.instr` file in the `firedancer` codebase contains test cases for left shift operations on 32-bit and 64-bit registers, using both immediate and register values, with various scenarios including valid and invalid operations.
+- **[bitwise.instr](bitwise.instr.md)**: Tests for bitwise operations including OR, AND, and HOR with both register and immediate values.
+- **[int_math.instr](int_math.instr.md)**: Tests for 32-bit and 64-bit integer arithmetic and bitwise operations, including validation of invalid cases.
+- **[jump.instr](jump.instr.md)**: Tests for jump instruction condition logic in a virtual machine using various scenarios and outcomes.
+- **[load.instr](load.instr.md)**: Tests for load instructions with various offsets and registers, including verification and error cases.
+- **[opcode.instr](opcode.instr.md)**: Defines a set of opcodes with their corresponding operations and status for a virtual machine.
+- **[shift.instr](shift.instr.md)**: Tests for left shift operations on 32-bit and 64-bit registers with immediate and register values.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
