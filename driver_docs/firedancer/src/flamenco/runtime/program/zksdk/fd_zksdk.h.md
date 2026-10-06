@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for closing a context account and verifying proofs in the zksdk runtime.
+The `fd_zksdk.h` file in the `firedancer` codebase declares functions for processing and verifying proofs and managing context accounts within the zkSDK framework.
 
 # Purpose
-This C header file defines function prototypes for operations related to the `zksdk` component within a larger system. It includes two primary functions: [`fd_zksdk_process_close_context_state`](<#fd_zksdk_process_close_context_state>), which handles the logic for closing a context account, and [`fd_zksdk_process_verify_proof`](<#fd_zksdk_process_verify_proof>), which manages the parsing of data, verification of proofs, and creation of context accounts. The file includes necessary dependencies from `fd_flamenco_base.h` and `fd_exec_instr_ctx.h`, indicating that it relies on base functionalities and execution context structures defined elsewhere. The use of include guards prevents multiple inclusions of this header file, ensuring that the compiler processes it only once.
+This code is a C header file that defines function prototypes for operations related to the "zksdk" component within a larger software system, likely involving zero-knowledge proofs or similar cryptographic processes. It includes necessary dependencies from other parts of the project, such as `fd_flamenco_base.h` and `fd_exec_instr_ctx.h`, indicating that it interacts with a broader framework. The file declares two functions: [`fd_zksdk_process_close_context_state`](#fd_zksdk_process_close_context_state), which handles the logic for closing a context account, and [`fd_zksdk_process_verify_proof`](#fd_zksdk_process_verify_proof), which manages the verification of proofs and the creation of context accounts. These functions suggest that the header is part of a runtime program dealing with cryptographic verification and context management.
 # Imports and Dependencies
 
 ---
@@ -18,26 +18,22 @@ This C header file defines function prototypes for operations related to the `zk
 
 ---
 ### fd\_zksdk\_process\_close\_context\_state<!-- {{#callable_declaration:fd_zksdk_process_close_context_state}} -->
-[View Source →](<../../../../../../../src/flamenco/runtime/program/zksdk/fd_zksdk.h#L7>)
-
 Executes the logic to close a context account.
-- **Description**: Use this function to close a context account by transferring lamports and resetting account data. It must be called with a valid execution instruction context. The function checks for required signatures and ensures that the proof and destination accounts are distinct. It also verifies the ownership of the account and adjusts lamports and data length accordingly. Call this function when you need to finalize and close a context account safely.
+- **Description**: This function is used to close a context account within the execution context provided. It should be called when the context account is no longer needed and its resources can be safely released. The function requires that the context account is properly initialized and that the necessary signatures are present. It performs several checks to ensure the validity of the account data and ownership before proceeding with the closure. If any of these checks fail, an error code is returned. The function modifies the state of the accounts involved, transferring lamports and resetting account data as part of the closure process.
 - **Inputs**:
-    - `ctx`: A pointer to an `fd_exec_instr_ctx_t` structure representing the execution instruction context. This parameter must not be null and must be properly initialized before calling the function. The function will return an error if the context is invalid or if required conditions are not met.
-- **Output**: Returns an integer status code indicating success or the type of error encountered. Possible errors include missing required signatures, invalid instruction data, invalid account data, or invalid account owner. On success, it returns `FD_EXECUTOR_INSTR_SUCCESS`.
-- **See Also**: [`fd_zksdk_process_close_context_state`](<fd_zksdk.c.md#fd_zksdk_process_close_context_state>)  (Implementation)
+    - `ctx`: A pointer to an fd_exec_instr_ctx_t structure representing the execution context. This must not be null and should be properly initialized before calling the function. The function expects the context to contain valid account information and signatures.
+- **Output**: Returns an integer status code indicating the success or failure of the operation. A return value of FD_EXECUTOR_INSTR_SUCCESS indicates success, while other values indicate specific errors encountered during the process.
+- **See also**: [`fd_zksdk_process_close_context_state`](fd_zksdk.c.md#fd_zksdk_process_close_context_state)  (Implementation)
 
 
 ---
 ### fd\_zksdk\_process\_verify\_proof<!-- {{#callable_declaration:fd_zksdk_process_verify_proof}} -->
-[View Source →](<../../../../../../../src/flamenco/runtime/program/zksdk/fd_zksdk.h#L17>)
-
-Executes common logic for ZKSDK instructions to verify proofs and manage context accounts.
-- **Description**: Use this function to process and verify zero-knowledge proofs (ZKPs) as part of ZKSDK instructions. It parses the instruction data to determine the type of proof to verify, executes the verification, and manages context accounts if necessary. This function must be called with a valid execution context that contains the instruction data. It handles different proof types based on the instruction identifier and ensures that the proof data is correctly accessed from either instruction or account data. The function returns an error code if the instruction data is invalid, the proof verification fails, or if there are issues with account data or ownership.
+Executes the common logic for verifying a proof and managing context accounts.
+- **Description**: This function is used to process and verify zero-knowledge proofs (ZKP) based on the instruction data provided in the execution context. It handles parsing of the context and proof data, verifies the proof using the appropriate verification function, and manages context accounts if necessary. The function must be called with a valid execution context that contains the instruction data and account information. It returns an error code if the instruction data is invalid, if there is an issue with account data, or if the proof verification fails.
 - **Inputs**:
-    - `ctx`: A pointer to an `fd_exec_instr_ctx_t` structure that contains the execution context for the instruction. This must not be null and must be properly initialized with valid instruction data. The function expects the context to include the instruction data size and account count.
-- **Output**: Returns an integer status code indicating success or the type of error encountered. Possible errors include invalid instruction data, invalid account data, invalid account owner, or account already initialized.
-- **See Also**: [`fd_zksdk_process_verify_proof`](<fd_zksdk.c.md#fd_zksdk_process_verify_proof>)  (Implementation)
+    - `ctx`: A pointer to an fd_exec_instr_ctx_t structure containing the execution context. This includes the instruction data and account information. The pointer must not be null, and the context must be properly initialized before calling this function.
+- **Output**: Returns an integer status code indicating success or the type of error encountered. Possible error codes include invalid instruction data, invalid account data, invalid account owner, and account already initialized.
+- **See also**: [`fd_zksdk_process_verify_proof`](fd_zksdk.c.md#fd_zksdk_process_verify_proof)  (Implementation)
 
 
 
