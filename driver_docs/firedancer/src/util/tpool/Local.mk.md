@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for tpool headers, objects, and unit test.
+Makefile for adding headers, objects, and unit tests related to thread pool utilities.
 
 # Purpose
-Build rules add the `fd_tpool.h` and `fd_map_reduce.h` header files to the install set, add the `fd_tpool` object file to the `fd_util` target, and define the `test_tpool` unit test target from `test_tpool` with a dependency on `fd_util`. These entries connect the thread pool and map-reduce components to the build and test process.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` function to include header files `fd_tpool.h` and `fd_map_reduce.h`. The `add-objs` function adds object files `fd_tpool` and `fd_util` to the build process. The `make-unit-test` function sets up a unit test named `test_tpool`, which depends on the `test_tpool` and `fd_util` components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

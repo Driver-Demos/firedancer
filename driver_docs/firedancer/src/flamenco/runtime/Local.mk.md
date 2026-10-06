@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for flamenco runtime headers, objects, and unit tests.
+Makefile for adding headers, objects, and unit tests to the `fd_flamenco` runtime in the `firedancer` codebase.
 
 # Purpose
-This Makefile fragment defines build rules for the `fd_flamenco` module and its related tests. It adds header files and object files for components such as `fd_acc_mgr`, `fd_executor`, `fd_hashes`, `fd_bank`, `fd_txncache`, and `fd_system_ids`, and it groups some rules under feature guards such as `FD_HAS_INT128`, `FD_HAS_ATOMIC`, `FD_HAS_ROCKSDB`, and `FD_HAS_HOSTED`. It also declares unit tests for selected components, including `test_hashes`, `test_cost_tracker`, `test_txn_account`, `test_bank`, `test_txncache`, and `test_system_ids`, and it schedules several of them to run after build. The conditional blocks control which source files and tests are included based on available platform features and optional dependencies.
+The Makefile content defines build rules and dependencies for a software project. It uses conditional statements to include headers and object files based on the presence of certain features, such as `FD_HAS_INT128`, `FD_HAS_ATOMIC`, and `FD_HAS_ROCKSDB`. The `add-hdrs` and `add-objs` functions are used to specify header and object files that are part of the build process, associating them with the `fd_flamenco` module. The file also defines unit tests using the `make-unit-test` and `run-unit-test` functions, specifying the test names and their dependencies. Conditional compilation is employed to include specific components only if certain conditions are met, ensuring that the build process is adaptable to different environments and configurations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
