@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines versioning rules and exports version variables for the Firedancer project.
+The `with-version.mk` file in the `firedancer` codebase defines and exports versioning information for the Firedancer application, including major, minor, and patch versions, as well as the current commit hash.
 
 # Purpose
-The file defines versioning information for the Frankendancer project, which is part of the Firedancer software. It sets the major version to zero, indicating that the first full release will be version 1.0. The minor version is specific to Firedancer and indicates the release candidate branch, while the patch version encodes the Agave version being linked, transforming it into a numeric format. If the Agave submodule is not checked out, the patch version defaults to 9999. Additionally, the file exports the current Git commit hash as `FIREDANCER_CI_COMMIT` for use in continuous integration processes.
+The provided file is a Makefile script used for managing versioning in the Frankendancer project, which is part of the Firedancer software suite. It defines how the version numbers for the software are constructed and exported for use in the build process. The major version is set to zero, indicating that the software is in a pre-release state, with the first full release planned to be version 1.0. The minor version is derived from a specific Firedancer release candidate branch, while the patch version is constructed from the Agave version, extracted from the `Cargo.toml` file, and formatted into a numeric string. If the Agave submodule is not available, a default patch version of 9999 is used. Additionally, the script captures the current Git commit hash to track the specific code state used in the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

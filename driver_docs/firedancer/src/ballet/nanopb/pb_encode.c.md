@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implementation of protobuf encoding functions using minimal resources, with support for various data types and extensions.
+The `pb_encode.c` file in the `firedancer` codebase provides functionality for encoding Protocol Buffers (protobuf) messages using minimal resources, including various helper functions and encoding strategies for different data types and field configurations.
 
 # Purpose
-The `pb_encode.c` file is responsible for encoding Protocol Buffers (protobuf) messages using minimal resources. It provides functions to serialize data structures into the protobuf binary format, which is efficient for storage and transmission. The file includes several static functions that handle the encoding of different data types and structures, such as arrays, basic fields, and extension fields. It also includes helper functions to manage the encoding of variable-length integers and fixed-size data types.
+The provided C source code file, `pb_encode.c`, is part of a library designed to encode Protocol Buffers (protobuf) messages using minimal resources. This file implements the encoding functionality for protobuf messages, focusing on efficiency and low memory usage. It includes functions to encode various data types and structures defined in protobuf schemas, such as integers, booleans, strings, bytes, and submessages. The file is structured to handle different field types, including static, pointer, and callback fields, and supports both proto2 and proto3 syntax, ensuring compatibility with different protobuf versions.
 
-The file defines the `pb_ostream_t` structure and functions like [`pb_ostream_from_buffer`](<#pb_ostream_from_buffer>), [`pb_write`](<#checkreturnpb_write>), and [`pb_encode`](<#checkreturnpb_encode>) to manage the output stream and perform the encoding process. The [`pb_encode`](<#checkreturnpb_encode>) function is a key component that iterates over message fields and encodes them based on their type and presence. The file also includes conditional compilation directives to handle different compiler attributes and configurations, such as 64-bit support and buffer-only mode. The use of the `checkreturn` attribute ensures that the return values of encoding functions are checked, which helps in error handling during the encoding process.
+Key technical components of this file include the `pb_ostream_t` structure, which represents an output stream for writing encoded data, and a series of static functions that perform the actual encoding of different field types. The file also defines macros and conditional compilation directives to optimize the code for different compilers and platforms, such as handling 64-bit integers and endian-specific operations. The [`pb_encode`](#checkreturnpb_encode) and [`pb_encode_ex`](#checkreturnpb_encode_ex) functions serve as the primary interfaces for encoding entire messages, while helper functions like [`pb_encode_varint`](#checkreturnpb_encode_varint) and [`pb_encode_fixed32`](#checkreturnpb_encode_fixed32) handle specific encoding tasks. This file is intended to be part of a larger library and is not an executable on its own; it is designed to be included and used by other parts of the protobuf encoding library.
 # Imports and Dependencies
 
 ---
@@ -21,853 +21,754 @@ The file defines the `pb_ostream_t` structure and functions like [`pb_ostream_fr
 
 ---
 ### buf\_write<!-- {{#callable:checkreturn::buf_write}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L53>)
-
-Writes a specified number of bytes from a buffer to a stream and updates the stream's state.
+The `buf_write` function writes a specified number of bytes from a buffer to a stream and updates the stream's state.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream.
-    - `buf`: A pointer to a buffer of type `pb_byte_t` containing the data to write.
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where data will be written.
+    - `buf`: A pointer to a buffer containing the data to be written to the stream.
     - `count`: The number of bytes to write from the buffer to the stream.
-- **Logic and Control Flow**:
-    - Cast the `state` of the `stream` to a `pb_byte_t` pointer and assign it to `dest`.
-    - Update the `state` of the `stream` by adding `count` to `dest`.
-    - Copy `count` bytes from `buf` to `dest` using `memcpy`.
+- **Control Flow**:
+    - Cast the `state` member of the `stream` to a `pb_byte_t*` and store it in `dest`.
+    - Update the `state` member of the `stream` to point to the location after the written data by adding `count` to `dest`.
+    - Use `memcpy` to copy `count` bytes from `buf` to `dest`.
     - Return `true` to indicate successful writing.
-- **Output**: Returns `true` to indicate that the write operation was successful.
+- **Output**: The function returns a boolean value `true` to indicate that the write operation was successful.
 
 
 ---
 ### pb\_ostream\_from\_buffer<!-- {{#callable:pb_ostream_from_buffer}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L63>)
-
-Initializes a `pb_ostream_t` structure for writing to a buffer.
+The function `pb_ostream_from_buffer` initializes a `pb_ostream_t` structure for writing to a buffer with a specified size.
 - **Inputs**:
-    - `buf`: A pointer to a buffer where the stream will write data.
-    - `bufsize`: The size of the buffer in bytes.
-- **Logic and Control Flow**:
-    - Declare a `pb_ostream_t` variable named `stream`.
-    - Check if `PB_BUFFER_ONLY` is defined; if so, set `stream.callback` to a static non-NULL marker to indicate a buffer stream.
-    - If `PB_BUFFER_ONLY` is not defined, set `stream.callback` to the `buf_write` function.
-    - Set `stream.state` to the provided buffer `buf`.
-    - Set `stream.max_size` to the provided buffer size `bufsize`.
-    - Initialize `stream.bytes_written` to 0.
-    - If `PB_NO_ERRMSG` is not defined, set `stream.errmsg` to NULL.
-    - Return the initialized `stream`.
-- **Output**: A `pb_ostream_t` structure initialized for writing to the specified buffer.
+    - `buf`: A pointer to a buffer of type `pb_byte_t` where the stream will write data.
+    - `bufsize`: The size of the buffer, indicating the maximum number of bytes that can be written to the stream.
+- **Control Flow**:
+    - A `pb_ostream_t` structure named `stream` is declared.
+    - If `PB_BUFFER_ONLY` is defined, a static integer `marker` is used to set the `callback` pointer to a non-NULL value to indicate a buffer stream.
+    - If `PB_BUFFER_ONLY` is not defined, the `callback` is set to the function `buf_write`.
+    - The `state` of the stream is set to the provided buffer `buf`.
+    - The `max_size` of the stream is set to the provided `bufsize`.
+    - The `bytes_written` field of the stream is initialized to 0.
+    - If `PB_NO_ERRMSG` is not defined, the `errmsg` field is initialized to NULL.
+    - The initialized `pb_ostream_t` structure is returned.
+- **Output**: A `pb_ostream_t` structure initialized for writing to the specified buffer with the given size constraints.
 
 
 ---
 ### pb\_write<!-- {{#callable:checkreturn::pb_write}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L84>)
-
-Writes a buffer to a protobuf output stream, checking for overflow and using a callback for the actual write operation.
+The `pb_write` function writes a specified number of bytes from a buffer to a protobuf output stream, ensuring that the stream does not exceed its maximum size and handling errors appropriately.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream.
-    - `buf`: A pointer to a buffer of type `pb_byte_t` containing the data to write.
-    - `count`: The number of bytes to write from the buffer.
-- **Logic and Control Flow**:
-    - Check if `count` is greater than 0 and if the `callback` in `stream` is not NULL.
-    - Verify that adding `count` to `stream->bytes_written` does not cause an overflow or exceed `stream->max_size`. If it does, return an error indicating the stream is full.
-    - If `PB_BUFFER_ONLY` is defined, use [`buf_write`](<#checkreturnbuf_write>) to write the buffer to the stream; otherwise, use the `callback` function in `stream`. If the write operation fails, return an I/O error.
-    - Increment `stream->bytes_written` by `count`.
-- **Output**: Returns `true` if the write operation is successful; otherwise, it returns an error through the `PB_RETURN_ERROR` macro.
-- **Functions Called**:
-    - [`checkreturn::buf_write`](<#checkreturnbuf_write>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where data is to be written.
+    - `buf`: A pointer to a buffer containing the bytes to be written to the stream.
+    - `count`: The number of bytes to write from the buffer to the stream.
+- **Control Flow**:
+    - Check if the count is greater than 0 and the stream's callback is not NULL.
+    - Verify that adding the count to the current bytes written does not cause an overflow or exceed the stream's maximum size.
+    - If the `PB_BUFFER_ONLY` macro is defined, use [`buf_write`](#checkreturnbuf_write) to write the data; otherwise, use the stream's callback function.
+    - If writing fails, return an error using `PB_RETURN_ERROR`.
+    - Increment the `bytes_written` field of the stream by the count.
+    - Return true to indicate successful writing.
+- **Output**: Returns a boolean value `true` if the bytes are successfully written to the stream, otherwise it returns an error through `PB_RETURN_ERROR`.
+- **Functions called**:
+    - [`checkreturn::buf_write`](#checkreturnbuf_write)
 
 
 ---
 ### safe\_read\_bool<!-- {{#callable:safe_read_bool}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L115>)
-
-Reads a boolean value from a memory location safely, avoiding undefined behavior.
+The `safe_read_bool` function safely reads a boolean value from a memory location without causing undefined behavior.
 - **Inputs**:
-    - `pSize`: A pointer to the memory location from which to read the boolean value.
-- **Logic and Control Flow**:
-    - Casts the input pointer `pSize` to a `const char*` pointer `p`.
-    - Iterates over each byte in the memory location up to the size of a `bool`.
-    - Checks if any byte in the memory location is non-zero.
-    - Returns `true` if any byte is non-zero, otherwise returns `false`.
-- **Output**: A `bool` value indicating whether any byte in the specified memory location is non-zero.
+    - `pSize`: A pointer to a memory location from which the boolean value is to be read.
+- **Control Flow**:
+    - Cast the input pointer `pSize` to a `const char*` pointer `p`.
+    - Iterate over each byte in the memory location up to the size of a boolean type.
+    - Check if any byte in the memory location is non-zero.
+    - If a non-zero byte is found, return `true`.
+    - If no non-zero byte is found after checking all bytes, return `false`.
+- **Output**: A boolean value indicating whether any byte in the specified memory location is non-zero, interpreted as `true` if any byte is non-zero, otherwise `false`.
 
 
 ---
 ### encode\_array<!-- {{#callable:checkreturn::encode_array}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L128>)
-
-Encodes a static array into a protobuf stream, handling size calculations and packing if necessary.
+The `encode_array` function encodes a static array into a protobuf stream, handling size calculations and packing if applicable.
 - **Inputs**:
-    - `stream`: A pointer to `pb_ostream_t`, which represents the output stream where the encoded data will be written.
-    - `field`: A pointer to `pb_field_iter_t`, which contains information about the field to be encoded, including its type, size, and data.
-- **Logic and Control Flow**:
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field descriptor and data to be encoded.
+- **Control Flow**:
     - Retrieve the count of elements in the array from `field->pSize`.
-    - If the count is zero, return true immediately as there is nothing to encode.
-    - Check if the array type is not a pointer and if the count exceeds `field->array_size`, return an error indicating the array max size is exceeded.
-    - If arrays are not unpacked and the field type is packable, encode the array in packed format by first encoding the tag and calculating the total size of the packed array.
-    - If the field type is `PB_LTYPE_FIXED32` or `PB_LTYPE_FIXED64`, calculate the size directly based on the count and element size.
-    - For other types, iterate over the array to calculate the size using a sizing stream and encode the size as a varint.
-    - If the stream callback is NULL, write the size and return true for sizing purposes.
-    - Iterate over the array elements and encode each element using [`pb_enc_fixed`](<#checkreturnpb_enc_fixed>) or [`pb_enc_varint`](<#checkreturnpb_enc_varint>) based on the field type.
-    - For unpacked fields, iterate over the array and encode each element using [`encode_basic_field`](<#checkreturnencode_basic_field>), handling pointer-type string and bytes fields by dereferencing pointers to get actual data.
-    - Return true if all elements are successfully encoded.
-- **Output**: Returns `true` if the array is successfully encoded into the stream, otherwise returns `false` if an error occurs during encoding.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_tag`](<#checkreturnpb_encode_tag>)
-    - [`checkreturn::pb_enc_varint`](<#checkreturnpb_enc_varint>)
-    - [`checkreturn::pb_encode_varint`](<#checkreturnpb_encode_varint>)
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
-    - [`checkreturn::pb_enc_fixed`](<#checkreturnpb_enc_fixed>)
-    - [`pb_encode_tag_for_field`](<#pb_encode_tag_for_field>)
-    - [`checkreturn::encode_basic_field`](<#checkreturnencode_basic_field>)
+    - If the count is zero, return true immediately as there's nothing to encode.
+    - Check if the array size exceeds the maximum allowed size for non-pointer types and return an error if it does.
+    - If arrays are not unpacked and the field type is packable, encode the array in packed format by first encoding the tag and then the size of the packed data.
+    - For fixed-size types (e.g., FIXED32, FIXED64), calculate the total size directly; for others, iterate over the array to calculate the size using a sizing stream.
+    - Encode the size of the packed data as a varint and write the data to the stream, handling both fixed and variable types appropriately.
+    - If the field type is not packable or arrays are unpacked, iterate over each element, handling pointer-type fields (e.g., strings, bytes) by dereferencing pointers and encoding each element individually.
+    - Return true if the encoding process completes successfully.
+- **Output**: Returns a boolean value indicating success (true) or failure (false) of the encoding process.
+- **Functions called**:
+    - [`checkreturn::pb_encode_tag`](#checkreturnpb_encode_tag)
+    - [`checkreturn::pb_enc_varint`](#checkreturnpb_enc_varint)
+    - [`checkreturn::pb_encode_varint`](#checkreturnpb_encode_varint)
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
+    - [`checkreturn::pb_enc_fixed`](#checkreturnpb_enc_fixed)
+    - [`pb_encode_tag_for_field`](#pb_encode_tag_for_field)
+    - [`checkreturn::encode_basic_field`](#checkreturnencode_basic_field)
 
 
 ---
 ### pb\_check\_proto3\_default\_value<!-- {{#callable:checkreturn::pb_check_proto3_default_value}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L244>)
-
-Determines if a field in a proto3 message has its default value.
+The function `pb_check_proto3_default_value` checks if a given protobuf field in a proto3 message is set to its default value, which is considered 'zero' or 'empty' for encoding purposes.
 - **Inputs**:
-    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to check.
-- **Logic and Control Flow**:
-    - Retrieve the field type from the `field` structure.
-    - Check if the field is of static allocation type (`PB_ATYPE_STATIC`).
-    - For static fields, handle different field types (`PB_HTYPE`) such as required, repeated, oneof, optional, and check for default values.
-    - For singular fields, check if the field data is zeroed out for integer/float, bytes, string, fixed-length bytes, or submessage types.
-    - If the field is a pointer type (`PB_ATYPE_POINTER`), check if the data pointer is `NULL`.
-    - If the field is a callback type (`PB_ATYPE_CALLBACK`), check if the callback is `NULL` or if the extension is `NULL`.
-    - Return `false` as a default for unhandled cases.
-- **Output**: Returns `true` if the field has its default value, otherwise `false`.
-- **Functions Called**:
-    - [`safe_read_bool`](<#safe_read_bool>)
-    - [`pb_field_iter_begin`](<pb_common.c.md#pb_field_iter_begin>)
-    - [`pb_field_iter_next`](<pb_common.c.md#pb_field_iter_next>)
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to be checked.
+- **Control Flow**:
+    - Determine the field type using `field->type` and check if it is statically allocated (`PB_ATYPE_STATIC`).
+    - For static fields, handle different field types: required, repeated, oneof, optional, and fields with default values, returning `false` if they are not at their default state.
+    - For singular fields, check if they are simple types (integers/floats), bytes, strings, fixed-length bytes, or submessages, and verify if they are at their default state.
+    - For pointer-allocated fields (`PB_ATYPE_POINTER`), check if the data pointer is `NULL`.
+    - For callback-allocated fields (`PB_ATYPE_CALLBACK`), check if the field is an extension or if the callback is the default, and verify if they are at their default state.
+    - Return `false` as a safe default for any unhandled or special cases.
+- **Output**: A boolean value indicating whether the field is at its default value (true) or not (false).
+- **Functions called**:
+    - [`safe_read_bool`](#safe_read_bool)
+    - [`pb_field_iter_begin`](pb_common.c.md#pb_field_iter_begin)
+    - [`pb_field_iter_next`](pb_common.c.md#pb_field_iter_next)
 
 
 ---
 ### encode\_basic\_field<!-- {{#callable:checkreturn::encode_basic_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L362>)
-
-Encodes a basic field in a Protocol Buffers stream based on its type.
+The `encode_basic_field` function encodes a basic protobuf field into a stream based on its type.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - `field`: A pointer to a `pb_field_iter_t` structure that contains information about the field to encode, including its type and data.
-- **Logic and Control Flow**:
-    - Check if `field->pData` is NULL; if so, return true as there is no data to encode.
-    - Call [`pb_encode_tag_for_field`](<#pb_encode_tag_for_field>) to encode the field's tag into the stream; return false if it fails.
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to be encoded, which contains metadata about the field type and data.
+- **Control Flow**:
+    - Check if the field's data pointer (`pData`) is NULL, and return true if it is, indicating a missing pointer field.
+    - Attempt to encode the field's tag using [`pb_encode_tag_for_field`](#pb_encode_tag_for_field); return false if this fails.
     - Use a switch statement to determine the field's type using `PB_LTYPE(field->type)`.
-    - For each case in the switch statement, call the appropriate encoding function ([`pb_enc_bool`](<#checkreturnpb_enc_bool>), [`pb_enc_varint`](<#checkreturnpb_enc_varint>), [`pb_enc_fixed`](<#checkreturnpb_enc_fixed>), [`pb_enc_bytes`](<#checkreturnpb_enc_bytes>), [`pb_enc_string`](<#checkreturnpb_enc_string>), [`pb_enc_submessage`](<#checkreturnpb_enc_submessage>), [`pb_enc_fixed_length_bytes`](<#checkreturnpb_enc_fixed_length_bytes>)) based on the field's type.
-    - If the field type is not recognized, call `PB_RETURN_ERROR` with an error message indicating an invalid field type.
+    - For each case in the switch statement, call the appropriate encoding function based on the field type (e.g., [`pb_enc_bool`](#checkreturnpb_enc_bool), [`pb_enc_varint`](#checkreturnpb_enc_varint), etc.).
+    - If the field type is not recognized, return an error using `PB_RETURN_ERROR`.
 - **Output**: Returns a boolean value indicating success (true) or failure (false) of the encoding process.
-- **Functions Called**:
-    - [`pb_encode_tag_for_field`](<#pb_encode_tag_for_field>)
-    - [`checkreturn::pb_enc_bool`](<#checkreturnpb_enc_bool>)
-    - [`checkreturn::pb_enc_varint`](<#checkreturnpb_enc_varint>)
-    - [`checkreturn::pb_enc_fixed`](<#checkreturnpb_enc_fixed>)
-    - [`checkreturn::pb_enc_bytes`](<#checkreturnpb_enc_bytes>)
-    - [`checkreturn::pb_enc_string`](<#checkreturnpb_enc_string>)
-    - [`checkreturn::pb_enc_submessage`](<#checkreturnpb_enc_submessage>)
-    - [`checkreturn::pb_enc_fixed_length_bytes`](<#checkreturnpb_enc_fixed_length_bytes>)
+- **Functions called**:
+    - [`pb_encode_tag_for_field`](#pb_encode_tag_for_field)
+    - [`checkreturn::pb_enc_bool`](#checkreturnpb_enc_bool)
+    - [`checkreturn::pb_enc_varint`](#checkreturnpb_enc_varint)
+    - [`checkreturn::pb_enc_fixed`](#checkreturnpb_enc_fixed)
+    - [`checkreturn::pb_enc_bytes`](#checkreturnpb_enc_bytes)
+    - [`checkreturn::pb_enc_string`](#checkreturnpb_enc_string)
+    - [`checkreturn::pb_enc_submessage`](#checkreturnpb_enc_submessage)
+    - [`checkreturn::pb_enc_fixed_length_bytes`](#checkreturnpb_enc_fixed_length_bytes)
 
 
 ---
 ### encode\_callback\_field<!-- {{#callable:checkreturn::encode_callback_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L407>)
-
-Executes a callback function for a field if the callback is defined.
+The `encode_callback_field` function encodes a field using a user-defined callback function if it is available.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream.
-    - ``field``: A pointer to a `pb_field_iter_t` structure that represents the field to encode.
-- **Logic and Control Flow**:
-    - Check if the `field_callback` in the field's descriptor is not `NULL`.
-    - If the callback is not `NULL`, call the callback function with `NULL`, `stream`, and `field` as arguments.
-    - If the callback function returns `false`, call `PB_RETURN_ERROR` with `stream` and the message "callback error".
-    - Return `true` if the callback is `NULL` or if the callback function executes successfully.
-- **Output**: Returns `true` if the callback is `NULL` or executes successfully; otherwise, it returns `false` and sets an error message in the stream.
+    - `stream`: A pointer to a `pb_ostream_t` structure, which represents the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure, which represents the field to be encoded, including its descriptor and data.
+- **Control Flow**:
+    - Check if the `field_callback` in the field's descriptor is not NULL.
+    - If the `field_callback` is not NULL, call it with NULL, the stream, and the field as arguments.
+    - If the callback returns false, return an error using `PB_RETURN_ERROR`.
+    - Return true if the callback is NULL or if it executes successfully.
+- **Output**: Returns a boolean value indicating success (true) or failure (false) of the encoding operation.
 
 
 ---
 ### encode\_field<!-- {{#callable:checkreturn::encode_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L418>)
-
-Encodes a protobuf field based on its type and presence.
+The `encode_field` function encodes a protobuf field into a stream, handling different field types and presence conditions.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - ``field``: A pointer to a `pb_field_iter_t` structure that represents the field to be encoded, containing information about the field's type, tag, and data.
-- **Logic and Control Flow**:
-    - Check if the field is a `ONEOF` type and if its tag matches the expected tag; if not, return `true` to skip encoding.
-    - For `OPTIONAL` fields, check if the field is present using `pSize`; if not present, return `true` to skip encoding.
-    - If the field data pointer `pData` is `NULL` and the field is `REQUIRED`, return an error; otherwise, return `true` to skip encoding.
-    - Determine the field's allocation type (`CALLBACK`, `REPEATED`, or basic) and call the appropriate encoding function ([`encode_callback_field`](<#checkreturnencode_callback_field>), [`encode_array`](<#checkreturnencode_array>), or [`encode_basic_field`](<#checkreturnencode_basic_field>)).
-- **Output**: Returns `true` if the field is successfully encoded or skipped, and `false` if an error occurs during encoding.
-- **Functions Called**:
-    - [`safe_read_bool`](<#safe_read_bool>)
-    - [`checkreturn::pb_check_proto3_default_value`](<#checkreturnpb_check_proto3_default_value>)
-    - [`checkreturn::encode_callback_field`](<#checkreturnencode_callback_field>)
-    - [`checkreturn::encode_array`](<#checkreturnencode_array>)
-    - [`checkreturn::encode_basic_field`](<#checkreturnencode_basic_field>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded field will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to be encoded, containing metadata and data pointers.
+- **Control Flow**:
+    - Check if the field is a 'oneof' type and if its tag matches the expected tag; if not, return true to skip encoding.
+    - For 'optional' fields, check if the field is present using its size pointer; if not present, return true to skip encoding.
+    - If the field data pointer is NULL, check if the field is 'required'; if so, return an error, otherwise return true to skip encoding.
+    - Determine the field's allocation type: if it's a callback, call [`encode_callback_field`](#checkreturnencode_callback_field); if it's repeated, call [`encode_array`](#checkreturnencode_array); otherwise, call [`encode_basic_field`](#checkreturnencode_basic_field).
+- **Output**: Returns a boolean indicating success (true) or failure (false) of the encoding process.
+- **Functions called**:
+    - [`safe_read_bool`](#safe_read_bool)
+    - [`checkreturn::pb_check_proto3_default_value`](#checkreturnpb_check_proto3_default_value)
+    - [`checkreturn::encode_callback_field`](#checkreturnencode_callback_field)
+    - [`checkreturn::encode_array`](#checkreturnencode_array)
+    - [`checkreturn::encode_basic_field`](#checkreturnencode_basic_field)
 
 
 ---
 ### default\_extension\_encoder<!-- {{#callable:checkreturn::default_extension_encoder}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L474>)
-
-Encodes a protobuf extension field using a default handler.
+The `default_extension_encoder` function encodes a protobuf extension field using a default handler.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - ``extension``: A pointer to a `pb_extension_t` structure that represents the extension field to be encoded.
-- **Logic and Control Flow**:
+    - `stream`: A pointer to a `pb_ostream_t` structure, which represents the output stream where the encoded data will be written.
+    - `extension`: A pointer to a `pb_extension_t` structure, which represents the extension field to be encoded.
+- **Control Flow**:
     - Initialize a `pb_field_iter_t` iterator to iterate over the fields of the extension.
-    - Call [`pb_field_iter_begin_extension_const`](<pb_common.c.md#pb_field_iter_begin_extension_const>) to start iterating over the extension fields.
+    - Call [`pb_field_iter_begin_extension_const`](pb_common.c.md#pb_field_iter_begin_extension_const) to start iterating over the extension fields.
     - If the iterator initialization fails, return an error using `PB_RETURN_ERROR`.
-    - Call [`encode_field`](<#checkreturnencode_field>) to encode the field pointed to by the iterator.
-    - Return the result of [`encode_field`](<#checkreturnencode_field>).
+    - If the iterator is successfully initialized, call [`encode_field`](#checkreturnencode_field) to encode the field represented by the iterator.
 - **Output**: Returns a boolean value indicating success (`true`) or failure (`false`) of the encoding process.
-- **Functions Called**:
-    - [`pb_field_iter_begin_extension_const`](<pb_common.c.md#pb_field_iter_begin_extension_const>)
-    - [`checkreturn::encode_field`](<#checkreturnencode_field>)
+- **Functions called**:
+    - [`pb_field_iter_begin_extension_const`](pb_common.c.md#pb_field_iter_begin_extension_const)
+    - [`checkreturn::encode_field`](#checkreturnencode_field)
 
 
 ---
 ### encode\_extension\_field<!-- {{#callable:checkreturn::encode_extension_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L487>)
-
-Encodes all registered extensions for a given field into a protobuf stream.
+The `encode_extension_field` function encodes all registered extensions for a given field into a protobuf stream.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - ``field``: A pointer to a `pb_field_iter_t` structure that represents the field containing the extensions to encode.
-- **Logic and Control Flow**:
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field iterator for the current field being processed.
+- **Control Flow**:
     - Retrieve the extension from the field's data pointer.
-    - Iterate over each extension in the linked list of extensions.
-    - For each extension, check if it has a custom encode function.
-    - If a custom encode function exists, call it with the stream and extension as arguments.
-    - If no custom encode function exists, use the [`default_extension_encoder`](<#checkreturndefault_extension_encoder>) to encode the extension.
-    - If encoding any extension fails, return `false`.
-    - If all extensions are successfully encoded, return `true`.
-- **Output**: Returns `true` if all extensions are successfully encoded, otherwise returns `false`.
-- **Functions Called**:
-    - [`checkreturn::default_extension_encoder`](<#checkreturndefault_extension_encoder>)
+    - Enter a loop that continues as long as there is an extension to process.
+    - Check if the extension has a custom encode function; if so, use it to encode the extension.
+    - If no custom encode function is available, use the [`default_extension_encoder`](#checkreturndefault_extension_encoder) to encode the extension.
+    - If encoding fails at any point, return false to indicate failure.
+    - Move to the next extension in the linked list and repeat the process.
+    - Return true if all extensions are successfully encoded.
+- **Output**: Returns a boolean value indicating success (true) or failure (false) of encoding all extensions.
+- **Functions called**:
+    - [`checkreturn::default_extension_encoder`](#checkreturndefault_extension_encoder)
 
 
 ---
 ### pb\_encode<!-- {{#callable:checkreturn::pb_encode}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L512>)
-
-Encodes a Protocol Buffers message from a source structure into a stream.
+The `pb_encode` function encodes a protobuf message from a given structure into a stream using the specified message descriptor.
 - **Inputs**:
     - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded message will be written.
-    - `fields`: A pointer to a `pb_msgdesc_t` structure that describes the fields of the message to encode.
-    - `src_struct`: A pointer to the source structure containing the data to encode.
-- **Logic and Control Flow**:
-    - Initialize a `pb_field_iter_t` iterator to traverse the fields of the message using [`pb_field_iter_begin_const`](<pb_common.c.md#pb_field_iter_begin_const>).
-    - If the message type is empty, return `true`.
-    - Iterate over each field in the message using a `do-while` loop and [`pb_field_iter_next`](<pb_common.c.md#pb_field_iter_next>).
-    - For each field, check if it is an extension field using `PB_LTYPE`.
-    - If it is an extension field, call [`encode_extension_field`](<#checkreturnencode_extension_field>) to encode it; if encoding fails, return `false`.
-    - If it is a regular field, call [`encode_field`](<#checkreturnencode_field>) to encode it; if encoding fails, return `false`.
-    - Continue the loop until all fields are processed.
+    - `fields`: A pointer to a `pb_msgdesc_t` structure that describes the fields of the protobuf message to be encoded.
+    - `src_struct`: A pointer to the source structure containing the data to be encoded into the protobuf message.
+- **Control Flow**:
+    - Initialize a field iterator `iter` using [`pb_field_iter_begin_const`](pb_common.c.md#pb_field_iter_begin_const) with the provided fields and source structure.
+    - Check if the message type is empty by evaluating the result of [`pb_field_iter_begin_const`](pb_common.c.md#pb_field_iter_begin_const); if true, return `true`.
+    - Iterate over each field in the message using a `do-while` loop with [`pb_field_iter_next`](pb_common.c.md#pb_field_iter_next).
+    - For each field, check if it is an extension field using `PB_LTYPE(iter.type) == PB_LTYPE_EXTENSION`.
+    - If it is an extension field, call [`encode_extension_field`](#checkreturnencode_extension_field) to encode it; if encoding fails, return `false`.
+    - If it is a regular field, call [`encode_field`](#checkreturnencode_field) to encode it; if encoding fails, return `false`.
+    - Continue the loop until all fields have been processed.
     - Return `true` after successfully encoding all fields.
-- **Output**: Returns `true` if the message is successfully encoded, otherwise `false` if an error occurs during encoding.
-- **Functions Called**:
-    - [`pb_field_iter_begin_const`](<pb_common.c.md#pb_field_iter_begin_const>)
-    - [`checkreturn::encode_extension_field`](<#checkreturnencode_extension_field>)
-    - [`checkreturn::encode_field`](<#checkreturnencode_field>)
-    - [`pb_field_iter_next`](<pb_common.c.md#pb_field_iter_next>)
+- **Output**: The function returns a boolean value `true` if the encoding is successful, or `false` if an error occurs during encoding.
+- **Functions called**:
+    - [`pb_field_iter_begin_const`](pb_common.c.md#pb_field_iter_begin_const)
+    - [`checkreturn::encode_extension_field`](#checkreturnencode_extension_field)
+    - [`checkreturn::encode_field`](#checkreturnencode_field)
+    - [`pb_field_iter_next`](pb_common.c.md#pb_field_iter_next)
 
 
 ---
 ### pb\_encode\_ex<!-- {{#callable:checkreturn::pb_encode_ex}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L536>)
-
-Encodes a protobuf message with optional flags for delimited or null-terminated encoding.
+The `pb_encode_ex` function encodes a protobuf message into a stream with optional flags for delimited or null-terminated encoding.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream for encoding.
-    - ``fields``: A pointer to a `pb_msgdesc_t` structure that describes the fields of the protobuf message to encode.
-    - ``src_struct``: A pointer to the source structure containing the data to encode.
-    - ``flags``: An unsigned integer that specifies encoding options, such as `PB_ENCODE_DELIMITED` or `PB_ENCODE_NULLTERMINATED`.
-- **Logic and Control Flow**:
-    - Checks if the `flags` argument has the `PB_ENCODE_DELIMITED` bit set.
-    - If `PB_ENCODE_DELIMITED` is set, calls [`pb_encode_submessage`](<#checkreturnpb_encode_submessage>) to encode the message as a submessage.
-    - If `PB_ENCODE_NULLTERMINATED` is set, calls [`pb_encode`](<#checkreturnpb_encode>) to encode the message, then writes a null byte to the stream using [`pb_write`](<#checkreturnpb_write>).
-    - If neither flag is set, calls [`pb_encode`](<#checkreturnpb_encode>) to encode the message without additional processing.
-- **Output**: Returns `true` if the encoding is successful, otherwise returns `false`.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_submessage`](<#checkreturnpb_encode_submessage>)
-    - [`checkreturn::pb_encode`](<#checkreturnpb_encode>)
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded message will be written.
+    - `fields`: A pointer to a `pb_msgdesc_t` structure that describes the fields of the protobuf message to be encoded.
+    - `src_struct`: A pointer to the source structure containing the data to be encoded into the protobuf message.
+    - `flags`: An unsigned integer representing encoding options, such as `PB_ENCODE_DELIMITED` or `PB_ENCODE_NULLTERMINATED`.
+- **Control Flow**:
+    - Check if the `flags` argument has the `PB_ENCODE_DELIMITED` bit set.
+    - If `PB_ENCODE_DELIMITED` is set, call [`pb_encode_submessage`](#checkreturnpb_encode_submessage) to encode the message as a submessage and return its result.
+    - Check if the `flags` argument has the `PB_ENCODE_NULLTERMINATED` bit set.
+    - If `PB_ENCODE_NULLTERMINATED` is set, call [`pb_encode`](#checkreturnpb_encode) to encode the message, and if successful, write a null byte to the stream using [`pb_write`](#checkreturnpb_write).
+    - If neither flag is set, call [`pb_encode`](#checkreturnpb_encode) to encode the message without any special termination.
+- **Output**: Returns a boolean value indicating success (`true`) or failure (`false`) of the encoding process.
+- **Functions called**:
+    - [`checkreturn::pb_encode_submessage`](#checkreturnpb_encode_submessage)
+    - [`checkreturn::pb_encode`](#checkreturnpb_encode)
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
 
 
 ---
 ### pb\_get\_encoded\_size<!-- {{#callable:pb_get_encoded_size}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L557>)
-
-Calculates the encoded size of a protobuf message without actually encoding it.
+The `pb_get_encoded_size` function calculates the size of the encoded protobuf message for a given structure and message descriptor.
 - **Inputs**:
-    - ``size``: A pointer to a `size_t` variable where the function will store the calculated size of the encoded message.
-    - ``fields``: A pointer to a `pb_msgdesc_t` structure that describes the fields of the protobuf message.
-    - ``src_struct``: A pointer to the source structure containing the data to be encoded.
-- **Logic and Control Flow**:
-    - Initialize a `pb_ostream_t` stream with `PB_OSTREAM_SIZING` to calculate the size without writing data.
-    - Call [`pb_encode`](<#checkreturnpb_encode>) with the stream, fields, and source structure to perform the size calculation.
-    - If [`pb_encode`](<#checkreturnpb_encode>) returns false, return false indicating failure.
-    - If [`pb_encode`](<#checkreturnpb_encode>) is successful, store the number of bytes written in the `size` variable.
-    - Return true indicating success.
-- **Output**: Returns a boolean value: true if the size calculation is successful, false otherwise.
-- **Functions Called**:
-    - [`checkreturn::pb_encode`](<#checkreturnpb_encode>)
+    - `size`: A pointer to a `size_t` variable where the function will store the calculated size of the encoded message.
+    - `fields`: A pointer to a `pb_msgdesc_t` structure that describes the fields of the protobuf message to be encoded.
+    - `src_struct`: A pointer to the source structure containing the data to be encoded into the protobuf message.
+- **Control Flow**:
+    - Initialize a `pb_ostream_t` stream with `PB_OSTREAM_SIZING` to calculate the size without actual encoding.
+    - Call [`pb_encode`](#checkreturnpb_encode) with the stream, fields, and source structure to perform the encoding size calculation.
+    - If [`pb_encode`](#checkreturnpb_encode) returns false, indicating an error during encoding, return false from the function.
+    - If encoding is successful, store the number of bytes written to the stream in the `size` variable.
+    - Return true to indicate successful size calculation.
+- **Output**: Returns a boolean value: true if the size calculation was successful, false if there was an error during encoding.
+- **Functions called**:
+    - [`checkreturn::pb_encode`](#checkreturnpb_encode)
 
 
 ---
 ### pb\_encode\_varint\_32<!-- {{#callable:checkreturn::pb_encode_varint_32}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L573>)
-
-Encodes a 32-bit varint from two 32-bit integers into a buffer and writes it to a stream.
+The `pb_encode_varint_32` function encodes a 32-bit varint from two 32-bit integers (low and high) into a byte buffer and writes it to a protobuf output stream.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure where the encoded varint will be written.
-    - `low`: A 32-bit unsigned integer representing the lower part of the varint to encode.
-    - `high`: A 32-bit unsigned integer representing the higher part of the varint to encode.
-- **Logic and Control Flow**:
-    - Initialize a buffer and a byte variable to store the encoded varint.
-    - Extract the least significant 7 bits from `low` and store it in `byte`.
-    - Shift `low` right by 7 bits.
-    - Enter a loop to encode up to 4 bytes while `low` or `high` is not zero.
-    - In each iteration, set the most significant bit of `byte` to 1, store `byte` in the buffer, and update `byte` with the next 7 bits of `low`.
-    - Shift `low` right by 7 bits after each iteration.
-    - If `high` is non-zero, encode additional bytes by combining bits from `high` with `byte` and shifting `high` right by 3 bits.
-    - Continue encoding until `high` becomes zero.
-    - Store the final `byte` in the buffer.
-    - Write the buffer to the stream using [`pb_write`](<#checkreturnpb_write>).
-- **Output**: Returns `true` if the varint is successfully written to the stream, otherwise `false`.
-- **Functions Called**:
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded varint will be written.
+    - `low`: A 32-bit unsigned integer representing the lower part of the value to be encoded.
+    - `high`: A 32-bit unsigned integer representing the higher part of the value to be encoded.
+- **Control Flow**:
+    - Initialize a buffer to hold up to 10 bytes and a byte variable to store the least significant 7 bits of the 'low' input.
+    - Shift the 'low' input right by 7 bits and enter a loop that continues while there are more bits to encode in 'low' or 'high'.
+    - In each iteration, set the most significant bit of the byte to 1 (indicating more bytes follow), store the byte in the buffer, and update the byte with the next 7 bits of 'low'.
+    - If 'high' is non-zero, encode its bits by setting the most significant bit of the byte to 1 and shifting 'high' right by 3 bits, continuing until all bits are processed.
+    - Store the final byte in the buffer and write the buffer to the output stream using [`pb_write`](#checkreturnpb_write).
+- **Output**: Returns a boolean indicating success (true) or failure (false) of writing the encoded varint to the stream.
+- **Functions called**:
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
 
 
 ---
 ### pb\_encode\_varint<!-- {{#callable:checkreturn::pb_encode_varint}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L607>)
-
-Encodes a 64-bit unsigned integer as a variable-length integer into a protobuf output stream.
+The `pb_encode_varint` function encodes a 64-bit unsigned integer into a variable-length format and writes it to a given output stream.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded varint will be written.
-    - ``value``: A `pb_uint64_t` value representing the 64-bit unsigned integer to encode.
-- **Logic and Control Flow**:
-    - Check if `value` is less than or equal to `0x7F` (127 in decimal).
-    - If true, cast `value` to `pb_byte_t` and write it as a single byte to `stream` using [`pb_write`](<#checkreturnpb_write>).
-    - If false, check if `PB_WITHOUT_64BIT` is defined.
-    - If `PB_WITHOUT_64BIT` is defined, call [`pb_encode_varint_32`](<#checkreturnpb_encode_varint_32>) with `value` and 0 as arguments.
-    - If `PB_WITHOUT_64BIT` is not defined, call [`pb_encode_varint_32`](<#checkreturnpb_encode_varint_32>) with the lower 32 bits and the upper 32 bits of `value`.
-- **Output**: Returns `true` if the encoding and writing to the stream are successful, otherwise returns `false`.
-- **Functions Called**:
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
-    - [`checkreturn::pb_encode_varint_32`](<#checkreturnpb_encode_varint_32>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded varint will be written.
+    - `value`: A 64-bit unsigned integer (`pb_uint64_t`) that is to be encoded into a varint format.
+- **Control Flow**:
+    - Check if the value is less than or equal to 0x7F (127 in decimal).
+    - If true, cast the value to a single byte and write it to the stream using [`pb_write`](#checkreturnpb_write).
+    - If false, check if the `PB_WITHOUT_64BIT` macro is defined.
+    - If `PB_WITHOUT_64BIT` is defined, call [`pb_encode_varint_32`](#checkreturnpb_encode_varint_32) with the value and 0 as arguments.
+    - If `PB_WITHOUT_64BIT` is not defined, call [`pb_encode_varint_32`](#checkreturnpb_encode_varint_32) with the lower 32 bits and the upper 32 bits of the value as arguments.
+- **Output**: Returns a boolean indicating success (`true`) or failure (`false`) of the encoding operation.
+- **Functions called**:
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
+    - [`checkreturn::pb_encode_varint_32`](#checkreturnpb_encode_varint_32)
 
 
 ---
 ### pb\_encode\_svarint<!-- {{#callable:checkreturn::pb_encode_svarint}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L625>)
-
-Encodes a signed integer as a zigzag-encoded varint and writes it to a protobuf output stream.
+The `pb_encode_svarint` function encodes a signed integer into a stream using ZigZag encoding and then encodes it as a varint.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded varint will be written.
-    - ``value``: A signed 64-bit integer (`pb_int64_t`) that is the value to be encoded.
-- **Logic and Control Flow**:
-    - Initialize a `mask` variable to handle integer sanitization.
-    - Check if `value` is negative; if true, apply zigzag encoding by negating and shifting the value, then store it in `zigzagged`.
-    - If `value` is non-negative, shift it left by one and store it in `zigzagged`.
-    - Call [`pb_encode_varint`](<#checkreturnpb_encode_varint>) with `stream` and `zigzagged` to write the encoded value to the stream.
-- **Output**: Returns a boolean indicating success (`true`) or failure (`false`) of the encoding operation.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_varint`](<#checkreturnpb_encode_varint>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded varint will be written.
+    - `value`: A signed 64-bit integer (`pb_int64_t`) that is to be encoded using ZigZag encoding.
+- **Control Flow**:
+    - The function first defines a `pb_uint64_t` variable `zigzagged` to store the ZigZag encoded value.
+    - It also defines a `mask` variable to ensure proper integer handling, especially for negative values.
+    - If the input `value` is negative, it applies ZigZag encoding by negating the bitwise AND of the value and the mask, then left-shifting by one.
+    - If the input `value` is non-negative, it simply left-shifts the value by one to apply ZigZag encoding.
+    - Finally, it calls [`pb_encode_varint`](#checkreturnpb_encode_varint) with the stream and the ZigZag encoded value, returning the result of this function call.
+- **Output**: The function returns a boolean value indicating the success or failure of encoding the ZigZag encoded integer as a varint into the stream.
+- **Functions called**:
+    - [`checkreturn::pb_encode_varint`](#checkreturnpb_encode_varint)
 
 
 ---
 ### pb\_encode\_fixed32<!-- {{#callable:checkreturn::pb_encode_fixed32}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L637>)
-
-Encodes a 32-bit fixed-width integer into a protobuf stream, considering endianness.
+The `pb_encode_fixed32` function encodes a 32-bit fixed-width integer into a protobuf stream, handling both little-endian and non-little-endian systems.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - `value`: A pointer to the 32-bit integer value to encode.
-- **Logic and Control Flow**:
-    - Checks if the system is little-endian and 8-bit, and if so, directly writes the 4 bytes of `value` to `stream` using [`pb_write`](<#checkreturnpb_write>).
-    - If the system is not little-endian, reads the 32-bit integer from `value`, splits it into 4 bytes, and stores them in the `bytes` array.
-    - Writes the `bytes` array to `stream` using [`pb_write`](<#checkreturnpb_write>).
-- **Output**: Returns `true` if the encoding and writing to the stream are successful, otherwise returns `false`.
-- **Functions Called**:
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `value`: A pointer to the 32-bit integer value to be encoded and written to the stream.
+- **Control Flow**:
+    - Check if the system is little-endian and 8-bit, if so, directly write the 4 bytes of the value to the stream using [`pb_write`](#checkreturnpb_write).
+    - If not little-endian, extract each byte of the 32-bit integer value manually by shifting and masking, then store them in a byte array.
+    - Write the byte array to the stream using [`pb_write`](#checkreturnpb_write).
+- **Output**: Returns a boolean indicating success (`true`) or failure (`false`) of the write operation.
+- **Functions called**:
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
 
 
 ---
 ### pb\_encode\_fixed64<!-- {{#callable:checkreturn::pb_encode_fixed64}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L654>)
-
-Encodes a 64-bit fixed-width integer into a protobuf stream, considering endianness.
+The `pb_encode_fixed64` function encodes a 64-bit fixed-width integer into a protobuf stream, handling both little-endian and non-little-endian systems.
 - **Inputs**:
-    - `stream`: A pointer to `pb_ostream_t`, which represents the output stream where the encoded data will be written.
-    - `value`: A pointer to the 64-bit integer value to encode.
-- **Logic and Control Flow**:
-    - Checks if the system is little-endian with 8-bit bytes using the `PB_LITTLE_ENDIAN_8BIT` macro.
-    - If the system is little-endian, directly writes the 64-bit value to the stream using [`pb_write`](<#checkreturnpb_write>).
-    - If the system is not little-endian, manually converts the 64-bit integer to a byte array in little-endian order.
-    - Writes the byte array to the stream using [`pb_write`](<#checkreturnpb_write>).
-- **Output**: Returns `true` if the encoding and writing to the stream are successful, otherwise returns `false`.
-- **Functions Called**:
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `value`: A pointer to the 64-bit integer value to be encoded and written to the stream.
+- **Control Flow**:
+    - Check if the system is little-endian and 8-bit, and if so, directly write the 64-bit value to the stream using [`pb_write`](#checkreturnpb_write).
+    - If the system is not little-endian, manually extract each byte from the 64-bit integer, starting from the least significant byte to the most significant byte, and store them in an array.
+    - Write the byte array to the stream using [`pb_write`](#checkreturnpb_write).
+- **Output**: Returns a boolean value indicating success (`true`) or failure (`false`) of the write operation.
+- **Functions called**:
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
 
 
 ---
 ### pb\_encode\_tag<!-- {{#callable:checkreturn::pb_encode_tag}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L675>)
-
-Encodes a Protobuf tag by combining a field number and wire type, then writes it as a varint to the output stream.
+The `pb_encode_tag` function encodes a Protobuf field tag by combining the field number and wire type into a single varint and writes it to the output stream.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded tag will be written.
-    - `wiretype`: A `pb_wire_type_t` value representing the wire type of the field.
-    - `field_number`: A `uint32_t` value representing the field number to be encoded.
-- **Logic and Control Flow**:
-    - Calculate the tag by shifting the `field_number` left by 3 bits and performing a bitwise OR with `wiretype`.
-    - Call [`pb_encode_varint`](<#checkreturnpb_encode_varint>) with `stream` and the calculated `tag` to encode and write the tag as a varint to the stream.
-    - Return the result of [`pb_encode_varint`](<#checkreturnpb_encode_varint>), which indicates success or failure.
-- **Output**: Returns a boolean value indicating whether the tag was successfully encoded and written to the stream.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_varint`](<#checkreturnpb_encode_varint>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded tag will be written.
+    - `wiretype`: A `pb_wire_type_t` value representing the wire type of the field to be encoded.
+    - `field_number`: A `uint32_t` representing the field number of the Protobuf field to be encoded.
+- **Control Flow**:
+    - Calculate the tag by shifting the field number left by 3 bits and OR-ing it with the wire type.
+    - Call [`pb_encode_varint`](#checkreturnpb_encode_varint) to encode the calculated tag as a varint and write it to the provided output stream.
+    - Return the result of the [`pb_encode_varint`](#checkreturnpb_encode_varint) function call, indicating success or failure.
+- **Output**: A boolean value indicating whether the tag was successfully encoded and written to the stream.
+- **Functions called**:
+    - [`checkreturn::pb_encode_varint`](#checkreturnpb_encode_varint)
 
 
 ---
 ### pb\_encode\_tag\_for\_field<!-- {{#callable:pb_encode_tag_for_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L681>)
-
-Encodes a protobuf field's tag based on its type and writes it to the output stream.
+The `pb_encode_tag_for_field` function encodes a protobuf field tag and wire type into a stream based on the field's type.
 - **Inputs**:
-    - `stream`: A pointer to `pb_ostream_t`, which represents the output stream where the encoded tag will be written.
-    - `field`: A pointer to `pb_field_iter_t`, which contains information about the field, including its type and tag.
-- **Logic and Control Flow**:
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded tag will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field whose tag and wire type are to be encoded.
+- **Control Flow**:
     - Determine the wire type based on the field's type using a switch statement.
-    - For `PB_LTYPE_BOOL`, `PB_LTYPE_VARINT`, `PB_LTYPE_UVARINT`, and `PB_LTYPE_SVARINT`, set the wire type to `PB_WT_VARINT`.
-    - For `PB_LTYPE_FIXED32`, set the wire type to `PB_WT_32BIT`.
-    - For `PB_LTYPE_FIXED64`, set the wire type to `PB_WT_64BIT`.
-    - For `PB_LTYPE_BYTES`, `PB_LTYPE_STRING`, `PB_LTYPE_SUBMESSAGE`, `PB_LTYPE_SUBMSG_W_CB`, and `PB_LTYPE_FIXED_LENGTH_BYTES`, set the wire type to `PB_WT_STRING`.
+    - For boolean, varint, uvarint, and svarint types, set the wire type to `PB_WT_VARINT`.
+    - For fixed32 type, set the wire type to `PB_WT_32BIT`.
+    - For fixed64 type, set the wire type to `PB_WT_64BIT`.
+    - For bytes, string, submessage, submsg_w_cb, and fixed_length_bytes types, set the wire type to `PB_WT_STRING`.
     - If the field type is invalid, return an error using `PB_RETURN_ERROR`.
-    - Call [`pb_encode_tag`](<#checkreturnpb_encode_tag>) with the determined wire type and the field's tag to encode the tag and write it to the stream.
-- **Output**: Returns `true` if the tag is successfully encoded and written to the stream; otherwise, returns `false` if an error occurs.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_tag`](<#checkreturnpb_encode_tag>)
+    - Call [`pb_encode_tag`](#checkreturnpb_encode_tag) with the determined wire type and the field's tag to encode the tag into the stream.
+- **Output**: Returns a boolean indicating success (`true`) or failure (`false`) of the encoding operation.
+- **Functions called**:
+    - [`checkreturn::pb_encode_tag`](#checkreturnpb_encode_tag)
 
 
 ---
 ### pb\_encode\_string<!-- {{#callable:checkreturn::pb_encode_string}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L716>)
-
-Encodes a string into a protobuf stream by first encoding its length as a varint and then writing the string data.
+The `pb_encode_string` function encodes a string into a protobuf stream by first encoding its length as a varint and then writing the string data to the stream.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - `buffer`: A pointer to a `pb_byte_t` array containing the string data to encode.
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `buffer`: A pointer to a `pb_byte_t` array containing the string data to be encoded.
     - `size`: The size of the string data in bytes.
-- **Logic and Control Flow**:
-    - Call [`pb_encode_varint`](<#checkreturnpb_encode_varint>) to encode the size of the string as a varint and write it to the stream.
-    - If [`pb_encode_varint`](<#checkreturnpb_encode_varint>) returns false, return false to indicate failure.
-    - Call [`pb_write`](<#checkreturnpb_write>) to write the string data from `buffer` to the stream.
-    - Return the result of [`pb_write`](<#checkreturnpb_write>), which indicates success or failure.
-- **Output**: Returns a boolean value indicating success (true) or failure (false) of the encoding process.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_varint`](<#checkreturnpb_encode_varint>)
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
+- **Control Flow**:
+    - The function first attempts to encode the size of the string as a varint using [`pb_encode_varint`](#checkreturnpb_encode_varint).
+    - If encoding the size fails, the function returns `false`.
+    - If encoding the size succeeds, the function proceeds to write the string data to the stream using [`pb_write`](#checkreturnpb_write).
+    - The function returns the result of the [`pb_write`](#checkreturnpb_write) operation, which indicates success or failure.
+- **Output**: The function returns a boolean value indicating whether the string was successfully encoded and written to the stream.
+- **Functions called**:
+    - [`checkreturn::pb_encode_varint`](#checkreturnpb_encode_varint)
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
 
 
 ---
 ### pb\_encode\_submessage<!-- {{#callable:checkreturn::pb_encode_submessage}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L724>)
-
-Encodes a submessage into a protobuf stream, ensuring the size is consistent and within limits.
+The `pb_encode_submessage` function encodes a submessage into a protobuf stream, ensuring the size is calculated and verified before writing.
 - **Inputs**:
-    - `stream`: A pointer to `pb_ostream_t`, which represents the output stream for encoding.
-    - `fields`: A pointer to `pb_msgdesc_t`, which describes the fields of the message to encode.
-    - `src_struct`: A pointer to the source structure containing the data to encode.
-- **Logic and Control Flow**:
-    - Initialize a non-writing substream to calculate the message size.
-    - Call [`pb_encode`](<#checkreturnpb_encode>) to encode the message into the substream and check for errors.
-    - Store the number of bytes written in `size`.
-    - Encode the size as a varint into the main stream and check for errors.
-    - If the stream's callback is NULL, write the size to the stream and return.
-    - Check if the stream can accommodate the new data size; return an error if not.
-    - Set up the substream with the main stream's callback, state, and size limits.
-    - Call [`pb_encode`](<#checkreturnpb_encode>) again to encode the message into the substream and check for errors.
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded submessage will be written.
+    - `fields`: A pointer to a `pb_msgdesc_t` structure that describes the fields of the submessage to be encoded.
+    - `src_struct`: A pointer to the source structure containing the data to be encoded into the submessage.
+- **Control Flow**:
+    - Initialize a non-writing substream to calculate the size of the submessage.
+    - Call [`pb_encode`](#checkreturnpb_encode) to encode the submessage into the substream to determine its size.
+    - If encoding fails, propagate the error message and return false.
+    - Store the calculated size from the substream.
+    - Encode the size as a varint into the main stream.
+    - If the stream's callback is NULL, write the size and return, as only sizing is needed.
+    - Check if the stream has enough space to accommodate the submessage; if not, return an error.
+    - Set up the substream with the main stream's callback, state, and size constraints.
+    - Encode the submessage again using the substream to ensure the callback does not exceed the calculated size.
     - Update the main stream's state and bytes written with the substream's results.
-    - Check if the substream's bytes written matches the calculated size; return an error if not.
+    - If the substream's bytes written do not match the calculated size, return an error.
     - Return the status of the encoding operation.
-- **Output**: Returns `true` if the submessage is successfully encoded, otherwise `false`.
-- **Functions Called**:
-    - [`checkreturn::pb_encode`](<#checkreturnpb_encode>)
-    - [`checkreturn::pb_encode_varint`](<#checkreturnpb_encode_varint>)
-    - [`checkreturn::pb_write`](<#checkreturnpb_write>)
+- **Output**: Returns a boolean indicating the success or failure of encoding the submessage.
+- **Functions called**:
+    - [`checkreturn::pb_encode`](#checkreturnpb_encode)
+    - [`checkreturn::pb_encode_varint`](#checkreturnpb_encode_varint)
+    - [`checkreturn::pb_write`](#checkreturnpb_write)
 
 
 ---
 ### pb\_enc\_bool<!-- {{#callable:checkreturn::pb_enc_bool}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L776>)
-
-Encodes a boolean value from a field into a protobuf varint format.
+The `pb_enc_bool` function encodes a boolean value from a protobuf field into a varint format and writes it to a given output stream.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - `field`: A pointer to a `pb_field_iter_t` structure that contains the field data to be encoded.
-- **Logic and Control Flow**:
-    - Reads a boolean value from the field's data using [`safe_read_bool`](<#safe_read_bool>) function.
-    - Converts the boolean value to a `uint32_t` where `true` becomes `1` and `false` becomes `0`.
-    - Calls [`pb_encode_varint`](<#checkreturnpb_encode_varint>) to encode the `uint32_t` value as a varint and writes it to the output stream.
-- **Output**: Returns `true` if the encoding is successful, otherwise returns `false`.
-- **Functions Called**:
-    - [`safe_read_bool`](<#safe_read_bool>)
-    - [`checkreturn::pb_encode_varint`](<#checkreturnpb_encode_varint>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the protobuf field containing the boolean data to be encoded.
+- **Control Flow**:
+    - The function reads the boolean value from the field's data using [`safe_read_bool`](#safe_read_bool) and converts it to a uint32_t value (1 for true, 0 for false).
+    - The `PB_UNUSED` macro is used to suppress unused variable warnings for the `field` parameter.
+    - The function calls [`pb_encode_varint`](#checkreturnpb_encode_varint) to encode the boolean value as a varint and write it to the output stream.
+- **Output**: Returns a boolean indicating success (true) or failure (false) of the encoding operation.
+- **Functions called**:
+    - [`safe_read_bool`](#safe_read_bool)
+    - [`checkreturn::pb_encode_varint`](#checkreturnpb_encode_varint)
 
 
 ---
 ### pb\_enc\_varint<!-- {{#callable:checkreturn::pb_enc_varint}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L783>)
-
-Encodes a field as a varint, handling both unsigned and signed integer types based on the field's type.
+The `pb_enc_varint` function encodes a field's data as a varint, handling both unsigned and signed integer types based on the field's type and data size.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded varint will be written.
-    - `field`: A pointer to a `pb_field_iter_t` structure that contains information about the field to be encoded, including its type and data size.
-- **Logic and Control Flow**:
-    - Check if the field type is `PB_LTYPE_UVARINT` for unsigned varint encoding.
-    - If unsigned, determine the integer value from the field's data based on its size (8, 16, 32, or 64 bits).
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded varint will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to be encoded, containing information about the field's type, data size, and data pointer.
+- **Control Flow**:
+    - Check if the field type is unsigned varint (`PB_LTYPE_UVARINT`).
+    - If unsigned, determine the value based on the data size and cast the data pointer to the appropriate unsigned integer type.
     - If the data size is invalid, return an error using `PB_RETURN_ERROR`.
-    - Encode the unsigned integer value using [`pb_encode_varint`](<#checkreturnpb_encode_varint>).
-    - If the field type is not `PB_LTYPE_UVARINT`, treat it as a signed integer.
-    - Determine the signed integer value from the field's data based on its size (8, 16, 32, or 64 bits).
+    - Encode the unsigned integer value using [`pb_encode_varint`](#checkreturnpb_encode_varint).
+    - If the field type is not unsigned, treat it as a signed integer.
+    - Determine the signed integer value based on the data size and cast the data pointer to the appropriate signed integer type.
     - If the data size is invalid, return an error using `PB_RETURN_ERROR`.
-    - If the field type is `PB_LTYPE_SVARINT`, encode the signed integer using [`pb_encode_svarint`](<#checkreturnpb_encode_svarint>).
-    - If the `PB_WITHOUT_64BIT` flag is defined and the value is negative, encode using [`pb_encode_varint_32`](<#checkreturnpb_encode_varint_32>).
-    - Otherwise, encode the signed integer as an unsigned varint using [`pb_encode_varint`](<#checkreturnpb_encode_varint>).
-- **Output**: Returns `true` if the encoding is successful, otherwise returns `false` if an error occurs.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_varint`](<#checkreturnpb_encode_varint>)
-    - [`checkreturn::pb_encode_svarint`](<#checkreturnpb_encode_svarint>)
-    - [`checkreturn::pb_encode_varint_32`](<#checkreturnpb_encode_varint_32>)
+    - If the field type is signed varint (`PB_LTYPE_SVARINT`), encode the value using [`pb_encode_svarint`](#checkreturnpb_encode_svarint).
+    - If the field type is not signed varint and the value is negative (only if `PB_WITHOUT_64BIT` is defined), encode using [`pb_encode_varint_32`](#checkreturnpb_encode_varint_32).
+    - Otherwise, encode the signed integer value as an unsigned varint using [`pb_encode_varint`](#checkreturnpb_encode_varint).
+- **Output**: Returns a boolean indicating success (`true`) or failure (`false`) of the encoding operation.
+- **Functions called**:
+    - [`checkreturn::pb_encode_varint`](#checkreturnpb_encode_varint)
+    - [`checkreturn::pb_encode_svarint`](#checkreturnpb_encode_svarint)
+    - [`checkreturn::pb_encode_varint_32`](#checkreturnpb_encode_varint_32)
 
 
 ---
 ### pb\_enc\_fixed<!-- {{#callable:checkreturn::pb_enc_fixed}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L831>)
-
-Encodes fixed-size numeric data into a protobuf stream based on the data size and type.
+The `pb_enc_fixed` function encodes fixed-size numeric fields into a protobuf stream, handling both 32-bit and 64-bit data sizes.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - ``field``: A pointer to a `pb_field_iter_t` structure that contains information about the field to be encoded, including its data size and type.
-- **Logic and Control Flow**:
-    - If `PB_CONVERT_DOUBLE_FLOAT` is defined and the field's data size is `sizeof(float)` with a type of `PB_LTYPE_FIXED64`, call [`pb_encode_float_as_double`](<#pb_encode_float_as_double>) to encode the float as a double.
-    - If the field's data size is `sizeof(uint32_t)`, call [`pb_encode_fixed32`](<#checkreturnpb_encode_fixed32>) to encode the data as a 32-bit fixed-size integer.
-    - If `PB_WITHOUT_64BIT` is not defined and the field's data size is `sizeof(uint64_t)`, call [`pb_encode_fixed64`](<#checkreturnpb_encode_fixed64>) to encode the data as a 64-bit fixed-size integer.
-    - If none of the conditions match, return an error indicating an invalid data size.
-- **Output**: Returns `true` if the encoding is successful, otherwise returns `false` if an error occurs.
-- **Functions Called**:
-    - [`pb_encode_float_as_double`](<#pb_encode_float_as_double>)
-    - [`checkreturn::pb_encode_fixed32`](<#checkreturnpb_encode_fixed32>)
-    - [`checkreturn::pb_encode_fixed64`](<#checkreturnpb_encode_fixed64>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to be encoded, which contains information about the data type and size.
+- **Control Flow**:
+    - Check if `PB_CONVERT_DOUBLE_FLOAT` is defined and if the field is a 32-bit float being encoded as a 64-bit fixed type, then call [`pb_encode_float_as_double`](#pb_encode_float_as_double) to encode it as a double.
+    - If the field's data size is 32 bits, call [`pb_encode_fixed32`](#checkreturnpb_encode_fixed32) to encode the data as a 32-bit fixed-size field.
+    - If 64-bit support is enabled and the field's data size is 64 bits, call [`pb_encode_fixed64`](#checkreturnpb_encode_fixed64) to encode the data as a 64-bit fixed-size field.
+    - If none of the conditions are met, return an error indicating an invalid data size.
+- **Output**: Returns a boolean value indicating success (`true`) or failure (`false`) of the encoding operation.
+- **Functions called**:
+    - [`pb_encode_float_as_double`](#pb_encode_float_as_double)
+    - [`checkreturn::pb_encode_fixed32`](#checkreturnpb_encode_fixed32)
+    - [`checkreturn::pb_encode_fixed64`](#checkreturnpb_encode_fixed64)
 
 
 ---
 ### pb\_enc\_bytes<!-- {{#callable:checkreturn::pb_enc_bytes}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L856>)
-
-Encodes a field of type bytes into a protobuf stream, handling null pointers and size constraints.
+The `pb_enc_bytes` function encodes a byte array field into a protobuf stream, handling null pointers and size constraints.
 - **Inputs**:
-    - `stream`: A pointer to `pb_ostream_t`, which represents the output stream where the encoded data will be written.
-    - `field`: A pointer to `pb_field_iter_t`, which contains information about the field to be encoded, including its data and type.
-- **Logic and Control Flow**:
-    - Retrieve the bytes data from the field's `pData` pointer and cast it to `pb_bytes_array_t` type.
-    - Check if the bytes data is null; if so, encode an empty string into the stream and return the result.
-    - If the field type is static and the size of the bytes data exceeds the allowed size, return an error indicating 'bytes size exceeded'.
-    - Encode the bytes data into the stream using [`pb_encode_string`](<#checkreturnpb_encode_string>), passing the bytes and their size.
-- **Output**: Returns a boolean indicating success (`true`) or failure (`false`) of the encoding process.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_string`](<#checkreturnpb_encode_string>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field descriptor and data to be encoded.
+- **Control Flow**:
+    - Retrieve the byte array from the field's data pointer.
+    - Check if the byte array is NULL; if so, encode an empty byte string and return the result.
+    - If the field type is static and the byte array size exceeds the allowed size, return an error.
+    - Encode the byte array into the stream using [`pb_encode_string`](#checkreturnpb_encode_string) and return the result.
+- **Output**: Returns a boolean indicating success (true) or failure (false) of the encoding operation.
+- **Functions called**:
+    - [`checkreturn::pb_encode_string`](#checkreturnpb_encode_string)
 
 
 ---
 ### pb\_enc\_string<!-- {{#callable:checkreturn::pb_enc_string}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L877>)
-
-Encodes a string field into a protobuf stream, ensuring it is properly terminated and optionally validating UTF-8.
+The `pb_enc_string` function encodes a string field into a protobuf stream, ensuring it is properly terminated and optionally validating UTF-8 encoding.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded string will be written.
-    - ``field``: A pointer to a `pb_field_iter_t` structure that contains information about the field being encoded, including its type, data size, and data pointer.
-- **Logic and Control Flow**:
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded string will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field metadata, including the string data and its size.
+- **Control Flow**:
     - Initialize `size` to 0 and `max_size` to the field's data size.
     - Check if the field type is a pointer; if so, set `max_size` to the maximum possible size.
-    - If the field type is not a pointer, ensure `max_size` is greater than zero to allow space for a null terminator.
-    - If the string pointer `str` is NULL, treat it as an empty string by setting `size` to 0.
-    - If `str` is not NULL, iterate through the string to calculate its length, ensuring it does not exceed `max_size`.
-    - If the string is not null-terminated within `max_size`, return an error for an unterminated string.
-    - If `PB_VALIDATE_UTF8` is defined, validate the string as UTF-8 and return an error if invalid.
-    - Encode the string using [`pb_encode_string`](<#checkreturnpb_encode_string>) with the calculated `size`.
+    - If the field type is not a pointer, ensure `max_size` allows space for a null terminator and is not zero.
+    - If the string pointer `str` is NULL, treat it as an empty string.
+    - Otherwise, iterate through the string to calculate its length up to `max_size`, checking for a null terminator.
+    - If the string is not null-terminated within `max_size`, return an error.
+    - Optionally validate the string as UTF-8 if `PB_VALIDATE_UTF8` is defined.
+    - Encode the string using [`pb_encode_string`](#checkreturnpb_encode_string) with the calculated size.
 - **Output**: Returns `true` if the string is successfully encoded into the stream, otherwise returns `false` if an error occurs.
-- **Functions Called**:
-    - [`pb_validate_utf8`](<pb_common.c.md#pb_validate_utf8>)
-    - [`checkreturn::pb_encode_string`](<#checkreturnpb_encode_string>)
+- **Functions called**:
+    - [`pb_validate_utf8`](pb_common.c.md#pb_validate_utf8)
+    - [`checkreturn::pb_encode_string`](#checkreturnpb_encode_string)
 
 
 ---
 ### pb\_enc\_submessage<!-- {{#callable:checkreturn::pb_enc_submessage}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L930>)
-
-Encodes a submessage field in a Protocol Buffers stream, handling optional callback encoding if specified.
+The `pb_enc_submessage` function encodes a submessage field in a Protocol Buffers stream, handling optional callback encoding if specified.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - ``field``: A pointer to a `pb_field_iter_t` structure that contains information about the field to be encoded, including its type, data, and descriptor.
-- **Logic and Control Flow**:
-    - Check if `field->submsg_desc` is `NULL`; if so, return an error using `PB_RETURN_ERROR` with the message 'invalid field descriptor'.
-    - Check if the field type is `PB_LTYPE_SUBMSG_W_CB` and `field->pSize` is not `NULL`.
-    - If the above condition is true, retrieve the callback function stored before `pSize` and check if the `encode` function is defined.
-    - If the `encode` function is defined, call it with `stream`, `field`, and `callback->arg`. If it returns `false`, return `false`.
-    - Call [`pb_encode_submessage`](<#checkreturnpb_encode_submessage>) with `stream`, `field->submsg_desc`, and `field->pData` to encode the submessage.
-- **Output**: Returns `true` if the submessage is successfully encoded, otherwise returns `false` if an error occurs during encoding.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_submessage`](<#checkreturnpb_encode_submessage>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field descriptor for the submessage to be encoded.
+- **Control Flow**:
+    - Check if the `submsg_desc` in the field is NULL and return an error if so.
+    - If the field type is `PB_LTYPE_SUBMSG_W_CB` and `pSize` is not NULL, retrieve the callback function stored before `pSize`.
+    - If the callback's encode function is present, call it with the stream, field, and callback argument, returning false if it fails.
+    - Call [`pb_encode_submessage`](#checkreturnpb_encode_submessage) with the stream, submessage descriptor, and field data to encode the submessage.
+- **Output**: Returns a boolean indicating success (true) or failure (false) of the encoding process.
+- **Functions called**:
+    - [`checkreturn::pb_encode_submessage`](#checkreturnpb_encode_submessage)
 
 
 ---
 ### pb\_enc\_fixed\_length\_bytes<!-- {{#callable:checkreturn::pb_enc_fixed_length_bytes}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L949>)
-
-Encodes a fixed-length byte array into a protobuf stream.
+The `pb_enc_fixed_length_bytes` function encodes a fixed-length byte array into a protobuf output stream.
 - **Inputs**:
-    - ``stream``: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written.
-    - ``field``: A pointer to a `pb_field_iter_t` structure that contains the data and metadata for the field to be encoded, including a pointer to the data (`pData`) and the size of the data (`data_size`).
-- **Logic and Control Flow**:
-    - Calls the [`pb_encode_string`](<#checkreturnpb_encode_string>) function with the `stream`, a cast of `field->pData` to `pb_byte_t*`, and `field->data_size` as arguments.
-    - Returns the result of the [`pb_encode_string`](<#checkreturnpb_encode_string>) function call.
-- **Output**: Returns a boolean value indicating the success (`true`) or failure (`false`) of the encoding operation.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_string`](<#checkreturnpb_encode_string>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written.
+    - `field`: A pointer to a `pb_field_iter_t` structure containing the field data to be encoded, specifically the byte array and its size.
+- **Control Flow**:
+    - The function calls [`pb_encode_string`](#checkreturnpb_encode_string), passing the output stream, the byte array from `field->pData`, and the size of the byte array from `field->data_size`.
+- **Output**: The function returns a boolean value indicating success (`true`) or failure (`false`) of the encoding operation.
+- **Functions called**:
+    - [`checkreturn::pb_encode_string`](#checkreturnpb_encode_string)
 
 
 ---
 ### pb\_encode\_float\_as\_double<!-- {{#callable:pb_encode_float_as_double}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L955>)
-
-Encodes a `float` value as a `double` and writes it to a protobuf output stream.
+The function `pb_encode_float_as_double` encodes a 32-bit float as a 64-bit double and writes it to a protobuf output stream.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure where the encoded `double` value will be written.
-    - `value`: The `float` value to encode as a `double`.
-- **Logic and Control Flow**:
-    - Decompose the `float` value into its sign, exponent, and mantissa components using bit manipulation.
-    - Check if the exponent indicates a special value (e.g., NaN) and adjust the exponent accordingly.
-    - Handle denormalized numbers by adjusting the mantissa and exponent until the mantissa is normalized.
-    - Combine the sign, adjusted exponent, and mantissa into a 64-bit `double` representation.
-    - Write the 64-bit `double` representation to the output stream using [`pb_encode_fixed64`](<#checkreturnpb_encode_fixed64>).
-- **Output**: Returns `true` if the encoding and writing to the stream are successful, otherwise `false`.
-- **Functions Called**:
-    - [`checkreturn::pb_encode_fixed64`](<#checkreturnpb_encode_fixed64>)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded double will be written.
+    - `value`: A 32-bit floating-point number (float) that needs to be encoded as a double.
+- **Control Flow**:
+    - The function begins by using a union to interpret the float as a 32-bit integer for bit manipulation.
+    - It extracts the sign, exponent, and mantissa from the float's binary representation.
+    - If the exponent indicates a special value (like NaN), it sets the exponent to 1024 for double representation.
+    - If the exponent indicates a denormalized number, it normalizes the mantissa and adjusts the exponent accordingly.
+    - The mantissa is shifted to fit the double's mantissa size, and the exponent and sign are adjusted and combined into a 64-bit integer.
+    - The combined 64-bit integer is then written to the output stream using [`pb_encode_fixed64`](#checkreturnpb_encode_fixed64).
+- **Output**: The function returns a boolean indicating success (`true`) or failure (`false`) of the encoding operation.
+- **Functions called**:
+    - [`checkreturn::pb_encode_fixed64`](#checkreturnpb_encode_fixed64)
 
 
 # Function Declarations (Public API)
 
 ---
 ### buf\_write<!-- {{#callable_declaration:checkreturn::buf_write}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L24>)
-
-Writes data to a protobuf output stream.
-- **Description**: Use this function to write a specified number of bytes from a buffer to a protobuf output stream. It updates the stream's state to reflect the new position after writing. Ensure that the stream's state is correctly initialized and that the buffer contains at least the specified number of bytes to avoid undefined behavior.
+Writes a buffer to a protobuf output stream.
+- **Description**: This function writes a specified number of bytes from a buffer to a protobuf output stream. It is typically used when encoding data into a protobuf format, ensuring that the data is correctly placed into the stream's current position. The function assumes that the stream's state is correctly initialized to point to a writable memory area. It is important to ensure that the stream has enough space to accommodate the data being written, as this function does not perform bounds checking.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream. The stream's state must be correctly initialized before calling this function.
-    - `buf`: A pointer to a buffer containing the data to write. The buffer must contain at least `count` bytes.
-    - `count`: The number of bytes to write from the buffer to the stream. Must be a positive value.
-- **Output**: Returns `true` if the operation is successful. Always returns `true` in this implementation.
-- **See Also**: [`checkreturn::buf_write`](<#checkreturnbuf_write>)  (Implementation)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream. The stream's state must point to a valid memory location where data can be written.
+    - `buf`: A pointer to a buffer containing the data to be written. The buffer must not be null and should contain at least `count` bytes.
+    - `count`: The number of bytes to write from the buffer to the stream. Must be a positive integer.
+- **Output**: Returns `true` to indicate successful writing of the buffer to the stream.
+- **See also**: [`checkreturn::buf_write`](#checkreturnbuf_write)  (Implementation)
 
 
 ---
 ### encode\_array<!-- {{#callable_declaration:checkreturn::encode_array}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L25>)
-
-Encodes a protobuf array field into the output stream.
-- **Description**: Use this function to encode an array field from a protobuf message into a given output stream. It handles both packed and unpacked array types, depending on the field's data type. Ensure that the `stream` is properly initialized and that the `field` points to a valid field iterator with the correct array size. The function returns `true` on success and `false` if an error occurs, such as exceeding the maximum array size or encountering a null pointer in a required field.
+Encodes a static array into a protobuf stream.
+- **Description**: This function is used to encode a static array field into a protobuf output stream. It handles both packed and unpacked encoding based on the field's type and configuration. The function should be called when encoding a repeated field in a protobuf message. It requires that the field's size is correctly set and that the stream is properly initialized. The function will return false if the array exceeds its maximum size or if any encoding operation fails.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream. Must not be null and should be properly initialized before calling this function.
-    - `field`: A pointer to a `pb_field_iter_t` structure that represents the field iterator for the array to encode. Must not be null and should point to a valid field with a correct array size.
-- **Output**: Returns `true` if the array is successfully encoded into the stream, otherwise returns `false` if an error occurs.
-- **See Also**: [`checkreturn::encode_array`](<#checkreturnencode_array>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded data will be written. Must not be null and should be properly initialized.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. Must not be null and should have its size and data correctly set. The function expects the field's type to be compatible with array encoding.
+- **Output**: Returns a boolean value: true if the array was successfully encoded, or false if an error occurred during encoding.
+- **See also**: [`checkreturn::encode_array`](#checkreturnencode_array)  (Implementation)
 
 
 ---
 ### pb\_check\_proto3\_default\_value<!-- {{#callable_declaration:checkreturn::pb_check_proto3_default_value}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L26>)
-
-Checks if a protobuf field has a default value in proto3.
-- **Description**: Use this function to determine if a given protobuf field in a proto3 message is set to its default value. This is important for encoding, as proto3 fields are only encoded if they are not set to their default values. The function examines various field types, including static, pointer, and callback types, and handles special cases such as required fields in proto2 submessages and optional fields with default values. It returns a boolean indicating whether the field is at its default state.
+Checks if a protobuf field has its default value in proto3.
+- **Description**: This function determines whether a given protobuf field, represented by a field iterator, is set to its default value according to proto3 semantics. It is useful when encoding messages to decide if a field should be omitted, as proto3 omits fields with default values. The function should be called with a valid field iterator, and it handles various field types including static, pointer, and callback types. It returns a boolean indicating whether the field is at its default state.
 - **Inputs**:
-    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to check. This parameter must not be null, and it should point to a valid field descriptor. The function expects the field to be part of a protobuf message structure.
-- **Output**: Returns `true` if the field is at its default value in a proto3 message, otherwise returns `false`. The return value must be used to ensure correct encoding behavior.
-- **See Also**: [`checkreturn::pb_check_proto3_default_value`](<#checkreturnpb_check_proto3_default_value>)  (Implementation)
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to check. The pointer must not be null, and the structure should be properly initialized to point to a valid field in a protobuf message.
+- **Output**: Returns a boolean value: true if the field is at its default value according to proto3 rules, false otherwise.
+- **See also**: [`checkreturn::pb_check_proto3_default_value`](#checkreturnpb_check_proto3_default_value)  (Implementation)
 
 
 ---
 ### encode\_basic\_field<!-- {{#callable_declaration:checkreturn::encode_basic_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L27>)
-
 Encodes a basic protobuf field into the output stream.
-- **Description**: Use this function to encode a basic field of a protobuf message into the provided output stream. It handles different field types such as boolean, varint, fixed32, fixed64, bytes, string, submessage, and fixed-length bytes. The function must be called with a valid field iterator and output stream. If the field's data pointer is null, the function returns true, indicating no data to encode. The function returns false if encoding fails due to an invalid field type or if the tag encoding fails.
+- **Description**: This function is used to encode a basic field of a protobuf message into a given output stream. It handles various field types such as boolean, varint, fixed32, fixed64, bytes, string, submessage, and fixed-length bytes. The function must be called with a valid field iterator and an output stream. If the field's data pointer is null, the function treats it as a missing field and returns true without encoding. The function returns false if encoding fails due to an invalid field type or if the tag encoding fails.
 - **Inputs**:
-    - `stream`: A pointer to `pb_ostream_t`, representing the output stream where the encoded data will be written. Must not be null.
-    - `field`: A pointer to `pb_field_iter_t`, representing the field to encode. Must not be null and must have a valid `pData` pointer unless the field is optional.
-- **Output**: Returns a boolean value: true if the field is successfully encoded or if the field's data pointer is null, false if an error occurs during encoding.
-- **See Also**: [`checkreturn::encode_basic_field`](<#checkreturnencode_basic_field>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded data will be written. The stream must be properly initialized and must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. The field must be properly initialized and must not be null. The function checks the field's data pointer and handles it accordingly.
+- **Output**: Returns a boolean value: true if the field is successfully encoded or if the field's data pointer is null, and false if an error occurs during encoding.
+- **See also**: [`checkreturn::encode_basic_field`](#checkreturnencode_basic_field)  (Implementation)
 
 
 ---
 ### encode\_callback\_field<!-- {{#callable_declaration:checkreturn::encode_callback_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L28>)
-
 Encodes a field using a callback function if available.
-- **Description**: Use this function to encode a field that has an associated callback function. It checks if the field's descriptor has a callback function and calls it to perform the encoding. If the callback function is not present, the function does nothing. This function must be called with a valid `pb_ostream_t` stream and a `pb_field_iter_t` field. It is important to handle the return value to check for any errors during the callback execution.
+- **Description**: This function is used to encode a field in a protocol buffer message by invoking a user-defined callback function if it is specified in the field's descriptor. It should be called when encoding fields that require custom handling through callbacks. The function ensures that if a callback is present, it is executed with the provided stream and field parameters. If the callback fails, an error is returned through the stream's error handling mechanism. This function is typically used internally during the encoding process of protocol buffer messages.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream. Must not be null.
-    - `field`: A pointer to a `pb_field_iter_t` structure that represents the field to encode. Must not be null and must have a valid descriptor with a potential callback function.
-- **Output**: Returns `true` if the encoding is successful or if no callback is present. Returns `false` if the callback function fails, and sets an error message in the stream.
-- **See Also**: [`checkreturn::encode_callback_field`](<#checkreturnencode_callback_field>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded data will be written. Must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. Must not be null and should have a valid descriptor with an optional field_callback.
+- **Output**: Returns true if the field was successfully encoded, or false if an error occurred during the callback execution.
+- **See also**: [`checkreturn::encode_callback_field`](#checkreturnencode_callback_field)  (Implementation)
 
 
 ---
 ### encode\_field<!-- {{#callable_declaration:checkreturn::encode_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L29>)
-
 Encodes a protobuf field into the output stream.
-- **Description**: Use this function to encode a single protobuf field into the provided output stream. It handles different field types, including optional, required, repeated, and oneof fields. The function checks for field presence and encodes the field contents accordingly. It must be called with valid field and stream pointers, and the field data must be correctly initialized. If a required field is missing, the function returns an error. The function returns a boolean indicating success or failure, and the caller must check this return value to ensure correct encoding.
+- **Description**: This function is used to encode a single protobuf field into the provided output stream. It handles different field types, including optional, required, repeated, and oneof fields, and encodes them according to their type and presence. The function must be called with a valid output stream and field iterator. It checks for field presence and handles missing required fields by returning an error. The function is typically used as part of a larger encoding process for protobuf messages.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream. Must not be null. The stream must be properly initialized before calling this function.
-    - `field`: A pointer to a `pb_field_iter_t` structure that represents the field to encode. Must not be null. The field must be correctly initialized and contain valid data for encoding.
-- **Output**: Returns a boolean value: `true` if the field was successfully encoded, or `false` if an error occurred during encoding.
-- **See Also**: [`checkreturn::encode_field`](<#checkreturnencode_field>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the field will be encoded. Must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. Must not be null and should be properly initialized to point to a valid field.
+- **Output**: Returns a boolean value indicating success (true) or failure (false). Failure occurs if a required field is missing or if there is an error during encoding.
+- **See also**: [`checkreturn::encode_field`](#checkreturnencode_field)  (Implementation)
 
 
 ---
 ### encode\_extension\_field<!-- {{#callable_declaration:checkreturn::encode_extension_field}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L30>)
-
-Encodes extension fields into a protobuf stream.
-- **Description**: Use this function to encode all registered extension fields into a given protobuf output stream. It processes each extension field in the provided field iterator, encoding it using either a custom encoder or a default encoder if no custom encoder is available. This function must be called with a valid output stream and a field iterator that points to the extension fields. It returns a boolean indicating success or failure, and it is important to check this return value to ensure that the encoding process completed successfully.
+Encodes all registered extensions for a given field into a protobuf stream.
+- **Description**: This function is used to encode all extensions associated with a specific field into a protobuf output stream. It should be called when you need to serialize extension fields of a protobuf message. The function iterates over each extension linked to the field and attempts to encode it using either a custom encoder provided by the extension or a default encoder. It is important to ensure that the `stream` and `field` parameters are properly initialized and valid before calling this function. The function returns a boolean indicating success or failure of the encoding process.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written. Must not be null.
-    - `field`: A pointer to a `pb_field_iter_t` structure that represents the current field iterator pointing to the extension fields to encode. Must not be null and must point to a valid extension field.
-- **Output**: Returns `true` if all extension fields are successfully encoded; otherwise, returns `false` if an error occurs during encoding.
-- **See Also**: [`checkreturn::encode_extension_field`](<#checkreturnencode_extension_field>)  (Implementation)
+    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream where the encoded data will be written. The stream must be properly initialized and must not be null.
+    - `field`: A pointer to a `pb_field_iter_t` structure representing the field whose extensions are to be encoded. This must be a valid field iterator pointing to a field with extensions, and must not be null.
+- **Output**: Returns `true` if all extensions are successfully encoded, otherwise returns `false` if an error occurs during encoding.
+- **See also**: [`checkreturn::encode_extension_field`](#checkreturnencode_extension_field)  (Implementation)
 
 
 ---
 ### default\_extension\_encoder<!-- {{#callable_declaration:checkreturn::default_extension_encoder}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L31>)
-
-Encodes a protobuf extension field.
-- **Description**: Use this function to encode a protobuf extension field into a given output stream. It is necessary to call this function when you have an extension field that needs encoding. The function checks if the extension is valid and then encodes it using the provided stream. Ensure that the `stream` and `extension` parameters are correctly initialized before calling this function.
+Encodes a protobuf extension field into the output stream.
+- **Description**: This function is used to encode a protobuf extension field into a given output stream. It should be called when you need to serialize an extension field as part of a protobuf message. The function requires a valid extension descriptor and an initialized output stream. If the extension is invalid, the function will return an error. This function is typically used internally within a protobuf encoding process and assumes that the stream and extension are properly set up before calling.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the encoded data will be written. Must not be null.
-    - `extension`: A pointer to a `pb_extension_t` structure that represents the extension field to encode. Must not be null and must point to a valid extension.
-- **Output**: Returns `true` if the encoding is successful, otherwise returns `false` if an error occurs, such as an invalid extension.
-- **See Also**: [`checkreturn::default_extension_encoder`](<#checkreturndefault_extension_encoder>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded data will be written. The stream must be initialized and must not be null.
+    - `extension`: A pointer to a pb_extension_t structure representing the extension field to be encoded. The extension must be valid and must not be null.
+- **Output**: Returns a boolean value indicating success (true) or failure (false) of the encoding process. If the extension is invalid, the function returns false and sets an error message in the stream.
+- **See also**: [`checkreturn::default_extension_encoder`](#checkreturndefault_extension_encoder)  (Implementation)
 
 
 ---
 ### pb\_encode\_varint\_32<!-- {{#callable_declaration:checkreturn::pb_encode_varint_32}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L32>)
-
 Encodes a 32-bit varint into a protobuf stream.
-- **Description**: Use this function to encode a 32-bit varint into a protobuf stream. It takes two 32-bit unsigned integers, `low` and `high`, which represent the lower and higher parts of a 64-bit integer, respectively. The function writes the encoded varint to the provided `stream`. Ensure that the `stream` is properly initialized and has enough space to accommodate the encoded data. The function returns a boolean indicating the success of the write operation.
+- **Description**: This function is used to encode a 32-bit varint into a protobuf stream, which is useful when dealing with protocol buffers that require efficient serialization of integer values. It should be called when you need to encode a varint that is split into low and high parts, typically when the integer value exceeds the range of a single 32-bit integer. The function writes the encoded varint to the provided stream and returns a boolean indicating success or failure. Ensure that the stream is properly initialized and has enough space to accommodate the encoded data.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure where the encoded varint will be written. Must not be null and should be properly initialized.
-    - `low`: A 32-bit unsigned integer representing the lower part of the varint to encode. No specific range restrictions, but typically used as part of a 64-bit value.
-    - `high`: A 32-bit unsigned integer representing the higher part of the varint to encode. No specific range restrictions, but typically used as part of a 64-bit value.
-- **Output**: Returns a boolean value: `true` if the varint was successfully written to the stream, `false` otherwise.
-- **See Also**: [`checkreturn::pb_encode_varint_32`](<#checkreturnpb_encode_varint_32>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded varint will be written. Must not be null and should be properly initialized.
+    - `low`: The lower 32 bits of the integer to be encoded. It is a 32-bit unsigned integer.
+    - `high`: The higher bits of the integer to be encoded, used when the integer value exceeds 32 bits. It is a 32-bit unsigned integer.
+- **Output**: Returns a boolean value: true if the varint was successfully encoded and written to the stream, false if there was an error (e.g., if the stream is full).
+- **See also**: [`checkreturn::pb_encode_varint_32`](#checkreturnpb_encode_varint_32)  (Implementation)
 
 
 ---
 ### pb\_enc\_bool<!-- {{#callable_declaration:checkreturn::pb_enc_bool}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L33>)
-
 Encodes a boolean field into a protobuf stream.
-- **Description**: Use this function to encode a boolean field into a protobuf stream. It reads the boolean value from the provided field data and encodes it as a varint into the stream. This function must be called with a valid output stream and a field iterator pointing to a boolean field. Ensure that the stream is properly initialized and has enough space to accommodate the encoded data. The function returns a boolean indicating the success of the encoding operation.
+- **Description**: This function is used to encode a boolean field into a protobuf stream by converting the boolean value to a varint format. It should be called when encoding a boolean field within a protobuf message. The function expects the field data to be accessible and valid, and it will handle the conversion of the boolean value to a varint, writing it to the provided stream. The function must be used in contexts where the stream is properly initialized and capable of handling varint encoding.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream. Must not be null and should be properly initialized before calling this function.
-    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to encode. Must not be null and should point to a valid boolean field.
-- **Output**: Returns `true` if the encoding is successful, otherwise returns `false`.
-- **See Also**: [`checkreturn::pb_enc_bool`](<#checkreturnpb_enc_bool>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded data will be written. Must not be null and should be properly initialized for writing.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. The field's pData should point to a boolean value. The function assumes the field data is valid and accessible.
+- **Output**: Returns a boolean indicating success (true) or failure (false) of the encoding operation.
+- **See also**: [`checkreturn::pb_enc_bool`](#checkreturnpb_enc_bool)  (Implementation)
 
 
 ---
 ### pb\_enc\_varint<!-- {{#callable_declaration:checkreturn::pb_enc_varint}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L34>)
-
 Encodes a field as a varint into the output stream.
-- **Description**: Use this function to encode a field as a varint into the provided output stream. It handles both unsigned and signed integer types based on the field's type. The function expects the field's data size to match one of the supported integer sizes. If the data size is invalid, the function returns an error. This function must be called with a valid `pb_ostream_t` stream and a `pb_field_iter_t` field that contains the data to encode.
+- **Description**: This function is used to encode a field from a protocol buffer message as a varint into the provided output stream. It handles both unsigned and signed integer types, performing the necessary conversions based on the field's type. The function should be called when encoding fields that are represented as varints in the protocol buffer schema. It requires a valid output stream and a field iterator pointing to the field to be encoded. The function will return an error if the field's data size is invalid for the expected type.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure where the encoded varint will be written. Must not be null.
-    - `field`: A pointer to a `pb_field_iter_t` structure that contains the field data to encode. The `type` field determines if the data is treated as unsigned or signed. The `data_size` must match one of the supported sizes (8, 16, 32, or 64 bits).
-- **Output**: Returns `true` if the encoding is successful; otherwise, returns `false` if an error occurs, such as an invalid data size.
-- **See Also**: [`checkreturn::pb_enc_varint`](<#checkreturnpb_enc_varint>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded varint will be written. Must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. Must not be null and should point to a valid field with appropriate data size and type.
+- **Output**: Returns a boolean value indicating success (true) or failure (false) of the encoding operation.
+- **See also**: [`checkreturn::pb_enc_varint`](#checkreturnpb_enc_varint)  (Implementation)
 
 
 ---
 ### pb\_enc\_fixed<!-- {{#callable_declaration:checkreturn::pb_enc_fixed}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L35>)
-
-Encodes a fixed-size field into a protobuf stream.
-- **Description**: Use this function to encode a fixed-size field into a protobuf stream. It supports encoding 32-bit and 64-bit fixed-size fields, depending on the data size. If the data size is invalid, the function returns an error. This function is typically used within a protobuf encoding process to handle fields with fixed sizes. Ensure that the `stream` and `field` parameters are correctly initialized before calling this function.
+Encodes a fixed-size numeric field into a protobuf stream.
+- **Description**: This function is used to encode fixed-size numeric fields, such as 32-bit or 64-bit integers, into a protobuf output stream. It should be called when you need to serialize fixed-size numeric data as part of a protobuf message. The function expects the field's data size to match the expected size for fixed32 or fixed64 types. If the data size is invalid, the function will return an error. Ensure that the stream and field parameters are properly initialized before calling this function.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream. Must not be null. The function writes encoded data to this stream.
-    - `field`: A pointer to a `pb_field_iter_t` structure that represents the field to encode. Must not be null. The `data_size` member determines the encoding method, and the `pData` member provides the data to encode.
-- **Output**: Returns `true` if the encoding is successful; otherwise, returns `false` if an error occurs, such as an invalid data size.
-- **See Also**: [`checkreturn::pb_enc_fixed`](<#checkreturnpb_enc_fixed>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded data will be written. Must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. The field's data_size must be either 4 (for fixed32) or 8 (for fixed64). Must not be null.
+- **Output**: Returns true if the encoding is successful; otherwise, returns false if an error occurs, such as an invalid data size.
+- **See also**: [`checkreturn::pb_enc_fixed`](#checkreturnpb_enc_fixed)  (Implementation)
 
 
 ---
 ### pb\_enc\_bytes<!-- {{#callable_declaration:checkreturn::pb_enc_bytes}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L36>)
-
 Encodes a bytes field into a protobuf stream.
-- **Description**: Use this function to encode a bytes field from a protobuf message into a given output stream. It handles null pointers by treating them as empty byte fields. Ensure that the size of the bytes does not exceed the allocated data size for static fields, as this will result in an error. This function must be called with a valid stream and field iterator, and it is important to check the return value to ensure successful encoding.
+- **Description**: This function is used to encode a bytes field from a protobuf message into a given output stream. It should be called when you need to serialize a bytes field as part of a protobuf message. The function handles null pointers by treating them as empty byte fields and checks for size constraints when the field is statically allocated. It is important to ensure that the stream and field parameters are properly initialized before calling this function.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure that represents the output stream where the bytes will be encoded. Must not be null.
-    - `field`: A pointer to a `pb_field_iter_t` structure that contains the field data to encode. Must not be null and should point to a valid bytes field.
-- **Output**: Returns `true` if the bytes are successfully encoded into the stream; otherwise, returns `false` if an error occurs, such as exceeding the allowed size for static fields.
-- **See Also**: [`checkreturn::pb_enc_bytes`](<#checkreturnpb_enc_bytes>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the bytes field will be encoded. Must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. Must not be null and should point to a valid bytes field.
+- **Output**: Returns a boolean value indicating success (true) or failure (false) of the encoding operation.
+- **See also**: [`checkreturn::pb_enc_bytes`](#checkreturnpb_enc_bytes)  (Implementation)
 
 
 ---
 ### pb\_enc\_string<!-- {{#callable_declaration:checkreturn::pb_enc_string}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L37>)
-
-Encodes a string field into a protobuf stream.
-- **Description**: Use this function to encode a string field into a protobuf stream. It handles both pointer and static string types, ensuring that the string is null-terminated if required. If the string is null, it treats it as an empty string. The function checks for string termination and validates UTF-8 encoding if enabled. It must be called with a valid `pb_ostream_t` stream and `pb_field_iter_t` field, and it returns false if encoding fails due to errors like unterminated strings or invalid UTF-8.
+Encodes a string field into a protobuf output stream.
+- **Description**: This function is used to encode a string field from a protobuf message into a given output stream. It handles both pointer and static string types, ensuring that the string is properly null-terminated if required. The function should be called when encoding a protobuf message that includes a string field. It checks for null pointers, treating them as empty strings, and validates UTF-8 encoding if enabled. The function returns an error if the string is not properly terminated or if it exceeds the maximum allowed size.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream. Must not be null. The function writes the encoded string to this stream.
-    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to encode. Must not be null. The `pData` member should point to the string data, and `data_size` should specify the maximum size for static strings.
-- **Output**: Returns a boolean value: true if the string is successfully encoded, false if an error occurs (e.g., unterminated string, invalid UTF-8).
-- **See Also**: [`checkreturn::pb_enc_string`](<#checkreturnpb_enc_string>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded string will be written. Must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. It contains the string data and its size. Must not be null.
+- **Output**: Returns a boolean indicating success (true) or failure (false) of the encoding process.
+- **See also**: [`checkreturn::pb_enc_string`](#checkreturnpb_enc_string)  (Implementation)
 
 
 ---
 ### pb\_enc\_submessage<!-- {{#callable_declaration:checkreturn::pb_enc_submessage}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L38>)
-
 Encodes a submessage field into a protobuf stream.
-- **Description**: Use this function to encode a submessage field into a protobuf stream. It requires a valid field descriptor and a stream to write to. If the field type is a submessage with a callback, the function will execute the callback to encode the data. This function must be called with a valid `pb_ostream_t` stream and a `pb_field_iter_t` field that has a non-null `submsg_desc`. If the field descriptor is invalid, the function will return an error.
+- **Description**: This function is used to encode a submessage field into a protobuf stream. It should be called when you need to serialize a submessage as part of a larger protobuf message. The function requires a valid field descriptor for the submessage and handles optional encoding callbacks if specified. It is important to ensure that the field descriptor is not null before calling this function, as a null descriptor will result in an error. The function returns a boolean indicating success or failure, and it is crucial to check this return value to handle any encoding errors appropriately.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure where the encoded data will be written. Must not be null.
-    - `field`: A pointer to a `pb_field_iter_t` structure representing the field to encode. The `submsg_desc` member must not be null. If the field type is `PB_LTYPE_SUBMSG_W_CB`, `pSize` must not be null.
-- **Output**: Returns `true` if the submessage is successfully encoded; otherwise, returns `false` if an error occurs.
-- **See Also**: [`checkreturn::pb_enc_submessage`](<#checkreturnpb_enc_submessage>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the submessage will be encoded. The stream must be properly initialized and have sufficient space for the encoded data.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. The field must have a valid submsg_desc, and if the field type is PB_LTYPE_SUBMSG_W_CB, it may have an associated callback function for encoding.
+- **Output**: Returns a boolean value: true if the submessage was successfully encoded, or false if an error occurred during encoding.
+- **See also**: [`checkreturn::pb_enc_submessage`](#checkreturnpb_enc_submessage)  (Implementation)
 
 
 ---
 ### pb\_enc\_fixed\_length\_bytes<!-- {{#callable_declaration:checkreturn::pb_enc_fixed_length_bytes}} -->
-[View Source →](<../../../../../src/ballet/nanopb/pb_encode.c#L39>)
-
-Encodes fixed-length byte data into a protobuf stream.
-- **Description**: Use this function to encode a fixed-length byte array into a protobuf stream. It is important to ensure that the `stream` is properly initialized and has enough space to accommodate the data. The `field` parameter must point to a valid `pb_field_iter_t` structure with `pData` pointing to the byte data and `data_size` indicating the size of the data. This function returns a boolean indicating success or failure, and it is crucial to check this return value to handle any encoding errors.
+Encodes a fixed-length byte array into a protobuf stream.
+- **Description**: This function is used to encode a fixed-length byte array from a protobuf field into a given output stream. It is typically called during the serialization process of a protobuf message when a field of fixed-length bytes needs to be encoded. The function requires a valid output stream and a field iterator pointing to the field data to be encoded. It is important to ensure that the field's data size is correctly set, as this function will encode exactly that number of bytes. The function returns a boolean indicating success or failure, which should be checked to ensure the encoding process completes without errors.
 - **Inputs**:
-    - `stream`: A pointer to a `pb_ostream_t` structure representing the output stream. Must be initialized and have sufficient space for the data.
-    - `field`: A pointer to a `pb_field_iter_t` structure. `pData` must point to the byte data to encode, and `data_size` must specify the size of this data. Must not be null.
-- **Output**: Returns `true` if encoding is successful, otherwise `false`.
-- **See Also**: [`checkreturn::pb_enc_fixed_length_bytes`](<#checkreturnpb_enc_fixed_length_bytes>)  (Implementation)
+    - `stream`: A pointer to a pb_ostream_t structure representing the output stream where the encoded data will be written. Must not be null.
+    - `field`: A pointer to a pb_field_iter_t structure representing the field to be encoded. This structure must contain valid data and data size for the fixed-length byte array. Must not be null.
+- **Output**: Returns a boolean value: true if the encoding was successful, false if an error occurred during encoding.
+- **See also**: [`checkreturn::pb_enc_fixed_length_bytes`](#checkreturnpb_enc_fixed_length_bytes)  (Implementation)
 
 
 

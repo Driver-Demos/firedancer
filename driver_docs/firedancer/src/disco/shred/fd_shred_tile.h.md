@@ -3,65 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines the `fd_shred_ctx_t` structure for managing shred tile contexts in the Firedancer codebase.
+Shred tile context structure and related forward declarations.
 
 # Purpose
-The code is a C header file that defines the structure `fd_shred_ctx_t`, which is used to manage the context for a "shred tile" in a distributed system. It includes necessary headers and forward declarations for types such as `fd_fec_resolver_t`, `fd_keyswitch_t`, and `fd_keyguard_client_t`. The `fd_shred_ctx_t` structure contains pointers to various components like `fd_shredder_t`, `fd_fec_resolver_t`, and `fd_keyswitch_t`, as well as fields for managing identity keys, round-robin identifiers, batch counts, and slot information. This structure is likely used to coordinate and track the shredding process within a specific operational context, ensuring that all shred tiles maintain consistent state information.
-# Imports and Dependencies
-
----
-- `../tiles.h`
-- `../../flamenco/types/fd_types_custom.h`
-
-
-# Data Structures
-
----
-### fd\_fec\_resolver\_t
-- **Type**: ``struct``
-- **Members**:
-    - `shredder`: Pointer to an `fd_shredder_t` structure.
-    - `resolver`: Pointer to an `fd_fec_resolver_t` structure.
-    - `identity_key`: Array containing a single `fd_pubkey_t` public key.
-    - `round_robin_id`: Unsigned long integer for round-robin identification.
-    - `round_robin_cnt`: Unsigned long integer for round-robin count.
-    - `batch_cnt`: Unsigned long integer for the number of batches shredded from PoH during the current slot.
-    - `slot`: Unsigned long integer for the slot of the most recent microblock seen from PoH.
-    - `keyswitch`: Pointer to an `fd_keyswitch_t` structure.
-    - `keyguard_client`: Array containing a single `fd_keyguard_client_t` structure.
-- **Description**: Defines the context for a shred tile, including pointers to various structures such as `fd_shredder_t`, `fd_fec_resolver_t`, and `fd_keyswitch_t`, as well as fields for managing round-robin operations, batch counts, and slot tracking.
-
-
----
-### fd\_keyswitch\_t
-- **Type**: ``fd_keyswitch_t``
-- **Members**:
-    - ``fd_keyswitch_private``: A forward declaration for the `fd_keyswitch_t` type.
-- **Description**: `fd_keyswitch_t` is a typedef for a structure named `fd_keyswitch_private`, which is forward declared in the code. The actual definition of `fd_keyswitch_private` is not provided in the given code, indicating that it is likely defined elsewhere. This data structure is used within the `fd_shred_ctx_t` structure, suggesting it plays a role in the context of a shred tile, possibly related to key switching operations.
-
-
----
-### fd\_keyguard\_client\_t
-- **Type**: ``fd_keyguard_client_t``
-- **Description**: `fd_keyguard_client_t` is a typedef for a forward-declared structure `fd_keyguard_client`. The actual structure definition is not provided in the given code, so details about its members and functionality are not available.
-
-
----
-### fd\_shred\_ctx\_t
-- **Type**: `struct`
-- **Members**:
-    - `shredder`: Pointer to a `fd_shredder_t` structure.
-    - `resolver`: Pointer to a `fd_fec_resolver_t` structure.
-    - `identity_key`: Array containing a single `fd_pubkey_t` representing the public key.
-    - `round_robin_id`: Unsigned long integer for the round-robin identifier.
-    - `round_robin_cnt`: Unsigned long integer for the round-robin count.
-    - `batch_cnt`: Unsigned long integer for the number of batches shredded from PoH during the current slot.
-    - `slot`: Unsigned long integer for the slot of the most recent microblock seen from PoH.
-    - `keyswitch`: Pointer to a `fd_keyswitch_t` structure.
-    - `keyguard_client`: Array containing a single `fd_keyguard_client_t` structure.
-- **Description**: Represents the context for a shred tile, containing pointers to various components such as a shredder, resolver, and keyswitch, as well as identifiers and counters for managing the shredding process and tracking the most recent microblock slot.
-
-
+This header file declares the `fd_shred_ctx_t` context structure used by a shred tile. It includes forward declarations for resolver and key management types, then defines fields for the shredder, FEC resolver, identity public key, round-robin state, batch count, and current slot tracking. The comments in the structure describe how the tile tracks PoH batches and the most recent microblock slot. The file also uses an include guard to prevent multiple inclusion.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Bash script to recreate a ledger with ZK SDK transactions using Solana and SPL Token dependencies.
+The `test_zksdk_create_ledger.sh` file is a bash script that recreates a ledger with ZK SDK transactions using Solana and SPL Token dependencies, including operations like creating token accounts, minting tokens, and performing confidential transfers.
 
 # Purpose
-This Bash script automates the process of creating and managing a ledger with Zero-Knowledge (ZK) SDK transactions using the Solana blockchain and the SPL Token program. It is an executable script that requires dependencies on `solana` and `spl-token` command-line tools. The script checks for the presence of necessary configurations and credentials for both the default user and a user named Alice. It performs several operations, including funding Alice's account, creating a token and token account, configuring confidential transfers, minting tokens, and executing confidential transactions. The script is intended to be run in an environment where a Solana test validator is active, as indicated by the prerequisite command to reset the validator.
+This Bash script is designed to automate the process of setting up and managing a ledger with transactions using the Solana blockchain and the Solana Program Library (SPL) token utilities. It provides a narrow functionality focused on initializing and configuring token accounts, minting tokens, and performing confidential transactions, specifically tailored for use with the Solana blockchain environment. The script checks for necessary dependencies and configurations, such as the presence of Solana and SPL token command-line tools, and user credentials, before proceeding with operations like creating token accounts, minting tokens, and executing confidential transfers. It is intended to be executed in a development or testing environment, as indicated by the use of a test validator and the configuration of confidential transfers, making it a utility script rather than a library or header file.
 # Imports and Dependencies
 
 ---
@@ -19,82 +19,82 @@ This Bash script automates the process of creating and managing a ledger with Ze
 ---
 ### SOLANA
 - **Type**: `string`
-- **Description**: The `SOLANA` variable is a string that stores the path to the Solana command-line tool executable. It is initially set to 'solana' and then updated to '../solana/target/debug/solana', which indicates a specific build of the Solana tool located in a relative directory path.
-- **Use**: Used to execute Solana CLI commands within the script.
+- **Description**: The `SOLANA` variable is a global string variable that holds the path to the Solana CLI executable. It is initially set to 'solana', which implies it would use the system's PATH to locate the executable, but is then reassigned to a specific path '../solana/target/debug/solana', indicating a local build of the Solana CLI is used.
+- **Use**: This variable is used to execute Solana CLI commands within the script.
 
 
 ---
 ### TOKEN
 - **Type**: `string`
-- **Description**: `TOKEN` is a global variable that stores the path to the `spl-token` executable. It is initially set to the string 'spl-token' and then redefined to point to the debug build of the `spl-token` executable located in the `solana-program-library` directory.
-- **Use**: Used to execute `spl-token` commands for managing token operations in the script.
+- **Description**: The `TOKEN` variable is a global string variable that holds the path to the `spl-token` executable. It is initially set to the string 'spl-token' and then reassigned to a relative path '../solana-program-library/target/debug/spl-token', which points to the debug build of the `spl-token` program within the Solana program library.
+- **Use**: This variable is used to execute various `spl-token` commands throughout the script, such as creating tokens, accounts, and performing confidential transfers.
 
 
 ---
 ### CONF
 - **Type**: `string`
-- **Description**: The `CONF` variable is a string that stores the file path to the Solana CLI configuration file, specifically located at `~/.config/solana/cli/config.yml`. This file contains configuration settings for the Solana command-line interface.
-- **Use**: Used to verify the existence of the Solana CLI configuration file during the execution of the script.
+- **Description**: The `CONF` variable is a string that holds the file path to the Solana CLI configuration file, specifically located at `~/.config/solana/cli/config.yml`. This file is expected to contain configuration settings for the Solana command-line interface.
+- **Use**: This variable is used to check the existence of the Solana CLI configuration file to ensure that the necessary settings are available for executing Solana commands.
 
 
 ---
 ### ALICE\_CONF
 - **Type**: `string`
-- **Description**: The `ALICE_CONF` variable is a string that stores the file path to Alice's Solana CLI configuration file. This file is located at `~/.config/solana/cli/alice.yml`.
-- **Use**: Used to specify the configuration file for Alice when executing Solana CLI commands.
+- **Description**: The `ALICE_CONF` variable is a string that holds the file path to Alice's Solana CLI configuration file, specifically located at `~/.config/solana/cli/alice.yml`. This file is expected to contain configuration settings for Alice's Solana CLI operations.
+- **Use**: This variable is used to specify the configuration file for Alice when executing Solana CLI commands that require Alice's specific settings.
 
 
 ---
 ### CRED
 - **Type**: `string`
-- **Description**: The `CRED` variable is a string that stores the file path to the Solana credentials JSON file. This file contains the necessary credentials for Solana operations.
-- **Use**: Used to verify the existence of Solana credentials in the `check_solana` function.
+- **Description**: The `CRED` variable is a string that holds the file path to the Solana credentials JSON file, specifically located at `~/.config/solana/id.json`. This file is expected to contain the necessary credentials for interacting with the Solana blockchain.
+- **Use**: This variable is used to verify the existence of the Solana credentials file, ensuring that the script can authenticate and perform operations on the Solana blockchain.
 
 
 ---
 ### ALICE\_CRED
 - **Type**: `string`
-- **Description**: The `ALICE_CRED` variable is a string that stores the file path to Alice's credentials JSON file, located at `~/.config/solana/alice.json`. This file contains the necessary credentials for Alice to interact with the Solana blockchain.
-- **Use**: Used to verify the existence of Alice's credentials file in the `check_alice` function.
+- **Description**: The `ALICE_CRED` variable is a string that holds the file path to Alice's Solana credentials, specifically located at `~/.config/solana/alice.json`. This file is expected to contain the necessary credentials for Alice to interact with the Solana blockchain.
+- **Use**: This variable is used to verify the existence of Alice's credentials file, ensuring that the script can authenticate and perform operations on behalf of Alice.
 
 
 # Functions
 
 ---
 ### check\_solana
-Checks if the Solana command-line tool and its necessary configuration and credentials files are available.
+The `check_solana` function verifies the presence and accessibility of the Solana command-line tool, credentials, and configuration files.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Runs the `solana help` command and checks if it executes without error.
-    - If the `solana help` command fails, it prints an error message and exits with status 1.
-    - Checks if the credentials file located at the path stored in `CRED` exists.
-    - If the credentials file does not exist, it prints an error message and exits with status 1.
-    - Checks if the configuration file located at the path stored in `CONF` exists.
-    - If the configuration file does not exist, it prints an error message and exits with status 1.
-- **Output**: No output is returned if all checks pass; otherwise, it prints an error message and exits the script.
+- **Control Flow**:
+    - Execute the Solana command with 'help' to check if the Solana CLI tool is available.
+    - If the Solana command fails, print an error message and exit with status 1.
+    - Check if the Solana credentials file exists using 'ls'.
+    - If the credentials file is not found, print an error message and exit with status 1.
+    - Check if the Solana configuration file exists using 'ls'.
+    - If the configuration file is not found, print an error message and exit with status 1.
+- **Output**: The function does not return any value but exits the script with status 1 if any checks fail.
 
 
 ---
 ### check\_spl\_token
-Checks if the `spl-token` command is available in the system.
+The `check_spl_token` function verifies the availability of the `spl-token` command-line tool.
 - **Inputs**: None
-- **Logic and Control Flow**:
+- **Control Flow**:
     - Execute the `spl-token help` command and redirect its output to `/dev/null`.
-    - Check the exit status of the previous command.
-    - If the exit status is not zero, print 'spl-token: command not found' and exit the script with status 1.
-- **Output**: The function does not return a value; it exits the script if the `spl-token` command is not found.
+    - Check the exit status of the previous command to determine if `spl-token` is available.
+    - If the exit status is not zero, print an error message indicating that `spl-token` is not found and exit the script with status 1.
+- **Output**: The function does not return any value but will terminate the script with an error message if `spl-token` is not found.
 
 
 ---
 ### check\_alice
-Checks if Alice's credentials and configuration files exist.
+The `check_alice` function verifies the existence of Alice's Solana credentials and configuration files.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Use the `ls` command to check if the file path stored in `ALICE_CRED` exists.
-    - If the file does not exist, print an error message 'solana: Alice credentials not found' and exit with status 1.
-    - Use the `ls` command to check if the file path stored in `ALICE_CONF` exists.
-    - If the file does not exist, print an error message 'solana: Alice config not found' and exit with status 1.
-- **Output**: No output is returned if both checks pass; otherwise, the function exits with an error message.
+- **Control Flow**:
+    - The function attempts to list the file at the path stored in the `ALICE_CRED` variable.
+    - If the file does not exist, it outputs an error message 'solana: Alice credentials not found' and exits with status 1.
+    - The function then attempts to list the file at the path stored in the `ALICE_CONF` variable.
+    - If the file does not exist, it outputs an error message 'solana: Alice config not found' and exits with status 1.
+- **Output**: The function does not return any value but will exit the script with status 1 if either Alice's credentials or configuration files are not found.
 
 
 
