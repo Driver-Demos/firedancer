@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Models and measures wallclock and tickcount performance, and calculates asynchronous minimum intervals.
+The `fd_tempo.c` file in the `firedancer` codebase implements functions for modeling and measuring the performance of wallclock and tickcount operations, as well as setting and retrieving the ticks per nanosecond ratio.
 
 # Purpose
-The code provides functionality for modeling and measuring the performance of time-related operations in a system. It includes functions to model the overhead and jitter of wallclock and tickcount operations, which are essential for understanding the timing characteristics of an application. The functions [`fd_tempo_wallclock_model`](<#fd_tempo_wallclock_model>) and [`fd_tempo_tickcount_model`](<#fd_tempo_tickcount_model>) estimate the time taken for these operations using a robust statistical approach, which helps in identifying the minimal overhead and jitter. These models are useful for applications that require precise timing measurements and need to account for system-induced delays.
+This C source code file provides functionality for modeling and measuring the performance of time-related operations, specifically focusing on wallclock and tickcount measurements. The file includes functions to model the overhead and jitter of these operations using robust statistical methods, such as fitting a shifted exponential distribution to the time differences observed between consecutive calls. The primary functions, [`fd_tempo_wallclock_model`](#fd_tempo_wallclock_model) and [`fd_tempo_tickcount_model`](#fd_tempo_tickcount_model), estimate the minimal overhead and jitter for wallclock and tickcount operations, respectively. Additionally, the file includes functions to set and retrieve the number of ticks per nanosecond, which is crucial for converting between different time units in performance-sensitive applications.
 
-Additionally, the code includes functions to set and retrieve the number of ticks per nanosecond, which is crucial for converting between different time units in performance-sensitive applications. The function [`fd_tempo_set_tick_per_ns`](<#fd_tempo_set_tick_per_ns>) allows explicit setting of this conversion factor, while `fd_tempo_tick_per_ns` calculates it based on observed data if not set explicitly. The [`fd_tempo_observe_pair`](<#fd_tempo_observe_pair>) function provides a mechanism to obtain synchronized observations of wallclock and tickcount values, which is important for accurate timing analysis. The [`fd_tempo_async_min`](<#fd_tempo_async_min>) function calculates the minimum asynchronous interval based on given parameters, ensuring that the interval is within a reasonable range. This collection of functions is designed to be used in environments where precise timing and performance measurements are critical.
+The code is structured to ensure that these measurements are robust against noise and outliers, using techniques like trimming and robust fitting. It also includes a function, [`fd_tempo_observe_pair`](#fd_tempo_observe_pair), to accurately pair wallclock and tickcount observations, minimizing the error in joint reads. The file is designed to be part of a larger system, as indicated by the inclusion of headers from other directories, and it provides a narrow but essential functionality related to time measurement and performance modeling. The use of static variables and the `FD_ONCE_BEGIN` macro suggests that some computations are intended to be performed only once, optimizing performance by avoiding redundant calculations.
 # Imports and Dependencies
 
 ---
@@ -20,125 +20,112 @@ Additionally, the code includes functions to set and retrieve the number of tick
 
 ---
 ### mu
-- **Type**: ``double``
-- **Description**: Represents the average number of ticks per nanosecond, used in timing calculations.
-- **Use**: Used to store the average tick rate per nanosecond, which is set by the `fd_tempo_set_tick_per_ns` function and used in the `fd_tempo_tick_per_ns` function.
+- **Type**: `double`
+- **Description**: The variable `mu` is a static global variable of type double, used to store the mean value of the tick per nanosecond measurement. It is initialized and updated within the `fd_tempo_set_tick_per_ns` and `fd_tempo_tick_per_ns` functions.
+- **Use**: `mu` is used to hold the mean tick per nanosecond value, which is either set explicitly or calculated through robust statistical estimation.
 
 
 ---
 ### sigma
-- **Type**: ``double``
-- **Description**: Represents the standard deviation of the tick per nanosecond measurement. It is used in conjunction with the mean (`mu`) to model the distribution of tick per nanosecond values.
-- **Use**: Used to store the standard deviation of tick per nanosecond measurements, which is calculated or set explicitly in the `fd_tempo_set_tick_per_ns` function.
+- **Type**: `double`
+- **Description**: The `sigma` variable is a static global variable of type double, used to store the standard deviation of the tick per nanosecond measurement. It is part of the robust estimation process for determining the tick rate of the system clock.
+- **Use**: `sigma` is used to store the standard deviation of the tick per nanosecond measurement, which is calculated during the initialization of the tick rate model.
 
 
 ---
 ### explicit\_set
-- **Type**: ``int``
-- **Description**: A static integer variable that indicates whether the tick per nanosecond value has been explicitly set by the user.
-- **Use**: Used to determine if the tick per nanosecond value should be sampled or if it has already been set explicitly.
+- **Type**: `int`
+- **Description**: The `explicit_set` variable is a static integer that acts as a flag to indicate whether certain values have been explicitly set by the user. It is initialized to 0, meaning that by default, the values are not explicitly set.
+- **Use**: This variable is used to determine if the `fd_tempo_set_tick_per_ns` function has been called to set specific values for `mu` and `sigma`, bypassing the need for further sampling.
+
+
+---
+### fd\_tempo\_tick\_per\_ns
+- **Type**: `function`
+- **Description**: The `fd_tempo_tick_per_ns` function calculates the number of ticks per nanosecond by measuring the change in tick count and wall clock over a constant time interval. It uses robust statistical methods to estimate the average and root mean square (RMS) values, assuming a normal distribution of noise.
+- **Use**: This function is used to determine the tick rate of the system's clock, which can be used for precise timing and synchronization tasks.
 
 
 # Functions
 
 ---
 ### fd\_tempo\_wallclock\_model<!-- {{#callable:fd_tempo_wallclock_model}} -->
-[View Source →](<../../../../../src/tango/tempo/fd_tempo.c#L6>)
-
-Models the overhead and jitter of the `fd_log_wallclock()` function call using a robust estimator for a shifted exponential random variable.
+The `fd_tempo_wallclock_model` function estimates the minimal overhead and jitter of the `fd_log_wallclock` function by modeling it as a shifted exponential random variable and returns the estimated minimum time required for a call.
 - **Inputs**:
-    - `opt_tau`: A pointer to a double where the function will store the estimated jitter parameter `tau` if it is not NULL.
-- **Logic and Control Flow**:
-    - Initialize static variables `t0` and `tau` to store the model parameters.
-    - Use `FD_ONCE_BEGIN` to ensure the initialization block runs only once.
-    - Enter an infinite loop to perform the modeling process.
-    - Define constants `TRIAL_CNT` and `TRIM_CNT` for the number of trials and trimming count.
-    - Create an array `trial` to store the time differences between consecutive `fd_log_wallclock()` calls.
-    - Perform `TRIAL_CNT` measurements of the time taken for `fd_log_wallclock()` calls and store the results in `trial`.
-    - Trim the first and last `TRIM_CNT` samples from `trial` to form `sample`.
-    - Calculate `sample_cnt` as the number of samples after trimming and `thresh` as half of `sample_cnt`.
-    - Use `fd_stat_robust_exp_fit_double` to fit a robust exponential model to `sample` and update `t0` and `tau`.
-    - Break the loop if the fit is successful and `t0` is positive, otherwise increment `iter`.
-    - Log a warning and set fallback values for `t0` and `tau` if the loop iterates three times without success.
-    - End the `FD_ONCE_BEGIN` block.
-    - If `opt_tau` is not NULL, store `tau` in the location pointed to by `opt_tau`.
-- **Output**: Returns the estimated minimal overhead `t0` of the `fd_log_wallclock()` function call.
+    - `opt_tau`: A pointer to a double where the function will store the estimated jitter parameter (tau) if it is not NULL.
+- **Control Flow**:
+    - The function uses static variables `t0` and `tau` to store the estimated minimum time and jitter, respectively.
+    - The `FD_ONCE_BEGIN` macro ensures the initialization block is executed only once.
+    - A loop is used to repeatedly measure the time taken by `fd_log_wallclock` calls, storing the differences in an array `trial`.
+    - The array is trimmed to remove outliers, and a robust exponential fit is applied to estimate `t0` and `tau`.
+    - If the fit is successful and `t0` is positive, the loop breaks; otherwise, it retries up to three times.
+    - If unsuccessful after three attempts, a warning is logged, and default values for `t0` and `tau` are used.
+    - If `opt_tau` is not NULL, the estimated `tau` is stored in the location pointed to by `opt_tau`.
+- **Output**: The function returns the estimated minimum time `t0` as a double, representing the minimal overhead of the `fd_log_wallclock` function.
 
 
 ---
 ### fd\_tempo\_tickcount\_model<!-- {{#callable:fd_tempo_tickcount_model}} -->
-[View Source →](<../../../../../src/tango/tempo/fd_tempo.c#L61>)
-
-Models the performance of the `fd_tickcount()` function by estimating the minimal overhead and jitter using a robust exponential fit.
+The `fd_tempo_tickcount_model` function models the performance of the `fd_tickcount()` function by estimating its minimal overhead and jitter using a robust statistical method.
 - **Inputs**:
-    - `opt_tau`: A pointer to a double where the function can store the estimated jitter (tau). If NULL, the function does not store the jitter.
-- **Logic and Control Flow**:
-    - Initializes static variables `t0` and `tau` to store the model parameters.
-    - Uses a loop to repeatedly measure the time difference between consecutive calls to `fd_tickcount()` to gather samples.
-    - Defines `TRIAL_CNT` as 512 and `TRIM_CNT` as 64 to control the number of samples and trimming for robust estimation.
-    - Stores the time differences in an array `trial` and trims the first and last `TRIM_CNT` samples to form the `sample` array.
-    - Calculates the number of samples `sample_cnt` and a threshold `thresh` for robust fitting.
-    - Uses `fd_stat_robust_exp_fit_double` to fit the samples to a shifted exponential model, updating `t0` and `tau`.
-    - Breaks the loop if the fit is successful and `t0` is positive, otherwise retries up to 3 times.
-    - Logs a warning and uses fallback values for `t0` and `tau` if the model cannot be fitted after 3 iterations.
-    - Stores the estimated jitter `tau` in `opt_tau` if it is not NULL.
-- **Output**: Returns the estimated minimal overhead `t0` for the `fd_tickcount()` function.
+    - `opt_tau`: A pointer to a double where the estimated jitter (tau) will be stored if not NULL.
+- **Control Flow**:
+    - Initialize static variables `t0` and `tau` to store the model parameters.
+    - Begin a loop that will attempt to model the `fd_tickcount()` performance up to three times.
+    - In each iteration, perform 512 trials where the difference between two consecutive `fd_tickcount()` calls is measured and stored in an array.
+    - Trim the first and last 64 samples from the array to remove outliers, leaving 384 samples for analysis.
+    - Use a robust exponential fitting function `fd_stat_robust_exp_fit_double` to estimate the parameters `t0` and `tau` from the trimmed sample data.
+    - If the fitting function returns a value greater than half the sample count and `t0` is positive, break the loop, indicating a successful model.
+    - If the loop iterates three times without success, log a warning and set `t0` and `tau` to fallback values of 24 and 4, respectively.
+    - End the once-only initialization block.
+    - If `opt_tau` is not NULL, store the estimated `tau` in the provided location.
+- **Output**: Returns the estimated minimal overhead `t0` of the `fd_tickcount()` function.
 
 
 ---
 ### fd\_tempo\_set\_tick\_per\_ns<!-- {{#callable:fd_tempo_set_tick_per_ns}} -->
-[View Source →](<../../../../../src/tango/tempo/fd_tempo.c#L108>)
-
-Sets the global variables `mu` and `sigma` to the provided values and marks them as explicitly set.
+The `fd_tempo_set_tick_per_ns` function sets the global variables `mu` and `sigma` to the provided values and marks them as explicitly set.
 - **Inputs**:
-    - `_mu`: The mean value to set for the global variable `mu`.
-    - `_sigma`: The standard deviation value to set for the global variable `sigma`.
-- **Logic and Control Flow**:
-    - Set the global variable `explicit_set` to 1 to indicate that the values have been explicitly set.
-    - Assign the input `_mu` to the global variable `mu`.
-    - Assign the input `_sigma` to the global variable `sigma`.
-- **Output**: No output is returned as the function is of type `void`.
+    - `_mu`: A double representing the mean value to be set for the global variable `mu`.
+    - `_sigma`: A double representing the standard deviation value to be set for the global variable `sigma`.
+- **Control Flow**:
+    - Set the global variable `explicit_set` to 1, indicating that the values have been explicitly set.
+    - Assign the value of `_mu` to the global variable `mu`.
+    - Assign the value of `_sigma` to the global variable `sigma`.
+- **Output**: This function does not return any value.
 
 
 ---
 ### fd\_tempo\_observe\_pair<!-- {{#callable:fd_tempo_observe_pair}} -->
-[View Source →](<../../../../../src/tango/tempo/fd_tempo.c#L169>)
-
-Performs a series of alternating tickcount and wallclock observations to determine the wallclock observation with the smallest elapsed ticks between adjacent tickcount observations.
+The `fd_tempo_observe_pair` function performs a series of alternating tickcount and wallclock observations to determine the wallclock observation with the smallest elapsed ticks, providing a precise joint read of time and tickcount.
 - **Inputs**:
-    - `opt_now`: A pointer to a long where the function will store the best wallclock observation, if not NULL.
-    - `opt_tic`: A pointer to a long where the function will store the best tickcount observation adjusted by the midpoint of the joint time, if not NULL.
-- **Logic and Control Flow**:
-    - Initialize variables `best_wc`, `best_tc`, and `best_jt` to store the best wallclock, tickcount, and joint time observations respectively.
-    - Define `TRIAL_CNT` as 4 to perform 1 warmup and 3 real reads.
-    - Perform a series of alternating tickcount and wallclock observations, storing results in arrays `wc` and `tc`.
-    - Initialize `best_wc`, `best_tc`, and `best_jt` with the first real observation results.
-    - Iterate over the observations to find the wallclock observation with the smallest elapsed ticks between adjacent tickcount observations, updating `best_wc`, `best_tc`, and `best_jt` accordingly.
-    - Check if `best_jt` is negative, log a warning if so, and set `best_jt` to 0.
-    - If `opt_now` is not NULL, store `best_wc` in `opt_now`.
-    - If `opt_tic` is not NULL, store the adjusted `best_tc` in `opt_tic`.
-- **Output**: Returns the best joint time (`best_jt`), which is the smallest elapsed ticks between adjacent tickcount observations.
+    - `opt_now`: A pointer to a long where the best wallclock observation will be stored, if not NULL.
+    - `opt_tic`: A pointer to a long where the best tickcount observation will be stored, adjusted to the midpoint of the tickcount bounds, if not NULL.
+- **Control Flow**:
+    - Initialize variables for best wallclock, tickcount, and joint tickcount difference.
+    - Perform a series of alternating tickcount and wallclock observations, storing results in arrays.
+    - Determine the best wallclock observation by finding the one with the smallest elapsed ticks between adjacent tickcount observations.
+    - If the best joint tickcount difference is negative, log a warning and set it to zero.
+    - Store the best wallclock and adjusted tickcount in the provided pointers, if they are not NULL.
+- **Output**: Returns the smallest elapsed number of ticks between adjacent tickcount observations, which is the best joint tickcount difference.
 
 
 ---
 ### fd\_tempo\_async\_min<!-- {{#callable:fd_tempo_async_min}} -->
-[View Source →](<../../../../../src/tango/tempo/fd_tempo.c#L254>)
-
-Calculates the minimum asynchronous interval based on input parameters, ensuring it is a power of two within a specified range.
+The `fd_tempo_async_min` function calculates a minimum asynchronous interval based on input parameters, ensuring the result is a power of two within a specified range.
 - **Inputs**:
-    - `lazy`: A long integer that should be in the range [1, 2^31).
-    - `event_cnt`: An unsigned long integer that should be in the range [1, 2^31).
-    - `tick_per_ns`: A float representing ticks per nanosecond, which should be in the range (0, ~1.5e29).
-- **Logic and Control Flow**:
-    - Check if `lazy` is within the valid range [1, 2^31); if not, log a warning and return 0.
-    - Check if `event_cnt` is within the valid range [1, 2^31); if not, log a warning and return 0.
-    - Calculate `tick_per_ns_max` as `FLT_MAX / (1L<<31)` and check if `tick_per_ns` is within the range (0, `tick_per_ns_max`); if not, log a warning and return 0.
-    - Convert `lazy` and `event_cnt` to floats `_lazy` and `_event_cnt`, respectively, and calculate `_async_target` as `(tick_per_ns * _lazy) / _event_cnt`.
-    - Check if `_async_target` is at least 1; if not, log a warning and return 0.
-    - Check if `_async_target` is less than 2^32; if not, log a warning and return 0.
-    - Convert `_async_target` to an unsigned long `async_target`.
-    - Return `1UL << fd_ulong_find_msb(async_target)`, ensuring the result is a power of two within [1, 2^31].
-- **Output**: An unsigned long integer representing the minimum asynchronous interval, which is a power of two within the range [1, 2^31].
+    - `lazy`: A long integer representing a laziness factor, which must be in the range [1, 2^31).
+    - `event_cnt`: An unsigned long integer representing the number of events, which must be in the range [1, 2^31).
+    - `tick_per_ns`: A float representing the number of ticks per nanosecond, which must be greater than 0 and less than or equal to approximately 1.5e29.
+- **Control Flow**:
+    - Check if 'lazy' is within the valid range [1, 2^31); if not, log a warning and return 0.
+    - Check if 'event_cnt' is within the valid range [1, 2^31); if not, log a warning and return 0.
+    - Calculate the maximum valid 'tick_per_ns' and check if 'tick_per_ns' is within the valid range (0, ~1.5e29); if not, log a warning and return 0.
+    - Convert 'lazy' and 'event_cnt' to floats and calculate '_async_target' as (tick_per_ns * _lazy) / _event_cnt.
+    - Check if '_async_target' is within the valid range [1, 2^32); if not, log a warning and return 0.
+    - Convert '_async_target' to an unsigned long 'async_target'.
+    - Return 1 shifted left by the most significant bit position of 'async_target', ensuring the result is a power of two within [1, 2^31].
+- **Output**: An unsigned long integer representing the minimum asynchronous interval, which is a power of two within the range [1, 2^31], or 0 if any input validation fails.
 
 
 

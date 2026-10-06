@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements and manages PCIe communication, data streaming, and Ed25519 verification for FPGA operations.
+PCI and ED25519 verify workspace types and hardware access functions.
 
 
 ## Files
-- **[wd_f1.c](wd_f1.c.md)**: Implements PCIe communication and management functions for FPGA-based operations, including data streaming and Ed25519 verification.
-- **[wd_f1.h](wd_f1.h.md)**: Header file for PCI management and ED25519 verification in the Wiredancer project.
+- **[wd_f1.c](wd_f1.c.md)**: The `wd_f1.c` file in the `firedancer` codebase provides functions for managing PCIe interactions and data streaming, including initialization, reading, writing, and handling requests for the AWS F1 FPGA environment.
+- **[wd_f1.h](wd_f1.h.md)**: PCI and ED25519 verify workspace types and hardware access function declarations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
