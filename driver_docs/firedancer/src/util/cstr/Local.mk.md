@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for `fd_cstr` in the `firedancer` codebase.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and unit tests for the `fd_cstr` component within the `firedancer/src/util/cstr` directory.
 
 # Purpose
-The Makefile content defines build and test instructions for a software project. It adds the header file `fd_cstr.h` and object files `fd_cstr` and `fd_util` to the build process. It also specifies a unit test named `test_cstr`, which uses the `fd_util` object, and includes instructions to run this unit test.
+The file is a Makefile snippet used for building and testing a software component. It adds the header file `fd_cstr.h` and object files `fd_cstr` and `fd_util` to the build process. It also defines and executes a unit test named `test_cstr` using the `fd_util` component.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

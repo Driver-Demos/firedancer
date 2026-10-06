@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers and objects related to fd_netlink_tile if Linux is available.
+Build rules for `fd_netlink_tile.h` and `fd_netlink_tile` when `FD_HAS_LINUX` is set.
 
 # Purpose
-The `Makefile` snippet uses conditional directives to include headers and objects for a build process. If the `FD_HAS_LINUX` variable is defined, it calls the `add-hdrs` function to add the `fd_netlink_tile.h` header and the `add-objs` function to add the `fd_netlink_tile` and `fd_disco` object files. This setup is used to manage dependencies and compilation targets specific to a Linux environment.
+Adds `fd_netlink_tile.h` to the header list and `fd_netlink_tile` to the object list when `FD_HAS_LINUX` is defined. The `fd_disco` target is used as the object source for `fd_netlink_tile`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
