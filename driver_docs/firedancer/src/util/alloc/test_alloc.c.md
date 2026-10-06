@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_alloc.c` file in the `firedancer` codebase implements a comprehensive unit test for memory allocation functions, including torture tests for same-thread and inter-thread memory allocation and deallocation scenarios.
+Tests memory allocation and deallocation functions, including torture tests for single and multi-threaded scenarios.
 
 # Purpose
-This C source code file is a comprehensive unit test for a custom memory allocation system, specifically designed to test the robustness and correctness of memory allocation and deallocation operations. The code is structured to perform a series of "torture tests" on the memory allocator, which involve allocating and freeing memory in various patterns and sizes, both within a single thread and across multiple threads. The primary focus is on ensuring that the allocator can handle a large number of allocations and deallocations without errors, such as memory corruption or misalignment. The code also includes mechanisms to verify that memory patterns are preserved between allocation and deallocation, which helps in detecting any potential memory corruption issues.
+The code is a C program designed to perform a series of tests on a custom memory allocation system. It includes a main function that initializes the environment, sets up a workspace for memory allocation, and runs a series of tests to validate the functionality of the memory allocator. The program uses a combination of static assertions, random number generation, and bit manipulation to test various aspects of memory allocation, such as alignment, size, and the ability to handle multiple allocations and deallocations. The code also includes mechanisms to test memory integrity by filling allocated memory with unique bit patterns and verifying them before deallocation.
 
-The file is intended to be compiled and executed as a standalone program, as indicated by the presence of a [`main`](#main) function. It includes several static assertions to ensure that certain compile-time conditions are met, such as alignment and footprint requirements. The code also makes use of a custom logging and random number generation system, which are likely part of a larger framework or library. The program is designed to be run in an environment with multiple processing units (tiles), and it uses these tiles to execute tests in parallel, further stressing the allocator's capabilities. The file does not define public APIs or external interfaces; instead, it serves as an internal testing tool to validate the functionality and reliability of the memory allocation system.
+The program is structured to run in a multi-threaded environment, where different threads can perform allocations and deallocations concurrently. It includes two main test functions, [`test_main`](<#test_main>) and [`test2_main`](<#test2_main>), which are executed on different threads to simulate real-world usage scenarios. The code uses a series of macros and utility functions to manage memory and log information about the tests being performed. The program is designed to be run in a hosted environment, as indicated by the `FD_HAS_HOSTED` preprocessor directive, and includes a fallback main function that logs a warning if the required capabilities are not available.
 # Imports and Dependencies
 
 ---
@@ -21,129 +21,141 @@ The file is intended to be compiled and executed as a standalone program, as ind
 
 ---
 ### \_go
-- **Type**: `int`
-- **Description**: The `_go` variable is a static integer used as a flag to control the execution flow of the program. It is initialized to zero and is used to signal when certain operations should begin.
-- **Use**: The `_go` variable is used to pause execution in loops until it is set to a non-zero value, indicating that the program should proceed with its operations.
+- **Type**: ``int``
+- **Description**: The `_go` variable is a static integer that acts as a control flag for the execution of certain loops in the program. It is used to synchronize the start of operations across multiple threads or processes.
+- **Use**: Used to signal when threads should start executing their main loop by checking its value in a spin-wait loop.
 
 
 ---
 ### \_shalloc
-- **Type**: `void *`
-- **Description**: `_shalloc` is a static global variable of type `void *` that is used to store a pointer to a shared memory allocation. It is initialized in the `main` function after a successful allocation of workspace memory for `fd_alloc`. This variable is used to manage memory allocations across different threads or processes.
-- **Use**: `_shalloc` is used to store and provide access to the shared memory allocation for memory management operations in the program.
+- **Type**: ``void *``
+- **Description**: Points to a memory region used for shared allocation operations. It is initialized with a memory address returned by `fd_alloc_new` and is used in conjunction with other allocation functions.
+- **Use**: Used to manage shared memory allocations across different threads or processes.
 
 
 ---
 ### \_alloc\_cnt
-- **Type**: `ulong`
-- **Description**: The `_alloc_cnt` variable is a static global variable of type `ulong` that is used to store the count of allocations to be performed in the memory allocation test. It is initialized with a default value of 1048576UL, which can be overridden by a command-line argument.
-- **Use**: This variable is used to determine the number of allocation operations to be executed during the memory allocation torture test.
+- **Type**: ``ulong``
+- **Description**: Represents the number of allocations to perform during the test. It is a static global variable of type `ulong`.
+- **Use**: Used to control the number of allocation operations in the `test_main` and `test2_main` functions.
 
 
 ---
 ### \_align\_max
-- **Type**: `ulong`
-- **Description**: The `_align_max` variable is a static global variable of type `ulong` that represents the maximum alignment value used in memory allocation operations within the program. It is initialized with a value from the command line or a default value and is used to determine the alignment constraints for memory allocations.
-- **Use**: It is used to set the maximum alignment constraint for memory allocations in the program's memory management routines.
+- **Type**: ``ulong``
+- **Description**: Stores the maximum alignment value used in memory allocation operations. It is a static global variable of type `ulong`.
+- **Use**: Used to determine the maximum alignment constraint for memory allocations in the test functions.
 
 
 ---
 ### \_sz\_max
-- **Type**: `ulong`
-- **Description**: The `_sz_max` variable is a static global variable of type `ulong` that represents the maximum size for memory allocations in the program. It is used to determine the upper limit for the size of memory blocks that can be allocated during the execution of the program.
-- **Use**: It is used to set the maximum size for memory allocations in the test functions `test_main` and `test2_main`.
+- **Type**: ``ulong``
+- **Description**: Represents the maximum size for memory allocations in the test program. It is used to determine the upper limit for the size of memory blocks that can be allocated during the execution of the test.
+- **Use**: Used to set the maximum size for memory allocations in the test functions `test_main` and `test2_main`.
 
 
 ---
 ### test2\_slot
-- **Type**: `array of structs`
-- **Description**: `test2_slot` is a static array of structs, each aligned to 128 bytes, with a maximum size defined by `TEST2_SLOT_MAX`. Each struct contains fields for a lock, a memory pointer, size, a pattern, and a source identifier. This structure is used to manage memory allocations and their associated metadata in a concurrent environment.
-- **Use**: `test2_slot` is used to store and manage memory allocations, ensuring thread-safe access and integrity of the memory through locking and pattern validation.
+- **Type**: `static struct`
+- **Description**: An array of structures, each aligned to 128 bytes, where each structure contains fields for a lock, a memory pointer, size, pattern, and source.
+- **Use**: Used to manage memory allocations and their associated metadata in a multi-threaded environment.
 
 
 # Functions
 
 ---
 ### test\_main<!-- {{#callable:test_main}} -->
-The `test_main` function performs a stress test on memory allocation and deallocation using a custom allocator, simulating random allocation and deallocation operations to ensure memory integrity and alignment.
+[View Source →](<../../../../../src/util/alloc/test_alloc.c#L30>)
+
+Performs a memory allocation and deallocation test using a random allocation strategy on a single thread.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize variables and constants for memory allocation parameters and random number generation.
-    - Wait for a volatile flag `_go` to be set before starting the main loop.
+    - `argc`: The number of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Initialize variables and constants for memory allocation testing.
+    - Wait for a volatile flag `_go` to be set before starting the test loop.
     - Iterate over a loop twice the number of `alloc_cnt` to perform allocation and deallocation operations.
-    - Determine whether to allocate or free memory based on the number of outstanding allocations and a random decision.
-    - For allocation, randomly determine size and alignment, allocate memory, and fill it with a unique pattern for later verification.
-    - For deallocation, randomly select an outstanding allocation, verify the memory pattern, and free the memory.
-    - Log memory allocation information periodically if certain conditions are met.
-    - After the loop, clean up by leaving the allocator and deleting the random number generator.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`main::FD_VOLATILE`](#mainfd_volatile)
-    - [`fd_alloc_fprintf`](fd_alloc.c.md#fd_alloc_fprintf)
+    - Randomly decide whether to allocate or free memory based on the number of outstanding allocations and a random coin toss.
+    - For allocation, determine random size and alignment, allocate memory, and fill it with a unique pattern.
+    - For deallocation, select a random outstanding allocation, verify its integrity, and free it.
+    - Log information about memory allocations at intervals if `FD_HAS_DEEPASAN` is not defined.
+    - After the loop, clean up by leaving the allocation and random number generator contexts.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`main::FD_VOLATILE`](<#mainfd_volatile>)
+    - [`fd_alloc_fprintf`](<fd_alloc.c.md#fd_alloc_fprintf>)
 
 
 ---
 ### test2\_main<!-- {{#callable:test2_main}} -->
-The `test2_main` function performs a memory allocation and deallocation test on a shared memory allocator, ensuring memory integrity through random slot selection and pattern validation.
+[View Source →](<../../../../../src/util/alloc/test_alloc.c#L187>)
+
+Performs a memory allocation and deallocation test using random slot selection and test patterns to ensure data integrity.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the tile index and retrieve volatile constants for shared memory allocation parameters.
-    - Join a random number generator and a shared memory allocator using the tile index.
-    - Calculate the maximum alignment logarithmically.
-    - Wait for a volatile go signal to start the test loop.
-    - Iterate over twice the allocation count, performing memory operations in each iteration.
-    - Randomly select a slot and attempt to lock it using atomic compare-and-swap operations.
-    - If the slot is unallocated, randomly determine size and alignment, allocate memory, and fill it with a unique pattern.
-    - If the slot is allocated, validate the memory pattern and free the memory.
-    - Release the lock on the slot after operations are complete.
-    - Leave the shared memory allocator and delete the random number generator.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`main::FD_VOLATILE`](#mainfd_volatile)
+    - `argc`: The number of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Initialize `tile_idx` with the current tile index using `fd_tile_idx()`.
+    - Retrieve volatile constants `_shalloc`, `_alloc_cnt`, `_align_max`, and `_sz_max`.
+    - Initialize a random number generator `rng` with `fd_rng_new` and join it with `fd_rng_join`.
+    - Join the allocator with `fd_alloc_join` using `shalloc` and `tile_idx`.
+    - Calculate `lg_align_max` as the most significant bit of `align_max`.
+    - Wait for the volatile `_go` flag to be set using a spin-wait loop.
+    - Iterate `2 * alloc_cnt` times to perform allocation and deallocation tests.
+    - In each iteration, select a random slot index `idx` and attempt to lock it using `FD_ATOMIC_CAS`.
+    - If the slot is unlocked, check if it has an associated memory allocation.
+    - If no memory is allocated, randomly determine size and alignment, allocate memory, and fill it with a test pattern.
+    - If memory is allocated, verify the test pattern, free the memory, and clear the slot's memory reference.
+    - Release the lock on the slot by setting `test2_slot[idx].lock` to 0.
+    - After the loop, leave the allocator and delete the random number generator.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`main::FD_VOLATILE`](<#mainfd_volatile>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment and logs a warning if the FD_HAS_HOSTED capabilities are not available, then halts the program.
+[View Source →](<../../../../../src/util/alloc/test_alloc.c#L456>)
+
+Initializes the environment and logs a warning if the `FD_HAS_HOSTED` capability is not available, then halts execution.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
+    - `argc`: The number of command-line arguments.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - The function begins by calling `fd_boot` to initialize the environment with the command-line arguments.
-    - It logs a warning message indicating that the unit test requires FD_HAS_HOSTED capabilities.
-    - The function then calls `fd_halt` to terminate the program.
-    - Finally, it returns 0, indicating successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Logs a warning message indicating that the unit test requires `FD_HAS_HOSTED` capabilities.
+    - Calls `fd_halt` to stop further execution.
+    - Returns 0 to indicate successful termination.
+- **Output**: Returns 0, indicating successful termination of the program.
 
 
 ---
 ### FD\_VOLATILE<!-- {{#callable:main::FD_VOLATILE}} -->
-The FD_VOLATILE macro is used to set volatile variables, specifically _go and _shalloc, to initial values of 0 and shalloc respectively.
+[View Source →](<../../../../../src/util/alloc/test_alloc.c#L408>)
+
+Sets the volatile variables `_go` and `_shalloc` to specific values.
 - **Inputs**:
-    - `_go`: A static integer variable that is set to 0 using the FD_VOLATILE macro.
-    - `_shalloc`: A static void pointer variable that is set to the value of shalloc using the FD_VOLATILE macro.
-- **Control Flow**:
-    - FD_VOLATILE is a macro that sets the value of a volatile variable.
-    - The macro is used to set the _go variable to 0, indicating an initial state or flag.
-    - The macro is also used to set the _shalloc variable to the value of shalloc, which is likely a memory allocation or shared memory pointer.
-- **Output**: The macro does not produce a direct output but sets the values of volatile variables _go and _shalloc.
+    - `_go`: A volatile integer variable that is set to 0.
+    - `_shalloc`: A volatile pointer variable that is set to the value of `shalloc`.
+- **Logic and Control Flow**:
+    - Set the volatile variable `_go` to 0.
+    - Set the volatile variable `_shalloc` to the value of `shalloc`.
+- **Output**: No output is produced.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_alloc\_fprintf<!-- {{#callable_declaration:fd_alloc_fprintf}} -->
-Prints diagnostic information about a memory allocator to a specified stream.
-- **Description**: Use this function to output detailed diagnostic information about a memory allocator's state to a given stream, such as a file or standard output. This function is useful for debugging and monitoring the allocator's usage and health. It requires a valid memory allocator join object and a non-null stream to print the information. If the stream is null, the function will return immediately with no output. The function does not modify the allocator or the stream, but it will return the number of characters printed if successful.
+[View Source →](<../../../../../src/util/alloc/test_alloc.c#L26>)
+
+Prints allocation details to a specified stream.
+- **Description**: Use this function to print detailed information about memory allocations associated with a given `fd_alloc_t` object to a specified output stream. This function is useful for debugging and monitoring memory usage. It requires a valid `fd_alloc_t` pointer and a non-null `FILE` stream. If the `stream` is null, the function returns immediately with a value of 0, indicating no output was produced. The function returns the number of characters printed to the stream.
 - **Inputs**:
-    - `join`: A pointer to a `fd_alloc_t` object representing the memory allocator join. It must be a valid, non-null pointer to a properly initialized allocator join object.
-    - `stream`: A pointer to a `FILE` object where the diagnostic information will be printed. It must not be null. If it is null, the function will return 0 and perform no printing.
-- **Output**: Returns the number of characters printed to the stream. If the stream is null, returns 0.
-- **See also**: [`fd_alloc_fprintf`](fd_alloc.c.md#fd_alloc_fprintf)  (Implementation)
+    - `join`: A pointer to an `fd_alloc_t` object representing the memory allocation context. Must not be null.
+    - `stream`: A pointer to a `FILE` object where the allocation details will be printed. Must not be null. If null, the function returns 0 immediately.
+- **Output**: The function returns the number of characters printed to the stream. If the `stream` is null, it returns 0.
+- **See Also**: [`fd_alloc_fprintf`](<fd_alloc.c.md#fd_alloc_fprintf>)  (Implementation)
 
 
 

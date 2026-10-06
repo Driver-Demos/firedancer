@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_poseidon.c` file in the `firedancer` codebase implements the Poseidon hash function for the BN254 curve, including initialization, parameter retrieval, and the application of arithmetic operations such as addition, multiplication, and S-box transformations.
+Implements the Poseidon hash function for the BN254 curve, including initialization, appending data, and finalizing the hash.
 
 # Purpose
-This C source code file implements the Poseidon cryptographic hash function, which is designed for use in zero-knowledge proofs and other cryptographic applications. The file provides both the internal mechanics and the public interface for the Poseidon hash function. The internal functions, such as [`fd_poseidon_apply_ark`](#fd_poseidon_apply_ark), [`fd_poseidon_apply_sbox_full`](#fd_poseidon_apply_sbox_full), [`fd_poseidon_apply_sbox_partial`](#fd_poseidon_apply_sbox_partial), and [`fd_poseidon_apply_mds`](#fd_poseidon_apply_mds), are responsible for the core operations of the Poseidon algorithm, including the application of the round constants (ark), the S-box transformations, and the matrix multiplication (MDS). These operations are essential for the cryptographic strength and permutation properties of the Poseidon hash function.
+The code implements the Poseidon cryptographic hash function, which is designed for use in zero-knowledge proofs and other cryptographic applications. It provides both internal and external interfaces for the Poseidon hash function. The internal functions include [`fd_poseidon_apply_ark`](<#fd_poseidon_apply_ark>), [`fd_poseidon_apply_sbox_full`](<#fd_poseidon_apply_sbox_full>), [`fd_poseidon_apply_sbox_partial`](<#fd_poseidon_apply_sbox_partial>), and [`fd_poseidon_apply_mds`](<#fd_poseidon_apply_mds>), which perform specific operations on the state of the hash function, such as adding round constants, applying the S-box transformation, and performing matrix multiplications. These operations are essential for the cryptographic security of the Poseidon hash function.
 
-The public interface consists of functions like [`fd_poseidon_init`](#fd_poseidon_init), [`fd_poseidon_append`](#fd_poseidon_append), and [`fd_poseidon_fini`](#fd_poseidon_fini), which manage the lifecycle of a Poseidon hash computation. [`fd_poseidon_init`](#fd_poseidon_init) initializes the hash state, [`fd_poseidon_append`](#fd_poseidon_append) allows data to be added to the hash computation, and [`fd_poseidon_fini`](#fd_poseidon_fini) finalizes the hash computation and produces the hash output. The code is structured to handle different input widths and endianness, ensuring flexibility and compatibility with various systems. The file also includes mechanisms for parameter retrieval, ensuring that the correct constants and matrices are used for different input sizes. Overall, this file provides a comprehensive implementation of the Poseidon hash function, suitable for integration into larger cryptographic systems.
+The external interface consists of functions like [`fd_poseidon_init`](<#fd_poseidon_init>), [`fd_poseidon_append`](<#fd_poseidon_append>), and [`fd_poseidon_fini`](<#fd_poseidon_fini>), which manage the lifecycle of a Poseidon hash computation. [`fd_poseidon_init`](<#fd_poseidon_init>) initializes the hash state, [`fd_poseidon_append`](<#fd_poseidon_append>) processes input data, and [`fd_poseidon_fini`](<#fd_poseidon_fini>) finalizes the hash computation and produces the hash output. The code also includes a mechanism to handle different endianness and validates input data to ensure it is within the expected field. The [`fd_poseidon_get_params`](<#fd_poseidon_get_params>) function retrieves the necessary parameters for the Poseidon function based on the input width, ensuring the correct application of the cryptographic transformations.
 # Imports and Dependencies
 
 ---
@@ -20,134 +20,151 @@ The public interface consists of functions like [`fd_poseidon_init`](#fd_poseido
 
 ---
 ### fd\_poseidon\_apply\_ark<!-- {{#callable:fd_poseidon_apply_ark}} -->
-The `fd_poseidon_apply_ark` function adds round-specific constants to each element of the state array in a Poseidon hash function.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L6>)
+
+Adds round constants to each element of the state array for a given round in the Poseidon hash function.
 - **Inputs**:
-    - `state`: An array of `fd_bn254_scalar_t` representing the current state of the Poseidon hash.
+    - `state`: An array of `fd_bn254_scalar_t` representing the current state of the Poseidon hash function.
     - `width`: An unsigned long integer representing the number of elements in the state array.
     - `params`: A pointer to a `fd_poseidon_par_t` structure containing the Poseidon parameters, including the round constants.
-    - `round`: An unsigned long integer representing the current round number in the Poseidon hash function.
-- **Control Flow**:
-    - Iterates over each element of the state array from index 0 to `width-1`.
-    - For each element, adds the corresponding round constant from `params->ark` to the state element using `fd_bn254_scalar_add`.
-- **Output**: The function does not return a value; it modifies the `state` array in place.
+    - `round`: An unsigned long integer representing the current round number for which the round constants are applied.
+- **Logic and Control Flow**:
+    - Iterates over each element in the `state` array up to the specified `width`.
+    - For each element, adds the corresponding round constant from `params->ark` to the current state element using `fd_bn254_scalar_add`.
+    - The round constant is accessed using the formula `params->ark[round * width + i]`, where `i` is the current index in the loop.
+- **Output**: The function does not return a value; it modifies the `state` array in place by adding the round constants.
 
 
 ---
 ### fd\_poseidon\_apply\_sbox\_full<!-- {{#callable:fd_poseidon_apply_sbox_full}} -->
-The `fd_poseidon_apply_sbox_full` function applies a non-linear transformation to each element of a state array by raising each element to the power of five.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L16>)
+
+Raises each element of the `state` array to the power of 5.
 - **Inputs**:
     - `state`: An array of `fd_bn254_scalar_t` elements representing the state to be transformed.
-    - `width`: An unsigned long integer representing the number of elements in the state array to be processed.
-- **Control Flow**:
-    - Iterates over each element in the state array up to the specified width.
-    - For each element, computes its square and stores it in a temporary variable `t`.
+    - `width`: An unsigned long integer representing the number of elements in the `state` array.
+- **Logic and Control Flow**:
+    - Iterates over each element in the `state` array up to the specified `width`.
+    - For each element, computes the square of the element and stores it in a temporary variable `t`.
     - Squares the temporary variable `t` again to get the fourth power of the original element.
-    - Multiplies the original element by the fourth power stored in `t` to compute the fifth power, updating the element in the state array.
-- **Output**: The function modifies the input `state` array in place, with each element raised to the power of five.
+    - Multiplies the original element by the fourth power stored in `t` to get the fifth power, updating the element in the `state` array.
+- **Output**: The function modifies the `state` array in place, with each element raised to the power of 5.
 
 
 ---
 ### fd\_poseidon\_apply\_sbox\_partial<!-- {{#callable:fd_poseidon_apply_sbox_partial}} -->
-The `fd_poseidon_apply_sbox_partial` function applies a partial S-box transformation to the first element of the state array by raising it to the power of 5.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L28>)
+
+Computes the fifth power of the first element in the `state` array.
 - **Inputs**:
-    - `state`: An array of `fd_bn254_scalar_t` representing the state of the Poseidon hash function.
-- **Control Flow**:
-    - The function calls [`fd_poseidon_apply_sbox_full`](#fd_poseidon_apply_sbox_full) with the `state` array and a width of 1, which applies the S-box transformation to the first element of the state array.
-    - The S-box transformation involves raising the first element of the state array to the power of 5.
-- **Output**: The function does not return a value; it modifies the first element of the `state` array in place.
-- **Functions called**:
-    - [`fd_poseidon_apply_sbox_full`](#fd_poseidon_apply_sbox_full)
+    - `state`: An array of `fd_bn254_scalar_t` elements representing the state to be transformed.
+- **Logic and Control Flow**:
+    - Calls [`fd_poseidon_apply_sbox_full`](<#fd_poseidon_apply_sbox_full>) with `state` and a width of 1 to compute the fifth power of the first element in the `state` array.
+- **Output**: No output is returned as the function operates directly on the input `state` array.
+- **Functions Called**:
+    - [`fd_poseidon_apply_sbox_full`](<#fd_poseidon_apply_sbox_full>)
 
 
 ---
 ### fd\_poseidon\_apply\_mds<!-- {{#callable:fd_poseidon_apply_mds}} -->
-The `fd_poseidon_apply_mds` function performs a vector-matrix multiplication between a state vector and an MDS matrix, updating the state vector with the result.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L34>)
+
+Performs a vector-matrix multiplication of the `state` vector with the MDS matrix from `params` and updates the `state` vector with the result.
 - **Inputs**:
     - `state`: An array of `fd_bn254_scalar_t` representing the state vector to be transformed.
     - `width`: An unsigned long integer representing the width of the state vector and MDS matrix.
-    - `params`: A pointer to a `fd_poseidon_par_t` structure containing the MDS matrix used for the transformation.
-- **Control Flow**:
+    - `params`: A pointer to `fd_poseidon_par_t` containing the MDS matrix used for the transformation.
+- **Logic and Control Flow**:
     - Initialize a temporary array `x` to store intermediate results, with all elements set to zero.
-    - Iterate over each element `i` of the state vector, from 0 to `width-1`.
-    - For each element `i`, iterate over each element `j` of the state vector, from 0 to `width-1`.
-    - Multiply the `j`-th element of the state vector by the corresponding element in the MDS matrix, storing the result in a temporary variable `t`.
-    - Add the value of `t` to the `i`-th element of the temporary array `x`.
-    - After completing the inner loop, assign the `i`-th element of `x` to the `i`-th element of the state vector.
-- **Output**: The function updates the `state` array in place with the result of the vector-matrix multiplication.
+    - Iterate over each element `i` of the `state` vector up to `width`.
+    - For each `i`, iterate over each element `j` of the `state` vector up to `width`.
+    - Multiply the `j`-th element of `state` with the corresponding element of the MDS matrix from `params` and store the result in a temporary variable `t`.
+    - Add the value of `t` to the `i`-th element of `x`.
+    - After completing the nested loops, copy the values from `x` back to `state`.
+- **Output**: The function does not return a value; it updates the `state` array in place.
 
 
 ---
 ### fd\_poseidon\_get\_params<!-- {{#callable:fd_poseidon_get_params}} -->
-The `fd_poseidon_get_params` function assigns the appropriate Ark and MDS matrices to a `fd_poseidon_par_t` structure based on the specified width.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L52>)
+
+Assigns the appropriate Poseidon parameters for a given width to the `params` structure.
 - **Inputs**:
-    - `params`: A pointer to a `fd_poseidon_par_t` structure where the Ark and MDS matrices will be stored.
-    - `width`: An unsigned long integer representing the width for which the parameters are to be retrieved.
-- **Control Flow**:
-    - The function uses a switch statement to determine the appropriate case based on the `width` value.
-    - For each case, the macro `FD_POSEIDON_GET_PARAMS(w)` is invoked, which assigns the Ark and MDS matrices corresponding to the width `w` to the `params` structure.
-    - The macro is defined to handle widths from 2 to 13, inclusive.
-    - If the `width` does not match any of the defined cases, no action is taken.
+    - ``params``: A pointer to an `fd_poseidon_par_t` structure where the function will store the Poseidon parameters.
+    - ``width``: An unsigned long integer that specifies the width for which the Poseidon parameters are needed.
+- **Logic and Control Flow**:
+    - Defines a macro `FD_POSEIDON_GET_PARAMS` to simplify the assignment of `ark` and `mds` parameters based on the width.
+    - Uses a `switch` statement to select the appropriate case based on the `width` value.
+    - For each case, assigns the `ark` and `mds` fields of the `params` structure to point to pre-defined arrays corresponding to the specified width.
+    - The macro `FD_POSEIDON_GET_PARAMS` is undefined after its use to prevent any unintended reuse.
 - **Output**: The function does not return a value; it modifies the `params` structure in place.
 
 
 ---
 ### fd\_poseidon\_init<!-- {{#callable:fd_poseidon_init}} -->
-The `fd_poseidon_init` function initializes a `fd_poseidon_t` structure with specified endianness and resets its state.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L79>)
+
+Initializes a `fd_poseidon_t` structure with specified endianness and resets its state.
 - **Inputs**:
-    - `pos`: A pointer to a `fd_poseidon_t` structure that needs to be initialized.
-    - `big_endian`: An integer indicating whether the data should be treated as big-endian (non-zero) or little-endian (zero).
-- **Control Flow**:
-    - Check if the `pos` pointer is NULL; if so, return NULL.
-    - Set the `big_endian` field of the `pos` structure to the provided `big_endian` value.
-    - Initialize the `cnt` field of the `pos` structure to 0.
-    - Clear the `state` array of the `pos` structure using `fd_memset` to set all bytes to zero.
-    - Return the initialized `pos` structure.
-- **Output**: Returns the initialized `fd_poseidon_t` structure, or NULL if the input pointer `pos` is NULL.
+    - `pos`: A pointer to a `fd_poseidon_t` structure to initialize.
+    - `big_endian`: An integer indicating if the data should be treated as big-endian (non-zero) or little-endian (zero).
+- **Logic and Control Flow**:
+    - Check if `pos` is `NULL`; if true, return `NULL`.
+    - Set the `big_endian` field of `pos` to the provided `big_endian` value.
+    - Set the `cnt` field of `pos` to `0UL`.
+    - Reset the `state` array of `pos` to zero using `fd_memset`.
+    - Return the pointer `pos`.
+- **Output**: Returns the initialized `fd_poseidon_t` pointer, or `NULL` if the input pointer `pos` is `NULL`.
 
 
 ---
 ### fd\_poseidon\_append<!-- {{#callable:fd_poseidon_append}} -->
-The `fd_poseidon_append` function appends a data element to a Poseidon hash state, handling endianness and validating the input.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L91>)
+
+Appends data to a Poseidon state, handling endianness and validating the input.
 - **Inputs**:
-    - `pos`: A pointer to an `fd_poseidon_t` structure representing the current state of the Poseidon hash.
-    - `data`: A pointer to an array of unsigned characters representing the data to be appended.
-    - `sz`: An unsigned long integer representing the size of the data to be appended, which must be between 1 and 32 bytes.
-- **Control Flow**:
-    - Check if the `pos` pointer is NULL and return NULL if true.
-    - Check if the current count of elements in `pos` is greater than or equal to `FD_POSEIDON_MAX_WIDTH` and return NULL if true.
-    - Check if the size `sz` is 0 or greater than 32 and return NULL if true.
-    - Initialize a `fd_bn254_scalar_t` structure `cur` to zero.
-    - Copy the input data into `cur`, adjusting for endianness if necessary.
-    - If the data is in big-endian format, swap the byte order of `cur`.
-    - Validate the `cur` scalar and return NULL if validation fails.
-    - Increment the element count in `pos`.
-    - Convert `cur` to Montgomery form and store it in the `state` array of `pos`.
-    - Return the updated `pos` pointer.
-- **Output**: Returns a pointer to the updated `fd_poseidon_t` structure, or NULL if an error occurs.
+    - ``pos``: A pointer to a `fd_poseidon_t` structure representing the current Poseidon state.
+    - ``data``: A pointer to an array of unsigned characters representing the data to append.
+    - ``sz``: An unsigned long integer representing the size of the data to append.
+- **Logic and Control Flow**:
+    - Check if `pos` is `NULL` and return `NULL` if true.
+    - Check if the current count in `pos` is greater than or equal to `FD_POSEIDON_MAX_WIDTH` and return `NULL` if true.
+    - Check if `sz` is 0 or greater than 32 and return `NULL` if true.
+    - Initialize a `fd_bn254_scalar_t` array `cur` with zero.
+    - Copy `sz` bytes from `data` to `cur->buf`, adjusting for endianness if necessary.
+    - If `pos->big_endian` is true, swap the byte order of `cur`.
+    - Validate `cur` using `fd_bn254_scalar_validate` and return `NULL` if validation fails.
+    - Increment the count in `pos`.
+    - Convert `cur` to Montgomery form and store it in `pos->state` at the current count index.
+    - Return the updated `pos`.
+- **Output**: Returns a pointer to the updated `fd_poseidon_t` structure, or `NULL` if an error occurs.
 
 
 ---
 ### fd\_poseidon\_fini<!-- {{#callable:fd_poseidon_fini}} -->
-The `fd_poseidon_fini` function finalizes the Poseidon hash computation by applying a series of cryptographic transformations to the state and outputs the resulting hash.
+[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.c#L122>)
+
+Finalizes the Poseidon hash computation and returns the hash value.
 - **Inputs**:
-    - `pos`: A pointer to an `fd_poseidon_t` structure representing the current state of the Poseidon hash computation.
-    - `hash`: An array of unsigned characters where the resulting hash will be stored; it must be aligned to `FD_UINT256_ALIGNED`.
-- **Control Flow**:
-    - Check if the `pos` pointer is NULL or if `pos->cnt` is zero, returning NULL if either condition is true.
-    - Calculate the `width` as `pos->cnt + 1` and initialize Poseidon parameters using [`fd_poseidon_get_params`](#fd_poseidon_get_params).
-    - Verify that the parameters `ark` and `mds` are valid, returning NULL if not.
-    - Determine the number of partial rounds from a predefined array based on `pos->cnt`.
-    - Perform a series of cryptographic transformations over three phases: half full rounds, partial rounds, and remaining full rounds, using functions [`fd_poseidon_apply_ark`](#fd_poseidon_apply_ark), [`fd_poseidon_apply_sbox_full`](#fd_poseidon_apply_sbox_full), [`fd_poseidon_apply_sbox_partial`](#fd_poseidon_apply_sbox_partial), and [`fd_poseidon_apply_mds`](#fd_poseidon_apply_mds).
-    - Convert the first element of the state from Montgomery form to a scalar hash.
-    - If `pos->big_endian` is true, swap the byte order of the scalar hash.
-    - Copy the scalar hash to the `hash` output buffer.
-- **Output**: The function returns a pointer to the `hash` array containing the final Poseidon hash, or NULL if an error occurs during processing.
-- **Functions called**:
-    - [`fd_poseidon_get_params`](#fd_poseidon_get_params)
-    - [`fd_poseidon_apply_ark`](#fd_poseidon_apply_ark)
-    - [`fd_poseidon_apply_sbox_full`](#fd_poseidon_apply_sbox_full)
-    - [`fd_poseidon_apply_mds`](#fd_poseidon_apply_mds)
-    - [`fd_poseidon_apply_sbox_partial`](#fd_poseidon_apply_sbox_partial)
+    - ``pos``: A pointer to an `fd_poseidon_t` structure that holds the state of the Poseidon hash computation.
+    - ``hash``: An array of unsigned characters where the computed hash will be stored. It must be `FD_UINT256_ALIGNED`.
+- **Logic and Control Flow**:
+    - Check if `pos` is `NULL` or if `pos->cnt` is zero; return `NULL` if either is true.
+    - Calculate `width` as `pos->cnt + 1` and initialize `params` with Poseidon parameters for the given `width`.
+    - Check if `params->ark` or `params->mds` is `NULL`; return `NULL` if either is true.
+    - Determine the number of `partial_rounds` using the `PARTIAL_ROUNDS` array based on `pos->cnt`.
+    - Set `full_rounds` to 8, calculate `half_rounds` as `full_rounds / 2`, and `all_rounds` as `full_rounds + partial_rounds`.
+    - Perform `half_rounds` of full S-box transformations, followed by `partial_rounds` of partial S-box transformations, and finally `half_rounds` of full S-box transformations again, applying the Ark and MDS transformations in each round.
+    - Convert the first element of `pos->state` from Montgomery form to a scalar and store it in `scalar_hash`.
+    - If `pos->big_endian` is true, swap the byte order of `scalar_hash`.
+    - Copy `scalar_hash` to `hash` and return `hash`.
+- **Output**: Returns a pointer to the `hash` array containing the computed Poseidon hash, or `NULL` if an error occurs.
+- **Functions Called**:
+    - [`fd_poseidon_get_params`](<#fd_poseidon_get_params>)
+    - [`fd_poseidon_apply_ark`](<#fd_poseidon_apply_ark>)
+    - [`fd_poseidon_apply_sbox_full`](<#fd_poseidon_apply_sbox_full>)
+    - [`fd_poseidon_apply_mds`](<#fd_poseidon_apply_mds>)
+    - [`fd_poseidon_apply_sbox_partial`](<#fd_poseidon_apply_sbox_partial>)
 
 
 
