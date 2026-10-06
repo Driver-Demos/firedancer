@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a hash function based on xxhash-r39 with additional memory copying functionality.
+The `fd_hash.c` file in the `firedancer` codebase provides an implementation of a hash function based on xxhash-r39, including functions for hashing data and copying memory while hashing.
 
 # Purpose
-The code provides a hashing functionality based on a cleaner implementation of the `xxhash-r39` algorithm, which is open source and BSD licensed. It defines two functions: [`fd_hash`](<#fd_hash>) and [`fd_hash_memcpy`](<#fd_hash_memcpy>). The [`fd_hash`](<#fd_hash>) function computes a hash value for a given buffer of data, using a specified seed and the size of the data. It processes the data in blocks, applying a series of bitwise operations and multiplications with predefined constants to generate the hash. The function handles data of varying sizes, including blocks smaller than 32 bytes, and applies a final avalanche step to ensure a good distribution of hash values.
+This C source code file provides a specialized implementation of a hashing algorithm, specifically a cleaner version of the xxHash algorithm (version r39), which is known for its speed and efficiency. The file defines two primary functions: [`fd_hash`](#fd_hash) and [`fd_hash_memcpy`](#fd_hash_memcpy). The [`fd_hash`](#fd_hash) function computes a hash value for a given buffer of data, using a seed value to initialize the hash computation. It processes the data in blocks, applying a series of bitwise operations and multiplications with predefined constants to ensure a good distribution of hash values. The [`fd_hash_memcpy`](#fd_hash_memcpy) function extends this functionality by not only computing the hash of the source data but also copying the data to a destination buffer, effectively combining the operations of hashing and memory copying.
 
-The [`fd_hash_memcpy`](<#fd_hash_memcpy>) function extends the functionality of [`fd_hash`](<#fd_hash>) by also copying the source data to a destination buffer while computing the hash. It follows a similar process to [`fd_hash`](<#fd_hash>), processing data in blocks and applying the same series of operations to compute the hash. Both functions use a set of constants (`C1` to `C5`) and a macro `ROTATE_LEFT` to perform bitwise rotations, which are crucial for the hash computation. The code is intended to be part of a larger system, as indicated by the inclusion of the header file `fd_util_base.h`, and it does not define any public APIs or external interfaces directly.
+The code is structured to handle data of varying sizes, with specific optimizations for processing data in blocks of 32 bytes, and additional logic to handle any remaining bytes. The use of constants and bitwise rotations is central to the algorithm's design, ensuring that the hash values are well-distributed and resistant to collisions. This file is likely intended to be part of a larger library or application where fast and reliable hashing is required, such as in data integrity checks, hash tables, or other data structures that rely on hashing. The inclusion of `fd_util_base.h` suggests that this file is part of a broader utility library, and the functions defined here could be used as part of a public API for hashing operations.
 # Imports and Dependencies
 
 ---
@@ -19,48 +19,39 @@ The [`fd_hash_memcpy`](<#fd_hash_memcpy>) function extends the functionality of 
 
 ---
 ### fd\_hash<!-- {{#callable:fd_hash}} -->
-[View Source →](<../../../../src/util/fd_hash.c#L12>)
-
-Computes a hash value for a given buffer using a variant of the xxHash algorithm.
+The `fd_hash` function computes a hash value for a given buffer using a variant of the xxHash algorithm.
 - **Inputs**:
-    - `seed`: An initial hash value to start the computation.
-    - `buf`: A pointer to the buffer containing the data to hash.
-    - `sz`: The size of the buffer in bytes.
-- **Logic and Control Flow**:
+    - `seed`: An initial seed value of type `ulong` used to start the hash computation.
+    - `buf`: A pointer to the buffer (of type `void const *`) containing the data to be hashed.
+    - `sz`: The size of the buffer in bytes, of type `ulong`.
+- **Control Flow**:
     - Initialize pointers `p` and `stop` to the start and end of the buffer, respectively.
-    - If the buffer size is less than 32 bytes, initialize the hash `h` with `seed + C5`.
-    - For buffers of 32 bytes or more, process complete 32-byte blocks, updating intermediate hash values `w`, `x`, `y`, and `z` using constants `C1` and `C2`.
-    - Combine the intermediate hash values into `h` using bitwise rotations and multiplications with constants.
-    - Add the buffer size to `h`.
-    - Process remaining complete 8-byte blocks, updating `h` with bitwise operations and constants.
-    - Process any remaining complete 4-byte block, updating `h` similarly.
-    - Process any remaining bytes one by one, updating `h` with bitwise operations and constants.
-    - Perform a final avalanche step on `h` to ensure a good distribution of hash values.
-    - Return the computed hash value `h`.
-- **Output**: A 64-bit unsigned long integer representing the computed hash value.
+    - If the buffer size `sz` is less than 32, initialize the hash `h` with `seed + C5`.
+    - If the buffer size `sz` is 32 or more, initialize variables `w`, `x`, `y`, and `z` with different values derived from `seed` and constants `C1` and `C2`.
+    - Iterate over complete 32-byte blocks of the buffer, updating `w`, `x`, `y`, and `z` with transformed values from the buffer and constants `C1` and `C2`.
+    - Combine `w`, `x`, `y`, and `z` into the hash `h` using bitwise rotations and additions.
+    - Process remaining complete 8-byte blocks, updating `h` with transformed values from the buffer.
+    - Process any remaining complete 4-byte block, updating `h` with transformed values from the buffer.
+    - Process any remaining bytes one by one, updating `h` with transformed values from the buffer.
+    - Perform a final avalanche step on `h` using bitwise shifts and multiplications with constants `C2` and `C3`.
+- **Output**: The function returns a `ulong` representing the computed hash value of the input buffer.
 
 
 ---
 ### fd\_hash\_memcpy<!-- {{#callable:fd_hash_memcpy}} -->
-[View Source →](<../../../../src/util/fd_hash.c#L75>)
-
-Copies memory from source to destination while computing a hash value based on the data.
+The `fd_hash_memcpy` function computes a hash of a memory block while simultaneously copying it from a source to a destination buffer.
 - **Inputs**:
     - `seed`: An initial hash value used to start the hash computation.
-    - `dst`: A pointer to the destination memory where data will be copied.
-    - `src`: A pointer to the source memory from which data will be copied.
-    - `sz`: The size in bytes of the data to be copied and hashed.
-- **Logic and Control Flow**:
-    - Initialize pointers `q` for destination and `p` for source, and calculate `stop` as the end of the source data.
-    - If `sz` is less than 32, set `h` to `seed + C5`.
-    - If `sz` is 32 or more, initialize variables `w`, `x`, `y`, and `z` with values derived from `seed` and constants `C1` and `C2`.
-    - Process complete blocks of 32 bytes: update `w`, `x`, `y`, and `z` with rotated and multiplied values of data blocks, and copy these blocks to `dst`.
-    - Compute intermediate hash `h` using rotated values of `w`, `x`, `y`, and `z`.
-    - Process remaining complete `ulong` blocks (8 bytes each), updating `h` and copying data to `dst`.
-    - Process remaining complete `uint` block (4 bytes), updating `h` and copying data to `dst`.
-    - Process remaining bytes (1 to 3 `uchar`s), updating `h` and copying data to `dst`.
-    - Apply final avalanche mixing to `h` to ensure a well-distributed hash value.
-- **Output**: Returns a `ulong` hash value computed from the source data.
+    - `dst`: A pointer to the destination buffer where the source data will be copied.
+    - `src`: A pointer to the source buffer containing the data to be hashed and copied.
+    - `sz`: The size in bytes of the data to be hashed and copied.
+- **Control Flow**:
+    - Initialize pointers for source and destination buffers and calculate the stop pointer.
+    - If the size is less than 32 bytes, initialize the hash with a constant added to the seed.
+    - For sizes 32 bytes or more, process the data in blocks of 32 bytes, updating the hash and copying data to the destination buffer.
+    - After processing full 32-byte blocks, update the hash with the remaining data in chunks of 8 bytes, 4 bytes, and finally 1 byte, copying each to the destination buffer.
+    - Perform a final avalanche step to mix the hash thoroughly before returning it.
+- **Output**: The function returns a `ulong` representing the computed hash of the source data.
 
 
 

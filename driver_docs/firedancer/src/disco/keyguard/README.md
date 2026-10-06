@@ -3,21 +3,21 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Digital signature creation, transaction authorization, client-server communication, key management, and testing.
+Signing request authorization, client handling, key loading, and key switch APIs with tests.
 
 
 ## Files
-- **[fd_keyguard.h](fd_keyguard.h.md)**: Header file for digital signature creation and authorization for validator components, defining roles, payload types, and sign types.
-- **[fd_keyguard_authorize.c](fd_keyguard_authorize.c.md)**: Implements authorization functions for various payload types and roles in the Firedancer keyguard system.
-- **[fd_keyguard_client.c](fd_keyguard_client.c.md)**: Implements a client for keyguard operations, including initialization and signing requests.
-- **[fd_keyguard_client.h](fd_keyguard_client.h.md)**: Defines a blocking client for a remote signing server using shared memory for secure communication.
-- **[fd_keyguard_match.c](fd_keyguard_match.c.md)**: Implements logic to fingerprint and verify signing requests to prevent fake signing attacks.
-- **[fd_keyload.c](fd_keyload.c.md)**: Functions for securely loading, parsing, and managing validator identity keys from JSON files.
-- **[fd_keyload.h](fd_keyload.h.md)**: Functions for reading, loading, unloading, and allocating protected memory for Solana keypairs.
-- **[fd_keyswitch.c](fd_keyswitch.c.md)**: Functions for managing memory alignment and lifecycle of `fd_keyswitch_t` objects.
-- **[fd_keyswitch.h](fd_keyswitch.h.md)**: APIs for managing the state and lifecycle of a keyswitch in shared memory.
-- **[Local.mk](Local.mk.md)**: Makefile configuration for adding headers, objects, and unit tests related to keyguard and keyswitch.
-- **[test_keyload.c](test_keyload.c.md)**: Tests for memory protection and fork behavior in the `fd_keyload` module.
+- **[fd_keyguard.h](fd_keyguard.h.md)**: Signing request limits, role and payload constants, and payload match and authorization APIs.
+- **[fd_keyguard_authorize.c](fd_keyguard_authorize.c.md)**: Payload authorization checks for send, gossip, repair, leader, bundle, event, and bundle crank roles.
+- **[fd_keyguard_client.c](fd_keyguard_client.c.md)**: Shared-memory client setup and sign request/response handling for keyguard.
+- **[fd_keyguard_client.h](fd_keyguard_client.h.md)**: Blocking client for remote signing requests over shared-memory mcaches.
+- **[fd_keyguard_match.c](fd_keyguard_match.c.md)**: Fingerprinting and matching signing payloads for transactions, gossip, shreds, TLS, ping, pong, bundle, and event messages.
+- **[fd_keyload.c](fd_keyload.c.md)**: Loads Solana key files into protected memory pages and clears them on unload.
+- **[fd_keyload.h](fd_keyload.h.md)**: The `fd_keyload.h` file in the `firedancer` codebase provides functions for reading, loading, unloading, and allocating protected memory pages for JSON-encoded keypairs, ensuring secure handling and storage of cryptographic keys.
+- **[fd_keyswitch.c](fd_keyswitch.c.md)**: The `fd_keyswitch.c` file in the `firedancer` codebase provides functions for creating, joining, leaving, and deleting a `fd_keyswitch_t` structure, ensuring proper memory alignment and integrity through magic number checks.
+- **[fd_keyswitch.h](fd_keyswitch.h.md)**: APIs for validator key switching and state query.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and object files for the keyguard component, conditional on the presence of hosted and Linux environments, and includes a unit test for `test_keyload`.
+- **[test_keyload.c](test_keyload.c.md)**: The `test_keyload.c` file in the `firedancer` codebase tests the functionality of protected memory pages allocation and access, including handling segmentation faults and verifying memory content after forking processes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

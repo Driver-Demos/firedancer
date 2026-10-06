@@ -3,17 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines constants for system variable alignment, size, and footprint in the Firedancer runtime.
+Sysvar size and alignment constants for clock, rent, hashes, history, and rewards.
 
 # Purpose
-This code is a C header file that defines constants related to system variables in a runtime environment, likely associated with a blockchain or distributed ledger system. It includes two other header files, `fd_flamenco_base.h` and `fd_funk_base.h`, which suggests dependencies on foundational components of the system. The file defines several constants for different system variables, such as `FD_SYSVAR_CLOCK`, `FD_SYSVAR_EPOCH_REWARDS`, and `FD_SYSVAR_RECENT_HASHES`, specifying their binary code sizes, alignment requirements, and memory footprints. These constants are used to manage memory layout and data alignment for efficient processing of system variables. The file also references specific versions of external resources, indicating alignment with certain versions of a software development kit (SDK).
-# Imports and Dependencies
-
----
-- `../../fd_flamenco_base.h`
-- `../../../funk/fd_funk_base.h`
-
-
+This header defines the fixed binary sizes, alignment requirements, and memory footprints for several runtime sysvar records used by the `flamenco` runtime. Each `FD_SYSVAR_*` macro gives the encoded size and the total storage size for a specific sysvar such as `clock`, `epoch_rewards`, `recent_hashes`, `slot_hashes`, and `stake_history`, so code can allocate and validate memory with exact limits. The file also sets `FD_SYSVAR_ALIGN_MAX` to define the maximum alignment used across these sysvars. The include guard prevents multiple inclusion, and the referenced base headers provide shared type and platform definitions used by these constants.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
