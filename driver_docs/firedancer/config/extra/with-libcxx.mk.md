@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Allows replacement of the default C++ standard library with libc++ for MSan builds.
+The `with-libcxx.mk` file in the `firedancer` codebase provides a makefile configuration to replace the default C++ standard library with libc++, particularly useful for building with MemorySanitizer (MSan).
 
 # Purpose
-The configuration file allows the user to replace the default C++ standard library with `libc++`, which is useful for building with MemorySanitizer (MSan). It checks if the `LIBCXX` environment variable is set, and if not, it produces an error. The file modifies the `CXXFLAGS` to exclude the default C++ standard library and include the headers from the `libc++` library. Additionally, it updates the `LDFLAGS` to link against the `libc++` and `libc++abi` libraries. This setup ensures that the build process uses the specified `libc++` libraries instead of the default ones.
+The provided content is a configuration snippet, likely from a Makefile, that facilitates the replacement of the default C++ standard library with libc++. This is particularly useful for developers who need to build their projects with MemorySanitizer (MSan), a tool for detecting memory errors in C/C++ programs. The file includes instructions for setting up the libc++ environment by cloning the LLVM project, configuring it with CMake, and building the necessary components. It checks if the `LIBCXX` environment variable is set, which should point to the directory containing the built libc++ libraries. The configuration modifies the compiler flags (`CXXFLAGS` and `LDFLAGS`) to exclude the default C++ standard library and include the headers and libraries from the specified libc++ path, ensuring that the project is compiled and linked against libc++.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for `fd_wsample` in the `firedancer` codebase.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit test configurations for the `fd_wsample` component within the `ballet` module.
 
 # Purpose
-The Makefile content defines build and test instructions for a software project. It adds the header file `fd_wsample.h` and object files `fd_wsample` and `fd_ballet` to the build process. It also specifies a unit test named `test_wsample`, which depends on `fd_ballet` and `fd_util`, and includes a command to execute this unit test.
+The file is a Makefile snippet used for building and testing components in a software project. It defines build rules by adding headers and object files, specifically `fd_wsample.h` and objects `fd_wsample` and `fd_ballet`. It also specifies the creation and execution of a unit test named `test_wsample`, which depends on `fd_ballet` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
