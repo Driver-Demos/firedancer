@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for a CodeQL query pack with C++ extractor and specific dependencies.
+The `qlpack.yml` file specifies the configuration for a CodeQL query pack named `asymmetric-research/fd-dev-queries`, including its version, extractor type, and dependencies.
 
 # Purpose
-The file defines metadata for a software package. It specifies the package name as `asymmetric-research/fd-dev-queries` and the version as `0.0.1`. The `extractor` field indicates that the package uses the `cpp` extractor. The `warnOnImplicitThis` field is set to `true`, which enables warnings for implicit `this` usage. The `dependencies` section lists `codeql/cpp-all` with a version constraint of `"*"`, indicating a dependency on all versions of the `codeql/cpp-all` package.
+This YAML file is a configuration file for a CodeQL query pack. It specifies the name and version of the query pack, the language extractor to be used (C++), and a setting to warn on implicit 'this' usage. It also lists a dependency on the 'codeql/cpp-all' package, allowing for any version.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
