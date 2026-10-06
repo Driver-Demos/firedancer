@@ -3,16 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Automatically generated nanopb constant definitions for ELF binary, loader context, effects, and fixture.
+Nanopb constant bindings for ELF test protobuf messages.
 
 # Purpose
-This C source code file contains automatically generated constant definitions using the nanopb library, version 0.4.9.1. It includes the header file `elf.pb.h` and checks if the `PB_PROTO_HEADER_VERSION` is 40, issuing an error if it is not, to ensure compatibility with the current nanopb generator version. The file uses the `PB_BIND` macro to bind protocol buffer message types to C structures, specifically `fd_exec_test_elf_binary_t`, `fd_exec_test_elf_loader_ctx_t`, `fd_exec_test_elf_loader_effects_t`, and `fd_exec_test_elf_loader_fixture_t`, with the `AUTO` option for automatic field handling. This setup is typically used for serializing and deserializing data structures in a protocol buffer format.
-# Imports and Dependencies
-
----
-- `elf.pb.h`
-
-
+This file defines nanopb constant bindings for protobuf message types used by the ELF test data. It includes `elf.pb.h` and checks `PB_PROTO_HEADER_VERSION` to make sure the generated code matches the installed nanopb header version. The `PB_BIND` entries connect the protobuf descriptors `FD_EXEC_TEST_ELF_BINARY`, `FD_EXEC_TEST_ELF_LOADER_CTX`, `FD_EXEC_TEST_ELF_LOADER_EFFECTS`, and `FD_EXEC_TEST_ELF_LOADER_FIXTURE` to their C types with automatic field handling.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
