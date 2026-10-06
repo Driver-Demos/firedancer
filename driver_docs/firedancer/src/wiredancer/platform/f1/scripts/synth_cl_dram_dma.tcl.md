@@ -3,34 +3,32 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A TCL script for synthesizing FPGA designs on Amazon's platform, including reading design files and IP blocks.
+The `synth_cl_dram_dma.tcl` file is a script for synthesizing a custom logic design for an AWS FPGA, including reading design files, IP blocks, and constraints, and managing the synthesis process.
 
 # Purpose
-This script is a configuration file for the Amazon FPGA Hardware Development Kit (HDK). It automates the process of setting up and synthesizing FPGA designs by defining parameters, creating projects, and managing design files. The script configures clock constraints, reads custom logic files, and includes necessary design files and intellectual property (IP) blocks. It also handles the synthesis process by setting up the compile order and executing the synthesis command with specified options. Additionally, the script manages constraints files and ensures that the synthesis process adheres to the defined parameters, while also providing error handling for resource utilization issues.
+This file is a Tcl script used for configuring and managing the synthesis and implementation of FPGA designs using the Amazon FPGA Hardware Development Kit (HDK). It provides narrow functionality focused on setting up the environment, reading design files, generating clock constraints, and synthesizing the design for AWS FPGAs. The script includes several conceptual components, such as setting parameters to avoid clock name collisions, reading Verilog design files, and integrating Intellectual Property (IP) blocks. It also handles the reading of constraints necessary for the synthesis process. The relevance of this file to a codebase lies in its role in automating the FPGA design flow, ensuring that the design is correctly synthesized and implemented according to the specified constraints and configurations.
 # Content Summary
-This file is a script for the Amazon FPGA Hardware Development Kit (HDK). It is used to automate the process of setting up and synthesizing FPGA designs. The script is written in Tcl and is executed in a hardware design environment to manage various tasks related to FPGA development.
+This file is a configuration script for the Amazon FPGA Hardware Development Kit (HDK), specifically designed to facilitate the synthesis and integration of custom logic (CL) with AWS-provided FPGA shells. The script is written in Tcl and is used to automate various stages of the FPGA design process, including project creation, clock constraint generation, design file reading, IP block integration, and synthesis.
 
-Key functional details include:
+Key technical details include:
 
-1. **License Information**: The script begins with a license notice, indicating that it is distributed under the Amazon Software License. Users must comply with this license to use the script.
+1. **Project Initialization**: The script begins by setting parameters to avoid clock name collisions and initializes an in-memory project with a specified FPGA device type.
 
-2. **Parameter Configuration**: The script sets parameters to avoid clock name collisions and initializes variables for custom logic modules and Verilog defines.
+2. **Clock Constraint Generation**: It calls an external script (`aws_gen_clk_constraints.tcl`) to generate clock constraints based on a developer-specified recipe, ensuring that the design adheres to the required timing specifications.
 
-3. **Project Creation**: It creates an in-memory project for a specified FPGA device type, ensuring that the project is set up correctly for further operations.
+3. **Design File Management**: The script sets up directories for encrypted source files and reads various Verilog files, both from the developer's custom logic and AWS-provided design libraries. This includes reading standard Verilog files and specific AWS shell design files necessary for the FPGA's operation.
 
-4. **Clock Generation**: The script calls another script, `aws_gen_clk_constraints.tcl`, to generate clock constraints based on a developer-specified recipe. This is crucial for ensuring that the design's timing requirements are met.
+4. **IP Block Integration**: The script reads several Intellectual Property (IP) blocks, including DDR4 memory controllers, AXI register slices, and debugging interfaces like virtual JTAG and ILA/VIO. These IPs are crucial for implementing complex functionalities and interfacing with external components.
 
-5. **Design File Management**: The script sets directories for encrypted source files and reads various Verilog files necessary for the design. It includes both user-defined and AWS-provided design files.
+5. **Constraint Management**: It reads constraint files that define the FPGA's physical and logical constraints, such as clock constraints and DDR pin constraints. Some constraints are auto-generated by AWS and should not be modified by the user.
 
-6. **IP Block Reading**: The script reads Intellectual Property (IP) blocks, including DDR IP and AXI register slices, which are essential components for FPGA designs.
+6. **Synthesis Process**: The script updates the compile order and initiates the synthesis process for the custom logic module. It includes directives and strategies for synthesis, and checks for resource utilization errors, which are logged in a `failfast.csv` file.
 
-7. **Constraint Management**: It reads constraint files that define the design's physical and timing constraints. Some constraints are auto-generated by AWS and should not be modified by the user.
+7. **Post-Synthesis Checkpoint**: After synthesis, the script writes a checkpoint file to save the design state, allowing for further analysis or continuation of the design process.
 
-8. **Synthesis Process**: The script initiates the synthesis process for the custom logic module, specifying include directories, top module, and synthesis options. It checks for resource utilization errors and writes a post-synthesis checkpoint.
+8. **Project Closure**: Finally, the script closes the project and resets the clock name persistence parameter to its default value.
 
-9. **Project Closure**: After synthesis, the script closes the project and resets parameters to their default values.
-
-This script is essential for developers working with AWS FPGAs, as it automates the setup, synthesis, and management of FPGA design projects, ensuring that all necessary files and constraints are correctly handled.
+This script is essential for developers working with AWS FPGAs, as it automates the integration of custom logic with AWS infrastructure, ensuring that the design meets all necessary constraints and is ready for deployment.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
