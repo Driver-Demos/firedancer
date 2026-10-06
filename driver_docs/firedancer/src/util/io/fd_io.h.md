@@ -3,512 +3,563 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_io.h` file in the `firedancer` codebase provides a platform-agnostic API for high-performance stream I/O operations, including buffered and memory-mapped I/O, with support for both blocking and non-blocking modes.
+Platform-agnostic high-performance stream I/O API with buffered and memory-mapped I/O support.
 
 # Purpose
-The provided C header file defines a comprehensive API for high-performance, platform-agnostic stream I/O operations. It includes both blocking and non-blocking read and write functionalities, as well as buffered I/O operations to optimize performance by reducing the number of system calls required for small data transfers. The file defines several key structures and functions for managing input and output streams, including [`fd_io_read`](#fd_io_read), [`fd_io_write`](#fd_io_write), and their buffered counterparts, [`fd_io_buffered_read`](#fd_io_buffered_read) and [`fd_io_buffered_write`](#fd_io_buffered_write). These functions are designed to handle various I/O scenarios, such as reading or writing a specific number of bytes, handling end-of-file conditions, and managing I/O errors in a consistent manner.
+The code provides a platform-agnostic API for high-performance stream I/O operations in C. It includes functions for reading and writing data to and from file descriptors, with support for both blocking and non-blocking modes. The API allows for reading and writing a specified range of bytes, handling end-of-file conditions, and managing I/O errors. It also includes buffered I/O operations, which can improve performance by consolidating multiple small reads or writes into larger operations. The buffered I/O functionality is implemented through structures `fd_io_buffered_istream_t` and `fd_io_buffered_ostream_t`, which manage the state of input and output streams, respectively.
 
-Additionally, the file provides memory-mapped I/O capabilities through functions like [`fd_io_mmio_init`](#fd_io_mmio_init) and [`fd_io_mmio_fini`](#fd_io_mmio_fini), allowing files to be mapped into memory for efficient access. The header also includes utility functions for error and signal handling, such as [`fd_io_strerror`](#fd_io_strerror) and [`fd_io_strsignal`](#fd_io_strsignal), which convert error codes and signal codes into human-readable strings. The API is designed to be robust and efficient, with careful attention to error handling and performance optimization, making it suitable for high-performance applications that require efficient data streaming and manipulation.
+The code also provides memory-mapped I/O functions, allowing files to be mapped into the process's address space for direct access. This can be useful for high-performance applications that need to manipulate large files efficiently. Additionally, the code includes utility functions for error handling, such as converting error codes to human-readable strings. The API is designed to be used in various contexts, including those where high performance is critical, and it abstracts away platform-specific details to provide a consistent interface for stream I/O operations.
 # Imports and Dependencies
 
 ---
 - `../bits/fd_bits.h`
 
 
-# Global Variables
-
----
-### fd\_io\_strerror
-- **Type**: ``FD_FN_CONST char const *``
-- **Description**: The `fd_io_strerror` function is a global function that returns a constant character pointer. It is used to convert an fd_io error code into a human-readable string. The function is thread-safe and the returned string has an infinite lifetime.
-- **Use**: This function is used to provide a human-readable description of error codes related to fd_io operations.
-
-
----
-### fd\_io\_strsignal
-- **Type**: `function pointer`
-- **Description**: `fd_io_strsignal` is a function that converts a signal code, such as those returned by `WTERMSIG`, into a human-readable string. This function is designed to be thread-safe and does not rely on system calls like `brk(3)` or `futex(2)`, unlike some other implementations such as glibc's `strsignal`. The returned string is always non-NULL and has an infinite lifetime.
-- **Use**: This function is used to obtain a human-readable description of a signal code in a thread-safe manner.
-
-
 # Data Structures
 
 ---
 ### fd\_io\_buffered\_istream\_private
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `fd`: An integer representing the open file descriptor of the stream.
-    - `rbuf`: A pointer to an unsigned character array serving as the read buffer.
-    - `rbuf_sz`: An unsigned long indicating the size of the read buffer.
-    - `rbuf_lo`: An unsigned long representing the number of bytes in the buffer that have already been consumed.
-    - `rbuf_ready`: An unsigned long indicating the number of buffered bytes that have not yet been consumed.
-- **Description**: The `fd_io_buffered_istream_private` structure is designed to manage buffered input streams in a platform-agnostic manner, facilitating high-performance I/O operations. It encapsulates the state of a buffered input stream, including the file descriptor, a read buffer, and metadata about the buffer's size and consumption state. This structure is used internally to optimize read operations by minimizing system calls and efficiently managing buffered data.
+    - ``fd``: Open file descriptor of the stream.
+    - ``rbuf``: Pointer to the read buffer, non-NULL, with arbitrary alignment.
+    - ``rbuf_sz``: Size of the read buffer, must be positive.
+    - ``rbuf_lo``: Number of bytes in the buffer that have already been consumed.
+    - ``rbuf_ready``: Number of buffered bytes that have not been consumed, constrained by buffer size.
+- **Description**: Manages buffered input stream operations by maintaining a file descriptor and a read buffer with its size and consumption state. It facilitates efficient reading by buffering data and tracking the number of bytes consumed and ready for consumption.
 
 
 ---
 ### fd\_io\_buffered\_istream\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `fd`: Open normal-ish file descriptor of stream.
-    - `rbuf`: Read buffer, non-NULL, indexed [0,rbuf_sz), arb alignment.
-    - `rbuf_sz`: Read buffer size, positive.
-    - `rbuf_lo`: Buf bytes [0,rbuf_lo) have already been consumed.
-    - `rbuf_ready`: Number of buffered bytes that haven't been consumed, 0<=rbuf_lo<=(rbuf_lo+rbuf_ready)<=rbuf_sz.
-- **Description**: The `fd_io_buffered_istream_t` is a structure designed for buffered input stream operations, providing efficient reading from a file descriptor by utilizing a buffer. It maintains the state of the stream, including the file descriptor, the buffer for reading, and the current status of the buffer in terms of consumed and ready bytes. This structure is used to optimize I/O operations by reducing the number of system calls required for reading data, especially useful in high-performance scenarios where minimizing latency and maximizing throughput are critical.
+    - ``fd``: Open file descriptor of the stream.
+    - ``rbuf``: Pointer to the read buffer, non-NULL.
+    - ``rbuf_sz``: Size of the read buffer, must be positive.
+    - ``rbuf_lo``: Number of bytes in the buffer that have been consumed.
+    - ``rbuf_ready``: Number of buffered bytes that have not been consumed.
+- **Description**: `fd_io_buffered_istream_t` is a structure that manages buffered input streams, allowing efficient reading from a file descriptor into a buffer. It maintains the state of the stream, including the file descriptor, the read buffer, and the number of bytes that have been consumed or are ready to be consumed. This structure is used to optimize I/O operations by reducing the number of system calls needed for reading data.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_private
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `fd`: Open normal-ish file descriptor of stream.
-    - `wbuf`: Write buffer, non-NULL, indexed [0,wbuf_sz), arb alignment.
-    - `wbuf_sz`: Write buffer size, positive.
-    - `wbuf_used`: Number of buffered bytes that haven't been written to fd, in [0,wbuf_sz].
-- **Description**: The `fd_io_buffered_ostream_private` structure is used to manage buffered output streams in a platform-agnostic high-performance I/O system. It contains a file descriptor `fd` for the stream, a write buffer `wbuf` to temporarily hold data before writing it to the file descriptor, the size of this buffer `wbuf_sz`, and `wbuf_used` which tracks how much of the buffer is currently filled with data that has not yet been written to the file descriptor. This structure is crucial for optimizing write operations by reducing the number of system calls needed for small writes, thus improving performance.
+    - `fd`: Open file descriptor of the stream.
+    - `wbuf`: Pointer to the write buffer, non-NULL, with arbitrary alignment.
+    - `wbuf_sz`: Size of the write buffer, must be positive.
+    - `wbuf_used`: Number of buffered bytes not yet written to the file descriptor.
+- **Description**: Manages buffered output stream operations by holding a file descriptor and a write buffer, tracking the buffer's size and the number of bytes buffered but not yet written.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `fd`: Open normal-ish file descriptor of stream.
-    - `wbuf`: Write buffer, non-NULL, indexed [0,wbuf_sz), arb alignment.
-    - `wbuf_sz`: Write buffer size, positive.
-    - `wbuf_used`: Number of buffered bytes that haven't been written to fd, in [0,wbuf_sz].
-- **Description**: The `fd_io_buffered_ostream_t` is a data structure designed for buffered output stream operations. It encapsulates a file descriptor and a write buffer, allowing efficient writing by minimizing the number of system calls through buffering. The structure maintains the state of the buffer, including its size and the number of bytes currently buffered but not yet written to the file descriptor. This setup is particularly useful for high-performance I/O operations where reducing the overhead of frequent system calls is critical.
+    - ``fd``: Open file descriptor of the stream.
+    - ``wbuf``: Pointer to the write buffer, non-NULL.
+    - ``wbuf_sz``: Size of the write buffer, positive.
+    - ``wbuf_used``: Number of buffered bytes not yet written to the file descriptor.
+- **Description**: Manages buffered output operations to a stream, allowing for efficient writing by consolidating multiple small writes into larger ones using a buffer.
 
 
 # Functions
 
 ---
 ### fd\_io\_buffered\_istream\_init<!-- {{#callable:fd_io_buffered_istream_init}} -->
-The `fd_io_buffered_istream_init` function initializes a buffered input stream for reading from a file descriptor using a specified buffer.
+[View Source →](<../../../../../src/util/io/fd_io.h#L536>)
+
+Initializes a buffered input stream for reading from a file descriptor using a specified buffer.
 - **Inputs**:
-    - `in`: A pointer to an `fd_io_buffered_istream_t` structure that will hold the state of the buffered input stream.
-    - `fd`: An integer representing the file descriptor from which the stream will read.
-    - `rbuf`: A pointer to a memory region that will be used as the read buffer for the stream.
-    - `rbuf_sz`: An unsigned long representing the size of the read buffer.
-- **Control Flow**:
+    - ``in``: A pointer to an `fd_io_buffered_istream_t` structure that will hold the state of the buffered input stream.
+    - ``fd``: An integer representing the file descriptor from which the stream will read.
+    - ``rbuf``: A pointer to a memory region that will be used as the read buffer.
+    - ``rbuf_sz``: An unsigned long representing the size of the read buffer.
+- **Logic and Control Flow**:
     - Assigns the file descriptor `fd` to the `fd` field of the `in` structure.
     - Casts the `rbuf` pointer to `uchar *` and assigns it to the `rbuf` field of the `in` structure.
     - Sets the `rbuf_sz` field of the `in` structure to the value of `rbuf_sz`.
     - Initializes the `rbuf_lo` field to 0, indicating no bytes have been consumed yet.
-    - Initializes the `rbuf_ready` field to 0, indicating no bytes are currently buffered.
-    - Returns the pointer `in` after initialization.
+    - Initializes the `rbuf_ready` field to 0, indicating no bytes are buffered yet.
+    - Returns the pointer `in`.
 - **Output**: Returns the initialized `fd_io_buffered_istream_t` pointer `in`.
 
 
 ---
 ### fd\_io\_buffered\_istream\_fd<!-- {{#callable:fd_io_buffered_istream_fd}} -->
-The function `fd_io_buffered_istream_fd` retrieves the file descriptor from a buffered input stream structure.
+[View Source →](<../../../../../src/util/io/fd_io.h#L552>)
+
+Retrieves the file descriptor from a buffered input stream structure.
 - **Inputs**:
-    - `in`: A pointer to a constant `fd_io_buffered_istream_t` structure, representing a buffered input stream.
-- **Control Flow**:
-    - The function is defined as a static inline function, which suggests it is intended for use within the same translation unit and optimized for performance.
-    - It directly accesses the `fd` member of the `fd_io_buffered_istream_t` structure pointed to by `in` and returns its value.
+    - `in`: A pointer to a `fd_io_buffered_istream_t` structure, which represents a buffered input stream.
+- **Logic and Control Flow**:
+    - Accesses the `fd` field of the `fd_io_buffered_istream_t` structure pointed to by `in`.
+    - Returns the value of the `fd` field.
 - **Output**: The function returns an integer representing the file descriptor associated with the buffered input stream.
 
 
 ---
 ### fd\_io\_buffered\_istream\_rbuf<!-- {{#callable:fd_io_buffered_istream_rbuf}} -->
-The function `fd_io_buffered_istream_rbuf` returns the read buffer pointer from a buffered input stream structure.
+[View Source →](<../../../../../src/util/io/fd_io.h#L553>)
+
+Returns the read buffer pointer from a buffered input stream.
 - **Inputs**:
-    - `in`: A pointer to a constant `fd_io_buffered_istream_t` structure, representing the buffered input stream from which the read buffer pointer is to be retrieved.
-- **Control Flow**:
-    - The function is a simple accessor that directly returns the `rbuf` member of the `fd_io_buffered_istream_t` structure pointed to by `in`.
-- **Output**: A void pointer to the read buffer (`rbuf`) used by the buffered input stream.
+    - `in`: A pointer to a `fd_io_buffered_istream_t` structure, which represents a buffered input stream.
+- **Logic and Control Flow**:
+    - Accesses the `rbuf` member of the `fd_io_buffered_istream_t` structure pointed to by `in`.
+    - Returns the value of `rbuf`, which is a pointer to the read buffer.
+- **Output**: A pointer to the read buffer (`void *`) used by the buffered input stream.
 
 
 ---
 ### fd\_io\_buffered\_istream\_rbuf\_sz<!-- {{#callable:fd_io_buffered_istream_rbuf_sz}} -->
-The function `fd_io_buffered_istream_rbuf_sz` returns the size of the read buffer used in a buffered input stream.
+[View Source →](<../../../../../src/util/io/fd_io.h#L554>)
+
+Returns the size of the read buffer for a given buffered input stream.
 - **Inputs**:
-    - `in`: A pointer to a constant `fd_io_buffered_istream_t` structure, representing a buffered input stream.
-- **Control Flow**:
-    - The function is a simple inline function that directly accesses the `rbuf_sz` member of the `fd_io_buffered_istream_t` structure pointed to by `in`.
-    - It returns the value of `rbuf_sz`, which represents the size of the read buffer associated with the input stream.
-- **Output**: The function returns an `ulong` representing the size of the read buffer (`rbuf_sz`) of the buffered input stream.
+    - `in`: A pointer to a constant `fd_io_buffered_istream_t` structure representing the buffered input stream.
+- **Logic and Control Flow**:
+    - Accesses the `rbuf_sz` member of the `fd_io_buffered_istream_t` structure pointed to by `in`.
+    - Returns the value of `rbuf_sz`.
+- **Output**: The function returns an `ulong` representing the size of the read buffer (`rbuf_sz`) for the specified buffered input stream.
 
 
 ---
 ### fd\_io\_buffered\_istream\_fini<!-- {{#callable:fd_io_buffered_istream_fini}} -->
-The `fd_io_buffered_istream_fini` function finalizes a buffered input stream, indicating that it is no longer in use and relinquishing ownership of the underlying file descriptor and buffer.
+[View Source →](<../../../../../src/util/io/fd_io.h#L565>)
+
+Finalizes a buffered input stream by marking it as no longer in use.
 - **Inputs**:
-    - `in`: A pointer to an `fd_io_buffered_istream_t` structure representing the buffered input stream to be finalized.
-- **Control Flow**:
-    - The function takes a single argument, a pointer to a buffered input stream structure.
-    - It performs no operations on the input stream, as indicated by the cast to void, which suggests that the function is a placeholder or a no-op in its current form.
-- **Output**: The function does not return any value or produce any output.
+    - ``in``: A pointer to an `fd_io_buffered_istream_t` structure representing the buffered input stream to finalize.
+- **Logic and Control Flow**:
+    - The function takes a pointer to a buffered input stream structure as input.
+    - It performs no operations on the input stream, as indicated by the cast to void, which suggests the function is a placeholder or a no-op in its current form.
+- **Output**: No output is produced, and the function does not return a value.
 
 
 ---
 ### fd\_io\_buffered\_istream\_read<!-- {{#callable:fd_io_buffered_istream_read}} -->
-The `fd_io_buffered_istream_read` function reads a specified number of bytes from a buffered input stream into a destination buffer, updating the stream's buffer state accordingly.
+[View Source →](<../../../../../src/util/io/fd_io.h#L586>)
+
+Reads a specified number of bytes from a buffered input stream into a destination buffer.
 - **Inputs**:
-    - `in`: A pointer to an initialized `fd_io_buffered_istream_t` structure representing the buffered input stream.
-    - `dst`: A pointer to the destination buffer where the read bytes will be stored.
-    - `dst_sz`: The number of bytes to read from the input stream into the destination buffer.
-- **Control Flow**:
-    - Extracts the current buffer state from the `in` structure, specifically `rbuf_lo` and `rbuf_ready`.
-    - Calls [`fd_io_buffered_read`](fd_io.c.md#fd_io_buffered_read) with the file descriptor, destination buffer, destination size, read buffer, read buffer size, and pointers to `rbuf_lo` and `rbuf_ready` to perform the read operation.
-    - Updates the `rbuf_lo` and `rbuf_ready` fields in the `in` structure with the new buffer state after the read operation.
-    - Returns the error code from [`fd_io_buffered_read`](fd_io.c.md#fd_io_buffered_read), indicating success or failure of the read operation.
-- **Output**: Returns an integer error code: 0 on success, a negative value if EOF is encountered before reading the specified number of bytes, or a positive errno-compatible error code on I/O failure.
-- **Functions called**:
-    - [`fd_io_buffered_read`](fd_io.c.md#fd_io_buffered_read)
+    - ``in``: A pointer to an `fd_io_buffered_istream_t` structure representing the buffered input stream.
+    - ``dst``: A pointer to the destination buffer where the read bytes will be stored.
+    - ``dst_sz``: The number of bytes to read from the input stream into the destination buffer.
+- **Logic and Control Flow**:
+    - Destructure the `in` structure to local variables `rbuf_lo` and `rbuf_ready` to avoid pointer escapes.
+    - Call [`fd_io_buffered_read`](<fd_io.c.md#fd_io_buffered_read>) with the file descriptor, destination buffer, destination size, read buffer, read buffer size, and pointers to `rbuf_lo` and `rbuf_ready`.
+    - Update the `rbuf_lo` and `rbuf_ready` fields of the `in` structure with the values returned from [`fd_io_buffered_read`](<fd_io.c.md#fd_io_buffered_read>).
+    - Return the error code from [`fd_io_buffered_read`](<fd_io.c.md#fd_io_buffered_read>).
+- **Output**: Returns an integer error code: 0 on success, a negative value if EOF is encountered before reading the specified number of bytes, or a positive errno-compatible error code on failure.
+- **Functions Called**:
+    - [`fd_io_buffered_read`](<fd_io.c.md#fd_io_buffered_read>)
 
 
 ---
 ### fd\_io\_buffered\_istream\_skip<!-- {{#callable:fd_io_buffered_istream_skip}} -->
-The `fd_io_buffered_istream_skip` function skips a specified number of bytes in a buffered input stream, updating the stream's internal buffer state accordingly.
+[View Source →](<../../../../../src/util/io/fd_io.h#L614>)
+
+Skips a specified number of bytes in a buffered input stream.
 - **Inputs**:
-    - `in`: A pointer to an initialized `fd_io_buffered_istream_t` structure representing the buffered input stream.
-    - `skip_sz`: The number of bytes to skip in the input stream.
-- **Control Flow**:
-    - Destructure the input stream `in` to local variables `rbuf_lo` and `rbuf_ready` to avoid pointer escapes that might inhibit optimizations.
-    - Call [`fd_io_buffered_skip`](fd_io.c.md#fd_io_buffered_skip) with the file descriptor, skip size, buffer, buffer size, and the local variables to perform the skip operation.
-    - Update the `rbuf_lo` and `rbuf_ready` fields of `in` with the modified local variables.
-    - Return the error code from [`fd_io_buffered_skip`](fd_io.c.md#fd_io_buffered_skip).
+    - ``in``: A pointer to an `fd_io_buffered_istream_t` structure representing the buffered input stream.
+    - ``skip_sz``: The number of bytes to skip in the input stream.
+- **Logic and Control Flow**:
+    - Destructures the `in` structure to local variables `rbuf_lo` and `rbuf_ready` to avoid pointer escapes.
+    - Calls [`fd_io_buffered_skip`](<fd_io.c.md#fd_io_buffered_skip>) with the file descriptor, skip size, read buffer, buffer size, and pointers to `rbuf_lo` and `rbuf_ready`.
+    - Updates the `rbuf_lo` and `rbuf_ready` fields of the `in` structure with the new values after skipping.
+    - Returns the error code from [`fd_io_buffered_skip`](<fd_io.c.md#fd_io_buffered_skip>).
 - **Output**: Returns an integer error code: 0 on success, a negative value if EOF is encountered before skipping the specified bytes, or a positive errno-compatible error code on failure.
-- **Functions called**:
-    - [`fd_io_buffered_skip`](fd_io.c.md#fd_io_buffered_skip)
+- **Functions Called**:
+    - [`fd_io_buffered_skip`](<fd_io.c.md#fd_io_buffered_skip>)
 
 
 ---
 ### fd\_io\_buffered\_istream\_peek<!-- {{#callable:fd_io_buffered_istream_peek}} -->
-The `fd_io_buffered_istream_peek` function returns a pointer to the first unconsumed byte in a buffered input stream.
+[View Source →](<../../../../../src/util/io/fd_io.h#L633>)
+
+Returns a pointer to the first unconsumed byte in the read buffer of a buffered input stream.
 - **Inputs**:
-    - `in`: A pointer to an initialized `fd_io_buffered_istream_t` structure representing the buffered input stream.
-- **Control Flow**:
-    - The function accesses the read buffer (`rbuf`) of the input stream structure `in`.
-    - It calculates the address of the first unconsumed byte by adding the offset `rbuf_lo` to the base address of the buffer `rbuf`.
-    - The function returns this calculated address as a pointer to the first unconsumed byte.
-- **Output**: A pointer to the first byte in the read buffer that has been read but not yet consumed, valid until the next read, fetch, or fini operation.
+    - `in`: A pointer to an `fd_io_buffered_istream_t` structure, which represents the buffered input stream.
+- **Logic and Control Flow**:
+    - Accesses the `rbuf` and `rbuf_lo` fields of the `fd_io_buffered_istream_t` structure pointed to by `in`.
+    - Calculates the address of the first unconsumed byte by adding `rbuf_lo` to the base address `rbuf`.
+    - Returns the calculated address as a `const void *` pointer.
+- **Output**: A `const void *` pointer to the first unconsumed byte in the read buffer.
 
 
 ---
 ### fd\_io\_buffered\_istream\_peek\_sz<!-- {{#callable:fd_io_buffered_istream_peek_sz}} -->
-The function `fd_io_buffered_istream_peek_sz` returns the number of bytes currently buffered and ready to be consumed from a buffered input stream.
+[View Source →](<../../../../../src/util/io/fd_io.h#L643>)
+
+Returns the number of bytes in the read buffer that have been read but not yet consumed.
 - **Inputs**:
-    - `in`: A pointer to an `fd_io_buffered_istream_t` structure representing the buffered input stream.
-- **Control Flow**:
-    - The function accesses the `rbuf_ready` field of the `fd_io_buffered_istream_t` structure pointed to by `in`.
-    - It returns the value of `rbuf_ready`, which indicates the number of bytes that have been read into the buffer but not yet consumed.
-- **Output**: The function returns an `ulong` representing the number of bytes currently buffered and ready to be consumed.
+    - `in`: A pointer to an `fd_io_buffered_istream_t` structure, which represents a buffered input stream.
+- **Logic and Control Flow**:
+    - Accesses the `rbuf_ready` field of the `fd_io_buffered_istream_t` structure pointed to by `in`.
+    - Returns the value of `rbuf_ready`, which indicates the number of bytes available in the buffer that have not been consumed.
+- **Output**: The function returns an `ulong` representing the number of bytes in the buffer that are ready to be consumed.
 
 
 ---
 ### fd\_io\_buffered\_istream\_seek<!-- {{#callable:fd_io_buffered_istream_seek}} -->
-The `fd_io_buffered_istream_seek` function advances the read buffer pointers of a buffered input stream by a specified number of bytes.
+[View Source →](<../../../../../src/util/io/fd_io.h#L651>)
+
+Adjusts the read buffer pointers in a buffered input stream to consume a specified number of bytes.
 - **Inputs**:
-    - `in`: A pointer to an `fd_io_buffered_istream_t` structure representing the buffered input stream.
-    - `sz`: The number of bytes to advance the read buffer pointers by.
-- **Control Flow**:
-    - The function increments the `rbuf_lo` member of the `fd_io_buffered_istream_t` structure by `sz`, indicating that `sz` bytes have been consumed from the buffer.
-    - The function decrements the `rbuf_ready` member of the `fd_io_buffered_istream_t` structure by `sz`, reducing the count of buffered bytes that are ready to be consumed.
-- **Output**: This function does not return a value; it modifies the state of the input stream buffer in place.
+    - ``in``: A pointer to a `fd_io_buffered_istream_t` structure representing the buffered input stream.
+    - ``sz``: The number of bytes to consume from the buffered input stream.
+- **Logic and Control Flow**:
+    - Increase the `rbuf_lo` field of the `in` structure by `sz`, indicating that `sz` bytes have been consumed from the buffer.
+    - Decrease the `rbuf_ready` field of the `in` structure by `sz`, reflecting the reduction in the number of unconsumed bytes in the buffer.
+- **Output**: No return value; the function modifies the state of the `fd_io_buffered_istream_t` structure in place.
 
 
 ---
 ### fd\_io\_buffered\_istream\_fetch<!-- {{#callable:fd_io_buffered_istream_fetch}} -->
-The `fd_io_buffered_istream_fetch` function attempts to fill a buffered input stream's read buffer with as many unconsumed bytes as possible from the underlying file descriptor.
+[View Source →](<../../../../../src/util/io/fd_io.h#L678>)
+
+Attempts to fill the read buffer of a buffered input stream with as many unconsumed bytes as possible.
 - **Inputs**:
-    - `in`: A pointer to an initialized `fd_io_buffered_istream_t` structure representing the buffered input stream.
-- **Control Flow**:
+    - `in`: A pointer to an `fd_io_buffered_istream_t` structure representing the buffered input stream.
+- **Logic and Control Flow**:
     - Check if the buffer is already full by comparing `rbuf_ready` with `rbuf_sz`; if full, return 0.
-    - If there are unconsumed bytes (`rbuf_ready` > 0) and the buffer is not at the start (`rbuf_lo` > 0), move the unconsumed bytes to the beginning of the buffer using `memmove`.
-    - Call [`fd_io_read`](fd_io.c.md#fd_io_read) to read more data from the file descriptor into the buffer, starting at the position after the unconsumed bytes, and update `rsz` with the number of bytes read.
-    - Update `rbuf_lo` to 0 and `rbuf_ready` to the sum of the previous `rbuf_ready` and `rsz`.
-    - Return the error code from [`fd_io_read`](fd_io.c.md#fd_io_read), which indicates success, end-of-file, or an I/O error.
-- **Output**: Returns an integer error code: 0 on success, a negative value if end-of-file is encountered, or a positive errno-compatible error code on failure.
-- **Functions called**:
-    - [`fd_io_read`](fd_io.c.md#fd_io_read)
+    - If there are unconsumed bytes (`rbuf_ready` > 0) and the buffer is not at the start (`rbuf_lo` > 0), move unconsumed bytes to the beginning of the buffer using `memmove`.
+    - Call [`fd_io_read`](<fd_io.c.md#fd_io_read>) to read more data from the file descriptor into the buffer, starting at the position after the unconsumed bytes.
+    - Update `rbuf_lo` to 0 and `rbuf_ready` to the new total of unconsumed bytes after the read operation.
+    - Return the error code from [`fd_io_read`](<fd_io.c.md#fd_io_read>), which indicates success, end-of-file, or an I/O error.
+- **Output**: Returns 0 on success, a negative value if end-of-file is encountered, or a positive error code if an I/O error occurs.
+- **Functions Called**:
+    - [`fd_io_read`](<fd_io.c.md#fd_io_read>)
 
 
 ---
 ### fd\_io\_buffered\_ostream\_init<!-- {{#callable:fd_io_buffered_ostream_init}} -->
-The `fd_io_buffered_ostream_init` function initializes a buffered output stream for writing to a file descriptor using a specified buffer.
+[View Source →](<../../../../../src/util/io/fd_io.h#L702>)
+
+Initializes a buffered output stream for writing to a file descriptor using a specified buffer.
 - **Inputs**:
-    - `out`: A pointer to an `fd_io_buffered_ostream_t` structure that will hold the state of the buffered output stream.
-    - `fd`: An integer representing the file descriptor to which the buffered output stream will write.
-    - `wbuf`: A pointer to a memory region that will be used as the write buffer for the buffered output stream.
-    - `wbuf_sz`: An unsigned long integer specifying the size of the write buffer.
-- **Control Flow**:
+    - ``out``: A pointer to an `fd_io_buffered_ostream_t` structure that will hold the state of the buffered output stream.
+    - ``fd``: An integer representing the file descriptor to which the buffered output stream will write.
+    - ``wbuf``: A pointer to a memory region that will be used as the write buffer for the buffered output stream.
+    - ``wbuf_sz``: An unsigned long integer representing the size of the write buffer in bytes.
+- **Logic and Control Flow**:
     - Assigns the file descriptor `fd` to the `fd` field of the `out` structure.
     - Casts the `wbuf` pointer to `uchar *` and assigns it to the `wbuf` field of the `out` structure.
-    - Sets the `wbuf_sz` field of the `out` structure to the value of `wbuf_sz`.
-    - Initializes the `wbuf_used` field of the `out` structure to 0, indicating that no bytes are currently buffered.
-    - Returns the pointer `out` after initialization.
+    - Sets the `wbuf_sz` field of the `out` structure to the provided buffer size `wbuf_sz`.
+    - Initializes the `wbuf_used` field of the `out` structure to 0, indicating no bytes are currently buffered.
+    - Returns the pointer to the initialized `fd_io_buffered_ostream_t` structure.
 - **Output**: Returns a pointer to the initialized `fd_io_buffered_ostream_t` structure.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_fd<!-- {{#callable:fd_io_buffered_ostream_fd}} -->
-The function `fd_io_buffered_ostream_fd` retrieves the file descriptor from a buffered output stream structure.
+[View Source →](<../../../../../src/util/io/fd_io.h#L717>)
+
+Retrieves the file descriptor from a buffered output stream.
 - **Inputs**:
-    - `out`: A pointer to a constant `fd_io_buffered_ostream_t` structure representing the buffered output stream.
-- **Control Flow**:
-    - The function accesses the `fd` field of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
-    - It returns the value of the `fd` field, which is the file descriptor associated with the buffered output stream.
+    - `out`: A pointer to a `fd_io_buffered_ostream_t` structure representing the buffered output stream.
+- **Logic and Control Flow**:
+    - Accesses the `fd` field of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
+    - Returns the value of the `fd` field.
 - **Output**: The function returns an integer representing the file descriptor of the buffered output stream.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_wbuf<!-- {{#callable:fd_io_buffered_ostream_wbuf}} -->
-The function `fd_io_buffered_ostream_wbuf` returns the write buffer pointer of a buffered output stream.
+[View Source →](<../../../../../src/util/io/fd_io.h#L718>)
+
+Retrieves the write buffer pointer from a buffered output stream.
 - **Inputs**:
-    - `out`: A pointer to a constant `fd_io_buffered_ostream_t` structure representing the buffered output stream.
-- **Control Flow**:
-    - The function accesses the `wbuf` member of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
-    - It returns the value of the `wbuf` member, which is a pointer to the write buffer.
+    - `out`: A pointer to a `fd_io_buffered_ostream_t` structure, which represents a buffered output stream.
+- **Logic and Control Flow**:
+    - Accesses the `wbuf` member of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
+    - Returns the value of the `wbuf` member, which is a pointer to the write buffer.
 - **Output**: A pointer to the write buffer (`void *`) of the buffered output stream.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_wbuf\_sz<!-- {{#callable:fd_io_buffered_ostream_wbuf_sz}} -->
-The function `fd_io_buffered_ostream_wbuf_sz` returns the size of the write buffer for a given buffered output stream.
+[View Source →](<../../../../../src/util/io/fd_io.h#L719>)
+
+Retrieves the size of the write buffer from a buffered output stream.
 - **Inputs**:
     - `out`: A pointer to a constant `fd_io_buffered_ostream_t` structure representing the buffered output stream.
-- **Control Flow**:
-    - The function accesses the `wbuf_sz` field of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
-    - It returns the value of the `wbuf_sz` field, which represents the size of the write buffer.
-- **Output**: The function returns an `ulong` representing the size of the write buffer for the specified buffered output stream.
+- **Logic and Control Flow**:
+    - Accesses the `wbuf_sz` field of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
+    - Returns the value of `wbuf_sz`.
+- **Output**: The function returns an `ulong` representing the size of the write buffer.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_fini<!-- {{#callable:fd_io_buffered_ostream_fini}} -->
-The `fd_io_buffered_ostream_fini` function finalizes a buffered output stream, releasing ownership of the underlying file descriptor and write buffer without performing any final flush of buffered data.
+[View Source →](<../../../../../src/util/io/fd_io.h#L729>)
+
+Finalizes a buffered output stream without performing any final flush of buffered bytes.
 - **Inputs**:
-    - `out`: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream to be finalized.
-- **Control Flow**:
+    - ``out``: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream to finalize.
+- **Logic and Control Flow**:
     - The function takes a single argument, `out`, which is a pointer to a buffered output stream structure.
-    - The function does not perform any operations on the `out` parameter other than casting it to void to suppress unused variable warnings.
-    - The function does not perform any flushing of buffered data, leaving it to the caller to handle any necessary final flushes before calling this function.
-- **Output**: The function does not return any value or output.
+    - The function does not perform any operations on the `out` structure other than casting it to void to suppress unused variable warnings.
+    - No flushing of buffered data is performed, and the function does not modify the state of the `out` structure.
+- **Output**: No output is produced, and the function does not return a value.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_write<!-- {{#callable:fd_io_buffered_ostream_write}} -->
-The `fd_io_buffered_ostream_write` function writes data from a source buffer to a buffered output stream, updating the buffer's usage and returning any error encountered during the write operation.
+[View Source →](<../../../../../src/util/io/fd_io.h#L751>)
+
+Writes data from a source buffer to a buffered output stream, updating the write buffer usage and returning any error encountered.
 - **Inputs**:
-    - `out`: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream.
-    - `src`: A pointer to the source data to be written to the output stream.
-    - `src_sz`: The size in bytes of the data to be written from the source buffer.
-- **Control Flow**:
-    - Extract the current number of used bytes in the write buffer from the `out` structure.
-    - Call [`fd_io_buffered_write`](fd_io.c.md#fd_io_buffered_write) to write data from `src` to the output stream, using the buffer in `out` and updating the number of used bytes.
-    - Update the `wbuf_used` field in `out` with the new number of used bytes after the write operation.
-    - Return the error code from [`fd_io_buffered_write`](fd_io.c.md#fd_io_buffered_write), indicating success or failure of the write operation.
+    - ``out``: A pointer to a `fd_io_buffered_ostream_t` structure representing the buffered output stream.
+    - ``src``: A pointer to the source buffer containing the data to write.
+    - ``src_sz``: The size in bytes of the data to write from the source buffer.
+- **Logic and Control Flow**:
+    - Destructure the `out` parameter to access its write buffer usage (`wbuf_used`).
+    - Call [`fd_io_buffered_write`](<fd_io.c.md#fd_io_buffered_write>) with the file descriptor, source buffer, source size, write buffer, write buffer size, and a pointer to the write buffer usage.
+    - Update the `wbuf_used` field of `out` with the new write buffer usage value.
+    - Return the error code from [`fd_io_buffered_write`](<fd_io.c.md#fd_io_buffered_write>).
 - **Output**: Returns an integer error code, where 0 indicates success and non-zero indicates an I/O error.
-- **Functions called**:
-    - [`fd_io_buffered_write`](fd_io.c.md#fd_io_buffered_write)
+- **Functions Called**:
+    - [`fd_io_buffered_write`](<fd_io.c.md#fd_io_buffered_write>)
 
 
 ---
 ### fd\_io\_buffered\_ostream\_peek<!-- {{#callable:fd_io_buffered_ostream_peek}} -->
-The `fd_io_buffered_ostream_peek` function returns a pointer to the location in the write buffer where new data can be prepared for streaming out.
+[View Source →](<../../../../../src/util/io/fd_io.h#L769>)
+
+Returns a pointer to the location in the write buffer where new data can be added.
 - **Inputs**:
-    - `out`: A pointer to an initialized `fd_io_buffered_ostream_t` structure representing the buffered output stream.
-- **Control Flow**:
-    - The function accesses the `wbuf` and `wbuf_used` fields of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
-    - It calculates the pointer to the next available space in the write buffer by adding `wbuf_used` to the base address of `wbuf`.
-    - The function returns this calculated pointer.
-- **Output**: A pointer to the next available space in the write buffer, where new data can be prepared for writing.
+    - `out`: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream.
+- **Logic and Control Flow**:
+    - Accesses the `wbuf` field of the `out` structure, which is a pointer to the write buffer.
+    - Calculates the position in the write buffer by adding the `wbuf_used` offset to the `wbuf` pointer.
+    - Returns the calculated pointer, indicating where new data can be added to the buffer.
+- **Output**: A pointer to the location in the write buffer where new data can be added.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_peek\_sz<!-- {{#callable:fd_io_buffered_ostream_peek_sz}} -->
-The function `fd_io_buffered_ostream_peek_sz` returns the amount of unused space available in the write buffer of a buffered output stream.
+[View Source →](<../../../../../src/util/io/fd_io.h#L779>)
+
+Calculates the available space in the write buffer of a buffered output stream.
 - **Inputs**:
     - `out`: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream.
-- **Control Flow**:
-    - The function calculates the unused space in the write buffer by subtracting the number of bytes currently used (`wbuf_used`) from the total buffer size (`wbuf_sz`).
-    - It returns the result of this subtraction, which represents the available space in the buffer.
-- **Output**: The function returns an `ulong` representing the number of bytes of unused space in the write buffer, which is in the range [0, wbuf_sz].
+- **Logic and Control Flow**:
+    - Accesses the `wbuf_sz` and `wbuf_used` fields of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
+    - Subtracts `wbuf_used` from `wbuf_sz` to determine the available space in the write buffer.
+- **Output**: Returns the number of unused bytes in the write buffer as an `ulong`.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_seek<!-- {{#callable:fd_io_buffered_ostream_seek}} -->
-The `fd_io_buffered_ostream_seek` function updates the number of used bytes in the write buffer of a buffered output stream by a specified size.
+[View Source →](<../../../../../src/util/io/fd_io.h#L788>)
+
+Updates the number of used bytes in the write buffer of a buffered output stream by a specified size.
 - **Inputs**:
-    - `out`: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream.
-    - `sz`: An unsigned long integer representing the number of bytes to add to the `wbuf_used` field of the output stream.
-- **Control Flow**:
-    - The function takes a pointer to a buffered output stream and a size as inputs.
-    - It increments the `wbuf_used` field of the `fd_io_buffered_ostream_t` structure by the specified size `sz`.
-- **Output**: The function does not return any value; it modifies the `wbuf_used` field of the `fd_io_buffered_ostream_t` structure in place.
+    - ``out``: A pointer to a `fd_io_buffered_ostream_t` structure representing the buffered output stream.
+    - ``sz``: An unsigned long integer representing the number of bytes to add to the used portion of the write buffer.
+- **Logic and Control Flow**:
+    - Accesses the `wbuf_used` field of the `fd_io_buffered_ostream_t` structure pointed to by `out`.
+    - Increments the `wbuf_used` field by the value of `sz`.
+- **Output**: No return value; the function modifies the `wbuf_used` field of the `fd_io_buffered_ostream_t` structure in place.
 
 
 ---
 ### fd\_io\_buffered\_ostream\_flush<!-- {{#callable:fd_io_buffered_ostream_flush}} -->
-The `fd_io_buffered_ostream_flush` function flushes the buffered data from a buffered output stream to the underlying file descriptor.
+[View Source →](<../../../../../src/util/io/fd_io.h#L812>)
+
+Flushes the buffered output stream by writing all buffered bytes to the underlying file descriptor.
 - **Inputs**:
-    - `out`: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream to be flushed.
-- **Control Flow**:
-    - Retrieve the number of bytes currently buffered (`wbuf_used`) from the `out` structure.
-    - Check if `wbuf_used` is zero; if so, return 0 immediately to optimize for cases with many small writes.
-    - Set `wbuf_used` in the `out` structure to zero, indicating the buffer is now empty.
-    - Call [`fd_io_write`](fd_io.c.md#fd_io_write) to write the buffered data to the file descriptor, passing the file descriptor, buffer, and the number of bytes to write.
-    - Return the result of the [`fd_io_write`](fd_io.c.md#fd_io_write) call, which indicates success or failure of the write operation.
-- **Output**: Returns 0 on success, indicating all buffered bytes have been written to the file descriptor, or a non-zero error code if an I/O error occurs.
-- **Functions called**:
-    - [`fd_io_write`](fd_io.c.md#fd_io_write)
+    - ``out``: A pointer to an `fd_io_buffered_ostream_t` structure representing the buffered output stream to flush.
+- **Logic and Control Flow**:
+    - Retrieve the number of bytes currently buffered in `out->wbuf_used`.
+    - Check if `wbuf_used` is zero; if true, return 0 immediately to optimize for cases with many small writes.
+    - Set `out->wbuf_used` to 0, indicating the buffer is now empty.
+    - Call [`fd_io_write`](<fd_io.c.md#fd_io_write>) to write the buffered data to the file descriptor `out->fd`, using `out->wbuf` as the source, and `wbuf_used` as the number of bytes to write.
+    - Return the result of the [`fd_io_write`](<fd_io.c.md#fd_io_write>) call.
+- **Output**: Returns 0 on success, indicating all buffered bytes have been written, or a non-zero error code if an I/O error occurs.
+- **Functions Called**:
+    - [`fd_io_write`](<fd_io.c.md#fd_io_write>)
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_io\_read<!-- {{#callable_declaration:fd_io_read}} -->
-Reads data from a file descriptor into a buffer.
-- **Description**: This function reads at least `dst_min` bytes and at most `dst_max` bytes from the specified file descriptor `fd` into the buffer pointed to by `dst`. It is designed to handle both blocking and non-blocking file descriptors. The function will block until at least `dst_min` bytes are read, EOF is encountered, or an error occurs. If `dst_min` is zero, the function attempts a non-blocking read. The function updates the number of bytes read in `_dst_sz` and returns 0 on success, a negative value if EOF is encountered before `dst_min` bytes are read, or a positive error code on failure. The buffer contents are undefined in case of an error.
+[View Source →](<../../../../../src/util/io/fd_io.h#L227>)
+
+Reads a specified number of bytes from a file descriptor into a buffer.
+- **Description**: Use this function to read data from a file descriptor into a buffer, ensuring that at least a minimum number of bytes are read, or until an error or end-of-file is encountered. This function is suitable for both blocking and non-blocking file descriptors. It will block until the minimum number of bytes is read, EOF is reached, or an error occurs. If the minimum number of bytes is zero, the function attempts a non-blocking read. The function handles POSIX-specific behavior around EAGAIN and EWOULDBLOCK errors, ensuring consistent error reporting.
 - **Inputs**:
-    - `fd`: An open file descriptor from which data is to be read. It can be blocking or non-blocking.
-    - `dst`: A pointer to the buffer where the read data will be stored. Must not be null and should have at least `dst_max` bytes available.
-    - `dst_min`: The minimum number of bytes to read. Must be less than or equal to `dst_max`.
-    - `dst_max`: The maximum number of bytes to read. If zero, the function is a no-op.
+    - `fd`: An open file descriptor from which to read. It can be blocking or non-blocking.
+    - `dst`: A pointer to the buffer where the read bytes will be stored. Must not be null and should have at least 'dst_max' bytes available.
+    - `dst_min`: The minimum number of bytes to read. Must be less than or equal to 'dst_max'.
+    - `dst_max`: The maximum number of bytes to read. If zero, the function performs no operation.
     - `_dst_sz`: A pointer to a variable where the number of bytes actually read will be stored. Must not be null.
-- **Output**: Returns 0 on success with `_dst_sz` updated to the number of bytes read. Returns a negative value if EOF is encountered before `dst_min` bytes are read, with `_dst_sz` indicating the number of bytes read. Returns a positive error code on failure, with `_dst_sz` set to zero and buffer contents undefined.
-- **See also**: [`fd_io_read`](fd_io.c.md#fd_io_read)  (Implementation)
+- **Output**: Returns 0 on success with '*_dst_sz' set to the number of bytes read. Returns a negative value if EOF is encountered before reading 'dst_min' bytes, with '*_dst_sz' indicating bytes read. Returns a positive error code on failure, with '*_dst_sz' set to zero and the buffer contents undefined.
+- **See Also**: [`fd_io_read`](<fd_io.c.md#fd_io_read>)  (Implementation)
 
 
 ---
 ### fd\_io\_write<!-- {{#callable_declaration:fd_io_write}} -->
+[View Source →](<../../../../../src/util/io/fd_io.h#L347>)
+
 Writes data from a buffer to a file descriptor.
-- **Description**: This function writes a specified number of bytes from a source buffer to a file descriptor, ensuring that at least a minimum number of bytes are written. It is designed to handle both blocking and non-blocking file descriptors. The function will attempt to write between `src_min` and `src_max` bytes from the buffer pointed to by `src`. If `src_min` is greater than zero, the function will block until at least `src_min` bytes are written or an error occurs. If `src_min` is zero, the function will attempt a non-blocking write if the file descriptor is non-blocking. The function returns an error code if an I/O error occurs, and the file descriptor should be considered failed if the error is not `EAGAIN`. The number of bytes successfully written is stored in the location pointed to by `_src_sz`.
+- **Description**: Use this function to write a specified range of bytes from a source buffer to a file descriptor. It blocks until at least the minimum number of bytes is written or an I/O error occurs. This function is suitable for both blocking and non-blocking file descriptors. If the maximum number of bytes is zero, the function performs no operation. Ensure that the source buffer is not null and that the minimum number of bytes is less than or equal to the maximum. The function returns an error code if an I/O error occurs, and the file descriptor should be considered failed.
 - **Inputs**:
-    - `fd`: An open file descriptor to which data will be written. It must be a valid, open file descriptor.
-    - `src`: A pointer to the buffer containing the data to be written. Must not be null, and the caller retains ownership.
+    - `fd`: An open file descriptor where data will be written. It must be valid and open for writing.
+    - `src`: A pointer to the source buffer containing the data to write. Must not be null.
     - `src_min`: The minimum number of bytes to write. Must be less than or equal to `src_max`.
-    - `src_max`: The maximum number of bytes to write. If zero, the function is a no-op.
-    - `_src_sz`: A pointer to a location where the function will store the number of bytes actually written. Must not be null.
-- **Output**: Returns 0 on success, with `_src_sz` set to the number of bytes written. Returns a positive error code on failure, with `_src_sz` set to zero.
-- **See also**: [`fd_io_write`](fd_io.c.md#fd_io_write)  (Implementation)
+    - `src_max`: The maximum number of bytes to write. If zero, the function does nothing.
+    - `_src_sz`: A pointer to a variable where the function will store the number of bytes successfully written. Must not be null.
+- **Output**: Returns 0 on success, with `_src_sz` updated to the number of bytes written. Returns a positive error code on failure, with `_src_sz` set to zero.
+- **See Also**: [`fd_io_write`](<fd_io.c.md#fd_io_write>)  (Implementation)
 
 
 ---
 ### fd\_io\_sz<!-- {{#callable_declaration:fd_io_sz}} -->
-Retrieve the size of a file from a file descriptor.
-- **Description**: Use this function to obtain the current size of the file associated with a given file descriptor. It is useful when you need to know the file size for operations like reading or writing. The function should be called with a valid file descriptor, and it will return the size in bytes if successful. If the function fails, it returns an error code and sets the size to zero. This function is particularly useful in scenarios where the file size might change, such as when writing to a file.
+[View Source →](<../../../../../src/util/io/fd_io.h#L362>)
+
+Gets the current size of a file from a file descriptor.
+- **Description**: Use this function to obtain the current size of the file associated with a given file descriptor. It is important to note that the size returned is in bytes and will be in the range [0, LONG_MAX]. This function is useful when you need to know the file size for operations like reading or writing. It returns 0 on success, and the size is stored in the provided pointer. If the function fails, it returns an error code compatible with `strerror`, and the size pointer is set to 0. Common reasons for failure include invalid file descriptors or other errors related to `fstat`.
 - **Inputs**:
-    - `fd`: An integer representing the file descriptor of the file whose size is to be determined. It must be a valid, open file descriptor.
-    - `_sz`: A pointer to an unsigned long where the file size will be stored. Must not be null. On failure, the value pointed to by _sz will be set to zero.
-- **Output**: Returns 0 on success, with *_sz containing the file size in bytes. On failure, returns a positive error code and *_sz is set to zero.
-- **See also**: [`fd_io_sz`](fd_io.c.md#fd_io_sz)  (Implementation)
+    - `fd`: An open file descriptor for which the file size is to be determined. It must be a valid file descriptor.
+    - `_sz`: A pointer to an unsigned long where the file size will be stored. Must not be null. On failure, it is set to 0.
+- **Output**: Returns 0 on success, with the file size stored in *_sz. On failure, returns a positive error code and sets *_sz to 0.
+- **See Also**: [`fd_io_sz`](<fd_io.c.md#fd_io_sz>)  (Implementation)
 
 
 ---
 ### fd\_io\_truncate<!-- {{#callable_declaration:fd_io_truncate}} -->
+[View Source →](<../../../../../src/util/io/fd_io.h#L377>)
+
 Truncates a file to a specified size.
-- **Description**: Use this function to change the size of a file associated with a given file descriptor to a specified number of bytes. It can either extend the file by zero-padding or reduce it by discarding excess bytes. This function should be called when you need to adjust the file size, ensuring that the size is within the permissible range for the system. Be cautious when truncating a file to a size smaller than the current file offset of any open file descriptor, as this can lead to undefined behavior.
+- **Description**: Use this function to change the size of a file associated with a given file descriptor. If the specified size is larger than the current file size, the file will be extended with zero padding. If the size is smaller, the file will be truncated, and any data beyond the specified size will be discarded. This function returns an error code if the size is too large or incompatible with the system's `ftruncate` function. Ensure that the file descriptor is valid and that the operation is supported by the underlying file system.
 - **Inputs**:
-    - `fd`: An open file descriptor representing the file to be truncated. The file descriptor must be valid and open for writing.
-    - `sz`: The desired size of the file in bytes. It must be a non-negative value that does not exceed the maximum allowable size for the system. If the size is invalid, the function returns an error.
-- **Output**: Returns 0 on success. On failure, returns a positive error code compatible with strerror, indicating the reason for failure.
-- **See also**: [`fd_io_truncate`](fd_io.c.md#fd_io_truncate)  (Implementation)
+    - `fd`: An open file descriptor representing the file to truncate. The file descriptor must be valid and support truncation operations.
+    - `sz`: The desired size of the file in bytes. Must be a non-negative value and within the range supported by the system's `ftruncate` function. If the size is larger than `LONG_MAX` or not compatible with `off_t`, the function returns `EINVAL`.
+- **Output**: Returns 0 on success. On failure, returns a positive error code compatible with `strerror`, indicating the reason for failure.
+- **See Also**: [`fd_io_truncate`](<fd_io.c.md#fd_io_truncate>)  (Implementation)
 
 
 ---
 ### fd\_io\_seek<!-- {{#callable_declaration:fd_io_seek}} -->
+[View Source →](<../../../../../src/util/io/fd_io.h#L412>)
+
 Seeks to a specified byte index in a file descriptor.
-- **Description**: This function adjusts the byte index of a given file descriptor based on a relative offset and a specified seek type. It is used to navigate within a file, allowing for reading or writing at different positions. The function must be called with a valid file descriptor and a seek type that is within the defined range. It handles errors by returning a standard error code and setting the output index to zero if the operation fails. This function is useful for applications that require precise control over file read/write positions.
+- **Description**: Use this function to change the current byte index of a file descriptor based on a relative offset and a specified seek type. It is important to ensure that the file descriptor is seekable, as this function does not support seeking on non-seekable descriptors like pipes or sockets. The function will return an error if the seek type is unsupported or if the relative offset is not compatible with `lseek`. On success, the new byte index is returned in the provided pointer.
 - **Inputs**:
-    - `fd`: An open file descriptor representing the file to seek within. It must be a valid, open descriptor that supports seeking.
-    - `rel_off`: A long integer representing the relative offset from the position specified by the seek type. It must be within the range that can be cast to an off_t type.
-    - `type`: An integer indicating the seek type, which must be one of FD_IO_SEEK_TYPE_SET, FD_IO_SEEK_TYPE_CUR, or FD_IO_SEEK_TYPE_END. Values outside this range will result in an error.
-    - `_idx`: A pointer to an unsigned long where the new byte index will be stored upon successful completion. Must not be null, and the caller retains ownership.
-- **Output**: Returns 0 on success, with *_idx set to the new byte index. On failure, returns a positive error code and sets *_idx to 0.
-- **See also**: [`fd_io_seek`](fd_io.c.md#fd_io_seek)  (Implementation)
+    - `fd`: An open file descriptor that must be seekable. The caller retains ownership.
+    - `rel_off`: A long integer representing the relative offset for seeking. It must be compatible with `lseek`.
+    - `type`: An integer indicating the seek type, which must be one of `FD_IO_SEEK_TYPE_SET`, `FD_IO_SEEK_TYPE_CUR`, or `FD_IO_SEEK_TYPE_END`. Values outside this range are invalid.
+    - `_idx`: A pointer to an unsigned long where the new byte index will be stored on success. Must not be null.
+- **Output**: Returns 0 on success, with the new byte index stored in `_idx`. On failure, returns a positive error code and sets `_idx` to 0.
+- **See Also**: [`fd_io_seek`](<fd_io.c.md#fd_io_seek>)  (Implementation)
 
 
 ---
 ### fd\_io\_buffered\_read<!-- {{#callable_declaration:fd_io_buffered_read}} -->
-Reads data from a file descriptor into a buffer with optional buffering.
-- **Description**: This function reads a specified number of bytes from a file descriptor into a destination buffer, utilizing an intermediate buffer to optimize for small read operations. It should be used when you want to perform buffered reads from a file descriptor, especially when dealing with many small reads. The function will block until the requested number of bytes is read or an end-of-file or error is encountered. It is important to ensure that the read buffer is properly initialized and that the buffer sizes are correctly set. The function updates the read buffer's state to reflect the consumed and available bytes.
+[View Source →](<../../../../../src/util/io/fd_io.h#L451>)
+
+Reads data from a file descriptor into a buffer using a read buffer for efficiency.
+- **Description**: Use this function to read a specified number of bytes from a file descriptor into a destination buffer, utilizing a read buffer to optimize performance for small reads. It is suitable for scenarios where you want to minimize the number of system calls by buffering data. Ensure that the read buffer is properly initialized and that the file descriptor is open and valid. The function will block until the read is complete or an end-of-file is encountered. It is important to handle the return value to check for success or failure, as well as to manage the state of the read buffer pointers.
 - **Inputs**:
-    - `fd`: An open file descriptor from which data will be read. It should be a valid, open file descriptor.
-    - `_dst`: A pointer to the destination buffer where the read data will be stored. Must not be null if dst_sz is greater than zero.
+    - `fd`: An open file descriptor from which data will be read. It must be valid and open for reading.
+    - `_dst`: A pointer to the destination buffer where the read data will be stored. It must be non-null if `dst_sz` is greater than zero.
     - `dst_sz`: The number of bytes to read into the destination buffer. Must be greater than zero for the function to perform any read operation.
-    - `_rbuf`: A pointer to the read buffer used for buffering data. Must not be null and should point to a valid memory region of size rbuf_sz.
+    - `_rbuf`: A pointer to the read buffer used for buffering data. It must be non-null and properly initialized.
     - `rbuf_sz`: The size of the read buffer. Must be greater than zero.
-    - `_rbuf_lo`: A pointer to the current offset in the read buffer where unconsumed data starts. Must not be null and should be initialized to a valid offset within the buffer.
-    - `_rbuf_ready`: A pointer to the number of bytes currently available in the read buffer. Must not be null and should be initialized to reflect the current state of the buffer.
-- **Output**: Returns 0 on success, indicating that the requested number of bytes was read. On failure, returns a non-zero error code, which can be positive (indicating an I/O error) or negative (indicating end-of-file). The destination buffer is updated with the read data, and the read buffer's state is updated to reflect the new offset and available bytes.
-- **See also**: [`fd_io_buffered_read`](fd_io.c.md#fd_io_buffered_read)  (Implementation)
+    - `_rbuf_lo`: A pointer to the current position in the read buffer where unconsumed data starts. It must be initialized to a valid position within the buffer.
+    - `_rbuf_ready`: A pointer to the number of unconsumed bytes in the read buffer. It must be initialized to a valid count of bytes available for consumption.
+- **Output**: Returns 0 on success, indicating that the specified number of bytes were read into the destination buffer. On failure, returns a non-zero value indicating an I/O error or end-of-file, and the destination buffer should be considered clobbered. The read buffer pointers `_rbuf_lo` and `_rbuf_ready` are updated to reflect the new state of the buffer.
+- **See Also**: [`fd_io_buffered_read`](<fd_io.c.md#fd_io_buffered_read>)  (Implementation)
 
 
 ---
 ### fd\_io\_buffered\_skip<!-- {{#callable_declaration:fd_io_buffered_skip}} -->
+[View Source →](<../../../../../src/util/io/fd_io.h#L480>)
+
 Skips a specified number of bytes in a buffered stream.
-- **Description**: This function is used to skip over a specified number of bytes in a buffered stream associated with a file descriptor. It is useful when you need to advance the read position without processing the data. The function handles both seekable and non-seekable streams, optimizing for seekable streams by using lseek and for non-seekable streams by reading and discarding data. It should be used when you want to efficiently skip data in a stream, especially when dealing with large skips. The function updates the buffer state accordingly and returns an error code if an I/O error occurs.
+- **Description**: Use this function to skip over a specified number of bytes in a stream associated with a file descriptor. It is suitable for both seekable and non-seekable streams. For seekable streams, it uses `lseek` to efficiently skip bytes. For non-seekable streams, it reads and discards data until the specified number of bytes is skipped. This function updates the buffer's state to reflect the skipped bytes. It does not detect end-of-file conditions, and skipping past the end-of-file is allowed by POSIX standards. Ensure the buffer is properly initialized before calling this function.
 - **Inputs**:
     - `fd`: An open file descriptor representing the stream. It must be valid and open for reading.
-    - `skip_sz`: The number of bytes to skip. Must be a positive value.
-    - `rbuf`: A pointer to the read buffer used for buffering the stream data. Must not be null.
-    - `rbuf_sz`: The size of the read buffer. Must be greater than zero.
-    - `_rbuf_lo`: A pointer to the current position in the buffer. The function updates this to reflect the new position after skipping.
-    - `_rbuf_ready`: A pointer to the number of bytes currently buffered and ready to be consumed. The function updates this to reflect the remaining buffered data after skipping.
-- **Output**: Returns 0 on success, a negative value if EOF is encountered before skipping all bytes, or a positive errno-compatible error code on failure. Updates *_rbuf_lo and *_rbuf_ready to reflect the new buffer state.
-- **See also**: [`fd_io_buffered_skip`](fd_io.c.md#fd_io_buffered_skip)  (Implementation)
+    - `skip_sz`: The number of bytes to skip in the stream. It must be a non-negative value.
+    - `rbuf`: A pointer to a buffer used for reading data. It must not be null and should have a size specified by `rbuf_sz`.
+    - `rbuf_sz`: The size of the buffer `rbuf`. It must be a positive value.
+    - `_rbuf_lo`: A pointer to a variable that holds the current position in the buffer. It must not be null and will be updated to reflect the new position after skipping.
+    - `_rbuf_ready`: A pointer to a variable that holds the number of bytes ready in the buffer. It must not be null and will be updated to reflect the remaining bytes after skipping.
+- **Output**: Returns 0 on success. On failure, returns a positive errno-compatible error code. The buffer state is updated to reflect the skipped bytes.
+- **See Also**: [`fd_io_buffered_skip`](<fd_io.c.md#fd_io_buffered_skip>)  (Implementation)
 
 
 ---
 ### fd\_io\_buffered\_write<!-- {{#callable_declaration:fd_io_buffered_write}} -->
+[View Source →](<../../../../../src/util/io/fd_io.h#L519>)
+
 Writes data to a file descriptor using a buffered approach.
-- **Description**: This function is used to write data from a source buffer to a file descriptor, utilizing a write buffer to optimize performance for small writes. It is particularly useful when dealing with many small writes, as it consolidates them into larger writes to the file descriptor, reducing the number of system calls. The function should be called when you have data to write and a buffer available for temporary storage. It requires the caller to manage the buffer state, ensuring that the buffer is flushed when necessary. The function will block until the write is complete or an error occurs.
+- **Description**: Use this function to write data from a source buffer to a file descriptor with buffering to optimize performance for small writes. It is suitable for scenarios where minimizing system calls is important, such as when writing many small data chunks. The function requires a pre-allocated write buffer and tracks the number of bytes currently buffered. It will attempt to write directly if the source data is larger than the buffer size. Ensure that the write buffer is properly initialized and that the file descriptor is open and valid before calling this function.
 - **Inputs**:
     - `fd`: An open file descriptor where data will be written. It must be valid and open for writing.
-    - `_src`: A pointer to the source data to be written. It must not be null if src_sz is greater than zero.
-    - `src_sz`: The size of the source data in bytes. If zero, the function does nothing and returns immediately.
-    - `_wbuf`: A pointer to the write buffer used for buffering data before writing to the file descriptor. It must not be null and should have a size of at least wbuf_sz.
-    - `wbuf_sz`: The size of the write buffer in bytes. It must be greater than zero.
-    - `_wbuf_used`: A pointer to a variable that tracks the number of bytes currently used in the write buffer. It must not be null and should be initialized to a valid state before calling the function.
-- **Output**: Returns 0 on success, or a non-zero error code if an I/O error occurs. The write buffer state is updated to reflect the number of bytes buffered but not yet written.
-- **See also**: [`fd_io_buffered_write`](fd_io.c.md#fd_io_buffered_write)  (Implementation)
+    - `_src`: A pointer to the source data to write. It must not be null if `src_sz` is greater than zero.
+    - `src_sz`: The size in bytes of the data to write from `_src`. If zero, the function does nothing.
+    - `_wbuf`: A pointer to the write buffer used for buffering data. It must not be null and should be pre-allocated with a size of at least `wbuf_sz`.
+    - `wbuf_sz`: The size in bytes of the write buffer. It must be greater than zero.
+    - `_wbuf_used`: A pointer to a variable that tracks the number of bytes currently buffered in `_wbuf`. It must not be null and should be initialized to a valid value within the range [0, `wbuf_sz`].
+- **Output**: Returns 0 on success. On failure, returns a positive errno-compatible error code, and the file descriptor should be considered failed. The number of bytes buffered in `_wbuf` is updated.
+- **See Also**: [`fd_io_buffered_write`](<fd_io.c.md#fd_io_buffered_write>)  (Implementation)
 
 
 ---
 ### fd\_io\_mmio\_init<!-- {{#callable_declaration:fd_io_mmio_init}} -->
-Initialize memory-mapped I/O for a file descriptor.
-- **Description**: This function maps a file into the caller's address space for memory-mapped I/O, based on the specified mode. It should be used when you need to access a file's contents directly in memory, either in read-only or read-write mode. The function requires a valid file descriptor and a mode indicating the desired access level. On success, it provides a pointer to the mapped memory region and its size. If the file is empty or an error occurs, the function returns an error code and sets the memory region to NULL with a size of zero. The caller is responsible for managing the memory mapping's lifecycle, including unmapping it when no longer needed.
+[View Source →](<../../../../../src/util/io/fd_io.h#L858>)
+
+Maps a file into the caller's address space for memory-mapped I/O.
+- **Description**: Use this function to map a file into memory for efficient I/O operations. It requires a valid file descriptor and a mode indicating read-only or read-write access. The function will return the mapped memory region and its size. Ensure the file is not zero-length to avoid a null mapping. The function does not retain interest in the memory region or its size after execution. Handle the returned error codes appropriately, as they indicate issues with file size determination or memory mapping.
 - **Inputs**:
-    - `fd`: An open file descriptor representing the file to be memory-mapped. It must be valid and support memory mapping.
-    - `mode`: Specifies the access mode for the memory mapping. Must be either FD_IO_MMIO_MODE_READ_ONLY or FD_IO_MMIO_MODE_READ_WRITE. Invalid modes result in an EINVAL error.
+    - `fd`: An open file descriptor for the file to map. Must be valid and support memory mapping.
+    - `mode`: Specifies the access mode for the mapping. Must be either `FD_IO_MMIO_MODE_READ_ONLY` or `FD_IO_MMIO_MODE_READ_WRITE`. Invalid modes result in an error.
     - `_mmio`: A pointer to a location where the function will store the address of the mapped memory region. Must not be null.
     - `_mmio_sz`: A pointer to a location where the function will store the size of the mapped memory region. Must not be null.
-- **Output**: Returns 0 on success, with _mmio pointing to the mapped memory and _mmio_sz containing its size. On failure, returns a non-zero error code, with _mmio set to NULL and _mmio_sz set to zero.
-- **See also**: [`fd_io_mmio_init`](fd_io.c.md#fd_io_mmio_init)  (Implementation)
+- **Output**: Returns 0 on success, with `_mmio` pointing to the mapped region and `_mmio_sz` containing its size. On failure, returns a non-zero error code, with `_mmio` set to null and `_mmio_sz` set to zero.
+- **See Also**: [`fd_io_mmio_init`](<fd_io.c.md#fd_io_mmio_init>)  (Implementation)
 
 
 ---
 ### fd\_io\_mmio\_fini<!-- {{#callable_declaration:fd_io_mmio_fini}} -->
-Finalize memory-mapped I/O on a file.
-- **Description**: Use this function to end memory-mapped I/O operations on a file that was previously initialized for such operations. It should be called with the memory region and size that were obtained from the corresponding initialization function. This function ensures that the memory-mapped region is properly unmapped and that any changes made to the mapped region are finalized. It is guaranteed not to fail from the caller's perspective, making it safe to call even if the region is already unmapped or the size is zero.
+[View Source →](<../../../../../src/util/io/fd_io.h#L870>)
+
+Finalizes memory-mapped I/O on a file.
+- **Description**: Use this function to end memory-mapped I/O operations on a file. It should be called with the memory region and size that were used during the memory-mapped I/O. This function ensures that the memory-mapped region is properly unmapped and that no further memory-mapped I/O operations are in progress. It is important to note that this function does not fail from the caller's perspective, even if the inputs are invalid.
 - **Inputs**:
-    - `mmio`: A pointer to the start of the memory-mapped region. It must be the same pointer obtained from the initialization function. If the region size is zero, this can be null.
-    - `mmio_sz`: The size of the memory-mapped region in bytes. It must be the same size obtained from the initialization function. If the size is zero, the function will perform no operation.
+    - `mmio`: Pointer to the start of the memory-mapped region. Must not be null if `mmio_sz` is non-zero. If null, the function will return immediately without performing any operations.
+    - `mmio_sz`: Size of the memory-mapped region in bytes. Must be greater than zero if `mmio` is not null. If zero, the function will return immediately without performing any operations.
 - **Output**: None
-- **See also**: [`fd_io_mmio_fini`](fd_io.c.md#fd_io_mmio_fini)  (Implementation)
+- **See Also**: [`fd_io_mmio_fini`](<fd_io.c.md#fd_io_mmio_fini>)  (Implementation)
 
 
 ---
 ### fd\_io\_strerror<!-- {{#callable_declaration:fd_io_strerror}} -->
-Converts an error code into a human-readable string.
-- **Description**: Use this function to obtain a human-readable description of an error code returned by other I/O functions. It is particularly useful for logging or displaying error messages to users. The function handles standard POSIX error codes, including special cases where certain error codes may map to the same value, such as EWOULDBLOCK/EAGAIN and EOPNOTSUPP/ENOTSUP. It also recognizes negative values as indicating end-of-file. The function is thread-safe and returns a constant string with an infinite lifetime.
+[View Source →](<../../../../../src/util/io/fd_io.h#L885>)
+
+Converts an error code to a human-readable string.
+- **Description**: Use this function to obtain a human-readable description of an error code related to file descriptor I/O operations. It is useful for logging or displaying error messages to users. The function handles standard POSIX error codes and maps certain equivalent error codes to a single description. It also provides a description for end-of-file conditions and returns a default message for unknown error codes. The returned string is thread-safe and has an infinite lifetime.
 - **Inputs**:
-    - `err`: An integer representing the error code to be converted. It can be a standard POSIX error code, a negative value indicating end-of-file, or zero indicating success. The function handles special cases where certain error codes may map to the same value.
-- **Output**: A constant string describing the error code. The string is always non-NULL and has an infinite lifetime.
-- **See also**: [`fd_io_strerror`](fd_io.c.md#fd_io_strerror)  (Implementation)
+    - `err`: An integer representing the error code to convert. It can be a standard POSIX error code, a negative value indicating end-of-file, or zero for success. The function maps certain equivalent error codes to a single description and returns "unknown" for unrecognized codes.
+- **Output**: A constant character pointer to a string describing the error. The string is non-NULL, thread-safe, and has an infinite lifetime.
+- **See Also**: [`fd_io_strerror`](<fd_io.c.md#fd_io_strerror>)  (Implementation)
 
 
 ---
 ### fd\_io\_strsignal<!-- {{#callable_declaration:fd_io_strsignal}} -->
+[View Source →](<../../../../../src/util/io/fd_io.h#L894>)
+
 Converts a signal code to a human-readable string.
-- **Description**: Use this function to obtain a human-readable description of a signal code, such as those returned by functions like `waitpid` when a process is terminated by a signal. This function is useful for logging or displaying signal information in a user-friendly format. It handles a variety of common signal codes and returns a default message for unknown signals. The function is thread-safe and the returned string has an infinite lifetime.
+- **Description**: Use this function to get a human-readable description of a signal code, such as those returned by `WTERMSIG`. It provides a string representation of common signal codes, including `SIGHUP`, `SIGINT`, `SIGQUIT`, and others. If the signal code is not recognized, it returns "unknown". This function is thread-safe and the returned string has an infinite lifetime.
 - **Inputs**:
-    - `sig`: An integer representing the signal code to be converted. It should be a valid signal number as defined in signal.h, such as `SIGINT` or `SIGTERM`. If the signal code is not recognized, the function returns "unknown".
-- **Output**: A constant character pointer to a string describing the signal. The string is always non-NULL and provides a human-readable description of the signal code.
-- **See also**: [`fd_io_strsignal`](fd_io.c.md#fd_io_strsignal)  (Implementation)
+    - `sig`: An integer representing the signal code to convert. Valid values include standard signal codes like `SIGHUP`, `SIGINT`, `SIGQUIT`, etc. If the signal code is not recognized, the function returns "unknown".
+- **Output**: A constant character pointer to a string describing the signal. The string is non-NULL and has an infinite lifetime.
+- **See Also**: [`fd_io_strsignal`](<fd_io.c.md#fd_io_strsignal>)  (Implementation)
 
 
 

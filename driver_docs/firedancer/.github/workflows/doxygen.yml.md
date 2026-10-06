@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Scheduled Doxygen build and upload workflow for Google Cloud Storage.
+GitHub Actions workflow for running Doxygen documentation generation and uploading artifacts to Google Cloud.
 
 # Purpose
-This GitHub Actions workflow runs the `Doxygen` job on a daily schedule and can also be started manually with `workflow_dispatch`. It checks out the repository, installs the build dependencies, and runs `contrib/doxygen/build.sh` to generate the documentation output. After that, it authenticates to Google Cloud with `google-github-actions/auth@v3`, removes the current content from the target bucket, and uploads the generated HTML files to `${{ vars.DOXYGEN_BUCKET }}`. The workflow also uses the `doxygen` environment and sets the environment URL from `${{ vars.DOXYGEN_URL }}`.
+This GitHub Actions workflow file automates the generation and upload of Doxygen documentation. It is scheduled to run daily at 3 AM using a cron expression and can also be triggered manually via `workflow_dispatch`. The workflow defines a job named `doxygen` that runs on a specified runner with the label `rocky810` and group `fd-public-repo`. The job installs necessary dependencies such as `clang-devel`, `llvm-devel`, and `graphviz` using the `dnf` package manager, and then executes a build script located at `contrib/doxygen/build.sh`. After building the documentation, the workflow authenticates to Google Cloud using a service account and uploads the generated HTML files to a specified Google Cloud Storage bucket.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

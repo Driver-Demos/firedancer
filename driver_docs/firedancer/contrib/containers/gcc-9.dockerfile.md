@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Rocky Linux 8 image with GCC 9, CMake 3.26.5, and Rust toolchain setup.
+Dockerfile for setting up a Rocky Linux 8 environment with GCC Toolset 9, CMake 3.26.5, and Rust.
 
 # Purpose
-This Dockerfile defines a Rocky Linux 8 build environment for the `firedancer` project. It installs `gcc-toolset-9`, `wget`, and `git`, then updates `PATH` and `LD_LIBRARY_PATH` so the GCC toolchain is available by default. It also downloads CMake `3.26.5`, creates links for `cmake`, `ctest`, and `cpack`, and installs Rust with `rustup` while setting the related environment variables for default use. The working directory is set to `/data/firedancer`, and the container starts with `/bin/bash`.
+This Dockerfile sets up a container environment based on the `rockylinux:8` image. It installs the GCC Toolset 9, which includes essential development tools, and configures the environment to use this toolset by default. The file also downloads and installs a pre-built binary of CMake version 3.26.5, creating symbolic links for easy access to CMake commands. Additionally, it installs Rust using `rustup`, setting up the environment to use Rust by default. The working directory is set to `/data/firedancer`, and the default command to run when the container starts is `/bin/bash`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

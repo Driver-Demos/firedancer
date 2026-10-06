@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-asan.mk` file in the `firedancer` codebase configures AddressSanitizer (ASAN) settings, including compiler and linker flags, to detect memory errors during development.
+Configuration for enabling AddressSanitizer (ASAN) with specific compiler flags and options.
 
 # Purpose
-The provided file content is a configuration script, likely part of a Makefile, used to set up compiler and linker flags for a software project that utilizes AddressSanitizer (ASan) for detecting memory errors such as buffer overflows and memory leaks. The script defines a flag `FD_HAS_ASAN` to indicate the presence of ASan and appends specific flags to `CPPFLAGS` and `LDFLAGS` to enable address and leak sanitization during compilation and linking. Additionally, when using the GCC compiler, it includes flags to suppress certain warnings and disable stack protection to avoid false positives and misalignments, which are noted as potential bugs in GCC when ASan is enabled. This configuration ensures that the software is built with enhanced memory error detection capabilities, improving its robustness and reliability during development and testing.
+The configuration file sets up compiler and linker flags to enable AddressSanitizer (ASan) for detecting memory errors such as buffer overflows and memory leaks. The `FD_HAS_ASAN` variable is defined and added to `CPPFLAGS` to indicate that ASan is active. The `CPPFLAGS` and `LDFLAGS` are appended with `-fsanitize=address,leak` to enable address and leak sanitization during compilation and linking. If the `FD_USING_GCC` flag is set, additional compiler flags are added to suppress specific warnings and disable stack protection, which can cause issues when using ASan with GCC. These settings help in identifying and debugging memory-related errors during the development process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

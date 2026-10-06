@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests related to UTF-8 functionality, including the execution of a unit test named `test_utf8`.
+Makefile for adding headers, objects, and unit tests for UTF-8 functionality.
 
 # Purpose
-The file is a Makefile snippet used for building and testing a software component. It specifies the inclusion of the header file `fd_utf8.h`, adds object files `fd_utf8` and `fd_ballet` to the build process, defines a unit test named `test_utf8` that depends on `fd_ballet` and `fd_util`, and executes the `test_utf8` unit test.
+The Makefile content defines build and test instructions for a software project. It adds the header file `fd_utf8.h` and object files `fd_utf8` and `fd_ballet` to the build process. It also specifies a unit test named `test_utf8`, which depends on the `fd_ballet` and `fd_util` components, and includes a command to execute this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

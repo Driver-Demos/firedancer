@@ -3,10 +3,44 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Grafana dashboard for QUIC packet, connection, handshake, and latency metrics.
+Grafana dashboard configuration for monitoring QUIC metrics using Prometheus data sources.
 
 # Purpose
-This JSON file defines a Grafana dashboard named `Firedancer QUIC` for monitoring QUIC traffic and connection behavior through Prometheus metrics. It uses the `datasource` and `instance` variables to let the user select a Prometheus source and filter data by target instance, and it sets the time range to the last 30 minutes. The dashboard groups panels for packet rate, bandwidth, transaction rate, connection churn, handshake and reject events, receive latency, ACK traffic, frame retransmits, and receive drops, so it gives a single view of QUIC transport health and TPU transaction flow. Each panel maps to specific metrics such as `quic_received_packets`, `quic_connections_created`, `quic_txns_received`, and `quic_receive_duration_seconds_bucket`, which makes the file a monitoring configuration that connects application telemetry to visual status and trend data.
+This JSON file is a configuration for a Grafana dashboard that monitors QUIC protocol metrics using Prometheus as the data source. The dashboard includes multiple panels, each visualizing different aspects of QUIC performance, such as packet rates, bandwidth, transaction counts, connection events, and latency. Each panel is configured with specific data queries, visualization options, and layout positions. The file defines the data sources, panel types, and field configurations, including color schemes, thresholds, and units of measurement. The dashboard is set to display data from the last 30 minutes and is configured to use the "Europe/Berlin" timezone. The configuration also includes templating options for dynamic data source and instance selection, allowing users to filter and customize the displayed data.
+# Content Summary
+The provided JSON file is a configuration for a Grafana dashboard titled "Firedancer QUIC". This dashboard is designed to monitor various metrics related to QUIC (Quick UDP Internet Connections) using Prometheus as the data source. The configuration includes several key components:
+
+1. **Annotations**: The dashboard includes a built-in annotation for "Annotations & Alerts" with specific settings such as icon color and visibility.
+
+2. **Panels**: The dashboard contains multiple panels, each configured to display different metrics related to QUIC. These panels include:
+   - **TPU**: A row panel for organizing other panels.
+   - **QUIC packets**: A timeseries panel showing UDP packet rates, with data sourced from Prometheus. It uses expressions to calculate incoming and outgoing packet rates.
+   - **QUIC bandwidth**: Another timeseries panel displaying UDP line rates, including network headers.
+   - **QUIC Txns Recvd**: A stat panel showing the transaction count received.
+   - **QUIC Txns Failed**: A stat panel for failed transactions due to various reasons.
+   - **Stream Complete Rate**: A gauge panel showing the ratio of streams received versus started.
+   - **QUIC conns**: A timeseries panel for active QUIC connections.
+   - **QUIC Conns Created**: A stat panel for the cumulative number of connections created.
+   - **Received Frames**: A timeseries panel for frames per second for each QUIC frame type.
+   - **QUIC Conns Aborted**: A stat panel for connections aborted by QUIC tiles.
+   - **QUIC Conns Gracef. Closed**: A stat panel for gracefully closed connections.
+   - **TPU Transaction Rate**: A timeseries panel for QUIC stream events per second.
+   - **QUIC Handshake Pool**: A timeseries panel for handshake events.
+   - **QUIC Conn Rejects**: A timeseries panel for connections rejected per second.
+   - **QUIC Conn Churn**: A timeseries panel for connection events per second.
+   - **QUIC RX Drops**: A timeseries panel for QUIC receive drops.
+   - **QUIC RX Latency**: A timeseries panel for receive latency quantiles.
+   - **QUIC ACK TX**: A timeseries panel for acknowledgment transmissions.
+   - **Frame Dups**: A timeseries panel for duplicate frames.
+   - **QUIC Frame Retransmits**: A timeseries panel for frame retransmissions.
+
+3. **Templating**: The dashboard uses templating to allow dynamic selection of data sources and instances. It includes variables for the data source and instance, with queries to populate these variables.
+
+4. **Time Settings**: The dashboard is configured to display data from the last 30 minutes, with the timezone set to "Europe/Berlin".
+
+5. **General Settings**: The dashboard is editable, has a unique identifier (UID), and is at version 56. It does not have any tags or specific refresh settings.
+
+This configuration allows users to monitor and analyze QUIC-related metrics effectively, providing insights into packet rates, bandwidth, transaction counts, connection statuses, and more.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
