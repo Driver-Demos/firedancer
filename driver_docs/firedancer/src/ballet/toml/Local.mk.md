@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and conditional fuzz tests for the `fd_toml` component.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, objects, and conditional fuzz test setup for the TOML component in the `ballet` module.
 
 # Purpose
-The `Makefile` content defines build instructions for a project. It uses the `add-hdrs` and `add-objs` functions to include the header file `fd_toml.h` and object files `fd_toml` and `fd_ballet` in the build process. If the `FD_HAS_HOSTED` variable is defined, it also calls the `make-fuzz-test` function to create a fuzz test named `fuzz_toml`, which depends on `fd_ballet` and `fd_util`.
+This file is a Makefile snippet used for building a software project. It defines build rules by adding headers and object files, specifically `fd_toml.h` and objects `fd_toml` and `fd_ballet`. Additionally, it conditionally includes a fuzz test target `fuzz_toml` if the `FD_HAS_HOSTED` variable is set, incorporating dependencies on `fd_ballet` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
