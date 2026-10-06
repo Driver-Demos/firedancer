@@ -3,17 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines constants for runtime configuration, including account limits and memory requirements.
+Runtime bounds and constants for vote, stake, slot, account, and stake instruction limits.
 
 # Purpose
-This C header file defines several constants used in the Flamenco runtime environment. These constants set upper limits on various system parameters, such as the maximum number of vote accounts (`FD_RUNTIME_MAX_VOTE_ACCOUNTS`), stake accounts (`FD_RUNTIME_MAX_STAKE_ACCOUNTS`), and writable accounts per transaction (`FD_RUNTIME_MAX_WRITABLE_ACCOUNTS_PER_TRANSACTION`). Additionally, it specifies the number of slots per epoch (`FD_RUNTIME_SLOTS_PER_EPOCH`) and the initial block ID hash (`FD_RUNTIME_INITIAL_BLOCK_ID`). The file also includes a constant for the minimum compute units required to execute the stake program (`FD_RUNTIME_MIN_STAKE_INSN_CUS`) and the maximum size of a Solana account (`FD_RUNTIME_ACC_SZ_MAX`). These constants help manage memory allocation and execution costs within the system.
-# Imports and Dependencies
-
----
-- `../types/fd_types.h`
-- `../leaders/fd_leaders.h`
-
-
+This header defines runtime constants used by the Flamenco bank and account logic. It sets fixed limits for vote accounts, stake accounts, slots per epoch, writable accounts per transaction, and the maximum Solana account size. It also defines an initial block ID value used when a snapshot does not provide one, and a minimum compute-unit cost for stake program instructions. The file contains only macro definitions and include guards, so it serves as a shared configuration header for other runtime source files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

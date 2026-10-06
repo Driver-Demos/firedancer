@@ -3,17 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for configuring nanopb with specific settings and including necessary dependencies.
+Nanopb configuration header with buffer-only, 32-bit fields, and malloc enabled.
 
 # Purpose
-This code is a C header file that sets up preprocessor directives and includes necessary dependencies for a project using the nanopb library. It ensures that the file `pb_firedancer.h` is the only header included by checking if `PB_H_INCLUDED` is defined, and if so, it raises a compilation error. The file defines several macros: `PB_BUFFER_ONLY`, `PB_FIELD_32BIT`, and `PB_ENABLE_MALLOC`, which configure the nanopb library to use 32-bit fields and enable dynamic memory allocation. The header includes the `pb.h` file from the nanopb library and a utility header `fd_util.h` from a relative path, indicating dependencies on these files for further functionality.
-# Imports and Dependencies
-
----
-- `pb.h`
-- `../../util/fd_util.h`
-
-
+`pb_firedancer.h` is a small configuration header for the nanopb protocol buffer library. It prevents direct use of `pb.h` by checking `PB_H_INCLUDED` and raising an error if `pb.h` was included first. The file sets nanopb build options with `PB_BUFFER_ONLY`, `PB_FIELD_32BIT`, and `PB_ENABLE_MALLOC`, then includes `pb.h` and `fd_util.h` to apply the Firedancer build environment.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

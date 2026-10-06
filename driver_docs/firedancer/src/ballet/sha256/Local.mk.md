@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing SHA-256 components with optional AVX and AVX512 optimizations.
+Build rules for SHA-256 headers, objects, unit test, and fuzz test.
 
 # Purpose
-This Makefile script configures the build process for a software project involving SHA-256 functionality. It adds header files and object files for `fd_sha256` and `fd_ballet`, and conditionally includes additional object files for AVX and AVX512 optimizations if the corresponding flags `FD_HAS_AVX` and `FD_HAS_AVX512` are set. The script also defines and runs a unit test named `test_sha256`, and conditionally creates a fuzz test named `fuzz_sha256` if the `FD_HAS_HOSTED` flag is set.
+This Makefile fragment adds the `fd_sha256.h` header and builds the `fd_sha256` object in `fd_ballet`. It also adds `fd_sha256_batch_avx` and `fd_sha256_batch_avx512` when `FD_HAS_AVX` or `FD_HAS_AVX512` is set, then defines and runs the `test_sha256` unit test, and defines `fuzz_sha256` only when `FD_HAS_HOSTED` is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
