@@ -3,12 +3,48 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-AVX-512 64x8 byte vector tests for constructors, broadcasts, shifts, and bit ops.
+Tests AVX-512 64x8 SIMD operations using random data and various bit manipulation functions.
 
 # Purpose
-This file is a test executable for the `wwb` byte-vector API used by the AVX-512 test suite. [`main`](<#main>) starts the runtime with `fd_boot`, creates a random number generator, and then checks a set of `wwb` constructors and operations against a 64-byte reference array. The tests cover constant values such as `wwb_zero()` and `wwb_one()`, vector construction from 64 input bytes, broadcast forms, exchange operations, and bitwise operations such as `wwb_not`, `wwb_shl`, `wwb_shr`, `wwb_and`, `wwb_andnot`, `wwb_or`, and `wwb_xor`.
+The code is a C program designed to test various operations on a data type `wwb_t`, which appears to be related to wide bit manipulation, possibly using AVX-512 instructions. The program includes a main function that initializes a random number generator and defines several macros to facilitate testing. It performs a series of tests on operations such as broadcasting, exchanging, and bit manipulation (e.g., NOT, AND, OR, XOR) on arrays of unsigned characters (`uchar`). The tests are executed in a loop, iterating 65,536 times, to ensure the correctness of the operations under various conditions.
 
-The file uses repeated randomized input data and compares each `wwb` result with an expected byte pattern through `WWB_TEST`. It also defines helper macros to expand byte arrays into function arguments and to fill the reference buffer. After 65,536 test iterations, it releases the RNG, prints `pass`, and exits through `fd_halt`.
+The program uses macros to expand indices and invoke operations on the `wwb_t` type, which suggests that the operations are vectorized or involve SIMD (Single Instruction, Multiple Data) processing. The code includes a series of tests labeled as `WWB_TEST`, which likely verify the results of operations against expected values. The program concludes by cleaning up the random number generator and logging a notice that the tests have passed before halting execution. The inclusion of the header file `test_avx512.h` indicates that the program is part of a larger test suite focused on AVX-512 functionality.
+# Imports and Dependencies
+
+---
+- `test_avx512.h`
+
+
+# Functions
+
+---
+### main<!-- {{#callable:main}} -->
+[View Source →](<../../../../../src/util/simd/test_avx512_64x8.c#L3>)
+
+Initializes a random number generator, performs a series of tests on wide word bit operations, and logs the results.
+- **Inputs**:
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Defines a macro `brand` to generate random unsigned characters in the range [253, 254, 255, 0, 1, 2, 3].
+    - Initializes an array `ti` of 64 unsigned characters.
+    - Defines macros for expanding indices and invoking functions with expanded arguments.
+    - Performs tests on wide word bit operations using the `WWB_TEST` macro, iterating 65536 times.
+    - In each iteration, initializes arrays `xi`, `yi`, and `ci` with random values and constructs wide word bit objects `x`, `y`, and `c`.
+    - Tests various bit operations such as broadcast, exchange, not, shift, and logical operations using the `WWB_TEST` macro.
+    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
+    - Logs a notice message "pass" using `FD_LOG_NOTICE`.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`wwb_bcast_pair`](<fd_avx512_wwb.h.md#wwb_bcast_pair>)
+    - [`wwb_bcast_quad`](<fd_avx512_wwb.h.md#wwb_bcast_quad>)
+    - [`wwb_bcast_oct`](<fd_avx512_wwb.h.md#wwb_bcast_oct>)
+    - [`wwb_bcast_hex`](<fd_avx512_wwb.h.md#wwb_bcast_hex>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
