@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for x86-64 architecture with compiler-specific flags and additional includes.
+The `with-x86-64.mk` file in the `firedancer` codebase configures compiler flags for x86-64 architecture, including specific settings for GCC and Clang, and includes additional configuration files for various libraries.
 
 # Purpose
-The `Makefile` content configures compilation flags and includes additional configuration files for a software project. The `CPPFLAGS` variable is used to specify compiler options, such as `-mfpmath=sse` and `-falign-functions=32`, which optimize floating-point math and function alignment. Conditional statements check for specific compilers, such as GCC and Clang, to apply additional flags like `-mbranch-cost=5` for GCC and `-Xclang -target-feature -Xclang +fast-vector-fsqrt` for Clang. The file also includes several other configuration files from the `config/extra` directory, which likely provide additional settings or dependencies for the build process. The variable `FD_ARCH_SUPPORTS_SANDBOX` is set to `1`, indicating that the architecture supports sandboxing features.
+The provided content is a Makefile, which is used to automate the build process of a software project. It defines compiler flags and includes additional configuration files to tailor the build process for different compilers and architectures. The `CPPFLAGS` variable is augmented with specific flags to optimize the performance of the compiled code, such as using SSE for floating-point math and aligning functions, jumps, labels, and loops for efficiency. Conditional directives (`ifdef`) are used to apply different flags depending on whether GCC or Clang is being used, ensuring compatibility and performance optimizations specific to each compiler. The file also includes several other Makefiles from the `config/extra` directory, which likely contain additional configurations for integrating various libraries and features like `ucontext`, `secp256k1`, `zstd`, `lz4`, `openssl`, and `rocksdb`. The `FD_ARCH_SUPPORTS_SANDBOX` variable is set to `1`, indicating that the architecture supports sandboxing, which is a security feature.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

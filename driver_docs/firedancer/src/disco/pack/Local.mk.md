@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines build rules and unit tests for the `firedancer` project's `disco/pack` module.
+Build rules for pack headers, objects, unit tests, and fuzz tests.
 
 # Purpose
-The content defines a set of build instructions using conditional compilation in a Makefile. It checks for the presence of certain features or architectures, such as `FD_HAS_DOUBLE`, `FD_HAS_HOSTED`, and `FD_ARCH_SUPPORTS_SANDBOX`, to conditionally include headers and object files, and to create and run unit tests and fuzz tests. The `add-hdrs` and `add-objs` functions are used to specify header files and object files that are necessary for the build process. The `make-unit-test` and `run-unit-test` functions are used to define and execute unit tests for various components, ensuring that the software behaves as expected. Additionally, `make-fuzz-test` is used to create fuzz tests, which help identify potential vulnerabilities or unexpected behavior in the code.
+This Makefile fragment controls build and test targets for the `fd_pack` area when `FD_HAS_DOUBLE` is enabled. It adds header files and object files for `fd_pack`, `fd_pack_tile`, and `fd_pack_rebate_sum`, then defines unit tests for compute budget parsing, estimate tables, bitset packing, duplicate checking, tip program blacklist checks, and rebate sum logic. When `FD_HAS_HOSTED` is enabled, it also defines fuzz tests for compute budget program parsing and duplicate checking, plus the `test_pack` unit test. When `FD_ARCH_SUPPORTS_SANDBOX` is enabled, it adds and runs the `test_pack_tile` unit test with the required library dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

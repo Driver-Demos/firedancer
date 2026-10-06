@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for Ed25519 and Curve25519 cryptographic operations, including key generation, signing, verification, and field element arithmetic.
+The `test_ed25519.c` file in the `firedancer` codebase contains a comprehensive suite of tests for the Ed25519 cryptographic functions, including tests for field element operations, scalar operations, point validation, signature generation and verification, and batch verification, with additional tests for compliance with Wycheproof and CCTV test vectors.
 
 # Purpose
-The code is a C test suite for cryptographic operations related to the Ed25519 and Curve25519 algorithms. It includes a series of test functions that validate the correctness and performance of various cryptographic operations such as field element arithmetic, scalar operations, and signature generation and verification. The code imports several header files and test cases, indicating that it is part of a larger cryptographic library or framework.
+This C source code file is a comprehensive test suite for cryptographic operations related to the Ed25519 and Curve25519 algorithms. It includes a variety of test functions that validate the correctness and performance of operations such as field element arithmetic, scalar operations, and signature generation and verification. The file imports several headers, including those for Ed25519 and Curve25519, indicating its reliance on these cryptographic libraries. The test functions cover a wide range of operations, including conversion between byte representations and field elements, arithmetic operations on field elements, and cryptographic operations like signing and verifying messages.
 
-The test suite includes functions for generating random numbers, logging benchmark results, and performing operations like addition, subtraction, multiplication, inversion, and conditional selection on field elements. It also tests the conversion of field elements to and from byte arrays, checks for zero values, and validates points and scalars. The suite includes tests for generating public keys from private keys, signing messages, and verifying signatures, including batch verification. The code is structured to allow for performance benchmarking and includes conditional compilation for comparison with OpenSSL implementations. The main function initializes the test environment, runs all the test functions, and logs the results.
+The code is structured to perform both individual and batch tests, with some sections conditionally compiling OpenSSL comparison tests to ensure compatibility and correctness against a well-known cryptographic library. The test suite also includes performance benchmarking for various operations, logging the results to provide insights into the efficiency of the implementations. Additionally, the code integrates with external test vectors, such as Wycheproof and CCTV, to validate the implementation against known test cases. The main function orchestrates the execution of all test cases, ensuring comprehensive coverage of the cryptographic functionalities provided by the imported libraries.
 # Imports and Dependencies
 
 ---
@@ -26,603 +26,541 @@ The test suite includes functions for generating random numbers, logging benchma
 
 ---
 ### fd\_rng\_b256<!-- {{#callable:fd_rng_b256}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L8>)
-
-Generates 256 bits of random data using a random number generator and stores it in a provided buffer.
+The `fd_rng_b256` function generates 256 bits of random data using a random number generator and stores it in a provided buffer.
 - **Inputs**:
-    - `rng`: A pointer to an `fd_rng_t` structure, which represents the random number generator to use.
-    - `r`: A pointer to an array of 32 `uchar` elements where the function will store the generated random data.
-- **Logic and Control Flow**:
-    - Casts the `uchar` array `r` to a `ulong` pointer `u`.
-    - Calls `fd_rng_ulong` four times to fill the `ulong` array `u` with random values from the `rng`.
-    - Returns the pointer `r` after filling it with random data.
-- **Output**: A pointer to the `uchar` array `r` containing the generated random data.
+    - `rng`: A pointer to an `fd_rng_t` structure, which represents the random number generator to be used.
+    - `r`: A buffer of 32 bytes (256 bits) where the generated random data will be stored.
+- **Control Flow**:
+    - The function casts the input buffer `r` to a pointer to `ulong` (unsigned long) to facilitate storing 64-bit random numbers.
+    - It then calls `fd_rng_ulong` four times, each time storing a 64-bit random number into the buffer `r`.
+    - Finally, the function returns the buffer `r` containing the generated random data.
+- **Output**: A pointer to the buffer `r` containing the generated 256 bits of random data.
 
 
 ---
 ### fd\_rng\_b512<!-- {{#callable:fd_rng_b512}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L16>)
-
-Generates 512 bits of random data using a random number generator and stores it in a provided buffer.
+The `fd_rng_b512` function fills a 64-byte array with random unsigned long integers generated by a given random number generator.
 - **Inputs**:
-    - `rng`: A pointer to an `fd_rng_t` structure, which represents the random number generator to use.
-    - `r`: A buffer of 64 bytes where the generated random data will be stored.
-- **Logic and Control Flow**:
-    - Casts the buffer `r` to a pointer to `ulong` to facilitate storing 64-bit random numbers.
-    - Calls `fd_rng_ulong` eight times to fill the buffer with random 64-bit unsigned integers.
-    - Stores each generated random number in the buffer `r`.
-- **Output**: Returns the pointer to the buffer `r` containing the generated random data.
+    - `rng`: A pointer to an `fd_rng_t` structure, which represents the random number generator to be used.
+    - `r`: A 64-byte array of type `uchar` where the generated random numbers will be stored.
+- **Control Flow**:
+    - Cast the input array `r` to a pointer of type `ulong` to treat it as an array of unsigned long integers.
+    - Generate eight random unsigned long integers using `fd_rng_ulong` and store them sequentially in the array `u`.
+    - Return the original array `r` after it has been filled with random data.
+- **Output**: A pointer to the 64-byte array `r` filled with random data.
 
 
 ---
 ### log\_bench<!-- {{#callable:log_bench}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L25>)
-
-Logs the performance metrics of a benchmark test.
+The `log_bench` function logs the performance metrics of a benchmark, specifically the iterations per second per core and the time per call, using a given description, iteration count, and elapsed time.
 - **Inputs**:
-    - ``descr``: A string that describes the benchmark being logged.
-    - ``iter``: The number of iterations performed in the benchmark.
-    - ``dt``: The time duration in microseconds for the benchmark to complete.
-- **Logic and Control Flow**:
-    - Calculate the performance in kilohertz (`khz`) by dividing the number of iterations by the time duration and multiplying by 1,000,000.
-    - Calculate the average time per call (`tau`) by dividing the time duration by the number of iterations.
-    - Log the description, performance in kilohertz, and average time per call using the `FD_LOG_NOTICE` macro.
-- **Output**: No return value; the function logs the output using `FD_LOG_NOTICE`.
+    - `descr`: A constant character pointer representing the description of the benchmark being logged.
+    - `iter`: An unsigned long integer representing the number of iterations performed during the benchmark.
+    - `dt`: A long integer representing the elapsed time in microseconds for the benchmark.
+- **Control Flow**:
+    - Calculate the performance in kilohertz (KHz) as the number of iterations per second per core by multiplying the number of iterations by 1e6 and dividing by the elapsed time.
+    - Calculate the average time per call in nanoseconds by dividing the elapsed time by the number of iterations.
+    - Log the description, performance in KHz, and time per call using the `FD_LOG_NOTICE` macro.
+- **Output**: The function does not return any value; it logs the benchmark performance metrics.
 
 
 ---
 ### fe\_rng<!-- {{#callable:fe_rng}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L39>)
-
-Generates an array of random integers using a random number generator, with specific bit masks applied to each integer.
+The `fe_rng` function generates an array of 10 random integers using a random number generator, with specific bit masks applied to each integer.
 - **Inputs**:
-    - ``h``: A pointer to an integer array where the generated random numbers will be stored.
-    - ``rng``: A pointer to a `fd_rng_t` random number generator used to generate random numbers.
-- **Logic and Control Flow**:
+    - `h`: A pointer to an integer array where the generated random numbers will be stored.
+    - `rng`: A pointer to a random number generator object used to generate random numbers.
+- **Control Flow**:
     - Define two bit masks, `m26` and `m25`, for 26 and 25 least significant bits respectively.
-    - Generate a random unsigned integer using `fd_rng_uint` and apply the `m26` mask, storing the result in `h[0]`.
+    - Generate a random unsigned integer using `fd_rng_uint(rng)` and apply the `m26` mask, storing the result in `h[0]`.
     - Generate another random unsigned integer, apply the `m25` mask, and store the result in `h[1]`.
     - Repeat the above two steps for `h[2]` to `h[9]`, alternating between `m26` and `m25` masks.
-    - Return the pointer `h`.
-- **Output**: Returns the pointer to the integer array `h` containing the generated random numbers.
+    - Return the pointer `h` containing the generated random numbers.
+- **Output**: A pointer to the integer array `h` containing the generated random numbers.
 
 
 ---
 ### test\_fe\_frombytes<!-- {{#callable:test_fe_frombytes}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L52>)
-
-Tests the conversion of byte arrays to field elements and verifies specific conditions and performance.
+The `test_fe_frombytes` function tests the conversion of byte arrays to field elements in the finite field F_25519 and benchmarks the conversion process.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t`.
-- **Logic and Control Flow**:
-    - Initialize a 32-byte array `_s` and a field element `_h` for testing.
-    - Decode a series of hexadecimal strings into the byte array `s` and convert them to field elements using `fd_f25519_frombytes`.
-    - Verify if the resulting field element is zero using `fd_f25519_is_zero` for specific byte patterns.
-    - Verify if the resulting field element equals two using `fd_f25519_eq` for other specific byte patterns.
-    - Generate random bytes using [`fd_rng_b256`](<#fd_rng_b256>) and measure the performance of `fd_f25519_frombytes` over 1,000,000 iterations.
-    - Log the performance results using [`log_bench`](<#log_bench>).
-- **Output**: No return value; performs tests and logs results.
-- **Functions Called**:
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used for generating random byte arrays for benchmarking.
+- **Control Flow**:
+    - Initialize a 32-byte array `s` and a field element `h` of type `fd_f25519_t`.
+    - Decode several predefined hexadecimal strings into the byte array `s` and convert them to field elements using `fd_f25519_frombytes`.
+    - Test if the resulting field elements are equal to zero or two using `FD_TEST` and the functions `fd_f25519_is_zero` and `fd_f25519_eq`.
+    - Generate a random 32-byte array using [`fd_rng_b256`](#fd_rng_b256) and measure the time taken to convert it to a field element `h` one million times, logging the benchmark results.
+- **Output**: The function does not return a value; it performs tests and logs benchmark results.
+- **Functions called**:
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_tobytes<!-- {{#callable:test_fe_tobytes}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L103>)
-
-Tests the conversion of field elements to byte arrays and verifies the correctness of the conversion.
+The `test_fe_tobytes` function tests the conversion of finite field elements to byte arrays and verifies the correctness of these conversions using various test cases.
 - **Inputs**:
-    - ``rng``: A pointer to a random number generator of type `fd_rng_t`.
-- **Logic and Control Flow**:
-    - Initialize byte arrays `_s` and `_e` and field element `_h` for testing.
-    - Decode a series of expected byte arrays `e` using `fd_hex_decode` and convert predefined field elements to byte arrays `s` using `fd_f25519_tobytes`.
-    - Verify that the converted byte arrays `s` match the expected byte arrays `e` using `FD_TEST` and `fd_memeq`.
-    - Test the reduction of field elements modulo `p` to ensure canonical results by adding and converting field elements.
-    - Test the conversion from bytes to field elements and back to bytes, checking for consistency.
-    - Perform a benchmark test by converting random field elements to byte arrays in a loop and logging the performance.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator object (`fd_rng_t`) used for generating random finite field elements during benchmarking.
+- **Control Flow**:
+    - Initialize byte arrays `_s` and `_e` for storing results and expected values, and a finite field element `_h` for intermediate calculations.
+    - Decode a series of hexadecimal strings into the expected byte array `e` and convert predefined finite field elements (zero, one, minus one, and a constant `k`) to byte arrays using `fd_f25519_tobytes`, then verify the conversion using `FD_TEST` and `fd_memeq`.
+    - Test the reduction of finite field elements modulo `p` by adding finite field elements and converting the result to bytes, then verify the conversion.
+    - Test the conversion of byte arrays back to finite field elements and then back to byte arrays, verifying the round-trip conversion for correctness.
+    - Perform a benchmark by converting a random finite field element to bytes repeatedly, measuring the time taken for a large number of iterations.
+    - Log the benchmark results using [`log_bench`](#log_bench).
+- **Output**: The function does not return a value; it performs tests and logs results, asserting correctness through `FD_TEST`.
+- **Functions called**:
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_is\_zero<!-- {{#callable:test_fe_is_zero}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L172>)
-
-Tests if a given `fd_f25519_t` field element is zero by decoding various hexadecimal strings into field elements and checking their zero status.
+The `test_fe_is_zero` function tests the `fd_f25519_is_zero` function to verify if various representations of zero and non-zero field elements are correctly identified as zero or not.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` random number generator, marked as unused in this function.
-- **Logic and Control Flow**:
-    - Initialize a 32-byte array `_s` and a `fd_f25519_t` array `_h` to hold field elements.
-    - Call `FD_TEST` to check if `fd_f25519_zero` is zero using `fd_f25519_is_zero`.
-    - Decode a series of hexadecimal strings into the byte array `s` using `fd_hex_decode`.
-    - Convert the byte array `s` into a field element `h` using `fd_f25519_frombytes`.
-    - Use `FD_TEST_CUSTOM` to verify if the field element `h` is zero or not, based on the expected result for each hexadecimal string.
-    - Repeat the decode and test process for several hexadecimal strings representing both zero and non-zero field elements.
-- **Output**: No output is returned; the function performs tests and assertions to verify the zero status of field elements.
+    - `rng`: A pointer to an unused random number generator object, marked as unused with `FD_PARAM_UNUSED`.
+- **Control Flow**:
+    - Initialize a 32-byte array `_s` and a field element `_h` for testing.
+    - Test if the constant `fd_f25519_zero` is identified as zero using `fd_f25519_is_zero`.
+    - Decode a series of hexadecimal strings into the byte array `s`, convert them to field elements using `fd_f25519_frombytes`, and test if they are identified as zero using `fd_f25519_is_zero`.
+    - Perform similar tests with hexadecimal strings that should not be identified as zero, ensuring `fd_f25519_is_zero` returns false for these cases.
+- **Output**: The function does not return any value; it uses assertions to verify the correctness of the `fd_f25519_is_zero` function.
 
 
 ---
 ### test\_fe\_copy<!-- {{#callable:test_fe_copy}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L225>)
-
-Tests the copying of finite field elements and benchmarks the `fd_f25519_set` function.
+The `test_fe_copy` function tests the copying of finite field elements using the `fd_f25519_set` function and benchmarks its performance.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t`.
-- **Logic and Control Flow**:
-    - Declare two finite field elements `_f` and `_h` of type `fd_f25519_t` and assign pointers `f` and `h` to them.
-    - If `OPENSSL_COMPARE` is defined, perform a loop 1,000,000 times to compare the results of copying finite field elements using OpenSSL's `fe_copy` and the custom `fd_f25519_set` function.
-    - Within the loop, generate random finite field elements `ref_f` and `ref_h`, copy `ref_f` to `f`, and set `h` using `fd_f25519_set`.
-    - Verify that `fd_f25519_set` returns the correct pointer and that the memory contents of `f` and `h` match `ref_f` and `ref_h`.
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used for generating random finite field elements.
+- **Control Flow**:
+    - Declare two finite field elements `_f` and `_h` as arrays of type `fd_f25519_t` and assign pointers `f` and `h` to them respectively.
+    - If `OPENSSL_COMPARE` is defined, perform a loop 1,000,000 times to compare the results of copying finite field elements using OpenSSL's `fe_copy` and the `fd_f25519_set` function, ensuring they produce identical results.
     - Generate a random finite field element `f` using `fd_f25519_rng_unsafe`.
-    - Benchmark the `fd_f25519_set` function by measuring the time taken to execute it 1,000,000 times and log the performance.
-- **Output**: No return value; the function performs tests and logs benchmark results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - Initialize a loop to run 1,000,000 iterations, where in each iteration, the `fd_f25519_set` function is used to copy the value of `f` to `h`, and the compiler is instructed to forget the values of `f` and `h` to prevent optimization.
+    - Calculate the time taken for the loop and log the benchmark results using [`log_bench`](#log_bench).
+- **Output**: The function does not return any value; it performs tests and logs benchmark results.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_add<!-- {{#callable:test_fe_add}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L250>)
-
-Tests the addition of two field elements using the `fd_f25519_add` function and benchmarks its performance.
+The `test_fe_add` function tests the addition of two field elements using the `fd_f25519_add` function and benchmarks its performance.
 - **Inputs**:
     - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements.
-- **Logic and Control Flow**:
+- **Control Flow**:
     - Declare and initialize three field elements `f`, `g`, and `h` of type `fd_f25519_t`.
     - If `OPENSSL_COMPARE` is defined, perform a loop 1,000,000 times to compare the results of `fd_f25519_add` with a reference implementation `fe_add` using random field elements.
-    - Copy the reference field elements to `f` and `g`, perform the addition using `fd_f25519_add`, and verify the results using `FD_TEST` and `memcmp`.
-    - Perform additional tests to ensure that the field elements `f` and `g` remain unchanged after the addition operation.
+    - Copy the reference field elements to `f` and `g`, perform the addition using `fd_f25519_add`, and verify the results using `FD_TEST` macros.
     - Generate random field elements `f` and `g` using `fd_f25519_rng_unsafe`.
-    - Benchmark the `fd_f25519_add` function by performing the addition operation 1,000,000 times and log the performance using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs tests and logs benchmark results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - Perform a loop 1,000,000 times to benchmark the `fd_f25519_add` function by adding `f` and `g` and storing the result in `h`.
+    - Calculate the time taken for the benchmark and log the performance using [`log_bench`](#log_bench).
+- **Output**: The function does not return a value; it performs tests and logs benchmark results.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_sub<!-- {{#callable:test_fe_sub}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L288>)
-
-Tests the subtraction of two field elements using the `fd_f25519_sub` function and benchmarks its performance.
+The `test_fe_sub` function tests the subtraction of two field elements using the `fd_f25519_sub` function and benchmarks its performance.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-- **Logic and Control Flow**:
-    - Declare and initialize three `fd_f25519_t` variables `_f`, `_g`, and `_h` to hold field elements.
-    - If `OPENSSL_COMPARE` is defined, perform a loop 1,000,000 times to compare the results of `fd_f25519_sub` with a reference implementation `fe_sub`.
-    - In each iteration, generate random field elements `ref_f` and `ref_g`, compute their subtraction using `fe_sub`, and verify the result with `fd_f25519_sub`.
-    - Check that the original field elements `f` and `g` remain unchanged after the subtraction operation.
-    - Perform the subtraction in-place on `f` and `g` and verify the results.
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements.
+- **Control Flow**:
+    - Initialize three field elements `f`, `g`, and `h` using the `fd_f25519_t` type.
+    - If `OPENSSL_COMPARE` is defined, perform a loop 1,000,000 times to compare the results of `fd_f25519_sub` with a reference implementation `fe_sub` using random field elements.
+    - Copy the reference field elements to `f` and `g` and perform subtraction using `fd_f25519_sub`, then verify the results against the reference.
+    - Perform additional tests to ensure that the field elements `f` and `g` remain unchanged after operations and that the result `h` matches the reference result.
     - Generate random field elements `f` and `g` using `fd_f25519_rng_unsafe`.
     - Perform a loop 1,000,000 times to benchmark the `fd_f25519_sub` function by subtracting `g` from `f` and storing the result in `h`.
-    - Log the benchmark results using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs tests and logs benchmark results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - Calculate the time taken for the benchmark and log the performance using [`log_bench`](#log_bench).
+- **Output**: The function does not return a value; it performs tests and logs benchmark results.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_mul<!-- {{#callable:test_fe_mul}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L326>)
-
-Tests the multiplication of two field elements using the `fd_f25519_mul` function and verifies the results against expected values.
+The `test_fe_mul` function tests the multiplication of two field elements in the finite field defined by the prime 2^255-19, using both random and predefined inputs, and benchmarks the performance of the multiplication operation.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t` used for generating random field elements.
-- **Logic and Control Flow**:
-    - Initializes field elements `f`, `g`, `h`, and `e` as arrays of type `fd_f25519_t`.
-    - If `OPENSSL_COMPARE` is defined, performs 1,000,000 iterations of multiplying random field elements `f` and `g`, comparing the result with a reference implementation, and verifying the integrity of the inputs and outputs.
-    - Decodes hexadecimal strings into field elements `f`, `g`, and `e`, performs multiplication, and checks if the result matches the expected value `e`.
-    - Converts the result `h` to bytes and verifies it matches the expected byte array.
-    - Generates random field elements `f` and `g`, performs 1,000,000 multiplications, and logs the performance metrics.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements for testing.
+- **Control Flow**:
+    - Initialize field elements `f`, `g`, `h`, and `e` as arrays of type `fd_f25519_t`.
+    - If `OPENSSL_COMPARE` is defined, perform 1,000,000 iterations of comparing the custom multiplication implementation with OpenSSL's reference implementation, checking for consistency in results.
+    - Decode predefined hexadecimal strings into field elements `f`, `g`, and `e`, and perform a multiplication test to verify the result matches the expected value `e`.
+    - Convert the result `h` to bytes and verify it matches the expected byte array `ebuf`.
+    - Generate random field elements `f` and `g` using the random number generator `rng`.
+    - Perform 1,000,000 iterations of multiplying `f` and `g`, measuring the time taken for benchmarking purposes.
+    - Log the benchmark results for the multiplication operation.
+- **Output**: The function does not return a value; it performs tests and logs results, asserting correctness and benchmarking performance.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_sq<!-- {{#callable:test_fe_sq}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L378>)
-
-Tests the square operation on finite field elements using random inputs and benchmarks the performance.
+The `test_fe_sq` function tests the squaring operation of field elements in the finite field defined by the Curve25519 parameters, and benchmarks the performance of this operation.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-- **Logic and Control Flow**:
-    - Initializes two finite field elements `_f` and `_h` as arrays of type `fd_f25519_t` and assigns pointers `f` and `h` to them.
-    - If `OPENSSL_COMPARE` is defined, runs a loop 1,000,000 times to compare the results of `fd_f25519_sqr` with a reference implementation `fe_sq` using random inputs generated by [`fe_rng`](<#fe_rng>).
-    - Copies the reference finite field elements to `f` and `h` and checks if the square operation results match using `FD_TEST` and `memcmp`.
-    - Generates a random finite field element using `fd_f25519_rng_unsafe` and assigns it to `f`.
-    - Runs a loop 1,000,000 times to perform the square operation `fd_f25519_sqr` on `f` and stores the result in `h`, while measuring the time taken using `fd_log_wallclock`.
-    - Logs the benchmark results using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs tests and logs benchmark results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements for testing.
+- **Control Flow**:
+    - Initialize two field elements `f` and `h` of type `fd_f25519_t`.
+    - If `OPENSSL_COMPARE` is defined, perform a loop 1,000,000 times to compare the custom squaring function `fd_f25519_sqr` with a reference implementation `fe_sq` from OpenSSL, ensuring correctness by comparing results and inputs.
+    - Generate a random field element `f` using `fd_f25519_rng_unsafe`.
+    - Measure the time taken to perform 1,000,000 squaring operations using `fd_f25519_sqr` on `f`, storing the result in `h`.
+    - Log the benchmark results using [`log_bench`](#log_bench) to report the performance of the squaring operation.
+- **Output**: The function does not return a value; it performs tests and logs benchmark results for the squaring operation.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_invert<!-- {{#callable:test_fe_invert}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L404>)
-
-Tests the inversion of field elements using the `fd_f25519_inv` function and benchmarks its performance.
+The `test_fe_invert` function tests the inversion of field elements using the `fd_f25519_inv` function and benchmarks its performance.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-- **Logic and Control Flow**:
-    - Declare and initialize two `fd_f25519_t` variables `_f` and `_h` as arrays of size 1, and set pointers `f` and `h` to these arrays respectively.
-    - If `OPENSSL_COMPARE` is defined, perform a loop 10,000 times to compare the inversion results of `fd_f25519_inv` with the reference implementation `fe_invert`.
-    - In each iteration of the loop, generate a random field element `ref_f` using [`fe_rng`](<#fe_rng>), invert it using `fe_invert`, and copy the result to `ref_h`.
-    - Copy `ref_f` to `f` and check if `fd_f25519_inv(h, f)` returns `h` and if `f` and `h` match `ref_f` and `ref_h` respectively using `FD_TEST` and `memcmp`.
-    - Perform a similar check by inverting `f` in place and comparing it to `ref_h`.
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements.
+- **Control Flow**:
+    - Declare and initialize two field element variables `_f` and `_h` of type `fd_f25519_t`.
+    - If `OPENSSL_COMPARE` is defined, perform a loop 10,000 times to compare the inversion results of `fd_f25519_inv` with a reference implementation `fe_invert`.
+    - Copy the reference field element `ref_f` to `f` and check if the inversion result `h` matches the expected result `ref_h`.
+    - Perform additional tests to ensure the inversion function does not alter the original field element `f`.
     - Generate a random field element `f` using `fd_f25519_rng_unsafe`.
-    - Initialize `iter` to 10,000 and record the current wall clock time in `dt`.
-    - Perform a loop `iter` times, forgetting the values of `f` and `h` in each iteration, and call `fd_f25519_inv(h, f)`.
-    - Calculate the elapsed time by subtracting the initial `dt` from the current wall clock time.
-    - Log the benchmark results using [`log_bench`](<#log_bench>) with the description "fd_f25519_inv".
-- **Output**: No return value; the function performs tests and logs benchmark results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - Benchmark the `fd_f25519_inv` function by measuring the time taken to invert `f` 10,000 times and log the performance results.
+- **Output**: The function does not return a value; it performs tests and logs benchmark results.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_neg<!-- {{#callable:test_fe_neg}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L430>)
-
-Tests the negation operation on finite field elements using random inputs and benchmarks the performance.
+The `test_fe_neg` function tests the negation operation on field elements using the `fd_f25519_neg` function and benchmarks its performance.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-- **Logic and Control Flow**:
-    - Declare and initialize two `fd_f25519_t` variables `_f` and `_h` for storing finite field elements.
-    - If `OPENSSL_COMPARE` is defined, perform 100,000 iterations of comparison tests between the custom negation function `fd_f25519_neg` and the reference OpenSSL function `fe_neg`.
-    - In each iteration, generate a random finite field element `ref_f`, compute its negation `ref_h` using `fe_neg`, and verify the results using `fd_f25519_neg`.
-    - Copy the reference finite field element `ref_f` to `f` and verify that `fd_f25519_neg` produces the same result as `fe_neg`.
-    - Perform a performance benchmark by generating a random finite field element `f` using `fd_f25519_rng_unsafe`, then measure the time taken to perform 100,000 negation operations using `fd_f25519_neg`.
-    - Log the benchmark results using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs tests and logs benchmark results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements.
+- **Control Flow**:
+    - Initialize two field element variables `_f` and `_h` as arrays of type `fd_f25519_t`.
+    - If `OPENSSL_COMPARE` is defined, perform a loop 100,000 times to compare the results of `fd_f25519_neg` with a reference implementation `fe_neg` using random field elements generated by [`fe_rng`](#fe_rng).
+    - Within the loop, copy the reference field element `ref_f` to `f`, negate `f` using `fd_f25519_neg` and store the result in `h`, then verify the results against the reference `ref_h`.
+    - Perform a similar negation operation directly on `f` and verify the result.
+    - Generate a random field element `f` using `fd_f25519_rng_unsafe`.
+    - Benchmark the `fd_f25519_neg` function by negating `f` and storing the result in `h` for 100,000 iterations, measuring the time taken.
+    - Log the benchmark results using [`log_bench`](#log_bench).
+- **Output**: The function does not return a value; it performs tests and logs benchmark results.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_if<!-- {{#callable:test_fe_if}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L456>)
-
-Tests the `fd_f25519_if` function by comparing its output with expected results using random inputs and benchmarks its performance.
+The `test_fe_if` function tests the `fd_f25519_if` function for conditional selection between two field elements based on a control bit, using random inputs and benchmarking its performance.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-- **Logic and Control Flow**:
-    - Initializes three `fd_f25519_t` variables `_f`, `_g`, and `_h` to store field elements.
-    - Generates random field elements `f` and `g` using `fd_f25519_rng_unsafe` and ensures they are not equal using `fd_memeq`.
-    - Tests the `fd_f25519_if` function with `c` set to 1 and 0, verifying that the output matches `f` and `g` respectively using `fd_memeq`.
-    - If `OPENSSL_COMPARE` is defined, performs additional tests comparing `fd_f25519_if` with OpenSSL's `fe_cmov` function for 100,000 iterations.
-    - Benchmarks the `fd_f25519_if` function by running it 100,000 times and logs the performance using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements and control bits.
+- **Control Flow**:
+    - Initialize three field elements `f`, `g`, and `h` and a control bit `c`.
+    - If `OPENSSL_COMPARE` is defined, perform a loop 100,000 times to compare the results of `fd_f25519_if` with a reference implementation using random field elements and a random control bit.
+    - Copy the reference field elements and perform conditional move operations, then verify the results using `FD_TEST` assertions.
+    - Generate random field elements `f` and `g` and ensure they are not equal using `FD_TEST`.
+    - Test `fd_f25519_if` with control bit `1` to ensure it returns `f` and with control bit `0` to ensure it returns `g`.
+    - Benchmark the `fd_f25519_if` function by running it 100,000 times with alternating control bits and log the performance.
+- **Output**: The function does not return a value; it performs tests and logs results, asserting correctness using `FD_TEST` and logging performance metrics.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_isnonzero<!-- {{#callable:test_fe_isnonzero}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L505>)
-
-Tests the `fd_f25519_is_nonzero` function for correctness and performance using random field elements.
+The `test_fe_isnonzero` function tests the `fd_f25519_is_nonzero` function for correctness and performance by comparing its output to a reference implementation and measuring execution time.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random field elements.
-- **Logic and Control Flow**:
-    - Declare a field element `_f` and a pointer `f` to it, and an integer `c` for storing results.
-    - If `OPENSSL_COMPARE` is defined, loop 100,000 times to compare the result of `fd_f25519_is_nonzero` with `fe_isnonzero` using random field elements generated by [`fe_rng`](<#fe_rng>).
-    - Copy the reference field element `ref_f` to `f` and verify that `fd_f25519_is_nonzero(f)` matches `c` and that `f` matches `ref_f`.
+    - `rng`: A pointer to an `fd_rng_t` structure used for random number generation.
+- **Control Flow**:
+    - Declare a local `fd_f25519_t` array `_f` and a pointer `f` pointing to it.
+    - Declare an integer `c` for storing the result of the `fd_f25519_is_nonzero` function.
+    - If `OPENSSL_COMPARE` is defined, run a loop 100,000 times to compare the output of `fd_f25519_is_nonzero` with a reference implementation `fe_isnonzero` using random field elements generated by [`fe_rng`](#fe_rng).
+    - Copy the reference field element to `f` and assert that `fd_f25519_is_nonzero(f)` equals `c` and that `f` matches the reference field element.
     - Generate a random field element using `fd_f25519_rng_unsafe` and store it in `f`.
-    - Loop 100,000 times, calling `fd_f25519_is_nonzero(f)` and storing the result in `c`, while using `FD_COMPILER_FORGET` to prevent compiler optimizations.
-    - Measure the time taken for the loop and log the performance using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - Run a loop 100,000 times to call `fd_f25519_is_nonzero(f)` and store the result in `c`, using `FD_COMPILER_FORGET` to prevent compiler optimizations.
+    - Measure the time taken for the loop and log the performance using [`log_bench`](#log_bench).
+- **Output**: The function does not return a value; it performs tests and logs performance metrics.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_fe\_pow22523<!-- {{#callable:test_fe_pow22523}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L530>)
-
-Tests the `fd_f25519_pow22523` function for correctness and performance using random inputs.
+The `test_fe_pow22523` function tests the `fd_f25519_pow22523` function for correctness and performance by comparing its results with reference implementations and measuring execution time.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for generating random numbers.
-- **Logic and Control Flow**:
-    - Initializes two `fd_f25519_t` variables, `_f` and `_h`, to store field elements.
-    - If `OPENSSL_COMPARE` is defined, runs a loop 100,000 times to compare the results of `fd_f25519_pow22523` with a reference implementation `fe_pow22523`.
-    - Copies the reference field element `ref_f` to `f` and checks if `fd_f25519_pow22523` applied to `f` matches `h`.
-    - Verifies that `f` and `h` match the reference values `ref_f` and `ref_h` respectively after the operation.
-    - Generates a random field element using `fd_f25519_rng_unsafe` and measures the time taken to perform 100,000 iterations of `fd_f25519_pow22523` on it.
-    - Logs the performance results using [`log_bench`](<#log_bench>).
-    - Contains commented-out code for testing `fd_f25519_pow22523_2` and `fd_f25519_pow22523_4`, which are not implemented.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fe_rng`](<#fe_rng>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to an `fd_rng_t` structure used for random number generation.
+- **Control Flow**:
+    - Initialize two `fd_f25519_t` variables, `_f` and `_h`, to hold field elements.
+    - If `OPENSSL_COMPARE` is defined, perform 100,000 iterations of testing the `fd_f25519_pow22523` function against a reference implementation, checking for correctness by comparing results and ensuring input values remain unchanged.
+    - Generate a random field element using `fd_f25519_rng_unsafe` and store it in `f`.
+    - Measure the execution time of 100,000 iterations of the `fd_f25519_pow22523` function, logging the performance results.
+    - Commented-out code suggests additional tests for `fd_f25519_pow22523_2` and `fd_f25519_pow22523_4`, which are not implemented.
+- **Output**: The function does not return a value; it performs tests and logs results for performance benchmarking.
+- **Functions called**:
+    - [`fe_rng`](#fe_rng)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_affine\_frombytes<!-- {{#callable:test_affine_frombytes}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L604>)
-
-Converts hexadecimal byte arrays into an affine point on the Curve25519 elliptic curve and logs a success message.
+The `test_affine_frombytes` function tests the conversion of byte arrays into an affine point on the Curve25519 using predefined hexadecimal values.
 - **Inputs**:
-    - ``rng``: A pointer to a `fd_rng_t` structure, which is unused in this function.
-- **Logic and Control Flow**:
-    - Declare two 32-byte arrays `x` and `y` to hold hexadecimal values.
-    - Declare a `fd_ed25519_point_t` array `fd_ed25519_base_point` to store the resulting affine point.
-    - Decode the hexadecimal string "1ad5258f602d56c9b2a7259560c72c695cdcd6fd31e2a4c0fe536ecdd3366921" into the `x` array using `fd_hex_decode`.
-    - Decode the hexadecimal string "5866666666666666666666666666666666666666666666666666666666666666" into the `y` array using `fd_hex_decode`.
-    - Convert the byte arrays `x` and `y` into an affine point on the Curve25519 elliptic curve using `fd_curve25519_affine_frombytes`, storing the result in `fd_ed25519_base_point`.
-    - Log a success message "test_affine_frombytes: ok" using `FD_LOG_NOTICE`.
-- **Output**: No output is returned from this function.
+    - `rng`: A pointer to a random number generator object, marked as unused in this function.
+- **Control Flow**:
+    - Initialize two 32-byte arrays `x` and `y` to hold hexadecimal values.
+    - Declare an array `fd_ed25519_base_point` to store the resulting affine point.
+    - Decode a predefined hexadecimal string into the `x` array using `fd_hex_decode`.
+    - Decode another predefined hexadecimal string into the `y` array using `fd_hex_decode`.
+    - Call `fd_curve25519_affine_frombytes` to convert the byte arrays `x` and `y` into an affine point stored in `fd_ed25519_base_point`.
+    - Log a notice message indicating the test has completed successfully.
+- **Output**: The function does not return any value; it logs a notice message to indicate successful execution.
 
 
 ---
 ### test\_affine\_is\_small\_order<!-- {{#callable:test_affine_is_small_order}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L614>)
-
-Tests if certain Ed25519 points are of small order by decoding them from hexadecimal strings and checking their order.
+The function `test_affine_is_small_order` tests whether certain Ed25519 points are of small order by decoding them from hexadecimal strings and checking their order using the `fd_ed25519_affine_is_small_order` function.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t`, which is not used in this function.
-- **Logic and Control Flow**:
-    - Initialize a 32-byte array `_s` and a pointer `s` to it, and a `fd_ed25519_point_t` array `_r` and a pointer `r` to it.
-    - Decode a series of hexadecimal strings into the array `s` using `fd_hex_decode`.
+    - `rng`: A pointer to a random number generator object, which is not used in this function.
+- **Control Flow**:
+    - Initialize a 32-byte array `_s` and a point `_r` to hold the decoded data and the point representation respectively.
+    - Decode a series of hexadecimal strings into the byte array `s` using `fd_hex_decode`.
     - Convert the byte array `s` into an Ed25519 point `r` using `fd_ed25519_point_frombytes`.
-    - Check if the point `r` is of small order using `fd_ed25519_affine_is_small_order` and assert the expected result with `FD_TEST`.
-    - Log a notice message indicating the test completion.
-- **Output**: No output is returned; the function performs assertions to validate the behavior of `fd_ed25519_affine_is_small_order`.
+    - Check if the point `r` is of small order using `fd_ed25519_affine_is_small_order` and assert the expected result using `FD_TEST`.
+    - Log a notice message indicating the test has completed successfully.
+- **Output**: The function does not return any value; it performs assertions to validate the behavior of `fd_ed25519_affine_is_small_order`.
 
 
 ---
 ### test\_point\_validate<!-- {{#callable:test_point_validate}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L670>)
-
-Validates various Ed25519 points by encoding them into bytes and checking their validity using `fd_ed25519_point_validate`.
+The `test_point_validate` function tests the validation of various Ed25519 elliptic curve points by encoding them into bytes and checking their validity using the `fd_ed25519_point_validate` function.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure, which is unused in this function.
-- **Logic and Control Flow**:
+    - `rng`: A pointer to a random number generator object, which is unused in this function.
+- **Control Flow**:
     - Initialize a 32-byte buffer `buf`.
-    - Convert the base point to bytes and validate it using `fd_ed25519_point_validate`.
-    - Decode several hexadecimal strings into `buf` and validate each using `fd_ed25519_point_validate`.
-    - Perform negative tests by decoding specific hexadecimal strings into `buf` and checking that `fd_ed25519_point_validate` returns false.
-- **Output**: No output is returned as the function is of type `void` and performs internal validation checks.
+    - Convert the base point of the Ed25519 curve to bytes and store it in `buf`.
+    - Validate the base point bytes using `fd_ed25519_point_validate` and log the result.
+    - Decode several hardcoded hexadecimal strings into `buf` and validate each using `fd_ed25519_point_validate`, logging the results.
+    - Perform negative tests by decoding other hexadecimal strings into `buf` and checking that `fd_ed25519_point_validate` returns false, logging the results.
+- **Output**: The function does not return any value; it logs the results of each validation test.
 
 
 ---
 ### test\_sc\_validate<!-- {{#callable:test_sc_validate}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L716>)
-
-Validates Curve25519 scalars using a series of tests, including edge cases and random values, and benchmarks the validation process.
+The `test_sc_validate` function tests the validation of Curve25519 scalars using various test cases, including known valid and invalid scalars, random scalars, and benchmarks the validation process.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-- **Logic and Control Flow**:
-    - Initialize two arrays `_in` and `_out` for input and output data.
-    - Validate three specific scalars: `fd_curve25519_scalar_zero`, `fd_curve25519_scalar_one`, and `fd_curve25519_scalar_minus_one`.
-    - Perform a negative test by modifying `fd_curve25519_scalar_minus_one` and checking that it fails validation.
-    - Generate a random 256-bit value, modify it, and check that it fails validation.
-    - Generate a random 512-bit value, reduce it to a scalar, and check that it passes validation.
-    - Benchmark the `fd_curve25519_scalar_validate` function by running it 1,000,000 times and logging the performance.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`fd_rng_b512`](<#fd_rng_b512>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to an `fd_rng_t` structure used for random number generation.
+- **Control Flow**:
+    - Initialize two arrays `_in` and `_out` for input and output data, respectively.
+    - Validate known valid scalars: zero, one, and minus one using `fd_curve25519_scalar_validate`.
+    - Perform negative tests by modifying a valid scalar to make it invalid and checking validation failure.
+    - Generate a random 512-bit number, reduce it to a scalar, and validate the result.
+    - Benchmark the scalar validation function by running it 1,000,000 times and logging the performance.
+- **Output**: The function does not return a value; it performs tests and logs results using `FD_TEST` and [`log_bench`](#log_bench).
+- **Functions called**:
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`fd_rng_b512`](#fd_rng_b512)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_sc\_reduce<!-- {{#callable:test_sc_reduce}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L743>)
-
-Tests the `fd_curve25519_scalar_reduce` function for correctness and performance using random inputs.
+The `test_sc_reduce` function tests the scalar reduction operation for Curve25519 scalars using random inputs and benchmarks its performance.
 - **Inputs**:
-    - ``rng``: A pointer to a random number generator of type `fd_rng_t` used to generate random input data.
-- **Logic and Control Flow**:
-    - Initializes two 64-byte arrays `_in` and `_out` for input and output.
-    - If `OPENSSL_COMPARE` is defined, runs a loop 1,000,000 times to compare the output of `fd_curve25519_scalar_reduce` with a reference implementation `x25519_sc_reduce`.
-    - Copies random data into `in` using [`fd_rng_b512`](<#fd_rng_b512>) and measures the time taken to perform 1,000,000 reductions using `fd_curve25519_scalar_reduce`.
-    - Logs the performance metrics using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fd_rng_b512`](<#fd_rng_b512>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to a random number generator object (`fd_rng_t`) used to generate random input data.
+- **Control Flow**:
+    - Initialize two 64-byte arrays `_in` and `_out` for input and output data.
+    - If `OPENSSL_COMPARE` is defined, perform a loop 1,000,000 times to compare the custom scalar reduction function `fd_curve25519_scalar_reduce` with the OpenSSL equivalent `x25519_sc_reduce`.
+    - In each iteration, generate a random 64-byte input using [`fd_rng_b512`](#fd_rng_b512), perform scalar reduction using both functions, and verify that the outputs match.
+    - After the comparison loop, generate a random 64-byte input using [`fd_rng_b512`](#fd_rng_b512).
+    - Measure the wall-clock time before and after performing 1,000,000 scalar reductions using `fd_curve25519_scalar_reduce` to benchmark its performance.
+    - Log the benchmark results using [`log_bench`](#log_bench).
+- **Output**: The function does not return any value; it performs tests and logs benchmark results.
+- **Functions called**:
+    - [`fd_rng_b512`](#fd_rng_b512)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_sc\_muladd<!-- {{#callable:test_sc_muladd}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L768>)
-
-Tests the `fd_curve25519_scalar_muladd` function by comparing its output with a reference implementation and measures its performance.
+The `test_sc_muladd` function tests the `fd_curve25519_scalar_muladd` function by comparing its output with a reference implementation and measures its performance.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-- **Logic and Control Flow**:
-    - Initializes four 32-byte arrays `_a`, `_b`, `_c`, and `_s` for input and output.
-    - If `OPENSSL_COMPARE` is defined, runs a loop 1,000,000 times to compare the output of `fd_curve25519_scalar_muladd` with a reference implementation `sc_muladd`.
-    - Copies random values into `a`, `b`, and `c` using [`fd_rng_b256`](<#fd_rng_b256>).
-    - Runs a loop 1,000,000 times to call `fd_curve25519_scalar_muladd` with `a`, `b`, and `c`, storing the result in `s`.
-    - Measures the time taken for the loop and logs the performance using [`log_bench`](<#log_bench>).
-- **Output**: No direct output; the function performs tests and logs performance metrics.
-- **Functions Called**:
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to an `fd_rng_t` structure used for random number generation.
+- **Control Flow**:
+    - Initialize four 32-byte arrays `_a`, `_b`, `_c`, and `_s` to hold random values and results.
+    - If `OPENSSL_COMPARE` is defined, run a loop 1,000,000 times to compare the output of `fd_curve25519_scalar_muladd` with a reference implementation `sc_muladd`.
+    - In each iteration, generate random values for `a`, `b`, and `c`, and compute the scalar multiplication and addition using both the reference and the function under test.
+    - Verify that the results from `fd_curve25519_scalar_muladd` match the reference results and that the input values remain unchanged.
+    - After the comparison loop, generate random values for `a`, `b`, and `c` again and measure the performance of `fd_curve25519_scalar_muladd` over 1,000,000 iterations.
+    - Log the performance results using [`log_bench`](#log_bench).
+- **Output**: The function does not return a value; it performs tests and logs performance metrics.
+- **Functions called**:
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_public\_from\_private<!-- {{#callable:test_public_from_private}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L820>)
-
-Generates a public key from a private key using the Ed25519 algorithm and measures the performance of this operation.
+The `test_public_from_private` function tests the conversion of a private key to a public key using the Ed25519 algorithm and benchmarks the performance of this conversion.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-    - `sha`: A pointer to a `fd_sha512_t` structure used for SHA-512 hashing.
-- **Logic and Control Flow**:
-    - Initializes arrays for private key (`prv`), public key (`pub`), and expected public key (`exp`).
-    - If `OPENSSL_COMPARE` is defined, runs a loop 10,000 times to compare the generated public key with a reference implementation using `ED25519_public_from_private`.
-    - Decodes a fixed private key and expected public key from hexadecimal strings and generates a public key using `fd_ed25519_public_from_private`.
-    - Generates a random private key using [`fd_rng_b256`](<#fd_rng_b256>) and computes the corresponding public key.
-    - Runs a performance benchmark by generating public keys from private keys 10,000 times and logs the results using [`log_bench`](<#log_bench>).
-- **Output**: No return value; the function performs operations and logs results.
-- **Functions Called**:
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to an `fd_rng_t` structure used for random number generation.
+    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing operations.
+- **Control Flow**:
+    - Initialize arrays for private key (`prv`), public key (`pub`), and expected public key (`exp`).
+    - If `OPENSSL_COMPARE` is defined, perform 10,000 iterations of generating a reference private key and public key using OpenSSL, then verify the conversion using `fd_ed25519_public_from_private` and compare the results.
+    - Decode a fixed private key from a hexadecimal string and convert it to a public key, comparing it to an expected public key (commented out).
+    - Generate a random private key using [`fd_rng_b256`](#fd_rng_b256), convert it to a public key, and log the results (commented out).
+    - Benchmark the `fd_ed25519_public_from_private` function by performing 10,000 iterations of converting a private key to a public key and logging the performance.
+- **Output**: The function does not return a value; it performs tests and logs results for verification and benchmarking purposes.
+- **Functions called**:
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_sign<!-- {{#callable:test_sign}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L855>)
-
-Tests the signing functionality of the Ed25519 algorithm using random and predefined data.
+The `test_sign` function tests the functionality and performance of the Ed25519 digital signature algorithm by generating random messages, signing them, and verifying the signatures against expected results.
 - **Inputs**:
-    - `rng`: A pointer to a `fd_rng_t` structure used for random number generation.
-    - `sha`: A pointer to a `fd_sha512_t` structure used for SHA-512 hashing.
-- **Logic and Control Flow**:
-    - Initializes arrays for message, public key, private key, signature, and expected signature.
-    - If `OPENSSL_COMPARE` is defined, performs 10,000 iterations of signing and verification using OpenSSL for comparison.
-    - Decodes a predefined private key and expected signature, generates a public key from the private key, signs an empty message, and verifies the signature against the expected signature.
-    - Generates a random message of 1024 bytes, generates a public key from a random private key, and performs signing operations for message sizes from 128 to 1024 bytes in increments of 128 bytes.
-    - Logs the performance of the signing operations.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`log_bench`](<#log_bench>)
+    - `rng`: A pointer to an `fd_rng_t` structure used for random number generation.
+    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing operations.
+- **Control Flow**:
+    - Initialize arrays for message, public key, private key, signature, and expected signature.
+    - If `OPENSSL_COMPARE` is defined, perform 10,000 iterations of generating random messages, keys, and signatures using OpenSSL functions, then verify the results using the `fd_ed25519_sign` function and compare outputs.
+    - Decode a predefined private key and expected signature from hexadecimal strings.
+    - Generate a public key from the private key and sign an empty message, then verify the signature matches the expected signature.
+    - Generate a random message of 1024 bytes and a public key from a random private key.
+    - For message sizes from 128 to 1024 bytes, perform 10,000 iterations of signing the message and log the performance metrics.
+- **Output**: The function does not return a value; it performs tests and logs results, asserting correctness of the Ed25519 signing process.
+- **Functions called**:
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`log_bench`](#log_bench)
 
 
 ---
 ### test\_verify<!-- {{#callable:test_verify}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L905>)
-
-Tests the verification of ED25519 signatures under various conditions, including batch verification and corrupted data scenarios.
+The `test_verify` function tests the verification of Ed25519 signatures under various conditions, including both valid and corrupted data scenarios, and benchmarks the verification process.
 - **Inputs**:
-    - ``rng``: A pointer to a `fd_rng_t` structure used for random number generation.
-    - ``sha``: A pointer to a `fd_sha512_t` structure used for SHA-512 hashing operations.
-- **Logic and Control Flow**:
-    - Initializes message, public key, signature, and private key buffers.
-    - If `OPENSSL_COMPARE` is defined, performs 10,000 iterations of signature verification with potential corruption of signature, message, size, or public key.
-    - Generates random messages and derives public keys from private keys for testing.
-    - Performs signature signing and verification for message sizes from 128 to 1024 bytes, logging performance metrics.
-    - Tests batch verification of signatures with varying batch sizes, logging performance metrics.
-    - Corrupts signatures, messages, and public keys to test verification failure scenarios, logging performance metrics.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`fd_ed25519_verify`](<fd_ed25519_user.c.md#fd_ed25519_verify>)
-    - [`log_bench`](<#log_bench>)
-    - [`fd_ed25519_verify_batch_single_msg`](<fd_ed25519_user.c.md#fd_ed25519_verify_batch_single_msg>)
+    - `rng`: A pointer to a random number generator state used for generating random data.
+    - `sha`: A pointer to a SHA-512 state used for cryptographic operations.
+- **Control Flow**:
+    - Initialize message, public key, signature, and private key buffers.
+    - If `OPENSSL_COMPARE` is defined, perform 10,000 iterations of generating random messages, keys, and signatures, potentially corrupting them, and verifying them using both OpenSSL and the custom implementation, comparing results.
+    - Generate a random message and derive a public key from a private key using the custom implementation.
+    - For message sizes from 128 to 1024 bytes, sign the message and verify it, logging the performance.
+    - For a fixed message size of 1024 bytes, generate 16 valid signatures and verify them in batches, logging the performance.
+    - For message sizes from 128 to 1024 bytes, corrupt the signature, message, or public key and verify, logging the performance.
+- **Output**: The function does not return a value; it performs tests and logs results, asserting correctness through `FD_TEST` macros.
+- **Functions called**:
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`fd_ed25519_verify`](fd_ed25519_user.c.md#fd_ed25519_verify)
+    - [`log_bench`](#log_bench)
+    - [`fd_ed25519_verify_batch_single_msg`](fd_ed25519_user.c.md#fd_ed25519_verify_batch_single_msg)
 
 
 ---
 ### test\_wycheproofs<!-- {{#callable:test_wycheproofs}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L1072>)
-
-Validates Ed25519 signature verification against a set of predefined test vectors (wycheproofs).
+The `test_wycheproofs` function verifies Ed25519 signatures against a set of predefined test vectors (wycheproofs) and logs the results.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing operations.
-- **Logic and Control Flow**:
-    - Initialize a character array `cstr` with a size of 128 to store formatted strings.
-    - Iterate over each `fd_ed25519_verify_wycheproof_t` structure in the `ed25519_verify_wycheproofs` array until a `msg` field is null.
-    - For each `proof`, call [`fd_ed25519_verify`](<fd_ed25519_user.c.md#fd_ed25519_verify>) with the message, message size, signature, public key, and SHA-512 context to verify the signature.
+    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing operations during signature verification.
+- **Control Flow**:
+    - Initialize a character array `cstr` to store formatted strings for logging.
+    - Iterate over each `fd_ed25519_verify_wycheproof_t` test vector in `ed25519_verify_wycheproofs` until a null message is encountered.
+    - For each test vector, call [`fd_ed25519_verify`](fd_ed25519_user.c.md#fd_ed25519_verify) with the message, message size, signature, public key, and SHA-512 context to verify the signature.
     - Compare the result of the verification with the expected result (`proof->ok`).
-    - Use `FD_TEST_CUSTOM` to assert that the actual verification result matches the expected result, logging the test case ID if it does not.
-    - Log a notice message indicating that all wycheproof tests passed.
-- **Output**: No return value; the function performs validation and logs results.
-- **Functions Called**:
-    - [`fd_ed25519_verify`](<fd_ed25519_user.c.md#fd_ed25519_verify>)
+    - Log a custom test message using `FD_TEST_CUSTOM` if the actual result does not match the expected result, including the test case ID in the log message.
+    - After all test vectors are processed, log a notice indicating that the wycheproof verification is complete.
+- **Output**: The function does not return a value; it logs the results of the verification tests.
+- **Functions called**:
+    - [`fd_ed25519_verify`](fd_ed25519_user.c.md#fd_ed25519_verify)
 
 
 ---
 ### test\_cctv<!-- {{#callable:test_cctv}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L1088>)
-
-Verifies a series of Ed25519 cryptographic proofs against expected outcomes using a SHA-512 context.
+The `test_cctv` function verifies a series of Ed25519 cryptographic proofs against expected outcomes and logs the results.
 - **Inputs**:
-    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing operations.
-- **Logic and Control Flow**:
-    - Initialize a character array `cstr` with a size of 128 to store formatted strings.
+    - `sha`: A pointer to an `fd_sha512_t` structure used for SHA-512 hashing during verification.
+- **Control Flow**:
+    - Initialize a character array `cstr` to store formatted strings for logging.
     - Iterate over each `proof` in the `ed25519_verify_cctvs` array until a `proof` with a null `msg` is encountered.
-    - For each `proof`, call [`fd_ed25519_verify`](<fd_ed25519_user.c.md#fd_ed25519_verify>) with the message, message size, signature, public key, and SHA-512 context to verify the signature.
-    - Compare the result of [`fd_ed25519_verify`](<fd_ed25519_user.c.md#fd_ed25519_verify>) with `FD_ED25519_SUCCESS` to determine if the verification was successful.
-    - Use `FD_TEST_CUSTOM` to assert that the verification result matches the expected outcome (`proof->ok`), and log the test case ID if it does not match.
-    - Log a notice message indicating that all `fd_ed25519_verify_cctv` tests passed.
-- **Output**: No return value; the function performs verification and logs results.
-- **Functions Called**:
-    - [`fd_ed25519_verify`](<fd_ed25519_user.c.md#fd_ed25519_verify>)
+    - For each `proof`, call [`fd_ed25519_verify`](fd_ed25519_user.c.md#fd_ed25519_verify) with the message, message size, signature, public key, and SHA-512 context to verify the signature.
+    - Compare the result of the verification with the expected outcome (`proof->ok`).
+    - Log a custom test message using `FD_TEST_CUSTOM` if the actual result does not match the expected result, including the test case ID in the log message.
+    - Log a notice message indicating the completion of the verification process.
+- **Output**: The function does not return a value; it logs the results of the verification process.
+- **Functions called**:
+    - [`fd_ed25519_verify`](fd_ed25519_user.c.md#fd_ed25519_verify)
 
 
 ---
 ### test\_cctv\_batch<!-- {{#callable:test_cctv_batch}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L1101>)
-
-Tests the batch verification of Ed25519 signatures using a predefined set of test cases.
+The `test_cctv_batch` function tests the batch verification of Ed25519 signatures using a single message against a set of known test cases.
 - **Inputs**:
-    - ``rng``: A pointer to a random number generator of type `fd_rng_t` used for generating private keys.
-    - ``sha``: A pointer to a SHA-512 context of type `fd_sha512_t` used for hashing during signature generation and verification.
-- **Logic and Control Flow**:
-    - Initialize a character array `cstr` for logging purposes.
-    - Retrieve a message and its size from the `ed25519_verify_cctvs` array for testing.
-    - Declare and initialize arrays for public keys, signatures, private keys, and SHA contexts.
-    - Generate 16 valid Ed25519 signatures using the random number generator and store them in the `sigs` array.
-    - Verify the batch of 16 signatures using [`fd_ed25519_verify_batch_single_msg`](<fd_ed25519_user.c.md#fd_ed25519_verify_batch_single_msg>) and check for success.
-    - Iterate over the `ed25519_verify_cctvs` array to test each proof with the same message size.
-    - For each proof, copy the signature and public key into the `sigs` and `pubs` arrays respectively.
-    - Verify the batch of 2 and 4 signatures using [`fd_ed25519_verify_batch_single_msg`](<fd_ed25519_user.c.md#fd_ed25519_verify_batch_single_msg>) and compare the result with the expected outcome in the proof.
-    - Log the success of the batch verification process.
-- **Output**: No return value; the function performs tests and logs results.
-- **Functions Called**:
-    - [`fd_rng_b256`](<#fd_rng_b256>)
-    - [`fd_ed25519_verify_batch_single_msg`](<fd_ed25519_user.c.md#fd_ed25519_verify_batch_single_msg>)
+    - `rng`: A pointer to a random number generator state used for generating private keys.
+    - `sha`: A pointer to a SHA-512 hashing context used in the signature generation and verification process.
+- **Control Flow**:
+    - Initialize a character array `cstr` for custom test messages.
+    - Retrieve a message and its size from a predefined test case `ed25519_verify_cctvs[7]`.
+    - Declare and initialize arrays for public keys, signatures, a private key, and SHA-512 contexts.
+    - Generate 16 valid Ed25519 signatures using random private keys and the given message, storing the results in `sigs` and `pubs`.
+    - Verify the batch of 16 signatures using [`fd_ed25519_verify_batch_single_msg`](fd_ed25519_user.c.md#fd_ed25519_verify_batch_single_msg) and assert success.
+    - Iterate over all test cases in `ed25519_verify_cctvs`.
+    - For each test case, check if the message size and content match the initial message; if not, skip the test case.
+    - Copy the test case's signature and public key into the second position of `sigs` and `pubs`.
+    - Verify the batch of 2 signatures and assert that the result matches the expected outcome (`proof->ok`).
+    - Repeat the verification for a batch size of 4 signatures.
+    - Log a notice indicating the completion of the batch verification tests.
+- **Output**: The function does not return a value but logs the results of the tests and asserts the correctness of the batch verification process.
+- **Functions called**:
+    - [`fd_rng_b256`](#fd_rng_b256)
+    - [`fd_ed25519_verify_batch_single_msg`](fd_ed25519_user.c.md#fd_ed25519_verify_batch_single_msg)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/ed25519/test_ed25519.c#L1146>)
-
-Initializes the environment, runs a series of cryptographic tests, and then cleans up resources before exiting.
+The `main` function initializes the environment, runs a series of cryptographic tests, and then cleans up resources before exiting.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Creates and joins a random number generator (`fd_rng_t`) and a SHA-512 context (`fd_sha512_t`).
-    - Executes a series of test functions related to finite field operations, affine transformations, point validation, scalar operations, and cryptographic signing and verification.
-    - Each test function uses the random number generator and, where applicable, the SHA-512 context.
-    - Deletes the SHA-512 context and the random number generator to free resources.
-    - Logs a notice indicating the tests passed.
-    - Calls `fd_halt` to perform any necessary cleanup before exiting.
-    - Returns 0 to indicate successful execution.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`test_fe_frombytes`](<#test_fe_frombytes>)
-    - [`test_fe_tobytes`](<#test_fe_tobytes>)
-    - [`test_fe_is_zero`](<#test_fe_is_zero>)
-    - [`test_fe_copy`](<#test_fe_copy>)
-    - [`test_fe_add`](<#test_fe_add>)
-    - [`test_fe_sub`](<#test_fe_sub>)
-    - [`test_fe_mul`](<#test_fe_mul>)
-    - [`test_fe_sq`](<#test_fe_sq>)
-    - [`test_fe_invert`](<#test_fe_invert>)
-    - [`test_fe_neg`](<#test_fe_neg>)
-    - [`test_fe_if`](<#test_fe_if>)
-    - [`test_fe_isnonzero`](<#test_fe_isnonzero>)
-    - [`test_fe_pow22523`](<#test_fe_pow22523>)
-    - [`test_affine_frombytes`](<#test_affine_frombytes>)
-    - [`test_affine_is_small_order`](<#test_affine_is_small_order>)
-    - [`test_point_validate`](<#test_point_validate>)
-    - [`test_sc_validate`](<#test_sc_validate>)
-    - [`test_sc_reduce`](<#test_sc_reduce>)
-    - [`test_sc_muladd`](<#test_sc_muladd>)
-    - [`test_public_from_private`](<#test_public_from_private>)
-    - [`test_sign`](<#test_sign>)
-    - [`test_verify`](<#test_verify>)
-    - [`test_wycheproofs`](<#test_wycheproofs>)
-    - [`test_cctv`](<#test_cctv>)
-    - [`test_cctv_batch`](<#test_cctv_batch>)
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the environment using `fd_boot` with command-line arguments.
+    - Create and join a random number generator (`fd_rng_t`) and a SHA-512 context (`fd_sha512_t`).
+    - Execute a series of cryptographic tests related to finite field operations, affine transformations, point validation, scalar operations, and signature verification.
+    - Each test function is called with the random number generator and, where applicable, the SHA-512 context.
+    - After all tests are executed, clean up by deleting the SHA-512 context and the random number generator.
+    - Log a 'pass' message indicating successful execution of all tests.
+    - Call `fd_halt` to perform any necessary finalization before exiting.
+    - Return 0 to indicate successful program termination.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`test_fe_frombytes`](#test_fe_frombytes)
+    - [`test_fe_tobytes`](#test_fe_tobytes)
+    - [`test_fe_is_zero`](#test_fe_is_zero)
+    - [`test_fe_copy`](#test_fe_copy)
+    - [`test_fe_add`](#test_fe_add)
+    - [`test_fe_sub`](#test_fe_sub)
+    - [`test_fe_mul`](#test_fe_mul)
+    - [`test_fe_sq`](#test_fe_sq)
+    - [`test_fe_invert`](#test_fe_invert)
+    - [`test_fe_neg`](#test_fe_neg)
+    - [`test_fe_if`](#test_fe_if)
+    - [`test_fe_isnonzero`](#test_fe_isnonzero)
+    - [`test_fe_pow22523`](#test_fe_pow22523)
+    - [`test_affine_frombytes`](#test_affine_frombytes)
+    - [`test_affine_is_small_order`](#test_affine_is_small_order)
+    - [`test_point_validate`](#test_point_validate)
+    - [`test_sc_validate`](#test_sc_validate)
+    - [`test_sc_reduce`](#test_sc_reduce)
+    - [`test_sc_muladd`](#test_sc_muladd)
+    - [`test_public_from_private`](#test_public_from_private)
+    - [`test_sign`](#test_sign)
+    - [`test_verify`](#test_verify)
+    - [`test_wycheproofs`](#test_wycheproofs)
+    - [`test_cctv`](#test_cctv)
+    - [`test_cctv_batch`](#test_cctv_batch)
 
 
 

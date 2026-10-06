@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines the maximum length of the pubkey in BlockBuilderFeeInfoResponse as 44.
+The `block_engine.options` file specifies a configuration option for the `BlockBuilderFeeInfoResponse` public key with a maximum length of 44 characters.
 
 # Purpose
-The metadata specifies that the `pubkey` field in the `BlockBuilderFeeInfoResponse` class of the `block_engine` module has a maximum length of 44 characters. This constraint ensures that any public key assigned to this field does not exceed the defined character limit.
+The file content specifies a configuration constraint for the `pubkey` attribute within the `BlockBuilderFeeInfoResponse` class of the `block_engine` module. It enforces a maximum length of 44 characters for the `pubkey` field, ensuring that any public key associated with this response does not exceed the defined character limit.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

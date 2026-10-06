@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for encoding and decoding elliptic curve points using AVX-512 instructions based on RFC 8032.
+The `fd_r43x6_ge.c` file in the `firedancer` codebase provides functions for encoding and decoding elliptic curve points using the RFC 8032 standard, optimized for AVX-512 instructions.
 
 # Purpose
-The code provides functionality for encoding and decoding elliptic curve points as specified in RFC 8032. It includes three main functions: [`fd_r43x6_ge_encode`](<#fd_r43x6_ge_encode>), [`fd_r43x6_ge_decode`](<#fd_r43x6_ge_decode>), and [`fd_r43x6_ge_decode2`](<#fd_r43x6_ge_decode2>). The [`fd_r43x6_ge_encode`](<#fd_r43x6_ge_encode>) function encodes a curve point into a 32-octet string using little-endian format, where the y-coordinate is encoded directly, and the least significant bit of the x-coordinate is stored in the most significant bit of the final octet. The [`fd_r43x6_ge_decode`](<#fd_r43x6_ge_decode>) function decodes a 32-octet string back into a curve point by interpreting the string as an integer, recovering the y-coordinate, and calculating the x-coordinate using the curve equation. The [`fd_r43x6_ge_decode2`](<#fd_r43x6_ge_decode2>) function is an optimized version for decoding two points concurrently, improving performance for high-performance computing (HPC) applications.
+The provided C source code file implements functions for encoding and decoding elliptic curve points, specifically following the guidelines of RFC 8032, which describes the EdDSA (Edwards-curve Digital Signature Algorithm). The file includes functions such as [`fd_r43x6_ge_encode`](#fd_r43x6_ge_encode), [`fd_r43x6_ge_decode`](#fd_r43x6_ge_decode), and [`fd_r43x6_ge_decode2`](#fd_r43x6_ge_decode2), which handle the conversion of elliptic curve points to and from a compact byte string representation. The encoding function converts the x and y coordinates of a point into a 32-byte string using little-endian format, while the decoding functions interpret such strings back into point coordinates, ensuring the correct mathematical properties are maintained.
 
-The code is part of a C library intended to be used in cryptographic applications that require encoding and decoding of elliptic curve points. It uses specific data types and functions, such as `fd_r43x6_t` and `fd_r43x6_mul_fast`, to perform arithmetic operations on the curve points. The functions are designed to handle edge cases, such as when no valid square root exists for the x-coordinate, and they return error codes to indicate failure. The code is structured to be efficient and, in some parts, constant time to prevent timing attacks, although constant time execution is not strictly required by the specification.
+The code is highly specialized, focusing on the mathematical operations required for elliptic curve cryptography, such as modular arithmetic and square root calculations in a finite field. It uses a custom data type `fd_r43x6_t` for handling large integers and operations on them, which are crucial for the cryptographic computations. The file is not a standalone executable but rather a library intended to be integrated into a larger cryptographic system. It provides a public API for encoding and decoding operations, which are essential for applications that require secure digital signatures or key exchange mechanisms. The code is optimized for performance, with considerations for high-performance computing (HPC) environments, as evidenced by the presence of both reference and HPC implementations of the decoding functions.
 # Imports and Dependencies
 
 ---
@@ -19,64 +19,56 @@ The code is part of a C library intended to be used in cryptographic application
 
 ---
 ### fd\_r43x6\_ge\_encode<!-- {{#callable:fd_r43x6_ge_encode}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_r43x6_ge.c#L5>)
-
-Encodes a curve point (x, y) into a 32-octet string using little-endian format.
+The `fd_r43x6_ge_encode` function encodes a curve point (x, y) into a 32-octet string using little-endian convention, with specific bit manipulations to include the least significant bit of the x-coordinate.
 - **Inputs**:
     - `P03`: A `wwl_t` type representing part of the input point data.
     - `P14`: A `wwl_t` type representing part of the input point data.
     - `P25`: A `wwl_t` type representing part of the input point data.
-- **Logic and Control Flow**:
-    - Unpack the input point `P` into components `X`, `Y`, `Z`, and `T` using `FD_R43X6_QUAD_UNPACK`.
-    - Invert `Z` to compute `one_Z`.
-    - Multiply `X` and `Y` by `one_Z` to get `x` and `y`.
-    - Extract limbs from `x` and `y` using `fd_r43x6_extract_limbs`.
-    - Propagate carries in `x` and `y` using `fd_r43x6_biased_carry_propagate_limbs`.
-    - Reduce `x` and `y` to be nearly reduced using `fd_r43x6_mod_nearly_reduced_limbs`.
-    - Encode the `y`-coordinate as a little-endian string of 32 octets, setting the most significant bit of the final octet to zero.
-    - Copy the least significant bit of the `x`-coordinate to the most significant bit of the final octet of the `y`-coordinate.
-    - Pack the modified `y` limbs into a `wv_t` type using [`fd_r43x6_pack`](<fd_r43x6.h.md#fd_r43x6_pack>).
-- **Output**: Returns a `wv_t` type representing the encoded 32-octet string of the curve point.
-- **Functions Called**:
-    - [`fd_r43x6_invert`](<fd_r43x6.c.md#fd_r43x6_invert>)
-    - [`fd_r43x6_mul_fast`](<fd_r43x6.h.md#fd_r43x6_mul_fast>)
-    - [`fd_r43x6_pack`](<fd_r43x6.h.md#fd_r43x6_pack>)
+- **Control Flow**:
+    - Unpack the input point data into four components X, Y, Z, and T using `FD_R43X6_QUAD_UNPACK`.
+    - Invert the Z component to compute `one_Z`.
+    - Compute x and y by multiplying X and Y with `one_Z` using [`fd_r43x6_mul_fast`](fd_r43x6.h.md#fd_r43x6_mul_fast).
+    - Extract the limbs of x and y into separate variables.
+    - Perform biased carry propagation on the limbs of x and y.
+    - Reduce the limbs of x and y to be nearly reduced modulo p.
+    - Encode the y-coordinate as a little-endian string of 32 octets, ensuring the most significant bit of the final octet is zero.
+    - Copy the least significant bit of the x-coordinate to the most significant bit of the final octet of the y-coordinate.
+    - Pack the modified y-coordinate into a `wv_t` type and return it.
+- **Output**: A `wv_t` type representing the encoded 32-octet string of the curve point.
+- **Functions called**:
+    - [`fd_r43x6_invert`](fd_r43x6.c.md#fd_r43x6_invert)
+    - [`fd_r43x6_mul_fast`](fd_r43x6.h.md#fd_r43x6_mul_fast)
+    - [`fd_r43x6_pack`](fd_r43x6.h.md#fd_r43x6_pack)
 
 
 ---
 ### fd\_r43x6\_ge\_decode<!-- {{#callable:fd_r43x6_ge_decode}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_r43x6_ge.c#L48>)
-
-Decodes a 32-octet string into a point on a curve, handling special cases for square roots and bit manipulations.
+The `fd_r43x6_ge_decode` function decodes a 32-byte string into a point on an elliptic curve, handling the complexities of modular arithmetic and square root calculations.
 - **Inputs**:
     - `_P03`: Pointer to store the first part of the decoded point.
     - `_P14`: Pointer to store the second part of the decoded point.
     - `_P25`: Pointer to store the third part of the decoded point.
-    - `_vs`: Pointer to the 32-octet string to decode.
-- **Logic and Control Flow**:
-    - Copy the 32-octet string into a 4-element array of `ulong` integers, interpreting it as a little-endian integer.
-    - Extract the least significant bit of the last element as `x_0` and clear this bit to recover the y-coordinate.
-    - Unpack the y-coordinate using [`fd_r43x6_unpack`](<fd_r43x6.h.md#fd_r43x6_unpack>).
-    - Calculate `u = y^2 - 1` and `v = d y^2 + 1` using the curve equation.
-    - Compute the candidate root `x` using modular arithmetic and a single modular powering operation.
-    - Check three cases to determine if `x` is a valid square root, adjusting `x` if necessary.
-    - Use `x_0` to select the correct square root, failing if `x` is zero and `x_0` is one.
-    - If `x_0` does not match `x mod 2`, adjust `x` by negating it.
-    - Pack the decoded point into the provided pointers and return 0 on success.
-    - If any checks fail, set the output pointers to zero and return -1.
-- **Output**: Returns 0 on successful decoding, or -1 if decoding fails.
-- **Functions Called**:
-    - [`fd_r43x6_unpack`](<fd_r43x6.h.md#fd_r43x6_unpack>)
-    - [`fd_r43x6_pow22523`](<fd_r43x6.c.md#fd_r43x6_pow22523>)
-    - [`fd_r43x6_is_nonzero`](<fd_r43x6.h.md#fd_r43x6_is_nonzero>)
-    - [`fd_r43x6_diagnose`](<fd_r43x6.h.md#fd_r43x6_diagnose>)
+    - `_vs`: Pointer to the 32-byte string representing the encoded point.
+- **Control Flow**:
+    - Copy the 32-byte input into a 4-element array of unsigned longs, interpreting it as a little-endian integer.
+    - Extract the least significant bit of the last byte to determine the x-coordinate's least significant bit (x_0).
+    - Clear the most significant bit of the last byte to recover the y-coordinate.
+    - Calculate y^2, then compute u = y^2 - 1 and v = d * y^2 + 1 using predefined constants for the curve.
+    - Compute the candidate x-coordinate using modular arithmetic and exponentiation.
+    - Check if the candidate x satisfies the curve equation, adjusting x if necessary using modular arithmetic tricks.
+    - Use the x_0 bit to select the correct square root, ensuring the decoded point is valid.
+    - Pack the decoded x and y coordinates into the output pointers, or set them to zero if decoding fails.
+- **Output**: Returns 0 on successful decoding of the point, or -1 if decoding fails.
+- **Functions called**:
+    - [`fd_r43x6_unpack`](fd_r43x6.h.md#fd_r43x6_unpack)
+    - [`fd_r43x6_pow22523`](fd_r43x6.c.md#fd_r43x6_pow22523)
+    - [`fd_r43x6_is_nonzero`](fd_r43x6.h.md#fd_r43x6_is_nonzero)
+    - [`fd_r43x6_diagnose`](fd_r43x6.h.md#fd_r43x6_diagnose)
 
 
 ---
 ### fd\_r43x6\_ge\_decode2<!-- {{#callable:fd_r43x6_ge_decode2}} -->
-[View Source →](<../../../../../../src/ballet/ed25519/avx512/fd_r43x6_ge.c#L163>)
-
-Decodes two encoded elliptic curve points from byte arrays into internal representations, handling potential decoding failures.
+The `fd_r43x6_ge_decode2` function decodes two encoded elliptic curve points from given byte arrays into their respective internal representations, handling potential decoding failures.
 - **Inputs**:
     - `_Pa03`: Pointer to store the first part of the decoded point A.
     - `_Pa14`: Pointer to store the second part of the decoded point A.
@@ -86,25 +78,24 @@ Decodes two encoded elliptic curve points from byte arrays into internal represe
     - `_Pb14`: Pointer to store the second part of the decoded point B.
     - `_Pb25`: Pointer to store the third part of the decoded point B.
     - `_vsb`: Pointer to the byte array representing the encoded point B.
-- **Logic and Control Flow**:
-    - Initialize constants `one`, `d`, and `sqrt_m1` for calculations.
-    - Copy the byte arrays `_vsa` and `_vsb` into aligned arrays `_sa` and `_sb`.
-    - Extract the y-coordinates and the least significant bit of the x-coordinates from `_sa` and `_sb`.
-    - Clear the most significant bit of the y-coordinates in `_sa` and `_sb`.
-    - Unpack the y-coordinates into `fd_r43x6_t` format for both points.
-    - Calculate `ysqa` and `ysqb` as the square of the y-coordinates for both points.
-    - Compute `ua`, `ub`, `va`, and `vb` using the curve equation components for both points.
-    - Calculate powers and products to find potential x-coordinates `xa` and `xb`.
-    - Check conditions to determine if the calculated x-coordinates are valid square roots.
-    - Adjust x-coordinates based on the least significant bit of the original x-coordinates.
-    - Pack the decoded points into the provided pointers `_Pa` and `_Pb`.
-    - Return 0 if successful, or -1/-2 if decoding fails for point A or B respectively.
+- **Control Flow**:
+    - Initialize constants for calculations, including one, d, and sqrt_m1.
+    - Copy the input byte arrays into aligned ulong arrays for both points A and B.
+    - Extract the y-coordinates and the least significant bit of the x-coordinate from the input data for both points.
+    - Clear the most significant bit of the y-coordinates to recover the y values for both points.
+    - Calculate y^2 for both points and derive u and v values using the curve equation.
+    - Compute v^2, v^4, v^3, u*v^3, and u*v^7 for both points to prepare for modular exponentiation.
+    - Calculate the candidate x values using modular exponentiation and multiplication for both points.
+    - Check if the calculated x values satisfy the curve equation for both points, adjusting with sqrt_m1 if necessary.
+    - Determine the correct x value based on the least significant bit of the original x-coordinate for both points.
+    - Pack the decoded x and y values into the output format for both points.
+    - Handle failure cases by zeroing the output and returning error codes.
 - **Output**: Returns 0 on successful decoding of both points, -1 if decoding of point A fails, and -2 if decoding of point B fails.
-- **Functions Called**:
-    - [`fd_r43x6_ge_decode`](<#fd_r43x6_ge_decode>)
-    - [`fd_r43x6_unpack`](<fd_r43x6.h.md#fd_r43x6_unpack>)
-    - [`fd_r43x6_is_nonzero`](<fd_r43x6.h.md#fd_r43x6_is_nonzero>)
-    - [`fd_r43x6_diagnose`](<fd_r43x6.h.md#fd_r43x6_diagnose>)
+- **Functions called**:
+    - [`fd_r43x6_ge_decode`](#fd_r43x6_ge_decode)
+    - [`fd_r43x6_unpack`](fd_r43x6.h.md#fd_r43x6_unpack)
+    - [`fd_r43x6_is_nonzero`](fd_r43x6.h.md#fd_r43x6_is_nonzero)
+    - [`fd_r43x6_diagnose`](fd_r43x6.h.md#fd_r43x6_diagnose)
 
 
 
