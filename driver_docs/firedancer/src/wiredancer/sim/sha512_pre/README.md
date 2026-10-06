@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for simulating `sha512_pre` with Verilog and Cocotb; test.py for SHA-512 pre-processing tests.
+The `sha512_pre` folder in the `firedancer` codebase contains configuration and testing scripts for simulating and verifying the SHA-512 preprocessing logic using Verilog and cocotb.
 
 
 ## Files
-- **[Makefile](Makefile.md)**: Makefile for simulating the `sha512_pre` module using Verilog sources and Cocotb.
-- **[test.py](test.py.md)**: A test for SHA-512 pre-processing using the cocotb framework with random message lengths and conditions.
+- **[Makefile](Makefile.md)**: The `Makefile` in the `firedancer/src/wiredancer/sim/sha512_pre` directory is used to configure and run simulations for the `sha512_pre` module using the Questa simulator with Verilog sources.
+- **[test.py](test.py.md)**: The `test.py` file in the `firedancer` codebase is a cocotb-based test script for simulating and verifying the SHA-512 preprocessing logic in a hardware design.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

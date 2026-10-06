@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Expected output for refactoring calls to memcpy, fd_memcpy, and __builtin_memcpy as assignments.
+CodeQL test expectations for memcpy calls that can be rewritten as assignments.
 
 # Purpose
-The content provides a list of code analysis results for the file `TrivialMemcpy.c`, identifying specific lines where calls to memory copy functions can be optimized. Each entry specifies the line numbers and the function call, such as `memcpy`, `fd_memcpy`, or `__builtin_memcpy`, and suggests that these calls could be replaced with direct assignments. The analysis aims to improve code efficiency by recommending simpler operations where possible. The entries are organized by line number and include a note indicating the context or variable, such as `foo` or `with_array`, where the optimization can be applied. This information is useful for developers looking to enhance performance by reducing unnecessary function calls.
+This file records static analysis findings for `TrivialMemcpy.c` and lists each source location where a trivial memory copy call was detected. Each entry identifies the line and column range, the function call name such as `memcpy`, `fd_memcpy`, or `__builtin_memcpy`, and the rule message that the call can be replaced by an assignment. The repeated entries show the same check applied to different code patterns, including cases named `foo` and `with_array`. This format is used to report code locations that can be simplified and to support review or automated cleanup of redundant copy operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

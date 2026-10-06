@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing XDP tile components with conditional sandbox support.
+Build rules for fd_xdp_tile and related unit tests when alloca and sandbox are supported.
 
 # Purpose
-This Makefile script conditionally adds object files and defines unit tests based on the presence of certain features. If `FD_HAS_ALLOCA` is defined, it adds the object files `fd_xdp_tile` and `fd_disco`. If `FD_ARCH_SUPPORTS_SANDBOX` is also defined, it creates and runs unit tests `test_xdp_tile` and `test_xdp_tile1`, which depend on various components such as `fd_disco`, `fd_tango`, `fd_waltz`, and others. The script ensures that these tests are only executed when the necessary architecture and feature support are available.
+This Makefile fragment adds `fd_xdp_tile` to the `fd_disco` object list when `FD_HAS_ALLOCA` is set. When `FD_ARCH_SUPPORTS_SANDBOX` is also set, it defines the `test_xdp_tile` and `test_xdp_tile1` unit tests with their required object dependencies, then schedules both tests to run.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
