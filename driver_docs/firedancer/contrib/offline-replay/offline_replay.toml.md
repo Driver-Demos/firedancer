@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Offline replay configuration with archiver, replay, runtime, consensus, log, path, snapshot, and gossip settings.
+Configuration settings for offline replay in the Firedancer codebase.
 
 # Purpose
-This configuration file defines the runtime layout and service settings for a node process. It enables the `archiver` tile with `rocksdb` ingest storage, sets the `replay` tile cluster version, and disables the `gui` tile. It also configures memory and record limits in `funk`, sets runtime limits for live slots, fork width, and program cache size, and turns off voting and several development features. The file defines log output, snapshot storage paths, snapshot download behavior, and a single gossip entrypoint for network startup.
+The configuration file defines various settings for a software application. The `[layout]` section specifies the `shred_tile_count`, which is set to 4. The `[tiles]` section configures different components such as `archiver`, `replay`, and `gui`, with specific settings like enabling the archiver and setting the ingest mode to `rocksdb`. The `[funk]` section sets parameters for memory management, including `heap_size_gib` and `max_account_records`. The `[runtime]` section configures execution parameters, such as `max_live_slots` and `max_fork_width`, and includes a sub-section for `program_cache` with a specified `heap_size_mib`. The `[consensus]` section has a `vote` setting, while the `[development]` section includes flags for development features like `sandbox` and `no_clone`. The `[log]` section specifies logging configurations, including the log level and path. The `[paths]` section defines the location for `snapshots`, and the `[snapshots]` section manages snapshot-related settings, such as download options and speed limits. Finally, the `[gossip]` section lists network entry points.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

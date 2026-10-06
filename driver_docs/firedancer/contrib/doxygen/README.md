@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build scripts and settings for generating Doxygen HTML API docs from source and README.md
+Doxygen-related version control, build script, and configuration file for documentation generation.
 
 
 ## Files
-- **[.gitignore](.gitignore.md)**: Ignores doxygen, opt, and dist directories.
-- **[build.sh](build.sh.md)**: Builds Doxygen from source and runs it to generate documentation output.
-- **[Doxyfile](Doxyfile.md)**: Doxygen settings for HTML API docs from README.md and selected source paths.
+- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in version control for Doxygen-related content.
+- **[build.sh](build.sh.md)**: Build script for downloading, building, and running Doxygen with specific configurations.
+- **[Doxyfile](Doxyfile.md)**: Configuration file for Doxygen documentation generation in the Firedancer project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

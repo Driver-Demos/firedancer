@@ -3,10 +3,38 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GRE header definition with flags_version and protocol fields.
+Defines a union for a GRE header with flags, version, and protocol fields.
 
 # Purpose
-Defines the `fd_gre_hdr` data type for a GRE network header. The header contains two 16-bit fields, `flags_version` and `protocol`, and also provides a 4-byte `uc` view of the same data. The macro `FD_GRE_HDR_FLG_VER_BASIC` defines the basic GRE flags and version value, and the comments state that the fields are stored in network byte order. The file also creates the alias `fd_gre_hdr_t` for the union type and uses include guards to prevent multiple inclusion.
+This code is a C header file that defines a data structure for handling Generic Routing Encapsulation (GRE) headers. It includes a macro `FD_GRE_HDR_FLG_VER_BASIC` that represents a basic flag and version combination for GRE headers. The `fd_gre_hdr` union is defined to represent a GRE header, containing a structure with two `ushort` fields: `flags_version` and `protocol`, which should be in network byte order. The union also provides an alternative view of the header as an array of four `uchar` elements. The `fd_gre_hdr_t` type is defined as an alias for the `fd_gre_hdr` union, facilitating its use in other parts of the program.
+# Imports and Dependencies
+
+---
+- `../bits/fd_bits.h`
+
+
+# Data Structures
+
+---
+### fd\_gre\_hdr
+- **Type**: ``union``
+- **Members**:
+    - ``flags_version``: A `ushort` field that should be `FD_GRE_HDR_FLG_VER_BASIC` in network byte order.
+    - ``protocol``: A `ushort` field that should be `FD_ETH_HDR_TYPE_IP` in network byte order.
+    - ``uc``: An array of 4 `uchar` elements providing raw access to the data.
+- **Description**: Defines a `union` that represents a GRE (Generic Routing Encapsulation) header, allowing access to the header fields either as a structured pair of `ushort` values (`flags_version` and `protocol`) or as a raw byte array (`uc`).
+
+
+---
+### fd\_gre\_hdr\_t
+- **Type**: `union`
+- **Members**:
+    - `flags_version`: A 16-bit field that should be set to `FD_GRE_HDR_FLG_VER_BASIC` in network byte order.
+    - `protocol`: A 16-bit field that should be set to `FD_ETH_HDR_TYPE_IP` in network byte order.
+    - `uc`: An array of 4 unsigned characters that provides raw access to the header data.
+- **Description**: Defines a union for a GRE (Generic Routing Encapsulation) header, allowing access to the header fields either as structured fields (`flags_version` and `protocol`) or as a raw byte array (`uc`).
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
