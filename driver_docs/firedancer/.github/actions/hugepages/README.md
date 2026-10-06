@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Action to set up 1 GiB and 2 MiB huge pages
+GitHub Action to set up 1 GiB gigantic pages with configurable huge and gigantic page counts.
 
 
 ## Files
-- **[action.yml](action.yml.md)**: GitHub Action to set up 1 GiB and 2 MiB huge pages
+- **[action.yml](action.yml.md)**: GitHub Action to set up 1 GiB gigantic pages with configurable huge and gigantic page counts.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

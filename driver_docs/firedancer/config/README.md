@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile build settings, rules, and fragments for tools, flags, targets, tests, coverage, and cleanup.
+Makefile configurations for build options, environments, compiler settings, and project management.
 
 ## Folders
-- **[extra](extra/README.md)**: Makefile fragments for build flags, sanitizers, fuzzing, linkers, architectures, and optional libraries.
-- **[machine](machine/README.md)**: Makefile build settings for Linux, FreeBSD, macOS, and CPU-specific Clang and GCC targets.
+- **[extra](extra/README.md)**: Makefile configurations for various build options, compiler settings, and library integrations.
+- **[machine](machine/README.md)**: Makefiles for configuring build environments with Clang and GCC across various architectures and operating systems.
 
 ## Files
-- **[base.mk](base.mk.md)**: Build tool and compiler settings, linker flags, fuzzing flags, and utility commands.
-- **[everything.mk](everything.mk.md)**: Make rules for builds, tests, coverage, frontend assets, and cleanup.
+- **[base.mk](base.mk.md)**: Makefile configuration for build settings, compiler flags, and toolchain parameters in the Firedancer project.
+- **[everything.mk](everything.mk.md)**: Makefile for building, testing, and cleaning various components, including binaries, libraries, and tests.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

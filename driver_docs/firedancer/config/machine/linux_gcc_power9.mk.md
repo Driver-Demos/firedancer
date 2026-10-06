@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_power9.mk` file in the `firedancer` codebase is a makefile configuration for building with GCC on Power9 architecture, including cross-compilation settings and various feature flags.
+Makefile for configuring GCC build settings for Power9 architecture in the Firedancer project.
 
 # Purpose
-The provided content is a Makefile, which is used to automate the build process of a software project. This Makefile is specifically configured for building software on a Power9 architecture using the GCC compiler. It sets up various flags and includes additional configuration files to tailor the build process, such as enabling optimizations, debugging, security features, and multi-threading support. The file also checks the machine architecture and sets up cross-compilation tools if the architecture is not `ppc64le`, ensuring compatibility with different environments. The `CPPFLAGS` and `LDFLAGS` are defined to include specific compiler and linker options, enhancing the build process with architecture-specific optimizations and capabilities.
+The Makefile configuration specifies the build environment and compilation settings for a software project targeting the Power9 architecture. It sets the build directory to `linux/gcc/power9` and includes several base and extra configuration files to extend the build setup. The `CPPFLAGS` and `LDFLAGS` are defined to include specific compiler and linker flags, such as `-mcpu=power9` for targeting the Power9 CPU and `-lm` for linking the math library. The file checks the machine architecture using `uname -m` and sets a cross-compilation flag if the architecture is not `ppc64le`. If cross-compilation is required, it defines the compiler and linker to use the PowerPC 64-bit little-endian GNU toolchain. Additional preprocessor flags are appended to `CPPFLAGS` to enable specific features like 128-bit integers, double precision, and stack allocation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_merlin.c` file contains a test for the Merlin transcript protocol, verifying the equivalence of generated challenge bytes against expected values.
+Tests the equivalence of a simple protocol using the Merlin transcript in the Firedancer codebase.
 
 # Purpose
-This C source code file is designed to test the functionality of the Merlin transcript protocol, which is a cryptographic protocol used for zero-knowledge proofs and other cryptographic applications. The code includes a main function that initializes a random number generator and calls a test function, [`test_equivalence_simple`](#test_equivalence_simple), to verify the correctness of the Merlin transcript operations. The test function initializes a Merlin transcript, appends a message to it, and generates a challenge. It then compares the generated challenge against an expected value to ensure the transcript operations are functioning as intended. The code uses functions from the Merlin library, such as `fd_merlin_transcript_init`, `fd_merlin_transcript_append_message`, and `fd_merlin_transcript_challenge_bytes`, to perform these operations.
+The code is a C program designed to test the functionality of the `fd_merlin_transcript` component, which is part of a cryptographic library. It includes headers from different directories, indicating dependencies on external modules such as `fd_merlin`, `fd_flamenco`, and `fd_hex`. The program focuses on verifying the equivalence of cryptographic operations by initializing a `fd_merlin_transcript_t` object, appending a message, and generating a challenge. It then compares the generated challenge bytes to an expected value using `memcmp` to ensure correctness.
 
-The file includes headers for the Merlin and Flamenco libraries, indicating that it relies on external cryptographic and utility functions. The code is structured as a standalone executable, with a [`main`](#main) function that serves as the entry point. It does not define public APIs or external interfaces but rather focuses on internal testing of the Merlin protocol's functionality. The use of static functions and the inclusion of commented-out debugging code suggest that this file is intended for development and testing purposes rather than production use. The test ensures that the cryptographic operations produce consistent and expected results, which is crucial for the reliability of cryptographic protocols.
+The [`main`](<#main>) function initializes the environment and a random number generator, then calls the [`test_equivalence_simple`](<#test_equivalence_simple>) function to perform the test. The program logs a notice if the test passes and concludes by halting the environment. The commented-out sections suggest additional debugging capabilities, such as printing the internal state of the `fd_merlin_strobe128_t` context, which are not active in the current implementation. This code serves as a test suite to validate the integrity and correctness of the cryptographic transcript operations within the library.
 # Imports and Dependencies
 
 ---
@@ -21,39 +21,43 @@ The file includes headers for the Merlin and Flamenco libraries, indicating that
 
 ---
 ### test\_equivalence\_simple<!-- {{#callable:test_equivalence_simple}} -->
-The function `test_equivalence_simple` initializes a Merlin transcript, appends a message, generates a challenge, and verifies the challenge against an expected value.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/merlin/test_merlin.c#L19>)
+
+Verifies that a generated challenge matches an expected value using the Merlin transcript protocol.
 - **Inputs**:
-    - `rng`: An unused pointer to a random number generator context (`fd_rng_t *`).
-- **Control Flow**:
+    - `rng`: A pointer to a random number generator object, marked as unused in this function.
+- **Logic and Control Flow**:
     - Initialize a Merlin transcript with the label 'test protocol'.
     - Append a message with the label 'some label' and data 'some data' to the transcript.
-    - Generate a 32-byte challenge from the transcript using the label 'challenge'.
-    - Decode a 32-byte expected value from a hexadecimal string.
-    - Compare the generated challenge with the expected value using `memcmp`.
-    - Assert that the comparison result is zero, indicating equivalence.
-- **Output**: The function does not return a value; it performs an assertion to verify the equivalence of the generated challenge and the expected value.
-- **Functions called**:
-    - [`fd_merlin_transcript_init`](fd_merlin.c.md#fd_merlin_transcript_init)
-    - [`fd_merlin_transcript_append_message`](fd_merlin.c.md#fd_merlin_transcript_append_message)
-    - [`fd_merlin_transcript_challenge_bytes`](fd_merlin.c.md#fd_merlin_transcript_challenge_bytes)
+    - Generate a challenge of 32 bytes from the transcript with the label 'challenge'.
+    - Decode a predefined expected 32-byte hexadecimal string into the `expected` array.
+    - Compare the generated `challenge` with the `expected` array using `memcmp`.
+    - Use `FD_TEST` to assert that the `challenge` matches the `expected` value.
+- **Output**: No output is returned, but the function asserts that the generated challenge matches the expected value, potentially terminating the program if the assertion fails.
+- **Functions Called**:
+    - [`fd_merlin_transcript_init`](<fd_merlin.c.md#fd_merlin_transcript_init>)
+    - [`fd_merlin_transcript_append_message`](<fd_merlin.c.md#fd_merlin_transcript_append_message>)
+    - [`fd_merlin_transcript_challenge_bytes`](<fd_merlin.c.md#fd_merlin_transcript_challenge_bytes>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, sets up a random number generator, tests a simple equivalence using a transcript, logs a success message, and then halts the program.
+[View Source →](<../../../../../../../../src/flamenco/runtime/program/zksdk/merlin/test_merlin.c#L35>)
+
+Initializes the environment, runs a test for equivalence, logs the result, and halts the program.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
+    - `argc`: The number of command-line arguments.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Create a random number generator object `_rng` and join it to `rng`.
-    - Call [`test_equivalence_simple`](#test_equivalence_simple) with the `rng` to perform a simple equivalence test.
-    - Log a notice message indicating the test passed using `FD_LOG_NOTICE`.
-    - Call `fd_halt` to cleanly terminate the program.
-    - Return 0 to indicate successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`test_equivalence_simple`](#test_equivalence_simple)
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Calls [`test_equivalence_simple`](<#test_equivalence_simple>) with `rng` to perform a test for equivalence.
+    - Logs a notice message 'pass' using `FD_LOG_NOTICE`.
+    - Calls `fd_halt` to terminate the program.
+    - Returns 0 to indicate successful execution.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`test_equivalence_simple`](<#test_equivalence_simple>)
 
 
 

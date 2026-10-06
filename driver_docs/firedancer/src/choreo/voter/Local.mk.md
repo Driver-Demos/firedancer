@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for voter headers, control binary, and unit test when int128 and hosted support exist.
+Makefile for building `fd_voter` components and unit tests with conditional compilation flags.
 
 # Purpose
-Build rules add the `fd_voter.h` header when `FD_HAS_INT128` is set. When `FD_HAS_HOSTED` is also set, the file defines the `fd_voter_ctl` binary and the `test_voter` unit test, and links both targets with `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util`.
+This Makefile script conditionally includes and builds components based on the presence of certain features. If `FD_HAS_INT128` is defined, it adds the header file `fd_voter.h`. If both `FD_HAS_INT128` and `FD_HAS_HOSTED` are defined, it compiles the binary `fd_voter_ctl` and the unit test `test_voter`, linking them with the libraries `fd_choreo`, `fd_flamenco`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

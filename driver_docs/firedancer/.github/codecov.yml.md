@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `codecov.yml` file in the `firedancer` codebase configures Codecov settings, disabling project and patch status checks, turning off comments, and enabling carryforward for `clusterfuzz` and `ledgers` flags.
+Configuration for Codecov coverage settings, disabling project and patch status, with specific flags.
 
 # Purpose
-This YAML configuration file is used to manage code coverage reporting settings for a project. It specifies that project-wide and patch-specific coverage status reporting are turned off, and comments are disabled. Additionally, it defines flags for "clusterfuzz" and "ledgers" with a "carryforward" option set to true, indicating that coverage data for these flags should be carried forward, likely for periodic or nightly reporting.
+The configuration file manages code coverage settings. It disables project and patch coverage status checks by setting `project` and `patch` to `off`. The `comment` option is set to `false`, indicating that comments are not added. The `flags` section includes `clusterfuzz` and `ledgers`, both with `carryforward` set to `true`, which indicates that coverage data for these flags is carried forward, with `clusterfuzz` specifically noted for nightly reporting.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
