@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ErrorDiscard.ql` file defines a CodeQL query to identify instances where a function returning an error code is called, but its return value is discarded, flagging it as a warning with low precision.
+Detects instances where a function's error code return value is discarded without handling.
 
 # Purpose
-This source code file defines a static analysis rule for identifying a specific coding issue related to error handling in C++ programs. The primary functionality of this code is to detect instances where a function that returns an error code is called, but the return value is not utilized or checked. This is a common issue in software development, as ignoring error codes can lead to unhandled exceptions and unpredictable program behavior. The code is structured to identify such occurrences and flag them as warnings, with a low precision level, indicating that the rule may produce false positives.
+This code defines a static analysis rule to identify instances where a function that returns an error code is called, but the return value is not used. The purpose of this rule is to detect potential issues in code where error handling might be neglected, which can lead to unhandled errors and unexpected behavior in software applications.
 
-The code is organized around a class `ErrFunction`, which extends a `Function` class, and a query that identifies function calls (`FunctionCall`) where the return value is discarded. The query checks several conditions to ensure that the function call is not part of a return statement, assignment, declaration, loop, macro expansion, or conditional statement. Additionally, it excludes calls within files that match a specific naming pattern, such as test or fuzz files, which are often used for testing purposes and may intentionally ignore error codes.
+The code uses a class `ErrFunction` that extends a `Function` class. The `ErrFunction` class is designed to identify functions that have a constant return type, which is typically used to return error codes. The logic then checks for function calls (`FunctionCall`) where the return value is not assigned, returned, or otherwise used in a statement (`Stmt`). It excludes certain types of statements such as `ReturnStmt`, `Assignment`, `DeclStmt`, `Loop`, `ConditionalStmt`, and macro expansions. Additionally, it filters out calls within files that match a specific naming pattern, such as test or fuzz files, to avoid false positives in test code.
 
-This file is part of a static analysis tool or framework, likely used to enforce coding standards or improve code quality by identifying potential issues in source code. It does not define a public API or external interface but rather contributes to the internal logic of the analysis tool by specifying a rule for error handling practices. The code imports modules `cpp` and `rettypes`, which suggests it leverages existing libraries or frameworks to analyze C++ code and handle return types.
+The code is part of a static analysis tool and is intended to be used as a rule or check within a larger framework. It does not define a public API or external interface but rather contributes to the internal logic of a static analysis system. The rule is categorized as a problem with a warning severity and low precision, indicating that while it may not always indicate a definite issue, it highlights areas of code that warrant further inspection.
 # Imports and Dependencies
 
 ---

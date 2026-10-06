@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_vinyl_io headers, objects, and unit tests.
+Makefile for adding headers, objects, and running unit tests for `fd_vinyl_io` components.
 
 # Purpose
-This Makefile fragment adds the `fd_vinyl_io.h` header and builds the `fd_vinyl_io`, `fd_vinyl_io_bd`, and `fd_vinyl_io_mm` object files into the `fd_vinyl` target. It also defines two unit test targets, `test_vinyl_io_bd` and `test_vinyl_io_mm`, links them with `fd_vinyl`, `fd_tango`, and `fd_util`, and runs both tests.
+This Makefile script automates the build and test process for components related to `fd_vinyl_io`. It adds header files and object files to the build using `add-hdrs` and `add-objs` functions. It defines unit tests for `test_vinyl_io_bd` and `test_vinyl_io_mm` with dependencies on `fd_vinyl`, `fd_tango`, and `fd_util` using `make-unit-test`. Finally, it executes the unit tests `test_vinyl_io_bd` and `test_vinyl_io_mm` using `run-unit-test`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

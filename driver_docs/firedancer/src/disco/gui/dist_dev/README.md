@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-HTML entry page, dependency licenses, and React UI assets for the app bundle
+HTML GUI, UI assets, and dependency license information.
 
 ## Folders
-- **[assets](assets/README.md)**: React UI, charts, state, validation, utility libraries, and dashboard styles
+- **[assets](assets/README.md)**: UI scripts, tree map components, and responsive styles.
 
 ## Files
-- **[index.html](index.html.md)**: HTML entry page that preloads assets and loads the Firedancer app bundle.
-- **[LICENSE_DEPENDENCIES](LICENSE_DEPENDENCIES.md)**: Third-party dependency license list for the GUI distribution.
+- **[index.html](index.html.md)**: HTML document for the Firedancer GUI with preloaded assets and a root div for content.
+- **[LICENSE_DEPENDENCIES](LICENSE_DEPENDENCIES.md)**: Lists dependencies with their licenses, versions, authors, and repository information.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
