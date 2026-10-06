@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `linux_gcc_zen2.mk` file in the `firedancer` codebase configures the build environment for GCC on Zen 2 architecture, including various optimizations and feature flags.
+Makefile for configuring GCC build settings for Zen 2 architecture with various optimizations and features.
 
 # Purpose
-The provided content is a Makefile, which is used to automate the build process of a software project. It specifies the build directory as `linux/gcc/zen2` and includes several configuration files that tailor the build process with specific features such as GCC support, x86-64 architecture, debugging, security, optimization, and threading. The file contains conditional logic to set compiler flags based on the version of GCC being used, ensuring compatibility with different processor architectures (znver1 or znver2). Additionally, it defines preprocessor flags (`CPPFLAGS`) to enable various hardware and software features, such as support for 128-bit integers, double precision, stack allocation, and several x86 instruction set extensions like SSE, AVX, SHANI, and AESNI, which are crucial for optimizing performance and security.
+The Makefile configures the build environment for a software project targeting the Zen 2 architecture using GCC. It sets the build directory to `linux/gcc/zen2` and includes several configuration files to enable specific features such as debugging, security, optimization, and threading. The file checks the GCC version and adjusts the compiler flags accordingly, using `znver1` for GCC version 8 and `znver2` for later versions. It defines preprocessor flags (`CPPFLAGS`) to enable various hardware and software features, such as 128-bit integers, double precision, and specific x86 instruction sets like SSE, AVX, SHANI, and AESNI. These flags ensure that the compiled code can utilize advanced processor capabilities for improved performance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
