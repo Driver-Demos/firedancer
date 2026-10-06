@@ -3,56 +3,56 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL queries and utilities for detecting various C++ code issues, including dereferencing, mismatches, overflow checks, and memory management.
+CodeQL queries for C++ bugs, memory errors, pointer issues, and lock checks.
 
 
 ## Files
-- **[AllocaCallInLoop.ql](AllocaCallInLoop.ql.md)**: Detects and warns about calls to alloca within loops to prevent stack overflows.
-- **[ArrayArgSizeMismatch.ql](ArrayArgSizeMismatch.ql.md)**: Finds function calls where an array argument is smaller than the declared parameter's array size.
-- **[AssignWhereCompareMeant.ql](AssignWhereCompareMeant.ql.md)**: Detects accidental use of '=' instead of '==' in C++ code, focusing on reliability and correctness.
-- **[BadAdditionOverflowCheck.ql](BadAdditionOverflowCheck.ql.md)**: Detects incorrect overflow checks in integer addition that can lead to reliability and security issues.
-- **[BadAdditionOverflowCheck.qll](BadAdditionOverflowCheck.qll.md)**: Implements the BadAdditionOverflowCheck query to detect incorrect overflow checks in C++ code.
-- **[BincodeCrdsValue.ql](BincodeCrdsValue.ql.md)**: CodeQL query to detect improper initialization of `fd_value_elem->data` using methods other than `fd_crds_value_encode`.
-- **[BitwiseSignCheck.ql](BitwiseSignCheck.ql.md)**: Detects potentially unsafe sign checks in bitwise operations in C++ code, issuing a warning.
-- **[BoundedPrintfLogging.ql](BoundedPrintfLogging.ql.md)**: Checks that custom runtime logging format strings do not exceed their fixed size target buffers.
-- **[BuiltinExpectScopeTooNarrow.ql](BuiltinExpectScopeTooNarrow.ql.md)**: Identifies and warns about the use of `__builtin_expect()` in non-conditional contexts in C++ code.
-- **[codeql-pack.lock.yml](codeql-pack.lock.yml.md)**: Specifies dependencies and their versions for a CodeQL pack.
-- **[ConstPureViolation.ql](ConstPureViolation.ql.md)**: Detects functions with const or pure attributes that illegally access pointers.
-- **[DoubleDelete.ql](DoubleDelete.ql.md)**: Detects double delete issues in C++ code, emphasizing non-idempotent delete functions.
-- **[DoubleLeave.ql](DoubleLeave.ql.md)**: Detects and warns about operations on objects that are not properly joined before use in C++ code.
-- **[DubiousNullCheck.ql](DubiousNullCheck.ql.md)**: Detects misleading NULL checks on non-first field addresses in C++ code, issuing a warning.
-- **[filter.qll](filter.qll.md)**: Excludes specific code from analysis based on file path prefixes.
-- **[FootprintBound.ql](FootprintBound.ql.md)**: Detects structs that do not fit within their defined footprint macros, issuing warnings.
-- **[GenericDoubleFree.qll](GenericDoubleFree.qll.md)**: Defines a data flow configuration to detect double free vulnerabilities in C++ code.
-- **[IncorrectPointerScalingCommon.qll](IncorrectPointerScalingCommon.qll.md)**: Shared utilities for CWE-468 queries, including functions for analyzing pointer arithmetic and `sizeof` expressions.
-- **[LossyPointerCast.ql](LossyPointerCast.ql.md)**: Detects lossy pointer casts where a pointer type is converted to a smaller integer type, potentially causing data loss.
-- **[MemsetMayBeDeleted.ql](MemsetMayBeDeleted.ql.md)**: Detects potential deletion of `memset` calls that clear unused private data, posing security risks.
-- **[MetricsEnumAccess.ql](MetricsEnumAccess.ql.md)**: Detects issues with FD_METRICS_ENUM_%_CNT and FD_METRICS_ENUM_%_IDX macros in array accesses.
-- **[MismatchedMemset.ql](MismatchedMemset.ql.md)**: Detects potential mismatches in memset size arguments where the type of the first argument differs from the sizeof type.
-- **[MissingBankEndCall.ql](MissingBankEndCall.ql.md)**: Detects missing end calls for bank locking operations on divergent return paths in C++ code.
-- **[MissingRwlockUnlock.ql](MissingRwlockUnlock.ql.md)**: Detects functions where an `fd_rwlock` is not unlocked on all code paths, issuing a warning.
-- **[MmapRetvalCmp.ql](MmapRetvalCmp.ql.md)**: Detects unverified mmap calls by identifying paths where mmap return values are not compared to MAP_FAILED.
-- **[NoDupMagic.ql](NoDupMagic.ql.md)**: Detects duplicate magic constants in code to prevent type confusion.
-- **[NoMagicCheck.ql](NoMagicCheck.ql.md)**: Identifies functions with a magic field that do not check or reset it, issuing a warning.
-- **[NonAnnotatedFormatFunction.ql](NonAnnotatedFormatFunction.ql.md)**: Detects calls to functions that likely expect a format string but lack a format annotation.
-- **[NonBinaryIsFunction.ql](NonBinaryIsFunction.ql.md)**: Identifies functions with `is` prefix that return non-boolean values.
-- **[NoNullShorcircuit.ql](NoNullShorcircuit.ql.md)**: Detects potential null pointer access without short-circuiting in C++ code, issuing a warning.
-- **[PointerOverflow.ql](PointerOverflow.ql.md)**: Detects pointer overflow issues in C++ code that can lead to memory corruption, with high precision.
-- **[qlpack.yml](qlpack.yml.md)**: Configuration for a CodeQL package with C++ extractor and dependencies for nightly queries.
-- **[RedundantNullCheck.ql](RedundantNullCheck.ql.md)**: Detects redundant null checks in C++ code where a pointer is checked for nullness after being dereferenced.
-- **[ReturnStackAllocatedMemory.ql](ReturnStackAllocatedMemory.ql.md)**: Detects functions that return pointers to stack-allocated memory, which can cause dangling pointer issues.
-- **[SeqCmp.ql](SeqCmp.ql.md)**: Identifies sequence number comparisons not using fd_seq_* functions, issuing a low-precision warning.
-- **[SurelyWrongConstPure.ql](SurelyWrongConstPure.ql.md)**: Checks for calls to known non-const/non-pure functions by functions marked as const or pure.
-- **[SuspiciousAddWithSizeof.ql](SuspiciousAddWithSizeof.ql.md)**: Detects suspicious pointer arithmetic with `sizeof` that can cause buffer overflows in C++ code.
-- **[SuspiciousIndexMaxComparison.ql](SuspiciousIndexMaxComparison.ql.md)**: Detects suspicious comparisons between index-based and max-sized expressions that can cause off-by-one errors.
-- **[SwappedParameters.ql](SwappedParameters.ql.md)**: Detects swapped parameters in C++ functions where the definition and implementation do not match.
-- **[TileUnionMismatch.ql](TileUnionMismatch.ql.md)**: Detects tile union type confusion in C++ code by identifying mismatches between tile union members and their source files.
-- **[TrivialMemcpy.ql](TrivialMemcpy.ql.md)**: Identifies `memcpy` calls that can be replaced with assignment for better maintainability and readability.
-- **[TrivialMemcpyWrong.ql](TrivialMemcpyWrong.ql.md)**: Detects incorrect `memcpy` size arguments when destination and source pointer types differ in size.
-- **[UnclearOperatorPrecedence.ql](UnclearOperatorPrecedence.ql.md)**: Identifies unparenthesised binary bitwise operations with comparison operations as operands.
-- **[UnsignedGEZero.ql](UnsignedGEZero.ql.md)**: Detects redundant unsigned comparisons to zero in C++ code, which may indicate a potential bug.
-- **[UnsignedGEZero.qll](UnsignedGEZero.qll.md)**: Classes and predicates for the UnsignedGEZero query, used to avoid duplicate results with PointlessComparison.
-- **[UseInOwnInitializer.ql](UseInOwnInitializer.ql.md)**: Detects and warns about variables used in their own initializers, which can cause undefined behavior.
+- **[AllocaCallInLoop.ql](AllocaCallInLoop.ql.md)**: CodeQL query that flags alloca calls inside loops to avoid stack overflows.
+- **[ArrayArgSizeMismatch.ql](ArrayArgSizeMismatch.ql.md)**: The `ArrayArgSizeMismatch.ql` file in the `firedancer` codebase identifies function calls in C++ where an array argument is smaller than the expected parameter size, potentially leading to out-of-bounds memory access.
+- **[AssignWhereCompareMeant.ql](AssignWhereCompareMeant.ql.md)**: The `AssignWhereCompareMeant.ql` file in the `firedancer` codebase defines a CodeQL query to detect instances in C++ code where the assignment operator '=' may have been mistakenly used instead of the comparison operator '==', potentially leading to reliability and correctness issues.
+- **[BadAdditionOverflowCheck.ql](BadAdditionOverflowCheck.ql.md)**: The `BadAdditionOverflowCheck.ql` file in the `firedancer` codebase identifies problematic checks for integer addition overflow that fail when the result is promoted to a larger type, highlighting it as a high-severity security issue.
+- **[BadAdditionOverflowCheck.qll](BadAdditionOverflowCheck.qll.md)**: The `BadAdditionOverflowCheck.qll` file implements a query to detect potentially faulty overflow checks in addition operations within C++ code, ensuring that the checks are not invalidated by automatic type promotions.
+- **[BincodeCrdsValue.ql](BincodeCrdsValue.ql.md)**: CodeQL path query flagging non-fd_crds_value_encode writes to fd_value_elem->data
+- **[BitwiseSignCheck.ql](BitwiseSignCheck.ql.md)**: The `BitwiseSignCheck.ql` file in the `firedancer` codebase defines a CodeQL query to identify potentially unsafe sign checks of bitwise operations in C++ code, flagging them as warnings for reliability and correctness.
+- **[BoundedPrintfLogging.ql](BoundedPrintfLogging.ql.md)**: CodeQL checks for custom printf format strings that exceed fixed-size log buffers.
+- **[BuiltinExpectScopeTooNarrow.ql](BuiltinExpectScopeTooNarrow.ql.md)**: The `BuiltinExpectScopeTooNarrow.ql` file identifies and warns about the use of `__builtin_expect()` in non-conditional contexts within the `firedancer` codebase.
+- **[codeql-pack.lock.yml](codeql-pack.lock.yml.md)**: CodeQL pack lock file listing dependency versions.
+- **[ConstPureViolation.ql](ConstPureViolation.ql.md)**: CodeQL query that flags const or pure functions with illegal pointer access.
+- **[DoubleDelete.ql](DoubleDelete.ql.md)**: CodeQL query for double-delete paths from _new to _delete functions.
+- **[DoubleLeave.ql](DoubleLeave.ql.md)**: CodeQL path query for double-leave warnings in C++ data flow.
+- **[DubiousNullCheck.ql](DubiousNullCheck.ql.md)**: The `DubiousNullCheck.ql` file in the `firedancer` codebase defines a CodeQL query to identify misleading NULL checks on non-first fields of a structure, which are flagged as a reliability and readability issue with a warning severity.
+- **[filter.qll](filter.qll.md)**: Filters locations to include only files under src/ for CodeQL analysis.
+- **[FootprintBound.ql](FootprintBound.ql.md)**: CodeQL query that flags structs that do not fit in their footprint macro.
+- **[GenericDoubleFree.qll](GenericDoubleFree.qll.md)**: The `GenericDoubleFree.qll` file in the `firedancer` codebase defines a CodeQL module for detecting double free vulnerabilities by configuring data flow analysis to identify sources, barriers, and sinks related to potential double free operations.
+- **[IncorrectPointerScalingCommon.qll](IncorrectPointerScalingCommon.qll.md)**: The `IncorrectPointerScalingCommon.qll` file provides shared utilities for CWE-468 queries, focusing on analyzing and handling pointer arithmetic and type expressions in C++ code.
+- **[LossyPointerCast.ql](LossyPointerCast.ql.md)**: The `LossyPointerCast.ql` file in the `firedancer` codebase defines a query to detect instances where a pointer type is converted to a smaller integer type, potentially leading to information loss and non-portability issues, and flags these occurrences with a warning.
+- **[MemsetMayBeDeleted.ql](MemsetMayBeDeleted.ql.md)**: The `MemsetMayBeDeleted.ql` file in the `firedancer` codebase defines a CodeQL query to identify calls to `memset` that may be removed by the compiler, potentially leading to information-leak vulnerabilities.
+- **[MetricsEnumAccess.ql](MetricsEnumAccess.ql.md)**: CodeQL query for metric enum array access mismatches and out-of-bounds reads or writes.
+- **[MismatchedMemset.ql](MismatchedMemset.ql.md)**: The `MismatchedMemset.ql` file in the `firedancer` codebase detects potential issues where the `memset` function is called with a size that does not match the type of the first argument, issuing a warning when a mismatch is found.
+- **[MissingBankEndCall.ql](MissingBankEndCall.ql.md)**: Finds paths missing a matching fd_bank_*_end_locking_* call after locking operations.
+- **[MissingRwlockUnlock.ql](MissingRwlockUnlock.ql.md)**: CodeQL query that flags fd_rwlock calls with a return path lacking an unlock.
+- **[MmapRetvalCmp.ql](MmapRetvalCmp.ql.md)**: CodeQL query flagging mmap calls whose return value is compared with -1 instead of checked for failure.
+- **[NoDupMagic.ql](NoDupMagic.ql.md)**: CodeQL query that flags duplicate magic constants in src macros.
+- **[NoMagicCheck.ql](NoMagicCheck.ql.md)**: CodeQL query that flags delete or join functions missing a magic-field check or reset.
+- **[NonAnnotatedFormatFunction.ql](NonAnnotatedFormatFunction.ql.md)**: The `NonAnnotatedFormatFunction.ql` file in the `firedancer` codebase identifies calls to functions that likely expect a format string but are not annotated as such, issuing a warning for potential issues.
+- **[NonBinaryIsFunction.ql](NonBinaryIsFunction.ql.md)**: CodeQL query that flags `is`-named functions with non-boolean return ranges.
+- **[NoNullShorcircuit.ql](NoNullShorcircuit.ql.md)**: CodeQL query for potential null pointer checks followed by non-short-circuit access.
+- **[PointerOverflow.ql](PointerOverflow.ql.md)**: The `PointerOverflow.ql` file in the `firedancer` codebase defines a query to detect pointer overflow checks in C++ code, which can lead to undefined behavior and potential memory corruption.
+- **[qlpack.yml](qlpack.yml.md)**: The `qlpack.yml` file specifies the configuration for a CodeQL package named `asymmetric-research/fd-nightly-queries`, including its version, extractor, and dependencies.
+- **[RedundantNullCheck.ql](RedundantNullCheck.ql.md)**: The `RedundantNullCheck.ql` file in the `firedancer` codebase defines a CodeQL query to identify and report errors where a null check is performed on a pointer after it has already been dereferenced, which is redundant and potentially incorrect.
+- **[ReturnStackAllocatedMemory.ql](ReturnStackAllocatedMemory.ql.md)**: The `ReturnStackAllocatedMemory.ql` file in the `firedancer` codebase defines a CodeQL query to detect functions that return pointers to stack-allocated memory, which can lead to dereferencing dangling pointers, and it includes configurations for identifying such problematic flows with high precision and security severity.
+- **[SeqCmp.ql](SeqCmp.ql.md)**: The `SeqCmp.ql` file in the `firedancer` codebase identifies relational comparisons of sequence numbers that do not utilize the `fd_seq_*` functions, issuing a warning to use appropriate sequence comparison functions instead.
+- **[SurelyWrongConstPure.ql](SurelyWrongConstPure.ql.md)**: Flags const or pure functions that transitively call known non-const functions.
+- **[SuspiciousAddWithSizeof.ql](SuspiciousAddWithSizeof.ql.md)**: The `SuspiciousAddWithSizeof.ql` file in the `firedancer` codebase defines a CodeQL query to identify potentially dangerous pointer arithmetic expressions that could lead to buffer overflow conditions due to incorrect scaling, specifically when the pointer type is not `char*` or `void*`.
+- **[SuspiciousIndexMaxComparison.ql](SuspiciousIndexMaxComparison.ql.md)**: CodeQL rule that flags suspicious comparisons between index-based and max-sized expressions.
+- **[SwappedParameters.ql](SwappedParameters.ql.md)**: The `SwappedParameters.ql` file in the `firedancer` codebase detects cases where function parameters are swapped between the definition and implementation, potentially leading to bugs if the parameters are of the same type.
+- **[TileUnionMismatch.ql](TileUnionMismatch.ql.md)**: CodeQL query that flags tile union member accesses in mismatched tile source files.
+- **[TrivialMemcpy.ql](TrivialMemcpy.ql.md)**: CodeQL query that flags `memcpy` calls that could be rewritten as assignments.
+- **[TrivialMemcpyWrong.ql](TrivialMemcpyWrong.ql.md)**: The `TrivialMemcpyWrong.ql` file in the `firedancer` codebase defines a CodeQL query to identify potential errors in `memcpy` calls where the size argument may not match the sizes of the source and destination types, suggesting the use of an assignment expression instead.
+- **[UnclearOperatorPrecedence.ql](UnclearOperatorPrecedence.ql.md)**: Lists unparenthesized comparison operands in binary bitwise operations.
+- **[UnsignedGEZero.ql](UnsignedGEZero.ql.md)**: The `UnsignedGEZero.ql` file in the `firedancer` codebase defines a CodeQL query that identifies redundant comparisons of unsigned values to zero, which may indicate a potential bug, and flags them with a warning for maintainability and readability.
+- **[UnsignedGEZero.qll](UnsignedGEZero.qll.md)**: The `UnsignedGEZero.qll` file defines classes and predicates for implementing the UnsignedGEZero query, which identifies pointless comparisons of unsigned values to zero, and is also utilized by the more general PointlessComparison query to prevent duplicate reporting.
+- **[UseInOwnInitializer.ql](UseInOwnInitializer.ql.md)**: The `UseInOwnInitializer.ql` file in the `firedancer` codebase defines a CodeQL query to identify instances where a variable is used in its own initializer, which can lead to undefined behavior, and flags these occurrences with a warning for maintainability and correctness.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
