@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `main.c` file in the `firedancer` codebase implements a wrapper to enable debugging with elevated capabilities in VS Code by managing process capabilities and executing GDB with the necessary permissions.
+A wrapper for running programs with all capabilities to support debugging in VS Code.
 
 # Purpose
-This C source code file implements a specialized wrapper program designed to facilitate debugging with Visual Studio Code (VS Code) by enabling the execution of a program with elevated capabilities, rather than root privileges. The primary challenge addressed by this code is the need to run a program with root-level capabilities for debugging purposes without actually running it as the root user, which is restricted by security policies and limitations in VS Code's debugging agent. The program achieves this by manipulating Linux capabilities, allowing the program to execute with all necessary permissions while maintaining compatibility with the VS Code debugging environment.
+The code is a C program designed to facilitate debugging with Visual Studio Code (VS Code) by enabling the execution of a program with elevated capabilities, which are necessary for certain operations that require root privileges. The program acts as a wrapper to allow the execution of the GNU Debugger (GDB) with all capabilities, circumventing the limitations imposed by running as a non-root user. This is achieved by setting the binary's capabilities to allow it to execute with elevated privileges, even when initiated by a non-root process.
 
-The code is structured to handle different execution paths based on the current capabilities of the process. It first checks if the process already has all capabilities; if not, it uses a fork-exec pattern to elevate its capabilities by invoking itself with `sudo` to set the necessary capabilities using extended attributes. Once the capabilities are set, the program re-executes itself to apply these capabilities and then raises them to ambient status, ensuring they persist across subsequent executions. Finally, it executes the GNU Debugger (GDB) with the provided arguments, allowing the debugging session to proceed with the required permissions. This approach circumvents the limitations of running as root while still providing the necessary environment for effective debugging.
+The program follows a specific sequence to achieve this: it first checks if the current process has all necessary capabilities. If not, it forks a child process to execute a `sudo` command that sets the capabilities of the binary. The parent process waits for this operation to complete and then re-executes itself with the newly set capabilities. Once running with the required capabilities, the program raises ambient capabilities to ensure they persist through the execution of GDB. Finally, it executes GDB with the arguments provided by the IDE, allowing the debugging session to proceed with the necessary permissions. This approach addresses the challenge of debugging programs that require root access without modifying the VS Code agent or the GDB binary itself.
 # Imports and Dependencies
 
 ---
@@ -30,72 +30,83 @@ The code is structured to handle different execution paths based on the current 
 
 ---
 ### vfs\_cap\_data
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `magic_etc`: A 32-bit little-endian integer used to store magic number and other flags.
-    - `data`: An array of two elements, each containing a structure with 32-bit little-endian integers for permitted and inheritable capabilities.
-- **Description**: The `vfs_cap_data` structure is used to represent capability data for a file in a Linux system, specifically for setting file capabilities using extended attributes. It contains a magic number and flags in `magic_etc`, and an array `data` that holds two sets of capability information, each with `permitted` and `inheritable` fields, allowing the specification of which capabilities are allowed and can be inherited by child processes.
+    - ``magic_etc``: A 32-bit little-endian integer that stores magic and other data.
+    - ``data``: An array of two elements, each containing `permitted` and `inheritable` fields.
+    - ``permitted``: A 32-bit little-endian integer that specifies the permitted capabilities.
+    - ``inheritable``: A 32-bit little-endian integer that specifies the inheritable capabilities.
+- **Description**: Stores capability data for a file system, including magic numbers and capability sets for permitted and inheritable capabilities.
 
 
 # Functions
 
 ---
 ### has\_all\_capabilities<!-- {{#callable:has_all_capabilities}} -->
-The `has_all_capabilities` function checks if the current process has all possible capabilities set.
+[View Source →](<../../../../../src/app/fddbg/main.c#L56>)
+
+Checks if the current process has all required capabilities.
 - **Inputs**: None
-- **Control Flow**:
-    - Initialize a `__user_cap_header_struct` and an array of two `__user_cap_data_struct` to hold capability data.
-    - Set the capability version to `_LINUX_CAPABILITY_VERSION_3` and the process ID to 0 in `capheader`.
-    - Use the `syscall` function with `SYS_capget` to retrieve the current capabilities into `capdata`.
-    - Check if the first element of `capdata` has all bits set in the `permitted` field (i.e., `0xFFFFFFFF`).
-    - Check if the `permitted` field of the second element of `capdata` has the lower 9 bits set (i.e., `0x000001FF`).
-    - Return true if both conditions are met, indicating all capabilities are set; otherwise, return false.
-- **Output**: The function returns an integer, 1 if the process has all capabilities set, and 0 otherwise.
+- **Logic and Control Flow**:
+    - Initialize `capheader` with version `_LINUX_CAPABILITY_VERSION_3` and `pid` set to 0.
+    - Call `syscall` with `SYS_capget` to retrieve the capability data into `capdata`.
+    - Check if `capdata[0].permitted` equals `0xFFFFFFFF` and `capdata[1].permitted` bitwise AND with `0x000001FF` equals `0x000001FF`.
+    - Return the result of the logical AND operation as the function's output.
+- **Output**: Returns an integer indicating whether the process has all capabilities (1 if true, 0 if false).
 
 
 ---
 ### raise\_all\_capabilities<!-- {{#callable:raise_all_capabilities}} -->
-The `raise_all_capabilities` function elevates the process's capabilities to the maximum possible level and ensures they are ambiently available.
+[View Source →](<../../../../../src/app/fddbg/main.c#L69>)
+
+Raises all capabilities for the current process to their maximum values.
 - **Inputs**: None
-- **Control Flow**:
+- **Logic and Control Flow**:
     - Initialize `capheader` and `capdata` structures to interact with Linux capabilities.
-    - Set the `capheader` version to `_LINUX_CAPABILITY_VERSION_3` and target the current process by setting `capheader.pid` to 0.
-    - Retrieve the current capabilities using `syscall(SYS_capget, &capheader, &capdata)` and ensure the call is successful with `FD_TEST`.
-    - Set all effective and inheritable capabilities in `capdata` to `0xFFFFFFFF`, which represents all capabilities being enabled.
-    - Apply the modified capabilities using `syscall(SYS_capset, &capheader, &capdata)` and ensure the call is successful with `FD_TEST`.
-    - Iterate over all possible capabilities from 0 to `CAP_LAST_CAP` and raise each one to ambient using `prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, cap, 0, 0)` and ensure each call is successful with `FD_TEST`.
-- **Output**: The function does not return a value; it modifies the process's capabilities to be fully enabled and ambient.
+    - Set `capheader.version` to `_LINUX_CAPABILITY_VERSION_3` and `capheader.pid` to 0 to target the current process.
+    - Use `syscall` with `SYS_capget` to retrieve the current capabilities into `capdata`.
+    - Set all `effective` and `inheritable` fields in `capdata` to `0xFFFFFFFF` to enable all capabilities.
+    - Use `syscall` with `SYS_capset` to apply the modified capabilities to the current process.
+    - Iterate over all capabilities from 0 to `CAP_LAST_CAP` and use `prctl` with `PR_CAP_AMBIENT_RAISE` to raise each capability to ambient.
+- **Output**: No direct output; modifies the capabilities of the current process.
 
 
 ---
 ### self\_exe<!-- {{#callable:self_exe}} -->
-The `self_exe` function retrieves the absolute path of the currently running executable and stores it in the provided buffer.
+[View Source →](<../../../../../src/app/fddbg/main.c#L88>)
+
+Retrieves the absolute path of the currently running executable and stores it in the provided buffer.
 - **Inputs**:
-    - `path`: A character array where the function will store the absolute path of the currently running executable.
-- **Control Flow**:
-    - The function calls `readlink` with the path "/proc/self/exe" to get the absolute path of the current executable and stores it in the `path` buffer.
-    - It checks if the number of bytes read is non-negative and less than `PATH_MAX` using `FD_TEST`.
-    - If the check passes, it null-terminates the string in `path` at the position indicated by the number of bytes read.
-- **Output**: The function does not return a value; it modifies the `path` buffer in place to contain the absolute path of the executable.
+    - `path`: A character array where the function will store the absolute path of the current executable.
+- **Logic and Control Flow**:
+    - Calls `readlink` to read the symbolic link `/proc/self/exe` which points to the executable of the current process.
+    - Stores the number of bytes read by `readlink` in the variable `count`.
+    - Checks if `count` is non-negative and less than `PATH_MAX` using `FD_TEST`.
+    - Appends a null terminator to the `path` at the position indicated by `count`.
+- **Output**: Does not return a value; modifies the `path` argument to contain the absolute path of the current executable.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function manages the execution of a program with elevated capabilities, allowing it to run with all capabilities using a sequence of checks and operations involving setting capabilities, forking, and executing commands.
+[View Source →](<../../../../../src/app/fddbg/main.c#L95>)
+
+Manages process capabilities to ensure the program runs with necessary permissions, particularly for debugging with GDB.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program with `fd_boot` using the command-line arguments.
-    - Check if the first argument is '--setcap'; if so, set the capabilities of the current executable to have all capabilities using `setxattr`.
-    - If '--setcap' is not provided, check if the program has all capabilities using [`has_all_capabilities`](#has_all_capabilities).
-    - If the program lacks capabilities and '--withcap' is not provided, fork a child process to run `sudo` to set capabilities, wait for it to complete, and then re-execute itself with '--withcap'.
-    - If the program has all capabilities, raise all capabilities using [`raise_all_capabilities`](#raise_all_capabilities), prepare arguments for `gdb`, and execute `gdb` with these arguments.
-- **Output**: The function does not return a value; it either sets capabilities, re-executes itself, or executes `gdb` with the provided arguments.
-- **Functions called**:
-    - [`self_exe`](#self_exe)
-    - [`has_all_capabilities`](#has_all_capabilities)
-    - [`raise_all_capabilities`](#raise_all_capabilities)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with `argc` and `argv`.
+    - Checks if the first argument is `--setcap`; if true, sets all capabilities for the current executable using `setxattr`.
+    - If not `--setcap`, checks if the process has all capabilities using [`has_all_capabilities`](<#has_all_capabilities>).
+    - If capabilities are missing and the first argument is `--withcap`, logs an error and exits.
+    - If capabilities are missing, forks a child process to run `sudo` to set capabilities, waits for it to complete, and then re-executes itself with `--withcap`.
+    - If the process has all capabilities, raises all capabilities using [`raise_all_capabilities`](<#raise_all_capabilities>) and prepares to execute GDB with the provided arguments.
+    - Executes GDB with the modified argument list.
+- **Output**: No explicit return value; the function primarily executes other processes and manages capabilities.
+- **Functions Called**:
+    - [`self_exe`](<#self_exe>)
+    - [`has_all_capabilities`](<#has_all_capabilities>)
+    - [`raise_all_capabilities`](<#raise_all_capabilities>)
 
 
 

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_groove_base.c` file in the `firedancer` codebase contains unit tests for the `fd_groove` module, verifying error codes, key initialization, equality, and hashing functions.
+Tests for the `fd_groove` module, including error codes, key initialization, and hashing functions.
 
 # Purpose
-This C source code file is a test suite designed to validate the functionality of the "fd_groove" module, which appears to be a part of a larger software system. The code includes a series of static assertions to ensure that various error codes and alignment constants are correctly defined, which is crucial for maintaining consistency and correctness in the module's operation. The main function initializes a random number generator and performs extensive testing on the `fd_groove_key_t` data structure, including its initialization, equality checks, and hashing capabilities. The tests cover various scenarios, such as zero padding, normal copying, and truncating copying, to ensure that the `fd_groove_key_t` operations behave as expected under different conditions.
+The code is a C program that serves as a test suite for validating the functionality of the `fd_groove` module. It includes static assertions to verify that various error codes and alignment constants are correctly defined. The program initializes a random number generator and uses it to create random data for testing the `fd_groove_key_t` data structure. It performs a series of tests to ensure that keys are initialized correctly, that equality checks between keys function as expected, and that hash values are consistent. The program also tests the behavior of key initialization with different sizes, including zero padding and truncating copies.
 
-The file is structured as an executable test program, as indicated by the presence of the [`main`](#main) function. It does not define public APIs or external interfaces but rather serves as an internal validation tool to verify the correctness of the `fd_groove` module's key handling and error reporting functionalities. The use of logging and assertions throughout the code helps in identifying and reporting any discrepancies or failures during the test execution, ensuring that the module's components are robust and reliable.
+The main function logs the results of error code checks and key operations, ensuring that the `fd_groove` module's functions behave as intended. It uses the `fd_groove_strerror` function to convert error codes to human-readable strings and logs these for verification. The program iterates through a loop to perform repeated tests on key initialization, equality, and hashing, ensuring robustness across multiple random inputs. The program concludes by cleaning up the random number generator and logging a success message if all tests pass.
 # Imports and Dependencies
 
 ---
@@ -19,29 +19,32 @@ The file is structured as an executable test program, as indicated by the presen
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a random number generator, logs error codes, and performs extensive testing on the `fd_groove_key_t` data structure and its associated functions.
+[View Source →](<../../../../src/groove/test_groove_base.c#L20>)
+
+Initializes the environment, tests key operations, and logs error codes and test results.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program environment using `fd_boot` with command-line arguments.
-    - Create and join a random number generator `rng`.
-    - Log various error codes and their string representations using `FD_LOG_NOTICE`.
-    - Enter a loop that iterates 1,000,000 times to perform tests on `fd_groove_key_t` keys.
-    - In each iteration, generate a random seed and an array of 8 random `ulong` values.
-    - Initialize two `fd_groove_key_t` keys `ka` and `kb` using the random values and verify their initialization.
-    - Check equality of the keys and compute their hash values using the random seed.
-    - Perform tests to ensure the keys' equality functions and hash values behave as expected.
-    - Test zero padding copy by initializing `kb` with `ka` and a calculated size, then verify padding and equality.
-    - Test normal and truncating copy by adjusting the size and verifying the keys' equality and hash values.
-    - Delete the random number generator and log a success message.
-    - Terminate the program with `fd_halt` and return 0.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
-- **Functions called**:
-    - [`fd_groove_strerror`](fd_groove_base.c.md#fd_groove_strerror)
-    - [`fd_groove_key_init_ulong`](fd_groove_base.h.md#fd_groove_key_init_ulong)
-    - [`fd_groove_key_hash`](fd_groove_base.h.md#fd_groove_key_hash)
-    - [`fd_groove_key_eq`](fd_groove_base.h.md#fd_groove_key_eq)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
+    - Logs various error codes and their string representations using `FD_LOG_NOTICE`.
+    - Executes a loop 1,000,000 times to test key operations:
+    - Generates a random `seed` and an array `limb` of 8 random unsigned long integers using `fd_rng_ulong`.
+    - Initializes two keys `ka` and `kb` using [`fd_groove_key_init_ulong`](<fd_groove_base.h.md#fd_groove_key_init_ulong>) with parts of `limb`.
+    - Verifies that the keys `ka` and `kb` are initialized correctly using `FD_TEST`.
+    - Checks equality of keys and their hash values using [`fd_groove_key_eq`](<fd_groove_base.h.md#fd_groove_key_eq>) and [`fd_groove_key_hash`](<fd_groove_base.h.md#fd_groove_key_hash>).
+    - Performs zero padding copy and verifies the result using `fd_groove_key_init` and `FD_TEST`.
+    - Performs normal and truncating copy and verifies the result using `fd_groove_key_init` and `FD_TEST`.
+    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
+    - Logs a 'pass' message using `FD_LOG_NOTICE`.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`fd_groove_strerror`](<fd_groove_base.c.md#fd_groove_strerror>)
+    - [`fd_groove_key_init_ulong`](<fd_groove_base.h.md#fd_groove_key_init_ulong>)
+    - [`fd_groove_key_hash`](<fd_groove_base.h.md#fd_groove_key_hash>)
+    - [`fd_groove_key_eq`](<fd_groove_base.h.md#fd_groove_key_eq>)
 
 
 

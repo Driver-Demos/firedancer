@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `bundle.options` file in the `firedancer` codebase specifies a configuration option for `bundle.BundleUuid.uuid` with a maximum size of 128.
+Defines a maximum size of 128 for bundle.BundleUuid.uuid.
 
 # Purpose
-The file content specifies a configuration setting for a software bundle, defining a unique identifier (UUID) for the bundle with a maximum size constraint of 128 characters. This ensures that the UUID adheres to a specific length requirement, likely for consistency or compatibility within the system.
+The `bundle.BundleUuid.uuid` configuration sets a maximum size of 128 for the UUID attribute within the `bundle` module. This constraint ensures that the UUID does not exceed the specified size limit.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

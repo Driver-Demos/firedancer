@@ -3,44 +3,138 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `run_unit_tests.sh` file is a bash script that functions as a NUMA-aware greedy test scheduler, managing the execution of unit tests across multiple NUMA nodes and CPUs while handling memory allocation and job distribution.
+A NUMA-aware test scheduler script for running unit tests with configurable job parallelism and memory settings.
 
 # Purpose
-The provided file is a Bash script designed to schedule and execute unit tests in a NUMA (Non-Uniform Memory Access) aware manner. It configures the execution environment by setting default values for job parameters such as the number of jobs, NUMA node index, page size, and memory allocation per job. The script parses command-line arguments to customize these settings and uses a greedy scheduling approach to distribute test execution across available NUMA nodes and CPUs. The script's functionality is narrow, focusing specifically on optimizing test execution by leveraging system resources efficiently. It is relevant to a codebase as it automates the testing process, ensuring that tests are run in parallel while considering system memory and CPU constraints, which is crucial for maintaining code quality and performance.
-# Content Summary
-The `run_unit_tests.sh` script is a Bash script designed to execute unit tests in a NUMA (Non-Uniform Memory Access) aware manner, optimizing the distribution of test jobs across available NUMA nodes and CPUs. This script is particularly useful in environments where memory and CPU resources are distributed across multiple NUMA nodes, allowing for efficient resource utilization during test execution.
+The `run_unit_tests.sh` script is a Bash executable designed to schedule and execute unit tests with awareness of Non-Uniform Memory Access (NUMA) nodes. It provides narrow functionality focused on managing test execution across multiple CPUs and NUMA nodes, optimizing resource allocation such as memory pages and CPU cores. The script reads command-line arguments to configure parameters like the number of jobs, NUMA node index, page size, and memory allocation per job. It parses a list of tests to run, distributes them across available NUMA nodes, and manages job scheduling and execution. The script also handles logging and reports the results of each test, indicating success or failure.
+# Global Variables
 
-### Key Functional Details:
+---
+### JOBS
+- **Type**: ``integer``
+- **Description**: The `JOBS` variable is an integer that represents the number of jobs to run concurrently. It is initialized to 0, which indicates that the script should use the maximum number of available CPUs for job execution.
+- **Use**: The script uses `JOBS` to determine the level of parallelism when scheduling and running tests across NUMA nodes.
 
-1. **Script Initialization and Defaults:**
-   - The script begins by setting strict error handling options (`set -euo pipefail`) to ensure robust execution.
-   - Default values are defined for several parameters, including `JOBS` (number of concurrent jobs), `NUMA_IDX` (NUMA node index), `PAGE_SZ` (page size, defaulting to "gigantic"), `JOB_MEM` (memory per job, defaulting to 2GiB), `PAGE_CNT` (page count), `TESTS` (test files), and `VERBOSE` (verbosity level).
 
-2. **Command-Line Argument Parsing:**
-   - The script processes command-line arguments to customize its behavior. Flags include `--tests` for specifying test files, `-j` for setting the number of jobs, `--numa-idx` for NUMA node indices, `--page-sz` for page size, `--page-cnt` for page count, `--job-mem` for job memory, and `-v` for verbosity.
+---
+### NUMA\_IDX
+- **Type**: `integer`
+- **Description**: This variable represents the index of the NUMA (Non-Uniform Memory Access) node to use for scheduling tasks. It is initialized to 0 by default, indicating the first NUMA node.
+- **Use**: Used to specify which NUMA node to target for task scheduling, allowing the script to manage resources based on NUMA topology.
 
-3. **NUMA and CPU Configuration:**
-   - The script determines the NUMA nodes to use by parsing the `NUMA_IDX` argument.
-   - It calculates the required page count based on the specified page size and job memory.
-   - The script maps available CPUs per NUMA node and calculates job parallelism, either using all available CPUs or distributing jobs evenly across NUMA nodes.
 
-4. **Test Scheduling and Execution:**
-   - The script reads a list of tests to be executed, filtering out comments.
-   - It schedules tests to run on available CPUs, ensuring that each CPU is utilized efficiently.
-   - The `dispatch` function is responsible for starting test jobs, logging their output, and associating them with specific NUMA nodes and CPUs.
+---
+### PAGE\_SZ
+- **Type**: `string`
+- **Description**: The `PAGE_SZ` variable is a global string variable that specifies the size of memory pages to use in the script. It can take values such as 'normal', 'huge', or 'gigantic', which correspond to different page sizes.
+- **Use**: Determines the page size for memory allocation calculations and operations in the script.
 
-5. **Job Management:**
-   - The script tracks running jobs using process IDs (PIDs) and manages job slots per NUMA node.
-   - It includes mechanisms to handle job completion, logging results, and adjusting job counts based on available resources.
 
-6. **Resource Checks and Adjustments:**
-   - Before executing jobs, the script checks the availability of memory pages on each NUMA node and adjusts the number of concurrent jobs if necessary to prevent resource exhaustion.
+---
+### JOB\_MEM
+- **Type**: `integer`
+- **Description**: `JOB_MEM` is a global variable that represents the memory allocation for each job in bytes. It is initialized to 2 GiB using a bitwise shift operation (`1<<31`).
+- **Use**: Used to calculate the number of pages (`PAGE_CNT`) required for each job based on the page size (`PAGE_SZ`).
 
-7. **Result Reporting:**
-   - The script provides feedback on test execution, indicating success or failure for each test. It outputs results in a color-coded format for easy identification of pass/fail status.
-   - Upon completion, it summarizes the overall test results, exiting with a status code that reflects the success or failure of the test suite.
 
-This script is a practical tool for developers working in environments with complex memory and CPU configurations, allowing them to efficiently run unit tests while maximizing resource utilization.
+---
+### PAGE\_CNT
+- **Type**: `string`
+- **Description**: `PAGE_CNT` is a global variable that represents the number of memory pages allocated for a job. It is derived based on the page size (`PAGE_SZ`) and the job memory (`JOB_MEM`).
+- **Use**: Used to calculate the number of pages required for a job based on the specified page size.
+
+
+---
+### TESTS
+- **Type**: ``string``
+- **Description**: The `TESTS` variable is a global string variable that holds the path to a file containing a list of tests to run. It is set through the `--tests` command-line argument.
+- **Use**: Stores the path to the test list file, which is read to schedule and execute tests.
+
+
+---
+### VERBOSE
+- **Type**: `integer`
+- **Description**: The `VERBOSE` variable is an integer that controls the verbosity level of the script's output. It is set to `0` by default, indicating that verbose output is disabled.
+- **Use**: Used to determine if additional information should be printed to the standard error during script execution when set to `1`.
+
+
+---
+### NUMAS
+- **Type**: `array`
+- **Description**: Holds the list of NUMA nodes to use for scheduling jobs. The `parse_list` function populates this array based on the `NUMA_IDX` value provided as a command-line argument.
+- **Use**: Used to determine which NUMA nodes are available for job scheduling.
+
+
+---
+### NUMA\_CPUS
+- **Type**: `array`
+- **Description**: Holds the number of available CPUs for each NUMA node. The array is indexed by NUMA node identifiers, and each element contains the count of CPUs available on that node.
+- **Use**: Used to determine the number of CPUs available for scheduling jobs on each NUMA node.
+
+
+---
+### NUMA\_JOBS
+- **Type**: `array`
+- **Description**: `NUMA_JOBS` is an array that holds the number of free job slots per NUMA node. It is used to track and manage the distribution of jobs across different NUMA nodes.
+- **Use**: Tracks the number of available job slots per NUMA node and decrements when a job is spawned.
+
+
+---
+### PIDS
+- **Type**: ``declare -A``
+- **Description**: A global associative array that tracks the process IDs (PIDs) of child processes spawned by the script. It maps each PID to itself, effectively creating a set of active PIDs.
+- **Use**: Used to keep track of active child processes for job scheduling and management.
+
+
+---
+### PID2NUMA
+- **Type**: ``declare -A``
+- **Description**: Maps process IDs (PIDs) to their corresponding NUMA node indices. This associative array is used to track which NUMA node each process is scheduled on.
+- **Use**: Used to remember the NUMA node assignment for each process ID in the test scheduling script.
+
+
+---
+### PID2CPU
+- **Type**: ``declare -A``
+- **Description**: `PID2CPU` is an associative array that maps process IDs (PIDs) to the CPU numbers on which they are scheduled. This mapping helps track which CPU each process is running on during the execution of the test scheduler.
+- **Use**: Used to remember which CPU each PID was scheduled to.
+
+
+---
+### CPU2PID
+- **Type**: ``declare -A``
+- **Description**: `CPU2PID` is an associative array that maps CPU identifiers to process IDs (PIDs). It is used to track which process is assigned to each CPU during the test scheduling and execution process.
+- **Use**: Used to remember which CPU each PID was scheduled to.
+
+
+---
+### PID2UNIT
+- **Type**: ``declare -A``
+- **Description**: Associative array that maps process IDs (PIDs) to their corresponding unit names. Each PID is associated with a specific unit name, which is typically the name of the program or test being executed.
+- **Use**: Used to track and retrieve the unit name associated with each running process by its PID.
+
+
+---
+### PID2LOG
+- **Type**: ``declare -A``
+- **Description**: `PID2LOG` is an associative array that maps process IDs (PIDs) to their corresponding log file names. This array is used to track the log file associated with each running process.
+- **Use**: Stores the log file name for each process ID to facilitate logging and debugging.
+
+
+---
+### TEST\_LIST
+- **Type**: `array`
+- **Description**: Contains a list of test commands or scripts that the script will schedule and execute as jobs. Each element in the array represents a test to be run.
+- **Use**: Used to store and manage the list of tests that need to be scheduled and executed by the script.
+
+
+---
+### FAIL\_CNT
+- **Type**: `integer`
+- **Description**: `FAIL_CNT` is a global integer variable that tracks the number of failed test jobs during the execution of the script. It is initialized to 0 and incremented each time a test job fails.
+- **Use**: Tracks the number of failed test jobs to determine the overall success or failure of the test execution.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
