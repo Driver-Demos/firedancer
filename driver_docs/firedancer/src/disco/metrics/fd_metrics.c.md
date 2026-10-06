@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines thread-local variables for metrics in the Firedancer codebase.
+The `fd_metrics.c` file in the `firedancer` codebase includes the `fd_metrics.h` header and declares thread-local pointers for metrics data.
 
 # Purpose
-The code is a simple C header file that declares two thread-local variables. The first variable, `fd_metrics_base_tl`, is a pointer to an unsigned long integer (`ulong`). The second variable, `fd_metrics_tl`, is a pointer to a volatile unsigned long integer (`volatile ulong`). These variables are likely used to store and access metrics data in a thread-local manner, ensuring that each thread has its own instance of these variables. The inclusion of the header file `fd_metrics.h` suggests that these variables are part of a larger metrics tracking or monitoring system.
+This code is a simple C header file that declares two thread-local (indicated by `FD_TL`) pointers to unsigned long integers. The first pointer, `fd_metrics_base_tl`, is a non-volatile pointer, suggesting it points to a base or starting address for some metrics-related data structure. The second pointer, `fd_metrics_tl`, is a volatile pointer, indicating it may be used to access data that can be changed by other threads or hardware, ensuring the compiler does not optimize away necessary reads or writes. The inclusion of `"fd_metrics.h"` suggests that these pointers are part of a larger metrics collection or monitoring system, likely used to track performance or operational metrics in a multi-threaded environment.
 # Imports and Dependencies
 
 ---
@@ -17,16 +17,16 @@ The code is a simple C header file that declares two thread-local variables. The
 
 ---
 ### fd\_metrics\_base\_tl
-- **Type**: ``ulong *``
-- **Description**: A pointer to an unsigned long integer, used to store or reference a base address for metrics data.
-- **Use**: Used to point to the base address of metrics data in a thread-local storage context.
+- **Type**: `pointer to unsigned long`
+- **Description**: The variable `fd_metrics_base_tl` is a global pointer to an unsigned long integer. It is declared with the `FD_TL` macro, which likely indicates a thread-local storage specifier, suggesting that each thread has its own instance of this pointer.
+- **Use**: This variable is used to point to a base address in memory for metrics data specific to each thread.
 
 
 ---
 ### fd\_metrics\_tl
-- **Type**: ``FD_TL volatile ulong *``
-- **Description**: A pointer to a volatile unsigned long integer, which is part of the `FD_TL` thread-local storage mechanism. The `volatile` keyword indicates that the value pointed to by this pointer can be changed at any time, potentially by external processes or hardware, and thus should not be optimized by the compiler.
-- **Use**: Used to access or modify thread-local metrics data in a concurrent environment.
+- **Type**: `volatile ulong *`
+- **Description**: The `fd_metrics_tl` is a global variable that is a pointer to a volatile unsigned long integer. It is declared with the `FD_TL` macro, which likely specifies a thread-local storage class or similar attribute. The use of `volatile` indicates that the value pointed to by this pointer can be changed by something outside the control of the code section in which it appears, such as hardware or a different thread.
+- **Use**: This variable is used to store a thread-local pointer to a volatile unsigned long integer, likely for metrics tracking or similar purposes in a multi-threaded environment.
 
 
 
