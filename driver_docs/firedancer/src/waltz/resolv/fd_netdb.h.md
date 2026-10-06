@@ -3,92 +3,97 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines data structures and functions for network database operations, including address resolution.
+The `fd_netdb.h` file in the `firedancer` codebase defines structures and functions for network database operations, including opening file descriptors for `/etc/hosts` and `/etc/resolv.conf`, and a custom implementation of `getaddrinfo`.
 
 # Purpose
-This C header file defines structures, constants, and function prototypes for network database operations. It includes the `fd_addrinfo` structure, which holds information about network addresses, such as flags, family, protocol, address length, address, canonical name, and a pointer to the next address info. The file defines several constants for address info flags and error codes, such as `FD_AI_PASSIVE` and `FD_EAI_BADFLAGS`. It also declares the `fd_netdb_fds` structure to manage file descriptors for `/etc/hosts` and `/etc/resolv.conf`. The file provides prototypes for functions like `fd_netdb_open_fds`, which opens and registers these file descriptors, [`fd_getaddrinfo`](<#fd_getaddrinfo>), which resolves network addresses, and [`fd_gai_strerror`](<#fd_gai_strerror>), which returns error descriptions for [`fd_getaddrinfo`](<#fd_getaddrinfo>) return values.
+This C header file defines structures, constants, and function prototypes for network database operations, specifically for address resolution. It introduces a custom `fd_addrinfo` structure, which is similar to the standard `addrinfo` structure, to store network address information. The file defines several constants for address resolution flags and error codes, which are used to control the behavior of and handle errors in the address resolution process. The `fd_netdb_fds` structure is used to manage file descriptors for `/etc/hosts` and `/etc/resolv.conf`, optimizing the process by avoiding repeated system calls. The file provides prototypes for three functions: `fd_netdb_open_fds`, which opens and registers these file descriptors; [`fd_getaddrinfo`](#fd_getaddrinfo), a custom implementation of the standard `getaddrinfo` function; and [`fd_gai_strerror`](#fd_gai_strerror), which returns a string description of error codes from [`fd_getaddrinfo`](#fd_getaddrinfo). This header is part of a larger system, likely focused on efficient network operations and address resolution.
 # Imports and Dependencies
 
 ---
 - `../../util/fd_util_base.h`
 
 
+# Global Variables
+
+---
+### fd\_gai\_strerror
+- **Type**: `function`
+- **Description**: The `fd_gai_strerror` function returns a constant character string that describes the error code returned by the `fd_getaddrinfo` function. It provides a human-readable explanation of the error, which is useful for debugging and logging purposes.
+- **Use**: This function is used to convert error codes from `fd_getaddrinfo` into descriptive error messages.
+
+
 # Data Structures
 
 ---
 ### fd\_addrinfo\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `ai_flags`: An integer that specifies options for the address lookup.
-    - `ai_family`: An integer that specifies the address family.
-    - `ai_protocol`: An integer that specifies the protocol for the socket.
-    - `ai_addrlen`: An unsigned integer that specifies the length of the socket address.
-    - `ai_addr`: A pointer to a `sockaddr` structure that contains the socket address.
-    - `ai_canonname`: A pointer to a character string that contains the canonical name of the host.
-    - `ai_next`: A pointer to the next `fd_addrinfo_t` structure in the list.
-- **Description**: Defines a structure for storing address information used in network operations, including flags, address family, protocol, address length, socket address, canonical name, and a pointer to the next address info structure.
+    - `ai_flags`: An integer representing flags that modify the behavior of the address lookup.
+    - `ai_family`: An integer specifying the address family, such as AF_INET for IPv4.
+    - `ai_protocol`: An integer indicating the protocol for the returned socket address.
+    - `ai_addrlen`: An unsigned integer representing the length of the socket address.
+    - `ai_addr`: A pointer to a sockaddr structure containing the address.
+    - `ai_canonname`: A pointer to a string containing the canonical name of the host.
+    - `ai_next`: A pointer to the next fd_addrinfo structure in the linked list.
+- **Description**: The `fd_addrinfo_t` structure is used to store information about network addresses, similar to the standard `addrinfo` structure in POSIX systems. It contains fields for flags, address family, protocol, address length, a pointer to the socket address, a canonical name for the host, and a pointer to the next structure in a linked list. This structure is typically used in network programming to resolve hostnames and service names into a set of socket addresses.
 
 
 ---
 ### fd\_addrinfo
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `ai_flags`: An integer that specifies options for the address lookup.
-    - `ai_family`: An integer that specifies the address family (e.g., AF_INET).
-    - `ai_protocol`: An integer that specifies the protocol for the socket.
-    - `ai_addrlen`: An unsigned integer that specifies the length of the address.
-    - `ai_addr`: A pointer to a `sockaddr` structure that contains the address.
-    - `ai_canonname`: A pointer to a string that contains the canonical name of the host.
-    - `ai_next`: A pointer to the next `fd_addrinfo` structure in the list.
-- **Description**: Represents address information used for network communication, including flags, address family, protocol, address length, address, canonical name, and a pointer to the next address information structure in a linked list.
+    - `ai_flags`: An integer representing flags that modify the behavior of the address lookup.
+    - `ai_family`: An integer specifying the address family, such as AF_INET for IPv4.
+    - `ai_protocol`: An integer indicating the protocol for the returned socket address.
+    - `ai_addrlen`: An unsigned integer representing the length of the ai_addr structure.
+    - `ai_addr`: A pointer to a sockaddr structure containing the address.
+    - `ai_canonname`: A pointer to a string containing the canonical name of the host.
+    - `ai_next`: A pointer to the next fd_addrinfo structure in the list.
+- **Description**: The `fd_addrinfo` structure is used to store information about a network address, including flags, address family, protocol, address length, and pointers to the address and canonical name. It is designed to be used in a linked list, with each node pointing to the next `fd_addrinfo` structure, allowing for the representation of multiple addresses or configurations.
 
 
 ---
 ### fd\_netdb\_fds
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `etc_hosts`: Stores the file descriptor for the `/etc/hosts` file.
-    - `etc_resolv_conf`: Stores the file descriptor for the `/etc/resolv.conf` file.
-- **Description**: Holds file descriptors for the `/etc/hosts` and `/etc/resolv.conf` files, which are used to avoid repeated system calls when accessing these files.
+    - `etc_hosts`: File descriptor for the /etc/hosts file.
+    - `etc_resolv_conf`: File descriptor for the /etc/resolv.conf file.
+- **Description**: The `fd_netdb_fds` structure is designed to hold file descriptors for the system's network configuration files, specifically `/etc/hosts` and `/etc/resolv.conf`. This structure is used to manage these file descriptors globally, allowing for efficient access and avoiding repeated system calls to open these files when performing network address resolution operations. The structure is integral to the `fd_netdb_open_fds` function, which initializes these descriptors and handles any errors related to opening the files.
 
 
 ---
 ### fd\_netdb\_fds\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `etc_hosts`: File descriptor for the `/etc/hosts` file.
-    - `etc_resolv_conf`: File descriptor for the `/etc/resolv.conf` file.
-- **Description**: Holds file descriptors for the `/etc/hosts` and `/etc/resolv.conf` files, which are used to avoid repeated open system calls when performing network address resolution.
+    - `etc_hosts`: File descriptor for the /etc/hosts file.
+    - `etc_resolv_conf`: File descriptor for the /etc/resolv.conf file.
+- **Description**: The `fd_netdb_fds_t` structure is used to store file descriptors for the /etc/hosts and /etc/resolv.conf files, which are essential for network database operations. By maintaining these file descriptors, the structure helps avoid repeated open system calls, thus optimizing the performance of functions like `fd_getaddrinfo`. This structure is particularly useful in scenarios where these files need to be accessed frequently, as it allows for efficient resource management and access.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_getaddrinfo<!-- {{#callable_declaration:fd_getaddrinfo}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_netdb.h#L51>)
-
-Resolves a host name to address information.
-- **Description**: Use this function to obtain address information for a given host name, optionally using hints to specify desired address types and flags. It is important to ensure that the `host` parameter is not null, as this will result in an error. The function populates the `res` parameter with a linked list of address information structures. Ensure that the `out_mem` parameter points to a memory buffer that is large enough to hold the results, as specified by `out_max`. If the buffer is too small, the function will return an error. This function is thread-local and should be used after opening necessary file descriptors with `fd_netdb_open_fds`.
+Resolve a hostname to an address information list.
+- **Description**: This function resolves a given hostname into a list of address information structures, which can be used for network communication. It should be called when you need to translate a hostname into a set of socket addresses. The function requires a pre-allocated memory buffer to store the results, and it is important to ensure that the buffer is large enough to hold the output. The function handles various address families and flags, and it returns specific error codes if the input parameters are invalid or if memory allocation fails. It is crucial to check the return value to handle any errors appropriately.
 - **Inputs**:
-    - `host`: A pointer to a null-terminated string containing the host name to resolve. Must not be null. If null, the function returns `FD_EAI_NONAME`.
-    - `hint`: A pointer to a `fd_addrinfo_t` structure containing hints about the type of socket the caller supports. Can be null. If provided, the `ai_family` and `ai_flags` fields are used to filter results.
-    - `res`: A pointer to a pointer that will be set to the head of a linked list of `fd_addrinfo_t` structures containing the address information. Must not be null.
-    - `pout`: A pointer to a memory buffer pointer where the function will store the address information. Must not be null and must point to a buffer with at least `out_max` bytes available.
-    - `out_max`: The maximum number of bytes available in the buffer pointed to by `pout`. Must be large enough to store the results, or the function will return `FD_EAI_MEMORY`.
-- **Output**: Returns 0 on success. On failure, returns a negative error code such as `FD_EAI_NONAME`, `FD_EAI_BADFLAGS`, `FD_EAI_FAMILY`, or `FD_EAI_MEMORY`.
-- **See Also**: [`fd_getaddrinfo`](<fd_getaddrinfo.c.md#fd_getaddrinfo>)  (Implementation)
+    - `node`: The hostname to resolve. Must not be null. If null, the function returns FD_EAI_NONAME.
+    - `hints`: Optional pointer to a fd_addrinfo_t structure that specifies criteria for selecting the socket address structures returned. If provided, the ai_family and ai_flags fields are used to filter results. If invalid flags are set, the function returns FD_EAI_BADFLAGS. If an unsupported family is specified, it returns FD_EAI_FAMILY.
+    - `res`: Pointer to a location where the function will store the resulting list of address information structures. Must not be null.
+    - `out_mem`: Pointer to a pre-allocated memory buffer where the function will store the address information. Must not be null, and the buffer must be large enough to hold the results. If the buffer is too small, the function returns FD_EAI_MEMORY.
+    - `out_max`: The size of the pre-allocated memory buffer pointed to by out_mem. Must be large enough to store the results, otherwise the function returns FD_EAI_MEMORY.
+- **Output**: Returns 0 on success, with res pointing to the resulting address information list. On failure, returns a negative error code indicating the type of error.
+- **See also**: [`fd_getaddrinfo`](fd_getaddrinfo.c.md#fd_getaddrinfo)  (Implementation)
 
 
 ---
 ### fd\_gai\_strerror<!-- {{#callable_declaration:fd_gai_strerror}} -->
-[View Source →](<../../../../../src/waltz/resolv/fd_netdb.h#L61>)
-
-Returns a string describing a `fd_getaddrinfo` error code.
-- **Description**: Use this function to obtain a human-readable string that describes the error code returned by `fd_getaddrinfo`. This function is useful for logging or displaying error messages to users. It handles both standard error codes and system-specific errors. The function returns a static string, so there is no need to manage memory for the returned value.
+Returns a string describing a getaddrinfo error code.
+- **Description**: Use this function to obtain a human-readable string that describes the error code returned by the fd_getaddrinfo function. This is useful for logging or displaying error messages to users. The function handles both standard error codes and system-specific errors by mapping them to descriptive strings. It is important to ensure that the error code passed to the function is a valid return value from fd_getaddrinfo to get meaningful output.
 - **Inputs**:
-    - `gai`: An integer representing the error code from `fd_getaddrinfo`. Valid values include predefined error codes such as `FD_EAI_BADFLAGS`, `FD_EAI_NONAME`, `FD_EAI_AGAIN`, `FD_EAI_FAIL`, `FD_EAI_NODATA`, `FD_EAI_FAMILY`, `FD_EAI_MEMORY`, and system errors indicated by values less than or equal to `FD_EAI_SYSTEM`. If the value is not recognized, the function returns "unknown error".
-- **Output**: A constant character pointer to a static string describing the error. The caller must not modify or free this string.
-- **See Also**: [`fd_gai_strerror`](<fd_getaddrinfo.c.md#fd_gai_strerror>)  (Implementation)
+    - `gai`: An integer representing the error code returned by fd_getaddrinfo. Valid values include predefined error codes such as FD_EAI_BADFLAGS, FD_EAI_NONAME, and others, as well as system error codes offset by FD_EAI_SYSTEM. If the value is not recognized, the function returns "unknown error".
+- **Output**: A constant character pointer to a static string describing the error. The string has a static lifetime and should not be modified or freed by the caller.
+- **See also**: [`fd_gai_strerror`](fd_getaddrinfo.c.md#fd_gai_strerror)  (Implementation)
 
 
 

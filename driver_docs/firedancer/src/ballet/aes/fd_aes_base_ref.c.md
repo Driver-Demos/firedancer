@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Optimized ANSI C implementation of the Rijndael cipher (AES) with encryption and decryption functions.
+The `fd_aes_base_ref.c` file in the `firedancer` codebase provides an implementation of the AES encryption and decryption algorithms, including key expansion and core encryption/decryption functions, adapted from the OpenSSL project.
 
 # Purpose
-The `fd_aes_ref.c` file is a C source code file that implements the Advanced Encryption Standard (AES) algorithm, which is a symmetric key encryption standard. This file was adapted from the OpenSSL project and provides functions for both encryption and decryption of data using AES. The code includes functions for key expansion, which is necessary for generating the round keys used in the AES encryption and decryption processes. The file defines several static functions such as [`XtimeWord`](<#xtimeword>), [`SubWord`](<#subword>), [`ShiftRows`](<#shiftrows>), [`MixColumns`](<#mixcolumns>), and their inverse operations, which are essential components of the AES algorithm. These functions perform various transformations and permutations on the data to ensure secure encryption.
+The provided C source code file, `fd_aes_ref.c`, is a reference implementation of the Advanced Encryption Standard (AES) algorithm, originally derived from the OpenSSL project. This file contains functions that implement the core operations of AES encryption and decryption, including key expansion, substitution, permutation, and mixing of columns, which are essential components of the AES cipher. The code is structured to handle different key sizes (128, 192, and 256 bits) and includes both encryption and decryption routines. The functions [`fd_aes_ref_set_encrypt_key`](#fd_aes_ref_set_encrypt_key) and [`fd_aes_ref_set_decrypt_key`](#fd_aes_ref_set_decrypt_key) are responsible for setting up the encryption and decryption key schedules, respectively, while [`fd_aes_ref_encrypt_core`](#fd_aes_ref_encrypt_core) and [`fd_aes_ref_decrypt_core`](#fd_aes_ref_decrypt_core) perform the actual encryption and decryption of data blocks.
 
-The file provides a public API through functions like [`fd_aes_ref_set_encrypt_key`](<#fd_aes_ref_set_encrypt_key>), [`fd_aes_ref_set_decrypt_key`](<#fd_aes_ref_set_decrypt_key>), [`fd_aes_ref_encrypt_core`](<#fd_aes_ref_encrypt_core>), and [`fd_aes_ref_decrypt_core`](<#fd_aes_ref_decrypt_core>). These functions allow users to set up encryption and decryption keys and perform the actual encryption and decryption of data blocks. The [`fd_aes_ref_set_encrypt_key`](<#fd_aes_ref_set_encrypt_key>) and [`fd_aes_ref_set_decrypt_key`](<#fd_aes_ref_set_decrypt_key>) functions are responsible for expanding the cipher key into the encryption and decryption key schedules, respectively. The [`fd_aes_ref_encrypt_core`](<#fd_aes_ref_encrypt_core>) and [`fd_aes_ref_decrypt_core`](<#fd_aes_ref_decrypt_core>) functions handle the encryption and decryption of single data blocks, ensuring that input and output can overlap. The file is intended to be used as part of a larger cryptographic library, providing AES functionality to other components or applications.
+The file is designed to be part of a larger cryptographic library, providing a specific implementation of AES that can be integrated into other software systems. It includes low-level operations such as [`SubWord`](#subword), [`ShiftRows`](#shiftrows), [`MixColumns`](#mixcolumns), and their inverse functions, which are fundamental to the AES algorithm's security and efficiency. The code is optimized for performance and includes detailed bitwise operations to achieve the necessary transformations. This implementation is intended to be used as a reference or for educational purposes, offering a clear and detailed example of how AES can be implemented in C. The file does not define a public API directly but provides the core functionality that can be wrapped or extended by other components of a cryptographic library.
 # Imports and Dependencies
 
 ---
@@ -21,363 +21,333 @@ The file provides a public API through functions like [`fd_aes_ref_set_encrypt_k
 
 ---
 ### uni
-- **Type**: ``union``
+- **Type**: `union`
 - **Members**:
-    - ``b``: An array of 8 `uchar` elements.
-    - ``w``: An array of 2 `uint` elements.
-    - ``d``: A single `ulong` element.
-- **Description**: Provides a way to store data in different formats within the same memory location, allowing access as an array of bytes, an array of words, or a single long integer.
+    - `b`: An array of 8 unsigned characters (bytes).
+    - `w`: An array of 2 unsigned integers.
+    - `d`: An unsigned long integer.
+- **Description**: The `uni` data structure is a union that allows for the storage of data in multiple formats within the same memory space. It can store an array of 8 bytes, an array of 2 unsigned integers, or a single unsigned long integer. This flexibility is useful in cryptographic operations, such as those found in AES encryption, where data may need to be accessed or manipulated in different formats without changing the underlying memory layout.
 
 
 # Functions
 
 ---
 ### XtimeWord<!-- {{#callable:XtimeWord}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L56>)
-
-Performs a multiplication of a 32-bit word by the polynomial 'x' in the finite field GF(2^8) and reduces it modulo the polynomial x^8 + x^4 + x^3 + x + 1.
+The `XtimeWord` function performs a multiplication of a 32-bit word by the polynomial x in the finite field GF(2^8), modulo the polynomial x^8 + x^4 + x^3 + x + 1.
 - **Inputs**:
-    - `w`: A pointer to a 32-bit unsigned integer that represents the word to be transformed.
-- **Logic and Control Flow**:
+    - `w`: A pointer to a 32-bit unsigned integer that represents the word to be multiplied by x in the finite field.
+- **Control Flow**:
     - Retrieve the value pointed to by `w` and store it in `a`.
-    - Compute `b` as the bitwise AND of `a` and the constant `0x80808080u`.
+    - Calculate `b` as the bitwise AND of `a` with the constant `0x80808080u`.
     - XOR `a` with `b` to clear the highest bit of each byte in `a`.
-    - Subtract `b` right-shifted by 7 from `b` itself to prepare for reduction.
-    - AND `b` with the constant `0x1B1B1B1Bu` to apply the reduction polynomial.
-    - XOR `b` with `a` left-shifted by 1 to complete the multiplication and reduction.
+    - Subtract `b` right-shifted by 7 from `b` itself to prepare for conditional addition of the polynomial constant.
+    - AND `b` with the constant `0x1B1B1B1Bu` to apply the polynomial reduction conditionally.
+    - XOR `b` with `a` left-shifted by 1 to complete the multiplication by x.
     - Store the result back into the location pointed to by `w`.
-- **Output**: The function modifies the input word in place, storing the result of the transformation back into the original memory location.
-
-
----
-### XtimeLong<!-- {{#callable:XtimeLong}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L69>)
-
-Performs a transformation on a 64-bit unsigned integer by applying bitwise operations and arithmetic shifts.
-- **Inputs**:
-    - `w`: A pointer to a 64-bit unsigned integer (`ulong`) that will be transformed.
-- **Logic and Control Flow**:
-    - Retrieve the value pointed to by `w` and store it in `a`.
-    - Compute `b` as the bitwise AND of `a` and the constant `0x8080808080808080`.
-    - Update `a` by XORing it with `b`.
-    - Subtract `b` right-shifted by 7 from `b`.
-    - Perform a bitwise AND of `b` with the constant `0x1B1B1B1B1B1B1B1B`.
-    - Update `b` by XORing it with `a` left-shifted by 1.
-    - Store the result back into the location pointed to by `w`.
-- **Output**: The function modifies the value at the pointer `w` in place, with no return value.
-
-
----
-### SubWord<!-- {{#callable:SubWord}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L128>)
-
-Transforms a 32-bit word using a series of bitwise operations and substitutions as part of the AES encryption process.
-- **Inputs**:
-    - `w`: A pointer to a 32-bit unsigned integer that will be transformed.
-- **Logic and Control Flow**:
-    - Initialize local variables `x`, `y`, `a1`, `a2`, `a3`, `a4`, `a5`, and `a6`.
-    - Assign the value pointed to by `w` to `x`.
-    - Perform a series of bitwise operations and substitutions on `x` and `y` using masks and shifts to transform the word.
-    - Use intermediate variables `a1` to `a6` to store results of transformations and further manipulate `x`.
-    - Apply a final transformation to `x` using a constant XOR operation.
-    - Store the transformed value back into the location pointed to by `w`.
-- **Output**: The transformed 32-bit word is stored back in the location pointed to by `w`.
-
-
----
-### SubLong<!-- {{#callable:SubLong}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L219>)
-
-Performs a series of bitwise transformations and substitutions on a 64-bit unsigned integer to modify its value.
-- **Inputs**:
-    - `w`: A pointer to a 64-bit unsigned integer (`ulong`) that will be transformed.
-- **Logic and Control Flow**:
-    - Initialize `x` with the value pointed to by `w`.
-    - Perform a series of bitwise operations and shifts on `x` and `y` to transform the value.
-    - Use masks and shifts to manipulate bits in `x` and `y`, applying XOR operations with specific patterns.
-    - Store intermediate results in variables `a1` to `a6` to facilitate further transformations.
-    - Apply additional bitwise operations and shifts to refine the transformation of `x`.
-    - Update the value pointed to by `w` with the final transformed value of `x`.
-- **Output**: The function modifies the value of the 64-bit unsigned integer pointed to by `w` in place.
-
-
----
-### InvSubLong<!-- {{#callable:InvSubLong}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L313>)
-
-Performs the inverse substitution operation on a 64-bit word as part of the AES decryption process.
-- **Inputs**:
-    - `w`: A pointer to a 64-bit unsigned long integer (`ulong`) that represents the word to be processed.
-- **Logic and Control Flow**:
-    - Initialize `x` with the value pointed to by `w` and XOR it with a constant `0x6363636363636363UL`.
-    - Perform a series of bitwise operations and shifts on `x` and `y` to transform the input word, using constants to mask and manipulate bits.
-    - Use intermediate variables `a1` to `a6` to store results of transformations and further manipulate the bits through XOR and shift operations.
-    - Reconstruct the transformed word `x` using the intermediate variables and additional bitwise operations.
-    - Store the final transformed value back into the location pointed to by `w`.
 - **Output**: The function modifies the input word in place, so it does not return a value but updates the value pointed to by `w`.
 
 
 ---
-### ShiftRows<!-- {{#callable:ShiftRows}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L408>)
-
-Performs a cyclic shift of rows in a 4x4 matrix representation of the state array for AES encryption.
+### XtimeLong<!-- {{#callable:XtimeLong}} -->
+The `XtimeLong` function performs a multiplication of a 64-bit unsigned integer by a fixed polynomial in a finite field, specifically used in AES encryption.
 - **Inputs**:
-    - `state`: A pointer to an array of type `ulong` that represents the state matrix in AES encryption.
-- **Logic and Control Flow**:
-    - Convert the `state` pointer to a `uchar` pointer `s0` to access individual bytes.
-    - Iterate over each row index `r` from 0 to 3.
-    - For each row, copy the elements of the column into a temporary array `s`.
-    - Perform a cyclic shift on the temporary array `s` by using the row index `r` to determine the shift amount.
-    - Write the shifted values back into the original `state` array.
-- **Output**: The function modifies the `state` array in place, performing a cyclic shift on each row of the 4x4 matrix.
+    - `w`: A pointer to a 64-bit unsigned integer (ulong) that will be modified in place.
+- **Control Flow**:
+    - Retrieve the value pointed to by `w` and store it in `a`.
+    - Compute `b` as the bitwise AND of `a` and the constant `0x8080808080808080`.
+    - XOR `a` with `b` to clear the most significant bits of each byte in `a`.
+    - Subtract `b` right-shifted by 7 from `b` itself, effectively performing a conditional subtraction based on the most significant bit of each byte.
+    - AND `b` with the constant `0x1B1B1B1B1B1B1B1B` to apply a polynomial reduction.
+    - XOR `b` with `a` left-shifted by 1 to complete the multiplication by the polynomial.
+    - Store the result back into the location pointed to by `w`.
+- **Output**: The function modifies the input 64-bit unsigned integer in place, effectively performing a multiplication by a polynomial in a finite field.
+
+
+---
+### SubWord<!-- {{#callable:SubWord}} -->
+The `SubWord` function performs a complex transformation on a 32-bit word, typically used in AES encryption, involving bitwise operations and substitutions.
+- **Inputs**:
+    - `w`: A pointer to a 32-bit unsigned integer (uint) that represents the word to be transformed.
+- **Control Flow**:
+    - Initialize local variables x, y, a1, a2, a3, a4, a5, and a6.
+    - Assign the value pointed to by w to x.
+    - Perform a series of bitwise operations and shifts on x and y, involving masks and XOR operations, to transform the word.
+    - Use intermediate variables a1 to a6 to store results of transformations and further manipulate the bits of x.
+    - Apply a final XOR operation with a constant value to x.
+    - Store the transformed value back into the location pointed to by w.
+- **Output**: The function modifies the input word in place, transforming it according to the AES S-box substitution and bitwise operations.
+
+
+---
+### SubLong<!-- {{#callable:SubLong}} -->
+The `SubLong` function performs a complex bitwise transformation on a 64-bit unsigned long integer, likely as part of an AES-like encryption process.
+- **Inputs**:
+    - `w`: A pointer to a 64-bit unsigned long integer that will be transformed in place.
+- **Control Flow**:
+    - Initialize local variables `x`, `y`, `a1`, `a2`, `a3`, `a4`, `a5`, and `a6`.
+    - Assign the value pointed to by `w` to `x`.
+    - Perform a series of bitwise operations on `x` and `y`, including shifts and masks, to transform the value.
+    - Use intermediate variables `a1` to `a6` to store results of transformations and further manipulate `x`.
+    - Apply a series of XOR operations and bit shifts to `x` and `y` to achieve the final transformation.
+    - Store the transformed value back into the location pointed to by `w`.
+- **Output**: The function modifies the input value in place, storing the transformed 64-bit unsigned long integer back into the location pointed to by `w`.
+
+
+---
+### InvSubLong<!-- {{#callable:InvSubLong}} -->
+The `InvSubLong` function performs an inverse substitution transformation on a 64-bit word as part of the AES decryption process.
+- **Inputs**:
+    - `w`: A pointer to a 64-bit unsigned long integer that represents the word to be transformed.
+- **Control Flow**:
+    - Initialize local variables x, y, a1, a2, a3, a4, a5, and a6.
+    - Load the value pointed to by w into x and apply an initial XOR with a constant.
+    - Perform a series of bitwise operations and shifts on x and y to transform the word, involving multiple XORs with constants and bitwise shifts.
+    - Use intermediate variables a1 to a6 to further manipulate the bits of x through a series of logical operations, including AND, XOR, and shifts.
+    - Apply a final series of transformations on x using y and several constants to complete the inverse substitution.
+    - Store the transformed value back into the location pointed to by w.
+- **Output**: The function modifies the input word in place, so it does not return a value but updates the word pointed to by the input pointer.
+
+
+---
+### ShiftRows<!-- {{#callable:ShiftRows}} -->
+The `ShiftRows` function performs a cyclic shift on the rows of a 4x4 matrix representation of the AES state.
+- **Inputs**:
+    - `state`: A pointer to an array of unsigned long integers representing the AES state, which is treated as a 4x4 matrix of bytes.
+- **Control Flow**:
+    - The function casts the `state` pointer to a byte pointer `s0`.
+    - It iterates over each row index `r` from 0 to 3.
+    - For each row, it extracts the bytes from the `state` corresponding to the current row into a temporary array `s`.
+    - It then performs a cyclic shift on the elements of `s` and writes them back to the `state` in the same row positions.
+- **Output**: The function modifies the `state` in place, performing a cyclic shift on each row of the 4x4 matrix representation of the AES state.
 
 
 ---
 ### InvShiftRows<!-- {{#callable:InvShiftRows}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L427>)
-
-Performs the inverse row shifting operation on a state matrix in the AES decryption process.
+The `InvShiftRows` function performs the inverse row shifting operation on a state matrix in the AES decryption process.
 - **Inputs**:
-    - `state`: A pointer to an array of `ulong` representing the state matrix to be modified.
-- **Logic and Control Flow**:
-    - Convert the `state` pointer to a `uchar` pointer `s0`.
-    - Iterate over each row index `r` from 0 to 3.
-    - For each row, store the elements of the row in a temporary array `s`.
-    - Reassign the elements of the row in `s0` using the inverse shift pattern based on the index `r`.
-- **Output**: The function modifies the `state` matrix in place, performing an inverse shift on each row.
+    - `state`: A pointer to an array of unsigned long integers representing the state matrix to be modified.
+- **Control Flow**:
+    - The function begins by declaring a temporary array `s` of 4 unsigned characters and a pointer `s0` to unsigned characters, which is initialized to point to the `state` array.
+    - A loop iterates over each row index `r` from 0 to 3.
+    - Within the loop, the elements of the `r`-th column of the state matrix are copied into the temporary array `s`.
+    - The elements of `s` are then rearranged and written back to the `r`-th column of the state matrix, effectively performing a circular right shift by `r` positions.
+- **Output**: The function modifies the input `state` in place, performing the inverse row shift operation required in the AES decryption process.
 
 
 ---
 ### MixColumns<!-- {{#callable:MixColumns}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L446>)
-
-Performs the MixColumns transformation on a state array as part of the AES encryption process.
+The `MixColumns` function performs a transformation on the state array as part of the AES encryption process, specifically implementing the MixColumns step of the AES algorithm.
 - **Inputs**:
-    - `state`: A pointer to an array of `ulong` values representing the state to transform.
-- **Logic and Control Flow**:
-    - Initialize two `uni` type variables `s1` and `s` to hold intermediate state values.
-    - Iterate over two columns of the state array using a loop with index `c`.
-    - For each column, copy the current state value into `s1.d` and `s.d`.
-    - Perform bitwise transformations on `s.d` to mix the bytes within the column.
-    - Call [`XtimeLong`](<#xtimelong>) on `s1.d` to perform a multiplication in the Galois Field.
-    - Apply further bitwise XOR operations between `s` and `s1` to complete the column mixing.
-    - Store the transformed value back into the state array at the current column index.
-- **Output**: The function modifies the input `state` array in place, transforming each column according to the MixColumns operation of AES.
-- **Functions Called**:
-    - [`XtimeLong`](<#xtimelong>)
+    - `state`: A pointer to an array of unsigned long integers representing the current state of the AES block.
+- **Control Flow**:
+    - Initialize two union variables `s1` and `s` to hold intermediate state values.
+    - Iterate over the first two elements of the `state` array.
+    - For each element, copy its value into `s1.d` and `s.d`.
+    - Perform bitwise operations on `s.d` to mix the columns, including shifts and XORs with itself and `s1.d`.
+    - Call [`XtimeLong`](#xtimelong) on `s1.d` to perform a multiplication in the Galois Field.
+    - Further modify `s.d` by XORing with `s1.d` and specific bytes of `s1.b`.
+    - Store the modified value back into the `state` array.
+- **Output**: The function modifies the `state` array in place, transforming its columns according to the AES MixColumns step.
+- **Functions called**:
+    - [`XtimeLong`](#xtimelong)
 
 
 ---
 ### InvMixColumns<!-- {{#callable:InvMixColumns}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L474>)
-
-Performs the inverse mix columns transformation on the state array as part of the AES decryption process.
+The `InvMixColumns` function performs the inverse MixColumns transformation on a state array as part of the AES decryption process.
 - **Inputs**:
-    - `state`: A pointer to an array of unsigned long integers representing the state to transform.
-- **Logic and Control Flow**:
+    - `state`: A pointer to an array of unsigned long integers representing the state to be transformed.
+- **Control Flow**:
     - Initialize two union variables `s1` and `s` to hold intermediate state values.
-    - Iterate over two columns of the state array.
+    - Iterate over two columns of the state array (since AES operates on 4x4 matrices, each column is represented by a 64-bit unsigned long).
     - For each column, copy the current state value into `s1` and `s`.
-    - Perform bitwise operations to rearrange and mix the bits in `s` using shifts and XOR operations.
-    - Call [`XtimeLong`](<#xtimelong>) on `s1.d` to perform a multiplication in the Galois Field.
-    - Mix the bytes of `s` using XOR operations with shifted bytes of `s1`.
-    - Repeat the [`XtimeLong`](<#xtimelong>) operation and further bitwise operations to complete the inverse mix columns transformation.
+    - Perform a series of bitwise operations and shifts on `s` to reverse the MixColumns transformation, including XOR operations and shifts by 16 and 8 bits.
+    - Call [`XtimeLong`](#xtimelong) on `s1.d` to perform a multiplication in the Galois Field, and XOR the result with `s.d`.
+    - Perform additional XOR operations on the byte-level elements of `s` using the byte-level elements of `s1`.
+    - Call [`XtimeLong`](#xtimelong) again on `s1.d` and perform further bitwise operations to complete the inverse transformation.
     - Store the transformed value back into the state array.
-- **Output**: The function modifies the input `state` array in place, applying the inverse mix columns transformation to each column.
-- **Functions Called**:
-    - [`XtimeLong`](<#xtimelong>)
+- **Output**: The function modifies the input state array in place, applying the inverse MixColumns transformation to each column.
+- **Functions called**:
+    - [`XtimeLong`](#xtimelong)
 
 
 ---
 ### AddRoundKey<!-- {{#callable:AddRoundKey}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L510>)
-
-Performs a bitwise XOR operation between the `state` and `w` arrays to add a round key in the AES encryption process.
+The `AddRoundKey` function performs a bitwise XOR operation between the state and a round key in the AES encryption process.
 - **Inputs**:
-    - `state`: A pointer to an array of `ulong` representing the current state of the AES encryption.
-    - `w`: A pointer to a constant array of `ulong` representing the round key to be added to the state.
-- **Logic and Control Flow**:
-    - Perform a bitwise XOR operation between the first element of `state` and the first element of `w`, and store the result back in the first element of `state`.
-    - Perform a bitwise XOR operation between the second element of `state` and the second element of `w`, and store the result back in the second element of `state`.
-- **Output**: The function modifies the `state` array in place by XORing it with the `w` array, effectively adding the round key to the state.
+    - `state`: A pointer to an array of two unsigned long integers representing the current state of the AES encryption.
+    - `w`: A pointer to an array of two unsigned long integers representing the round key to be XORed with the state.
+- **Control Flow**:
+    - The function takes two pointers, `state` and `w`, each pointing to an array of two unsigned long integers.
+    - It performs a bitwise XOR operation between the first element of `state` and the first element of `w`, storing the result back in the first element of `state`.
+    - It performs a bitwise XOR operation between the second element of `state` and the second element of `w`, storing the result back in the second element of `state`.
+- **Output**: The function modifies the `state` array in place by XORing it with the `w` array, and it does not return any value.
 
 
 ---
 ### Cipher<!-- {{#callable:Cipher}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L517>)
-
-Performs AES encryption on a 128-bit block using a specified number of rounds and a key schedule.
+The `Cipher` function performs AES encryption on a single block of data using a specified number of rounds and a key schedule.
 - **Inputs**:
-    - ``in``: Pointer to the input data block (128 bits) to encrypt.
-    - ``out``: Pointer to the output buffer where the encrypted data will be stored.
-    - ``w``: Pointer to the expanded key schedule used for encryption.
-    - ``nr``: Number of rounds to perform in the encryption process.
-- **Logic and Control Flow**:
-    - Copy the input data into a local state array.
-    - Apply the initial round key to the state using [`AddRoundKey`](<#addroundkey>).
+    - `in`: A pointer to the input data block (16 bytes) to be encrypted.
+    - `out`: A pointer to the output buffer where the encrypted data will be stored (16 bytes).
+    - `w`: A pointer to the expanded key schedule used for encryption.
+    - `nr`: The number of rounds to perform in the encryption process.
+- **Control Flow**:
+    - Initialize the state array by copying 16 bytes from the input data block.
+    - Apply the initial round key to the state using the [`AddRoundKey`](#addroundkey) function.
     - Iterate over the number of rounds minus one, performing the following operations in each round:
-    - Apply the [`SubLong`](<#sublong>) transformation to each part of the state.
-    - Perform the [`ShiftRows`](<#shiftrows>) operation on the state.
-    - Execute the [`MixColumns`](<#mixcolumns>) transformation on the state.
-    - Add the round key to the state using [`AddRoundKey`](<#addroundkey>).
-    - After the loop, perform the final round without the [`MixColumns`](<#mixcolumns>) transformation.
+    - - Apply the [`SubLong`](#sublong) transformation to each half of the state.
+    - - Perform the [`ShiftRows`](#shiftrows) transformation on the state.
+    - - Execute the [`MixColumns`](#mixcolumns) transformation on the state.
+    - - Add the round key to the state using [`AddRoundKey`](#addroundkey).
+    - After the loop, perform the final round without the [`MixColumns`](#mixcolumns) transformation:
+    - - Apply the [`SubLong`](#sublong) transformation to each half of the state.
+    - - Perform the [`ShiftRows`](#shiftrows) transformation on the state.
+    - - Add the final round key to the state using [`AddRoundKey`](#addroundkey).
     - Copy the final state to the output buffer.
-- **Output**: The function does not return a value; it writes the encrypted data to the `out` buffer.
-- **Functions Called**:
-    - [`AddRoundKey`](<#addroundkey>)
-    - [`SubLong`](<#sublong>)
-    - [`ShiftRows`](<#shiftrows>)
-    - [`MixColumns`](<#mixcolumns>)
+- **Output**: The function outputs the encrypted data block in the buffer pointed to by `out`.
+- **Functions called**:
+    - [`AddRoundKey`](#addroundkey)
+    - [`SubLong`](#sublong)
+    - [`ShiftRows`](#shiftrows)
+    - [`MixColumns`](#mixcolumns)
 
 
 ---
 ### InvCipher<!-- {{#callable:InvCipher}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L545>)
-
-Performs the inverse AES cipher operation on a block of data using a given key schedule.
+The `InvCipher` function performs the decryption of a single block of data using the AES algorithm by applying the inverse of the AES encryption transformations.
 - **Inputs**:
-    - ``in``: Pointer to the input data block to decrypt, expected to be 16 bytes.
-    - ``out``: Pointer to the output buffer where the decrypted data will be stored, expected to be 16 bytes.
-    - ``w``: Pointer to the key schedule, an array of `ulong` values used in the decryption process.
-    - ``nr``: Number of rounds in the AES decryption process, determined by the key size.
-- **Logic and Control Flow**:
-    - Copy 16 bytes from `in` to `state` array.
-    - Apply the [`AddRoundKey`](<#addroundkey>) function to `state` using the last round key from `w`.
-    - Iterate from `nr-1` to 1, performing the following steps in each iteration:
-    - - Apply [`InvShiftRows`](<#invshiftrows>) to `state`.
-    - - Apply [`InvSubLong`](<#invsublong>) to each half of `state`.
-    - - Apply [`AddRoundKey`](<#addroundkey>) to `state` using the current round key from `w`.
-    - - Apply [`InvMixColumns`](<#invmixcolumns>) to `state`.
-    - After the loop, apply [`InvShiftRows`](<#invshiftrows>) to `state`.
-    - Apply [`InvSubLong`](<#invsublong>) to each half of `state`.
-    - Apply [`AddRoundKey`](<#addroundkey>) to `state` using the first round key from `w`.
-    - Copy 16 bytes from `state` to `out`.
-- **Output**: The function outputs the decrypted data block in the `out` buffer, which is 16 bytes in size.
-- **Functions Called**:
-    - [`AddRoundKey`](<#addroundkey>)
-    - [`InvShiftRows`](<#invshiftrows>)
-    - [`InvSubLong`](<#invsublong>)
-    - [`InvMixColumns`](<#invmixcolumns>)
+    - `in`: A pointer to the input data block (16 bytes) to be decrypted.
+    - `out`: A pointer to the output buffer where the decrypted data block will be stored (16 bytes).
+    - `w`: A pointer to the expanded key schedule used for decryption.
+    - `nr`: The number of rounds to be performed, which depends on the key size (10, 12, or 14 rounds for 128, 192, or 256-bit keys respectively).
+- **Control Flow**:
+    - Copy the input data block into the `state` array.
+    - Apply the [`AddRoundKey`](#addroundkey) transformation using the last round key from the key schedule.
+    - Iterate over the number of rounds minus one, performing the following steps in each iteration:
+    - - Apply the [`InvShiftRows`](#invshiftrows) transformation to the `state`.
+    - - Apply the [`InvSubLong`](#invsublong) transformation to each half of the `state`.
+    - - Apply the [`AddRoundKey`](#addroundkey) transformation using the current round key from the key schedule.
+    - - Apply the [`InvMixColumns`](#invmixcolumns) transformation to the `state`.
+    - After the loop, perform the final round transformations:
+    - - Apply the [`InvShiftRows`](#invshiftrows) transformation to the `state`.
+    - - Apply the [`InvSubLong`](#invsublong) transformation to each half of the `state`.
+    - - Apply the [`AddRoundKey`](#addroundkey) transformation using the first round key from the key schedule.
+    - Copy the `state` array to the output buffer.
+- **Output**: The function outputs the decrypted data block into the `out` buffer, which is 16 bytes in size.
+- **Functions called**:
+    - [`AddRoundKey`](#addroundkey)
+    - [`InvShiftRows`](#invshiftrows)
+    - [`InvSubLong`](#invsublong)
+    - [`InvMixColumns`](#invmixcolumns)
 
 
 ---
 ### RotWord<!-- {{#callable:RotWord}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L573>)
-
-Rotates the bytes in a 32-bit word to the left by one position.
+The `RotWord` function rotates the bytes in a 32-bit word to the left by one position.
 - **Inputs**:
-    - ``x``: A pointer to a 32-bit unsigned integer (`uint`) that represents the word to rotate.
-- **Logic and Control Flow**:
-    - Cast the input `x` to a pointer to an unsigned character (`uchar *`) and assign it to `w0`.
+    - `x`: A pointer to a 32-bit unsigned integer (uint) that represents the word to be rotated.
+- **Control Flow**:
+    - Cast the input pointer `x` to a pointer to an unsigned char, `w0`, to access individual bytes.
     - Store the first byte of `w0` in a temporary variable `tmp`.
     - Shift the second byte of `w0` to the first position.
     - Shift the third byte of `w0` to the second position.
     - Shift the fourth byte of `w0` to the third position.
-    - Assign the value of `tmp` to the fourth position of `w0`.
-- **Output**: The function does not return a value; it modifies the input word in place.
+    - Move the byte stored in `tmp` to the fourth position of `w0`.
+- **Output**: The function modifies the input word in place, rotating its bytes to the left by one position.
 
 
 ---
 ### KeyExpansion<!-- {{#callable:KeyExpansion}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L586>)
-
-Expands the cipher key into the encryption key schedule for AES encryption.
+The `KeyExpansion` function generates the key schedule for AES encryption by expanding the initial cipher key into a series of round keys.
 - **Inputs**:
-    - `key`: A pointer to the input cipher key, which is an array of unsigned characters.
-    - `w`: A pointer to the output key schedule, which is an array of unsigned long integers.
-    - `nr`: The number of rounds in the AES encryption process.
-    - `nk`: The number of 32-bit words in the cipher key.
-- **Logic and Control Flow**:
-    - Copy the initial key into the beginning of the key schedule `w` using `memcpy`.
+    - `key`: A pointer to the initial cipher key, represented as an array of unsigned characters.
+    - `w`: A pointer to an array of unsigned long integers where the expanded key schedule will be stored.
+    - `nr`: An integer representing the number of rounds in the AES encryption process.
+    - `nk`: An integer representing the number of 32-bit words in the cipher key.
+- **Control Flow**:
+    - Copy the initial key into the beginning of the expanded key array `w`.
     - Initialize the round constant `rcon` to 1.
-    - Calculate `n` as half of `nk`.
-    - Set `prev.d` to the last word of the initial key schedule.
-    - Iterate over the range from `n` to `(nr+1)*2` to fill the key schedule.
-    - In each iteration, set `temp` to the second word of `prev`.
-    - If `i` is a multiple of `n`, perform a key schedule core transformation on `temp` using [`RotWord`](<#rotword>), [`SubWord`](<#subword>), and XOR with `rcon`, then update `rcon` using [`XtimeWord`](<#xtimeword>).
-    - If `nk` is greater than 6 and `i` modulo `n` equals 2, apply [`SubWord`](<#subword>) to `temp`.
-    - Update `prev.d` to the word `n` positions before `i` in the key schedule.
-    - XOR `prev.w[0]` with `temp` and `prev.w[1]` with `prev.w[0]`.
-    - Store `prev.d` in the current position `i` of the key schedule.
+    - Calculate `n` as half of `nk`, which determines the number of 64-bit words in the initial key.
+    - Set `prev.d` to the last 64-bit word of the initial key.
+    - Iterate over the range from `n` to `(nr+1)*2`, expanding the key schedule.
+    - For each iteration, set `temp` to the second 32-bit word of `prev`.
+    - If the current index `i` is a multiple of `n`, perform a key schedule core operation: rotate `temp`, substitute bytes in `temp`, XOR `temp` with `rcon`, and update `rcon` using [`XtimeWord`](#xtimeword).
+    - If `nk` is greater than 6 and `i` is even, substitute bytes in `temp`.
+    - Update `prev.d` to the 64-bit word `n` positions before the current index in `w`.
+    - XOR the first 32-bit word of `prev` with `temp`, then XOR the second 32-bit word of `prev` with the first.
+    - Store the updated `prev.d` in the current position of `w`.
 - **Output**: The function outputs the expanded key schedule in the array `w`, which is used for AES encryption.
-- **Functions Called**:
-    - [`RotWord`](<#rotword>)
-    - [`SubWord`](<#subword>)
-    - [`XtimeWord`](<#xtimeword>)
+- **Functions called**:
+    - [`RotWord`](#rotword)
+    - [`SubWord`](#subword)
+    - [`XtimeWord`](#xtimeword)
 
 
 ---
 ### fd\_aes\_ref\_set\_encrypt\_key<!-- {{#callable:fd_aes_ref_set_encrypt_key}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L620>)
-
-Expands the cipher key into the encryption key schedule for AES encryption.
+The `fd_aes_ref_set_encrypt_key` function initializes the encryption key schedule for AES encryption based on the provided user key and key size.
 - **Inputs**:
-    - ``userKey``: A pointer to the user-provided cipher key.
-    - ``bits``: The length of the cipher key in bits, which must be 128, 192, or 256.
-    - ``key``: A pointer to the `fd_aes_key_ref_t` structure where the expanded key schedule will be stored.
-- **Logic and Control Flow**:
-    - Check if `userKey` or `key` is NULL; if so, return -1.
-    - Check if `bits` is not 128, 192, or 256; if so, return -2.
-    - Cast `key->rd_key` to a `ulong` pointer `rk` using `fd_type_pun`.
-    - Set `key->rounds` to 10, 12, or 14 based on the value of `bits`.
-    - Call [`KeyExpansion`](<#keyexpansion>) with `userKey`, `rk`, `key->rounds`, and `bits/32UL` to expand the key.
-    - Return 0 to indicate success.
-- **Output**: Returns 0 on success, -1 if `userKey` or `key` is NULL, and -2 if `bits` is not a valid key length.
-- **Functions Called**:
-    - [`KeyExpansion`](<#keyexpansion>)
+    - `userKey`: A pointer to the user-provided key, which is used to generate the encryption key schedule.
+    - `bits`: The size of the key in bits, which must be either 128, 192, or 256.
+    - `key`: A pointer to an `fd_aes_key_ref_t` structure where the generated encryption key schedule will be stored.
+- **Control Flow**:
+    - Check if `userKey` or `key` is NULL, returning -1 if either is NULL.
+    - Check if `bits` is not one of the valid AES key sizes (128, 192, 256), returning -2 if invalid.
+    - Cast the `rd_key` field of the `key` structure to a `ulong` pointer `rk`.
+    - Set the number of rounds in the `key` structure based on the key size: 10 for 128 bits, 12 for 192 bits, and 14 for 256 bits.
+    - Call [`KeyExpansion`](#keyexpansion) to generate the encryption key schedule using `userKey`, `rk`, the number of rounds, and the number of 32-bit words in the key.
+    - Return 0 to indicate successful key schedule generation.
+- **Output**: Returns 0 on success, -1 if `userKey` or `key` is NULL, and -2 if `bits` is not a valid AES key size.
+- **Functions called**:
+    - [`KeyExpansion`](#keyexpansion)
 
 
 ---
 ### fd\_aes\_ref\_set\_decrypt\_key<!-- {{#callable:fd_aes_ref_set_decrypt_key}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L647>)
-
-Sets the decryption key for AES by calling the encryption key setup function.
+The `fd_aes_ref_set_decrypt_key` function sets up the decryption key schedule for AES by calling the encryption key setup function.
 - **Inputs**:
-    - ``userKey``: A pointer to the user's key, which is an array of unsigned characters.
-    - ``bits``: The length of the key in bits, which must be 128, 192, or 256.
-    - ``key``: A pointer to an `fd_aes_key_ref_t` structure where the key schedule will be stored.
-- **Logic and Control Flow**:
-    - Calls the [`fd_aes_ref_set_encrypt_key`](<#fd_aes_ref_set_encrypt_key>) function with the same parameters to set up the key schedule for decryption.
-- **Output**: Returns the result of the [`fd_aes_ref_set_encrypt_key`](<#fd_aes_ref_set_encrypt_key>) function, which is 0 on success, -1 if `userKey` or `key` is NULL, and -2 if `bits` is not 128, 192, or 256.
-- **Functions Called**:
-    - [`fd_aes_ref_set_encrypt_key`](<#fd_aes_ref_set_encrypt_key>)
+    - `userKey`: A pointer to the user's key, which is a sequence of bytes used for AES encryption/decryption.
+    - `bits`: The length of the key in bits, which must be either 128, 192, or 256.
+    - `key`: A pointer to an `fd_aes_key_ref_t` structure where the key schedule will be stored.
+- **Control Flow**:
+    - The function directly calls [`fd_aes_ref_set_encrypt_key`](#fd_aes_ref_set_encrypt_key) with the same parameters it received.
+    - No additional logic or processing is performed within this function.
+- **Output**: The function returns the result of [`fd_aes_ref_set_encrypt_key`](#fd_aes_ref_set_encrypt_key), which is 0 on success, -1 if the userKey or key is NULL, and -2 if the bits value is invalid.
+- **Functions called**:
+    - [`fd_aes_ref_set_encrypt_key`](#fd_aes_ref_set_encrypt_key)
 
 
 ---
 ### fd\_aes\_ref\_encrypt\_core<!-- {{#callable:fd_aes_ref_encrypt_core}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L658>)
-
-Encrypts a single block of data using the AES algorithm with a given key.
+The `fd_aes_ref_encrypt_core` function encrypts a single block of data using the AES algorithm with a specified key.
 - **Inputs**:
-    - `in`: Pointer to the input data block to encrypt.
-    - `out`: Pointer to the output buffer where the encrypted data will be stored.
-    - `key`: Pointer to the AES key structure containing the encryption key and number of rounds.
-- **Logic and Control Flow**:
-    - Check that `in`, `out`, and `key` are not null using `assert`.
-    - Retrieve the round keys from the `key` structure using `fd_type_pun_const`.
-    - Call the [`Cipher`](<#cipher>) function with the input data, output buffer, round keys, and number of rounds to perform the encryption.
-- **Output**: The function does not return a value; it writes the encrypted data to the `out` buffer.
-- **Functions Called**:
-    - [`Cipher`](<#cipher>)
+    - `in`: A pointer to the input data block to be encrypted.
+    - `out`: A pointer to the output buffer where the encrypted data will be stored.
+    - `key`: A pointer to the AES key structure containing the encryption key and the number of rounds.
+- **Control Flow**:
+    - The function begins by asserting that the input, output, and key pointers are not null.
+    - It retrieves the round keys from the key structure using a type punning technique.
+    - The [`Cipher`](#cipher) function is called with the input data, output buffer, round keys, and the number of rounds to perform the encryption.
+- **Output**: The function does not return a value; it outputs the encrypted data in the buffer pointed to by `out`.
+- **Functions called**:
+    - [`Cipher`](#cipher)
 
 
 ---
 ### fd\_aes\_ref\_decrypt\_core<!-- {{#callable:fd_aes_ref_decrypt_core}} -->
-[View Source →](<../../../../../src/ballet/aes/fd_aes_base_ref.c#L673>)
-
-Decrypts a single block of data using the AES decryption algorithm with a given key.
+The `fd_aes_ref_decrypt_core` function decrypts a single block of data using the AES algorithm with a given decryption key.
 - **Inputs**:
-    - `in`: A pointer to the input data block to decrypt.
+    - `in`: A pointer to the input data block to be decrypted.
     - `out`: A pointer to the output buffer where the decrypted data will be stored.
-    - `key`: A pointer to the `fd_aes_key_ref_t` structure containing the decryption key and the number of rounds.
-- **Logic and Control Flow**:
-    - Check that `in`, `out`, and `key` are not null using `assert`.
-    - Retrieve the round keys from the `key` structure using `fd_type_pun_const` to cast `key->rd_key` to a `ulong` pointer.
-    - Call the [`InvCipher`](<#invcipher>) function with the input data, output buffer, round keys, and number of rounds to perform the decryption.
-- **Output**: The function does not return a value; it writes the decrypted data to the buffer pointed to by `out`.
-- **Functions Called**:
-    - [`InvCipher`](<#invcipher>)
+    - `key`: A pointer to the AES key structure containing the decryption key and the number of rounds.
+- **Control Flow**:
+    - The function begins by asserting that the input, output, and key pointers are not null.
+    - It retrieves the round keys from the key structure using a type punning technique.
+    - The [`InvCipher`](#invcipher) function is called with the input data, output buffer, round keys, and the number of rounds to perform the decryption.
+- **Output**: The function does not return a value; it outputs the decrypted data directly into the provided output buffer.
+- **Functions called**:
+    - [`InvCipher`](#invcipher)
 
 
 

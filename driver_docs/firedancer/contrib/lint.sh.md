@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Shell script to search for and exit on lines with 'for (' or 'if (' in the codebase.
+The `lint.sh` file is a shell script that checks for the presence of specific patterns ('for (' and 'if (') in the codebase using `git grep` and exits with an error if they are found.
 
 # Purpose
-The script is a shell script that checks for specific patterns in a Git repository. It searches for occurrences of the patterns `for (` and `if (` within the codebase using the `git grep` command. If either pattern is found, the script exits with a status code of 1, indicating that the patterns were detected. This script provides narrow functionality, serving as a code quality check to enforce coding standards or detect specific code constructs.
+This shell script is a utility tool designed to search through a Git repository for specific patterns in the code, specifically looking for occurrences of 'for (' and 'if (' statements. It provides narrow functionality, focusing solely on identifying these patterns, which might be used for code style enforcement or refactoring purposes. The script is not an executable in the traditional sense but rather a utility script that can be run in a Unix-like environment to assist developers in maintaining code consistency. By exiting with a status of 1 if any matches are found, it can be integrated into automated workflows to flag code that does not meet certain criteria.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
