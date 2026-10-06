@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated seccomp BPF filter headers for run command syscall allowlists.
+Seccomp filter policies and rules for syscall handling and process isolation with architecture-specific checks.
 
 
 ## Files
-- **[main_seccomp.h](main_seccomp.h.md)**: Generated seccomp BPF filter for write, fsync, wait4, kill, and exit_group.
-- **[pidns_arm64_seccomp.h](pidns_arm64_seccomp.h.md)**: Generated seccomp BPF filter for pidns arm64 syscall allowlist.
-- **[pidns_seccomp.h](pidns_seccomp.h.md)**: Generated seccomp BPF filter for pidns run commands, allowing only selected syscalls and args.
+- **[main_seccomp.h](main_seccomp.h.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and actions.
+- **[pidns_arm64_seccomp.h](pidns_arm64_seccomp.h.md)**: Defines a seccomp filter for ARM64 architecture to control system call permissions.
+- **[pidns_seccomp.h](pidns_seccomp.h.md)**: Defines a seccomp filter policy for process isolation with architecture-specific checks and syscall rules.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

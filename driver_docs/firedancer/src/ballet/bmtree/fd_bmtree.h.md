@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_bmtree.h` file in the `firedancer` codebase provides APIs for constructing and managing binary Merkle trees using the SHA256 hash function, including operations for creating trees, generating and verifying inclusion proofs, and handling both leaf-based and proof-based commitment calculations.
+APIs for binary Merkle trees using SHA256, including construction, inclusion proofs, and verification.
 
 # Purpose
-The provided C header file, `fd_bmtree.h`, defines a set of APIs for constructing and manipulating binary Merkle trees using the SHA-256 hash function. This file is part of a larger library and is intended to be included in other C source files to provide functionality related to Merkle trees, which are commonly used in cryptographic applications for data integrity and verification. The header outlines the core operations for constructing Merkle trees, such as creating leaf and branch nodes, and provides methods for generating and verifying inclusion proofs. These proofs are essential for verifying that a particular data element is part of a larger dataset without revealing the entire dataset, a feature widely used in blockchain and distributed ledger technologies.
+The code defines a C header file for working with binary Merkle trees using the SHA256 hash function. It provides a set of APIs for constructing and managing Merkle trees, which are used as a vector commitment scheme. The primary operations include constructing leaf nodes, branch nodes with one or two children, and deriving methods for constructing full trees, creating inclusion proofs, and verifying node inclusion proofs. The header file outlines the tree topology, construction process, and inclusion proof mechanisms, emphasizing the use of SHA256 for cryptographic security.
 
-The file defines several key data structures and functions. The `fd_bmtree_node_t` structure represents a node in the Merkle tree, storing the hash of the node. The `fd_bmtree_commit_t` structure is used to manage the state of a Merkle tree during its construction, supporting both leaf-based and proof-based commitment calculations. Functions such as [`fd_bmtree_hash_leaf`](#fd_bmtree_hash_leaf), [`fd_bmtree_commit_init`](#fd_bmtree_commit_init), [`fd_bmtree_commit_append`](#fd_bmtree_commit_append), and [`fd_bmtree_commit_fini`](#fd_bmtree_commit_fini) provide the necessary operations to build and finalize a Merkle tree, while functions like [`fd_bmtree_get_proof`](#fd_bmtree_get_proof) and [`fd_bmtree_from_proof`](#fd_bmtree_from_proof) handle the creation and verification of inclusion proofs. The header also includes constants and macros to facilitate the alignment and memory footprint calculations required for efficient tree operations. Overall, this file provides a comprehensive interface for working with binary Merkle trees, emphasizing cryptographic security and efficient data handling.
+The file defines several data structures and functions to facilitate the creation and manipulation of Merkle trees. The `fd_bmtree_node_t` structure represents a tree node's hash, while the `fd_bmtree_commit_t` structure manages the state of a Merkle tree during its construction. Functions such as [`fd_bmtree_hash_leaf`](<#fd_bmtree_hash_leaf>), [`fd_bmtree_commit_init`](<#fd_bmtree_commit_init>), [`fd_bmtree_commit_append`](<#fd_bmtree_commit_append>), and [`fd_bmtree_commit_fini`](<#fd_bmtree_commit_fini>) are provided to initialize, append leaves, and finalize the tree, respectively. The file also includes mechanisms for handling inclusion proofs, allowing verification of leaf node inclusion in the tree. The header file is designed to be included in other C source files, providing a public API for Merkle tree operations.
 # Imports and Dependencies
 
 ---
@@ -19,116 +19,76 @@ The file defines several key data structures and functions. The `fd_bmtree_node_
 
 ---
 ### fd\_bmtree\_leaf\_prefix
-- **Type**: `uchar const[32UL]`
-- **Description**: The `fd_bmtree_leaf_prefix` is a constant array of 32 unsigned characters, aligned to 32 bytes, used as a prefix for leaf nodes in a binary Merkle tree. It is initialized with the string "\x00SOLANA_MERKLE_SHREDS_LEAF", where the first byte is 0x00, followed by the ASCII representation of the string "SOLANA_MERKLE_SHREDS_LEAF". This prefix is used to ensure second preimage resistance in the Merkle tree's hash calculations.
-- **Use**: This variable is used as a prefix in the hash calculation of leaf nodes within the Merkle tree to enhance security by preventing second preimage attacks.
+- **Type**: ``uchar const[32UL]``
+- **Description**: A constant array of unsigned characters, aligned to 32 bytes, that stores a prefix used in the hashing process of leaf nodes in a binary Merkle tree. The prefix is specifically for the Solana Merkle Shreds leaf nodes and starts with a single byte `0x00` followed by the string 'SOLANA_MERKLE_SHREDS_LEAF'. This prefix is used to ensure second preimage resistance in the hashing process.
+- **Use**: Used as a prefix in the SHA-256 hashing of leaf nodes in the Merkle tree to ensure second preimage resistance.
 
 
 ---
 ### fd\_bmtree\_node\_prefix
-- **Type**: `uchar const[32UL]`
-- **Description**: The `fd_bmtree_node_prefix` is a globally defined constant array of unsigned characters, specifically 32 bytes long, aligned to 32 bytes. It is initialized with a specific byte sequence that starts with a byte value of 0x01 followed by the string 'SOLANA_MERKLE_SHREDS_NODE'. This prefix is used in the context of binary Merkle trees, particularly for nodes in the tree.
-- **Use**: This variable is used as a prefix in hashing operations for constructing or verifying nodes within a binary Merkle tree, ensuring consistency and uniqueness in the hashing process.
-
-
----
-### fd\_bmtree\_hash\_leaf
-- **Type**: `function pointer`
-- **Description**: `fd_bmtree_hash_leaf` is a function that computes the SHA-256 hash of a given data blob prefixed by a specified number of bytes from a predefined leaf prefix. This function is used to create a leaf node in a binary Merkle tree, which is a fundamental step in constructing the tree.
-- **Use**: This function is used to hash data into a leaf node format for inclusion in a binary Merkle tree.
-
-
----
-### fd\_bmtree\_commit\_init
-- **Type**: `fd_bmtree_commit_t *`
-- **Description**: The `fd_bmtree_commit_init` is a function that initializes a binary Merkle tree commitment structure. It takes a memory pointer, hash size, prefix size, and inclusion proof layer count as parameters, and returns a pointer to an `fd_bmtree_commit_t` structure. This structure is used to compute the root of a binary Merkle tree incrementally, supporting both leaf-based and proof-based commitment calculations.
-- **Use**: This function is used to set up the initial state for a binary Merkle tree commitment calculation, preparing the necessary memory and configuration for subsequent operations.
-
-
----
-### fd\_bmtree\_commit\_append
-- **Type**: `function pointer`
-- **Description**: `fd_bmtree_commit_append` is a function that appends a range of new leaf nodes to an existing binary Merkle tree commitment state. It takes a pointer to the current state of the Merkle tree, a pointer to the new leaf nodes, and the count of new leaf nodes to be appended.
-- **Use**: This function is used to incrementally build a binary Merkle tree by adding new leaf nodes to the existing tree structure.
-
-
----
-### fd\_bmtree\_commit\_fini
-- **Type**: `function pointer`
-- **Description**: The `fd_bmtree_commit_fini` is a function that finalizes the calculation of a binary Merkle tree's root hash. It takes a pointer to a `fd_bmtree_commit_t` structure, which contains the intermediate state of the Merkle tree computation, and returns a pointer to an unsigned character array representing the root hash of the tree.
-- **Use**: This function is used to complete the calculation of a Merkle tree's root hash after all leaf nodes have been processed.
-
-
----
-### fd\_bmtree\_from\_proof
-- **Type**: `fd_bmtree_node_t *`
-- **Description**: The `fd_bmtree_from_proof` function is a global function that derives the root of a Merkle tree from a given leaf node and its inclusion proof. It takes a leaf node, its index, a buffer for the root, a proof array, the depth of the proof, the size of the hash, and the prefix size as parameters. The function returns a pointer to the root node if the proof is valid, otherwise it returns NULL.
-- **Use**: This function is used to verify the inclusion of a leaf node in a Merkle tree by reconstructing the root from the leaf and its proof.
-
-
----
-### fd\_bmtree\_commitp\_fini
-- **Type**: `uchar *`
-- **Description**: The `fd_bmtree_commitp_fini` function is a global function that finalizes a proof-based calculation of a binary Merkle tree. It returns a pointer to the root of the tree if the entire tree is verified to be correct for a commitment of a specified number of leaf nodes, otherwise it returns NULL.
-- **Use**: This function is used to conclude a proof-based Merkle tree calculation and verify the correctness of the tree structure.
+- **Type**: ``uchar const[32UL]``
+- **Description**: A constant array of unsigned characters, aligned to 32 bytes, initialized with a specific prefix string for Merkle tree nodes in the Solana blockchain context.
+- **Use**: Used as a prefix in the hashing process for internal nodes of a binary Merkle tree.
 
 
 # Data Structures
 
 ---
 ### fd\_bmtree\_node
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `hash`: An array of 32 unsigned characters representing the hash of the node, where the last bytes may not be meaningful.
-- **Description**: The `fd_bmtree_node` structure is a packed data structure used to represent a node in a binary Merkle tree, specifically designed to store the hash value of the node. The hash is typically a SHA-256 hash, which is 32 bytes long, making the structure AVX-friendly and allowing for efficient hash operations. This structure is fundamental in the construction and manipulation of binary Merkle trees, which are used for secure data verification and integrity checks.
+    - ``hash``: An array of 32 unsigned characters representing the hash of a tree node.
+- **Description**: Represents a node in a binary Merkle tree, where the `hash` field stores the hash value of the node, typically using the SHA-256 algorithm. The structure is packed to optimize memory alignment and access, making it suitable for cryptographic operations within the Merkle tree.
 
 
 ---
 ### fd\_bmtree\_node\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `hash`: An array of 32 unsigned characters representing the hash of a tree node.
-- **Description**: The `fd_bmtree_node_t` structure represents a node in a binary Merkle tree, specifically storing the hash value of the node. This hash is typically generated using the SHA-256 algorithm, and the structure is designed to be AVX-friendly, allowing for efficient processing and storage of hash values. The structure is packed to ensure that the hash data is stored contiguously in memory, which is crucial for performance in cryptographic operations.
+    - ``hash``: An array of 32 unsigned characters representing the hash of a tree node.
+- **Description**: The `fd_bmtree_node_t` structure represents a node in a binary Merkle tree, where each node contains a hash value. The hash is typically generated using the SHA-256 algorithm, and the structure is designed to be AVX-friendly, allowing for efficient processing of cryptographic operations. The `hash` array may not use all 32 bytes, depending on the specific implementation of the Merkle tree (e.g., SHA256-160 or SHA256).
 
 
 ---
 ### fd\_bmtree\_commit\_private
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `leaf_cnt`: Number of leaves added so far.
-    - `hash_sz`: Size of the hash, up to 32 bytes.
-    - `prefix_sz`: Size of the prefix, up to 26 bytes.
-    - `inclusion_proof_sz`: Size of the inclusion proof.
-    - `node_buf`: Buffer for nodes, indexed by layer, with 0 being the leaf layer.
-    - `inclusion_proofs_valid`: Pointer to a dense bit set used in proof-based commits.
-    - `inclusion_proofs`: Array storing hashes of internal nodes for inclusion proofs.
-- **Description**: The `fd_bmtree_commit_private` structure is used to manage the internal state of a binary Merkle tree during its construction and verification processes. It tracks the number of leaf nodes added (`leaf_cnt`), manages node data across different layers (`node_buf`), and handles inclusion proofs for verifying node inclusion in the tree (`inclusion_proofs`). The structure supports both leaf-based and proof-based commitment calculations, allowing for efficient computation and verification of the tree's root hash. The `hash_sz` and `prefix_sz` fields define the size constraints for hashing operations, while `inclusion_proofs_valid` is used to manage proof validity in proof-based calculations.
+    - ``leaf_cnt``: Stores the number of leaf nodes added so far.
+    - ``hash_sz``: Specifies the size of the hash, up to 32 bytes.
+    - ``prefix_sz``: Specifies the size of the prefix, up to 26 bytes.
+    - ``inclusion_proof_sz``: Indicates the size of the inclusion proof.
+    - ``node_buf``: An array of `fd_bmtree_node_t` that stores nodes by layer, with 0 being the leaf layer.
+    - ``inclusion_proofs_valid``: A pointer to a dense bit set used in proof-based commits.
+    - ``inclusion_proofs``: An array of `fd_bmtree_node_t` that stores hashes of internal nodes for inclusion proofs.
+- **Description**: Manages the internal state for computing the root of a binary Merkle tree incrementally. It tracks the number of leaf nodes added, manages node buffers for different layers, and handles inclusion proofs for verifying node inclusion. The structure supports both leaf-based and proof-based commitment calculations, allowing for efficient tree construction and verification.
 
 
 ---
 ### fd\_bmtree\_commit\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `leaf_cnt`: Stores the number of leaf nodes added so far.
-    - `hash_sz`: Indicates the size of the hash, up to 32 bytes.
-    - `prefix_sz`: Specifies the size of the prefix, up to 26 bytes.
-    - `inclusion_proof_sz`: Holds the size of the inclusion proof.
-    - `node_buf`: An array of nodes used to buffer branch nodes during tree construction.
-    - `inclusion_proofs_valid`: A dense bit set indicating valid inclusion proofs.
-    - `inclusion_proofs`: Stores hashes of internal nodes for inclusion proofs.
-- **Description**: The `fd_bmtree_commit_t` structure is designed to manage the intermediate state during the incremental computation of a binary Merkle tree's root. It supports two types of commitment calculations: leaf-based and proof-based, but only one at a time. The structure efficiently handles the accumulation of leaf nodes and the buffering of branch nodes, ultimately deriving the root hash in the finalization phase. It is optimized for trees with non-power-of-two leaf counts, ensuring that branch nodes with single children are correctly managed. The structure is capable of handling trees with up to 2^63 leaves, although practical usage is limited by time constraints. It also supports inclusion proofs, which are stored separately to maintain efficient cache utilization.
+    - ``leaf_cnt``: Contains the number of leaf nodes added so far.
+    - ``hash_sz``: Specifies the size of the hash in bytes, up to 32.
+    - ``prefix_sz``: Specifies the size of the prefix in bytes, up to 26.
+    - ``inclusion_proof_sz``: Indicates the size of the inclusion proof.
+    - ``node_buf``: An array of `fd_bmtree_node_t` that buffers nodes for each layer, indexed by layer.
+    - ``inclusion_proofs_valid``: A pointer to a dense bit set used in proof-based commits.
+    - ``inclusion_proofs``: An array of `fd_bmtree_node_t` storing hashes of internal nodes for inclusion proofs.
+- **Description**: Stores intermediate state for computing the root of a binary Merkle tree incrementally, supporting both leaf-based and proof-based commitment calculations. It manages the accumulation of leaf nodes and the buffering of branch nodes, finalizing with the root hash calculation. The structure separates accumulation and finalization phases to handle trees with non-power-of-two leaf counts, and it includes mechanisms for managing inclusion proofs.
 
 
 # Functions
 
 ---
 ### fd\_bmtree\_commit\_leaf\_cnt<!-- {{#callable:fd_bmtree_commit_leaf_cnt}} -->
-The `fd_bmtree_commit_leaf_cnt` function returns the number of leaf nodes that have been appended to a binary Merkle tree commitment so far.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L336>)
+
+Returns the number of leaf nodes appended to a binary Merkle tree commitment.
 - **Inputs**:
-    - `bmt`: A pointer to a constant `fd_bmtree_commit_t` structure representing the current state of a binary Merkle tree commitment.
-- **Control Flow**:
-    - The function accesses the `leaf_cnt` member of the `fd_bmtree_commit_t` structure pointed to by `bmt`.
-    - It returns the value of `leaf_cnt`, which indicates the number of leaf nodes appended to the tree.
+    - `bmt`: A pointer to a constant `fd_bmtree_commit_t` structure representing the binary Merkle tree commitment.
+- **Logic and Control Flow**:
+    - Accesses the `leaf_cnt` member of the `fd_bmtree_commit_t` structure pointed to by `bmt`.
+    - Returns the value of `leaf_cnt`, which indicates the number of leaf nodes appended to the tree.
 - **Output**: The function returns an `ulong` representing the number of leaf nodes appended to the binary Merkle tree commitment.
 
 
@@ -136,143 +96,167 @@ The `fd_bmtree_commit_leaf_cnt` function returns the number of leaf nodes that h
 
 ---
 ### fd\_bmtree\_hash\_leaf<!-- {{#callable_declaration:fd_bmtree_hash_leaf}} -->
-Compute the SHA-256 hash of a data blob with a specified prefix.
-- **Description**: This function computes the SHA-256 hash of a given data blob, prefixed by a specified number of bytes from a predefined prefix. It is typically used as the first step in creating a Merkle tree, where each leaf node is derived from hashing a data blob with a prefix. The function requires a valid node structure to store the resulting hash and expects the data and node memory regions not to overlap. The prefix size should be either FD_BMTREE_LONG_PREFIX_SZ or FD_BMTREE_SHORT_PREFIX_SZ.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L159>)
+
+Computes the SHA-256 hash of a leaf node with a specified prefix.
+- **Description**: Use this function to compute the hash of a leaf node in a binary Merkle tree using the SHA-256 algorithm. This is the initial step in constructing a Merkle tree. The function requires a prefix, which is a portion of a predefined constant, to be prepended to the data before hashing. The prefix size must be specified and is typically one of two predefined sizes. The function returns the node with the computed hash. Ensure that the `node` and `data` do not overlap in memory to avoid undefined behavior.
 - **Inputs**:
-    - `node`: A pointer to an fd_bmtree_node_t structure where the resulting hash will be stored. Must not overlap with the data memory region.
-    - `data`: A pointer to the data blob to be hashed. The caller retains ownership and it must not overlap with the node memory region.
-    - `data_sz`: The size in bytes of the data blob to be hashed. Must be a valid size for the data provided.
-    - `prefix_sz`: The number of bytes from the fd_bmtree_leaf_prefix to prepend to the data before hashing. Typically FD_BMTREE_LONG_PREFIX_SZ or FD_BMTREE_SHORT_PREFIX_SZ.
-- **Output**: Returns a pointer to the node structure containing the computed hash.
-- **See also**: [`fd_bmtree_hash_leaf`](fd_bmtree.c.md#fd_bmtree_hash_leaf)  (Implementation)
+    - `node`: A pointer to an `fd_bmtree_node_t` structure where the computed hash will be stored. Must not overlap with `data`.
+    - `data`: A pointer to the data to be hashed. The data is read-only and must not overlap with `node`.
+    - `data_sz`: The size of the data in bytes. Must be a valid size for the data buffer.
+    - `prefix_sz`: The size of the prefix to use from `fd_bmtree_leaf_prefix`. Typically `FD_BMTREE_LONG_PREFIX_SZ` or `FD_BMTREE_SHORT_PREFIX_SZ`.
+- **Output**: Returns a pointer to the `fd_bmtree_node_t` structure containing the computed hash.
+- **See Also**: [`fd_bmtree_hash_leaf`](<fd_bmtree.c.md#fd_bmtree_hash_leaf>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_commit\_align<!-- {{#callable_declaration:fd_bmtree_commit_align}} -->
-Return the alignment requirement for a binary Merkle tree commitment structure.
-- **Description**: This function provides the alignment requirement for memory regions used to store a `fd_bmtree_commit_t` structure. It is essential to ensure that any memory allocated for a binary Merkle tree commitment is aligned according to this requirement to avoid undefined behavior. This function should be called before allocating memory for a Merkle tree commitment to determine the correct alignment.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L306>)
+
+Returns the alignment requirement for a binary Merkle tree commitment.
+- **Description**: Use this function to obtain the alignment requirement for memory regions intended to store a `fd_bmtree_commit_t` structure. This is necessary to ensure that the memory is correctly aligned for operations on binary Merkle trees. The function does not require any parameters and can be called at any time to retrieve the alignment value.
 - **Inputs**: None
-- **Output**: Returns the alignment requirement in bytes for a `fd_bmtree_commit_t` structure.
-- **See also**: [`fd_bmtree_commit_align`](fd_bmtree.c.md#fd_bmtree_commit_align)  (Implementation)
+- **Output**: Returns an unsigned long integer representing the alignment requirement in bytes.
+- **See Also**: [`fd_bmtree_commit_align`](<fd_bmtree.c.md#fd_bmtree_commit_align>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_commit\_footprint<!-- {{#callable_declaration:fd_bmtree_commit_footprint}} -->
-Calculate the memory footprint required for a binary Merkle tree commitment.
-- **Description**: This function calculates the memory footprint needed for a binary Merkle tree commitment structure, given a specified number of inclusion proof layers. It is useful when setting up memory allocations for Merkle tree operations, ensuring that enough space is reserved to accommodate the tree's nodes and inclusion proofs. The function should be called before initializing a Merkle tree commitment to determine the appropriate memory size. The number of layers specified should not exceed the expected maximum layers of the tree to ensure all inclusion proofs can be retrieved.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L313>)
+
+Calculates the memory footprint for a binary Merkle tree commitment.
+- **Description**: Use this function to determine the memory size required for a binary Merkle tree commitment structure, given a specific number of inclusion proof layers. This is useful when allocating memory for a Merkle tree that will not exceed the specified number of layers. Ensure that the `inclusion_proof_layer_cnt` is set according to the expected maximum depth of the tree to avoid memory allocation issues.
 - **Inputs**:
-    - `inclusion_proof_layer_cnt`: Specifies the number of layers for which inclusion proofs should be stored. It must be a non-negative integer, and the function assumes this value is within a reasonable range for the application. Invalid values may lead to incorrect memory size calculations.
-- **Output**: Returns the size in bytes of the memory footprint required for the Merkle tree commitment structure.
-- **See also**: [`fd_bmtree_commit_footprint`](fd_bmtree.c.md#fd_bmtree_commit_footprint)  (Implementation)
+    - `inclusion_proof_layer_cnt`: Specifies the number of layers for which inclusion proofs are needed. Must be a non-negative integer. The function calculates the required memory footprint based on this layer count.
+- **Output**: Returns the size in bytes of the memory footprint needed for the Merkle tree commitment.
+- **See Also**: [`fd_bmtree_commit_footprint`](<fd_bmtree.c.md#fd_bmtree_commit_footprint>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_commit\_init<!-- {{#callable_declaration:fd_bmtree_commit_init}} -->
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L332>)
+
 Initializes a binary Merkle tree commitment state.
-- **Description**: This function initializes a memory region to be used as a binary Merkle tree commitment state, setting up the necessary parameters for hash size, prefix size, and inclusion proof layers. It should be called before any commitment calculations are performed, ensuring that the memory provided is unused and meets the required alignment and footprint. The function prepares the state for either leaf-based or proof-based commitment calculations, depending on the subsequent operations. Inclusion proofs can be generated if the tree does not exceed the specified number of layers.
+- **Description**: Use this function to start a new vector commitment calculation for a binary Merkle tree. The memory region provided must be unused and have the required alignment and footprint. This function sets up the initial state for either leaf-based or proof-based commitment calculations. Ensure that the `prefix_sz` does not exceed `FD_BMTREE_LONG_PREFIX_SZ`. The function also configures the state to store inclusion proofs if the tree does not exceed the specified number of layers. If the tree grows beyond this, inclusion proofs may not be available.
 - **Inputs**:
-    - `mem`: A pointer to a memory region that is assumed to be unused and must have the required alignment and footprint for a fd_bmtree_commit_t structure. The caller retains ownership.
+    - `mem`: A pointer to a memory region that must be unused, with the required alignment and footprint for a `fd_bmtree_commit_t` structure. The caller retains ownership.
     - `hash_sz`: The size of the hash in bytes, which must be less than or equal to 32.
-    - `prefix_sz`: The size of the prefix in bytes, typically FD_BMTREE_LONG_PREFIX_SZ or FD_BMTREE_SHORT_PREFIX_SZ, and must not exceed FD_BMTREE_LONG_PREFIX_SZ.
-    - `inclusion_proof_layer_cnt`: The number of layers for which inclusion proofs can be generated. If the tree grows beyond this number of layers, inclusion proofs may not be available.
-- **Output**: Returns a pointer to the initialized fd_bmtree_commit_t structure, ready for commitment calculations.
-- **See also**: [`fd_bmtree_commit_init`](fd_bmtree.c.md#fd_bmtree_commit_init)  (Implementation)
+    - `prefix_sz`: The size of the prefix used for second-preimage resistance, typically `FD_BMTREE_LONG_PREFIX_SZ` or `FD_BMTREE_SHORT_PREFIX_SZ`. Must not exceed `FD_BMTREE_LONG_PREFIX_SZ`.
+    - `inclusion_proof_layer_cnt`: The maximum number of layers for which inclusion proofs will be stored. If the tree exceeds this number of layers, inclusion proofs may not be available.
+- **Output**: Returns a pointer to the initialized `fd_bmtree_commit_t` structure.
+- **See Also**: [`fd_bmtree_commit_init`](<fd_bmtree.c.md#fd_bmtree_commit_init>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_depth<!-- {{#callable_declaration:fd_bmtree_depth}} -->
-Calculates the depth of a binary Merkle tree given the number of leaf nodes.
-- **Description**: Use this function to determine the number of layers in a binary Merkle tree, including both the leaf and root layers, based on the specified number of leaf nodes. This is useful for understanding the structure and height of the tree when planning operations such as inclusion proofs or tree traversal. The function handles edge cases where the number of leaves is zero or one, returning the appropriate depth for these scenarios.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L342>)
+
+Calculates the depth of a binary Merkle tree.
+- **Description**: Use this function to determine the number of layers in a binary Merkle tree, including both the leaf and root layers. This is useful for understanding the structure of the tree and for operations that depend on tree depth. The function can handle any number of leaves from 0 to ULONG_MAX, and it returns a depth of 0 for an empty tree and 1 for a tree with a single leaf.
 - **Inputs**:
-    - `leaf_cnt`: The number of leaf nodes in the binary Merkle tree. It must be a non-negative integer within the range [0, ULONG_MAX]. The function will return a depth of 0 for 0 leaves and 1 for 1 leaf, while larger numbers will result in a calculated depth based on the binary tree structure.
-- **Output**: The function returns an unsigned long integer representing the depth of the binary Merkle tree, which includes both the leaf and root layers.
-- **See also**: [`fd_bmtree_depth`](fd_bmtree.c.md#fd_bmtree_depth)  (Implementation)
+    - `leaf_cnt`: The number of leaf nodes in the binary Merkle tree. Valid values are in the range [0, ULONG_MAX]. The function handles all values within this range without error.
+- **Output**: Returns the depth of the binary Merkle tree as an unsigned long integer, which includes both the leaf and root layers.
+- **See Also**: [`fd_bmtree_depth`](<fd_bmtree.c.md#fd_bmtree_depth>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_node\_cnt<!-- {{#callable_declaration:fd_bmtree_node_cnt}} -->
-Calculate the total number of nodes in a binary Merkle tree given the number of leaf nodes.
-- **Description**: This function is used to determine the total number of nodes in a binary Merkle tree when the number of leaf nodes is known. It is useful in scenarios where you need to allocate resources or understand the structure of the tree based on its leaf count. The function expects a non-negative number of leaf nodes and returns zero if the leaf count is zero, indicating an empty tree. It is a constant function, meaning it does not modify any state and is safe to call multiple times with the same input.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L343>)
+
+Calculates the total number of nodes in a binary Merkle tree.
+- **Description**: Use this function to determine the total number of nodes in a binary Merkle tree given a specific number of leaf nodes. This is useful for understanding the structure and size of the tree. The function expects a non-negative number of leaf nodes and will return zero if the input is zero, indicating an empty tree. It is important to ensure that the input is within the valid range of an unsigned long integer.
 - **Inputs**:
-    - `leaf_cnt`: The number of leaf nodes in the binary Merkle tree. It must be a non-negative integer within the range [0, ULONG_MAX]. If the value is zero, the function returns zero, indicating an empty tree.
-- **Output**: The function returns an unsigned long integer representing the total number of nodes in the binary Merkle tree, including both leaf and internal nodes.
-- **See also**: [`fd_bmtree_node_cnt`](fd_bmtree.c.md#fd_bmtree_node_cnt)  (Implementation)
+    - `leaf_cnt`: The number of leaf nodes in the binary Merkle tree. Must be a non-negative value within the range of an unsigned long integer. If zero, the function returns zero, indicating an empty tree.
+- **Output**: Returns the total number of nodes in the binary Merkle tree as an unsigned long integer.
+- **See Also**: [`fd_bmtree_node_cnt`](<fd_bmtree.c.md#fd_bmtree_node_cnt>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_commit\_append<!-- {{#callable_declaration:fd_bmtree_commit_append}} -->
-Appends a range of new leaf nodes to the binary Merkle tree state.
-- **Description**: Use this function to add a sequence of new leaf nodes to an existing binary Merkle tree commitment state. This function should be called when you have a set of new leaf nodes that need to be incorporated into the tree. The state must be valid and in a leaf-based calculation mode before calling this function. The function updates the state with the new leaf nodes and maintains the necessary internal structures to ensure the tree's integrity. It is assumed that the total number of leaves, including the new ones, is significantly less than 2^63, which is practically always true.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L348>)
+
+Appends a range of new leaf nodes to a binary Merkle tree commitment.
+- **Description**: Use this function to add new leaf nodes to an ongoing binary Merkle tree commitment calculation. It assumes that the `state` is valid and currently in a leaf-based calculation. The function updates the internal state to include the new leaf nodes and maintains the necessary data for future tree operations. Ensure that the sum of existing and new leaf nodes does not exceed the practical limit of 2^63, which is unlikely to be reached in typical use cases.
 - **Inputs**:
-    - `state`: A pointer to a valid fd_bmtree_commit_t structure that is currently in a leaf-based calculation. The caller retains ownership and must ensure it is not null.
-    - `new_leaf`: A pointer to an array of fd_bmtree_node_t structures representing the new leaf nodes to be appended. The array is indexed from 0 to new_leaf_cnt-1. The caller retains ownership and must ensure it is not null.
-    - `new_leaf_cnt`: The number of new leaf nodes to append, represented as an unsigned long. It must be a non-negative value.
-- **Output**: Returns a pointer to the updated fd_bmtree_commit_t state, allowing for further operations or inspection.
-- **See also**: [`fd_bmtree_commit_append`](fd_bmtree.c.md#fd_bmtree_commit_append)  (Implementation)
+    - `state`: A pointer to a `fd_bmtree_commit_t` structure representing the current state of the Merkle tree commitment. It must be valid and in a leaf-based calculation.
+    - `new_leaf`: A pointer to an array of `fd_bmtree_node_t` structures representing the new leaf nodes to append. The array is indexed from 0 to `new_leaf_cnt - 1`.
+    - `new_leaf_cnt`: The number of new leaf nodes to append. It must be a non-negative value.
+- **Output**: Returns a pointer to the updated `fd_bmtree_commit_t` state.
+- **See Also**: [`fd_bmtree_commit_append`](<fd_bmtree.c.md#fd_bmtree_commit_append>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_commit\_fini<!-- {{#callable_declaration:fd_bmtree_commit_fini}} -->
-Finalizes a binary Merkle tree commitment and returns the root hash.
-- **Description**: Use this function to complete the calculation of a binary Merkle tree's root hash after all leaf nodes have been appended. It should be called when the tree is in a leaf-based calculation state and contains at least one leaf. The function finalizes the commitment by deriving the root node, and the returned pointer to the root hash remains valid as long as the state is not reinitialized for a new calculation. This function is essential for obtaining the final commitment of the tree.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L361>)
+
+Finalizes a binary Merkle tree commitment calculation.
+- **Description**: Use this function to complete a leaf-based commitment calculation of a binary Merkle tree. It must be called after all leaf nodes have been appended using `fd_bmtree_commit_append`. The function derives the root node of the tree and returns a pointer to the root hash. The state must be valid and in a leaf-based calculation on entry, with at least one leaf in the tree. After calling this function, the state will no longer be in a calculation, but it remains valid for other operations.
 - **Inputs**:
-    - `state`: A pointer to a valid fd_bmtree_commit_t structure that is in a leaf-based calculation state. It must have at least one leaf node appended. The caller retains ownership, and the state must not be null.
-- **Output**: Returns a pointer to the root hash of the Merkle tree, which is a memory region of size BMTREE_HASH_SZ. The pointer remains valid until the state is reinitialized for a new calculation.
-- **See also**: [`fd_bmtree_commit_fini`](fd_bmtree.c.md#fd_bmtree_commit_fini)  (Implementation)
+    - `state`: A pointer to a `fd_bmtree_commit_t` structure representing the current state of the Merkle tree commitment calculation. It must be valid and in a leaf-based calculation with at least one leaf node appended.
+- **Output**: Returns a pointer to the root hash of the Merkle tree. The pointer is valid as long as the state remains valid or until the memory used for the state is reinitialized for a new calculation.
+- **See Also**: [`fd_bmtree_commit_fini`](<fd_bmtree.c.md#fd_bmtree_commit_fini>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_get\_proof<!-- {{#callable_declaration:fd_bmtree_get_proof}} -->
-Writes an inclusion proof for a specified leaf to a destination buffer.
-- **Description**: Use this function to obtain an inclusion proof for a specific leaf in a binary Merkle tree. The function requires a valid, sealed `fd_bmtree_commit_t` state that has been initialized with sufficient inclusion proof layers to cover the tree's height. The inclusion proof is written to the provided destination buffer, excluding the root hash, and the function returns the number of hashes written. If the state was initialized with insufficient inclusion proof layers, the function returns -1 and does not modify the destination buffer.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L382>)
+
+Writes an inclusion proof for a specified leaf index to a destination buffer.
+- **Description**: Use this function to obtain an inclusion proof for a specific leaf in a binary Merkle tree. The function requires a valid, sealed `fd_bmtree_commit_t` state with at least `leaf_idx + 1` leaves. The state must have been initialized with an `inclusion_proof_layers_cnt` that is at least the height of the tree. The inclusion proof is written to the `dest` buffer, excluding the root of the tree. If the initialization conditions are not met, the function returns -1 and does not modify `dest`. Otherwise, it returns the number of hashes written.
 - **Inputs**:
-    - `state`: A pointer to a valid, sealed `fd_bmtree_commit_t` structure representing the Merkle tree. It must have been initialized with enough inclusion proof layers to cover the tree's height.
-    - `dest`: A pointer to a memory buffer where the inclusion proof will be written. The buffer must be large enough to hold the proof, which is up to `hash_sz * (tree depth - 1)` bytes.
-    - `leaf_idx`: The index of the leaf for which the inclusion proof is requested. It must be less than the number of leaves in the tree.
-- **Output**: Returns the number of hashes written to `dest` if successful, or -1 if the inclusion proof layers were insufficient. The `dest` buffer is not modified if the function returns -1.
-- **See also**: [`fd_bmtree_get_proof`](fd_bmtree.c.md#fd_bmtree_get_proof)  (Implementation)
+    - `state`: A pointer to a valid, sealed `fd_bmtree_commit_t` structure. It must have been initialized with sufficient `inclusion_proof_layers_cnt` to cover the tree height.
+    - `dest`: A pointer to a memory buffer where the inclusion proof will be written. The buffer must be large enough to hold the proof, which is `hash_sz * (tree depth - 1)` bytes.
+    - `leaf_idx`: An unsigned long integer representing the index of the leaf for which the inclusion proof is requested. It must be less than the number of leaves in the tree.
+- **Output**: Returns the number of hashes written to `dest` if successful, or -1 if the conditions for generating the proof are not met.
+- **See Also**: [`fd_bmtree_get_proof`](<fd_bmtree.c.md#fd_bmtree_get_proof>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_from\_proof<!-- {{#callable_declaration:fd_bmtree_from_proof}} -->
-Derives the root of a Merkle tree from a leaf node and its inclusion proof.
-- **Description**: This function is used to compute the root hash of a Merkle tree given a specific leaf node, its index, and an inclusion proof. It is useful for verifying that a particular leaf is part of a Merkle tree with a known root. The function requires the leaf node, its index, a buffer for the root, the inclusion proof, and parameters specifying the proof depth, hash size, and prefix size. The inclusion proof must be valid and of sufficient depth to correspond to the specified leaf index. If the proof is valid, the root hash is stored in the provided root buffer; otherwise, the function returns NULL, indicating an invalid proof.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L408>)
+
+Derives the root of a Merkle tree from a leaf and its inclusion proof.
+- **Description**: Use this function to compute the root of a Merkle tree when you have a specific leaf node and its inclusion proof. This function is useful for verifying that a leaf is part of a Merkle tree by reconstructing the root from the leaf and proof. Ensure that the `proof` array contains the correct sequence of sibling hashes, and that `proof_depth` is sufficient to reach the root from the given `leaf_idx`. The function does not modify any input if the proof is invalid, and it returns `NULL` in such cases.
 - **Inputs**:
-    - `leaf`: A pointer to the leaf node for which the root is being derived. Must not be null.
+    - `leaf`: A pointer to the leaf node hash. Must not be null. Represents the hash of the leaf node for which the proof is provided.
     - `leaf_idx`: The index of the leaf node in the Merkle tree. Must be in the range [0, ULONG_MAX).
-    - `root`: A pointer to a buffer where the computed root hash will be stored. Must not be null.
-    - `proof`: A pointer to the inclusion proof, which is a sequence of hashes. Must not be null and should be ordered from leaf to root, excluding the root.
-    - `proof_depth`: The depth of the inclusion proof, indicating the number of hashes in the proof. Must be in the range [0, 63].
-    - `hash_sz`: The size of each hash in the proof, in bytes. Must be in the range [1, 32].
-    - `prefix_sz`: The size of the prefix used for hash calculations, typically either FD_BMTREE_LONG_PREFIX_SZ or FD_BMTREE_SHORT_PREFIX_SZ.
-- **Output**: Returns a pointer to the root if the proof is valid, or NULL if the proof is invalid. The root buffer is updated with the root hash if the proof is valid.
-- **See also**: [`fd_bmtree_from_proof`](fd_bmtree.c.md#fd_bmtree_from_proof)  (Implementation)
+    - `root`: A pointer to where the computed root node hash will be stored. Must not be null.
+    - `proof`: A pointer to the array of sibling hashes forming the inclusion proof. Must not be null if `proof_depth` is greater than 0.
+    - `proof_depth`: The number of hashes in the proof. Must be in the range [0, 63]. Determines how many levels up the tree the proof goes.
+    - `hash_sz`: The size of each hash in bytes. Must be in the range [1, 32]. Determines the size of each hash in the proof.
+    - `prefix_sz`: The size of the prefix used for hash calculations. Must be either `FD_BMTREE_LONG_PREFIX_SZ` or `FD_BMTREE_SHORT_PREFIX_SZ`.
+- **Output**: Returns a pointer to the root node if the proof is valid, or NULL if the proof is invalid.
+- **See Also**: [`fd_bmtree_from_proof`](<fd_bmtree.c.md#fd_bmtree_from_proof>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_commitp\_insert\_with\_proof<!-- {{#callable_declaration:fd_bmtree_commitp_insert_with_proof}} -->
-Inserts a leaf node into a proof-based Merkle tree calculation with optional proof verification.
-- **Description**: This function is used to insert a new leaf node at a specified index in a proof-based Merkle tree calculation. It optionally verifies the provided proof against the current state of the tree. The function should be called when you want to add a leaf node and potentially validate its inclusion proof in an ongoing proof-based commitment calculation. The function requires that the depth of the tree at the specified index does not exceed the inclusion proof layer count specified during initialization. If the function returns success and an optional root pointer is provided, it will store the highest known node in the branch containing the index. If the function fails, the state remains unchanged.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L453>)
+
+Inserts a leaf node into a proof-based Merkle tree calculation.
+- **Description**: Use this function to insert a new leaf node at a specified index in a proof-based Merkle tree calculation. This function checks if the provided leaf and proof are consistent with the current state of the tree. It requires that the depth of the tree at the specified index does not exceed the maximum layer count specified during initialization. If the proof is valid and the optional root pointer is provided, the function writes the highest known node in the branch to the memory pointed to by the optional root. If the function returns 0, the state remains unchanged. If it returns 1, the state is updated with the new information, which can speed up future validations.
 - **Inputs**:
-    - `state`: A pointer to a valid fd_bmtree_commit_t structure representing the current state of the proof-based Merkle tree calculation. The caller retains ownership and must ensure it is properly initialized.
-    - `idx`: The index at which to insert the new leaf node. It must be within the bounds of the tree as determined by the inclusion proof layer count.
-    - `new_leaf`: A pointer to the new leaf node to be inserted. The caller retains ownership and must ensure it is not null.
-    - `proof`: A pointer to the proof data, which is an array of hashes ordered from leaf to root, excluding the root. It can be null if proof_depth is zero.
-    - `proof_depth`: The depth of the proof, indicating how many hashes are included in the proof. It must be less than the inclusion proof layer count and can be zero.
-    - `opt_root`: An optional pointer to a fd_bmtree_node_t where the highest known node in the branch will be stored if the function succeeds. It can be null if the caller does not need this information.
-- **Output**: Returns 1 if the leaf and proof are consistent with the current state, or 0 if not. If successful and opt_root is provided, it will be updated with the highest known node in the branch.
-- **See also**: [`fd_bmtree_commitp_insert_with_proof`](fd_bmtree.c.md#fd_bmtree_commitp_insert_with_proof)  (Implementation)
+    - `state`: A pointer to a valid `fd_bmtree_commit_t` structure representing the current state of the proof-based calculation. The caller retains ownership and must ensure it is properly initialized.
+    - `idx`: An unsigned long integer representing the index at which to insert the new leaf. The depth of the tree at this index must not exceed the maximum layer count specified during initialization.
+    - `new_leaf`: A pointer to a `fd_bmtree_node_t` structure representing the new leaf node to insert. The caller retains ownership and must ensure it is valid.
+    - `proof`: A pointer to an array of unsigned characters representing the inclusion proof. Each hash in the proof is `hash_sz` bytes long, and the proof is ordered from leaf to root, excluding the root. If `proof_depth` is 0, this can be NULL.
+    - `proof_depth`: An unsigned long integer representing the depth of the proof. It must be less than the maximum layer count specified during initialization and can be 0.
+    - `opt_root`: An optional pointer to a `fd_bmtree_node_t` structure where the highest known node in the branch will be written if the proof is valid. If NULL, this parameter is ignored.
+- **Output**: Returns 1 if the leaf and proof are consistent with the current state, or 0 if not. If successful and `opt_root` is not NULL, writes the highest known node in the branch to `opt_root`.
+- **See Also**: [`fd_bmtree_commitp_insert_with_proof`](<fd_bmtree.c.md#fd_bmtree_commitp_insert_with_proof>)  (Implementation)
 
 
 ---
 ### fd\_bmtree\_commitp\_fini<!-- {{#callable_declaration:fd_bmtree_commitp_fini}} -->
-Finalize a proof-based Merkle tree calculation and return the root hash.
-- **Description**: Use this function to complete a proof-based Merkle tree calculation and obtain the root hash, provided the tree is consistent with the given number of leaf nodes. It should be called after all necessary leaf nodes and proofs have been inserted using the appropriate functions. The function will return NULL if the tree cannot be conclusively determined to be correct, such as when the number of leaf nodes is zero or if the internal consistency checks fail.
+[View Source →](<../../../../../src/ballet/bmtree/fd_bmtree.h#L465>)
+
+Finalizes a proof-based Merkle tree calculation.
+- **Description**: Use this function to complete a proof-based Merkle tree calculation and verify the correctness of the entire tree for a specified number of leaf nodes. It must be called after all necessary leaf nodes and proofs have been inserted into the state. If the function can confirm the tree's correctness, it returns the root hash; otherwise, it returns NULL. Ensure that the state is valid and in a proof-based calculation before calling this function.
 - **Inputs**:
-    - `state`: A pointer to a valid fd_bmtree_commit_t structure that has been initialized for a proof-based calculation. The caller retains ownership and must ensure it is not null.
-    - `leaf_cnt`: The number of leaf nodes expected in the tree. Must be greater than zero. If the count is not a power of two, additional internal processing will be performed to complete the tree.
-- **Output**: Returns a pointer to the root hash of the tree if the calculation is successful and the tree is consistent with the specified number of leaf nodes. Returns NULL if the tree cannot be conclusively determined to be correct.
-- **See also**: [`fd_bmtree_commitp_fini`](fd_bmtree.c.md#fd_bmtree_commitp_fini)  (Implementation)
+    - `state`: A pointer to a `fd_bmtree_commit_t` structure representing the current state of the proof-based calculation. It must be valid and initialized for a proof-based calculation.
+    - `leaf_cnt`: The number of leaf nodes expected in the tree. It must be greater than zero, as a zero value will result in a NULL return.
+- **Output**: Returns a pointer to the root hash of the tree if the calculation is successful and the tree is correct. Returns NULL if the tree cannot be conclusively determined to be correct.
+- **See Also**: [`fd_bmtree_commitp_fini`](<fd_bmtree.c.md#fd_bmtree_commitp_fini>)  (Implementation)
 
 
 
