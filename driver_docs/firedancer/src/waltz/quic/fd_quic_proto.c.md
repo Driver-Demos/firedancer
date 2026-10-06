@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Instantiates structures and functions for the QUIC protocol, including an optimized stream frame encoder.
+The `fd_quic_proto.c` file in the `firedancer` codebase implements the structures and functions for the QUIC protocol, including an optimized encoder for stream headers.
 
 # Purpose
-The code is part of a C implementation of the QUIC protocol, which is a transport layer network protocol. It includes various header files and templates that define types, common utilities, and protocol-specific functions for handling QUIC operations. The file focuses on encoding functionalities, particularly for stream frames, which are essential components of the QUIC protocol for managing data streams. The inclusion of multiple template files suggests that the code uses a templated approach to handle different aspects of the QUIC protocol, such as parsing, encoding, and managing transport parameters.
+This C source code file is dedicated to implementing components of the QUIC (Quick UDP Internet Connections) protocol, specifically focusing on encoding functionalities. The file includes a variety of header files that define types, common utilities, and templates necessary for parsing and encoding QUIC protocol frames. The primary function within this file, [`fd_quic_encode_stream_frame`](#fd_quic_encode_stream_frame), is an optimized encoder for stream headers, which are a critical part of the QUIC protocol's data transmission mechanism. This function encodes various components of a stream frame, such as the stream ID, offset, and data size, into a buffer, ensuring that the encoded data fits within the specified buffer limits.
 
-The function [`fd_quic_encode_stream_frame`](<#fd_quic_encode_stream_frame>) is a static function that encodes a stream frame header for QUIC. It takes parameters such as buffer pointers, stream ID, offset, data size, and a flag indicating if the stream is finished. The function calculates the maximum size of a stream header and checks if there is enough space in the buffer to write the frame. It encodes the stream ID, optionally encodes the offset if it is greater than zero, and encodes the length of the data. The function also sets the frame type, which includes flags for the presence of an offset and whether the stream is finished. The function returns the number of bytes written to the buffer.
+The file is structured to handle the encoding of stream frames efficiently, using macros and templates to manage different encoding scenarios. It includes several template files that likely provide reusable code patterns for encoding and parsing, which are essential for handling the complex data structures of the QUIC protocol. The use of pragma directives to suppress specific compiler warnings indicates a focus on maintaining compatibility and functionality across different data types. This file is part of a larger library or application that implements the QUIC protocol, providing essential encoding capabilities that can be utilized by other components of the system.
 # Imports and Dependencies
 
 ---
@@ -30,29 +30,28 @@ The function [`fd_quic_encode_stream_frame`](<#fd_quic_encode_stream_frame>) is 
 
 ---
 ### fd\_quic\_encode\_stream\_frame<!-- {{#callable:fd_quic_encode_stream_frame}} -->
-[View Source →](<../../../../../src/waltz/quic/fd_quic_proto.c#L40>)
-
-Encodes a QUIC stream frame into a buffer with specified parameters.
+The `fd_quic_encode_stream_frame` function encodes a QUIC stream frame into a buffer, including stream ID, optional offset, data size, and a finalization flag.
 - **Inputs**:
-    - `buf`: Pointer to the start of the buffer where the stream frame will be encoded.
-    - `buf_end`: Pointer to the end of the buffer, used to ensure there is enough space for encoding.
-    - `stream_id`: Identifier for the stream to be encoded.
-    - `offset`: Offset value for the stream data, encoded if greater than zero.
-    - `data_sz`: Size of the data to be encoded in the stream frame.
-    - `fin`: Boolean flag indicating if this is the final frame of the stream.
-- **Logic and Control Flow**:
-    - Initialize `cur` to point to the start of the buffer `buf`.
+    - `buf`: A pointer to the start of the buffer where the encoded stream frame will be written.
+    - `buf_end`: A pointer to the end of the buffer, used to ensure there is enough space for encoding.
+    - `stream_id`: The identifier of the stream to be encoded.
+    - `offset`: The offset within the stream where the data starts, encoded if greater than zero.
+    - `data_sz`: The size of the data to be encoded in the stream frame.
+    - `fin`: A boolean flag indicating if this is the final frame for the stream.
+- **Control Flow**:
+    - Initialize a pointer `cur` to the start of the buffer `buf`.
     - Define `stream_hdr_max` as the maximum size of a stream header, which is 25 bytes.
-    - Check if there is enough space in the buffer to encode the stream frame; if not, return `FD_QUIC_ENCODE_FAIL`.
-    - Reserve space for the frame type and initialize `frame_type` to indicate a stream frame with length.
-    - Encode the `stream_id` using [`fd_quic_varint_encode`](<templ/fd_quic_parse_util.h.md#fd_quic_varint_encode>) and update `cur`.
-    - If `offset` is greater than zero, update `frame_type` to include the offset field and encode the `offset`.
-    - Encode the `data_sz` as a swapped ushort and store it in the buffer, updating `cur`.
-    - Set the `frame_type` in the reserved space, including the `fin` flag if set.
-    - Return the number of bytes written to the buffer.
-- **Output**: Returns the number of bytes written to the buffer, or `FD_QUIC_ENCODE_FAIL` if there is insufficient space.
-- **Functions Called**:
-    - [`fd_quic_varint_encode`](<templ/fd_quic_parse_util.h.md#fd_quic_varint_encode>)
+    - Check if there is enough space in the buffer to write the maximum stream header size plus at least one byte of data; if not, return `FD_QUIC_ENCODE_FAIL`.
+    - Reserve space for the frame type at the current buffer position and increment the buffer pointer `cur`.
+    - Set the initial frame type to `0x0a`, indicating a stream frame with length.
+    - Encode the `stream_id` using [`fd_quic_varint_encode`](templ/fd_quic_parse_util.h.md#fd_quic_varint_encode) and advance the buffer pointer `cur`.
+    - If `offset` is greater than zero, set the frame type to include an offset field and encode the `offset` using [`fd_quic_varint_encode`](templ/fd_quic_parse_util.h.md#fd_quic_varint_encode), advancing the buffer pointer `cur`.
+    - Encode the `data_sz` as a 16-bit integer with a specific format and store it in the buffer, advancing the buffer pointer `cur` by 2 bytes.
+    - Set the frame type to include the `fin` flag and store the frame type in the reserved space.
+    - Return the number of bytes written to the buffer by calculating the difference between `cur` and `buf`.
+- **Output**: The function returns the number of bytes written to the buffer as an unsigned long integer, or `FD_QUIC_ENCODE_FAIL` if there is insufficient space in the buffer.
+- **Functions called**:
+    - [`fd_quic_varint_encode`](templ/fd_quic_parse_util.h.md#fd_quic_varint_encode)
 
 
 

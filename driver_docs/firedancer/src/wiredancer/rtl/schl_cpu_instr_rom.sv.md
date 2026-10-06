@@ -3,36 +3,35 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a dual-port instruction ROM module with parameterized width and depth.
+The `schl_cpu_instr_rom.sv` file defines a SystemVerilog module for a dual-port instruction ROM with parameterized width and depth, used in the `firedancer` codebase.
 
 # Purpose
-The `schl_cpu_instr_rom` module defines a read-only memory (ROM) component for a CPU instruction set. It is parameterized by `ROM_WIDTH` and `ROM_DEPTH`, allowing flexibility in the width and depth of the ROM. The module uses a two-port interface, enabling simultaneous read operations from two different addresses, `a_addr` and `b_addr`, with corresponding enable signals `a_en` and `b_en`. The outputs `a_data` and `b_data` provide the data read from the ROM at the specified addresses.
+The provided Verilog code defines a module named `schl_cpu_instr_rom`, which serves as an instruction read-only memory (ROM) for a CPU. This module is designed to store and provide access to a set of instructions, which are loaded from an external memory initialization file (MIF) specified by the macro `PATH_TO_INSTR_ROM_MIF`. The ROM is parameterized by its width (`ROM_WIDTH`) and depth (`ROM_DEPTH`), allowing for flexibility in the size of the instruction set it can handle. The module supports dual-port access, enabling two separate addresses (`a_addr` and `b_addr`) to be read simultaneously, each controlled by an enable signal (`a_en` and `b_en`). The outputs `a_data` and `b_data` provide the instruction data corresponding to the addresses when the respective enable signals are active.
 
-The ROM is initialized using the `$readmemb` function, which loads data from a memory initialization file specified by the macro `PATH_TO_INSTR_ROM_MIF`. The module uses a synchronous read mechanism, where data is read on the rising edge of the clock signal `clk`. The `rst` input is present but not used in the current implementation. This module is typically used in CPU designs to store and provide access to instruction sets, serving as a fundamental component in the instruction fetch stage of a processor.
+This module is a specialized component within a larger CPU design, focusing on the storage and retrieval of instructions. It is not a broad functionality module but rather a specific implementation of an instruction memory, crucial for the operation of a CPU. The use of dual-port access allows for efficient instruction fetching, which can be beneficial in pipelined CPU architectures where multiple instructions may need to be accessed concurrently. The module's design emphasizes the importance of parameterization and initial memory loading, which are key technical components for adapting the instruction ROM to different CPU designs and instruction sets.
 # Modules
 
 ---
 ### schl\_cpu\_instr\_rom
-Implements a read-only memory (ROM) for instruction storage with dual-port access. Provides data output based on address inputs and enable signals for two separate ports.
+The `schl_cpu_instr_rom` module is a dual-port instruction ROM designed to store and provide instruction data for a CPU. It supports simultaneous read operations from two different addresses, controlled by enable signals.
 - **Constants**:
-    - ``ROM_WIDTH``: Defines the width of the ROM data output.
-    - ``ROM_DEPTH``: Sets the depth of the ROM, defaulting to 4096.
-    - ``W_ROM_DEPTH``: Calculates the bit width needed to address the ROM depth using the ceiling of the logarithm base 2 of `ROM_DEPTH`.
+    - `ROM_WIDTH`: Defines the bit-width of each instruction stored in the ROM.
+    - `ROM_DEPTH`: Specifies the total number of instructions that can be stored in the ROM, defaulting to 4096.
+    - `W_ROM_DEPTH`: Calculates the bit-width required to address the ROM, using the logarithm base 2 of ROM_DEPTH.
 - **Ports**:
-    - ``clk``: Clock input for synchronizing data access.
-    - ``rst``: Reset input, though not used in the module logic.
-    - ``a_addr``: Address input for the first port to access ROM data.
-    - ``a_en``: Enable signal for the first port to control data output.
-    - ``a_data``: Data output for the first port, providing ROM data based on `a_addr`.
-    - ``b_addr``: Address input for the second port to access ROM data.
-    - ``b_en``: Enable signal for the second port to control data output.
-    - ``b_data``: Data output for the second port, providing ROM data based on `b_addr`.
-- **Logic and Control Flow**:
-    - Defines a register array `IR` to store ROM data with a size of `ROM_WIDTH` by `ROM_DEPTH`.
-    - Initializes the `IR` array with data from a memory initialization file specified by `PATH_TO_INSTR_ROM_MIF`.
-    - Uses an `always_ff` block triggered on the rising edge of `clk` to control data output.
-    - Checks if `a_en` is high to assign `a_data` with the value from `IR` at the address `a_addr`.
-    - Checks if `b_en` is high to assign `b_data` with the value from `IR` at the address `b_addr`.
+    - `clk`: Clock signal for synchronizing read operations.
+    - `rst`: Reset signal, though not used in the current implementation.
+    - `a_addr`: Address input for the first read port.
+    - `a_en`: Enable signal for the first read port.
+    - `a_data`: Output data from the first read port.
+    - `b_addr`: Address input for the second read port.
+    - `b_en`: Enable signal for the second read port.
+    - `b_data`: Output data from the second read port.
+- **Logic And Control Flow**:
+    - The ROM is initialized using the `$readmemb` function to load data from a memory initialization file specified by `PATH_TO_INSTR_ROM_MIF`.
+    - An `always_ff` block is used to handle read operations on the positive edge of the clock signal.
+    - If `a_en` is high, the data at address `a_addr` is assigned to `a_data`.
+    - If `b_en` is high, the data at address `b_addr` is assigned to `b_data`.
 
 
 
