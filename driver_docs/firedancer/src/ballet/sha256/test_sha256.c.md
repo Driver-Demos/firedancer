@@ -3,54 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests and benchmarks for the SHA-256 implementation, including single, incremental, and batched hashing.
+SHA-256 unit tests, batch tests, benchmarks, and large-input verification.
 
 # Purpose
-The code is a C program designed to test and benchmark the functionality of a SHA-256 hashing implementation. It includes the header file `fd_sha256.h` and a test vector file `fd_sha256_test_vector.c`, which suggests that it relies on predefined test vectors for validation. The program uses static assertions to verify the alignment and footprint of the SHA-256 structures and constants, ensuring that they meet expected specifications. The main function initializes a random number generator and performs a series of tests on the SHA-256 functions, including single-shot, incremental, and batched hashing operations. It validates the correctness of the hash outputs against expected values from the test vectors.
+This file is a test and benchmark program for the `fd_sha256` implementation. It checks the SHA-256 object layout and constants with `FD_STATIC_ASSERT`, then verifies the public API for object creation, join, leave, and delete. It also tests the hash functions against known test vectors from `fd_sha256_test_vector.c`, including single-shot hashing with `fd_sha256_hash`, incremental hashing with `fd_sha256_init`, `fd_sha256_append`, and `fd_sha256_fini`, and the batched interface with `fd_sha256_batch_init`, `fd_sha256_batch_add`, `fd_sha256_batch_fini`, and `fd_sha256_batch_abort`.
 
-The program also includes performance benchmarks for different hashing scenarios, such as Poh-style repeated hashing and hashing of small and large UDP payloads. It measures the throughput in terms of hashes per second and gigabits per second, providing insights into the efficiency of the hashing implementation. Additionally, the code tests the handling of large input sizes and ensures that the SHA-256 functions can process data larger than 2^32 bytes. The program concludes by cleaning up resources and logging the results of the tests and benchmarks.
-# Imports and Dependencies
-
----
-- `fd_sha256.h`
-- `fd_sha256_test_vector.c`
-
-
-# Functions
-
----
-### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/ballet/sha256/test_sha256.c#L13>)
-
-Executes a series of tests and benchmarks for SHA-256 hashing functions, including single-shot, incremental, and batched hashing, and logs performance metrics.
-- **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line arguments.
-- **Logic and Control Flow**:
-    - Initializes the environment with `fd_boot` and sets up a random number generator `rng`.
-    - Performs alignment and footprint tests for SHA-256 using `FD_TEST`.
-    - Tests the creation and joining of SHA-256 objects with [`fd_sha256_new`](<fd_sha256.c.md#fd_sha256_new>) and [`fd_sha256_join`](<fd_sha256.c.md#fd_sha256_join>).
-    - Iterates over test vectors to validate single-shot, incremental, and streamlined SHA-256 hashing.
-    - Tests batching of SHA-256 hashes with `fd_sha256_batch_init`, `fd_sha256_batch_add`, and `fd_sha256_batch_fini`.
-    - Benchmarks SHA-256 hashing performance for different scenarios, including PoH-style hashing and UDP payloads.
-    - Tests large input hashing and compares the result with a known hash value.
-    - Cleans up resources by leaving and deleting SHA-256 and RNG objects.
-    - Logs the success of tests and benchmarks with `FD_LOG_NOTICE`.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`fd_sha256_align`](<fd_sha256.c.md#fd_sha256_align>)
-    - [`fd_sha256_footprint`](<fd_sha256.c.md#fd_sha256_footprint>)
-    - [`fd_sha256_new`](<fd_sha256.c.md#fd_sha256_new>)
-    - [`fd_sha256_join`](<fd_sha256.c.md#fd_sha256_join>)
-    - [`fd_sha256_init`](<fd_sha256.c.md#fd_sha256_init>)
-    - [`fd_sha256_append`](<fd_sha256.c.md#fd_sha256_append>)
-    - [`fd_sha256_fini`](<fd_sha256.c.md#fd_sha256_fini>)
-    - [`fd_sha256_hash`](<fd_sha256.c.md#fd_sha256_hash>)
-    - [`fd_sha256_hash_32_repeated`](<fd_sha256.c.md#fd_sha256_hash_32_repeated>)
-    - [`fd_sha256_leave`](<fd_sha256.c.md#fd_sha256_leave>)
-    - [`fd_sha256_delete`](<fd_sha256.c.md#fd_sha256_delete>)
-
-
+The file also exercises special-purpose helpers such as `fd_sha256_hash_32_repeated`, and it runs timing loops to measure throughput for repeated hashing, incremental hashing, streamlined hashing, and batched hashing. It includes a large-input test that hashes more than 4 GiB of zero bytes and compares the result with a known SHA-256 digest. The [`main`](<#main>) function uses the `fd_boot`, `fd_rng`, and logging utilities from the surrounding code base, so this file is an executable test driver for the SHA-256 library.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A canary file for testing the canary finder in the fuzzing process.
+The `test_fuzz_canary_canary.c` file contains a canary function intended to be detected by a canary finder as a test of the finder's effectiveness.
 
 # Purpose
-This code defines a canary function intended for use with a canary finder script. The function [`do_not_call_me`](<#do_not_call_me>) is marked with the macro `FD_FUZZ_MUST_BE_COVERED`, which indicates that the canary finder should detect this function during its operation. The presence of this canary helps verify that the canary finder script is functioning correctly. If the script does not find this canary, it will treat the situation as a failure. This code is not a unit test but serves as a mechanism to ensure the reliability of the canary detection process.
+This C source code file defines a static function [`do_not_call_me`](#do_not_call_me) that serves as a "canary" for a fuzz testing framework, as indicated by the inclusion of the "fd_fuzz.h" header. The function contains a macro `FD_FUZZ_MUST_BE_COVERED`, which likely acts as a marker or trigger for the fuzz testing tool to ensure that this code path is executed during testing. The purpose of this file is not to perform any functional operations but to verify the effectiveness of the fuzz testing process by ensuring that the canary is detected. If the fuzz testing script fails to identify this canary, it is considered a failure, highlighting potential gaps in the test coverage.
 # Imports and Dependencies
 
 ---
@@ -17,13 +17,12 @@ This code defines a canary function intended for use with a canary finder script
 
 ---
 ### do\_not\_call\_me<!-- {{#callable:do_not_call_me}} -->
-[View Source →](<../../../../../src/util/sanitize/test_fuzz_canary_canary.c#L8>)
-
-Triggers a canary check using the `FD_FUZZ_MUST_BE_COVERED` macro.
+The `do_not_call_me` function is a static function that serves as a canary to ensure that a specific code path is covered by the fuzz testing framework.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Calls the `FD_FUZZ_MUST_BE_COVERED` macro to perform a canary check.
-- **Output**: No output is produced as the function is `void`.
+- **Control Flow**:
+    - The function is defined as static, meaning it is limited to the file scope and cannot be called from other files.
+    - The function contains a single macro `FD_FUZZ_MUST_BE_COVERED`, which is likely used to mark this function as a required coverage point for fuzz testing.
+- **Output**: The function does not return any value as it is a `void` function.
 
 
 

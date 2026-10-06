@@ -3,22 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-NUMA and shared memory management functions, utilities, scripts, and tests for the Firedancer project.
+NUMA-aware shared memory APIs, admin and CLI tools, helpers, and tests.
 
 
 ## Files
-- **[fd_numa_linux.c](fd_numa_linux.c.md)**: NUMA-related functions for parsing node indices, counting nodes and CPUs, and managing memory policies using syscalls.
-- **[fd_numa_stub.c](fd_numa_stub.c.md)**: Stub implementations for NUMA functions that log warnings and return error codes when NUMA support is unavailable.
-- **[fd_shmem.h](fd_shmem.h.md)**: APIs for NUMA and page size aware manipulation of interprocess shared memory topologies.
-- **[fd_shmem_admin.c](fd_shmem_admin.c.md)**: Shared memory management functions, including page size conversion, NUMA topology handling, and region creation/destruction.
-- **[fd_shmem_cfg](fd_shmem_cfg.md)**: Bash script for managing shared memory IPC domains with commands for initialization, allocation, querying, and cleanup.
-- **[fd_shmem_ctl.c](fd_shmem_ctl.c.md)**: A command-line utility for shared memory control, supporting operations like create, unlink, and query.
-- **[fd_shmem_ctl_help](fd_shmem_ctl_help.md)**: Command-line tool for managing shared memory regions, querying CPU and NUMA node information.
-- **[fd_shmem_private.h](fd_shmem_private.h.md)**: Header file for private shared memory utilities, including NUMA operations and thread synchronization.
-- **[fd_shmem_user.c](fd_shmem_user.c.md)**: Shared memory management functions for joining, leaving, and querying shared memory regions.
-- **[Local.mk](Local.mk.md)**: Makefile for managing shared memory components, scripts, binaries, and tests in the Firedancer project.
-- **[test_shmem.c](test_shmem.c.md)**: Tests for shared memory operations, including name validation, page size conversion, and join/leave functionality.
-- **[test_shmem_ctl](test_shmem_ctl.md)**: A Bash script to test various functionalities of the `fd_shmem_ctl` shared memory control utility.
+- **[fd_numa_linux.c](fd_numa_linux.c.md)**: The `fd_numa_linux.c` file in the `firedancer` codebase provides functions for interacting with NUMA (Non-Uniform Memory Access) configurations on Linux systems, including parsing node indices, counting NUMA nodes and CPUs, and managing memory policies using syscalls.
+- **[fd_numa_stub.c](fd_numa_stub.c.md)**: The `fd_numa_stub.c` file in the `firedancer` codebase provides stub implementations for NUMA-related functions, logging warnings and returning error codes due to lack of NUMA support for the build target.
+- **[fd_shmem.h](fd_shmem.h.md)**: APIs for NUMA-aware shared memory join, create, query, and page allocation.
+- **[fd_shmem_admin.c](fd_shmem_admin.c.md)**: The `fd_shmem_admin.c` file in the `firedancer` codebase provides functions for managing shared memory, including creating, updating, and unlinking shared memory regions, as well as handling NUMA topology and memory policies.
+- **[fd_shmem_cfg](fd_shmem_cfg.md)**: Shared memory IPC domain setup, query, allocation, reset, and teardown commands for hugetlbfs pages.
+- **[fd_shmem_ctl.c](fd_shmem_ctl.c.md)**: The `fd_shmem_ctl.c` file in the `firedancer` codebase implements a command-line utility for managing shared memory, including commands for querying, creating, and unlinking shared memory segments, as well as retrieving CPU and NUMA information.
+- **[fd_shmem_ctl_help](fd_shmem_ctl_help.md)**: The `fd_shmem_ctl_help` file provides command-line usage instructions for managing shared memory regions, including commands for querying CPU and NUMA node information, creating, unlinking, and querying shared memory regions.
+- **[fd_shmem_private.h](fd_shmem_private.h.md)**: NUMA and private shared-memory helpers, plus path formatting and random mapping.
+- **[fd_shmem_user.c](fd_shmem_user.c.md)**: Shared-memory join, leave, query, and anonymous join management for hosted systems.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the build configuration for shared memory utilities, including headers, objects, scripts, binaries, and unit tests, with conditional object inclusion based on the `FD_HAS_HOSTED` flag.
+- **[test_shmem.c](test_shmem.c.md)**: The `test_shmem.c` file in the `firedancer` codebase contains unit tests for shared memory operations, including validation of NUMA and CPU indices, name length checks, page size conversions, and join/leave operations.
+- **[test_shmem_ctl](test_shmem_ctl.md)**: The `test_shmem_ctl` file is a Bash script that tests various functionalities of the `fd_shmem_ctl` command, including operations like create, query, and unlink, within the `firedancer` codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
