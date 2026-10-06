@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile rules to add headers and objects for `fd_quic_tls` and `fd_quic`.
+The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects for the `fd_quic_tls` component in the build process.
 
 # Purpose
-The `Makefile` content uses the `add-hdrs` and `add-objs` functions to manage dependencies for a build process. The `add-hdrs` function includes the header file `fd_quic_tls.h`, while the `add-objs` function adds the object file `fd_quic_tls` to the `fd_quic` target. This setup helps automate the compilation and linking of the specified components in the build system.
+The file is a Makefile snippet used in a build system to manage dependencies and compilation targets. It utilizes macros to add a header file `fd_quic_tls.h` and object files `fd_quic_tls` and `fd_quic` to the build process, ensuring they are included in the compilation of the project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing BLAKE3 components with optional SSE, AVX, and AVX512 optimizations.
+Build rules for BLAKE3 headers, objects, unit test, and fuzz test with SIMD variants.
 
 # Purpose
-This Makefile script configures the build process for a software project. It adds header files and object files for the `fd_blake3` module and its variants, such as `fd_blake3_ref` and `fd_ballet`. The script conditionally includes additional object files based on the presence of specific CPU features, such as SSE, AVX512, and AVX, to optimize performance. It also defines and runs a unit test named `test_blake3` and conditionally sets up a fuzz test named `fuzz_blake3` if the `FD_HAS_HOSTED` environment variable is defined.
+This Makefile fragment adds the `fd_blake3.h` header and the `fd_blake3` source objects to the `fd_ballet` build target. It also adds CPU-specific `fd_blake3` objects when `FD_HAS_SSE`, `FD_HAS_AVX512`, or `FD_HAS_AVX` is defined, and it defines a `test_blake3` unit test plus a `fuzz_blake3` fuzz test when `FD_HAS_HOSTED` is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

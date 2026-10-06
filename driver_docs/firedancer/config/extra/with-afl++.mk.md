@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for integrating AFL++ fuzzing with specific compiler and linker flags.
+The `with-afl++.mk` file in the `firedancer` codebase configures build settings for fuzz testing with AFL++, including setting compiler and linker flags and requiring the AFL_LIB environment variable.
 
 # Purpose
-The `Makefile` content configures the build process for a software project with fuzzing capabilities. It sets the `FD_HAS_FUZZ` variable to enable fuzzing features. The script checks if the `AFL_LIB` environment variable is set, which should point to the AFL (American Fuzzy Lop) installation directory, and raises an error if it is not. The `CPPFLAGS` are configured to include options for frame pointer omission and fuzzing sanitization, while `LDFLAGS` and `LDFLAGS_FUZZ` are set to include specific sanitization coverage and link against AFL's runtime libraries.
+This file is a Makefile snippet used to configure the build process for a software project that incorporates fuzz testing. It sets a flag indicating the presence of fuzzing capabilities, checks for the presence of the AFL (American Fuzzy Lop) library, and adjusts compiler and linker flags to include sanitization and coverage options necessary for fuzz testing. The file ensures that the necessary AFL libraries and runtime objects are linked during the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

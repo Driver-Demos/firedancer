@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for deserializing vectors of shreds into block entries with initialization and processing functions.
+The `fd_deshredder.h` file defines the `fd_deshredder_t` structure and functions for deserializing a vector of shreds into block entries within the Firedancer codebase.
 
 # Purpose
-This C header file defines the interface for a deshredder, which is responsible for deserializing a vector of shreds into block entries. The `fd_deshredder_t` structure holds the state of the deshredder, including a vector of data shreds, a buffer for concatenated shreds, and metadata such as the number of shreds and buffer size. The [`fd_deshredder_init`](<#fd_deshredder_init>) function initializes the deshredder with a buffer, its size, a vector of shreds, and the count of shreds, ensuring that each shred has passed validation checks. The [`fd_deshredder_next`](<#fd_deshredder_next>) function processes batches of shreds, concatenating them into the buffer and returning the number of bytes written or an error code if issues occur, such as insufficient buffer space or invalid shred types.
+This C header file defines the interface for a deserialization utility, specifically a "deshredder," which is responsible for reconstructing block entries from a series of data shreds. The file includes the definition of the `fd_deshredder_t` structure, which holds the state necessary for the deserialization process, such as a vector of shreds, a buffer for concatenated data, and a result code. It provides two main functions: [`fd_deshredder_init`](#fd_deshredder_init), which initializes the deshredder with a buffer and a set of shreds, and [`fd_deshredder_next`](#fd_deshredder_next), which processes these shreds in batches, concatenating them into the provided buffer. The header ensures that the deshredder can handle multiple calls to process all shreds, returning specific error codes if issues arise, such as insufficient buffer size or invalid shred types.
 # Imports and Dependencies
 
 ---
@@ -18,44 +18,40 @@ This C header file defines the interface for a deshredder, which is responsible 
 
 ---
 ### fd\_deshredder\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `shreds`: A pointer to a vector of constant pointers to `fd_shred_t` data shreds.
-    - `shred_cnt`: An unsigned integer representing the number of shreds left in the buffer.
-    - `buf`: A pointer to an unsigned character array that serves as the target buffer for deserialized data.
-    - `bufsz`: An unsigned long integer indicating the free space available in the target buffer.
-    - `result`: A long integer storing the cached return code of the deshredder operation.
-- **Description**: Deserializes a vector of shreds into block entries, managing a buffer to store the concatenated shreds and tracking the number of shreds processed and the operation's result.
+    - `shreds`: A pointer to a vector of data shreds.
+    - `shred_cnt`: The number of shreds left in the buffer.
+    - `buf`: A cursor pointing to the target buffer where deserialized data is stored.
+    - `bufsz`: The size of the free space available in the target buffer.
+    - `result`: A cached return code indicating the status of the deshredder operation.
+- **Description**: The `fd_deshredder_t` structure is designed to manage the deserialization of a vector of shreds into block entries. It maintains a pointer to the shreds, tracks the number of shreds remaining, and manages a buffer where the deserialized data is stored. The structure also keeps track of the available buffer size and caches the result of the deserialization process, which can indicate various states or errors encountered during the operation.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_deshredder\_init<!-- {{#callable_declaration:fd_deshredder_init}} -->
-[View Source →](<../../../../../src/ballet/shred/fd_deshredder.h#L46>)
-
-Initializes a deshredder for processing shreds.
-- **Description**: Use this function to prepare a deshredder for processing a series of shreds into a buffer. This function sets up the deshredder with a buffer where concatenated shreds will be written, a vector of shreds to process, and the count of these shreds. Ensure that each shred has passed validation checks and ideally authentication checks before calling this function. This function must be called before any other operations on the deshredder.
+Initialize the deshredder with a buffer and shreds.
+- **Description**: This function prepares a deshredder for operation by setting up its internal state with a provided buffer and a vector of shreds. It should be called before any deshredding operations are performed. The buffer is where concatenated shreds will be written, and its size must be specified. The shreds vector must contain validated and ideally authenticated shreds, with each shred's index incrementing by one and having the same slot and version. The function does not perform any operations on the shreds themselves, but merely sets up the deshredder for future processing.
 - **Inputs**:
-    - `shredder`: A pointer to an `fd_deshredder_t` structure that will be initialized. Must not be null.
-    - `buf`: A pointer to a buffer where concatenated shreds will be written. Must not be null.
-    - `bufsz`: The size of the buffer in bytes. Must be large enough to hold the concatenated shreds.
-    - `shreds`: A pointer to a contiguous vector of `fd_shred_t` pointers representing the shreds to process. Must not be null and must point to valid shreds.
-    - `shred_cnt`: The number of shreds in the `shreds` vector. Must be a non-negative value.
+    - `shredder`: A pointer to an fd_deshredder_t structure that will be initialized. The caller must allocate this structure before calling the function.
+    - `buf`: A pointer to a buffer where concatenated shreds will be written. The buffer must be allocated by the caller and must not be null.
+    - `bufsz`: The size of the buffer in bytes. It must be large enough to hold the concatenated shreds.
+    - `shreds`: A pointer to a contiguous vector of fd_shred_t pointers, representing the shreds to be deserialized. Each shred must be validated and ideally authenticated before being passed to this function.
+    - `shred_cnt`: The number of shreds in the shreds vector. It must accurately reflect the number of shreds provided.
 - **Output**: None
-- **See Also**: [`fd_deshredder_init`](<fd_deshredder.c.md#fd_deshredder_init>)  (Implementation)
+- **See also**: [`fd_deshredder_init`](fd_deshredder.c.md#fd_deshredder_init)  (Implementation)
 
 
 ---
 ### fd\_deshredder\_next<!-- {{#callable_declaration:fd_deshredder_next}} -->
-[View Source →](<../../../../../src/ballet/shred/fd_deshredder.h#L84>)
-
 Concatenates a batch of shreds into a buffer.
-- **Description**: Use this function to process and concatenate a batch of shreds into a buffer previously initialized with `fd_deshredder_init`. It is typically necessary to call this function multiple times to process all shreds, as each block can contain multiple batches. The function updates the shredder's result code to indicate the status of the operation, such as completion of a batch or slot, or an error condition. Ensure that the shredder has been properly initialized and that the buffer has sufficient space to accommodate the shreds. Do not call this function again on the same shredder if an error occurs.
+- **Description**: This function processes a batch of shreds, concatenating their data into a buffer previously provided during initialization. It should be called after `fd_deshredder_init` has been used to set up the deshredder with a valid buffer and shred vector. The function may need to be called multiple times to process all shreds, as each call handles a batch. It returns the number of bytes written to the buffer if successful, or a negative error code if an issue occurs, such as an invalid shred type or insufficient buffer space. The function updates the deshredder's result code to indicate the status of the operation, which can be used to determine if more shreds are available or if the end of a batch or slot has been reached.
 - **Inputs**:
-    - `shredder`: A pointer to an `fd_deshredder_t` structure that has been initialized with `fd_deshredder_init`. The shredder must not be null, and it must have a valid buffer and shred vector. The function will update the shredder's internal state and result code.
-- **Output**: Returns the number of bytes written to the buffer if at least one shred was consumed. Returns a negative error code if an error occurs, such as `-FD_SHRED_ENOMEM` if the buffer is too small or `-FD_SHRED_EINVAL` if the shred type is invalid. The shredder's result code is updated to reflect the operation's outcome.
-- **See Also**: [`fd_deshredder_next`](<fd_deshredder.c.md#fd_deshredder_next>)  (Implementation)
+    - `shredder`: A pointer to an initialized `fd_deshredder_t` structure. Must not be null and should have been initialized with `fd_deshredder_init`. The function will update the internal state of this structure, including the buffer cursor and result code.
+- **Output**: Returns the number of bytes written to the buffer if successful. Returns a negative error code if an error occurs, such as `-FD_SHRED_ENOMEM` for insufficient buffer space or `-FD_SHRED_EINVAL` for an invalid shred type. The deshredder's result code is updated to reflect the operation's outcome.
+- **See also**: [`fd_deshredder_next`](fd_deshredder.c.md#fd_deshredder_next)  (Implementation)
 
 
 
