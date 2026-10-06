@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_quic headers, objects, and fd_quic_pcap binary
+Makefile for building the `fd_quic` library and related binaries with specified headers and objects.
 
 # Purpose
-This Makefile fragment defines the `fd_quic` library and lists the header files and object files that belong to it. It groups the QUIC API and support modules into separate build targets, including `fd_quic_ack_tx`, `fd_quic_conn`, `fd_quic_pkt_meta`, `fd_quic_retry`, `fd_quic_svc_q`, `fd_quic_stream_pool`, and `fd_quic_stream`. The file also registers shared protocol headers such as `fd_quic_proto.h`, `fd_quic_proto_structs.h`, and `fd_quic_types.h`, which are used across the QUIC implementation. When `FD_HAS_HOSTED` is defined, it also builds the `fd_quic_pcap` binary and links it with `fd_quic`, `fd_waltz`, `fd_tls`, `fd_ballet`, and `fd_util`.
+The Makefile content defines the build process for the `fd_quic` library and its associated components. It uses custom functions such as `make-lib`, `add-hdrs`, and `add-objs` to organize the compilation of header files and object files related to the `fd_quic` module. The `add-hdrs` function specifies the header files required for each component, while the `add-objs` function lists the object files to be compiled. Additionally, the conditional block `ifdef FD_HAS_HOSTED` checks if the `FD_HAS_HOSTED` variable is defined, and if so, it compiles the `fd_quic_pcap` binary using the specified dependencies. This structure helps manage dependencies and ensures that the correct files are included during the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

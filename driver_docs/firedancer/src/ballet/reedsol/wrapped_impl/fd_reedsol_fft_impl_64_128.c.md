@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_reedsol_fft_impl_64_128.c` file in the `firedancer` codebase provides auto-generated implementations for forward and inverse fast Fourier transforms (FFT and IFFT) on 64 input elements using Reed-Solomon error correction techniques.
+Auto-generated C code for 64-point forward and inverse Reed-Solomon FFT implementations.
 
 # Purpose
-This C source code file is auto-generated and provides specialized functionality for performing Fast Fourier Transform (FFT) and Inverse Fast Fourier Transform (IFFT) operations on a set of 64 input elements, each represented by the type `gf_t`. The file defines two primary functions: [`fd_reedsol_fft_64_128`](#fd_reedsol_fft_64_128) and [`fd_reedsol_ifft_64_128`](#fd_reedsol_ifft_64_128). These functions are designed to handle FFT and IFFT operations, respectively, using a specific implementation that likely involves Reed-Solomon error correction techniques, as suggested by the naming convention and the inclusion of the header file `fd_reedsol_fft.h`. The functions take pointers to 64 `gf_t` elements as input, perform the transformation, and update the input values in place.
+The code defines two functions, [`fd_reedsol_fft_64_128`](<#fd_reedsol_fft_64_128>) and [`fd_reedsol_ifft_64_128`](<#fd_reedsol_ifft_64_128>), which perform Fast Fourier Transform (FFT) and Inverse Fast Fourier Transform (IFFT) operations, respectively, on a set of 64 input elements. These functions are part of a Reed-Solomon error correction implementation, as indicated by the inclusion of the header file `fd_reedsol_fft.h`. The functions take pointers to `gf_t` type elements as input, which are likely elements of a Galois Field used in error correction algorithms.
 
-The code is structured to facilitate high-performance computations, possibly in the context of data encoding and decoding processes where error correction is critical. The use of macros like `FD_REEDSOL_GENERATE_FFT` and `FD_REEDSOL_GENERATE_IFFT` indicates that the actual transformation logic is abstracted and likely optimized for specific hardware or algorithmic efficiency. This file is part of a larger library or system, as indicated by the inclusion of a relative header file path, and it is intended to be used as a component within a broader application rather than as a standalone executable. The functions defined here do not expose a public API directly but are likely part of an internal implementation detail of a Reed-Solomon coding library.
+The [`fd_reedsol_fft_64_128`](<#fd_reedsol_fft_64_128>) function reads 64 input elements, processes them using the `FD_REEDSOL_GENERATE_FFT` macro, and writes the results back to the input pointers. Similarly, the [`fd_reedsol_ifft_64_128`](<#fd_reedsol_ifft_64_128>) function performs the inverse operation using the `FD_REEDSOL_GENERATE_IFFT` macro. These functions are auto-generated, as noted in the file, and are intended to be used as part of a larger system for encoding and decoding data with error correction capabilities. The functions do not define public APIs or external interfaces directly but are likely used internally within a library or application that implements Reed-Solomon coding.
 # Imports and Dependencies
 
 ---
@@ -19,7 +19,9 @@ The code is structured to facilitate high-performance computations, possibly in 
 
 ---
 ### fd\_reedsol\_fft\_64\_128<!-- {{#callable:fd_reedsol_fft_64_128}} -->
-The function `fd_reedsol_fft_64_128` performs a Fast Fourier Transform (FFT) on 64 input elements using a Reed-Solomon code with a length of 128.
+[View Source →](<../../../../../../src/ballet/reedsol/wrapped_impl/fd_reedsol_fft_impl_64_128.c#L4>)
+
+Performs a Fast Fourier Transform (FFT) on 64 input elements using Reed-Solomon encoding.
 - **Inputs**:
     - `_in00`: Pointer to the first input element of type `gf_t`.
     - `_in01`: Pointer to the second input element of type `gf_t`.
@@ -85,17 +87,18 @@ The function `fd_reedsol_fft_64_128` performs a Fast Fourier Transform (FFT) on 
     - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
     - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
     - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
-- **Control Flow**:
-    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values.
-    - It then calls the macro `FD_REEDSOL_GENERATE_FFT` with the parameters 64, 128, and the 64 dereferenced input values.
-    - The macro presumably performs the FFT operation on these values.
-    - After the FFT operation, the function updates the original input pointers with the transformed values.
-- **Output**: The function does not return a value; it modifies the input data in place.
+- **Logic and Control Flow**:
+    - Initialize local variables `in00` to `in63` with the values pointed to by `_in00` to `_in63` respectively.
+    - Call the macro `FD_REEDSOL_GENERATE_FFT` with parameters `64`, `128`, and the local variables `in00` to `in63`.
+    - Update the values pointed to by `_in00` to `_in63` with the transformed values from `in00` to `in63`.
+- **Output**: No return value; the function modifies the input data in place.
 
 
 ---
 ### fd\_reedsol\_ifft\_64\_128<!-- {{#callable:fd_reedsol_ifft_64_128}} -->
-The function `fd_reedsol_ifft_64_128` performs an inverse fast Fourier transform (IFFT) on 64 input elements using a Reed-Solomon code with a length of 128.
+[View Source →](<../../../../../../src/ballet/reedsol/wrapped_impl/fd_reedsol_fft_impl_64_128.c#L201>)
+
+Performs an inverse fast Fourier transform (IFFT) on 64 input elements using a Reed-Solomon code.
 - **Inputs**:
     - `_in00`: Pointer to the first input element of type `gf_t`.
     - `_in01`: Pointer to the second input element of type `gf_t`.
@@ -161,11 +164,11 @@ The function `fd_reedsol_ifft_64_128` performs an inverse fast Fourier transform
     - `_in61`: Pointer to the sixty-second input element of type `gf_t`.
     - `_in62`: Pointer to the sixty-third input element of type `gf_t`.
     - `_in63`: Pointer to the sixty-fourth input element of type `gf_t`.
-- **Control Flow**:
-    - The function begins by dereferencing each of the 64 input pointers to obtain the actual `gf_t` values.
-    - It then calls the macro `FD_REEDSOL_GENERATE_IFFT` with the 64 input values and the parameters 64 and 128, which likely performs the inverse FFT operation.
-    - After the IFFT operation, the function updates the original input pointers with the transformed values.
-- **Output**: The function does not return a value; it modifies the input data in place.
+- **Logic and Control Flow**:
+    - Initialize local variables `in00` to `in63` with the values pointed to by `_in00` to `_in63` respectively.
+    - Call the macro `FD_REEDSOL_GENERATE_IFFT` with parameters `64`, `128`, and the local variables `in00` to `in63`.
+    - Update the values pointed to by `_in00` to `_in63` with the modified local variables `in00` to `in63`.
+- **Output**: The function does not return a value; it modifies the input elements in place.
 
 
 

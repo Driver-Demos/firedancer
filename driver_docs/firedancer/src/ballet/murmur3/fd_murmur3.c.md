@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_murmur3.c` file implements the MurmurHash3 algorithm for generating a 32-bit hash from input data.
+Implements the Murmur3 hash function for 32-bit unsigned integers.
 
 # Purpose
-This C source code file implements a 32-bit version of the MurmurHash3 algorithm, a non-cryptographic hash function known for its speed and efficiency. The file defines a static function [`fd_murmur3_32_`](#fd_murmur3_32_) that performs the core hashing operations, and a public function [`fd_murmur3_32`](#fd_murmur3_32) that serves as an interface to the static function. The static function processes input data in chunks of four bytes, applying a series of bitwise operations and multiplications to generate a hash value. It also handles any remaining bytes that do not fit into a complete four-byte chunk, ensuring that all input data contributes to the final hash.
+The code implements the MurmurHash3 algorithm, specifically a 32-bit variant, which is a non-cryptographic hash function suitable for general hash-based lookup. The primary function, [`fd_murmur3_32`](<#fd_murmur3_32>), serves as a public interface that calls the static helper function [`fd_murmur3_32_`](<#fd_murmur3_32_>). The helper function performs the actual computation of the hash value. It processes the input data in 4-byte chunks, applying a series of bitwise operations and multiplications to mix the input data into a hash value. The function also handles any remaining bytes that do not fit into a 4-byte chunk, ensuring that all input data contributes to the final hash value.
 
-The code is designed to be part of a larger library, as indicated by the inclusion of a header file `fd_murmur3.h` and the use of utility functions like `FD_LOAD` and `fd_uint_rotate_left`, which are likely defined elsewhere in the project. The public function [`fd_murmur3_32`](#fd_murmur3_32) provides a simple API for users to compute hash values by calling the internal static function. This separation of concerns allows the internal implementation to remain hidden while exposing a clean and straightforward interface for external use. The use of constants and bitwise operations ensures that the hash function is both fast and effective at distributing input data uniformly across the hash space.
+The code includes constants and operations that are specific to the MurmurHash3 algorithm, such as the constants `c1`, `c2`, `m`, and `n`, and the rotation operations `fd_uint_rotate_left`. The use of `FD_LOAD` and `fd_uint_rotate_left` suggests that these are likely macros or functions defined elsewhere, possibly in the included header file `fd_murmur3.h`. The function is designed to be efficient and is suitable for use in applications where a fast, non-cryptographic hash function is required. The static nature of [`fd_murmur3_32_`](<#fd_murmur3_32_>) indicates that it is intended for use only within this source file, while [`fd_murmur3_32`](<#fd_murmur3_32>) is the function intended for external use.
 # Imports and Dependencies
 
 ---
@@ -19,40 +19,44 @@ The code is designed to be part of a larger library, as indicated by the inclusi
 
 ---
 ### fd\_murmur3\_32\_<!-- {{#callable:fd_murmur3_32_}} -->
-The `fd_murmur3_32_` function computes a 32-bit hash value for a given data input using the Murmur3 hashing algorithm.
+[View Source →](<../../../../../src/ballet/murmur3/fd_murmur3.c#L3>)
+
+Computes a 32-bit hash value using the Murmur3 algorithm for a given data input and seed.
 - **Inputs**:
-    - `_data`: A pointer to the input data to be hashed.
+    - `_data`: A pointer to the input data to hash.
     - `sz`: The size of the input data in bytes.
     - `seed`: An initial seed value for the hash computation.
-- **Control Flow**:
-    - Initialize constants and variables for the Murmur3 algorithm.
-    - Set the initial hash value to the provided seed.
-    - Process the input data in 4-byte chunks, updating the hash value with each chunk using bitwise operations and rotations.
-    - Handle any remaining bytes (less than 4) by processing them separately and updating the hash.
-    - Finalize the hash by mixing in the size of the data and applying additional bitwise operations and multiplications to ensure a uniform distribution.
-    - Return the computed 32-bit hash value.
+- **Logic and Control Flow**:
+    - Initialize constants `c1`, `c2`, `r1`, `r2`, `m`, and `n` for the Murmur3 algorithm.
+    - Set `hash` to the initial `seed` value.
+    - Iterate over the input data in 4-byte chunks while `sz` is greater than or equal to 4.
+    - For each 4-byte chunk, load it into `k`, multiply by `c1`, rotate left by `r1`, multiply by `c2`, and update `hash` with XOR and rotation operations.
+    - Adjust `data` pointer and decrement `sz` by 4 for each iteration.
+    - Handle remaining bytes (less than 4) using a switch statement to update `rem` and `hash` accordingly.
+    - Finalize the hash by XORing with `sz_tag`, applying bit shifts, multiplications, and XOR operations to mix the hash thoroughly.
+    - Return the final hash value.
 - **Output**: A 32-bit unsigned integer representing the hash of the input data.
 
 
 ---
 ### fd\_murmur3\_32<!-- {{#callable:fd_murmur3_32}} -->
-The `fd_murmur3_32` function computes a 32-bit hash value for a given data input using the Murmur3 hashing algorithm.
+[View Source →](<../../../../../src/ballet/murmur3/fd_murmur3.c#L56>)
+
+Computes a 32-bit hash value using the Murmur3 algorithm for a given data input and seed.
 - **Inputs**:
-    - `_data`: A pointer to the input data to be hashed.
+    - `_data`: A pointer to the input data to hash.
     - `sz`: The size of the input data in bytes.
     - `seed`: An initial seed value for the hash computation.
-- **Control Flow**:
-    - The function `fd_murmur3_32` is a wrapper that calls the static function [`fd_murmur3_32_`](#fd_murmur3_32_) with the same arguments.
-    - In [`fd_murmur3_32_`](#fd_murmur3_32_), the input data is cast to a `uchar` pointer for byte-wise operations.
-    - Constants for the Murmur3 algorithm are initialized, including two constants `c1` and `c2`, two rotation amounts `r1` and `r2`, and two additional constants `m` and `n`.
-    - The initial hash value is set to the provided seed.
-    - A loop processes the input data in 4-byte chunks, updating the hash with each chunk using multiplication, bitwise rotation, and XOR operations.
-    - After processing full 4-byte chunks, any remaining bytes (1 to 3) are processed in a switch statement, updating the hash with similar operations.
-    - The hash is finalized by mixing in the size of the input data and applying a series of bitwise operations and multiplications to ensure a uniform distribution of hash values.
-    - The final hash value is returned.
+- **Logic and Control Flow**:
+    - Calls the internal function [`fd_murmur3_32_`](<#fd_murmur3_32_>) with the provided data, size, and seed.
+    - [`fd_murmur3_32_`](<#fd_murmur3_32_>) initializes constants and the hash value with the seed.
+    - Processes the input data in 4-byte chunks, updating the hash with each chunk.
+    - Handles any remaining bytes that do not fit into a 4-byte chunk, updating the hash accordingly.
+    - Finalizes the hash by mixing in the size and applying several bitwise operations and multiplications to ensure a uniform distribution.
+    - Returns the computed 32-bit hash value.
 - **Output**: A 32-bit unsigned integer representing the hash of the input data.
-- **Functions called**:
-    - [`fd_murmur3_32_`](#fd_murmur3_32_)
+- **Functions Called**:
+    - [`fd_murmur3_32_`](<#fd_murmur3_32_>)
 
 
 

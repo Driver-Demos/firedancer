@@ -3,43 +3,43 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC test helpers, fuzz targets, unit tests, and transaction scripts.
+Scripts and files for testing QUIC protocol features, including transaction transmissions, fuzz testing, and various QUIC functionalities like stream management, cryptographic operations, and connection handling.
 
 ## Folders
-- **[txn](txn/README.md)**: The `txn` folder in the `firedancer` codebase contains various scripts and data files for testing and handling transactions, including Bash scripts for executing and logging transaction tests, and Base64-encoded data files for storing or transmitting binary data.
+- **[txn](txn/README.md)**: Scripts and files for testing transaction transmissions and encoding binary data in Base64.
 
 ## Files
-- **[fd_quic_sandbox.c](fd_quic_sandbox.c.md)**: QUIC sandbox helpers for packet capture, connection setup, and test frame injection.
-- **[fd_quic_sandbox.h](fd_quic_sandbox.h.md)**: QUIC test sandbox API with packet capture, mock crypto keys, and frame injection helpers.
-- **[fd_quic_stream_spam.c](fd_quic_stream_spam.c.md)**: The `fd_quic_stream_spam.c` file in the `firedancer` codebase implements functions for creating, managing, and sending data over QUIC streams, including generating random payloads and handling stream notifications.
-- **[fd_quic_stream_spam.h](fd_quic_stream_spam.h.md)**: The `fd_quic_stream_spam.h` file defines functions and structures for generating and managing random QUIC stream payloads for testing purposes in the Firedancer codebase.
-- **[fd_quic_test_helpers.c](fd_quic_test_helpers.c.md)**: QUIC test helpers for boot, anonymous setup, virtual pairs, UDP sockets, and netem.
-- **[fd_quic_test_helpers.h](fd_quic_test_helpers.h.md)**: Helpers for QUIC tests, virtual pairs, UDP sockets, and packet loss emulation.
-- **[fuzz_quic.c](fuzz_quic.c.md)**: QUIC server fuzz test that builds UDP/IPv4 packets and feeds them to packet processing.
-- **[fuzz_quic_wire.c](fuzz_quic_wire.c.md)**: QUIC packet fuzz target with custom decrypt, mutate, and reencrypt logic.
-- **[Local.mk](Local.mk.md)**: Build rules for QUIC unit, fuzz, and manual tests.
-- **[test_quic_ack_tx.c](test_quic_ack_tx.c.md)**: QUIC ACK queue and frame generation tests.
-- **[test_quic_bw.c](test_quic_bw.c.md)**: QUIC bandwidth test with virtual client-server pair, loss/reorder emulation, and throughput logging
-- **[test_quic_client_flood.c](test_quic_client_flood.c.md)**: QUIC client flood test that sends signed messages on many streams and can reclaim packet metadata.
-- **[test_quic_concurrency.c](test_quic_concurrency.c.md)**: QUIC server concurrency test that injects many stream frames and checks packet and ACK behavior.
-- **[test_quic_conformance.c](test_quic_conformance.c.md)**: QUIC conformance tests for flow control, limits, ACKs, ALPN, RTT, and packet handling.
-- **[test_quic_conn.c](test_quic_conn.c.md)**: QUIC connection lifecycle test with repeated connect, send, close, and cleanup.
-- **[test_quic_crypto.c](test_quic_crypto.c.md)**: QUIC crypto tests for RFC9001 secrets, key derivation, packet encryption, decryption, and nonce generation.
-- **[test_quic_drops.c](test_quic_drops.c.md)**: QUIC drop test with client and server fibres, packet loss emulation, and stream send/receive checks.
-- **[test_quic_hs.c](test_quic_hs.c.md)**: QUIC handshake, stream, keep-alive, and TLS cache tests
-- **[test_quic_idle_conns.c](test_quic_idle_conns.c.md)**: QUIC client idle-connection test that opens and tracks many connections.
-- **[test_quic_keep_alive.c](test_quic_keep_alive.c.md)**: QUIC keep-alive and timeout tests for connection state, final callbacks, and slot reuse.
-- **[test_quic_key_phase.c](test_quic_key_phase.c.md)**: QUIC key phase change test with client and server fibres.
-- **[test_quic_layout.c](test_quic_layout.c.md)**: The `test_quic_layout.c` file in the `firedancer` codebase is a test program that prints the sizes of various QUIC-related structures.
-- **[test_quic_pkt_meta.c](test_quic_pkt_meta.c.md)**: Tests QUIC packet metadata compare and ACK range handling under reordering.
-- **[test_quic_proto.c](test_quic_proto.c.md)**: The `test_quic_proto.c` file in the `firedancer` codebase contains a series of tests for QUIC protocol components, including variable integer parsing and encoding, packet number parsing, crypto frame parsing, stream frame encoding, and path response frame handling.
-- **[test_quic_retry_integration.c](test_quic_retry_integration.c.md)**: QUIC retry integration tests and stream send/receive checks.
-- **[test_quic_retry_unit.c](test_quic_retry_unit.c.md)**: QUIC Retry integrity tag tests and benchmarks.
-- **[test_quic_server.c](test_quic_server.c.md)**: QUIC server test that boots a workspace, configures UDP I/O, and services the server loop.
-- **[test_quic_streams.c](test_quic_streams.c.md)**: QUIC stream spam test with handshake, payload checks, and connection cleanup.
-- **[test_quic_svc_q.c](test_quic_svc_q.c.md)**: Tests QUIC service timer scheduling, cancellation, and event ordering.
-- **[test_quic_tls_hs.c](test_quic_tls_hs.c.md)**: The `test_quic_tls_hs.c` file in the `firedancer` codebase tests the QUIC TLS handshake process using the `fd_quic_tls` API, which is a lightweight wrapper over `fd_tls`.
-- **[test_quic_txns.c](test_quic_txns.c.md)**: QUIC client test that reads base64 transactions from stdin and sends them over a stream.
+- **[fd_quic_sandbox.c](fd_quic_sandbox.c.md)**: Implements a QUIC sandbox for testing packet capture, sending, and connection management.
+- **[fd_quic_sandbox.h](fd_quic_sandbox.h.md)**: Defines a single-threaded QUIC sandbox for testing, capturing, and analyzing QUIC packet exchanges.
+- **[fd_quic_stream_spam.c](fd_quic_stream_spam.c.md)**: Tests for QUIC stream spam generation and management functions in the Firedancer codebase.
+- **[fd_quic_stream_spam.h](fd_quic_stream_spam.h.md)**: Header file for generating and managing random QUIC stream payloads for testing purposes.
+- **[fd_quic_test_helpers.c](fd_quic_test_helpers.c.md)**: Test helpers for QUIC protocol in Firedancer, including callbacks, configuration, and UDP socket management.
+- **[fd_quic_test_helpers.h](fd_quic_test_helpers.h.md)**: Helpers for QUIC tests, including virtual pair setup, UDP socket creation, and network emulation.
+- **[fuzz_quic.c](fuzz_quic.c.md)**: Fuzz testing for QUIC protocol implementation using LLVM's libFuzzer.
+- **[fuzz_quic_wire.c](fuzz_quic_wire.c.md)**: A stateless fuzz target for testing the early stages of QUIC packet processing, including custom mutator logic for handling encrypted UDP datagrams.
+- **[Local.mk](Local.mk.md)**: Makefile for building and running QUIC-related unit and fuzz tests in the Firedancer codebase.
+- **[test_quic_ack_tx.c](test_quic_ack_tx.c.md)**: Tests for QUIC acknowledgment transmission functionality, including packet insertion and frame generation.
+- **[test_quic_bw.c](test_quic_bw.c.md)**: Tests QUIC bandwidth performance by simulating client-server interactions and measuring data rates.
+- **[test_quic_client_flood.c](test_quic_client_flood.c.md)**: Tests the QUIC client by sending a flood of QUIC INITIAL frames and handling connection events.
+- **[test_quic_concurrency.c](test_quic_concurrency.c.md)**: Tests the `fd_quic` server's ability to handle many connections with small streams, simulating mainnet conditions.
+- **[test_quic_conformance.c](test_quic_conformance.c.md)**: Tests for QUIC protocol conformance, including stream data limits, concurrency, and error handling.
+- **[test_quic_conn.c](test_quic_conn.c.md)**: Tests repeated opening and closing of QUIC connections with data transmission and handshake verification.
+- **[test_quic_crypto.c](test_quic_crypto.c.md)**: Tests for QUIC cryptographic operations, including encryption, decryption, and nonce generation.
+- **[test_quic_drops.c](test_quic_drops.c.md)**: Tests QUIC protocol functionality by simulating client-server communication with stream handling and packet dropping.
+- **[test_quic_hs.c](test_quic_hs.c.md)**: Tests for QUIC handshake functionality, including connection setup, data transmission, and TLS cache validation.
+- **[test_quic_idle_conns.c](test_quic_idle_conns.c.md)**: Tests QUIC idle connections by simulating client behavior and managing connection states.
+- **[test_quic_keep_alive.c](test_quic_keep_alive.c.md)**: Tests for QUIC keep-alive functionality, connection timeouts, and connection management in the Firedancer codebase.
+- **[test_quic_key_phase.c](test_quic_key_phase.c.md)**: Tests QUIC key phase changes by simulating client-server communication with multiple streams and key updates.
+- **[test_quic_layout.c](test_quic_layout.c.md)**: Tests the size of QUIC frame structures by printing their sizes.
+- **[test_quic_pkt_meta.c](test_quic_pkt_meta.c.md)**: Tests for QUIC packet metadata handling, including initialization, comparison, and adversarial acknowledgment scenarios.
+- **[test_quic_proto.c](test_quic_proto.c.md)**: Tests for QUIC protocol functions, including varint parsing, encoding, packet number handling, and frame processing.
+- **[test_quic_retry_integration.c](test_quic_retry_integration.c.md)**: Tests for QUIC retry integration, including server-client handshake and token handling.
+- **[test_quic_retry_unit.c](test_quic_retry_unit.c.md)**: Unit tests and benchmarks for QUIC retry packet integrity and token handling in the Firedancer codebase.
+- **[test_quic_server.c](test_quic_server.c.md)**: Tests the QUIC server implementation in the Firedancer codebase.
+- **[test_quic_streams.c](test_quic_streams.c.md)**: Tests QUIC stream functionality, including connection setup, data transmission, and cleanup.
+- **[test_quic_svc_q.c](test_quic_svc_q.c.md)**: Tests for QUIC service queue functionality, including connection scheduling and timer management.
+- **[test_quic_tls_hs.c](test_quic_tls_hs.c.md)**: Tests the QUIC TLS handshake process using the `fd_quic_tls` API in a client-server setup.
+- **[test_quic_txns.c](test_quic_txns.c.md)**: Tests QUIC transaction functionality by simulating a QUIC client that sends transactions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
