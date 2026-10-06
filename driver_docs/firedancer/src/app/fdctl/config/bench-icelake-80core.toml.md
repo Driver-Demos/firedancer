@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for benchmarking on an Intel Icelake CPU with AVX512 support and 80 physical cores.
+The `bench-icelake-80core.toml` file is a configuration file for benchmarking on an Intel Icelake CPU with AVX512 support, specifically designed for a dual socket setup with 80 physical cores, as part of the 1.4 Milestone demo in the `firedancer` codebase.
 
 # Purpose
-The configuration file is designed for benchmarking on an Intel Icelake CPU with AVX512 support, specifically for a 1.4 Milestone demo. It is optimized for a dual-socket CPU setup with 80 physical cores, where the CPU IDs are distributed across two NUMA nodes. The file specifies a dynamic port range from `8100-8200` and sets a scratch directory at `/dev/shm/fd1`. The `[layout]` section defines CPU affinity and tile counts for various operations, while the `[development.genesis]` and `[development.bench]` sections configure initial account funding and benchmarking parameters, respectively. The `[rpc]` section controls transaction history and metadata storage, and the `[tiles.shred]` section sets the maximum number of pending shred sets to `16384`.
+This configuration file is designed for benchmarking a software application on an Intel Icelake CPU with AVX512 support, specifically for a 1.4 Milestone demo. It is tailored for a dual-socket CPU setup with 80 physical cores, distributed across two NUMA nodes, and specifies how these cores should be utilized for optimal performance during benchmarking. The file includes settings for dynamic port ranges, scratch directory paths, and various affinity configurations to manage CPU core assignments for different tasks. It also outlines parameters for development and benchmarking, such as initial account funding, tile counts for different operations, and block processing limits. Additionally, it configures RPC settings related to transaction history and metadata storage, as well as parameters for managing shred operations, which are likely related to data processing or storage tasks.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

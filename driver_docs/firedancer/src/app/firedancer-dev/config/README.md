@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration settings for memory, runtime limits, layout, and tile parameters in TOML format.
+Minimal Firedancer dev config with hugetlbfs, funk, runtime limits, layout, and tile settings.
 
 
 ## Files
-- **[minimal.toml](minimal.toml.md)**: Configuration settings for memory, runtime limits, layout, and tile parameters in TOML format.
+- **[minimal.toml](minimal.toml.md)**: Minimal Firedancer dev config with hugetlbfs, funk, runtime limits, layout, and tile settings.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

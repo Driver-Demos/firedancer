@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for HTTP and WebSocket server interactions using requests and websockets libraries.
+The `test_live_http_server.py` file tests the functionality of an HTTP server by making multiple GET and POST requests and establishing a WebSocket connection to verify responses.
 
 # Purpose
-The code is a script that interacts with a local server running on port 4321 using both HTTP and WebSocket protocols. It performs two main tasks: making HTTP requests and establishing a WebSocket connection. The script first sends 5000 HTTP GET requests to the endpoint `/hello/from/the/magic/tavern` and prints the response content. It then sends 20 HTTP POST requests to the server with a JSON-RPC payload to retrieve account information, printing the parsed JSON response.
+This Python script is designed to interact with a local server running on port 4321, utilizing both HTTP and WebSocket protocols. The script performs three main tasks: it first sends 5000 HTTP GET requests to a specific endpoint (`/hello/from/the/magic/tavern`) and prints the response content. Next, it sends 20 HTTP POST requests with a JSON-RPC payload to the server, requesting account information for a specific account identifier, and prints the parsed JSON response. Finally, it establishes a WebSocket connection to the server and subscribes to a service using the `slotSubscribe` method, continuously receiving and printing messages from the server.
 
-Additionally, the script defines an asynchronous function [`hello`](<#hello>) that connects to the server using a WebSocket. It sends a JSON-RPC request to subscribe to slot updates and continuously receives and prints messages from the server. The script uses the `asyncio` library to run the [`hello`](<#hello>) function until completion. The script concludes by printing 'Test passed!' indicating the end of its execution.
+The script demonstrates a combination of synchronous and asynchronous programming paradigms. It uses the `requests` library for synchronous HTTP requests and the `websockets` library for asynchronous WebSocket communication. The use of JSON-RPC indicates that the server supports remote procedure calls over HTTP and WebSocket, allowing for structured communication. This script is likely intended for testing or interacting with a local server that provides specific services, such as account information retrieval and real-time updates via WebSocket. It does not define public APIs or external interfaces, as it is primarily focused on client-side operations.
 # Imports and Dependencies
 
 ---
@@ -22,16 +22,15 @@ Additionally, the script defines an asynchronous function [`hello`](<#hello>) th
 
 ---
 ### hello<!-- {{#callable:firedancer/src/waltz/http/test_live_http_server.hello}} -->
-[View Source →](<../../../../../src/waltz/http/test_live_http_server.py#L26>)
-
-Establishes a WebSocket connection to a specified URI and continuously sends and receives JSON-RPC messages.
+The `hello` function establishes a WebSocket connection to a local server and continuously sends a JSON-RPC request to subscribe to slot updates, printing the received responses.
 - **Inputs**: None
-- **Logic and Control Flow**:
-    - Defines the WebSocket URI as 'ws://localhost:4321'.
-    - Opens an asynchronous WebSocket connection to the specified URI using `websockets.connect`.
-    - Sends a JSON-RPC request with method 'slotSubscribe' to the WebSocket server.
-    - Enters an infinite loop where it waits for messages from the WebSocket server, decodes them, and prints them in a formatted JSON structure.
-- **Output**: No explicit return value; outputs formatted JSON messages to the console.
+- **Control Flow**:
+    - The function defines a WebSocket URI pointing to 'ws://localhost:4321'.
+    - It establishes an asynchronous WebSocket connection to the specified URI using `websockets.connect`.
+    - A JSON-RPC request object is created with method 'slotSubscribe'.
+    - The JSON-RPC request is sent over the WebSocket connection.
+    - The function enters an infinite loop where it waits for messages from the WebSocket, decodes them from JSON, and prints them in a pretty-printed format.
+- **Output**: The function does not return any value; it continuously prints the received WebSocket messages.
 
 
 
