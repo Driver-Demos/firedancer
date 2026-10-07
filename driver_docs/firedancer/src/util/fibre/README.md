@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements and tests cooperative threading, scheduling, and communication with fibres in Firedancer.
+The `fibre` folder in the `firedancer` codebase contains the implementation and testing of a cooperative threading library using fibers, with files for defining and managing fibers, a makefile for conditional building, and a test suite for validating fiber functionalities.
 
 
 ## Files
-- **[fd_fibre.c](fd_fibre.c.md)**: Implements cooperative threading and scheduling with fibre initialization, management, and communication.
-- **[fd_fibre.h](fd_fibre.h.md)**: Data structures and functions for managing fibres, including initialization, scheduling, and inter-fibre communication.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing the fd_fibre library and its unit tests on Linux.
-- **[test_fibre.c](test_fibre.c.md)**: Tests for fibre scheduling, pipe communication, and timing functions in the Firedancer codebase.
+- **[fd_fibre.c](fd_fibre.c.md)**: The `fd_fibre.c` file in the `firedancer` codebase implements cooperative threading using fibers, including functions for fiber initialization, scheduling, context switching, and inter-fiber communication through pipes.
+- **[fd_fibre.h](fd_fibre.h.md)**: The `fd_fibre.h` file in the `firedancer` codebase defines the structures and functions for managing fibres, including initialization, execution, scheduling, and inter-fibre communication through pipes.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase is a makefile script that conditionally builds and tests the `fd_fibre` library and its unit tests if both `FD_HAS_HOSTED` and `FD_HAS_LINUX` are defined.
+- **[test_fibre.c](test_fibre.c.md)**: The `test_fibre.c` file in the `firedancer` codebase contains tests for the `fd_fibre` library, including functions to test fibre scheduling, waiting mechanisms, and pipe communication between producer and consumer fibres.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

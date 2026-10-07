@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for QUIC with architecture-specific syscall handling.
+Generated seccomp BPF filter for QUIC syscalls, allowing write, fsync, and getrandom.
 
 
 ## Files
-- **[quic_seccomp.h](quic_seccomp.h.md)**: Defines a seccomp filter policy for QUIC with architecture-specific syscall handling.
+- **[quic_seccomp.h](quic_seccomp.h.md)**: Generated seccomp BPF filter for QUIC syscalls, allowing write, fsync, and getrandom.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

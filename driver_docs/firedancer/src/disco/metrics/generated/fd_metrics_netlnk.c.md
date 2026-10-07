@@ -3,12 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines network link metrics as counters and gauges for monitoring purposes.
+The `fd_metrics_netlnk.c` file in the `firedancer` codebase defines a set of network link metrics, including counters and gauges, for monitoring various network events and states.
 
 # Purpose
-The code defines a set of network-related metrics using the `fd_metrics_meta_t` data structure. These metrics are part of a generated file, as indicated by the comment at the top, and should not be manually edited. The metrics are declared using macros such as `DECLARE_METRIC` and `DECLARE_METRIC_ENUM`, which likely expand to define specific properties of each metric, such as its type (e.g., `COUNTER` or `GAUGE`) and any associated enumeration values.
-
-The metrics cover various aspects of network link operations, including event counts (`NETLNK_DROP_EVENTS`), synchronization events (`NETLNK_LINK_FULL_SYNCS`, `NETLNK_ROUTE_FULL_SYNCS`), and updates (`NETLNK_UPDATES`). Additionally, the code tracks interface and route counts (`NETLNK_INTERFACE_COUNT`, `NETLNK_ROUTE_COUNT`) and neighbor probe statistics (`NETLNK_NEIGH_PROBE_SENT`, `NETLNK_NEIGH_PROBE_FAILS`). The use of enumerations in some metrics suggests that these metrics can be further categorized, such as by message type or route table. This file is likely part of a larger system that monitors and reports on network performance and status.
+This C source code file is an auto-generated configuration file that defines a collection of network-related metrics for monitoring purposes. It includes an array of `fd_metrics_meta_t` structures, each initialized with specific metrics using macros like `DECLARE_METRIC` and `DECLARE_METRIC_ENUM`. These metrics are categorized as either counters or gauges, and they track various network link statistics such as drop events, full syncs, updates, interface counts, and neighbor probe activities. The file is not meant to be manually edited, as indicated by the comment at the top, and it relies on the inclusion of the "fd_metrics_netlnk.h" header file for necessary type definitions and macro declarations. This setup is typically used in systems that require detailed network performance monitoring and analysis.
 # Imports and Dependencies
 
 ---
@@ -19,9 +17,9 @@ The metrics cover various aspects of network link operations, including event co
 
 ---
 ### FD\_METRICS\_NETLNK
-- **Type**: ``fd_metrics_meta_t` array`
-- **Description**: An array of `fd_metrics_meta_t` structures that define various network link metrics. Each element in the array is initialized using macros like `DECLARE_METRIC` and `DECLARE_METRIC_ENUM`, which specify the type of metric (e.g., `COUNTER`, `GAUGE`) and its specific category or enumeration (e.g., `NETLINK_MSG`, `ROUTE_TABLE`).
-- **Use**: Used to store and manage metadata for network link metrics in the application.
+- **Type**: `const fd_metrics_meta_t[]`
+- **Description**: FD_METRICS_NETLNK is a constant array of type fd_metrics_meta_t, which holds metadata for various network link metrics. Each element in the array is initialized using macros like DECLARE_METRIC and DECLARE_METRIC_ENUM, which define different types of metrics such as counters and gauges for network link events and states. The array is used to track and manage metrics related to network link operations, such as drop events, full syncs, updates, and probe activities.
+- **Use**: This variable is used to store and manage metadata for network link metrics, facilitating the tracking and analysis of network link performance and events.
 
 
 
