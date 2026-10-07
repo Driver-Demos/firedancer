@@ -3,15 +3,15 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SHA-256 binary Merkle tree hashing, proof, verification, tests, fuzzing, and build rules
+Functions, APIs, and tests for binary Merkle trees using SHA-256, including fuzz testing and a Makefile.
 
 
 ## Files
-- **[fd_bmtree.c](fd_bmtree.c.md)**: Binary Merkle tree hashing, commit, proof, and verification functions based on SHA-256.
-- **[fd_bmtree.h](fd_bmtree.h.md)**: The `fd_bmtree.h` file in the `firedancer` codebase provides APIs for constructing and managing binary Merkle trees using the SHA256 hash function, including operations for creating trees, generating and verifying inclusion proofs, and handling both leaf-based and proof-based commitment calculations.
-- **[fuzz_bmtree.c](fuzz_bmtree.c.md)**: The `fuzz_bmtree.c` file in the `firedancer` codebase implements a fuzz testing framework for binary Merkle trees, ensuring the integrity and correctness of tree operations under various conditions.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_bmtree headers, objects, unit test, and optional fuzz test.
-- **[test_bmtree.c](test_bmtree.c.md)**: Tests BMTree commit, proof, inclusion, depth, and node count functions.
+- **[fd_bmtree.c](fd_bmtree.c.md)**: Functions for binary Merkle trees using SHA-256, supporting different tree widths and operations like hashing, merging, and proof management.
+- **[fd_bmtree.h](fd_bmtree.h.md)**: APIs for binary Merkle trees using SHA256, including construction, inclusion proofs, and verification.
+- **[fuzz_bmtree.c](fuzz_bmtree.c.md)**: Fuzz testing implementation for binary Merkle trees with memory management and proof verification.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests, with optional fuzz testing for `fd_bmtree`.
+- **[test_bmtree.c](test_bmtree.c.md)**: Tests for the construction and verification of binary Merkle trees using 20-byte and 32-byte nodes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

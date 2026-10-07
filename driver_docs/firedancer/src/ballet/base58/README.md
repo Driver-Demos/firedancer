@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `base58` folder in the `firedancer` codebase contains source files, headers, and test scripts for implementing, optimizing, and verifying Base58 encoding and decoding, including AVX optimizations and fuzz testing.
+Base58 encoding and decoding with AVX optimizations, templates, fuzz tests, and a Makefile for building.
 
 
 ## Files
-- **[fd_base58.c](fd_base58.c.md)**: The `fd_base58.c` file in the `firedancer` codebase provides an implementation for encoding and decoding data using the Base58 encoding scheme, with support for AVX optimizations.
-- **[fd_base58.h](fd_base58.h.md)**: The `fd_base58.h` file in the `firedancer` codebase provides methods for encoding and decoding 32 and 64 byte binary data to and from base58 strings, suitable for use with Solana account addresses and transaction signatures.
-- **[fd_base58_avx.h](fd_base58_avx.h.md)**: The `fd_base58_avx.h` file in the `firedancer` codebase provides AVX2-optimized functions for converting data to and from base58 encoding, including operations for loading, storing, and manipulating vectors, as well as counting leading zeros and packing base58 digits.
-- **[fd_base58_tmpl.c](fd_base58_tmpl.c.md)**: The `fd_base58_tmpl.c` file in the `firedancer` codebase provides template functions for encoding and decoding binary data to and from base58, specifically for binary data of lengths 32 or 64 bytes.
-- **[fuzz_base58_garbage.c](fuzz_base58_garbage.c.md)**: The `fuzz_base58_garbage.c` file in the `firedancer` codebase implements a fuzzing test for the Base58 decoding functions, ensuring they handle various inputs correctly and safely.
-- **[fuzz_base58_roundtrip.c](fuzz_base58_roundtrip.c.md)**: The `fuzz_base58_roundtrip.c` file in the `firedancer` codebase implements a fuzz testing routine to verify the correctness of Base58 encoding and decoding functions for data of specific sizes.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the build configuration for the `base58` module, including headers, object files, unit tests, and conditional fuzz tests.
-- **[test_base58.c](test_base58.c.md)**: The `test_base58.c` file in the `firedancer` codebase contains tests for encoding and decoding functions that convert data to and from base58 format, including reference implementations and performance tests for both 256-bit and 512-bit conversions, with additional tests for AVX optimizations if available.
+- **[fd_base58.c](fd_base58.c.md)**: Implements base58 encoding and decoding with AVX optimizations and lookup tables for character mapping.
+- **[fd_base58.h](fd_base58.h.md)**: Methods for converting between binary data and base58 encoding, including encoding and decoding functions.
+- **[fd_base58_avx.h](fd_base58_avx.h.md)**: Header file for AVX2-optimized base58 encoding and decoding operations, including vector manipulation functions.
+- **[fd_base58_tmpl.c](fd_base58_tmpl.c.md)**: Template for base58 encoding and decoding functions for binary data of specific sizes (32 or 64 bytes).
+- **[fuzz_base58_garbage.c](fuzz_base58_garbage.c.md)**: Fuzz testing for Base58 decoding functions with memory sanitization and error handling.
+- **[fuzz_base58_roundtrip.c](fuzz_base58_roundtrip.c.md)**: A fuzz test for Base58 encoding and decoding round-trip validation.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing the fd_base58 module with unit and fuzz tests.
+- **[test_base58.c](test_base58.c.md)**: Tests for base58 encoding and decoding functions, including performance and boundary checks, with AVX optimizations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
