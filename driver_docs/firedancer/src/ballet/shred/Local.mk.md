@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and conditional fuzz tests for the shred and deshredder components within the `fd_ballet` module.
+Makefile for adding headers, objects, and unit tests, with optional fuzz testing for hosted environments.
 
 # Purpose
-This file is a Makefile snippet used for building and testing components of a software project. It defines rules to add header files (`fd_shred.h`, `fd_deshredder.h`) and object files (`fd_shred`, `fd_deshredder`, `fd_ballet`) to the build process. It also specifies the creation and execution of a unit test (`test_shred`) and conditionally includes a fuzz test (`fuzz_shred_parse`) if the `FD_HAS_HOSTED` environment variable is set.
+This Makefile script automates the build process for a software project. It adds header files `fd_shred.h` and `fd_deshredder.h` to the build using the `add-hdrs` function. It compiles object files `fd_shred` and `fd_deshredder` with the `fd_ballet` library using the `add-objs` function. The script creates and runs a unit test named `test_shred` with dependencies on `fd_ballet` and `fd_util`. If the `FD_HAS_HOSTED` variable is defined, it also creates a fuzz test named `fuzz_shred_parse` with the same dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
