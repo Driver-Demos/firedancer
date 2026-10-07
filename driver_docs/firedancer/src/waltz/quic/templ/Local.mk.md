@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, unit tests, and fuzz tests for the QUIC module within the Waltz component.
+Makefile for adding headers and objects, and creating unit and fuzz tests for QUIC transport parameters.
 
 # Purpose
-This file is a Makefile script used for automating the build process of a software project. It defines rules to add header files and object files, create and run unit tests, and create fuzz tests for components related to QUIC (Quick UDP Internet Connections) transport parameters. The script utilizes custom functions such as `add-hdrs`, `add-objs`, `make-unit-test`, and `make-fuzz-test` to streamline these tasks.
+The Makefile content defines build and test instructions for a software project. It uses custom functions to add header files and object files, specifically `fd_quic_defs.h`, `fd_quic_frames_templ.h`, `fd_quic_dft.h`, `fd_quic_templ.h`, `fd_quic_undefs.h`, and `fd_quic_transport_params.h`. It compiles object files `fd_quic_transport_params` and `fd_quic`. The file also specifies the creation and execution of a unit test named `test_quic_transport_params` and a fuzz test named `fuzz_quic_parse_transport_params`, linking them with libraries `fd_quic`, `fd_tls`, `fd_waltz`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

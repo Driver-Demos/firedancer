@@ -3,10 +3,35 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Waits for all non-agave tiles to reach ready status and logs when all tiles are ready.
+Function to wait for all tiles to be ready and log their status in a distributed system.
 
 # Purpose
-Waits for the configured topology to reach a ready state before the `ready` action returns. The `ready_cmd_fn` function joins the `metric_in` workspace, then checks each tile in `config->topo` by reading the tile status from `fd_metrics_tile(...)` and the `FD_METRICS_GAUGE_TILE_STATUS_OFF` gauge. It skips tiles marked as `is_agave`, accepts status `1` as ready, and also accepts status `2` when `allow_shutdown` is set; any other nonzero status causes an error. After all tiles are ready, it leaves the workspaces and logs `all tiles ready`, and the `fd_action_ready` structure registers this function as the `ready` command.
+The code defines a function `ready_cmd_fn` that is part of a larger system for managing and monitoring a set of computational tiles. The function is responsible for ensuring that all tiles in a given configuration are ready to operate. It does this by checking the status of each tile and waiting until they are in a ready state. The function uses the `fd_topo_find_wksp`, `fd_topo_join_workspace`, and `fd_topo_workspace_fill` functions to interact with a shared memory workspace, which is identified by the name "metric_in". The function also logs messages to indicate the readiness of the tiles and any issues encountered during the process.
+
+The code also defines an `action_t` structure named `fd_action_ready`, which associates the `ready_cmd_fn` function with the action name "ready". This structure includes metadata such as the action's name, a description, and a flag indicating that a configuration is required. The `fd_action_ready` structure is likely used to register or execute the "ready" action within a larger framework or application. The code is part of a system that uses metrics and shared memory to manage the state of distributed computational resources.
+# Imports and Dependencies
+
+---
+- `run/run.h`
+- `../../../disco/metrics/fd_metrics.h`
+
+
+# Global Variables
+
+---
+### ready\_cmd\_fn
+- **Type**: `function`
+- **Description**: Executes a command to prepare the system by ensuring all tiles are ready. It checks the status of each tile and waits until they are in a ready state before proceeding.
+- **Use**: Used as a function pointer in the `fd_action_ready` structure to define the behavior of the 'ready' action.
+
+
+---
+### fd\_action\_ready
+- **Type**: `action_t`
+- **Description**: Defines an action named 'ready' that waits for all tiles to be running. It uses the function 'ready_cmd_fn' to execute this action and requires a configuration to operate.
+- **Use**: Used to represent an action that checks and waits for the readiness of all tiles in a system.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

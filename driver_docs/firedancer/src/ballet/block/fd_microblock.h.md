@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_microblock.h` file defines a packed structure for a microblock header, including fields for PoH hash count, hash state, and transaction count, in the `firedancer` codebase.
+Defines a packed structure for a microblock header with fields for hash count, hash, and transaction count.
 
 # Purpose
-This C header file defines a data structure, `fd_microblock_hdr`, which is used to represent the header of a microblock in a blockchain-like system. The structure is packed to ensure no padding is added between its fields, which include a count of Proof of History (PoH) hashes (`hash_cnt`), a SHA-256 hash representing the PoH state (`hash`), and a count of transactions (`txn_cnt`). The file includes dependencies on other headers for base functionality and SHA-256 hashing, indicating its integration into a larger system. A comment suggests that this structure may be redundant and slated for removal after a merge, hinting at ongoing refactoring or optimization efforts in the codebase.
+This code is a C header file that defines a data structure for a microblock header in a blockchain context. The `fd_microblock_hdr` structure is packed and contains three fields: `hash_cnt`, `hash`, and `txn_cnt`. The `hash_cnt` field is an unsigned long integer that represents the number of Proof of History (PoH) hashes between the current and the last microblock. The `hash` field is an array of unsigned characters that stores the PoH state after evaluating the current microblock, using the SHA-256 hash size defined in `fd_sha256.h`. The `txn_cnt` field is an unsigned long integer that indicates the number of transactions in the microblock. The file includes dependencies on `fd_ballet_base.h` and `fd_sha256.h` for base definitions and SHA-256 hashing functionality, respectively.
 # Imports and Dependencies
 
 ---
@@ -18,22 +18,22 @@ This C header file defines a data structure, `fd_microblock_hdr`, which is used 
 
 ---
 ### fd\_microblock\_hdr
-- **Type**: `struct`
-- **Members**:
-    - `hash_cnt`: Stores the number of PoH hashes between this and the last microblock.
-    - `hash`: Represents the PoH state after evaluating this microblock, including all appends and mixin.
-    - `txn_cnt`: Indicates the number of transactions in this microblock.
-- **Description**: The `fd_microblock_hdr` is a packed structure that encapsulates metadata for a microblock, including the count of Proof of History (PoH) hashes since the last microblock, the PoH state after processing the current microblock, and the number of transactions contained within the microblock. This structure is crucial for maintaining the integrity and order of transactions in a blockchain system, ensuring that each microblock is correctly linked and verifiable.
-
-
----
-### fd\_microblock\_hdr\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
     - `hash_cnt`: Stores the number of PoH hashes between this and the last microblock.
     - `hash`: Contains the PoH state after evaluating this microblock, including all appends and mixin.
     - `txn_cnt`: Indicates the number of transactions in this microblock.
-- **Description**: The `fd_microblock_hdr_t` structure is a packed data structure used to represent the header of a microblock in a blockchain system. It includes fields for the number of Proof of History (PoH) hashes since the last microblock (`hash_cnt`), the PoH state after processing the current microblock (`hash`), and the count of transactions contained within the microblock (`txn_cnt`). This structure is crucial for maintaining the integrity and order of transactions in a blockchain by linking microblocks through PoH hashes.
+- **Description**: Defines a packed structure that represents the header of a microblock, including the count of PoH hashes, the PoH state, and the transaction count.
+
+
+---
+### fd\_microblock\_hdr\_t
+- **Type**: ``struct fd_microblock_hdr``
+- **Members**:
+    - ``hash_cnt``: Number of PoH hashes between this and the last microblock.
+    - ``hash``: PoH state after evaluating this microblock, including all appends and mixin.
+    - ``txn_cnt``: Number of transactions in this microblock.
+- **Description**: Represents the header of a microblock, containing information about the number of PoH hashes since the last microblock, the PoH state after processing the current microblock, and the number of transactions included in the microblock.
 
 
 

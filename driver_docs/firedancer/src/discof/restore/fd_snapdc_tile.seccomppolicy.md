@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Security policy for logging writes, logfile fsync, and exit on shutdown.
+Defines security policies for logging and shutdown operations, including file descriptor management.
 
 # Purpose
-This file defines logging and shutdown rules for a boot-time service by mapping file descriptors to allowed operations. The `logfile_fd` value stores the descriptor used for the log file, and the `write` rule permits output only to `STDERR` (`2`) or to `logfile_fd`, while the `fsync` rule allows disk sync only for `logfile_fd`. The `exit` rule permits process termination only when the argument is `0`, which ties shutdown behavior to the expected exit path.
+The configuration file defines logging and shutdown behaviors for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above also directed to the STDERR pipe. The file descriptor for logging is identified by `logfile_fd`, and the boot process ensures that descriptor 2 is always STDERR. Additionally, 'WARNING' level messages and above trigger an immediate `fsync` to the disk for the log file, ensuring data integrity. The shutdown process is managed by calling `exit` when the argument is 0, indicating a normal termination.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
