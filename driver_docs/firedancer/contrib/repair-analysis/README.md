@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generates PDF reports from testnet logs and CSV data for repair, FEC, and peer analysis.
+Generates a PDF report analyzing repair mechanisms in a testnet run using CSV data and logs.
 
 
 ## Files
-- **[report.py](report.py.md)**: Generates a PDF report from testnet logs and CSV data for repair, FEC, and peer analysis.
+- **[report.py](report.py.md)**: Generates a PDF report analyzing repair mechanisms in a testnet run, using CSV data and logs.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

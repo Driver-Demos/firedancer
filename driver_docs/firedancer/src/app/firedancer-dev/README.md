@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Commands, config, build rules, and main application setup for Firedancer dev.
+Commands for testing and development, configuration settings, a Makefile, and the main function.
 
 ## Folders
-- **[commands](commands/README.md)**: Commands for backtest, benchmark, dev, gossip, repair, simulation, and snapshot load.
-- **[config](config/README.md)**: Minimal Firedancer dev config with hugetlbfs, funk, runtime limits, layout, and tile settings.
+- **[commands](commands/README.md)**: Implements commands for backtesting, benchmarking, development, gossip configuration, simulation, and more.
+- **[config](config/README.md)**: Configuration settings for memory, runtime limits, layout, and tile parameters in TOML format.
 
 ## Files
-- **[Local.mk](Local.mk.md)**: Build rules for firedancer-dev commands and binary, gated by platform feature checks.
-- **[main.c](main.c.md)**: Defines Firedancer actions, tiles, callbacks, and config presets, then calls fd_dev_main.
-- **[main.h](main.h.md)**: Declarations for configure stages kill, netns, genesis, and keys.
+- **[Local.mk](Local.mk.md)**: Makefile for building and integrating the `firedancer-dev` application with various dependencies.
+- **[main.c](main.c.md)**: Defines the main function for the Firedancer application, initializing configurations, callbacks, stages, tiles, and actions.
+- **[main.h](main.h.md)**: Header file declaring external configuration stages for the Firedancer application.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

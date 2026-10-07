@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_hpack.c` file in the `firedancer` codebase implements functions for handling HPACK header compression and decompression, including managing a static table of HTTP/2 headers and decoding Huffman-encoded header fields.
+Implements HPACK header compression and decompression for HTTP/2, using static tables and Huffman coding.
 
 # Purpose
-This C source code file is part of an implementation of the HPACK compression format, which is used in HTTP/2 to efficiently encode HTTP headers. The file provides functionality for reading and decoding HPACK-encoded header fields. It includes a static table of common HTTP headers and their values, which is a key component of HPACK's compression mechanism. The static table is used to quickly reference frequently used headers, reducing the size of HTTP/2 header frames. The file defines several functions that handle the initialization of HPACK reading structures, the selection of headers from the static table, and the decoding of headers, including handling Huffman-encoded data.
+The code is a C implementation of an HPACK decoder, which is used in HTTP/2 for header compression. It includes functions to initialize and process HPACK encoded data, specifically focusing on reading and decoding headers from a static table. The static table, `fd_hpack_static_table`, contains predefined HTTP/2 headers and their associated values, which are used to efficiently compress and decompress HTTP headers. The code provides functions such as [`fd_hpack_rd_init`](<#fd_hpack_rd_init>), [`fd_hpack_rd_indexed`](<#fd_hpack_rd_indexed>), and [`fd_hpack_rd_next`](<#fd_hpack_rd_next>) to handle the initialization of the decoder, selection of headers from the static table, and processing of the next header in the encoded data stream, respectively.
 
-The code is structured to handle various types of HPACK instructions, such as indexed and literal header fields, and it includes error handling for compression errors. The functions [`fd_hpack_rd_next_raw`](#fd_hpack_rd_next_raw) and [`fd_hpack_rd_next`](#fd_hpack_rd_next) are central to the decoding process, with the latter also managing Huffman decoding using the `nghttp2_hd_huff_decode` function. The file is not a standalone executable but rather a component of a larger library, likely intended to be used in conjunction with other parts of an HTTP/2 implementation. It does not define public APIs directly but provides internal functionality that can be used by other parts of the library to decode HTTP/2 headers efficiently.
+The code also includes mechanisms to handle Huffman decoding, which is a part of the HPACK compression strategy. The function [`fd_hpack_rd_next_raw`](<#fd_hpack_rd_next_raw>) processes raw HPACK instructions, while [`fd_hpack_rd_next`](<#fd_hpack_rd_next>) manages the decoding of headers, including Huffman-encoded names and values. The code uses several utility functions and macros, such as `fd_hpack_rd_varint` for reading variable-length integers and `nghttp2_hd_huff_decode` for Huffman decoding. The implementation is designed to handle different types of HPACK instructions, including those for indexed and literal headers, and provides error handling for compression errors.
 # Imports and Dependencies
 
 ---
@@ -23,101 +23,111 @@ The code is structured to handle various types of HPACK instructions, such as in
 
 ---
 ### fd\_hpack\_static\_table
-- **Type**: `fd_hpack_static_entry_t const[62]`
-- **Description**: The `fd_hpack_static_table` is an array of 62 constant entries of type `fd_hpack_static_entry_t`. Each entry represents a predefined HTTP/2 header field with its name, name length, and value length. This table is used in the HPACK compression context to efficiently encode and decode HTTP/2 headers using a static set of common headers.
-- **Use**: This variable is used to provide quick access to a set of predefined HTTP/2 headers for compression and decompression operations in the HPACK protocol.
+- **Type**: ``fd_hpack_static_entry_t const[62]``
+- **Description**: Represents a static table of HTTP/2 header fields used in HPACK compression. Each entry in the table is a `fd_hpack_static_entry_t` structure, which contains a header field name, its length, and a value length.
+- **Use**: Used to provide quick access to common HTTP/2 header fields during HPACK compression and decompression.
 
 
 # Functions
 
 ---
 ### fd\_hpack\_rd\_init<!-- {{#callable:fd_hpack_rd_init}} -->
-The `fd_hpack_rd_init` function initializes an HPACK reader structure and skips over any dynamic table size updates in the source data.
+[View Source →](<../../../../../src/waltz/h2/fd_hpack.c#L72>)
+
+Initializes an `fd_hpack_rd_t` structure and skips over dynamic table size updates in the source data.
 - **Inputs**:
-    - `rd`: A pointer to an `fd_hpack_rd_t` structure that will be initialized.
-    - `src`: A pointer to the source data buffer containing HPACK encoded data.
-    - `srcsz`: The size of the source data buffer in bytes.
-- **Control Flow**:
-    - Initialize the `rd` structure with the source data pointer and calculate the end of the source data using `srcsz`.
-    - Enter a loop that continues as long as the current source pointer is less than the end of the source data.
-    - In each iteration, read the first byte of the current source data.
-    - Check if the byte indicates a dynamic table size update (i.e., the top three bits are `0x20`).
-    - If it is a dynamic table size update, read the variable integer size using [`fd_hpack_rd_varint`](fd_hpack_private.h.md#fd_hpack_rd_varint) and check if it is non-zero; if so, break the loop.
-    - If the byte does not indicate a dynamic table size update, break the loop.
-    - Increment the source pointer to skip the current byte if it was a dynamic table size update.
-    - Return the initialized `rd` structure.
-- **Output**: Returns a pointer to the initialized `fd_hpack_rd_t` structure.
-- **Functions called**:
-    - [`fd_hpack_rd_varint`](fd_hpack_private.h.md#fd_hpack_rd_varint)
+    - `rd`: A pointer to an `fd_hpack_rd_t` structure to initialize.
+    - `src`: A pointer to the source data to read from.
+    - `srcsz`: The size of the source data in bytes.
+- **Logic and Control Flow**:
+    - Assigns the `src` and `src_end` fields of the `rd` structure to point to the start and end of the source data, respectively.
+    - Enters a loop to skip over dynamic table size updates in the source data.
+    - In each iteration, checks if the current byte indicates a dynamic table size update by examining the top three bits.
+    - If a dynamic table size update is detected, reads the size using [`fd_hpack_rd_varint`](<fd_hpack_private.h.md#fd_hpack_rd_varint>) and checks if it is non-zero to break the loop.
+    - Increments the source pointer to skip the current byte if it is a dynamic table size update.
+    - Exits the loop if no more dynamic table size updates are found or if the end of the source data is reached.
+    - Returns the initialized `fd_hpack_rd_t` structure.
+- **Output**: A pointer to the initialized `fd_hpack_rd_t` structure.
+- **Functions Called**:
+    - [`fd_hpack_rd_varint`](<fd_hpack_private.h.md#fd_hpack_rd_varint>)
 
 
 ---
 ### fd\_hpack\_rd\_indexed<!-- {{#callable:fd_hpack_rd_indexed}} -->
-The `fd_hpack_rd_indexed` function retrieves a header from the HPACK static table based on a given index and populates a header structure with the corresponding name and value.
+[View Source →](<../../../../../src/waltz/h2/fd_hpack.c#L99>)
+
+Selects a header from the HPACK static table based on an index and populates the header structure.
 - **Inputs**:
-    - `hdr`: A pointer to an `fd_h2_hdr_t` structure where the header information will be stored.
-    - `idx`: An unsigned long integer representing the index of the header in the HPACK static table.
-- **Control Flow**:
-    - Check if the index is out of bounds (0 or greater than 61); if so, return an error code `FD_H2_ERR_COMPRESSION`.
-    - Retrieve the entry from the `fd_hpack_static_table` using the provided index.
-    - Populate the `hdr` structure with the name, name length, value, value length, and a hint indicating the header is indexed.
-    - Return `FD_H2_SUCCESS` to indicate successful execution.
-- **Output**: Returns `FD_H2_SUCCESS` if the header is successfully retrieved and populated, or `FD_H2_ERR_COMPRESSION` if the index is invalid.
+    - ``hdr``: A pointer to an `fd_h2_hdr_t` structure where the function will store the selected header information.
+    - ``idx``: An unsigned long integer representing the index of the header in the HPACK static table.
+- **Logic and Control Flow**:
+    - Check if `idx` is 0 or greater than 61; if true, return `FD_H2_ERR_COMPRESSION`.
+    - Retrieve the entry from `fd_hpack_static_table` using `idx`.
+    - Populate the `hdr` structure with the name, name length, value, value length, and hint from the retrieved entry.
+    - Return `FD_H2_SUCCESS`.
+- **Output**: Returns `FD_H2_SUCCESS` if the header is successfully retrieved and populated, otherwise returns `FD_H2_ERR_COMPRESSION` if the index is invalid.
 
 
 ---
 ### fd\_hpack\_rd\_next\_raw<!-- {{#callable:fd_hpack_rd_next_raw}} -->
-The `fd_hpack_rd_next_raw` function decodes the next HPACK header field from a source buffer, handling various encoding types and updating the header structure accordingly.
+[View Source →](<../../../../../src/waltz/h2/fd_hpack.c#L114>)
+
+Parses the next HPACK-encoded header from the source buffer and updates the header structure accordingly.
 - **Inputs**:
-    - `rd`: A pointer to an `fd_hpack_rd_t` structure representing the current state of the HPACK reader, including the source buffer and its end.
-    - `hdr`: A pointer to an `fd_h2_hdr_t` structure where the decoded header field will be stored.
-- **Control Flow**:
-    - Check if the source pointer has reached the end of the buffer and log a critical error if so.
-    - Read the first byte from the source buffer to determine the encoding type of the header field.
-    - If the first byte indicates a name and value indexed header with an index in [0,63], call [`fd_hpack_rd_indexed`](#fd_hpack_rd_indexed) to decode it and set the appropriate hint.
-    - If the first byte indicates a name and value literal header, read the name and value lengths using [`fd_hpack_rd_varint`](fd_hpack_private.h.md#fd_hpack_rd_varint), check for buffer overflows, and update the header structure with the decoded name and value.
-    - If the first byte indicates a name indexed and value literal header, read the name index and value length, check for buffer overflows, and update the header structure with the decoded value.
-    - If the first byte indicates a name and value indexed header with an index >=128, read the index using [`fd_hpack_rd_varint`](fd_hpack_private.h.md#fd_hpack_rd_varint) and call [`fd_hpack_rd_indexed`](#fd_hpack_rd_indexed).
-    - Skip over any Dynamic Table Size Updates in the source buffer.
-    - Return a compression error if an unknown HPACK instruction is encountered.
-- **Output**: Returns a `uint` indicating success (`FD_H2_SUCCESS`) or an error code (`FD_H2_ERR_COMPRESSION`) if a decoding error occurs.
-- **Functions called**:
-    - [`fd_hpack_rd_indexed`](#fd_hpack_rd_indexed)
-    - [`fd_hpack_rd_varint`](fd_hpack_private.h.md#fd_hpack_rd_varint)
+    - ``rd``: A pointer to an `fd_hpack_rd_t` structure that contains the source buffer and its end.
+    - ``hdr``: A pointer to an `fd_h2_hdr_t` structure where the parsed header information will be stored.
+- **Logic and Control Flow**:
+    - Check if the source pointer `rd->src` is out of bounds compared to `rd->src_end` and log a critical error if so.
+    - Read the first byte `b0` from the source buffer and increment the source pointer.
+    - If `b0` indicates a name and value indexed header, call [`fd_hpack_rd_indexed`](<#fd_hpack_rd_indexed>) to retrieve the header and set the value indexed hint.
+    - If `b0` indicates a name and value literal header, read the name and value lengths using [`fd_hpack_rd_varint`](<fd_hpack_private.h.md#fd_hpack_rd_varint>), check for buffer overflows, and update the header structure with the name and value pointers and lengths.
+    - If `b0` indicates a name indexed and value literal header, read the name index and value length, check for buffer overflows, retrieve the name using [`fd_hpack_rd_indexed`](<#fd_hpack_rd_indexed>), and update the header structure with the value pointer and length.
+    - If `b0` indicates a name and value indexed header with an index greater than or equal to 128, read the index and call [`fd_hpack_rd_indexed`](<#fd_hpack_rd_indexed>) to retrieve the header.
+    - Skip over any Dynamic Table Size Updates by checking for specific byte patterns and continue parsing.
+    - Return an error if an unknown HPACK instruction is encountered.
+- **Output**: Returns a `uint` indicating success (`FD_H2_SUCCESS`) or an error code (`FD_H2_ERR_COMPRESSION`) if parsing fails.
+- **Functions Called**:
+    - [`fd_hpack_rd_indexed`](<#fd_hpack_rd_indexed>)
+    - [`fd_hpack_rd_varint`](<fd_hpack_private.h.md#fd_hpack_rd_varint>)
 
 
 ---
 ### fd\_hpack\_decoded\_sz\_max<!-- {{#callable:fd_hpack_decoded_sz_max}} -->
-The `fd_hpack_decoded_sz_max` function calculates the maximum possible size of decoded data from a given encoded size using a conservative estimate for HPACK Huffman coding.
+[View Source →](<../../../../../src/waltz/h2/fd_hpack.c#L208>)
+
+Calculates the maximum possible size of decoded data from a given encoded size using HPACK Huffman coding.
 - **Inputs**:
-    - `enc_sz`: The size of the encoded data in bytes, represented as an unsigned long integer.
-- **Control Flow**:
-    - The function takes the input `enc_sz` and multiplies it by 2 to calculate the maximum possible size of the decoded data.
-    - The function returns the result of this multiplication as the output.
-- **Output**: The function returns an unsigned long integer representing the maximum possible size of the decoded data, which is twice the size of the input encoded data.
+    - `enc_sz`: The size of the encoded data in bytes.
+- **Logic and Control Flow**:
+    - Multiply the input `enc_sz` by 2 to calculate the maximum possible size of the decoded data.
+- **Output**: Returns an unsigned long integer representing the maximum possible size of the decoded data.
 
 
 ---
 ### fd\_hpack\_rd\_next<!-- {{#callable:fd_hpack_rd_next}} -->
-The `fd_hpack_rd_next` function decodes the next HPACK header field from a stream, handling Huffman decoding if necessary, and updates the header and scratch buffer accordingly.
+[View Source →](<../../../../../src/waltz/h2/fd_hpack.c#L213>)
+
+Processes the next HPACK header field, decoding Huffman-encoded names and values if necessary.
 - **Inputs**:
-    - `hpack_rd`: A pointer to an `fd_hpack_rd_t` structure representing the HPACK reader state.
+    - `hpack_rd`: A pointer to an `fd_hpack_rd_t` structure that represents the HPACK reader state.
     - `hdr`: A pointer to an `fd_h2_hdr_t` structure where the decoded header field will be stored.
-    - `scratch`: A pointer to a buffer pointer used for temporary storage during decoding.
-    - `scratch_end`: A pointer to the end of the scratch buffer, used to ensure buffer bounds are not exceeded.
-- **Control Flow**:
-    - Call [`fd_hpack_rd_next_raw`](#fd_hpack_rd_next_raw) to read the next raw header field from the HPACK stream into `hdr` and check for errors.
-    - If the header name is Huffman encoded, check if there is enough space in the scratch buffer for the decoded name, decode it using Huffman decoding, and update `hdr->name` and `hdr->name_len`.
-    - If the header value is Huffman encoded, check if there is enough space in the scratch buffer for the decoded value, decode it using Huffman decoding, and update `hdr->value` and `hdr->value_len`.
-    - Update the `scratch` pointer to reflect the new position after decoding.
-    - Clear the Huffman hint bits in `hdr->hint` to indicate that Huffman decoding has been handled.
-    - Return `FD_H2_SUCCESS` if successful, or an error code if any step fails.
-- **Output**: Returns `FD_H2_SUCCESS` on successful decoding, or an error code if an error occurs during the process.
-- **Functions called**:
-    - [`fd_hpack_rd_next_raw`](#fd_hpack_rd_next_raw)
-    - [`fd_hpack_decoded_sz_max`](#fd_hpack_decoded_sz_max)
-    - [`nghttp2_hd_huff_decode_context_init`](nghttp2_hd_huffman.c.md#nghttp2_hd_huff_decode_context_init)
-    - [`nghttp2_hd_huff_decode`](nghttp2_hd_huffman.c.md#nghttp2_hd_huff_decode)
+    - `scratch`: A pointer to a pointer to a `uchar` buffer used for temporary storage during decoding.
+    - `scratch_end`: A pointer to the end of the `scratch` buffer, used to ensure buffer boundaries are not exceeded.
+- **Logic and Control Flow**:
+    - Calls [`fd_hpack_rd_next_raw`](<#fd_hpack_rd_next_raw>) to process the next raw HPACK header field and checks for errors.
+    - If the header name is Huffman-encoded, checks if there is enough space in the `scratch` buffer for the decoded name and decodes it using [`nghttp2_hd_huff_decode`](<nghttp2_hd_huffman.c.md#nghttp2_hd_huff_decode>).
+    - Updates the `hdr->name` and `hdr->name_len` with the decoded name and advances the `scratch` pointer.
+    - If the header value is Huffman-encoded, checks if there is enough space in the `scratch` buffer for the decoded value and decodes it using [`nghttp2_hd_huff_decode`](<nghttp2_hd_huffman.c.md#nghttp2_hd_huff_decode>).
+    - Updates the `hdr->value` and `hdr->value_len` with the decoded value and advances the `scratch` pointer.
+    - Updates the `scratch` pointer to the new position after decoding.
+    - Clears the Huffman encoding hints from `hdr->hint`.
+    - Returns `FD_H2_SUCCESS` if successful, or an error code if a failure occurs.
+- **Output**: Returns `FD_H2_SUCCESS` on success or an error code if a failure occurs during processing.
+- **Functions Called**:
+    - [`fd_hpack_rd_next_raw`](<#fd_hpack_rd_next_raw>)
+    - [`fd_hpack_decoded_sz_max`](<#fd_hpack_decoded_sz_max>)
+    - [`nghttp2_hd_huff_decode_context_init`](<nghttp2_hd_huffman.c.md#nghttp2_hd_huff_decode_context_init>)
+    - [`nghttp2_hd_huff_decode`](<nghttp2_hd_huffman.c.md#nghttp2_hd_huff_decode>)
 
 
 

@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Netlink tile APIs, event loop, seccomp policy, and build rules for link, route, and neighbor updates.
+Network topology management and monitoring using Netlink, seccomp policies, and architecture checks.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp BPF filter for netlink syscalls and fd checks.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for netlink communication with architecture checks.
 
 ## Files
-- **[fd_netlink_tile.c](fd_netlink_tile.c.md)**: Netlink tile setup, seccomp, and event loop for link, route, and neighbor updates.
-- **[fd_netlink_tile.h](fd_netlink_tile.h.md)**: Netlink tile APIs, topology setup, and IPv4 neighbor solicitation helpers.
-- **[fd_netlink_tile_private.h](fd_netlink_tile_private.h.md)**: The `fd_netlink_tile_private.h` file defines the `fd_netlink_tile_ctx` structure and associated constants for managing network link, route, and neighbor updates within the Firedancer project.
-- **[Local.mk](Local.mk.md)**: Build rules for `fd_netlink_tile.h` and `fd_netlink_tile` when `FD_HAS_LINUX` is set.
-- **[netlink.seccomppolicy](netlink.seccomppolicy.md)**: The `netlink.seccomppolicy` file in the `firedancer` codebase defines security policies for handling file descriptors and network sockets, including logging, sending, and receiving network messages using specific file descriptors.
+- **[fd_netlink_tile.c](fd_netlink_tile.c.md)**: Implements network topology management and monitoring using Netlink, including route and neighbor updates.
+- **[fd_netlink_tile.h](fd_netlink_tile.h.md)**: APIs and structures for managing netlink tiles, including neighbor solicitation and topology creation.
+- **[fd_netlink_tile_private.h](fd_netlink_tile_private.h.md)**: Defines the `fd_netlink_tile_ctx` structure for managing network link, route, and neighbor updates.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and objects related to fd_netlink_tile if Linux is available.
+- **[netlink.seccomppolicy](netlink.seccomppolicy.md)**: Defines file descriptors and seccomp policies for logging, ARP probes, and rtnetlink socket operations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
