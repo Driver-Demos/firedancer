@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Solfuzz APIs and Firedancer SVM backend layering.
+Documentation for the Firedancer SVM backend integration with solfuzz, detailing its layered architecture.
 
 # Purpose
-This file describes the Firedancer backend for `solfuzz`, which wraps the Solana runtime in a Protobuf-based interface so the same input can run on different SVM implementations. It defines a layered design with `sol_compat` as the stable public ABI, `fd_solfuzz` as an internal Protobuf-based API for tooling and tests, and `fd_runtime` as the Firedancer runtime that executes the transaction. The document also states that `sol_compat` is exposed through the `libfd_exec_sol_compat.so` shared library for external users such as `solfuzz` and `solana-conformance`. It points readers to `fd_sol_compat.h`, `fd_solfuzz.h`, and `src/flamenco/runtime` for the API and runtime details.
+The document describes the integration of the Firedancer SVM backend with the `solfuzz` tool, which wraps the Solana runtime (SVM) in a Protobuf format. This integration allows users to execute inputs against various SVM implementations, including Agave, Firedancer, Mithril, and Sig. The integration is structured in three layers: `sol_compat`, `fd_solfuzz`, and `fd_runtime`. The `sol_compat` layer provides a stable C API for external users, outputting a shared library `libfd_exec_sol_compat.so`. The `fd_solfuzz` layer, which is not a stable API, uses Protobuf formats and is mainly for internal use, supporting advanced features for command-line tools and tests. The `fd_runtime` layer represents the actual Firedancer SVM implementation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

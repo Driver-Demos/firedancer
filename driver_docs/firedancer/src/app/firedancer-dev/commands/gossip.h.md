@@ -3,14 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Shared gossip topology setup function declaration.
+Shared gossip topology setup functions for configuring the gossip subtopology in Firedancer.
 
 # Purpose
-This header file declares the [`fd_gossip_subtopo`](<#fd_gossip_subtopo>) setup function for the gossip command path. It includes `fd_config.h` for the `config_t` type and the `FD_TILE_MAX` limit, and it defines an include guard to prevent multiple inclusion. The function prepares the gossip subtopology, including `gossip`, `gossvf`, and `ipecho`, and it assumes that the `net`, `metrics`, and `sign` tiles already exist in the topology. It does not finish the topology, so callers must complete the setup with `fd_topos_net_tile_finish` and `fd_topob_finish` after calling [`fd_gossip_subtopo`](<#fd_gossip_subtopo>).
+This C header file defines a function for setting up a gossip topology in a network configuration. The function [`fd_gossip_subtopo`](<#fd_gossip_subtopo>) is responsible for configuring the gossip subtopology, which includes components such as gossip, gossvf, and ipecho. It requires that network, metrics, and sign tiles are already part of the topology before execution. The function does not finalize the topology, so it must be followed by calls to `fd_topos_net_tile_finish` and `fd_topob_finish` to complete the setup. Additionally, it avoids adding new in-links to gossip after the unpolled sign_gossip by not calling `fd_topo_tile_in("gossip", "sign_gossip")`.
+# Imports and Dependencies
+
+---
+- `../../shared/fd_config.h`
+
+
 # Function Declarations (Public API)
 
 ---
-- `fd_gossip_subtopo`
+### fd\_gossip\_subtopo<!-- {{#callable_declaration:fd_gossip_subtopo}} -->
+[View Source →](<../../../../../../src/app/firedancer-dev/commands/gossip.h#L14>)
+
+Sets up the gossip subtopology.
+- **Description**: Use this function to configure the gossip subtopology, which includes the gossip, gossvf, and ipecho components. Ensure that the net, metrics, and sign tiles are already added to the topology before calling this function. This function does not finalize the topology, so you must call `fd_topos_net_tile_finish` and `fd_topob_finish` afterwards. Note that it does not add new in_links to gossip after the unpolled sign_gossip to prevent unintended link additions.
+- **Inputs**:
+    - `config`: A pointer to a `config_t` structure containing configuration data for the topology. Must not be null.
+    - `tile_to_cpu`: An array of type `ulong` with a size of `FD_TILE_MAX`. This parameter is not used in the function.
+- **Output**: None
+- **See Also**: [`fd_gossip_subtopo`](<gossip.c.md#fd_gossip_subtopo>)  (Implementation)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
