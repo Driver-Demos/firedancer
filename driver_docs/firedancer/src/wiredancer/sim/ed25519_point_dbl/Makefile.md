@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for simulating the `ed25519_point_dbl` module using Verilog sources and Cocotb.
+The `Makefile` in the `firedancer/src/wiredancer/sim/ed25519_point_dbl` directory is used to configure and run simulations for the `ed25519_point_dbl` module using Verilog sources and the Questa simulator.
 
 # Purpose
-The `Makefile` is used to automate the build process for a simulation environment. It specifies the simulator to use with the `SIM` variable, defaulting to `questa` if not set. The `MODULE` variable defines the test module, while `TOPLEVEL` specifies the top-level module for simulation, which is `ed25519_point_dbl`. The `VERILOG_SOURCES` variable lists the Verilog and SystemVerilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files located in the `RTL_DIR`. The file also includes additional makefile configurations from `cocotb-config`, which are necessary for integrating the CoCoTB testing framework into the simulation process.
+The provided Makefile is used to automate the simulation of a hardware design, specifically for a module named "test" using the Questa simulator. It sets up various environment variables and paths necessary for the simulation, such as the directory containing the RTL (Register Transfer Level) source files and the top-level module to be simulated, which is "ed25519_point_dbl". The file lists several Verilog source files, including those from the Xilinx Vivado library and custom RTL files, which are required for the simulation. Additionally, it includes a Makefile from the cocotb framework, which is a coroutine-based co-simulation library for verifying VHDL and Verilog designs, to facilitate the simulation process. This setup allows for efficient and repeatable simulation runs, ensuring that all necessary components are correctly configured and included.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

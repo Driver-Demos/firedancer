@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the square root functions for various integer types using random number generation.
+The `test_sqrt.c` file in the `firedancer` codebase is a test program that verifies the correctness of various square root functions for different integer types using random number generation.
 
 # Purpose
-This code is an executable C program designed to test the correctness of square root functions for various integer types. It includes the necessary headers `fd_util.h` and `fd_sqrt.h` to access utility functions and square root operations. The program initializes a random number generator and performs 50 million iterations of tests on square root functions for different data types, including `uchar`, `ushort`, `uint`, and `ulong`, as well as their signed counterparts. 
+This C source code file is an executable program designed to test the correctness of square root functions for various integer types. The program includes headers for utility functions and square root operations, indicating that it relies on external libraries or modules for these functionalities. The main function initializes a random number generator and performs 50 million iterations of tests on square root calculations for different integer types, including unsigned and signed 8-bit, 16-bit, 32-bit, and 64-bit integers. The tests verify that the computed square roots and their residuals meet expected mathematical properties, logging errors if any discrepancies are found.
 
-The main testing logic is encapsulated in a macro `TEST`, which verifies the accuracy of the square root calculations by comparing the results of the square root functions against expected values. The program logs progress every million iterations and reports errors if any discrepancies are found during the tests. Upon successful completion of all tests, it logs a "pass" message. The program also manages the lifecycle of the random number generator, ensuring proper initialization and cleanup.
+The code is structured to provide comprehensive validation of square root functions, ensuring they handle edge cases and produce accurate results across a range of integer sizes. It uses macros to define test cases for each integer type, which simplifies the repetitive nature of the tests and ensures consistency. The program logs progress at regular intervals and reports any failures encountered during the tests. Upon successful completion of all tests, it logs a "pass" message. This file is primarily focused on testing and validation rather than providing a public API or external interface, as it does not define functions or structures intended for use outside of this specific testing context.
 # Imports and Dependencies
 
 ---
@@ -20,25 +20,19 @@ The main testing logic is encapsulated in a macro `TEST`, which verifies the acc
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/math/test_sqrt.c#L4>)
-
-Initializes the environment, performs a series of random number-based tests on square root functions, and logs the results.
+The `main` function initializes a random number generator and performs 50 million iterations of testing various square root functions for different integer types, logging progress and errors.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Creates a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Initializes a counter `ctr` to zero.
-    - Iterates 50,000,000 times, logging progress every 1,000,000 iterations.
-    - Defines a macro `TEST` to perform a series of tests on square root functions for different data types (`uchar`, `ushort`, `uint`, `ulong`).
-    - In each iteration, generates a random number `n` and shifts a random value `x` by `n` bits.
-    - Calculates the square root `y` of `x` and checks if the result is valid; logs an error if not.
-    - Converts `x` to a signed integer `u` and performs similar square root calculations and validations for signed integers.
-    - Performs additional tests using `fd_##INT##_re_sqrt` and `fd_##INT##_sqrt_abs` functions, logging errors if results are invalid.
-    - Deletes the random number generator using `fd_rng_delete` and `fd_rng_leave`.
-    - Logs a final notice indicating the tests passed and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - The function begins by calling `fd_boot` to initialize the environment with command-line arguments.
+    - A random number generator is initialized using `fd_rng_new` and `fd_rng_join`.
+    - A loop runs for 50 million iterations, logging progress every 1 million iterations.
+    - Within the loop, a macro `TEST` is defined and used to test square root functions for different integer types (uchar, ushort, uint, ulong) and their signed counterparts (schar, short, int, long).
+    - Each test involves generating a random number, computing its square root, and checking the result against expected properties, logging errors if any discrepancies are found.
+    - After the loop, the random number generator is cleaned up using `fd_rng_leave` and `fd_rng_delete`.
+    - A final log message indicates successful completion, and `fd_halt` is called before returning 0.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
 
 
 

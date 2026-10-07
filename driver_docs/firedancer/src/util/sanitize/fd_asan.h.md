@@ -3,104 +3,101 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for integrating AddressSanitizer (ASan) functionality to manage memory poisoning and access checks.
+The `fd_asan.h` file in the `firedancer` codebase provides an interface for integrating AddressSanitizer (ASan) functionality to track and manage memory regions, allowing for the detection of out-of-bounds errors in memory accesses.
 
 # Purpose
-The code is a C header file that provides an interface for integrating AddressSanitizer (ASan) functionality into a program. ASan is a tool that detects memory errors such as out-of-bounds accesses and use-after-free bugs. This header file defines macros and inline functions to manage memory poisoning and unpoisoning, which are essential for marking memory regions as addressable or unaddressable. The file checks if ASan is available in the compilation environment using the `FD_HAS_ASAN` macro and provides conditional definitions based on its presence.
+This C header file provides an interface for integrating AddressSanitizer (ASan) functionality into a program, specifically for managing memory regions in a way that complements ASan's capabilities. AddressSanitizer is a tool used to detect memory errors such as out-of-bounds accesses and use-after-free bugs. The file defines macros and inline functions that allow developers to mark memory regions as "poisoned" (unaddressable) or "unpoisoned" (addressable), which helps in identifying illegal memory accesses during runtime. The functions [`fd_asan_poison`](#fd_asan_poison), [`fd_asan_unpoison`](#fd_asan_unpoison), [`fd_asan_test`](#fd_asan_test), and [`fd_asan_query`](#fd_asan_query) are central to this functionality, providing mechanisms to manipulate and query the state of memory regions with respect to ASan's tracking.
 
-The primary functions defined in this file include [`fd_asan_poison`](<#fd_asan_poison>), [`fd_asan_unpoison`](<#fd_asan_unpoison>), [`fd_asan_test`](<#fd_asan_test>), and [`fd_asan_query`](<#fd_asan_query>). These functions allow the user to mark memory regions as poisoned or unpoisoned, test if a specific address is poisoned, and query if any part of a memory region is poisoned. If ASan is not available, these functions default to no-op implementations. The file also includes provisions for deeper ASan integration with `FD_HAS_DEEPASAN` and `FD_HAS_DEEPASAN_WATCH` macros, which add additional checks and functionality for memory region monitoring.
+The header file is designed to be included in other C source files, providing a public API for memory management in environments where ASan is used. It conditionally compiles its functionality based on whether ASan is available, using preprocessor directives to check for ASan support and to define the necessary attributes and functions accordingly. If ASan is not available, the functions default to no-operations, ensuring compatibility across different build environments. This file is part of a larger project, likely involving custom memory management, and it ensures that memory regions managed by the project are properly tracked by ASan, enhancing the robustness and reliability of the software by catching memory-related errors during development and testing.
 # Imports and Dependencies
 
 ---
 - `../fd_util_base.h`
 
 
+# Global Variables
+
+---
+### \_\_asan\_region\_is\_poisoned
+- **Type**: `function pointer`
+- **Description**: `__asan_region_is_poisoned` is a function pointer that takes a memory address and a size as parameters and returns a pointer. It is part of the AddressSanitizer (ASan) interface used to check if any part of a specified memory region is poisoned, meaning it is marked as unaddressable by ASan.
+- **Use**: This function is used internally to determine if a memory region has been poisoned by ASan, which helps in detecting out-of-bounds memory access errors.
+
+
 # Functions
 
 ---
 ### fd\_asan\_poison<!-- {{#callable:fd_asan_poison}} -->
-[View Source →](<../../../../../src/util/sanitize/fd_asan.h#L110>)
-
-Marks a memory region as unaddressable and returns the address.
+The `fd_asan_poison` function marks a memory region as unaddressable for AddressSanitizer (ASan) instrumentation, or simply returns the address if ASan is not enabled.
 - **Inputs**:
-    - `addr`: A pointer to the start of the memory region to poison.
-    - `sz`: The size of the memory region to poison, in bytes.
-- **Logic and Control Flow**:
-    - If `FD_HAS_ASAN` is set, calls `__asan_poison_memory_region` to mark the memory region `[addr, addr+sz)` as unaddressable.
-    - If `FD_HAS_DEEPASAN_WATCH` is defined, calls `fd_asan_check_watch` with parameters `1`, `addr`, and `sz` to monitor the poisoned region.
-    - Returns the `addr` pointer.
-- **Output**: Returns the input address `addr`.
+    - `addr`: A pointer to the start of the memory region to be poisoned.
+    - `sz`: The size of the memory region to be poisoned, in bytes.
+- **Control Flow**:
+    - If ASan is enabled, the function calls `__asan_poison_memory_region` to mark the memory region `[addr, addr+sz)` as unaddressable.
+    - If ASan is not enabled, the function does nothing with `sz` and simply returns `addr`.
+- **Output**: The function returns the input address `addr`.
 
 
 ---
 ### fd\_asan\_unpoison<!-- {{#callable:fd_asan_unpoison}} -->
-[View Source →](<../../../../../src/util/sanitize/fd_asan.h#L111>)
-
-Marks a memory region as addressable and returns the address.
+The `fd_asan_unpoison` function marks a memory region as addressable and returns the address of the region.
 - **Inputs**:
-    - `addr`: A pointer to the start of the memory region to unpoison.
-    - `sz`: The size of the memory region to unpoison, in bytes.
-- **Logic and Control Flow**:
-    - If `FD_HAS_ASAN` is set, calls `__asan_unpoison_memory_region` to mark the memory region `[addr, addr+sz)` as addressable.
-    - If `FD_HAS_DEEPASAN_WATCH` is defined, calls `fd_asan_check_watch` to update the watch status for the memory region.
-    - Returns the `addr` pointer.
-- **Output**: Returns the `addr` pointer, indicating the start of the unpoisoned memory region.
+    - `addr`: A pointer to the start of the memory region to be marked as addressable.
+    - `sz`: The size of the memory region to be marked as addressable, though it is not used in the function implementation.
+- **Control Flow**:
+    - The function takes two parameters: a pointer to a memory address (`addr`) and a size (`sz`).
+    - The size parameter (`sz`) is explicitly cast to void to indicate it is unused in the function logic.
+    - The function simply returns the `addr` parameter, effectively making the memory region starting at `addr` addressable.
+- **Output**: The function returns the `addr` pointer, indicating the start of the now addressable memory region.
 
 
 ---
 ### fd\_asan\_test<!-- {{#callable:fd_asan_test}} -->
-[View Source →](<../../../../../src/util/sanitize/fd_asan.h#L112>)
-
-Checks if an address is poisoned by ASan and returns 0 if ASan is not enabled.
+The `fd_asan_test` function checks if a given memory address is poisoned by AddressSanitizer (ASan) and returns 0 if ASan is not enabled.
 - **Inputs**:
-    - `addr`: A pointer to the memory address to test for poisoning.
-- **Logic and Control Flow**:
-    - If `FD_HAS_ASAN` is set, call `__asan_address_is_poisoned` with `addr` and return its result.
-    - If `FD_HAS_ASAN` is not set, cast `addr` to void to suppress unused variable warnings and return 0.
-- **Output**: Returns 1 if the address is poisoned, otherwise returns 0. If ASan is not enabled, always returns 0.
+    - `addr`: A pointer to the memory address to be tested for poisoning.
+- **Control Flow**:
+    - The function takes a single input, `addr`, which is a pointer to a memory address.
+    - If ASan is enabled (`FD_HAS_ASAN` is set), the function calls `__asan_address_is_poisoned` to check if the address is poisoned and returns the result.
+    - If ASan is not enabled, the function simply returns 0, indicating the address is not poisoned.
+- **Output**: Returns 1 if the address is poisoned (when ASan is enabled), otherwise returns 0.
 
 
 ---
 ### fd\_asan\_query<!-- {{#callable:fd_asan_query}} -->
-[View Source →](<../../../../../src/util/sanitize/fd_asan.h#L113>)
-
-Returns NULL, indicating no memory region is poisoned, when AddressSanitizer is not enabled.
+The `fd_asan_query` function checks if any part of a specified memory region is poisoned and returns the address of the first poisoned byte, or NULL if none is poisoned.
 - **Inputs**:
-    - `addr`: A pointer to the start of the memory region to check.
-    - `sz`: The size of the memory region to check.
-- **Logic and Control Flow**:
-    - The function takes two parameters: `addr` and `sz`, which represent the start and size of a memory region, respectively.
-    - Both parameters are cast to void to indicate they are unused in this implementation.
-    - The function returns NULL, indicating that no part of the memory region is poisoned.
-- **Output**: Returns NULL, indicating that no byte in the specified memory region is poisoned.
+    - `addr`: A pointer to the start of the memory region to be checked for poisoning.
+    - `sz`: The size of the memory region in bytes to be checked for poisoning.
+- **Control Flow**:
+    - The function takes two parameters, `addr` and `sz`, which represent the starting address and size of the memory region to be checked.
+    - If AddressSanitizer (ASan) is enabled (`FD_HAS_ASAN` is set), the function calls `__asan_region_is_poisoned` to check the region and returns the address of the first poisoned byte if any.
+    - If ASan is not enabled, the function simply returns NULL without performing any checks.
+- **Output**: The function returns the address of the first poisoned byte in the specified memory region if any byte is poisoned; otherwise, it returns NULL.
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_asan\_check\_watch<!-- {{#callable_declaration:fd_asan_check_watch}} -->
-[View Source →](<../../../../../src/util/sanitize/fd_asan.h#L95>)
-
-Checks and logs the status of memory addresses under ASan watch.
-- **Description**: Use this function to verify and log the status of memory addresses that are being monitored by AddressSanitizer (ASan). It is useful for debugging purposes when you need to know if specific memory regions are marked as poisoned or not. This function should be called when you want to check the status of a memory region that might have been affected by ASan's memory poisoning. It logs the status to standard error and provides a backtrace for further analysis. Ensure that the ASan watch feature is enabled before using this function.
+Monitors memory regions for ASan watchpoints and logs updates.
+- **Description**: This function is used to check if any addresses within a specified memory region are being monitored by AddressSanitizer (ASan) watchpoints. It logs a message to standard error if any such addresses are found, indicating whether they are now poisoned or not. This function is typically used in conjunction with manual ASan memory poisoning to ensure that changes to memory regions are tracked and reported. It should be called whenever a memory region's poison status is updated, and it assumes that the ASan watchpoints have been set up correctly beforehand.
 - **Inputs**:
-    - `poison`: An integer indicating the desired status of the memory region. Use a non-zero value to indicate that the region should be poisoned, and zero to indicate it should not be poisoned.
-    - `addr`: A pointer to the start of the memory region to check. Must not be null and should point to a valid memory region.
+    - `poison`: An integer indicating the poison status to be set for the memory region. A non-zero value indicates the region is poisoned, while zero indicates it is not poisoned.
+    - `addr`: A pointer to the start of the memory region to be checked. Must not be null and should point to a valid memory region.
     - `sz`: The size of the memory region in bytes. Must be a positive value.
 - **Output**: None
-- **See Also**: [`fd_asan_check_watch`](<fd_asan.c.md#fd_asan_check_watch>)  (Implementation)
+- **See also**: [`fd_asan_check_watch`](fd_asan.c.md#fd_asan_check_watch)  (Implementation)
 
 
 ---
 ### fd\_asan\_watch<!-- {{#callable_declaration:fd_asan_watch}} -->
-[View Source →](<../../../../../src/util/sanitize/fd_asan.h#L96>)
-
-Monitors a memory address for AddressSanitizer status.
-- **Description**: Use this function to track a specific memory address with AddressSanitizer (ASan) to determine if it is poisoned or not. This is useful for debugging memory issues in programs that use custom memory allocators or shared memory segments. The function logs the address and its ASan status to standard error. It is important to note that there is a limit of 64 addresses that can be watched simultaneously. Exceeding this limit will result in a critical log message. Ensure that ASan is enabled in your build environment to utilize this function effectively.
+Monitors a memory address for ASan poisoning status.
+- **Description**: Use this function to track a specific memory address for its poisoning status under AddressSanitizer (ASan). This is particularly useful in environments where ASan's default instrumentation might be missing, such as in custom memory allocators or shared memory segments. The function logs the current poisoning status of the address and maintains a watch list of addresses being monitored. It is important to note that there is a limit to the number of addresses that can be watched simultaneously, and exceeding this limit will result in a critical log message. This function should be used in debugging scenarios where memory safety is a concern.
 - **Inputs**:
-    - `addr`: A pointer to the memory address to monitor. Must not be null. The address should be part of a memory region managed by your program. Invalid or null addresses will not be handled by this function.
+    - `addr`: A pointer to the memory address to be monitored. The address must be valid and previously allocated by the program. The function does not take ownership of the memory and expects the address to be non-null. If the address is null or invalid, the behavior is undefined.
 - **Output**: None
-- **See Also**: [`fd_asan_watch`](<fd_asan.c.md#fd_asan_watch>)  (Implementation)
+- **See also**: [`fd_asan_watch`](fd_asan.c.md#fd_asan_watch)  (Implementation)
 
 
 
