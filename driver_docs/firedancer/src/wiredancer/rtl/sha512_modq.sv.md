@@ -3,40 +3,39 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `sha512_modq.sv` file in the `firedancer` codebase implements a hardware module for processing SHA-512 hashes and performing modular arithmetic operations with the Ed25519 curve's order.
+Implements a SHA-512 module with modular reduction for cryptographic operations in Verilog.
 
 # Purpose
-The provided Verilog code defines a module named `sha512_modq`, which is designed to perform cryptographic operations involving the SHA-512 hashing algorithm and modular arithmetic. This module is part of a larger cryptographic system, likely used for digital signatures or secure hashing, as indicated by the use of constants related to the Ed25519 elliptic curve, such as `ED25519_Q` and `ED25519_L0`. The module processes input data blocks, applies the SHA-512 hashing algorithm, and performs modular reduction operations to produce a final output. The code includes several submodules, such as `sha512_sch` and `sha512_block`, which handle the scheduling and block processing of the SHA-512 algorithm, respectively. Additionally, the module uses wide multiplication operations (`mul_wide` instances) to perform arithmetic operations on large bit-width data, which are essential for cryptographic computations.
+The `sha512_modq` module implements a SHA-512 hashing operation followed by a modular reduction operation. The module processes input data blocks and outputs a hash value that is reduced modulo a predefined constant, `ED25519_Q`. The module uses two submodules: `sha512_sch` and `sha512_block`. The `sha512_sch` submodule handles the scheduling of input data blocks, while the `sha512_block` submodule performs the actual SHA-512 hashing. The module also includes a series of wide multipliers (`mul_wide` instances) to perform arithmetic operations necessary for the modular reduction.
 
-The module's primary functionality is to take input data, hash it using SHA-512, and then perform modular arithmetic to ensure the result fits within a specified range, as dictated by the Ed25519 curve parameters. The code is structured to handle multiple data blocks, manage transaction IDs, and apply backpressure when necessary. The use of local parameters and logic variables indicates a focus on precise bit-width management, which is crucial in cryptographic applications to maintain data integrity and security. Overall, this module provides a specialized function within a cryptographic system, focusing on secure data processing and transformation using SHA-512 and modular arithmetic.
+The module's inputs include a valid signal (`i_v`), a first block indicator (`i_f`), the number of blocks (`i_c`), the data to be hashed (`i_d`), and a transaction ID (`i_t`). The outputs are a valid signal (`o_v`), a transaction ID (`o_t`), and the reduced hash value (`o_d`). The module operates synchronously with a clock (`clk`) and reset (`rst`) signal. The internal logic performs arithmetic operations to compute the modular reduction, ensuring that the final output is within the range defined by `ED25519_Q`. The design is structured to handle data in a pipelined manner, allowing for efficient processing of multiple data blocks.
 # Modules
 
 ---
 ### sha512\_modq
-The `sha512_modq` module is designed to process SHA-512 hash computations and perform modular arithmetic operations with the Ed25519 curve's order. It integrates SHA-512 scheduling and block processing, along with wide multiplication and modular reduction to produce a final output.
+Implements a SHA-512 hashing operation followed by a modular reduction using a constant `ED25519_Q`. The module processes input data blocks and outputs a reduced hash value.
 - **Constants**:
-    - `META_W`: A parameter defining the width of the transaction ID, set to 64 bits.
-    - `ED25519_Q`: A local parameter representing the Ed25519 curve's order, used for modular arithmetic.
-    - `ED25519_L0`: A local parameter representing a portion of the Ed25519 curve's order, used in calculations.
+    - ``META_W``: Defines the width of the transaction ID, set to 64 bits.
+    - ``ED25519_Q``: A 253-bit constant used for modular reduction, representing a specific large prime number.
+    - ``ED25519_L0``: A 125-bit constant used in calculations, representing a specific large number.
 - **Ports**:
-    - `i_v`: Input signal indicating the validity of the data.
-    - `i_f`: Input signal indicating the first block of data.
-    - `i_c`: Input signal representing the number of blocks.
-    - `i_d`: Input data signal with a width of 1024 bits.
-    - `i_t`: Input transaction ID signal with a width defined by META_W.
-    - `i_p`: Output signal for backpressure, applied only for the first block.
-    - `o_v`: Output signal indicating the validity of the output data.
-    - `o_t`: Output transaction ID signal with a width defined by META_W.
-    - `o_d`: Output data signal with a width of 256 bits.
-    - `clk`: Clock input signal for synchronization.
-    - `rst`: Reset input signal for initializing the module.
-- **Logic And Control Flow**:
-    - The module uses two local parameters, ED25519_Q and ED25519_L0, for modular arithmetic operations related to the Ed25519 curve.
-    - The module instantiates a `sha512_sch` submodule for SHA-512 scheduling and a `sha512_block` submodule for block processing.
-    - Three `mul_wide` instances perform wide multiplications, each configured with specific bit widths and control parameters.
-    - An `always_ff` block updates several intermediate signals based on the results of modular arithmetic operations, using the Ed25519 curve's order for reductions.
-    - An `always_comb` block reverses the order of the SHA-512 output data and prepares it for further processing.
-    - Another `always_comb` block extracts and assigns portions of intermediate results to output signals, completing the modular reduction process.
+    - ``i_v``: Indicates if the input data is valid.
+    - ``i_f``: Indicates if the current block is the first block.
+    - ``i_c``: Specifies the number of blocks.
+    - ``i_d``: Carries the input data to be processed.
+    - ``i_t``: Carries the transaction ID.
+    - ``i_p``: Indicates backpressure, applied only for the first block.
+    - ``o_v``: Indicates if the output data is valid.
+    - ``o_t``: Carries the output transaction ID.
+    - ``o_d``: Carries the output data after processing.
+    - ``clk``: The clock signal for synchronization.
+    - ``rst``: The reset signal to initialize the module.
+- **Logic and Control Flow**:
+    - Uses `sha512_sch` and `sha512_block` submodules to perform SHA-512 hashing on input data.
+    - The `mul_wide` instances perform wide multiplication operations on intermediate data.
+    - An `always_ff` block updates intermediate results and performs modular reduction using `ED25519_Q`.
+    - An `always_comb` block rearranges the output hash data and prepares it for further processing.
+    - The final output data is assigned after modular reduction, ensuring it is within the desired range.
 
 
 

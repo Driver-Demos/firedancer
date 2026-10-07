@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_util library, unit tests, and fuzz test, with UBSan gating.
+Makefile for building and testing the `fd_util` library with unit and fuzz tests.
 
 # Purpose
-This Makefile fragment defines the build rules for the `fd_util` library and its related test targets. It adds the header files `fd_util_base.h` and `fd_util.h`, builds the `fd_hash` and `fd_util` object files into the `fd_util` library, and creates the `test_util` unit test with a matching run rule. When `FD_HAS_UBSAN` is not defined, it also builds and runs `test_util_base`, which checks target compatibility with the `FD` machine model by probing undefined and implementation-defined behavior. If `FD_HAS_HOSTED` is defined in the same build mode, it also enables the `fuzz_hash` fuzz test.
+The `Makefile` content defines build and test instructions for the `fd_util` library. It uses a series of `make` function calls to organize the compilation and testing process. The `make-lib` function call creates the `fd_util` library, while `add-hdrs` and `add-objs` specify the header and object files associated with it. The `make-unit-test` and `run-unit-test` function calls set up and execute unit tests for `test_util` and, conditionally, `test_util_base`, which checks compatibility with the FD machine model. The `ifndef FD_HAS_UBSAN` block prevents the building of `test_util_base` under undefined behavior sanitizer (UBSAN) conditions, as it is expected to fail by design. Additionally, if `FD_HAS_HOSTED` is defined, a fuzz test for `fuzz_hash` is created and executed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
