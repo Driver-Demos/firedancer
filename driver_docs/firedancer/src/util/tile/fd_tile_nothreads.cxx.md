@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_tile_nothreads.cxx` file in the `firedancer` codebase provides an implementation for managing tile execution without threading, including functions for booting and halting tiles, as well as handling tile execution tasks and their associated metadata.
+Implements non-threaded tile management functions, including boot, halt, and execution handling.
 
 # Purpose
-This C++ source code file is designed to manage and execute tasks on a conceptual "tile" within a computing environment. It provides a set of functions and structures that facilitate the initialization, execution, and termination of tasks associated with these tiles. The code includes private and public APIs for managing tile identifiers and execution contexts, as well as boot and halt procedures for setting up and tearing down the tile environment. The file defines several static and non-static variables to track tile IDs and execution states, and it provides functions to retrieve these values. The `fd_tile_exec_private` structure and associated functions manage the execution context, including task details and command-line arguments.
+The code defines a set of functions and structures related to managing and executing tasks on a tile-based system. It includes private and public APIs for handling tile identifiers and execution contexts. The private variables such as `fd_tile_private_id0`, `fd_tile_private_id1`, and `fd_tile_private_cnt` are used to store state information about the tiles, which are initialized during the boot process. The functions [`fd_tile_id0`](<#fd_tile_id0>), [`fd_tile_id1`](<#fd_tile_id1>), and [`fd_tile_cnt`](<#fd_tile_cnt>) provide access to these private variables. The code also defines a structure `fd_tile_exec_private` to manage execution contexts, including task information and command-line arguments.
 
-The code is not intended to be a standalone executable but rather a component of a larger system, likely a library or module that is integrated into a broader application. It does not define a main function but instead offers APIs for other parts of the system to interact with the tile management functionality. The boot and halt functions are particularly important as they handle the setup and teardown of the tile environment, logging relevant information for debugging and monitoring purposes. The code also includes placeholder implementations for some functions, indicating that it may be part of a multi-threaded or distributed system where actual task execution logic is implemented elsewhere.
+The code includes functions for creating and managing execution contexts, such as [`fd_tile_exec_new`](<#fd_tile_exec_new>) and [`fd_tile_exec_delete`](<#fd_tile_exec_delete>), which handle the lifecycle of tasks on tiles. The boot and halt functions, [`fd_tile_private_boot`](<#fd_tile_private_boot>) and [`fd_tile_private_halt`](<#fd_tile_private_halt>), manage the initialization and cleanup of the tile system, logging relevant information during these processes. The code is structured to support a tile-based execution model, where tasks are dispatched and managed across different tiles, with logging and diagnostic capabilities integrated into the boot and halt processes.
 # Imports and Dependencies
 
 ---
@@ -19,250 +19,292 @@ The code is not intended to be a standalone executable but rather a component of
 
 ---
 ### fd\_tile\_private\_id0
-- **Type**: `ulong`
-- **Description**: The variable `fd_tile_private_id0` is a static unsigned long integer that is used to store an identifier for a tile, which is initialized during the boot process and reset during the halt process.
-- **Use**: This variable is used to track the identifier of a tile, particularly during the boot and halt operations of the tile system.
+- **Type**: ``ulong``
+- **Description**: Represents a global variable that stores an identifier for a tile. It is initialized during the boot process and reset during the halt process.
+- **Use**: Used to store and retrieve the identifier of a tile in the system.
 
 
 ---
 ### fd\_tile\_private\_id1
-- **Type**: `ulong`
-- **Description**: The variable `fd_tile_private_id1` is a static unsigned long integer that is used to store an identifier related to the tile system in the application. It is initialized during the boot process and reset during the halt process.
-- **Use**: This variable is used to manage and track the state of a tile by storing an identifier that is incremented from `fd_tile_private_id0` during the boot process.
+- **Type**: ``ulong``
+- **Description**: Represents a static global variable of type `ulong` that is used to store an identifier related to the tile system.
+- **Use**: Used to store and manage a unique identifier for a tile, initialized during the boot process and reset during the halt process.
 
 
 ---
 ### fd\_tile\_private\_cnt
 - **Type**: `ulong`
-- **Description**: The `fd_tile_private_cnt` is a static global variable of type `ulong` that is used to keep track of the count of tiles or threads in a particular context. It is initialized during the boot process and reset during the halt process.
-- **Use**: This variable is used to store and manage the count of active tiles or threads, particularly during the boot and halt operations of the tile system.
+- **Description**: Represents the count of tiles that are currently active or initialized in the system.
+- **Use**: Used to track the number of active tiles, initialized during the boot process and reset during the halt process.
 
 
 ---
 ### fd\_tile\_private\_id
 - **Type**: `ulong`
-- **Description**: The `fd_tile_private_id` is a static global variable of type `ulong` that is initialized during the boot process of the tile system. It is set to zero outside of the boot/halt phases and is used to store the identifier of the current tile.
-- **Use**: This variable is used to track and manage the identifier of the current tile during the boot and halt processes.
+- **Description**: Stores the identifier for the current tile, initialized during the boot process and reset during halt.
+- **Use**: Used to track the identifier of the tile in the system.
 
 
 ---
 ### fd\_tile\_private\_idx
-- **Type**: `ulong`
-- **Description**: The `fd_tile_private_idx` is a static global variable of type `ulong` that is used to store the index of a tile in the system. It is initialized to 0 during the boot process and reset to 0 during the halt process.
-- **Use**: This variable is used to track the current tile index within the system, particularly during the boot and halt processes.
+- **Type**: ``ulong``
+- **Description**: A static global variable that stores the index of a tile in the system. It is initialized to 0 during the boot process and reset to 0 during the halt process.
+- **Use**: Used to track the current tile index in the system, particularly during boot and halt operations.
 
 
 ---
 ### fd\_tile\_private\_stack0
 - **Type**: `ulong`
-- **Description**: The `fd_tile_private_stack0` is a global variable of type `ulong` that is used to store a stack-related value for a tile in the system. It is initialized during the boot process and reset during the halt process.
-- **Use**: This variable is used to hold stack diagnostics information for a tile, which is discovered and logged during the boot process.
+- **Description**: Represents a global variable of type `ulong` that is used to store a stack-related value for a tile in the system.
+- **Use**: Used in the `fd_tile_private_boot` and `fd_tile_private_halt` functions to manage stack diagnostics and reset stack values during boot and halt operations.
 
 
 ---
 ### fd\_tile\_private\_stack1
 - **Type**: `ulong`
-- **Description**: The `fd_tile_private_stack1` is a global variable of type `ulong` that is used to store a stack-related value for the tile system. It is initialized during the boot process and reset during the halt process.
-- **Use**: This variable is used to hold stack diagnostics information for a tile, which is discovered during the boot process and reset during the halt process.
+- **Description**: `fd_tile_private_stack1` is a global variable of type `ulong` that is used to store stack-related information for a tile in the system.
+- **Use**: It is initialized during the boot process and reset during the halt process to manage stack diagnostics.
 
 
 # Data Structures
 
 ---
 ### fd\_tile\_exec\_private<!-- {{#data_structure:fd_tile_exec_private}} -->
-- **Type**: `struct`
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L23>)
+
+- **Type**: ``struct``
 - **Members**:
-    - `done`: Indicates whether the task execution is completed.
-    - `argc`: Stores the number of command-line arguments.
-    - `argv`: Holds the command-line arguments as an array of strings.
-    - `task`: Represents the task to be executed, defined by fd_tile_task_t.
-    - `idx`: Stores the index of the tile execution.
-- **Description**: The `fd_tile_exec_private` struct is a data structure used to manage the execution state of a tile task in a multi-threaded environment. It contains fields to track the completion status of the task (`done`), the number of command-line arguments (`argc`), the arguments themselves (`argv`), the task to be executed (`task`), and the index of the tile execution (`idx`). This struct is likely used internally to coordinate and manage the execution of tasks across different tiles in a system.
+    - ``done``: Indicates if the task is complete.
+    - ``argc``: Stores the number of command-line arguments.
+    - ``argv``: Holds the command-line arguments as an array of strings.
+    - ``task``: Represents the task to execute, defined by `fd_tile_task_t`.
+    - ``idx``: Stores the index of the tile.
+- **Description**: Defines a structure to manage the execution state of a tile, including task details, command-line arguments, and execution status.
 
 
 # Functions
 
 ---
 ### fd\_tile\_id0<!-- {{#callable:fd_tile_id0}} -->
-The `fd_tile_id0` function returns the value of the static variable `fd_tile_private_id0`.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L7>)
+
+Returns the value of the static variable `fd_tile_private_id0`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the static variable `fd_tile_private_id0`.
+- **Logic and Control Flow**:
+    - Return the value of the static variable `fd_tile_private_id0`.
 - **Output**: The function returns an `ulong` which is the value of `fd_tile_private_id0`.
 
 
 ---
 ### fd\_tile\_id1<!-- {{#callable:fd_tile_id1}} -->
-The function `fd_tile_id1` returns the value of the static variable `fd_tile_private_id1`.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L8>)
+
+Returns the value of the static variable `fd_tile_private_id1`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined to return an unsigned long integer (`ulong`).
-    - It directly returns the value of the static variable `fd_tile_private_id1`.
-- **Output**: The function returns an unsigned long integer representing the value of `fd_tile_private_id1`.
+- **Logic and Control Flow**:
+    - Accesses the static variable `fd_tile_private_id1`.
+    - Returns the value of `fd_tile_private_id1`.
+- **Output**: The function returns an `ulong` which is the value of `fd_tile_private_id1`.
 
 
 ---
 ### fd\_tile\_cnt<!-- {{#callable:fd_tile_cnt}} -->
-The `fd_tile_cnt` function returns the current count of tiles initialized in the system.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L9>)
+
+Returns the value of the static variable `fd_tile_private_cnt`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the static variable `fd_tile_private_cnt`.
-- **Output**: The function returns an unsigned long integer representing the number of tiles.
+- **Logic and Control Flow**:
+    - Accesses the static variable `fd_tile_private_cnt`.
+    - Returns the value of `fd_tile_private_cnt`.
+- **Output**: The function returns an `ulong` representing the current count of tiles.
 
 
 ---
 ### fd\_tile\_id<!-- {{#callable:fd_tile_id}} -->
-The `fd_tile_id` function returns the current private tile identifier.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L16>)
+
+Returns the value of the private variable `fd_tile_private_id`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the static variable `fd_tile_private_id`.
-- **Output**: The function outputs an unsigned long integer representing the current private tile identifier.
+- **Logic and Control Flow**:
+    - Return the value of the static variable `fd_tile_private_id`.
+- **Output**: The function returns an `ulong` which is the value of `fd_tile_private_id`.
 
 
 ---
 ### fd\_tile\_idx<!-- {{#callable:fd_tile_idx}} -->
-The `fd_tile_idx` function returns the current tile index from a private static variable.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L17>)
+
+Returns the value of the private variable `fd_tile_private_idx`.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the static variable `fd_tile_private_idx`.
-- **Output**: The function outputs an unsigned long integer representing the current tile index.
+- **Logic and Control Flow**:
+    - Return the value of the static variable `fd_tile_private_idx`.
+- **Output**: The function returns an `ulong` which is the value of `fd_tile_private_idx`.
 
 
 ---
 ### fd\_tile\_cpu\_id<!-- {{#callable:fd_tile_cpu_id}} -->
-The `fd_tile_cpu_id` function returns the maximum unsigned long value if the input `tile_idx` is non-zero, otherwise it returns the CPU ID of the current log.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L19>)
+
+Returns `ULONG_MAX` if `tile_idx` is non-zero, otherwise returns the CPU ID from `fd_log_cpu_id()`.
 - **Inputs**:
-    - `tile_idx`: An unsigned long integer representing the tile index to be checked.
-- **Control Flow**:
-    - The function checks if the `tile_idx` is non-zero.
-    - If `tile_idx` is non-zero, it returns `ULONG_MAX`.
-    - If `tile_idx` is zero, it calls and returns the result of `fd_log_cpu_id()`.
-- **Output**: The function returns an unsigned long integer, which is either `ULONG_MAX` or the result of `fd_log_cpu_id()`.
+    - `tile_idx`: An unsigned long integer representing the tile index.
+- **Logic and Control Flow**:
+    - Check if `tile_idx` is non-zero.
+    - If `tile_idx` is non-zero, return `ULONG_MAX`.
+    - If `tile_idx` is zero, return the result of `fd_log_cpu_id()`.
+- **Output**: An unsigned long integer, either `ULONG_MAX` or the CPU ID from `fd_log_cpu_id()`.
 
 
 ---
 ### fd\_tile\_exec\_new<!-- {{#callable:fd_tile_exec_new}} -->
-The `fd_tile_exec_new` function initializes a new tile execution context but currently does nothing and returns NULL.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L31>)
+
+Creates a new `fd_tile_exec_t` object but currently returns `NULL` without using the input parameters.
 - **Inputs**:
-    - `idx`: An unsigned long integer representing the index of the tile.
-    - `task`: A task of type `fd_tile_task_t` to be executed by the tile.
-    - `argc`: An integer representing the number of arguments.
-    - `argv`: An array of character pointers representing the arguments.
-- **Control Flow**:
-    - The function takes four parameters: `idx`, `task`, `argc`, and `argv`, but does not use them beyond suppressing compiler warnings.
-    - The `FD_VOLATILE_CONST` macro is used on `idx` to suppress compiler warnings about unused variables.
-    - The function returns NULL, indicating that it does not currently perform any meaningful operation.
-- **Output**: The function returns a pointer of type `fd_tile_exec_t*`, which is currently always NULL.
+    - ``idx``: An unsigned long integer representing the index of the tile.
+    - ``task``: A `fd_tile_task_t` object representing the task to execute.
+    - ``argc``: An integer representing the number of arguments.
+    - ``argv``: A pointer to an array of character strings representing the arguments.
+- **Logic and Control Flow**:
+    - The function takes four parameters: `idx`, `task`, `argc`, and `argv`.
+    - The parameters `task`, `argc`, and `argv` are cast to void to suppress unused variable warnings.
+    - The macro `FD_VOLATILE_CONST` is used on `idx` to suppress compiler warnings about unused variables.
+    - The function returns `NULL`.
+- **Output**: Returns `NULL`, indicating that no `fd_tile_exec_t` object is created or returned.
 
 
 ---
 ### fd\_tile\_exec<!-- {{#callable:fd_tile_exec}} -->
-The `fd_tile_exec` function is a placeholder that takes a tile index as input and returns a null pointer, primarily serving to suppress compiler warnings.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L41>)
+
+Returns a null pointer after suppressing compiler warnings for the input argument.
 - **Inputs**:
-    - `tile_idx`: An unsigned long integer representing the index of the tile to be executed.
-- **Control Flow**:
-    - The function takes a single input parameter `tile_idx`.
-    - The macro `FD_VOLATILE_CONST` is used with `tile_idx` to suppress compiler warnings about unused variables.
-    - The function returns `NULL`, indicating no operation is performed.
-- **Output**: The function returns a null pointer (`fd_tile_exec_t *`).
+    - `tile_idx`: An unsigned long integer representing the tile index.
+- **Logic and Control Flow**:
+    - Suppresses compiler warnings for the `tile_idx` argument using `FD_VOLATILE_CONST` macro.
+    - Returns `NULL`.
+- **Output**: A null pointer of type `fd_tile_exec_t *`.
 
 
 ---
 ### fd\_tile\_exec\_delete<!-- {{#callable:fd_tile_exec_delete}} -->
-The `fd_tile_exec_delete` function waits for a tile execution to complete and returns a message indicating the deletion of an execution context without a matching successful creation.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L48>)
+
+Waits for the `done` flag in `fd_tile_exec_t` to be set before returning a specific message.
 - **Inputs**:
-    - `exec`: A pointer to an `fd_tile_exec_t` structure representing the execution context to be deleted.
-    - `opt_ret`: An optional pointer to an integer, which is not used in the function.
-- **Control Flow**:
-    - The function enters a loop that continues as long as the `done` member of the `exec` structure is not set to a volatile constant value.
-    - Within the loop, the function yields control to other processes or threads using `FD_YIELD()`.
-    - After the loop exits, the function ignores the `opt_ret` parameter and proceeds to return a constant string.
-- **Output**: A constant string "fd_tile_exec_delete with no matching successful new" indicating the deletion of an execution context without a matching successful creation.
+    - ``exec``: A pointer to an `fd_tile_exec_t` structure, which contains the `done` flag to check.
+    - ``opt_ret``: An optional pointer to an integer, which is not used in the function.
+- **Logic and Control Flow**:
+    - Enter a loop that continues while the `done` flag in the `exec` structure is not set.
+    - Use `FD_VOLATILE_CONST` to read the `done` flag to ensure the compiler does not optimize away the check.
+    - Call `FD_YIELD()` to yield the processor, allowing other threads to run while waiting for the `done` flag.
+    - Exit the loop once the `done` flag is set.
+    - Ignore the `opt_ret` parameter by casting it to void.
+    - Return the string "fd_tile_exec_delete with no matching successful new".
+- **Output**: A constant string message indicating that the function was called without a matching successful `new` operation.
 
 
 ---
 ### fd\_tile\_exec\_idx<!-- {{#callable:fd_tile_exec_idx}} -->
-The function `fd_tile_exec_idx` retrieves the index of a tile execution context from a given `fd_tile_exec_t` structure.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L56>)
+
+Returns the index of the given `fd_tile_exec_t` execution context.
 - **Inputs**:
-    - `exec`: A pointer to a constant `fd_tile_exec_t` structure from which the index is to be retrieved.
-- **Control Flow**:
-    - The function accesses the `idx` member of the `fd_tile_exec_t` structure pointed to by `exec`.
-- **Output**: The function returns an unsigned long integer representing the index of the tile execution context.
+    - `exec`: A pointer to a constant `fd_tile_exec_t` structure representing the execution context.
+- **Logic and Control Flow**:
+    - Accesses the `idx` member of the `fd_tile_exec_t` structure pointed to by `exec`.
+    - Returns the value of the `idx` member.
+- **Output**: The index (`ulong`) of the execution context.
 
 
 ---
 ### fd\_tile\_exec\_task<!-- {{#callable:fd_tile_exec_task}} -->
-The function `fd_tile_exec_task` retrieves the task associated with a given `fd_tile_exec_t` execution context.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L57>)
+
+Returns the task associated with a given `fd_tile_exec_t` object.
 - **Inputs**:
-    - `exec`: A pointer to a constant `fd_tile_exec_t` structure, representing the execution context from which the task is to be retrieved.
-- **Control Flow**:
-    - The function accesses the `task` member of the `fd_tile_exec_t` structure pointed to by `exec`.
-- **Output**: The function returns the `fd_tile_task_t` task associated with the provided execution context.
+    - `exec`: A pointer to a constant `fd_tile_exec_t` object from which the task is retrieved.
+- **Logic and Control Flow**:
+    - Accesses the `task` member of the `fd_tile_exec_t` object pointed to by `exec`.
+    - Returns the value of the `task` member.
+- **Output**: The `fd_tile_task_t` task associated with the provided `fd_tile_exec_t` object.
 
 
 ---
 ### fd\_tile\_exec\_argc<!-- {{#callable:fd_tile_exec_argc}} -->
-The function `fd_tile_exec_argc` retrieves the argument count (`argc`) from a given `fd_tile_exec_t` structure.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L58>)
+
+Returns the argument count from the `fd_tile_exec_t` structure.
 - **Inputs**:
-    - `exec`: A pointer to a constant `fd_tile_exec_t` structure from which the argument count is to be retrieved.
-- **Control Flow**:
-    - The function accesses the `argc` member of the `fd_tile_exec_t` structure pointed to by `exec`.
-- **Output**: The function returns an integer representing the number of arguments (`argc`) stored in the `fd_tile_exec_t` structure.
+    - ``exec``: A pointer to a constant `fd_tile_exec_t` structure from which to retrieve the argument count.
+- **Logic and Control Flow**:
+    - Accesses the `argc` member of the `fd_tile_exec_t` structure pointed to by `exec`.
+    - Returns the value of `exec->argc`.
+- **Output**: The function returns an integer representing the number of arguments (`argc`) in the `fd_tile_exec_t` structure.
 
 
 ---
 ### fd\_tile\_exec\_argv<!-- {{#callable:fd_tile_exec_argv}} -->
-The function `fd_tile_exec_argv` retrieves the argument vector (`argv`) from a given `fd_tile_exec_t` structure.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L59>)
+
+Returns the `argv` member of the `fd_tile_exec_t` structure.
 - **Inputs**:
-    - `exec`: A pointer to a constant `fd_tile_exec_t` structure from which the argument vector is to be retrieved.
-- **Control Flow**:
-    - The function directly accesses the `argv` member of the `fd_tile_exec_t` structure pointed to by `exec`.
-    - It returns the `argv` member without any additional processing or checks.
-- **Output**: A pointer to a character array (`char **`), which is the argument vector (`argv`) stored in the `fd_tile_exec_t` structure.
+    - ``exec``: A pointer to a constant `fd_tile_exec_t` structure from which to retrieve the `argv` member.
+- **Logic and Control Flow**:
+    - Access the `argv` member of the `fd_tile_exec_t` structure pointed to by `exec`.
+    - Return the `argv` member.
+- **Output**: A pointer to a list of argument strings (`char **`) associated with the `fd_tile_exec_t` structure.
 
 
 ---
 ### fd\_tile\_exec\_done<!-- {{#callable:fd_tile_exec_done}} -->
-The `fd_tile_exec_done` function checks if a tile execution task is completed by returning the value of the `done` field from the `fd_tile_exec_t` structure.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L61>)
+
+Returns the value of the `done` field from a `fd_tile_exec_t` structure.
 - **Inputs**:
-    - `exec`: A pointer to a constant `fd_tile_exec_t` structure, which contains information about a tile execution task.
-- **Control Flow**:
-    - The function accesses the `done` field of the `fd_tile_exec_t` structure pointed to by `exec`.
-    - It returns the value of the `done` field, using the `FD_VOLATILE_CONST` macro to ensure the value is read directly from memory, preventing compiler optimizations that might cache the value.
-- **Output**: An integer representing the `done` status of the tile execution task, where a non-zero value typically indicates completion.
+    - `exec`: A pointer to a constant `fd_tile_exec_t` structure from which the `done` field is accessed.
+- **Logic and Control Flow**:
+    - Accesses the `done` field of the `exec` structure using the `FD_VOLATILE_CONST` macro to ensure volatile access.
+    - Returns the value of the `done` field.
+- **Output**: The function returns an integer representing the `done` status of the execution.
 
 
 ---
 ### fd\_tile\_private\_boot<!-- {{#callable:fd_tile_private_boot}} -->
-The `fd_tile_private_boot` function initializes and logs the booting process of a tile in a non-threaded environment, setting up necessary identifiers and stack diagnostics.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L65>)
+
+Initializes and logs the boot process for a tile, setting up thread and stack information.
 - **Inputs**:
-    - `pargc`: A pointer to an integer representing the argument count.
-    - `pargv`: A pointer to an array of character strings representing the argument vector.
-- **Control Flow**:
-    - Logs the start of the booting process with 'fd_tile: booting'.
-    - Strips command line arguments related to '--tile-cpus' but does not use the results, logging if this argument is present.
-    - Initializes `fd_tile_private_id0`, `fd_tile_private_id1`, and `fd_tile_private_cnt` with the current thread ID and a count of 1.
-    - Logs the booting of the thread group with the application ID and thread identifiers.
-    - Logs the booting of tile 0 on the current CPU and host IDs.
-    - Sets `fd_tile_private_id` and `fd_tile_private_idx` to initial values.
-    - Discovers and logs stack details using `fd_log_private_stack_discover`.
-    - Logs a warning if stack diagnostics are unavailable.
-    - Logs the successful booting of tile 0 and the overall boot success.
-- **Output**: The function does not return any value; it logs various informational messages and sets up internal state variables for the tile boot process.
+    - ``pargc``: A pointer to an integer representing the argument count.
+    - ``pargv``: A pointer to an array of character strings representing the argument values.
+- **Logic and Control Flow**:
+    - Logs the start of the boot process with the message 'fd_tile: booting'.
+    - Calls `fd_env_strip_cmdline_cstr` to strip command line arguments related to '--tile-cpus', logging a message if this argument is ignored.
+    - Initializes `fd_tile_private_id0` with the current thread ID and sets `fd_tile_private_id1` to one more than `fd_tile_private_id0`.
+    - Sets `fd_tile_private_cnt` to 1, indicating the count of tiles.
+    - Retrieves the application ID using `fd_log_app_id` and logs the booting of the thread group with the application ID and thread IDs.
+    - Logs the booting of tile 0 on the current CPU using `fd_log_host_id` and `fd_log_cpu_id`.
+    - Sets `fd_tile_private_id` to `fd_tile_private_id0` and `fd_tile_private_idx` to 0.
+    - Calls `fd_log_private_stack_discover` to discover stack details, logging a warning if stack diagnostics are unavailable.
+    - Logs the success of booting tile 0 with the thread and application IDs.
+    - Logs the overall success of the boot process.
+- **Output**: No return value; the function performs logging and initializes global variables related to tile booting.
 
 
 ---
 ### fd\_tile\_private\_halt<!-- {{#callable:fd_tile_private_halt}} -->
-The `fd_tile_private_halt` function halts the tile by resetting various private state variables to zero and logs the halting process.
+[View Source →](<../../../../../src/util/tile/fd_tile_nothreads.cxx#L99>)
+
+Resets private tile-related variables to zero and logs the halting process.
 - **Inputs**: None
-- **Control Flow**:
-    - Log the message 'fd_tile: halting'.
-    - Log the message 'fd_tile: halting tile 0'.
-    - Set `fd_tile_private_stack1`, `fd_tile_private_stack0`, `fd_tile_private_idx`, and `fd_tile_private_id` to 0UL.
-    - Log the message 'fd tile: halt tile 0 success'.
-    - Set `fd_tile_private_cnt`, `fd_tile_private_id1`, and `fd_tile_private_id0` to 0UL.
-    - Log the message 'fd_tile: halt success'.
-- **Output**: The function does not return any value.
+- **Logic and Control Flow**:
+    - Logs the message 'fd_tile: halting'.
+    - Logs the message 'fd_tile: halting tile 0'.
+    - Sets `fd_tile_private_stack1`, `fd_tile_private_stack0`, `fd_tile_private_idx`, and `fd_tile_private_id` to zero.
+    - Logs the message 'fd tile: halt tile 0 success'.
+    - Sets `fd_tile_private_cnt`, `fd_tile_private_id1`, and `fd_tile_private_id0` to zero.
+    - Logs the message 'fd_tile: halt success'.
+- **Output**: No return value (void function).
 
 
 

@@ -3,10 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_tempo.h` file in the `firedancer` codebase provides APIs for measuring time and tick intervals, including models for wallclock and tickcount, functions for setting and estimating tick rates, and utilities for managing timing intervals in asynchronous processes.
+APIs for measuring time and tick intervals, including models, settings, and housekeeping utilities.
 
 # Purpose
-This C header file, `fd_tempo.h`, provides a collection of APIs for time measurement and interval management, specifically designed for high-performance computing environments. It includes functions to model and estimate the performance characteristics of wallclock and tickcount operations, such as [`fd_tempo_wallclock_model`](#fd_tempo_wallclock_model) and [`fd_tempo_tickcount_model`](#fd_tempo_tickcount_model), which help in understanding the cost and jitter associated with these operations. The file also offers utilities for synchronizing tick rates across processes ([`fd_tempo_set_tick_per_ns`](#fd_tempo_set_tick_per_ns)) and for observing synchronized time and tickcount pairs ([`fd_tempo_observe_pair`](#fd_tempo_observe_pair)). Additionally, it provides mechanisms for managing intervals between housekeeping events, such as [`fd_tempo_lazy_default`](#fd_tempo_lazy_default) for determining default laziness intervals and [`fd_tempo_async_min`](#fd_tempo_async_min) for calculating minimum intervals between asynchronous events. These functions are crucial for optimizing timing and synchronization in distributed systems, ensuring efficient and consistent performance across different threads and processes.
+The code is a C header file that defines a set of APIs for measuring time and tick intervals, primarily for performance and synchronization purposes in a multi-threaded environment. It provides functions to model and estimate the cost and jitter of time-related operations, such as `fd_log_wallclock()` and `fd_tickcount()`, which are used to measure wall clock time and tick counts, respectively. The functions [`fd_tempo_wallclock_model`](<#fd_tempo_wallclock_model>) and [`fd_tempo_tickcount_model`](<#fd_tempo_tickcount_model>) return estimates of the minimum cost and typical jitter for these operations. The header also includes functions to set and retrieve the tick rate per nanosecond, allowing for synchronization of tick rates across different processes.
+
+Additionally, the file provides utilities for observing and estimating the relationship between wall clock time and tick counts, such as [`fd_tempo_observe_pair`](<#fd_tempo_observe_pair>), which estimates the tick count at the time of a wall clock observation. It also includes functions for managing intervals between housekeeping events, such as [`fd_tempo_lazy_default`](<#fd_tempo_lazy_default>) and [`fd_tempo_async_min`](<#fd_tempo_async_min>), which calculate appropriate intervals for event scheduling to ensure efficient flow control and avoid synchronization issues. The header file is intended to be included in other C source files, providing a consistent interface for time measurement and synchronization tasks.
 # Imports and Dependencies
 
 ---
@@ -17,84 +19,97 @@ This C header file, `fd_tempo.h`, provides a collection of APIs for time measure
 
 ---
 ### fd\_tempo\_lazy\_default<!-- {{#callable:fd_tempo_lazy_default}} -->
-The `fd_tempo_lazy_default` function calculates a default target interval in nanoseconds for housekeeping events based on the maximum credits available.
+[View Source →](<../../../../../src/tango/tempo/fd_tempo.h#L150>)
+
+Calculates a target interval in nanoseconds for housekeeping events based on the maximum credits available.
 - **Inputs**:
     - `cr_max`: The maximum number of credits available, represented as an unsigned long integer.
-- **Control Flow**:
-    - The function checks if `cr_max` is greater than 954,437,176.
-    - If `cr_max` is greater, it returns `INT_MAX` cast to a long integer.
-    - If `cr_max` is not greater, it calculates the interval as `1 + ((9 * cr_max) >> 2)` and returns it as a long integer.
-- **Output**: The function returns a long integer representing the target interval in nanoseconds for housekeeping events, constrained to be within [1, 2^31].
+- **Logic and Control Flow**:
+    - Checks if `cr_max` is greater than 954,437,176.
+    - If true, returns `INT_MAX` cast to a long integer.
+    - If false, calculates the interval as `1 + ((9 * cr_max) >> 2)` and returns it as a long integer.
+- **Output**: A long integer representing the target interval in nanoseconds for housekeeping events.
 
 
 ---
 ### fd\_tempo\_async\_reload<!-- {{#callable:fd_tempo_async_reload}} -->
-The `fd_tempo_async_reload` function generates a random number within a specified range to randomize timing intervals for background tasks.
+[View Source →](<../../../../../src/tango/tempo/fd_tempo.h#L200>)
+
+Generates a random number within the range [async_min, 2*async_min) using a random number generator.
 - **Inputs**:
-    - `rng`: A pointer to an `fd_rng_t` structure, which is used to generate random numbers.
-    - `async_min`: An unsigned long integer representing the minimum interval, which must be a power of two within the range [1, 2^31].
-- **Control Flow**:
-    - The function calls `fd_rng_uint` with the `rng` pointer to generate a random unsigned integer.
-    - It performs a bitwise AND operation between the generated random number and `async_min-1UL` to ensure the result is within the range [0, async_min).
-    - The function adds `async_min` to the result of the bitwise operation to shift the range to [async_min, 2*async_min).
-    - The final result is returned as the output of the function.
-- **Output**: The function returns an unsigned long integer that is a random number within the range [async_min, 2*async_min).
+    - `rng`: A pointer to an `fd_rng_t` structure, which is used as the random number generator.
+    - `async_min`: An unsigned long integer representing the minimum value of the range, which must be a power of 2.
+- **Logic and Control Flow**:
+    - Calls `fd_rng_uint` with `rng` to generate a random unsigned integer.
+    - Performs a bitwise AND operation between the generated random number and `async_min-1UL` to ensure the result is within the range [0, async_min).
+    - Adds `async_min` to the result of the bitwise operation to shift the range to [async_min, 2*async_min).
+- **Output**: Returns an unsigned long integer that is a random number within the range [async_min, 2*async_min).
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_tempo\_wallclock\_model<!-- {{#callable_declaration:fd_tempo_wallclock_model}} -->
-Returns an estimate of the minimum cost of fd_log_wallclock() in ticks.
-- **Description**: This function provides an estimate of the minimum time cost, in ticks, for calling fd_log_wallclock(). It is useful for understanding the overhead and jitter associated with this function call. The first invocation in a thread group may be slow as it performs the necessary measurements, but subsequent calls will be fast and return the same parameters. The function ensures that the returned minimum cost is finite and positive, and if the optional parameter is provided, it also estimates the typical jitter. In cases where the function cannot be parameterized correctly on the first call, it logs a warning and uses a fallback parameterization.
+[View Source →](<../../../../../src/tango/tempo/fd_tempo.h#L8>)
+
+Returns an estimate of the minimum cost of `fd_log_wallclock()` in ticks.
+- **Description**: Use this function to obtain an estimate of the minimum time cost associated with calling `fd_log_wallclock()`, expressed in ticks. This function is useful for performance modeling and analysis, particularly when you need to understand the overhead and jitter of `fd_log_wallclock()` calls. The function must be called in a thread group, and the first call will be slower as it performs the necessary calculations. Subsequent calls will be faster and return the same parameters as the first call. The function guarantees that the returned minimum cost (`t0`) is finite and positive, and the jitter (`tau`) is finite and non-negative. If the function cannot parameterize `fd_log_wallclock()` sanely on the first call, it logs a warning and uses a fallback parameterization.
 - **Inputs**:
-    - `opt_tau`: A pointer to a double where the function will store the estimated typical jitter of fd_log_wallclock() if it is not NULL. The caller retains ownership and must ensure it is a valid pointer if provided.
-- **Output**: Returns a double representing the estimated minimum cost of fd_log_wallclock() in ticks, which is guaranteed to be finite and positive.
-- **See also**: [`fd_tempo_wallclock_model`](fd_tempo.c.md#fd_tempo_wallclock_model)  (Implementation)
+    - `opt_tau`: A pointer to a double where the function will store the estimated typical jitter associated with `fd_log_wallclock()`. This parameter is optional and can be NULL. If provided, the caller retains ownership of the memory.
+- **Output**: Returns a double representing the estimated minimum cost (`t0`) of `fd_log_wallclock()` in ticks. If `opt_tau` is non-NULL, it will contain the estimated jitter (`tau`).
+- **See Also**: [`fd_tempo_wallclock_model`](<fd_tempo.c.md#fd_tempo_wallclock_model>)  (Implementation)
 
 
 ---
 ### fd\_tempo\_tickcount\_model<!-- {{#callable_declaration:fd_tempo_tickcount_model}} -->
-Estimates the minimum cost and typical jitter of fd_tickcount() in ticks.
-- **Description**: This function provides an estimate of the minimum cost (t0) and typical jitter (tau) associated with the fd_tickcount() function, modeling it as a shifted exponential distribution. It should be called when you need to understand the performance characteristics of fd_tickcount() in terms of ticks. The first invocation in a thread group may be slow as it performs the necessary calculations, but subsequent calls will be fast and return the same parameters. If the function cannot determine a sane parameterization on the first call, it logs a warning and uses a fallback parameterization. The estimated t0 will always be finite and positive, while tau will be finite and non-negative.
+[View Source →](<../../../../../src/tango/tempo/fd_tempo.h#L30>)
+
+Estimates the minimum cost and typical jitter of `fd_tickcount()` in ticks.
+- **Description**: Use this function to obtain an estimate of the minimum cost and typical jitter associated with `fd_tickcount()`. This is useful for modeling `fd_tickcount()` as a shifted exponential distribution with a minimum of `t0` and a wait time of `tau`. The first call in a thread group will be slow, but subsequent calls will be fast and return the same parameters. The function ensures that `t0` is finite and positive, and `tau` is finite and non-negative. If the function cannot parameterize `fd_tickcount()` sanely on the first call, it logs a warning and uses a fallback parameterization.
 - **Inputs**:
-    - `opt_tau`: A pointer to a double where the function will store the estimated typical jitter (tau) if it is non-NULL. The caller retains ownership of this pointer, and it must be valid if provided. If NULL, the function will not provide the jitter estimate.
-- **Output**: Returns the estimated minimum cost (t0) of fd_tickcount() in ticks, which is a finite and positive double.
-- **See also**: [`fd_tempo_tickcount_model`](fd_tempo.c.md#fd_tempo_tickcount_model)  (Implementation)
+    - `opt_tau`: A pointer to a double where the function will store the estimated typical jitter (`tau`) of `fd_tickcount()`. If `opt_tau` is `NULL`, the function will not store the jitter estimate. The caller retains ownership of the memory pointed to by `opt_tau`.
+- **Output**: Returns a double representing the estimated minimum cost (`t0`) of `fd_tickcount()` in ticks.
+- **See Also**: [`fd_tempo_tickcount_model`](<fd_tempo.c.md#fd_tempo_tickcount_model>)  (Implementation)
 
 
 ---
 ### fd\_tempo\_set\_tick\_per\_ns<!-- {{#callable_declaration:fd_tempo_set_tick_per_ns}} -->
+[View Source →](<../../../../../src/tango/tempo/fd_tempo.h#L41>)
+
 Sets the tick per nanosecond values for synchronization.
-- **Description**: Use this function to explicitly set the tick per nanosecond values, which will affect the return values of subsequent calls to `fd_tempo_tick_per_ns`. This function is primarily intended for synchronizing the tick_per_ns value across different processes. It should not be used arbitrarily, as it overrides the default behavior of `fd_tempo_tick_per_ns`.
+- **Description**: Use this function to explicitly set the tick per nanosecond values for synchronization across different processes. This function is primarily intended for scenarios where processes need to have a consistent tick_per_ns value. It should not be used arbitrarily, as it affects the return values of subsequent calls to `fd_tempo_tick_per_ns`. Ensure that the values provided are appropriate for the intended synchronization.
 - **Inputs**:
-    - `_mu`: The mean tick per nanosecond value to be set. The caller is responsible for ensuring this value is appropriate for synchronization purposes.
-    - `_sigma`: The standard deviation of the tick per nanosecond value to be set. The caller is responsible for ensuring this value is appropriate for synchronization purposes.
+    - `_mu`: The mean tick per nanosecond value to set. Must be a valid double precision floating-point number. Caller retains ownership.
+    - `_sigma`: The standard deviation of the tick per nanosecond value to set. Must be a valid double precision floating-point number. Caller retains ownership.
 - **Output**: None
-- **See also**: [`fd_tempo_set_tick_per_ns`](fd_tempo.c.md#fd_tempo_set_tick_per_ns)  (Implementation)
+- **See Also**: [`fd_tempo_set_tick_per_ns`](<fd_tempo.c.md#fd_tempo_set_tick_per_ns>)  (Implementation)
 
 
 ---
 ### fd\_tempo\_observe\_pair<!-- {{#callable_declaration:fd_tempo_observe_pair}} -->
-Observes wallclock and tickcount simultaneously and estimates jitter.
-- **Description**: This function is used to obtain simultaneous observations of the wallclock and tickcount, estimating the tickcount at the time the wallclock was observed. It is useful for precision timing calibrations, providing a measure of the jitter in ticks. The function returns a non-negative jitter value, indicating the accuracy of the tickcount relative to the wallclock observation. If any anomalies are detected during the measurement, a warning is logged, and a best-effort result is returned. This function should be used when precise timing synchronization between wallclock and tickcount is required.
+[View Source →](<../../../../../src/tango/tempo/fd_tempo.h#L98>)
+
+Observes the wallclock and tickcount simultaneously to estimate jitter.
+- **Description**: Use this function to obtain a synchronized observation of the wallclock and tickcount, which helps in precision timing calibrations. It alternates between observing the wallclock and tickcount multiple times to determine the best estimate of the tickcount at the time of the wallclock observation. This function returns a measure of the jitter in ticks, indicating the accuracy of the synchronization. If anomalies are detected during the measurement, a warning is logged, and a best-effort result is returned. This function is not highly expensive but should be used judiciously for precise timing needs.
 - **Inputs**:
-    - `opt_now`: A pointer to a long where the observed wallclock value will be stored. Can be NULL if the wallclock observation is not needed. Caller retains ownership.
-    - `opt_tic`: A pointer to a long where the estimated tickcount value will be stored. Can be NULL if the tickcount estimation is not needed. Caller retains ownership.
-- **Output**: Returns a non-negative long representing the jitter in ticks. If opt_now is non-NULL, it stores the wallclock observation; if opt_tic is non-NULL, it stores the estimated tickcount.
-- **See also**: [`fd_tempo_observe_pair`](fd_tempo.c.md#fd_tempo_observe_pair)  (Implementation)
+    - `opt_now`: A pointer to a long where the function will store the observed wallclock value. This parameter is optional and can be NULL if the wallclock observation is not needed.
+    - `opt_tic`: A pointer to a long where the function will store the estimated tickcount value. This parameter is optional and can be NULL if the tickcount estimation is not needed.
+- **Output**: Returns a non-negative long representing the jitter in ticks. If `opt_now` is non-NULL, it stores the wallclock observation. If `opt_tic` is non-NULL, it stores the estimated tickcount.
+- **See Also**: [`fd_tempo_observe_pair`](<fd_tempo.c.md#fd_tempo_observe_pair>)  (Implementation)
 
 
 ---
 ### fd\_tempo\_async\_min<!-- {{#callable_declaration:fd_tempo_async_min}} -->
-Calculates a reasonable minimum interval in ticks between housekeeping events.
-- **Description**: This function determines a suitable minimum interval, in ticks, for scheduling housekeeping events in a system. It should be used when you need to ensure that a cycle of events completes within a specified time frame, given in nanoseconds. The function returns a power of two that represents this interval, ensuring that events are spaced appropriately to avoid synchronization issues. It is important to provide valid input values within specified ranges to avoid failure, which results in a return value of zero.
+[View Source →](<../../../../../src/tango/tempo/fd_tempo.h#L187>)
+
+Selects a minimum interval in ticks for housekeeping events.
+- **Description**: Use this function to determine a suitable minimum interval in ticks between housekeeping events, ensuring that the interval is a power of two and falls within a specified range. This function is useful in scenarios where events are cyclically scheduled with random intervals, and there is a need to complete an event cycle within a given time frame. The function returns zero and logs a warning if any input parameters are out of their valid ranges or if the calculated interval is unreasonably small or large.
 - **Inputs**:
-    - `lazy`: The target interval in nanoseconds for completing a cycle of housekeeping events. Must be a positive long integer within the range [1, 2^31). If outside this range, the function logs a warning and returns zero.
-    - `event_cnt`: The number of housekeeping events to be scheduled in a cycle. Must be a positive unsigned long integer within the range [1, 2^31). If outside this range, the function logs a warning and returns zero.
-    - `tick_per_ns`: The conversion ratio from nanoseconds to ticks, representing the tick rate of the scheduling counter. Must be a positive float within the range (0, ~1.5e29). If outside this range, the function logs a warning and returns zero.
-- **Output**: Returns a positive integer power of two in the range [1, 2^31] representing the minimum interval in ticks. Returns zero if any input validation fails or if the calculated interval is unreasonable.
-- **See also**: [`fd_tempo_async_min`](fd_tempo.c.md#fd_tempo_async_min)  (Implementation)
+    - `lazy`: Specifies the target interval in nanoseconds for completing an event cycle. Must be in the range [1, 2^31). If outside this range, the function returns zero and logs a warning.
+    - `event_cnt`: Indicates the number of housekeeping events to schedule in a cycle. Must be in the range [1, 2^31). If outside this range, the function returns zero and logs a warning.
+    - `tick_per_ns`: Represents the conversion ratio between wallclock time and tick rate. Must be greater than 0 and less than or equal to approximately 1.5e29. If outside this range, the function returns zero and logs a warning.
+- **Output**: Returns a positive integer power of two in the range [1, 2^31) representing the minimum interval in ticks. Returns zero if input validation fails or if the calculated interval is unreasonable.
+- **See Also**: [`fd_tempo_async_min`](<fd_tempo.c.md#fd_tempo_async_min>)  (Implementation)
 
 
 
