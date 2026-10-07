@@ -3,25 +3,25 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Bit manipulation, floating-point, saturating, and 128-bit arithmetic helpers with tests.
+Bit manipulation and arithmetic functions, type-generic macros, floating-point operations, and related tests.
 
 
 ## Files
-- **[fd_bits.c](fd_bits.c.md)**: The `fd_bits.c` file in the `firedancer` codebase provides implementations for computing approximate, rounded, floored, and ceiling square roots and cube roots of unsigned long integers using integer arithmetic and Newton-Raphson iteration.
-- **[fd_bits.h](fd_bits.h.md)**: The `fd_bits.h` file in the `firedancer` codebase provides a comprehensive set of bit manipulation APIs for various data types, including functions for bit masking, setting, clearing, flipping, extracting, inserting, alignment, shifting, rotating, counting, and encoding/decoding operations, as well as utilities for hashing and layout management.
-- **[fd_bits_find_lsb.h](fd_bits_find_lsb.h.md)**: The `fd_bits_find_lsb.h` file in the `firedancer` codebase provides inline functions to find the least significant bit in various integer types, with optimizations for different architectures and support for default values when the input is zero.
-- **[fd_bits_find_msb.h](fd_bits_find_msb.h.md)**: The `fd_bits_find_msb.h` file in the `firedancer` codebase provides functions to find the most significant bit of various integer types, with optimizations for different architectures and support for default values.
-- **[fd_bits_tg.h](fd_bits_tg.h.md)**: The `fd_bits_tg.h` file in the `firedancer` codebase provides type-generic macros for bit manipulation and arithmetic operations, addressing language limitations in C/C++ regarding type promotions and ensuring robust, fast, and portable code.
-- **[fd_float.h](fd_float.h.md)**: IEEE-754 float and double bit conversion, packing, and classification helpers.
-- **[fd_sat.h](fd_sat.h.md)**: The `fd_sat.h` file in the `firedancer` codebase provides a set of primitives for performing saturating arithmetic operations on various data types, mimicking Rust's saturating operations to prevent overflow and underflow.
-- **[fd_uwide.h](fd_uwide.h.md)**: Unsigned 128-bit arithmetic helpers for add, sub, mul, shifts, msb, and division.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies header files, object files, and unit tests for the `bits` utility, including commands to add headers, objects, create unit tests, and run them.
-- **[test_bits.c](test_bits.c.md)**: The `test_bits.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various bit manipulation functions and operations on different data types, including uchar, ushort, uint, ulong, and others, as well as tests for floating-point operations and unaligned memory access.
-- **[test_bits_tg.c](test_bits_tg.c.md)**: The `test_bits_tg.c` file in the `firedancer` codebase contains a comprehensive suite of tests for various bit manipulation functions across different data types, including uchar, ushort, uint, ulong, and conditional tests for int128 if available.
-- **[test_float.c](test_float.c.md)**: The `test_float.c` file in the `firedancer` codebase contains tests for floating-point bit manipulation functions, verifying the conversion and properties of single and double precision floating-point numbers.
-- **[test_hash.c](test_hash.c.md)**: The `test_hash.c` file in the `firedancer` codebase tests the correctness and avalanche properties of hash functions and their inverses for both 32-bit and 64-bit integers.
-- **[test_sat.c](test_sat.c.md)**: The `test_sat.c` file in the `firedancer` codebase implements a series of tests for saturating arithmetic operations on various integer types, including 64-bit and 128-bit integers, to ensure correct behavior under edge cases and potential overflow conditions.
-- **[test_uwide.c](test_uwide.c.md)**: The `test_uwide.c` file in the `firedancer` codebase is a unit test for various operations on 128-bit unsigned integers, including addition, subtraction, multiplication, division, and bit shifts, using the `fd_uwide` functions.
+- **[fd_bits.c](fd_bits.c.md)**: Functions for calculating approximate, floor, ceiling, and rounded square and cube roots of unsigned long integers.
+- **[fd_bits.h](fd_bits.h.md)**: Bit manipulation APIs for various data types, including functions for power of two checks, bit masking, alignment, and hashing.
+- **[fd_bits_find_lsb.h](fd_bits_find_lsb.h.md)**: Functions to find the least significant bit in various integer types, optimized for different architectures.
+- **[fd_bits_find_msb.h](fd_bits_find_msb.h.md)**: Functions to find the most significant bit in various integer types, with optional default values.
+- **[fd_bits_tg.h](fd_bits_tg.h.md)**: Type-generic macros for bit manipulation and arithmetic operations, addressing C/C++ type promotion issues.
+- **[fd_float.h](fd_float.h.md)**: Functions for manipulating and classifying IEEE-754 floating-point bit patterns in C.
+- **[fd_sat.h](fd_sat.h.md)**: Primitives for saturating math operations on various data types, mimicking Rust's behavior.
+- **[fd_uwide.h](fd_uwide.h.md)**: Operations for unsigned 128-bit integers on platforms without native support, including addition, subtraction, multiplication, division, and bit shifts.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for bits and utility components.
+- **[test_bits.c](test_bits.c.md)**: Tests for various bit manipulation and integer operations, including conversions, alignment, and mathematical functions.
+- **[test_bits_tg.c](test_bits_tg.c.md)**: Tests for bit manipulation functions across various data types, including uchar, ushort, uint, ulong, and int128.
+- **[test_float.c](test_float.c.md)**: Tests for floating-point bit manipulation functions in the Firedancer codebase.
+- **[test_hash.c](test_hash.c.md)**: Tests hash functions and their inverses for correctness and avalanche effect.
+- **[test_sat.c](test_sat.c.md)**: Tests for saturation arithmetic operations on various integer types, including 128-bit integers if supported.
+- **[test_uwide.c](test_uwide.c.md)**: Tests for 128-bit integer operations including addition, subtraction, multiplication, division, and bit shifts.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

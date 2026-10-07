@@ -3,31 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Auth, client, crank, keepalive, tests, fuzzers, proto, and seccomp policy for bundle handling.
+Seccomp policy, proto files, auth, gRPC client, crank, tile, keepalive, fuzz tests, and unit tests.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter policy for allowed syscalls and argument checks.
-- **[proto](proto/README.md)**: The `proto` folder in the `firedancer` codebase contains protocol buffer definitions, options, and automatically generated nanopb source and header files for handling various components such as authentication, block engine operations, bundles, packets, shared resources, and timestamps, along with build configuration files like `Makefile` and `Local.mk`.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and conditions.
+- **[proto](proto/README.md)**: Protocol buffer definitions, nanopb-generated files, and build scripts for authentication, block engine, bundle, packet, shared, and timestamp operations.
 
 ## Files
-- **[fd_bundle_auth.c](fd_bundle_auth.c.md)**: Auth token request and refresh state machine using gRPC, protobuf, base58, and keyguard signing.
-- **[fd_bundle_auth.h](fd_bundle_auth.h.md)**: Challenge-response auth flow for bundle server tokens, with poll, reset, and response handlers.
-- **[fd_bundle_client.c](fd_bundle_client.c.md)**: gRPC client logic for bundle auth, subscriptions, keepalive, and transaction forwarding.
-- **[fd_bundle_crank.c](fd_bundle_crank.c.md)**: Generates and applies bundle crank transactions for tip payment and block builder updates.
-- **[fd_bundle_crank.h](fd_bundle_crank.h.md)**: Bundle crank transaction generation, address lookup, and apply helpers for tip distribution updates.
-- **[fd_bundle_crank_constants.h](fd_bundle_crank_constants.h.md)**: Keyguard tile constants for bundle crank sizes, offsets, and discriminator bytes.
-- **[fd_bundle_tile.c](fd_bundle_tile.c.md)**: Bundle tile init, TLS setup, URL parsing, metrics, and gRPC/plugin update handling.
-- **[fd_bundle_tile.h](fd_bundle_tile.h.md)**: The `fd_bundle_tile.h` file defines a bundle client tile for the Firedancer project, utilizing HTTP/2 over TLS with OpenSSL and Firedancer's fd_h2 and fd_grpc for network communication.
-- **[fd_bundle_tile.seccomppolicy](fd_bundle_tile.seccomppolicy.md)**: Seccomp policy allowing file, socket, DNS, OpenSSL, and scheduler syscalls for bundle tile.
-- **[fd_bundle_tile_private.h](fd_bundle_tile_private.h.md)**: Private bundle client state, metrics, and gRPC reconnect and subscription callbacks.
-- **[fd_keepalive.h](fd_keepalive.h.md)**: API for periodic keepalive probes, ACK tracking, and timeout detection.
-- **[fuzz_bundle_auth_resp.c](fuzz_bundle_auth_resp.c.md)**: Fuzzer for bundle auth response handling and state transitions.
-- **[fuzz_bundle_client.c](fuzz_bundle_client.c.md)**: Fuzzer for injecting HTTP/2 frames into bundle tile state and checking workspace leaks.
-- **[Local.mk](Local.mk.md)**: Build rules for bundle headers, objects, unit tests, and fuzz tests.
-- **[README.md](README.md.md)**: Rewrite of the bundle tile with feature checklists for versions 1.0 and 2.0.
-- **[test_bundle_client.c](test_bundle_client.c.md)**: Tests bundle client forwarding, subscriptions, timeouts, resets, and status handling.
-- **[test_bundle_common.c](test_bundle_common.c.md)**: Mock bundle topology setup and teardown helpers for bundle tile tests.
-- **[test_bundle_crank.c](test_bundle_crank.c.md)**: Tests bundle crank transaction generation, address derivation, duplicate checks, and crank count cases.
+- **[fd_bundle_auth.c](fd_bundle_auth.c.md)**: Generates and manages authentication tokens using gRPC and protobuf for communication.
+- **[fd_bundle_auth.h](fd_bundle_auth.h.md)**: Header file for acquiring authentication tokens for a bundle server using a challenge-response flow.
+- **[fd_bundle_client.c](fd_bundle_client.c.md)**: Handles gRPC tasks for a bundle client, including connection management, subscription handling, and transaction processing.
+- **[fd_bundle_crank.c](fd_bundle_crank.c.md)**: Implements functions for initializing, updating, and applying configurations for bundle crank operations.
+- **[fd_bundle_crank.h](fd_bundle_crank.h.md)**: Defines structures and functions for managing and generating crank transactions for tip distribution.
+- **[fd_bundle_crank_constants.h](fd_bundle_crank_constants.h.md)**: Defines constants for the keyguard tile in the Firedancer codebase to minimize its attack surface.
+- **[fd_bundle_tile.c](fd_bundle_tile.c.md)**: Implements functionality for managing and monitoring bundle tiles, including metrics and network operations.
+- **[fd_bundle_tile.h](fd_bundle_tile.h.md)**: Provides a bundle client tile using HTTP/2 over TLS with TCP sockets and OpenSSL for I/O and security.
+- **[fd_bundle_tile.seccomppolicy](fd_bundle_tile.seccomppolicy.md)**: Defines a seccomp policy for managing file descriptors and network operations in a bundle application.
+- **[fd_bundle_tile_private.h](fd_bundle_tile_private.h.md)**: Defines data structures and functions for managing bundle tiles, including gRPC client operations and error handling.
+- **[fd_keepalive.h](fd_keepalive.h.md)**: API for generating and managing periodic keepalive events with configurable intervals and timeouts.
+- **[fuzz_bundle_auth_resp.c](fuzz_bundle_auth_resp.c.md)**: Fuzz testing for bundle authentication response handling in the Firedancer codebase.
+- **[fuzz_bundle_client.c](fuzz_bundle_client.c.md)**: Fuzz testing for injecting HTTP/2 frames into a bundle tile state without timeout support.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for the `firedancer` codebase components.
+- **[README.md](README.md.md)**: Feature checklist for the rewrite of the "bundle" tile, comparing versions 1.0 and 2.0.
+- **[test_bundle_client.c](test_bundle_client.c.md)**: Tests for the Firedancer bundle client, including packet and bundle forwarding, stream handling, and client status.
+- **[test_bundle_common.c](test_bundle_common.c.md)**: Utilities for creating and managing a mock bundle topology for testing purposes.
+- **[test_bundle_crank.c](test_bundle_crank.c.md)**: Tests for the `fd_bundle_crank` functionality, including transaction generation and duplicate checking.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

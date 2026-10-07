@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `fd_forest` and unit tests for `test_forest` when `FD_HAS_INT128` is defined.
+Makefile logic for building and testing components if 128-bit integer support is available.
 
 # Purpose
-This file is a Makefile snippet used in a build system to conditionally add object files and create a unit test target. If the macro `FD_HAS_INT128` is defined, it adds the object file `fd_discof` to the `fd_forest` target and sets up a unit test named `test_forest` that depends on several object files, including `fd_discof`, `fd_disco`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.
+The `Makefile` content uses conditional compilation to include specific object files and unit tests if the `FD_HAS_INT128` macro is defined. The `add-objs` function adds the `fd_discof` object to the `fd_forest` target. The `make-unit-test` function creates a unit test named `test_forest` that depends on several components, including `fd_discof`, `fd_disco`, `fd_flamenco`, `fd_tango`, `fd_ballet`, and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

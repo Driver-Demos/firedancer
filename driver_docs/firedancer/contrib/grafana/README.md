@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Grafana dashboards for bundle, QUIC, and tile metrics.
+Grafana dashboard configurations for monitoring QUIC, network metrics, and Firedancer tiles using Prometheus.
 
 
 ## Files
-- **[bundle.json](bundle.json.md)**: Grafana dashboard for bundle uptime, throughput, and edge RTT.
-- **[quic.json](quic.json.md)**: Grafana dashboard for QUIC packet, connection, handshake, and latency metrics.
-- **[tile_details.json](tile_details.json.md)**: Grafana dashboard JSON for tile busy percentage by regime.
-- **[tile_overview.json](tile_overview.json.md)**: Grafana dashboard for tile busy percentage and backpressure metrics.
+- **[bundle.json](bundle.json.md)**: Configuration for a Grafana dashboard with panels for monitoring uptime, bundles per second, and RTT.
+- **[quic.json](quic.json.md)**: Grafana dashboard configuration for monitoring QUIC metrics using Prometheus data sources.
+- **[tile_details.json](tile_details.json.md)**: Configuration for a Grafana dashboard displaying Firedancer tile details with Prometheus data sources.
+- **[tile_overview.json](tile_overview.json.md)**: Grafana dashboard configuration for monitoring Firedancer tiles with Prometheus data sources.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

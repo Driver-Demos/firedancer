@@ -3,32 +3,34 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_alloc_ctl_help` file provides a command-line interface for managing workspace allocations, including commands for setting tags, creating and deleting allocators, performing memory allocations and deallocations, compacting memory, and querying allocator status.
+Command-line interface for managing workspace allocations, including creation, deletion, and querying.
 
 # Purpose
-The provided content appears to be a command-line interface (CLI) usage guide for a memory allocation control tool, likely named `fd_alloc_ctl`. This tool is designed to manage memory allocations within a workspace (wksp) environment, providing commands for creating, deleting, allocating, freeing, compacting, and querying memory allocations. The functionality is relatively narrow, focusing specifically on memory management tasks, such as setting tags for allocations, creating new allocations, and optimizing memory usage for concurrency. The commands are conceptually organized around the lifecycle of memory management, from allocation to deallocation, with additional capabilities for querying the state of allocations. This file is relevant to a codebase as it provides essential instructions for developers or system administrators to efficiently manage memory resources, ensuring optimal performance and resource utilization in applications that rely on dynamic memory allocation.
+The `fd_alloc_ctl` command-line tool manages memory allocation within a workspace (`wksp`). It provides several commands to control and query memory allocations. The `tag` command sets a tag for future workspace allocations, while the `new` command creates a new allocator backed by a specified workspace, tagging allocations with a unique identifier. The `delete` command removes an allocator and optionally performs garbage collection on unfreed allocations. The `malloc` and `free` commands handle memory allocation and deallocation, respectively, with options to optimize for concurrency. The `compact` command reclaims unused workspace allocations, and the `query` command retrieves information about an allocator, such as its existence, tag, memory leaks, or detailed status. Each command is designed to ensure efficient memory management and provide diagnostic information, logging any anomalies encountered during execution.
 # Content Summary
-The provided content is a usage guide for a command-line tool named `fd_alloc_ctl`, which is used for managing memory allocations within a workspace (wksp) environment. This tool provides several commands to control and query memory allocations, each with specific arguments and behaviors.
+The provided content describes the usage and functionality of a command-line tool named `fd_alloc_ctl`. This tool is used for managing memory allocations within a workspace (wksp) environment. Below is a summary of the key commands and their functions:
 
-Key commands include:
+1. **help**: Displays a help message that outlines the available commands and their usage.
 
-- **help**: Displays the usage instructions for the tool, detailing available commands and their functions.
+2. **tag val**: Sets a tag value for subsequent workspace allocations. The default tag value is 1.
 
-- **tag val**: Sets a tag for subsequent workspace allocations, with a default value of 1. This tag is used to identify and manage allocations.
+3. **new wksp wksp_tag**: Creates a new allocator backed by a specified workspace. Allocations made by this allocator will be tagged with `wksp_tag`. The command outputs the global address (gaddr) of the new allocator on success.
 
-- **new wksp wksp_tag**: Creates a new allocator backed by a specified workspace. Allocations made by this allocator are tagged with `wksp_tag`, which should be unique. The command outputs the global address (gaddr) of the new allocator on success.
+4. **delete alloc_gaddr garbage_collect**: Deletes the allocator at the specified global address. If `garbage_collect` is non-zero, it also frees any unfreed allocations. Otherwise, the allocations remain in the workspace for potential later cleanup.
 
-- **delete alloc_gaddr garbage_collect**: Deletes an allocator at a given global address. If `garbage_collect` is non-zero, it also frees any unfreed allocations. Otherwise, allocations remain in the workspace for potential later cleanup.
+5. **malloc alloc_gaddr cgroup_idx align sz**: Allocates a specified number of bytes (`sz`) with a given alignment using the allocator at `alloc_gaddr`. The alignment is optimized for a specified concurrency group (`cgroup_idx`). The command outputs the global address of the allocated memory on success.
 
-- **malloc alloc_gaddr cgroup_idx align sz**: Allocates a specified size of memory with a given alignment using the allocator at `alloc_gaddr`. The alignment is optimized for a specified concurrency group. The command outputs the global address of the allocated memory on success.
+6. **free alloc_gaddr cgroup_idx malloc_gaddr**: Frees a previously allocated memory block, identified by `malloc_gaddr`, using the allocator at `alloc_gaddr`. The operation is optimized for the specified concurrency group.
 
-- **free alloc_gaddr cgroup_idx malloc_gaddr**: Frees a previously allocated memory block, optimizing it for future reuse by a specified concurrency group. The operation logs any anomalies but is designed to always succeed.
+7. **compact alloc_gaddr**: Frees up workspace allocations that are not needed for any outstanding memory allocations, optimizing future allocations.
 
-- **compact alloc_gaddr**: Releases any unnecessary workspace allocations that are not required for outstanding memory allocations, optimizing future allocation performance.
+8. **query what alloc_gaddr**: Queries the allocator at `alloc_gaddr` for specific information based on the `what` parameter. The possible queries include:
+   - `test`: Returns 0 if the allocator exists, otherwise returns a negative error code.
+   - `tag`: Returns the workspace tag if the allocator exists, otherwise returns 0.
+   - `leak`: Checks for memory leaks, returning 0 if no leaks are present, or a negative error code if leaks are detected.
+   - `full`: Provides detailed information about the allocator, recommended only when there are no concurrent users.
 
-- **query what alloc_gaddr**: Provides information about the allocator at `alloc_gaddr`. The `what` parameter specifies the type of information, such as testing existence, retrieving tags, checking for memory leaks, or obtaining detailed status. The command logs any anomalies but is designed to always succeed.
-
-This tool is essential for developers managing memory allocations in a concurrent environment, providing mechanisms for efficient memory usage, cleanup, and diagnostics.
+The tool logs any anomalies detected during operations, ensuring that the system remains stable and consistent.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

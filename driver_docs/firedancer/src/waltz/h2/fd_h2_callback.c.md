@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_h2_callback.c` file in the `firedancer` codebase provides a set of no-operation (noop) callback functions for HTTP/2 connections and streams, initializing them with default behavior that effectively does nothing.
+Implements no-operation callbacks for HTTP/2 connections and streams.
 
 # Purpose
-This C source code file defines a set of no-operation (noop) callback functions for handling HTTP/2 protocol events. The primary purpose of these functions is to provide a default implementation that does nothing, effectively serving as placeholders or stubs. Each function takes parameters relevant to HTTP/2 operations, such as connection and stream identifiers, but the parameters are not used within the functions, as indicated by the `(void)` casts. This pattern is typical in situations where a complete implementation is not yet needed, or when testing and debugging require a minimal, non-functional setup.
+The code defines a set of no-operation (noop) functions for handling HTTP/2 protocol events. These functions are part of a callback mechanism, where each function corresponds to a specific event or operation in an HTTP/2 connection, such as stream creation, connection establishment, and data handling. The functions do not perform any operations; they simply accept parameters and return either `NULL` or perform no action. This is indicated by the use of `(void)` casts on the parameters, which suppresses compiler warnings about unused variables.
 
-The file also defines a `fd_h2_callbacks_t` structure, `fd_h2_callbacks_noop`, which aggregates these noop functions into a single entity. This structure can be used to initialize other callback structures via the [`fd_h2_callbacks_init`](#fd_h2_callbacks_init) function, which assigns the noop callbacks to a given `fd_h2_callbacks_t` instance. This setup is useful in modular software design, where components can be developed and tested independently, with the noop callbacks serving as a temporary stand-in for actual functionality. The file is likely part of a larger library or framework dealing with HTTP/2 connections, providing a basic template for developers to implement their own specific logic for handling HTTP/2 events.
+The code also defines a constant `fd_h2_callbacks_noop`, which is a structure of type `fd_h2_callbacks_t`. This structure contains pointers to the noop functions, effectively creating a set of default callbacks that perform no actions. The function [`fd_h2_callbacks_init`](<#fd_h2_callbacks_init>) initializes a given `fd_h2_callbacks_t` structure with these noop callbacks. This setup is useful for scenarios where a default, non-functional behavior is required, such as during testing or as a placeholder in a larger system where specific callback implementations are not yet provided.
 # Imports and Dependencies
 
 ---
@@ -20,154 +20,173 @@ The file also defines a `fd_h2_callbacks_t` structure, `fd_h2_callbacks_noop`, w
 
 ---
 ### fd\_h2\_callbacks\_noop
-- **Type**: `fd_h2_callbacks_t const`
-- **Description**: The `fd_h2_callbacks_noop` is a constant instance of the `fd_h2_callbacks_t` structure, which is initialized with a set of no-operation (noop) functions. These functions are placeholders that do nothing and return default values, such as NULL for pointers or void for functions with no return value. This structure is used to define a set of default behaviors for HTTP/2 connection and stream events, where no specific action is required.
-- **Use**: This variable is used to initialize callback structures with no-operation functions, providing a default behavior where no specific callback actions are needed.
+- **Type**: ``fd_h2_callbacks_t``
+- **Description**: Defines a set of no-operation (noop) callback functions for HTTP/2 operations. Each function in the structure is a placeholder that does not perform any action and returns default values or does nothing.
+- **Use**: Used to initialize callback structures with no-operation functions for HTTP/2 connections.
 
 
 # Functions
 
 ---
 ### fd\_h2\_noop\_stream\_create<!-- {{#callable:fd_h2_noop_stream_create}} -->
-The `fd_h2_noop_stream_create` function is a no-operation function that takes a connection and stream ID as inputs and returns NULL.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L4>)
+
+Returns a null pointer, effectively creating a no-operation stream.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
-    - `stream_id`: An unsigned integer representing the stream ID.
-- **Control Flow**:
-    - The function takes two parameters, `conn` and `stream_id`, but does not use them, as indicated by the `(void)` cast.
-    - The function immediately returns `NULL`, indicating no operation is performed.
-- **Output**: The function returns `NULL`, indicating that no stream is created.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure, representing the connection.
+    - `stream_id`: An unsigned integer representing the stream identifier.
+- **Logic and Control Flow**:
+    - Casts `conn` and `stream_id` to void to indicate they are unused.
+    - Returns `NULL`, indicating no stream is created.
+- **Output**: A null pointer of type `fd_h2_stream_t *`, indicating no stream is created.
 
 
 ---
 ### fd\_h2\_noop\_stream\_query<!-- {{#callable:fd_h2_noop_stream_query}} -->
-The `fd_h2_noop_stream_query` function is a no-operation placeholder that takes a connection and stream ID as inputs and always returns `NULL`.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L11>)
+
+Returns a null pointer, effectively performing no operation.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
-    - `stream_id`: An unsigned integer representing the stream ID.
-- **Control Flow**:
-    - The function takes two parameters, `conn` and `stream_id`, but does not use them, as indicated by the `(void)` cast to suppress unused parameter warnings.
-    - The function immediately returns `NULL`, indicating no operation or result.
-- **Output**: The function returns `NULL`, indicating that no stream is found or processed.
+    - ``conn``: A pointer to an `fd_h2_conn_t` structure representing the connection.
+    - ``stream_id``: An unsigned integer representing the stream identifier.
+- **Logic and Control Flow**:
+    - Ignores the `conn` and `stream_id` parameters by casting them to void.
+    - Returns `NULL`, indicating no stream is found or processed.
+- **Output**: A null pointer of type `fd_h2_stream_t *`, indicating no operation is performed.
 
 
 ---
 ### fd\_h2\_noop\_conn\_established<!-- {{#callable:fd_h2_noop_conn_established}} -->
-The `fd_h2_noop_conn_established` function is a no-operation callback for when an HTTP/2 connection is established, taking a connection pointer as input but performing no actions.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L18>)
+
+Does nothing when a connection is established.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
-- **Control Flow**:
-    - The function takes a single argument, `conn`, which is a pointer to an `fd_h2_conn_t` structure.
-    - The function explicitly casts the `conn` parameter to void to indicate that it is intentionally unused.
-    - No operations or logic are performed within the function body.
-- **Output**: The function does not return any value or produce any output.
+    - ``conn``: A pointer to an `fd_h2_conn_t` structure representing the connection.
+- **Logic and Control Flow**:
+    - The function takes a single argument `conn` and explicitly does nothing with it by casting it to void.
+- **Output**: No output is produced.
 
 
 ---
 ### fd\_h2\_noop\_conn\_final<!-- {{#callable:fd_h2_noop_conn_final}} -->
-The `fd_h2_noop_conn_final` function is a no-operation placeholder for handling the finalization of an HTTP/2 connection.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L23>)
+
+Does nothing with the given connection, error code, and closure indicator.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
     - `h2_err`: An unsigned integer representing the HTTP/2 error code.
     - `closed_by`: An integer indicating who closed the connection.
-- **Control Flow**:
-    - The function takes three parameters: `conn`, `h2_err`, and `closed_by`, but does not use them.
-    - Each parameter is explicitly cast to void to suppress compiler warnings about unused parameters.
-- **Output**: The function does not return any value or perform any operations.
+- **Logic and Control Flow**:
+    - The function takes three parameters: `conn`, `h2_err`, and `closed_by`.
+    - Each parameter is explicitly cast to void to indicate that they are unused.
+    - The function performs no operations and returns no value.
+- **Output**: No output is produced as the function is a no-operation (noop) function.
 
 
 ---
 ### fd\_h2\_noop\_headers<!-- {{#callable:fd_h2_noop_headers}} -->
-The `fd_h2_noop_headers` function is a no-operation placeholder for handling HTTP/2 headers, taking several parameters but performing no actions with them.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L30>)
+
+Does nothing with the provided HTTP/2 connection, stream, and header data.
 - **Inputs**:
     - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
     - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream.
-    - `data`: A constant void pointer to the data associated with the headers.
-    - `data_sz`: An unsigned long representing the size of the data.
-    - `flags`: An unsigned long representing any flags associated with the headers.
-- **Control Flow**:
+    - `data`: A pointer to a constant void type representing the header data.
+    - `data_sz`: An unsigned long integer representing the size of the header data.
+    - `flags`: An unsigned long integer representing flags associated with the header data.
+- **Logic and Control Flow**:
     - The function takes five parameters: `conn`, `stream`, `data`, `data_sz`, and `flags`.
-    - Each parameter is explicitly cast to void to indicate that they are unused, effectively making the function a no-op.
-    - The function does not perform any operations or return any values.
-- **Output**: This function does not produce any output or return a value.
+    - Each parameter is cast to void to indicate that they are unused in the function body.
+- **Output**: No output is produced as the function is a no-operation (noop) and returns void.
 
 
 ---
 ### fd\_h2\_noop\_data<!-- {{#callable:fd_h2_noop_data}} -->
-The `fd_h2_noop_data` function is a no-operation placeholder for handling data frames in an HTTP/2 connection.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L39>)
+
+Does nothing with the provided connection, stream, data, data size, and flags.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
-    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream.
-    - `data`: A constant pointer to the data being passed, which is not used in this function.
-    - `data_sz`: An unsigned long representing the size of the data, which is not used in this function.
-    - `flags`: An unsigned long representing flags associated with the data, which is not used in this function.
-- **Control Flow**:
-    - The function takes five parameters but does not perform any operations with them.
-    - Each parameter is explicitly cast to void to indicate that they are intentionally unused.
-- **Output**: This function does not return any value or produce any output.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
+    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the stream.
+    - `data`: A pointer to a constant void type representing the data.
+    - `data_sz`: An unsigned long integer representing the size of the data.
+    - `flags`: An unsigned long integer representing flags associated with the data.
+- **Logic and Control Flow**:
+    - The function takes five parameters: `conn`, `stream`, `data`, `data_sz`, and `flags`.
+    - Each parameter is explicitly cast to void to indicate that they are unused.
+    - The function does not perform any operations or return any values.
+- **Output**: No output is produced as the function is a no-operation (noop) function.
 
 
 ---
 ### fd\_h2\_noop\_rst\_stream<!-- {{#callable:fd_h2_noop_rst_stream}} -->
-The `fd_h2_noop_rst_stream` function is a no-operation placeholder for handling HTTP/2 RST_STREAM frames, taking in connection, stream, error code, and closed-by parameters without performing any actions.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L48>)
+
+Does nothing with the provided connection, stream, error code, and closed_by parameters.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
-    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the HTTP/2 stream.
-    - `error_code`: An unsigned integer representing the error code associated with the RST_STREAM frame.
-    - `closed_by`: An integer indicating who closed the stream (e.g., client or server).
-- **Control Flow**:
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
+    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the stream.
+    - `error_code`: An unsigned integer representing the error code.
+    - `closed_by`: An integer indicating who closed the stream.
+- **Logic and Control Flow**:
     - The function takes four parameters: `conn`, `stream`, `error_code`, and `closed_by`.
-    - Each parameter is explicitly cast to void to indicate that they are unused, effectively making the function a no-op.
-    - The function does not perform any operations or return any values.
-- **Output**: The function does not produce any output or return any value.
+    - Each parameter is cast to void to indicate that they are unused in the function body.
+- **Output**: No output is produced as the function is a no-operation (noop) and does not perform any actions.
 
 
 ---
 ### fd\_h2\_noop\_window\_update<!-- {{#callable:fd_h2_noop_window_update}} -->
-The `fd_h2_noop_window_update` function is a no-operation placeholder for handling window update events in an HTTP/2 connection.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L56>)
+
+Does nothing with the given connection and increment parameters.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
-    - `increment`: An unsigned integer representing the window size increment.
-- **Control Flow**:
-    - The function takes two parameters: a connection pointer and an increment value.
-    - Both parameters are explicitly marked as unused using the `(void)` cast, indicating that the function does not perform any operations with them.
-- **Output**: The function does not return any value or perform any operations; it is a no-op function.
+    - ``conn``: A pointer to an `fd_h2_conn_t` structure representing the connection.
+    - ``increment``: An unsigned integer representing the increment value for the window update.
+- **Logic and Control Flow**:
+    - The function takes two parameters: `conn` and `increment`.
+    - Both parameters are explicitly marked as unused with `(void)` to prevent compiler warnings about unused variables.
+    - No operations or logic are performed within the function body.
+- **Output**: No output is produced as the function is a no-op (no operation).
 
 
 ---
 ### fd\_h2\_noop\_stream\_window\_update<!-- {{#callable:fd_h2_noop_stream_window_update}} -->
-The `fd_h2_noop_stream_window_update` function is a no-operation placeholder for handling stream window updates in an HTTP/2 connection.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L62>)
+
+Does nothing with the provided connection, stream, and increment parameters.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
-    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the specific stream within the connection.
-    - `increment`: An unsigned integer representing the amount by which the stream's window size should be incremented.
-- **Control Flow**:
-    - The function takes three parameters: a connection pointer, a stream pointer, and an increment value.
-    - All parameters are explicitly marked as unused using the `(void)` cast, indicating that the function does not perform any operations with them.
-- **Output**: The function does not produce any output or perform any operations; it is a no-op function.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
+    - `stream`: A pointer to an `fd_h2_stream_t` structure representing the stream.
+    - `increment`: An unsigned integer representing the increment value for the window update.
+- **Logic and Control Flow**:
+    - The function takes three parameters: `conn`, `stream`, and `increment`.
+    - Each parameter is cast to void to indicate that they are unused.
+    - The function does not perform any operations or return any value.
+- **Output**: No output is produced as the function is a no-op (no operation).
 
 
 ---
 ### fd\_h2\_noop\_ping\_ack<!-- {{#callable:fd_h2_noop_ping_ack}} -->
-The `fd_h2_noop_ping_ack` function is a no-operation placeholder for handling ping acknowledgments in an HTTP/2 connection.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L69>)
+
+Does nothing with the provided connection object.
 - **Inputs**:
-    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the HTTP/2 connection.
-- **Control Flow**:
-    - The function takes a single argument, `conn`, which is a pointer to an `fd_h2_conn_t` structure.
-    - The function body contains a single statement that casts `conn` to void, effectively ignoring the input parameter.
-    - No operations or logic are performed within the function.
-- **Output**: The function does not return any value or produce any output.
+    - `conn`: A pointer to an `fd_h2_conn_t` structure representing the connection.
+- **Logic and Control Flow**:
+    - Casts the `conn` parameter to void to indicate it is unused.
+- **Output**: No output is produced.
 
 
 ---
 ### fd\_h2\_callbacks\_init<!-- {{#callable:fd_h2_callbacks_init}} -->
-The `fd_h2_callbacks_init` function initializes a given `fd_h2_callbacks_t` structure with default no-operation callbacks.
+[View Source →](<../../../../../src/waltz/h2/fd_h2_callback.c#L87>)
+
+Initializes a `fd_h2_callbacks_t` structure with no-operation callbacks.
 - **Inputs**:
-    - `callbacks`: A pointer to an `fd_h2_callbacks_t` structure that will be initialized with no-operation callbacks.
-- **Control Flow**:
-    - The function takes a pointer to an `fd_h2_callbacks_t` structure as input.
-    - It assigns the `fd_h2_callbacks_noop` structure, which contains no-operation functions, to the dereferenced `callbacks` pointer.
-    - The function returns the initialized `callbacks` pointer.
+    - `callbacks`: A pointer to a `fd_h2_callbacks_t` structure that will be initialized with no-operation callbacks.
+- **Logic and Control Flow**:
+    - Assigns the `fd_h2_callbacks_noop` structure to the `callbacks` pointer, which contains no-operation functions for various HTTP/2 events.
+    - Returns the `callbacks` pointer after initialization.
 - **Output**: A pointer to the initialized `fd_h2_callbacks_t` structure.
 
 

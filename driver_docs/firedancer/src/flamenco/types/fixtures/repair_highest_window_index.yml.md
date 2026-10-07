@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `repair_highest_window_index.yml` file in the `firedancer` codebase contains configuration data for a highest window index, including details such as signature, sender, recipient, timestamp, nonce, slot, and shred index.
+YAML configuration for the highest window index with header details and slot information.
 
 # Purpose
-The file contains metadata related to a specific data transaction or message within a distributed system or blockchain. It includes a header with a digital signature, sender and recipient identifiers, a timestamp, and a nonce for uniqueness. Additionally, it specifies a slot and shred index, which likely pertain to the data's position or order within a larger dataset or ledger.
+The YAML configuration defines metadata for a specific data window in a distributed system. The `header` section contains cryptographic and transactional information, including a `signature`, `sender`, `recipient`, `timestamp`, and `nonce`, which are used for data integrity and authentication. The `slot` and `shred_index` fields specify the position and index of the data within the system, aiding in data organization and retrieval.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

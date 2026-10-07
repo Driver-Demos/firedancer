@@ -3,138 +3,139 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_alloc_ctl` file is a Bash script that tests various functionalities of the `fd_alloc_ctl` and `fd_wksp_ctl` commands in the `firedancer` codebase, including workspace creation, allocation, querying, freeing, compacting, and deletion.
+A Bash script for testing the `fd_alloc_ctl` command-line tool in the `firedancer` codebase.
 
 # Purpose
-This Bash script is a test suite designed to validate the functionality of two command-line utilities, `fd_wksp_ctl` and `fd_alloc_ctl`, which are likely part of a larger software system dealing with workspace and memory allocation management. The script provides narrow functionality, focusing specifically on testing various operations such as creating, querying, allocating, freeing, compacting, and deleting memory allocations within a specified workspace. It sets up a test environment by defining configuration variables, cleans up any previous test artifacts, and executes a series of tests to ensure that the utilities behave as expected under different scenarios. The script is not an executable for end-users but rather a utility for developers to verify the correctness and robustness of the memory management tools in their software.
+This script is a Bash test suite for validating the functionality of the `fd_alloc_ctl` and `fd_wksp_ctl` command-line tools. It sets up a test environment by defining workspace parameters and cleaning up any previous test artifacts. The script tests various operations such as creating, querying, allocating, freeing, compacting, and deleting memory allocations within a specified workspace. It uses a series of commands to verify expected behaviors and error handling, and it reports failures with specific messages if any command does not execute as expected. The script concludes by cleaning up the test environment and indicating a successful test run if all operations pass.
 # Global Variables
 
 ---
 ### UNIT\_TEST
-- **Type**: `string`
-- **Description**: The `UNIT_TEST` variable is a string that holds the directory path of the script's source file. It is determined using the `dirname` command on the `$BASH_SOURCE` variable, which contains the path of the script being executed.
-- **Use**: This variable is used to determine the location of the binaries relative to the script's location.
+- **Type**: ``string``
+- **Description**: `UNIT_TEST` is a string variable that stores the directory path of the script's source file. It is determined using the `dirname` command on the `$BASH_SOURCE` variable, which contains the path of the script being executed.
+- **Use**: Stores the directory path of the script's source file for use in determining the location of binaries.
 
 
 ---
 ### BUILD
-- **Type**: `string`
-- **Description**: The `BUILD` variable is a string that holds the directory path of the build location for the binaries used in the script. It is determined by taking the directory name of the `UNIT_TEST` variable, which itself is derived from the script's source path.
-- **Use**: This variable is used to construct the path to the `bin` directory, which contains the executable binaries needed for the script's operations.
+- **Type**: ``string``
+- **Description**: Represents the directory path where the build artifacts are located. It is determined by finding the directory name of the `UNIT_TEST` path.
+- **Use**: Used to construct the path to the `bin` directory where executable binaries are stored.
 
 
 ---
 ### BIN
-- **Type**: `string`
-- **Description**: The `BIN` variable is a string that holds the path to the directory where the binary executables are located. It is constructed by appending '/bin' to the `BUILD` directory path, which is derived from the directory of the unit test script.
-- **Use**: This variable is used to specify the location of the binary executables for various commands executed in the script.
+- **Type**: ``string``
+- **Description**: `BIN` is a string variable that stores the path to the 'bin' directory within the build directory. It is determined by appending '/bin' to the `BUILD` variable, which is derived from the directory of the unit test script.
+- **Use**: Used to construct the path for executing various control commands like `fd_wksp_ctl` and `fd_alloc_ctl`.
 
 
 ---
 ### WKSP
-- **Type**: `string`
-- **Description**: The `WKSP` variable is a global string variable that holds the name of the workspace file used in the script. It is set to the value `test_fd_alloc_ctl.wksp`. This variable is used throughout the script to reference the workspace in various commands.
-- **Use**: `WKSP` is used to specify the workspace file name for operations such as creation, deletion, and allocation control in the script.
+- **Type**: ``string``
+- **Description**: The `WKSP` variable is a string that specifies the name of the workspace file used in the script. It is set to 'test_fd_alloc_ctl.wksp' and is used in various command-line operations to manage the workspace.
+- **Use**: Used to specify the workspace name for operations such as creation, deletion, and allocation in the script.
 
 
 ---
 ### PAGE\_CNT
 - **Type**: `integer`
-- **Description**: The variable `PAGE_CNT` is a global integer variable set to 1. It represents the number of pages to be used when creating a workspace (`wksp`) in the script.
-- **Use**: This variable is used as an argument in the command to create a new workspace, specifying the number of pages to allocate.
+- **Description**: Specifies the number of pages to allocate for the workspace in the script. It is set to 1, indicating a single page allocation.
+- **Use**: Used as an argument in the `fd_wksp_ctl new` command to define the number of pages for the workspace.
 
 
 ---
 ### PAGE\_SZ
-- **Type**: `string`
-- **Description**: The variable `PAGE_SZ` is a global string variable set to the value 'gigantic'. It is used to specify the size of a page in the context of workspace allocation and management.
-- **Use**: `PAGE_SZ` is used as an argument when creating a new workspace with the `fd_wksp_ctl` command.
+- **Type**: ``string``
+- **Description**: The `PAGE_SZ` variable is a global variable defined as a string with the value 'gigantic'. It specifies the size of a page in the context of workspace allocation and management.
+- **Use**: Used to define the page size when creating a new workspace with the `fd_wksp_ctl` command.
 
 
 ---
 ### CPU\_IDX
 - **Type**: `integer`
-- **Description**: The `CPU_IDX` variable is a global integer variable set to 0. It is used to specify the CPU index for operations related to workspace management in the script.
-- **Use**: This variable is used as a parameter when creating a new workspace with the `fd_wksp_ctl` command, indicating which CPU index to associate with the workspace.
+- **Description**: The variable `CPU_IDX` is an integer that specifies the index of the CPU to use for operations. It is set to 0, indicating the first CPU.
+- **Use**: Used to specify the CPU index when creating a workspace with the `fd_wksp_ctl` command.
 
 
 ---
 ### MODE
-- **Type**: `integer`
-- **Description**: The `MODE` variable is a global variable defined in the script with a value of `0600`. It represents the file permission mode used when creating a new workspace (`wksp`) in the script. The mode `0600` indicates that the file is readable and writable by the owner, but not accessible by others.
-- **Use**: This variable is used as an argument when creating a new workspace to set its file permission mode.
+- **Type**: ``int``
+- **Description**: `MODE` is a global variable that stores the file permission mode for the workspace. It is set to `0600`, which means the owner has read and write permissions, while others have no permissions.
+- **Use**: Used to specify the file permission mode when creating a new workspace with the `fd_wksp_ctl` command.
 
 
 ---
 ### TAG\_META
 - **Type**: `integer`
-- **Description**: `TAG_META` is a global variable defined as an integer with a value of 1234. It is used as a tag identifier in the script, likely to differentiate or categorize certain operations or data allocations.
-- **Use**: This variable is used as a tag identifier when invoking the `fd_alloc_ctl` command to manage allocations.
+- **Description**: A global variable that holds the integer value `1234`. It is used as a tag identifier in the script.
+- **Use**: Used as a tag identifier for allocation operations in the script.
 
 
 ---
 ### TAG\_ALLOC
 - **Type**: `integer`
-- **Description**: `TAG_ALLOC` is a global integer variable set to the value 2345. It is used as a tag identifier for allocation operations within the script.
-- **Use**: This variable is used as a tag to identify and manage allocation operations in the `fd_alloc_ctl` command.
+- **Description**: Represents a numeric identifier used for allocation operations in the script. It is set to the value 2345.
+- **Use**: Used as a tag identifier in allocation commands to manage resources.
 
 
 ---
 ### FD\_LOG\_PATH
 - **Type**: `string`
-- **Description**: The `FD_LOG_PATH` variable is a global string variable that is used to specify the path for logging. In this script, it is set to an empty string, effectively disabling any permanent logging functionality.
-- **Use**: This variable is used to control the logging behavior of the script, and by setting it to an empty string, it ensures that no logs are written to a file.
+- **Description**: A global variable that stores the path to the log file. It is set to an empty string to disable the permanent log.
+- **Use**: Used to specify the log file path for logging operations, but is currently set to disable logging.
 
 
 ---
 ### ALLOC
-- **Type**: `string`
-- **Description**: The `ALLOC` variable is a string that stores the result of a command execution, specifically the output of the `fd_alloc_ctl` command when creating a new allocation with a specified tag in a workspace. This variable is used to reference the allocation for subsequent operations such as querying, allocating, freeing, compacting, and deleting memory allocations.
-- **Use**: `ALLOC` is used to store and reference the identifier of a memory allocation created in a workspace for further memory management operations.
+- **Type**: ``string``
+- **Description**: Stores the result of the `fd_alloc_ctl` command that creates a new allocation with a specific tag in the workspace. The value is used in subsequent commands to reference this allocation.
+- **Use**: Used to store and reference the allocation identifier for operations like query, malloc, free, compact, and delete.
 
 
 ---
 ### GADDR0
-- **Type**: `string`
-- **Description**: `GADDR0` is a global variable that stores the result of a memory allocation command executed by the `fd_alloc_ctl` tool. It captures the address or identifier of the allocated memory block within the workspace specified by the `ALLOC` variable.
-- **Use**: `GADDR0` is used to store the address of a memory allocation for later operations such as freeing the allocated memory.
+- **Type**: ``string``
+- **Description**: Stores the result of a memory allocation command executed by the `fd_alloc_ctl` tool. The command allocates a memory block with specific parameters and returns an address or identifier for the allocated memory.
+- **Use**: Used to hold the address or identifier of a memory block allocated by the `fd_alloc_ctl malloc` command.
 
 
 ---
 ### GADDR1
-- **Type**: `string`
-- **Description**: GADDR1 is a global variable that stores the result of a memory allocation operation performed by the fd_alloc_ctl command. It is assigned the output of the command, which is expected to be a memory address or identifier for the allocated memory block.
-- **Use**: GADDR1 is used to store and reference a specific memory allocation for further operations such as freeing the memory.
+- **Type**: ``string``
+- **Description**: `GADDR1` is a global variable that stores the result of a memory allocation operation. It is assigned the output of the `fd_alloc_ctl malloc` command, which allocates memory in a workspace with specific parameters.
+- **Use**: Stores the address of the allocated memory block for further operations.
 
 
 ---
 ### GADDR2
-- **Type**: `string`
-- **Description**: `GADDR2` is a global variable that stores the result of a memory allocation operation performed by the `fd_alloc_ctl` command. It is assigned the output of the command that allocates memory with specific parameters (6, 2, 10) for the allocation identified by `ALLOC`. This variable is used to keep track of the address or identifier of the allocated memory block.
-- **Use**: `GADDR2` is used to store the address or identifier of a memory block allocated by the `fd_alloc_ctl` command for later operations such as freeing the memory.
+- **Type**: ``string``
+- **Description**: `GADDR2` is a global variable that stores the result of a memory allocation operation. It is assigned the output of the `fd_alloc_ctl malloc` command with specific parameters.
+- **Use**: Stores the address of a memory block allocated by the `fd_alloc_ctl malloc` command.
 
 
 ---
 ### GADDR3
-- **Type**: `string`
-- **Description**: GADDR3 is a global variable that stores the result of a memory allocation operation performed by the fd_alloc_ctl command. It is assigned the output of the command, which is expected to be a memory address or identifier for the allocated memory block.
-- **Use**: GADDR3 is used to store and reference the memory address or identifier of a specific allocated memory block for further operations such as freeing the memory.
+- **Type**: ``string``
+- **Description**: `GADDR3` is a global variable that stores the result of a memory allocation operation. It is assigned the output of the `fd_alloc_ctl malloc` command with specific parameters.
+- **Use**: Stores the address or identifier of a memory block allocated by the `fd_alloc_ctl malloc` command.
 
 
 # Functions
 
 ---
 ### fail
-The `fail` function logs an error message, attempts to clean up a workspace, and exits the script with a failure status.
+Outputs a failure message, attempts to delete a workspace, and exits with status 1.
 - **Inputs**:
-    - `$1`: A string representing the context or name of the operation that failed.
-    - `$2`: An integer representing the unexpected exit code of the failed operation.
-- **Control Flow**:
-    - Prints an error message to the standard output, indicating the failure context and the unexpected exit code.
-    - Attempts to delete a workspace using the `fd_wksp_ctl delete` command, suppressing any output or errors.
-    - Prints a message indicating that the log is not available.
-    - Exits the script with a status code of 1, indicating failure.
-- **Output**: The function does not return any value; it exits the script with a status code of 1.
+    - `$1`: The name or description of the operation that failed.
+    - `$2`: The unexpected exit code of the operation.
+- **Logic and Control Flow**:
+    - Prints a failure message with the operation name and unexpected exit code.
+    - Attempts to delete the workspace using the `fd_wksp_ctl delete` command.
+    - Suppresses the output of the delete command by redirecting it to `/dev/null`.
+    - Prints 'Log N/A' to indicate that no log is available.
+    - Exits the script with status code 1.
+- **Output**: No output is returned as the function exits the script with status 1.
 
 
 
