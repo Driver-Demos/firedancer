@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Epoch reward calculation, distribution, storage, and tests for stake and vote accounts.
+Functions, constants, and structures for blockchain reward calculations and Makefile logic for 128-bit support.
 
 
 ## Files
-- **[fd_epoch_rewards.c](fd_epoch_rewards.c.md)**: Epoch reward storage, partitioning, and iteration for stake rewards.
-- **[fd_epoch_rewards.h](fd_epoch_rewards.h.md)**: Epoch rewards shared-memory data structure, partitioning, insertion, hashing, and iteration APIs.
-- **[fd_rewards.c](fd_rewards.c.md)**: Epoch reward calculation and distribution for stake and vote accounts.
-- **[fd_rewards.h](fd_rewards.h.md)**: APIs for distributing Solana staking rewards and recalculating epoch reward state.
-- **[fd_rewards_base.h](fd_rewards_base.h.md)**: Reward calculation constants for lamports, block counts, and stake account storage.
-- **[Local.mk](Local.mk.md)**: Build rules for rewards headers, objects, and epoch rewards unit tests.
-- **[test_epoch_rewards.c](test_epoch_rewards.c.md)**: Tests epoch rewards allocation, join/leave, hashing, insertion, and partition iteration.
+- **[fd_epoch_rewards.c](fd_epoch_rewards.c.md)**: Manages epoch rewards, including memory alignment, creation, joining, deletion, and partitioning.
+- **[fd_epoch_rewards.h](fd_epoch_rewards.h.md)**: Defines data structures and functions for managing and distributing epoch rewards in a blockchain system.
+- **[fd_rewards.c](fd_rewards.c.md)**: Functions for calculating and distributing epoch rewards, including inflation, stake, and vote rewards, in a partitioned manner.
+- **[fd_rewards.h](fd_rewards.h.md)**: APIs for distributing Solana staking rewards, updating epoch bank calculations, and restoring replay state.
+- **[fd_rewards_base.h](fd_rewards_base.h.md)**: Defines constants for reward calculation parameters in the Flamenco rewards system.
+- **[Local.mk](Local.mk.md)**: Makefile for managing headers, objects, and unit tests related to rewards in the Firedancer project.
+- **[test_epoch_rewards.c](test_epoch_rewards.c.md)**: Tests the functionality of epoch rewards, including memory alignment, insertion, and iteration of accounts.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

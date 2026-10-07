@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-ELF constants, ELF64 structs, and unit tests for structure compatibility and string bounds checks.
+Constants, functions, and tests for ELF file formats, including ELF64 headers, segments, and symbols.
 
 
 ## Files
-- **[fd_elf.h](fd_elf.h.md)**: ELF constants and a C-string bounds-check helper, plus fd_elf64 re-export.
-- **[fd_elf64.h](fd_elf64.h.md)**: Packed ELF64 header, segment, section, symbol, relocation, and dynamic entry structs.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers and unit test setup for the ELF component, including `fd_elf.h`, `fd_elf64.h`, and the `test_elf` unit test.
-- **[test_elf.c](test_elf.c.md)**: The `test_elf.c` file in the `firedancer` codebase performs sanity checks and binary compatibility assertions for ELF (Executable and Linkable Format) structures and definitions, and includes tests for reading C-style strings from a predefined character array.
+- **[fd_elf.h](fd_elf.h.md)**: Defines constants and functions for handling ELF files, including reading C-style strings.
+- **[fd_elf64.h](fd_elf64.h.md)**: Defines packed struct types for ELF64 file headers, segments, sections, symbols, relocations, and dynamic entries.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers and running unit tests for ELF-related components.
+- **[test_elf.c](test_elf.c.md)**: Tests for binary compatibility of ELF structures and functions for reading C strings in ELF files.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
