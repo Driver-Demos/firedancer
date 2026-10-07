@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for including `fd_groove_data.h` and its dependencies in the Firedancer codebase.
+The `fd_groove.h` file in the `firedancer` codebase serves as a header file that includes other related headers for the groove module, specifically `fd_groove_data.h`, which in turn includes `fd_groove_meta.h` and `fd_groove_volume.h`.
 
 # Purpose
-This code is a C header file that uses include guards to prevent multiple inclusions of the same header, which can cause compilation errors. The file conditionally includes the `fd_groove_data.h` header, which itself includes other headers such as `fd_groove_meta.h` and `fd_groove_volume.h`. The comment indicates that the code can function without `FD_HAS_ATOMIC`, but it will not be safe for concurrent use in such a case. This suggests that the code is part of a larger system that may involve concurrent operations, and the included headers likely define data structures or functions related to the "groove" functionality.
+This code is a C header file that serves as a guard to prevent multiple inclusions of the same header, which is a common practice to ensure that the compiler processes the header file only once. The file uses include guards, defined by `#ifndef`, `#define`, and `#endif`, to encapsulate its contents. It includes another header file, `fd_groove_data.h`, which itself includes additional headers, suggesting a layered or modular design where `fd_groove_data.h` is a higher-level component that depends on `fd_groove_meta.h` and `fd_groove_volume.h`. The comment indicates that the functionality provided by these headers can operate without atomic operations (`FD_HAS_ATOMIC`), but doing so would not be thread-safe, implying that the code is designed with concurrency in mind. This header file is likely part of a larger system dealing with "groove" data, possibly related to audio or data processing, given the naming conventions.
 # Imports and Dependencies
 
 ---
