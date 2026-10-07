@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `crypto` folder in the `firedancer` codebase contains implementation and configuration files for cryptographic operations related to the QUIC protocol, including key management and packet encryption/decryption.
+Cryptographic operations and definitions for QUIC, with Makefile rules for headers and objects.
 
 
 ## Files
-- **[fd_quic_crypto_suites.c](fd_quic_crypto_suites.c.md)**: The `fd_quic_crypto_suites.c` file in the `firedancer` codebase implements cryptographic operations for QUIC, including key generation, encryption, and decryption of packets using AES and HMAC.
-- **[fd_quic_crypto_suites.h](fd_quic_crypto_suites.h.md)**: The `fd_quic_crypto_suites.h` file in the `firedancer` codebase defines the cryptographic suites and related functions for handling encryption and decryption in QUIC protocol, including key generation, key updates, and packet protection mechanisms.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and object files related to QUIC crypto suites for the build process.
+- **[fd_quic_crypto_suites.c](fd_quic_crypto_suites.c.md)**: Implements cryptographic operations for QUIC, including key generation, encryption, and decryption.
+- **[fd_quic_crypto_suites.h](fd_quic_crypto_suites.h.md)**: Defines QUIC v1 crypto suites, structures, and functions for key generation, encryption, and decryption.
+- **[Local.mk](Local.mk.md)**: Makefile rules to add headers and objects for QUIC crypto suites.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies build conditions for the `fd_ledger` tool, contingent on the presence of `ROCKSDB` and `SECP256K1` libraries.
+Makefile logic for building the fd_ledger tool with dependencies on RocksDB and secp256k1.
 
 # Purpose
-This file is a Makefile segment that conditionally compiles the `fd_ledger` binary. It checks for the presence of `ROCKSDB` and `SECP256K1` libraries, and if both are available, it proceeds with the build using specified dependencies. If either library is missing, it issues a warning indicating the build is disabled due to the absence of the respective library.
+The `Makefile` content controls the build process for the `fd_ledger` tool. It checks for the presence of `ROCKSDB` and `SECP256K1` libraries using conditional statements. If both libraries are available, it compiles the `fd_ledger` binary with specified dependencies. If either library is missing, it issues a warning indicating that the build is disabled due to the absence of the required library.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

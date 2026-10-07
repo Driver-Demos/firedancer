@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `auth.options` file in the `firedancer` codebase defines the maximum sizes for various fields in authentication-related requests and responses, such as public keys, challenges, signed challenges, refresh tokens, and token values.
+Defines maximum sizes for authentication-related request and token fields.
 
 # Purpose
-The file defines the maximum size constraints for various fields involved in an authentication process. It specifies the size limits for public keys, challenges, signed challenges, refresh tokens, and token values within different authentication request and response structures. This ensures that the data used in these processes adheres to predefined size limitations for security and consistency.
+The file defines the maximum size constraints for various fields in authentication-related requests and responses. The `auth.GenerateAuthChallengeRequest.pubkey` field has a maximum size of 32 bytes. The `auth.GenerateAuthChallengeResponse.challenge` field is limited to 9 bytes. The `auth.GenerateAuthTokensRequest` includes three fields: `challenge` with a maximum size of 55 bytes, `client_pubkey` with a maximum size of 32 bytes, and `signed_challenge` with a maximum size of 64 bytes. The `auth.RefreshAccessTokenRequest.refresh_token` and `auth.Token.value` fields both have a maximum size of 1024 bytes. These constraints ensure that the data transmitted in these fields does not exceed the specified byte limits.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

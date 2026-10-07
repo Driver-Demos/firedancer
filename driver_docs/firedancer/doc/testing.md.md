@@ -3,29 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `testing.md` file in the `firedancer` codebase provides detailed guidelines and configurations for testing the Firedancer system, including recommended system setups, instructions for running unit and fuzz tests, and best practices for ensuring test reliability and determinism.
+Documentation for testing Firedancer, including system configuration, unit and fuzz tests, sanitizers, and best practices.
 
 # Purpose
-This document is a comprehensive guide for configuring and running tests for the Firedancer software, primarily focusing on system requirements, test execution, and best practices. It outlines the "Golden Configuration," which specifies the optimal system setup for testing, including kernel versions, operating systems, compilers, CPU types, and memory configurations. The document categorizes tests into unit tests and fuzz tests, providing detailed instructions on how to configure and execute them using Makefile commands. It also discusses the integration of fuzzing engines and sanitizers to enhance error detection and test reliability. The guide emphasizes best practices for test determinism, memory management, and the use of static variables, ensuring that tests are robust, repeatable, and efficient. This file is crucial for developers and testers within the Firedancer codebase, as it standardizes the testing process and helps maintain code quality across different environments.
+The document provides detailed instructions for configuring and running tests for the Firedancer software. It specifies the optimal system configuration, known as the "Golden Configuration," which includes specific kernel versions, operating systems, compilers, CPU types, and memory settings to ensure reliable test execution. The document outlines procedures for running unit tests and fuzz tests, including the necessary configurations in `Local.mk` files and the use of different fuzzing engines like `libFuzzer`, `AFL++`, and `Honggfuzz`. It also describes the use of sanitizers to detect runtime errors and provides best practices for test determinism, memory management, and input handling. The document emphasizes the importance of using static variables and shared memory for efficient memory allocation during tests.
 # Content Summary
-The provided document is a comprehensive guide for configuring and running tests for the Firedancer software. It outlines the optimal system configuration, test execution procedures, and best practices for developers working with the Firedancer codebase.
+The document provides detailed instructions for configuring and testing the Firedancer software. It outlines the recommended system configuration, known as the "Golden Configuration," which includes specific versions of the Linux kernel, operating systems, compilers, and hardware requirements. This configuration is used internally by the Firedancer team to minimize system noise and ensure reliable test results.
 
-### Golden Configuration
-The document specifies the most reliable system configuration for running tests, which includes using Linux kernel version 4.18 or newer, operating systems like RHEL 8 or Ubuntu 22.04, and compilers such as GCC 12 or Clang 15. It recommends using CPUs like Icelake Server or Epyc 2, with memory configured to reserve 2 gigantic pages per core via `fd_shmem_cfg`. This setup minimizes system noise and ensures consistent test results.
+The document also provides a "Quick Start" guide for running tests, which involves allocating memory with `fd_shmem_cfg`, compiling the code with `make`, and executing unit tests. It includes instructions for configuring large page and NUMA settings.
 
-### Quick Start and Test Configuration
-For a quick start, the document provides commands to allocate memory and run unit tests. It details the structure and execution of unit tests, which are C programs located in the `/src` directory. These tests are designed to run automatically without command-line parameters, using a single thread and completing within 5 minutes. The document also explains how to configure these tests in `Local.mk` files.
+The "Test Configuration" section describes different types of tests, including unit tests and fuzz tests. Unit tests are C programs that test Firedancer modules and are located in the `/src` directory. They run automatically without command-line parameters and require 2 GiB of memory. Fuzz tests evaluate component behavior with arbitrary byte sequences and are effective for finding bugs in parsers. The document provides example configurations for both unit and fuzz tests using `Local.mk`.
 
-### Fuzz Tests
-Fuzz tests are used to verify component behavior with arbitrary byte sequences, often combined with sanitizers for error detection. The document provides instructions for setting up fuzz tests using different engines like libFuzzer, AFL++, and Honggfuzz, each with specific compile commands and requirements. It also explains how to use a stub engine for regression testing when no fuzzing engine is available.
+The document also explains the use of fuzzing engines like libFuzzer, AFL++, and Honggfuzz, detailing the compile commands and installation steps for each. It notes that if no fuzzing engine is provided, a stub engine is used for regression testing.
 
-### Sanitizers
-The document describes various sanitizers that can be used to perform runtime checks, such as AddressSanitizer, UndefinedBehaviorSanitizer, and MemorySanitizer. These tools help detect memory issues and undefined behavior, although they are not recommended for production environments.
+Sanitizers are supported to perform runtime checks, and the document lists compile commands for AddressSanitizer, UndefinedBehaviorSanitizer, and MemorySanitizer. These tools help detect memory issues and undefined behavior.
 
-### Best Practices
-The document emphasizes best practices for testing, including ensuring test determinism, avoiding external inputs, and managing memory efficiently. It advises against using `malloc()` in tests and recommends using static variables or shared memory for memory allocation. Detailed instructions are provided for setting up memory workspaces using `fd_wksp_new_anonymous` and related functions.
+The "Best Practices" section emphasizes the importance of test determinism, automatic configuration, and proper memory management. It advises against using `malloc()` in tests and recommends using static variables or shared memory for memory allocation. The document provides a code pattern for setting up memory allocation with specific flags for page size, count, and NUMA node.
 
-Overall, this document serves as a detailed reference for developers to configure their systems, execute tests, and adhere to best practices when working with the Firedancer software.
+Overall, the document serves as a comprehensive guide for developers to configure, run, and manage tests for the Firedancer software, ensuring reliability and consistency across different environments.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
