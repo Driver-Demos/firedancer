@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Rust package manifest with tonic, prost, tokio, and test dependencies.
+Configuration for the `bundle-test-server` package with dependencies and build settings.
 
 # Purpose
-This `Cargo.toml` file defines the Rust package `bundle-test-server` and sets the package version and Rust 2021 edition. It lists the runtime dependencies used for gRPC service support, Protocol Buffers handling, async execution, logging, time handling, error management, encoding, and command-line input, including `tonic`, `prost`, `tokio`, `futures`, `chrono`, `thiserror`, `bs58`, `env_logger`, `base64`, and `rustyline`. It also defines build-time dependencies for generating gRPC and Protobuf code, plus a test dependency for `ed25519-dalek`. The `release-with-debug` profile inherits from `release` and keeps debug information with packed split debug info for release builds that still need symbol data.
+The file defines the configuration for a Rust project using the Cargo package manager. It specifies the package metadata, including the `name`, `version`, and `edition` of the project. The `[dependencies]` section lists the libraries required for the project, such as `tonic`, `prost`, and `tokio`, along with their respective versions and any specific features needed, like `tls-webpki-roots` for `tonic`. The `[build-dependencies]` section includes dependencies necessary for building the project, such as `tonic-prost-build` and `protobuf-src`. The `[dev-dependencies]` section specifies libraries used for development and testing, like `ed25519-dalek`. Additionally, the `[profile.release-with-debug]` section customizes the release profile to include debug information, with `debug` set to `true` and `split-debuginfo` configured as `packed`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
