@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Undefines template macros related to QUIC structure definitions and frame contexts.
+The `fd_quic_undefs.h` file in the `firedancer` codebase contains preprocessor directives to undefine a series of macros related to QUIC template structures and elements.
 
 # Purpose
-This code is a C preprocessor directive file that undefines a series of macros. These macros, such as `FD_TEMPL_DEF_STRUCT_BEGIN` and `FD_TEMPL_MBR_ELEM`, are likely used in other parts of the codebase to define or manipulate data structures and their elements. By undefining these macros, the file ensures that any previous definitions are removed, which can prevent conflicts or redefinitions in subsequent code. This is typically done to maintain a clean preprocessor environment or to prepare for redefining these macros with different values or behaviors later in the code.
+This code is a C preprocessor directive file that undefines a series of macros, likely used in a templated structure definition system. The macros, prefixed with `FD_TEMPL_`, suggest a framework for defining and manipulating structured data, possibly for network packet processing or data serialization. By undefining these macros, the file ensures that any previous definitions are removed, preventing potential conflicts or redefinitions in subsequent code. This is typically done to maintain clean and modular code, especially in larger projects where these macros might be redefined with different implementations or parameters. The file serves as a cleanup or reset mechanism in the preprocessing stage of compilation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

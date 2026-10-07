@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration settings for memory, runtime limits, layout, and tile parameters in TOML format.
+Minimal Firedancer dev config with hugetlbfs, funk, runtime limits, layout, and tile settings.
 
 # Purpose
-This configuration file defines various system and application limits. The `[hugetlbfs]` section specifies the `max_page_size` for huge pages. The `[funk]` section sets limits for `max_account_records`, `heap_size_gib`, and `max_database_transactions`. The `[runtime.limits]` section defines constraints on `max_live_slots`, `max_vote_accounts`, and `max_fork_width`. The `[layout]` section configures `verify_tile_count` and `exec_tile_count`. The `[tiles.shred]` section sets the `max_pending_shred_sets`. The `[tiles.gui]` section controls GUI settings, including whether it is `enabled`, and limits for `max_http_connections`, `max_websocket_connections`, and `send_buffer_size_mb`.
+This configuration file sets resource and capacity limits for several system areas. It defines huge page use in `hugetlbfs`, account and database limits in `funk`, runtime limits for live slots, vote accounts, and fork width, tile counts in `layout`, and shred and GUI tile settings under `tiles.shred` and `tiles.gui`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers and unit tests for the log collector if 128-bit integers are available.
+The `Local.mk` file in the `firedancer` codebase defines build instructions for the `log_collector` component, including header file addition and unit test creation, conditional on the presence of 128-bit integer support.
 
 # Purpose
-The `ifdef FD_HAS_INT128` directive checks if the `FD_HAS_INT128` macro is defined. If it is defined, the script adds the header file `fd_log_collector.h` to the build process and creates a unit test named `test_log_collector`. This unit test depends on the components `fd_flamenco`, `fd_ballet`, and `fd_util`.
+This file is a Makefile snippet used in a build system. It conditionally includes a header file and defines a unit test target if the macro `FD_HAS_INT128` is defined, indicating support for 128-bit integers. The unit test `test_log_collector` is configured to link against the `fd_flamenco`, `fd_ballet`, and `fd_util` libraries.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

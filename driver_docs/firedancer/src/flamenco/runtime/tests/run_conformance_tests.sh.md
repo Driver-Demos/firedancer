@@ -3,87 +3,73 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A script to run Solana conformance tests, setting up dependencies and executing tests with specified inputs.
+The `run_conformance_tests.sh` file is a script used to execute the Solana conformance test suite by setting up necessary dependencies and running tests with specified input and output directories.
 
 # Purpose
-The `run_conformance_tests.sh` script is a Bash script designed to execute conformance tests for the Solana blockchain using specified test inputs. It sets up the necessary dependencies by cloning and configuring the required repositories, such as `firedancer`, `solfuzz-agave`, and `solana-conformance`, and checks out the specified branches. The script accepts various command-line arguments to customize the test environment, including directories for test inputs, run locations, and output storage, as well as repository paths and branches. It ensures that all required directories and dependencies are in place before running the tests and outputs the results to a specified directory.
+This Bash script, `run_conformance_tests.sh`, is designed to automate the execution of conformance tests for the Solana blockchain using a specified set of test inputs. It provides a narrow functionality focused on setting up the necessary environment and dependencies, such as cloning and preparing specific branches of the Firedancer, Solfuzz-Agave, and Solana-Conformance repositories. The script is an executable file that manages the configuration and execution of tests by accepting various command-line arguments to customize the test environment, such as specifying directories, repositories, and branches. It ensures that all required dependencies are correctly set up and then runs the tests, storing the results in a designated output directory. This script is essential for developers or testers who need to validate the conformance of Solana implementations efficiently.
 # Global Variables
 
 ---
 ### RUN\_DIRECTORY
 - **Type**: `string`
-- **Description**: Specifies the default directory where the conformance tests will be executed. It is initialized with the path '/data/conformance_tests'.
-- **Use**: Used to determine the directory for running tests and storing related files.
+- **Description**: The `RUN_DIRECTORY` variable is a global string variable that specifies the default directory path where the conformance tests will be executed. It is initialized with the default value "/data/conformance_tests". This directory is used as the working directory for running the tests and storing related files.
+- **Use**: This variable is used to determine the directory where the conformance tests are run and where related repositories and results are stored.
 
 
 ---
 ### FIREDANCER\_BRANCH
 - **Type**: `string`
-- **Description**: Specifies the branch of the Firedancer repository to use for the conformance tests. It is set to 'main' by default, but can be overridden by the '-fdb' or '--firedancer-branch' command-line argument.
-- **Use**: Used to determine which branch of the Firedancer repository is checked out during the setup process for running conformance tests.
+- **Description**: The `FIREDANCER_BRANCH` variable is a global string variable that specifies the branch of the Firedancer repository to be used during the setup and execution of the conformance tests. It is initialized with a default value of 'main', which can be overridden by a command-line argument.
+- **Use**: This variable is used to determine which branch of the Firedancer repository is checked out and built during the script execution.
 
 
 ---
 ### AGAVE\_BRANCH
-- **Type**: ``string``
-- **Description**: The `AGAVE_BRANCH` variable is a global string variable that specifies the branch of the `solfuzz-agave` repository to use. It is initialized with the default value `agave-v2.0`. This variable can be overridden by the `-ab` or `--agave-branch` command-line argument.
-- **Use**: Specifies the branch of the `solfuzz-agave` repository to check out during the script execution.
+- **Type**: `string`
+- **Description**: `AGAVE_BRANCH` is a global variable that specifies the branch of the solfuzz-agave repository to be used in the script. It is initialized with a default value of 'agave-v2.0', which can be overridden by a command-line argument.
+- **Use**: This variable is used to determine which branch of the solfuzz-agave repository to checkout during the setup process.
 
 
 ---
 ### SOLANA\_CONFORMANCE\_BRANCH
 - **Type**: `string`
-- **Description**: Specifies the branch of the `solana-conformance` repository to use for running conformance tests. It is set to a default value of 'main' but can be overridden by a command-line argument.
-- **Use**: Used to determine which branch of the `solana-conformance` repository to check out and use during the setup of the conformance test environment.
+- **Description**: The `SOLANA_CONFORMANCE_BRANCH` variable is a global string variable that specifies the branch of the solana-conformance repository to be used during the execution of the conformance tests. By default, it is set to 'main', but it can be overridden by a command-line argument.
+- **Use**: This variable is used to determine which branch of the solana-conformance repository is checked out and used for running the conformance tests.
 
 
 ---
 ### FIREDANCER\_REPO
 - **Type**: `string`
-- **Description**: The `FIREDANCER_REPO` variable stores the path to the Firedancer repository. It is set based on the command-line argument `-fdr` or defaults to a directory within `RUN_DIRECTORY` if not specified.
-- **Use**: Stores the path to the Firedancer repository for use in the script's operations.
+- **Description**: The `FIREDANCER_REPO` variable is a global string variable that holds the path to the Firedancer repository. It is used to specify the location where the Firedancer codebase is stored or cloned to, which is necessary for setting up and running the conformance tests.
+- **Use**: This variable is used to determine the directory path for the Firedancer repository, which is essential for cloning the repository if it does not exist and for navigating to the directory to perform setup and build operations.
 
 
 ---
 ### AGAVE\_REPO
 - **Type**: `string`
-- **Description**: The `AGAVE_REPO` variable stores the path to the Solfuzz-Agave repository. It is set based on the command-line argument `-ar` or defaults to a directory within `RUN_DIRECTORY` if not provided.
-- **Use**: Used to navigate to the Solfuzz-Agave repository directory for setup and build operations.
+- **Description**: `AGAVE_REPO` is a global variable that stores the path to the solfuzz-agave repository. It is used to specify the location of the repository, which can be set via a command-line argument or defaults to a directory within the run directory if not provided.
+- **Use**: This variable is used to navigate to the solfuzz-agave repository directory for setup and build operations.
 
 
 ---
 ### SOLANA\_CONFORMANCE\_REPO
 - **Type**: `string`
-- **Description**: The `SOLANA_CONFORMANCE_REPO` variable stores the path to the local directory where the Solana conformance repository is cloned. If not specified by the user, it defaults to a directory named `solana-conformance` within the `RUN_DIRECTORY`. This variable is used to navigate to the Solana conformance repository for setup and execution of tests.
-- **Use**: Stores the path to the Solana conformance repository for test setup and execution.
+- **Description**: The `SOLANA_CONFORMANCE_REPO` variable is a global string variable that holds the path to the solana-conformance repository. It is used to specify the location of the repository needed for running conformance tests.
+- **Use**: This variable is used to determine the directory path where the solana-conformance repository is located or cloned to, which is necessary for setting up and executing the conformance tests.
 
 
 ---
 ### TEST\_INPUTS
 - **Type**: `string`
-- **Description**: The `TEST_INPUTS` variable is a string that stores the directory path containing the test inputs for the conformance tests. It is a required argument for the script to run properly.
-- **Use**: Stores the directory path for test inputs used in the conformance tests.
+- **Description**: `TEST_INPUTS` is a global variable that stores the directory path containing the test inputs for the conformance tests. It is a required argument for the script, and the script will exit with an error if it is not provided.
+- **Use**: This variable is used to specify the location of test inputs when running the conformance tests.
 
 
 ---
 ### OUTPUT\_DIR
 - **Type**: `string`
-- **Description**: Specifies the directory where the test results will be stored. If not provided by the user, it defaults to the 'test_results' directory within the 'RUN_DIRECTORY'. This variable is set based on the '-o' or '--output-dir' command-line argument.
-- **Use**: Stores the path for saving test results after running the conformance tests.
-
-
----
-### PATH
-- **Type**: `string`
-- **Description**: `PATH` is a global environment variable that specifies a list of directories where the system looks for executable files. It is used to locate the binaries for commands and scripts that are executed in the shell.
-- **Use**: Modifies the system's search path to include the directory `/opt/rh/gcc-toolset-12/root/usr/bin` at the beginning of the existing `PATH` variable.
-
-
----
-### PKG\_CONFIG\_PATH
-- **Type**: `string`
-- **Description**: `PKG_CONFIG_PATH` is a string variable that specifies the directory paths where the system should look for package configuration files. It is used to locate `.pc` files, which contain metadata about installed libraries.
-- **Use**: Used to set the search path for package configuration files during the setup of the `firedancer` project.
+- **Description**: The `OUTPUT_DIR` variable is a global string variable that specifies the directory path where the test results will be stored after running the conformance tests. It can be set via the command-line argument `-o` or `--output-dir`, and defaults to a subdirectory `test_results` within the `RUN_DIRECTORY` if not explicitly provided.
+- **Use**: This variable is used to determine the location for saving the output of the test results generated by the conformance test suite.
 
 
 
