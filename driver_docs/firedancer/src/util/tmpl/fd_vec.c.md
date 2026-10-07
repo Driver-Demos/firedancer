@@ -3,29 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_vec.c` file in the `firedancer` codebase provides a template for creating vectors of bounded run-time maximum size, designed for persistent and IPC usage with POD types, offering various operations such as creation, joining, expansion, contraction, and element removal.
+Header-only library for vectors with bounded run-time maximum size, suitable for persistent and IPC usage.
 
 # Purpose
-This C source code file is a template for creating vectors with a bounded maximum size, designed for use in persistent and inter-process communication (IPC) contexts. The code is structured to be included in other C files, allowing developers to define custom vector types by specifying the vector name and type through preprocessor directives (`VEC_NAME` and `VEC_T`). The template provides a set of static inline functions that operate as a header-only library, offering a range of operations on these vectors. These operations include creating and managing the memory footprint of vectors, joining and leaving vector contexts, and manipulating vector elements through expansion, contraction, and removal operations. The design assumes that the vector elements are Plain Old Data (POD) types with trivial copy semantics, making it suitable for high-performance computing (HPC) applications where efficiency and memory alignment are critical.
+The code is a template for creating vectors with a bounded maximum size, suitable for persistent and inter-process communication (IPC) usage. It is designed for Plain Old Data (POD) types that have a trivial copy operator. The code provides a set of static inline functions that allow the user to define vectors with different types and names by setting the `VEC_NAME` and `VEC_T` macros before including the file. This approach allows the creation of multiple vector types within a single compilation unit, making it flexible for various use cases.
 
-The code defines a series of functions that manage the lifecycle and operations of the vectors, such as `new`, `join`, `leave`, and `delete`, which handle the initialization and cleanup of vector memory. It also includes functions for querying vector properties like maximum capacity, current count, and available space, as well as functions for modifying the vector's contents, such as `expand`, `contract`, `remove`, and `remove_compact`. The template is designed to be flexible, allowing multiple vector types to be defined within a single compilation unit, and it emphasizes performance by using inline functions and assuming the caller's knowledge of the vector's state. The code also hints at potential future enhancements, such as additional APIs for operations like shuffling, indicating its extensibility.
+The main functionalities provided by the code include creating a new vector (`VEC_(new)`), joining an existing vector (`VEC_(join)`), leaving a vector (`VEC_(leave)`), and deleting a vector (`VEC_(delete)`). It also includes operations to manage the elements within the vector, such as expanding (`VEC_(expand)`), contracting (`VEC_(contract)`), and removing elements either by index or by compacting (`VEC_(remove_idx)`, `VEC_(remove_compact_idx)`). The code ensures that memory alignment and footprint requirements are met, and it provides utility functions to check the vector's capacity and usage, such as `VEC_(max)`, `VEC_(cnt)`, `VEC_(free)`, `VEC_(is_empty)`, and `VEC_(is_full)`. The design is intended for high-performance computing contexts, where the user is expected to manage memory and element counts carefully.
 # Functions
 
 ---
 ### VEC\_<!-- {{#callable:VEC_}} -->
-The `VEC_(remove_compact_idx)` function removes an element from a vector at a specified index by shifting subsequent elements to fill the gap, effectively compacting the vector.
+[View Source →](<../../../../../src/util/tmpl/fd_vec.c#L241>)
+
+Removes an element from a vector at a specified index by shifting subsequent elements to fill the gap.
 - **Inputs**:
-    - `join`: A pointer to the vector from which an element is to be removed.
-    - `idx`: The index of the element to be removed from the vector.
-- **Control Flow**:
-    - Retrieve the private vector structure associated with the given vector pointer.
+    - ``join``: A pointer to the vector from which to remove an element.
+    - ``idx``: The index of the element to remove from the vector.
+- **Logic and Control Flow**:
+    - Retrieve the private vector structure using the `VEC_(private)` function.
     - Calculate the new count of elements by decrementing the current count by one.
-    - Iterate over the vector starting from the specified index to the second last element, shifting each element one position to the left to fill the gap left by the removed element.
-    - Update the vector's element count to reflect the removal.
-    - Return the modified vector pointer.
-- **Output**: The function returns a pointer to the modified vector after the specified element has been removed and the vector has been compacted.
-- **Functions called**:
-    - [`VEC_`](#vec_)
+    - Iterate over the vector starting from the specified index `idx` to the second-to-last element, shifting each element one position to the left.
+    - Update the count of elements in the vector to reflect the removal.
+    - Return the pointer to the modified vector.
+- **Output**: A pointer to the modified vector after the element has been removed and the remaining elements have been compacted.
+- **Functions Called**:
+    - [`VEC_`](<#vec_>)
 
 
 
