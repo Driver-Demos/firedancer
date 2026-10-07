@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for linking libraries with rpath using LDFLAGS.
+The `with-rpath.mk` file in the `firedancer` codebase is used to link libraries with rpath by appending the `-Wl,-rpath,${LD_LIBRARY_PATH}` option to `LDFLAGS`.
 
 # Purpose
-The `LDFLAGS` variable in this configuration file is used to specify linker flags for compiling a program. It appends the `-Wl,-rpath,${LD_LIBRARY_PATH}` option, which instructs the linker to set the runtime library search path (`rpath`) to the directories specified in the `LD_LIBRARY_PATH` environment variable. This ensures that the linked libraries are found at runtime.
+The file contains a configuration directive for a build system, likely a Makefile. It appends a linker flag (`-Wl,-rpath,${LD_LIBRARY_PATH}`) to `LDFLAGS`, which instructs the linker to set the runtime library search path to the directories specified in the `LD_LIBRARY_PATH` environment variable. This ensures that the linked libraries are found at runtime.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
