@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_sort_para.c` file in the `firedancer` codebase tests various parallel sorting algorithms on arrays of floats, using a thread pool to manage concurrency and verifying the correctness of the sorting operations through multiple test cases.
+Tests parallel sorting algorithms using various data configurations and thread pools.
 
 # Purpose
-This C source code file is designed to test and demonstrate the functionality of a parallel sorting algorithm. It includes the necessary setup for a multi-threaded environment using a thread pool, which is initialized and managed throughout the execution of the program. The code defines a custom sorting algorithm, `mysort`, by including a generic sorting implementation from "fd_sort.c" and configuring it with specific parameters such as the data type (`float`) and the comparison logic. The main function orchestrates the execution of multiple iterations of sorting tests, where arrays of floats are shuffled and sorted using various parallel sorting functions. These functions are tested for correctness by comparing the sorted output against a reference array.
+The code is a C program designed to test and validate parallel sorting algorithms. It includes a main function that initializes a thread pool and a random number generator, and then performs multiple iterations of sorting tests on arrays of floating-point numbers. The program uses a variety of sorting functions, such as `mysort_inplace_para`, `mysort_stable_fast_para`, and `mysort_stable_para`, to sort arrays in different configurations, including monotonically increasing, decreasing, and shuffled arrays. The sorting functions are defined in the included `fd_sort.c` file, and the program verifies the correctness of the sorting operations by comparing the sorted arrays to reference arrays.
 
-The program is structured to handle different scenarios, including sorting arrays with unique, non-unique, and randomly shuffled elements. It uses a random number generator to create test cases and validate the sorting algorithm's performance and correctness under different conditions. The code also includes diagnostic logging to track the progress and status of the sorting operations. The use of macros and conditional compilation allows for flexibility in testing different sorting strategies and configurations, such as using stack allocation when available. Overall, this file serves as a comprehensive test harness for evaluating the efficiency and accuracy of parallel sorting algorithms in a controlled, multi-threaded environment.
+The program is structured to run in a parallel computing environment, utilizing multiple threads to perform sorting operations concurrently. It uses a thread pool to manage the threads and includes diagnostic logging to track the progress of the sorting tests. The program also includes a [`shuffle`](<#shuffle>) function to randomize the order of elements in an array, which is used to test the sorting algorithms under different conditions. The code is intended to be executed as a standalone application, and it provides command-line options to configure the number of iterations and diagnostic intervals.
 # Imports and Dependencies
 
 ---
@@ -20,67 +20,70 @@ The program is structured to handle different scenarios, including sorting array
 
 ---
 ### ref
-- **Type**: `TYPE[]`
-- **Description**: The `ref` variable is a static array of type `TYPE` with a size defined by the constant `MAX`, which is set to 65536. It is used to store reference data for sorting operations, typically initialized with a sequence of values that are used to verify the correctness of sorting algorithms.
-- **Use**: The `ref` array is used to hold reference data against which sorted results are compared to ensure sorting algorithms function correctly.
+- **Type**: ``TYPE` array`
+- **Description**: `ref` is a static array of type `TYPE` with a size defined by the macro `MAX`, which is set to 65536. The array is used to store reference data for sorting operations.
+- **Use**: Used to store reference data for comparison in sorting tests.
 
 
 ---
 ### tst
-- **Type**: `TYPE array`
-- **Description**: The `tst` variable is a static array of type `TYPE`, which is defined as `float`, with a size of `MAX`, which is 65536. It is used to store data that will be sorted and tested against reference data in various sorting algorithms.
-- **Use**: The `tst` array is used to hold data that is shuffled, sorted, and compared to ensure the correctness of sorting algorithms in the program.
+- **Type**: ``TYPE` array`
+- **Description**: `tst` is a static array of type `TYPE` with a size defined by the macro `MAX`, which is set to 65536. The array is used to store elements for sorting operations.
+- **Use**: Used to hold data that is sorted and tested for correctness in various sorting functions.
 
 
 ---
 ### tmp
 - **Type**: ``TYPE` array`
-- **Description**: The `tmp` variable is a static array of type `TYPE` with a size defined by the constant `MAX`, which is 65536. It is used as a temporary storage buffer during sorting operations.
-- **Use**: This variable is used as a temporary buffer in various parallel sorting functions to hold intermediate data.
+- **Description**: A static array named `tmp` with a size defined by the macro `MAX`, which is 65536. The array is of type `TYPE`, which is defined as `float`. It is used as a temporary storage buffer in sorting operations.
+- **Use**: Used as a temporary buffer in various parallel sorting functions to hold intermediate data.
 
 
 # Functions
 
 ---
 ### shuffle<!-- {{#callable:shuffle}} -->
-The `shuffle` function randomly shuffles elements from an input array `x` into an output array `y` using a given random number generator.
+[View Source →](<../../../../../src/util/tmpl/test_sort_para.c#L12>)
+
+Randomly shuffles elements from array `x` into array `y` using a given random number generator.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random indices for shuffling.
-    - `y`: A pointer to the output array of type `TYPE` where the shuffled elements will be stored.
-    - `x`: A pointer to the input array of type `TYPE` containing the elements to be shuffled.
-    - `cnt`: An unsigned long integer representing the number of elements in the arrays `x` and `y` to be shuffled.
-- **Control Flow**:
-    - Initialize a loop that iterates over each element index `i` from 0 to `cnt-1`.
-    - Copy the element from `x[i]` to `y[i]`.
-    - Generate a random index `j` using the random number generator `rng`, ensuring `j` is within the range [0, i].
-    - Swap the elements `y[i]` and `y[j]` to shuffle the array.
-- **Output**: The function returns a pointer to the shuffled output array `y`.
+    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random indices.
+    - `y`: A pointer to an array of type `TYPE` where the shuffled elements will be stored.
+    - `x`: A pointer to a constant array of type `TYPE` containing the elements to shuffle.
+    - `cnt`: An unsigned long integer representing the number of elements to shuffle.
+- **Logic and Control Flow**:
+    - Iterates over each element in the array `x` up to `cnt` elements.
+    - Copies the current element from `x` to `y`.
+    - Generates a random index `j` using the random number generator `rng` and the current index `i`.
+    - Swaps the elements at indices `i` and `j` in the array `y`.
+- **Output**: Returns a pointer to the shuffled array `y`.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a parallel sorting test environment, executes multiple iterations of sorting tests on various data configurations, and cleans up resources upon completion.
+[View Source →](<../../../../../src/util/tmpl/test_sort_para.c#L32>)
+
+Initializes and runs a parallel sorting test using multiple threads and logs diagnostic information.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the environment using `fd_boot` with command-line arguments.
-    - Extract `--iter-max` and `--diag-int` values from command-line arguments with default values of 10,000 and 100, respectively.
-    - Determine the number of available threads using `fd_tile_cnt`.
-    - Initialize a random number generator `rng`.
-    - Create a thread pool `tpool` using all available threads and log the creation.
-    - Push worker threads into the thread pool for parallel processing.
-    - Log the start of the sorting test with the specified iteration and diagnostic interval.
-    - For each iteration up to `iter_max`, perform the following:
-    -   - Randomly select thread indices `t0` and `t1` for parallel execution.
-    -   - Randomly determine the count `cnt` of elements to sort and `zcnt` for zero elements.
-    -   - Log diagnostic information if required by `diag_rem`.
-    -   - Initialize reference and test arrays for sorting tests.
-    -   - Perform sorting tests on monotonically increasing, decreasing, unique shuffled, random permutation, and non-unique shuffled data using various parallel sorting functions.
-    -   - Use macros to conditionally compile additional tests if `FD_HAS_ALLOCA` is defined.
-    - Log the cleanup process and finalize the thread pool and random number generator.
-    - Log the successful completion of the tests and halt the program.
-- **Output**: The function returns an integer value `0` indicating successful execution.
+    - `argc`: The number of command-line arguments.
+    - `argv`: The array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Extracts `--iter-max` and `--diag-int` from command-line arguments with default values of 10000 and 100, respectively.
+    - Determines the number of available threads using `fd_tile_cnt`.
+    - Initializes a random number generator `rng`.
+    - Creates a thread pool `tpool` using all available threads and logs the creation details.
+    - Pushes worker threads into the thread pool for all threads except the main thread.
+    - Logs the start of the sorting test with the iteration and diagnostic interval parameters.
+    - Iterates over `iter_max` iterations, performing the following steps in each iteration:
+    - Randomly selects a range of threads `[t0, t1)` and a count `cnt` of elements to sort.
+    - Logs diagnostic information at intervals specified by `diag_int`.
+    - Initializes reference and test arrays with monotonically increasing, decreasing, and shuffled values.
+    - Tests various parallel sorting functions (`mysort_inplace_para`, `mysort_stable_fast_para`, `mysort_stable_para`, `mysort_fast_para`) to ensure they sort correctly.
+    - Logs the completion of the sorting test and cleans up resources.
+    - Finalizes the thread pool and deletes the random number generator.
+    - Logs a 'pass' message and halts the program.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 

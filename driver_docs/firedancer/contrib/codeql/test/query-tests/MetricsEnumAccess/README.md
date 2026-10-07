@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL test files for metric enum access, array bounds, and enum size mismatch diagnostics
+Defines metric types, converters, and macros for testing enum-based metrics with error detection.
 
 
 ## Files
-- **[MetricsEnumAccess.c](MetricsEnumAccess.c.md)**: CodeQL test for metric enum access, array bounds, and mismatched enum sizes.
-- **[MetricsEnumAccess.expected](MetricsEnumAccess.expected.md)**: Expected CodeQL diagnostics for array access metric enum mismatches and size errors.
-- **[MetricsEnumAccess.qlref](MetricsEnumAccess.qlref.md)**: Query reference for MetricsEnumAccess test and its postprocess query.
+- **[MetricsEnumAccess.c](MetricsEnumAccess.c.md)**: Defines metric types, converters, and macros for testing enum-based metrics with error detection.
+- **[MetricsEnumAccess.expected](MetricsEnumAccess.expected.md)**: Expected output for array access issues in `MetricsEnumAccess.c`, highlighting mismatches and potential errors.
+- **[MetricsEnumAccess.qlref](MetricsEnumAccess.qlref.md)**: References a query and a postprocess script for testing metrics enumeration access.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

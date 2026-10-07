@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `aio` folder in the `firedancer` codebase contains source and header files implementing and defining asynchronous I/O operations, including packet handling, PCAPNG file management, and testing, along with a makefile for building these components.
+Stubs, abstractions, and tests for asynchronous I/O, including PCAPNG and memory cache operations.
 
 
 ## Files
-- **[fd_aio.c](fd_aio.c.md)**: The `fd_aio.c` file in the `firedancer` codebase provides stub implementations for asynchronous I/O functionality, including functions for alignment, footprint calculation, creation, joining, leaving, deletion, and error string retrieval.
-- **[fd_aio.h](fd_aio.h.md)**: The `fd_aio.h` file in the `firedancer` codebase defines an abstraction for asynchronous packet sending and receiving, providing structures and functions to facilitate integration with various low-level I/O libraries and hardware.
-- **[fd_aio_pcapng.c](fd_aio_pcapng.c.md)**: The `fd_aio_pcapng.c` file in the `firedancer` codebase implements functions for handling asynchronous I/O operations with PCAPNG packet capture, including sending packets and managing PCAPNG file headers.
-- **[fd_aio_pcapng.h](fd_aio_pcapng.h.md)**: The `fd_aio_pcapng.h` file in the `firedancer` codebase defines a structure and functions for implementing a man-in-the-middle asynchronous I/O that captures network packets to a PCAPNG file, supporting multiple writers on the same thread but not across threads.
-- **[fd_aio_tango.c](fd_aio_tango.c.md)**: The `fd_aio_tango.c` file in the `firedancer` codebase implements asynchronous input/output operations for sending and receiving packet data using a memory cache system.
-- **[fd_aio_tango.h](fd_aio_tango.h.md)**: The `fd_aio_tango.h` file in the `firedancer` codebase defines APIs for transmitting and receiving fragments using mcache and dcache structures, primarily for testing purposes without high performance support.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `aio` components within the `waltz` module.
-- **[test_aio.c](test_aio.c.md)**: The `test_aio.c` file in the `firedancer` codebase contains unit tests for the asynchronous I/O (AIO) functionality, including error handling and basic send operations.
+- **[fd_aio.c](fd_aio.c.md)**: Stubs for asynchronous I/O functionality, including memory alignment and error handling.
+- **[fd_aio.h](fd_aio.h.md)**: Defines an abstraction for asynchronous packet I/O, including structures, functions, and error codes.
+- **[fd_aio_pcapng.c](fd_aio_pcapng.c.md)**: Implements functions for sending and managing asynchronous I/O with PCAPNG format in a network context.
+- **[fd_aio_pcapng.h](fd_aio_pcapng.h.md)**: Implements a man-in-the-middle asynchronous I/O for capturing packets to a PCAPNG file.
+- **[fd_aio_tango.c](fd_aio_tango.c.md)**: Implements asynchronous I/O operations for sending and receiving packet data using a memory cache.
+- **[fd_aio_tango.h](fd_aio_tango.h.md)**: APIs for submitting and receiving fragments via mcache/dcache pairs, mainly for testing purposes.
+- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for `fd_aio`, `fd_aio_pcapng`, and `fd_aio_tango`.
+- **[test_aio.c](test_aio.c.md)**: Tests for asynchronous I/O error handling and functionality in the Firedancer codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
