@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for bzip2 objects and libfd_ballet.a, with a skip warning if bzip2 is absent.
+Makefile logic for checking bzip2 installation and compiling related objects.
 
 # Purpose
-This Makefile fragment enables `bzip2` support when `$(OPT)/git/bzip2/bzlib.c` exists. It sets `FD_HAS_BZIP2` and adds `-DFD_HAS_BZIP2=1` to `CFLAGS`, adds the `bzip2` object files to `$(OBJDIR)/lib/libfd_ballet.a`, and defines a compile rule for building `$(OBJDIR)/obj/ballet/bzip2/%.o` from the matching source file under `$(OPT)/git/bzip2/`.
+This Makefile script checks for the presence of the `bzlib.c` file in the specified directory `$(OPT)/git/bzip2/`. If the file is not found, it issues a warning that bzip2 is not installed and skips further actions. If the file is present, it sets the `FD_HAS_BZIP2` flag to 1 and appends a corresponding definition to `CFLAGS`. It defines a list of object files `BZ2_OBJS` related to bzip2 and specifies a rule to build these object files into a static library `libfd_ballet.a`. The script also modifies `CFLAGS_NOWARN` to exclude warning-related flags and defines a rule to compile each source file into an object file, creating necessary directories as needed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

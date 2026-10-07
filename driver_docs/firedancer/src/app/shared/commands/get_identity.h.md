@@ -3,14 +3,25 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prototypes for the get_identity command function and action.
+Header file for the `get_identity` command function and associated action in the Firedancer codebase.
 
 # Purpose
-This header file declares the interface for the `get_identity` command in the shared command set. It includes `fd_config.h` and uses `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` to keep the function prototype compatible with C and C++ builds. The file declares the command handler `get_identity_cmd_fn( args_t * args, config_t * config )` and the external action object `fd_action_get_identity`. It does not define command logic; it only exposes the symbols needed by other source files.
-# Function Declarations (Public API)
+This C header file defines the interface for a command related to identity retrieval within an application. It includes a function prototype for [`get_identity_cmd_fn`](<#get_identity_cmd_fn>), which takes pointers to `args_t` and `config_t` structures as parameters, indicating that it processes command arguments and configuration data. The file also declares an external variable `fd_action_get_identity` of type `action_t`, which likely represents an action or command related to identity. The header uses include guards to prevent multiple inclusions and includes a configuration header file `fd_config.h` to access necessary configuration settings.
+# Imports and Dependencies
 
 ---
-- `get_identity_cmd_fn`
+- `../fd_config.h`
+
+
+# Global Variables
+
+---
+### fd\_action\_get\_identity
+- **Type**: ``action_t``
+- **Description**: `fd_action_get_identity` is a global variable of type `action_t`. It is declared as an external variable, indicating that it is defined elsewhere in the program.
+- **Use**: Used to represent an action related to getting identity within the application.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

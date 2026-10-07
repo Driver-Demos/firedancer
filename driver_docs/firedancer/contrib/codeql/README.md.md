@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL queries and tests split into dev, nightly, and test directories.
+CodeQL queries and tests for the Firedancer codebase, organized into `dev`, `nightly`, and `test` directories.
 
 # Purpose
-This directory contains CodeQL queries and tests for the Firedancer codebase. The queries are split into `dev` and `nightly` directories, where `dev` queries can be run manually and `nightly` queries run once each day on the `main` branch. The `test` directory contains the query tests.
+This directory contains CodeQL queries and tests for the Firedancer codebase. The queries are organized into `dev` and `nightly` directories, where `dev` queries are for manual execution and `nightly` queries are automatically executed daily on the `main` branch. The `test` directory includes tests for these queries.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

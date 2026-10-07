@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SHA-256 Monte Carlo and short message test vectors.
+SHA-256 Monte Carlo and short message test vectors for byte-oriented implementations.
 
 
 ## Files
-- **[SHA256Monte.rsp](SHA256Monte.rsp.md)**: The `SHA256Monte.rsp` file in the `firedancer` codebase contains test vectors for SHA-256 Monte Carlo testing, detailing multiple iterations of message digests generated from a given seed.
-- **[SHA256ShortMsg.rsp](SHA256ShortMsg.rsp.md)**: The `SHA256ShortMsg.rsp` file in the `firedancer` codebase contains test vectors for SHA-256 short message hashing, detailing message lengths, message data, and their corresponding message digests.
+- **[SHA256Monte.rsp](SHA256Monte.rsp.md)**: SHA-256 Monte Carlo test vectors for byte-oriented implementations.
+- **[SHA256ShortMsg.rsp](SHA256ShortMsg.rsp.md)**: Test vectors for SHA-256 short message hashing with varying message lengths and their corresponding digests.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
