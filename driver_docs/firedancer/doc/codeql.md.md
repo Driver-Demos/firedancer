@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `codeql.md` file provides a quickstart guide for running CodeQL queries on the Firedancer repository, including setup instructions and steps for creating a CodeQL database from scratch.
+Quickstart guide for running CodeQL queries on the Firedancer repository using a GitHub-hosted database.
 
 # Purpose
-The provided content is a quickstart guide for running CodeQL queries against a CodeQL database hosted on GitHub for the Firedancer repository. It outlines the necessary steps and requirements for setting up a local environment to perform these queries, emphasizing that the process should be conducted locally rather than through remote environments like VSCode Remote SSH. The guide specifies prerequisites such as having Visual Studio Code installed and access to the firedancer-io organization. It provides detailed instructions on downloading and installing the CodeQL bundle, configuring the environment, and setting up the VSCode extension to interact with the CodeQL database. Additionally, it offers an alternative method for creating a CodeQL database from scratch, which involves using a build directory and executing a command to generate the database, highlighting the need to recreate the database upon source code changes.
+The quickstart guide provides instructions to run CodeQL queries against the GitHub-hosted CodeQL database for the Firedancer repository. The database updates nightly, so it does not immediately reflect source code changes. The guide specifies that the process should be executed locally and not through remote environments like VSCode Remote SSH. It lists the requirements, including a Visual Studio Code installation and access to the `firedancer-io` organization. The steps include downloading the CodeQL bundle, installing `codeql` to the system path, optionally fixing CA certificates if behind a corporate proxy, and setting up the VSCode environment to recognize `codeql`. Users must install the `vscode-codeql` extension, download the Firedancer CodeQL database, and add it to the workspace. Additionally, the guide provides an alternative method to create a CodeQL database from scratch, which requires re-creation whenever the source code changes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

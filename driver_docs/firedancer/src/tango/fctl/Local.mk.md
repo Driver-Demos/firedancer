@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_fctl` component, including running the `test_fctl` unit test.
+Makefile for adding headers, objects, and unit tests for `fd_fctl` in the `firedancer` codebase.
 
 # Purpose
-The file is a Makefile snippet used for building and testing a software component. It adds the header file `fd_fctl.h` and object files `fd_fctl` and `fd_tango` to the build process. It also defines and executes a unit test named `test_fctl`, which depends on `fd_tango` and `fd_util`.
+The `Makefile` content defines build and test instructions for a software project. It adds the header file `fd_fctl.h` and object files `fd_fctl` and `fd_tango` to the build process. It also specifies a unit test named `test_fctl`, which depends on the `fd_tango` and `fd_util` components, and includes a command to execute this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
