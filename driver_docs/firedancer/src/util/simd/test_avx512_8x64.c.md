@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_avx512_8x64.c` file in the `firedancer` codebase contains a comprehensive suite of tests for AVX-512 SIMD operations on 8x64-bit vectors, including construction, arithmetic, bitwise, comparison, and conversion operations.
+Tests for AVX-512 8x64 SIMD operations, including arithmetic, bitwise, and comparison functions.
 
 # Purpose
-This C source code file is a comprehensive test suite for verifying the functionality of operations on two custom data types, `wwl_t` and `wwv_t`, which appear to be vector types designed to handle operations on arrays of long integers and unsigned long integers, respectively. The code is structured to perform a series of tests on these data types, including construction, arithmetic operations, bitwise operations, and various utility functions like broadcasting, zeroing, and conditional operations. The tests are executed in a loop, iterating a million times to ensure robustness and correctness of the operations under various conditions. The file includes tests for loading and storing data, arithmetic operations such as addition, subtraction, multiplication, and bitwise operations like AND, OR, XOR, and shifts. It also tests more complex operations like permutations, selections, and conditional operations based on a mask.
+The code is a C program designed to test various operations on two data types, `wwl_t` and `wwv_t`, which are likely vector types representing collections of long integers and unsigned long integers, respectively. The program includes a main function that initializes a random number generator and performs a series of tests on these vector types. The tests cover a wide range of operations, including construction, permutation, selection, broadcasting, arithmetic operations, bitwise operations, comparisons, and conversions. Each operation is tested using randomly generated data to ensure correctness.
 
-The code is intended to be executed as a standalone program, as indicated by the presence of a [`main`](#main) function, and it does not define any public APIs or external interfaces. It relies on a random number generator to produce test data, ensuring that the tests cover a wide range of input scenarios. The use of macros and helper functions like `WWL_TEST` and `WWV_TEST` suggests a focus on automated testing, with the results likely being logged or asserted to verify correctness. The file is part of a larger testing framework, as indicated by the inclusion of a header file `test_avx512.h`, which likely contains definitions and declarations necessary for the tests, such as the `wwl_t` and `wwv_t` types and their associated operations.
+The program is structured to execute a large number of iterations (1,000,000) for each type, ensuring thorough testing. It uses macros such as `WWL_TEST` and `WWV_TEST` to verify the results of operations against expected values. The code also includes tests for more complex operations like vector transposition and sliding, as well as specialized operations like `madd52lo` and `madd52hi`, which involve modular arithmetic. The program logs the progress of the tests and concludes by cleaning up the random number generator resources before halting. This code is intended to be an executable test suite for validating the functionality and correctness of the `wwl_t` and `wwv_t` vector operations.
 # Imports and Dependencies
 
 ---
@@ -19,41 +19,38 @@ The code is intended to be executed as a standalone program, as indicated by the
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes a random number generator and performs extensive testing on two data types, `wwl_t` and `wwv_t`, by executing various operations and verifying their correctness through a series of tests.
+[View Source →](<../../../../../src/util/simd/test_avx512_8x64.c#L3>)
+
+Executes a series of tests on `wwl_t` and `wwv_t` data types, including construction, permutation, arithmetic, bitwise, and comparison operations, using random number generation and logging.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Initialize the program with `fd_boot` using command-line arguments.
-    - Create and join a random number generator `rng`.
-    - Log the start of testing for `wwl_t`.
-    - Enter a loop to perform 1,000,000 iterations of tests on `wwl_t`.
-    - Generate random long integers and construct `wwl_t` objects `x`, `y`, and `z`.
-    - Perform various tests on `wwl_t` objects including construction, permutation, selection, broadcasting, arithmetic, bitwise operations, and comparisons.
-    - Log the start of testing for `wwv_t`.
-    - Enter a loop to perform 1,000,000 iterations of tests on `wwv_t`.
-    - Generate random unsigned long integers and construct `wwv_t` objects `x`, `y`, and `z`.
-    - Perform similar tests on `wwv_t` objects as done for `wwl_t`.
-    - Delete the random number generator and log the completion of tests.
-    - Call `fd_halt` to terminate the program.
-- **Output**: The function returns an integer `0` indicating successful execution.
-- **Functions called**:
-    - [`wwl_st`](fd_avx512_wwl.h.md#wwl_st)
-    - [`wwl_ld`](fd_avx512_wwl.h.md#wwl_ld)
-    - [`wwl_stu`](fd_avx512_wwl.h.md#wwl_stu)
-    - [`wwl_ldu`](fd_avx512_wwl.h.md#wwl_ldu)
-    - [`wwl_rol_variable`](fd_avx512_wwl.h.md#wwl_rol_variable)
-    - [`wwl_ror_variable`](fd_avx512_wwl.h.md#wwl_ror_variable)
-    - [`wwl_rol_vector`](fd_avx512_wwl.h.md#wwl_rol_vector)
-    - [`wwl_ror_vector`](fd_avx512_wwl.h.md#wwl_ror_vector)
-    - [`wwv_st`](fd_avx512_wwv.h.md#wwv_st)
-    - [`wwv_ld`](fd_avx512_wwv.h.md#wwv_ld)
-    - [`wwv_stu`](fd_avx512_wwv.h.md#wwv_stu)
-    - [`wwv_ldu`](fd_avx512_wwv.h.md#wwv_ldu)
-    - [`wwv_rol_variable`](fd_avx512_wwv.h.md#wwv_rol_variable)
-    - [`wwv_ror_variable`](fd_avx512_wwv.h.md#wwv_ror_variable)
-    - [`wwv_rol_vector`](fd_avx512_wwv.h.md#wwv_rol_vector)
-    - [`wwv_ror_vector`](fd_avx512_wwv.h.md#wwv_ror_vector)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Initializes the environment with `fd_boot` and sets up a random number generator `rng`.
+    - Logs the start of testing for `wwl_t`.
+    - Runs a loop 1,000,000 times to test various operations on `wwl_t` data type, including construction, permutation, selection, broadcasting, arithmetic, bitwise, and comparison operations.
+    - Logs the start of testing for `wwv_t`.
+    - Runs a loop 1,000,000 times to test various operations on `wwv_t` data type, similar to `wwl_t`.
+    - Deletes the random number generator and logs the completion of tests.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`wwl_st`](<fd_avx512_wwl.h.md#wwl_st>)
+    - [`wwl_ld`](<fd_avx512_wwl.h.md#wwl_ld>)
+    - [`wwl_stu`](<fd_avx512_wwl.h.md#wwl_stu>)
+    - [`wwl_ldu`](<fd_avx512_wwl.h.md#wwl_ldu>)
+    - [`wwl_rol_variable`](<fd_avx512_wwl.h.md#wwl_rol_variable>)
+    - [`wwl_ror_variable`](<fd_avx512_wwl.h.md#wwl_ror_variable>)
+    - [`wwl_rol_vector`](<fd_avx512_wwl.h.md#wwl_rol_vector>)
+    - [`wwl_ror_vector`](<fd_avx512_wwl.h.md#wwl_ror_vector>)
+    - [`wwv_st`](<fd_avx512_wwv.h.md#wwv_st>)
+    - [`wwv_ld`](<fd_avx512_wwv.h.md#wwv_ld>)
+    - [`wwv_stu`](<fd_avx512_wwv.h.md#wwv_stu>)
+    - [`wwv_ldu`](<fd_avx512_wwv.h.md#wwv_ldu>)
+    - [`wwv_rol_variable`](<fd_avx512_wwv.h.md#wwv_rol_variable>)
+    - [`wwv_ror_variable`](<fd_avx512_wwv.h.md#wwv_ror_variable>)
+    - [`wwv_rol_vector`](<fd_avx512_wwv.h.md#wwv_rol_vector>)
+    - [`wwv_ror_vector`](<fd_avx512_wwv.h.md#wwv_ror_vector>)
 
 
 

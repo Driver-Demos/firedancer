@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `pktgen.h` file in the `firedancer` codebase declares an external action, `fd_action_pktgen`, for packet generation functionality.
+Defines an external action for packet generation.
 
 # Purpose
-This code is a C header file that serves as an interface for a packet generation module within a larger application. It uses include guards to prevent multiple inclusions, ensuring that the file's contents are only processed once by the compiler. The file includes another header, `fd_config.h`, which likely contains configuration settings or dependencies needed for the packet generation functionality. Additionally, it declares an external variable, `fd_action_pktgen`, which is presumably a function or data structure related to packet generation actions. This header file is part of a modular system, facilitating the integration and use of packet generation capabilities in the application.
+This code is a C header file that defines an interface for packet generation functionality. It includes a configuration header file, `fd_config.h`, which is located in a relative path. The header file declares an external variable, `fd_action_pktgen`, of type `action_t`, which is likely used to represent a specific action or command related to packet generation. The header guard prevents multiple inclusions of this file, ensuring that the declarations are only processed once during compilation.
 # Imports and Dependencies
 
 ---
@@ -17,9 +17,9 @@ This code is a C header file that serves as an interface for a packet generation
 
 ---
 ### fd\_action\_pktgen
-- **Type**: `action_t`
-- **Description**: The variable `fd_action_pktgen` is a global variable of type `action_t`, which is declared as an external variable. This indicates that its definition is located in another source file, and it is intended to be used across multiple files within the program.
-- **Use**: `fd_action_pktgen` is used to represent or perform a specific action related to packet generation in the application.
+- **Type**: ``action_t``
+- **Description**: `fd_action_pktgen` is a global variable of type `action_t` declared with external linkage. It is likely used to represent or manage a specific action related to packet generation in the application.
+- **Use**: Used to define or reference an action for packet generation across different source files.
 
 
 
