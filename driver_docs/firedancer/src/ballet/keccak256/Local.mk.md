@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the Keccak256 implementation in the Firedancer codebase.
+The `Local.mk` file in the `firedancer` codebase defines build rules for the `keccak256` module, including header and object file additions, unit test creation and execution, and conditional fuzz test setup.
 
 # Purpose
-The `Makefile` content defines build and test instructions for the `fd_keccak256` component. It adds the header file `fd_keccak256.h` and object files `fd_keccak256` and `fd_ballet` to the build process. It specifies a unit test named `test_keccak256` that depends on `fd_ballet` and `fd_util`, and it includes a command to run this unit test. If the `FD_HAS_HOSTED` variable is defined, it also includes instructions to create a fuzz test named `fuzz_keccak256` with dependencies on `fd_ballet` and `fd_util`.
+This file is a Makefile script used to automate the build process for a software project. It defines rules to add header files and object files related to the `fd_keccak256` module, and specifies the creation and execution of a unit test named `test_keccak256`. Additionally, it conditionally includes a fuzz test `fuzz_keccak256` if the `FD_HAS_HOSTED` environment variable is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
