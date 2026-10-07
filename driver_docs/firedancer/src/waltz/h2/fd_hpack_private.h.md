@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_hpack_private.h` file in the `firedancer` codebase provides internal definitions and functions for handling HPACK static tables and reading variable-length integers, with optimizations for x86 architectures.
+Defines structures and functions for handling HPACK static tables and reading variable-length integers.
 
 # Purpose
-This C header file, `fd_hpack_private.h`, is part of a library that deals with HPACK, a compression format used in HTTP/2 for efficient header field representation. The file provides internal functionality specific to handling HPACK static tables and variable-length integer encoding, which are crucial components of the HPACK specification. The static table is a predefined set of header fields that can be referenced by index, reducing the size of transmitted headers. The file defines a structure, `fd_hpack_static_entry_t`, to represent entries in this static table, and declares an array, `fd_hpack_static_table`, which holds these entries.
+The code is a C header file that defines private components for handling HPACK, which is a compression format used in HTTP/2 for efficient encoding of HTTP headers. The file includes a definition for a static table of HPACK entries, which is used to store predefined header fields. This table is represented by the `fd_hpack_static_entry_t` structure, which contains pointers to header entries and their respective lengths.
 
-Additionally, the file includes a static inline function, [`fd_hpack_rd_varint`](#fd_hpack_rd_varint), which is responsible for reading variable-length integers from a data stream. This function is optimized for performance, with considerations for different CPU architectures, such as x86, and includes mechanisms to handle potential decoding errors. The function reads a variable-length integer, which is a common operation in HPACK encoding and decoding, and returns the decoded value or an error indicator. The file is intended for internal use within the library, as indicated by its private nature, and does not define public APIs or external interfaces.
+The file also provides a function, [`fd_hpack_rd_varint`](<#fd_hpack_rd_varint>), which reads a variable-length integer from a data stream. This function is designed to handle integers encoded with a prefix and can read up to 8 bytes. It includes logic to handle both typical and edge cases, such as end-of-file conditions and unterminated varints. The function uses platform-specific optimizations when available, such as the use of the `_pext_u64` instruction on x86 architectures. The header file is intended for internal use within the HPACK implementation and does not define public APIs or external interfaces.
 # Imports and Dependencies
 
 ---
@@ -20,52 +20,58 @@ Additionally, the file includes a static inline function, [`fd_hpack_rd_varint`]
 
 ---
 ### fd\_hpack\_static\_table
-- **Type**: `fd_hpack_static_entry_t const[62]`
-- **Description**: The `fd_hpack_static_table` is an array of 62 constant entries, each of type `fd_hpack_static_entry_t`, which represents a simple HPACK static table. Each entry in the table contains a pointer to a character string (`entry`), and two unsigned characters representing the lengths of the name and value (`name_len` and `value_len`).
-- **Use**: This variable is used to store predefined static entries for HPACK header compression, which can be accessed globally throughout the program.
+- **Type**: ``fd_hpack_static_entry_t const` array`
+- **Description**: The `fd_hpack_static_table` is an array of 62 constant entries of type `fd_hpack_static_entry_t`. Each entry in the array represents a static table entry used in HPACK, which is a header compression format for HTTP/2. The structure `fd_hpack_static_entry_t` contains a pointer to a character string (`entry`), and two unsigned characters (`name_len` and `value_len`) that represent the lengths of the name and value in the entry.
+- **Use**: Used to store and access the predefined static table entries for HPACK header compression.
 
 
 # Data Structures
 
 ---
 ### fd\_hpack\_static\_entry
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `entry`: A pointer to a constant character string representing the entry.
-    - `name_len`: An unsigned character representing the length of the name.
-    - `value_len`: An unsigned character representing the length of the value.
-- **Description**: The `fd_hpack_static_entry` structure is used to represent an entry in the HPACK static table, which is part of the HTTP/2 header compression mechanism. Each entry consists of a pointer to a string (`entry`) and two unsigned characters (`name_len` and `value_len`) that store the lengths of the name and value components of the entry, respectively. This structure is designed to facilitate efficient storage and retrieval of static header fields in HTTP/2 communications.
+    - ``entry``: A pointer to a constant character string representing the entry.
+    - ``name_len``: An unsigned character representing the length of the name.
+    - ``value_len``: An unsigned character representing the length of the value.
+- **Description**: Represents an entry in the HPACK static table, which includes a pointer to the entry string and the lengths of the name and value components.
 
 
 ---
 ### fd\_hpack\_static\_entry\_t
-- **Type**: `struct`
+- **Type**: ``struct``
 - **Members**:
-    - `entry`: A pointer to a constant character string representing the entry in the static table.
-    - `name_len`: An unsigned character representing the length of the name in the entry.
-    - `value_len`: An unsigned character representing the length of the value in the entry.
-- **Description**: The `fd_hpack_static_entry_t` structure is used to represent an entry in the HPACK static table, which is part of the HTTP/2 header compression mechanism. Each entry consists of a pointer to a string (`entry`) and two unsigned characters (`name_len` and `value_len`) that store the lengths of the name and value components of the entry, respectively. This structure is designed to facilitate efficient storage and retrieval of static header fields in HTTP/2 communications.
+    - ``entry``: A pointer to a constant character string representing the entry.
+    - ``name_len``: An unsigned character representing the length of the name.
+    - ``value_len``: An unsigned character representing the length of the value.
+- **Description**: Represents an entry in the HPACK static table, which includes a pointer to the entry string and the lengths of the name and value components.
 
 
 # Functions
 
 ---
 ### fd\_hpack\_rd\_varint<!-- {{#callable:fd_hpack_rd_varint}} -->
-The `fd_hpack_rd_varint` function reads a variable-length integer from a source buffer, using a specified prefix and addend, and returns the decoded integer or an error code on failure.
+[View Source →](<../../../../../src/waltz/h2/fd_hpack_private.h#L32>)
+
+Reads a variable-length integer from a source buffer, using a specified prefix and addend, and returns the decoded integer or an error code.
 - **Inputs**:
     - `rd`: A pointer to an `fd_hpack_rd_t` structure, which contains the source buffer and its end.
-    - `prefix`: An unsigned integer representing the prefix of the variable-length integer.
-    - `addend`: An unsigned integer representing the maximum value of the prefix, typically (2^n)-1 where n is the number of prefix bits.
-- **Control Flow**:
-    - The function first masks the prefix with the addend to ensure it is within the valid range.
-    - If the prefix is less than the addend, it returns the prefix as the result, indicating a zero-length varint.
-    - It attempts to read an 8-byte encoded word from the source buffer, using a fast path if enough bytes are available, or a slow path with careful copying if not.
-    - It calculates the length of the varint by finding the least significant set bit in a bit pattern derived from the encoded word.
-    - If the varint is unterminated, it returns `ULONG_MAX` to indicate an error.
-    - It masks off any garbage bits from the encoded word and extracts the varint using either a specialized instruction or bit manipulation.
-    - It checks if the end of the source buffer is reached and returns `ULONG_MAX` if so, indicating an error.
-    - Finally, it updates the source pointer and returns the decoded integer plus the addend.
-- **Output**: The function returns the decoded variable-length integer plus the addend, or `ULONG_MAX` on failure (e.g., end of file or unterminated varint).
+    - `prefix`: An unsigned integer representing the actual value of the varint prefix.
+    - `addend`: An unsigned integer, typically (2^n)-1, where n is the varint prefix bit count.
+- **Logic and Control Flow**:
+    - Apply a bitwise AND operation between `prefix` and `addend` to update `prefix`.
+    - If `prefix` is less than `addend`, return `prefix` as the result.
+    - Attempt to read an 8-byte encoded word from the source buffer `rd->src`.
+    - If the read is successful, store the result in `enc`; otherwise, handle the read carefully and check for end-of-file conditions.
+    - Calculate `sz_run` to determine the length of the varint by finding the least significant one bit in the bit pattern.
+    - If `sz_run` is zero, return `ULONG_MAX` to indicate an unterminated varint.
+    - Calculate `sz_bits` and `sz` to determine the number of bytes in the varint.
+    - Mask off any garbage bits from `enc` using `sz_bits`.
+    - Extract the varint from `enc` using either the `_pext_u64` intrinsic or a series of bitwise operations, depending on the platform.
+    - Update `rd->src` to point to the end of the varint in the source buffer.
+    - If the updated `rd->src` exceeds `rd->src_end`, return `ULONG_MAX` to indicate an end-of-file condition.
+    - Return the decoded varint value plus `addend`.
+- **Output**: Returns a decoded unsigned long integer from the source buffer, or `ULONG_MAX` on decode failure or end-of-file conditions.
 
 
 

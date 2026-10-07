@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-ABI helpers and tile logic for transaction layout, lookup resolution, execution, and commit.
+Data structures, functions, and a Makefile for processing transactions and handling ABI in Firedancer.
 
 
 ## Files
-- **[fd_bank_abi.c](fd_bank_abi.c.md)**: Transaction ABI structs and initialization logic for legacy and v0 messages, plus address lookup resolution.
-- **[fd_bank_abi.h](fd_bank_abi.h.md)**: ABI helpers for transaction layout, address lookup resolution, and transaction initialization.
-- **[fd_bank_tile.c](fd_bank_tile.c.md)**: Bank tile logic for sanitizing, executing, committing, hashing, and publishing microblocks and bundles.
-- **[Local.mk](Local.mk.md)**: Build rules for fd_bank_abi headers and fd_bank_abi and fd_bank_tile objects when atomic and int128 are enabled.
+- **[fd_bank_abi.c](fd_bank_abi.c.md)**: Defines data structures and functions for handling sanitized transaction ABI in the Firedancer codebase.
+- **[fd_bank_abi.h](fd_bank_abi.h.md)**: Defines structures, constants, and functions for handling ABI-compatible transactions with sidecar data.
+- **[fd_bank_tile.c](fd_bank_tile.c.md)**: Implements a bank tile for processing transactions, including transaction execution, commitment, and metrics tracking.
+- **[Local.mk](Local.mk.md)**: Makefile for conditional inclusion of headers and objects based on atomic and int128 support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

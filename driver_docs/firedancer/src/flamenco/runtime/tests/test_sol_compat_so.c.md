@@ -3,12 +3,89 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Loads a shared object and runs Solana compatibility tests on input files.
+Tests the compatibility of Solana shared objects by executing solfuzz inputs using the public ABI.
 
 # Purpose
-`test_sol_compat_so.c` is a test driver for Solana compatibility interfaces that loads a target shared object at run time with `dlopen` and calls exported public ABI entry points with input files from the command line. It accepts `--target` and `--type`, selects one of the supported execution or parse functions such as `sol_compat_instr_execute_v1`, `sol_compat_txn_execute_v1`, `sol_compat_block_execute_v1`, `sol_compat_elf_loader_v1`, `sol_compat_vm_syscall_execute_v1`, `sol_compat_vm_interp_v1`, or `sol_compat_shred_parse_v1`, then loads each input file, passes the file data to the selected function, and prints the returned status.
+The `test_sol_compat_so.c` file is a C program designed to execute solfuzz inputs using a shared object that is dynamically loaded at runtime. The program uses the `dlopen` function to load a shared object specified by the `--target` command-line argument. It then retrieves function pointers for initialization, execution, and finalization functions from the shared object using `dlsym`. The program supports various input types, such as `instr`, `txn`, `block`, `elf_parse`, `vm_syscall`, `vm_interp`, and `shred_parse`, which determine the specific execution function to use.
 
-The file also handles shared object setup and teardown by calling `sol_compat_init` before any input is processed and `sol_compat_fini` before exit. It uses a fixed output buffer for the ABI call, reads each input file into memory, and reports errors for file access, symbol lookup, and dynamic loading failures. This code is an executable test program, not a library, and it is intended to validate shared object implementations through the public interface.
+The main functionality of the program involves reading input files, processing them through the specified execution function, and handling the output. The [`process_file`](<#process_file>) function is responsible for opening each input file, reading its contents, and passing the data to the execution function. The program also includes error handling for file operations and dynamic loading processes. The use of `fd_boot` and `fd_halt` suggests integration with a specific framework or environment setup. The program is intended to be run as an executable, and it provides a usage message to guide users on the correct command-line arguments.
+# Imports and Dependencies
+
+---
+- `fd_sol_compat.h`
+- `errno.h`
+- `dlfcn.h`
+- `fcntl.h`
+- `stdio.h`
+- `stdlib.h`
+- `sys/stat.h`
+- `unistd.h`
+
+
+# Functions
+
+---
+### usage<!-- {{#callable:usage}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/tests/test_sol_compat_so.c#L17>)
+
+Displays usage information and terminates the program.
+- **Inputs**: None
+- **Logic and Control Flow**:
+    - Writes a usage message to the standard error output using `fputs`.
+    - Calls `exit(1)` to terminate the program immediately.
+- **Output**: No output is returned as the function does not return to the caller.
+
+
+---
+### process\_file<!-- {{#callable:process_file}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/tests/test_sol_compat_so.c#L26>)
+
+Opens a file, reads its contents into a buffer, executes a function on the buffer, and logs the result.
+- **Inputs**:
+    - `arg`: A constant character pointer representing the file path to open and process.
+    - `execute_fn`: A function pointer to a function that processes the file data.
+    - `out_buf`: A pointer to a buffer where the output of the `execute_fn` will be stored.
+    - `out_bufsz`: An unsigned long integer representing the size of the output buffer.
+- **Logic and Control Flow**:
+    - Open the file specified by `arg` in read-only mode and obtain a file descriptor `fd`.
+    - Check if the file descriptor is valid; if not, log an error and exit.
+    - Retrieve file statistics using `fstat` and store the file size in `in_sz`.
+    - Allocate memory for `file_buf` to hold the file contents, and check for successful allocation.
+    - Read the file contents into `file_buf` and verify the read operation was successful.
+    - Call the `execute_fn` function with `out_buf`, `out_sz`, `file_buf`, and `in_sz` as arguments.
+    - Free the allocated memory for `file_buf`.
+    - Log the status returned by `execute_fn` along with the file name.
+- **Output**: No output is returned; the function logs the status of the execution.
+
+
+---
+### main<!-- {{#callable:main}} -->
+[View Source →](<../../../../../../src/flamenco/runtime/tests/test_sol_compat_so.c#L53>)
+
+Executes a shared object function based on command-line arguments and processes input files using the specified function.
+- **Inputs**:
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line argument strings.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Extracts the `--target` and `--type` command-line arguments using `fd_env_strip_cmdline_cstr`; calls [`usage`](<#usage>) if either is missing.
+    - Opens the shared object specified by `--target` using `dlopen`; logs an error and exits if it fails.
+    - Retrieves the `sol_compat_init` and `sol_compat_fini` functions from the shared object using `dlsym`; logs an error and exits if retrieval fails.
+    - Determines the function name to execute based on the `--type` argument; calls [`usage`](<#usage>) if the type is unsupported.
+    - Retrieves the execution function from the shared object using `dlsym`; logs an error and exits if retrieval fails.
+    - Calls the initialization function `init_fn`.
+    - Allocates a buffer of size 64MB for output; logs an error and exits if allocation fails.
+    - Iterates over remaining command-line arguments, treating each as a file to process; calls [`usage`](<#usage>) if an unsupported flag is encountered.
+    - Calls [`process_file`](<#process_file>) for each file, passing the execution function and output buffer.
+    - Calls the finalization function `fini_fn`.
+    - Closes the shared object with `dlclose` and frees the output buffer.
+    - Calls `fd_halt` to terminate the program.
+- **Output**: Returns 0 upon successful execution.
+- **Functions Called**:
+    - [`usage`](<#usage>)
+    - [`process_file`](<#process_file>)
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

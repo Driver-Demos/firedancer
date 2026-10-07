@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `rant` folder in the `firedancer` codebase contains documentation files that provide in-depth discussions on specific technical decisions, such as defining custom integer types and the use of the `-fomit-frame-pointer` compile flag.
+Discussions on custom integer types and the relevance of the `-fomit-frame-pointer` compile flag.
 
 
 ## Files
-- **[integer-types.md](integer-types.md.md)**: The `integer-types.md` file discusses the rationale behind defining custom integer types in the `firedancer` codebase instead of using `stdint.h`, emphasizing developer expectations, platform consistency, and reducing code complexity and errors.
-- **[omit-frame-pointer.md](omit-frame-pointer.md.md)**: The `omit-frame-pointer.md` file discusses the historical and current relevance of the `-fomit-frame-pointer` compile flag, particularly in the context of x86 and x86_64 architectures on Linux.
+- **[integer-types.md](integer-types.md.md)**: Discussion on defining custom integer types in Firedancer instead of using `stdint.h`, focusing on developer expectations and platform behavior.
+- **[omit-frame-pointer.md](omit-frame-pointer.md.md)**: Discussion on the historical and current relevance of the `-fomit-frame-pointer` compile flag.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
