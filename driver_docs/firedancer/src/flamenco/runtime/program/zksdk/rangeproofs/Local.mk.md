@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects related to `fd_rangeproofs` and `fd_flamenco` for the build process.
+Makefile for adding headers and objects related to range proofs in the Firedancer codebase.
 
 # Purpose
-The file is a Makefile snippet used in a build system to manage dependencies and compilation targets. It utilizes a macro or function `add-hdrs` to include the header file `fd_rangeproofs.h` and `add-objs` to specify object files `fd_rangeproofs` and `fd_flamenco` for compilation. This setup helps automate the process of compiling and linking the specified components in the project.
+The `Makefile` content defines build instructions for a software project. It uses the `add-hdrs` function to include the header file `fd_rangeproofs.h` in the build process. Additionally, it uses the `add-objs` function to add object files `fd_rangeproofs` and `fd_flamenco` to the build, indicating that these components are part of the compilation process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

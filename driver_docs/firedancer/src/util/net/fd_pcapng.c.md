@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_pcapng.c` file in the `firedancer` codebase provides functions for reading and writing pcapng files, including handling various block types and options, with specific support for Linux and FreeBSD systems.
+Functions for reading and writing pcapng files, including handling of various block types and options.
 
 # Purpose
-This C source code file is designed to handle the reading and writing of PCAP Next Generation (pcapng) files, which are used for storing network packet data. The file provides a set of functions to manage pcapng file operations, including setting default options for section header blocks (SHB) and interface description blocks (IDB), parsing pcapng blocks, and writing various types of blocks to a file. The code includes functions to initialize and manage iterators for reading pcapng files, allowing for the sequential processing of blocks within a file. It also includes error handling and logging to ensure robust file operations.
+The code is a C module that provides functionality for reading and writing PCAP Next Generation (pcapng) files. It includes functions to set default options for Section Header Blocks (SHB) and Interface Description Blocks (IDB), as well as functions to parse and iterate over pcapng blocks in a file. The module defines several functions to handle different block types, such as Simple Packet Blocks (SPB), Enhanced Packet Blocks (EPB), and Decryption Secrets Blocks (DSB). It also includes functions to write these blocks to a file, ensuring proper alignment and block termination.
 
-The file is structured to support both reading and writing operations, with functions like [`fd_pcapng_iter_new`](#fd_pcapng_iter_new) and [`fd_pcapng_iter_next`](#fd_pcapng_iter_next) for reading, and [`fd_pcapng_fwrite_shb`](#fd_pcapng_fwrite_shb), [`fd_pcapng_fwrite_idb`](#fd_pcapng_fwrite_idb), and [`fd_pcapng_fwrite_pkt`](#fd_pcapng_fwrite_pkt) for writing. The code is modular, with clear separation between different block types and their respective operations. It also includes platform-specific code to handle different operating systems, such as Linux and FreeBSD. The file is intended to be part of a larger library, as indicated by the inclusion of private headers and utility functions, and it provides a public API for interacting with pcapng files, making it a crucial component for applications that need to process network capture data.
+The module is designed to be used in a hosted environment, as indicated by the `FD_HAS_HOSTED` preprocessor directive. It includes error handling and logging for various operations, such as reading block headers, parsing options, and writing data to files. The code defines public APIs for creating and deleting iterators ([`fd_pcapng_iter_new`](<#fd_pcapng_iter_new>) and [`fd_pcapng_iter_delete`](<#fd_pcapng_iter_delete>)), iterating over frames ([`fd_pcapng_iter_next`](<#fd_pcapng_iter_next>)), and writing different types of blocks ([`fd_pcapng_fwrite_shb`](<#fd_pcapng_fwrite_shb>), [`fd_pcapng_fwrite_idb`](<#fd_pcapng_fwrite_idb>), [`fd_pcapng_fwrite_pkt`](<#fd_pcapng_fwrite_pkt>), and [`fd_pcapng_fwrite_tls_key_log`](<#fd_pcapng_fwrite_tls_key_log>)). The module is intended to be part of a larger system that processes pcapng files, providing both reading and writing capabilities.
 # Imports and Dependencies
 
 ---
@@ -23,247 +23,282 @@ The file is structured to support both reading and writing operations, with func
 
 ---
 ### fd\_pcapng\_shb\_defaults<!-- {{#callable:fd_pcapng_shb_defaults}} -->
-The `fd_pcapng_shb_defaults` function initializes default values for the hardware, operating system, and user application fields in a `fd_pcapng_shb_opts_t` structure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L11>)
+
+Sets default values for the `fd_pcapng_shb_opts_t` structure based on the system's architecture and operating system.
 - **Inputs**:
-    - `opt`: A pointer to a `fd_pcapng_shb_opts_t` structure where default values for hardware, operating system, and user application will be set.
-- **Control Flow**:
-    - Check if the macro `FD_HAS_X86` is defined; if so, set `opt->hardware` to "x86_64".
-    - Check if the macro `__linux__` is defined; if so, set `opt->os` to "Linux".
+    - `opt`: A pointer to an `fd_pcapng_shb_opts_t` structure where default values will be set.
+- **Logic and Control Flow**:
+    - If the system has an x86 architecture, set `opt->hardware` to "x86_64".
+    - If the system is running Linux, set `opt->os` to "Linux".
     - Set `opt->userappl` to "Firedancer".
-- **Output**: The function does not return a value; it modifies the `fd_pcapng_shb_opts_t` structure pointed to by `opt`.
+- **Output**: No return value; modifies the `opt` structure in place.
 
 
 ---
 ### fd\_pcapng\_idb\_defaults<!-- {{#callable:fd_pcapng_idb_defaults}} -->
-The `fd_pcapng_idb_defaults` function initializes default values for a pcapng interface description block (IDB) options structure, including setting the interface name and timestamp resolution.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L24>)
+
+Initializes default values for a pcapng interface description block (IDB) options structure.
 - **Inputs**:
-    - `opt`: A pointer to an `fd_pcapng_idb_opts_t` structure where default options for the interface description block will be set.
-    - `if_idx`: An unsigned integer representing the index of the network interface for which the defaults are being set.
-- **Control Flow**:
-    - Check if the code is being compiled on Linux or FreeBSD systems.
-    - Declare a static thread-local character array `_name` to store the interface name.
-    - Use `if_indextoname` to get the interface name corresponding to `if_idx` and store it in `_name`.
-    - If `if_indextoname` fails, return 0 indicating failure.
-    - Copy the interface name from `_name` to `opt->name`, ensuring it does not exceed 16 characters.
-    - Set the timestamp resolution `opt->tsresol` to `FD_PCAPNG_TSRESOL_NS`.
-    - Return 1 to indicate success.
-- **Output**: Returns an integer: 1 on success, indicating that the defaults were set, or 0 on failure, indicating that the interface name could not be retrieved.
+    - ``opt``: A pointer to an `fd_pcapng_idb_opts_t` structure where default values will be set.
+    - ``if_idx``: An unsigned integer representing the interface index to retrieve the interface name on Linux or FreeBSD systems.
+- **Logic and Control Flow**:
+    - On Linux or FreeBSD, attempts to retrieve the interface name using `if_indextoname` with `if_idx` and stores it in `opt->name` if successful.
+    - If the interface name retrieval fails, returns 0 indicating failure.
+    - Sets the `tsresol` field of `opt` to `FD_PCAPNG_TSRESOL_NS`.
+    - Returns 1 indicating successful initialization of defaults.
+- **Output**: Returns 1 on success, or 0 if the interface name retrieval fails on Linux or FreeBSD.
 
 
 ---
 ### fd\_pcapng\_iter\_align<!-- {{#callable:fd_pcapng_iter_align}} -->
-The `fd_pcapng_iter_align` function returns the alignment requirement of the `fd_pcapng_iter_t` type.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L62>)
+
+Returns the alignment requirement of the `fd_pcapng_iter_t` type.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the result of the `alignof` operator applied to `fd_pcapng_iter_t`.
-- **Output**: The function outputs an `ulong` representing the alignment requirement of the `fd_pcapng_iter_t` type.
+- **Logic and Control Flow**:
+    - Calls the `alignof` operator on `fd_pcapng_iter_t` to determine its alignment requirement.
+    - Returns the result of the `alignof` operator.
+- **Output**: The alignment requirement of the `fd_pcapng_iter_t` type as an `ulong`.
 
 
 ---
 ### fd\_pcapng\_iter\_footprint<!-- {{#callable:fd_pcapng_iter_footprint}} -->
-The function `fd_pcapng_iter_footprint` returns the size of the `fd_pcapng_iter_t` structure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L67>)
+
+Returns the size of the `fd_pcapng_iter_t` structure.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined as a constant function, meaning it does not modify any global or static state.
-    - It directly returns the result of the `sizeof` operator applied to the `fd_pcapng_iter_t` type.
-- **Output**: The function returns an `ulong` representing the size in bytes of the `fd_pcapng_iter_t` structure.
+- **Logic and Control Flow**:
+    - Calculate the size of the `fd_pcapng_iter_t` structure using the `sizeof` operator.
+    - Return the calculated size.
+- **Output**: The function returns an `ulong` representing the size of the `fd_pcapng_iter_t` structure.
 
 
 ---
 ### fd\_pcapng\_iter\_strerror<!-- {{#callable:fd_pcapng_iter_strerror}} -->
-The `fd_pcapng_iter_strerror` function generates a human-readable error message based on the provided error code and file stream position.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L72>)
+
+Generates a human-readable error message based on the given error code and file position.
 - **Inputs**:
-    - `error`: An integer representing the error code encountered during pcapng file processing.
-    - `file`: A pointer to a FILE object representing the file stream being processed.
-- **Control Flow**:
+    - `error`: An integer representing the error code encountered during file processing.
+    - `file`: A pointer to a `FILE` object representing the file being processed.
+- **Logic and Control Flow**:
     - Initialize a static buffer `err_cstr_buf` for error message storage.
     - Initialize a character pointer `err_cstr` using `fd_cstr_init` to point to the start of `err_cstr_buf`.
-    - Check if the error code is `EPROTO`; if true, format a parse error message with the current file position using `fd_cstr_printf` and return it.
-    - Check if the error code is `-1` and the file is not at EOF; if true, return the string "end of section".
-    - For other error codes, format a message with the error code and its string representation using `fd_cstr_printf` and return it.
-- **Output**: A constant character pointer to a formatted error message string.
+    - Check if `error` equals `EPROTO`; if true, return a formatted string indicating a parse error at the current file position using `fd_cstr_printf`.
+    - If `error` is -1 and the end of the file has not been reached (`!feof(file)`), return the string "end of section".
+    - For other error codes, return a formatted string combining the error code and its string representation using `fd_cstr_printf` and `fd_io_strerror`.
+- **Output**: A constant character pointer to a string containing the error message.
 
 
 ---
 ### fd\_pcapng\_peek\_block<!-- {{#callable:fd_pcapng_peek_block}} -->
-The `fd_pcapng_peek_block` function reads and validates a block header and footer from a pcapng file stream, ensuring they match and are correctly aligned.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L86>)
+
+Reads and validates a block header and footer from a pcapng file stream without advancing the file position.
 - **Inputs**:
-    - `stream`: A pointer to a FILE object representing the pcapng file stream to read from.
-    - `_hdr`: A pointer to an fd_pcapng_block_hdr_t structure where the block header information will be stored.
-    - `end_ptr`: A pointer to a long where the end position of the block will be stored, or NULL if not needed.
-- **Control Flow**:
-    - Retrieve the current position in the file stream using ftell and check for errors or misalignment.
-    - Read the block header from the stream into a local fd_pcapng_block_hdr_t structure and check for end-of-file or read errors.
-    - Validate the block size in the header to ensure it is within acceptable limits and aligned.
-    - Seek to the block footer position in the stream and read the footer size.
-    - Restore the file stream position to the original block start position.
-    - Compare the block size in the header and footer to ensure they match.
-    - Store the header in the provided _hdr pointer and calculate the end position if end_ptr is not NULL.
-- **Output**: Returns 0 on success, -1 if end-of-file is reached, or an error code if an error occurs during reading or validation.
+    - `stream`: A pointer to a `FILE` object representing the pcapng file stream to read from.
+    - `_hdr`: A pointer to a `fd_pcapng_block_hdr_t` structure where the function will store the block header information.
+    - `end_ptr`: A pointer to a `long` where the function will store the position of the end of the block, or `NULL` if not needed.
+- **Logic and Control Flow**:
+    - Get the current file position using `ftell` and check for errors or misalignment.
+    - Read the block header into a temporary `fd_pcapng_block_hdr_t` structure and check for end-of-file or read errors.
+    - Validate the block size in the header for minimum, maximum, and alignment constraints.
+    - Seek to the block footer position using `fseek` and check for errors.
+    - Read the block footer and check for read errors.
+    - Restore the file position to the start of the block using `fseek`.
+    - Compare the block size in the header and footer for consistency.
+    - Store the header in `_hdr` and calculate the end position if `end_ptr` is not `NULL`.
+    - Return 0 on success or an error code on failure.
+- **Output**: Returns 0 on success, -1 on end-of-file, or an error code on failure.
 
 
 ---
 ### fd\_pcapng\_read\_option<!-- {{#callable:fd_pcapng_read_option}} -->
-The `fd_pcapng_read_option` function reads a pcapng option from a file stream and stores it in a provided option structure, handling alignment and potential errors.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L140>)
+
+Reads an option from a pcapng file stream and stores it in a provided option structure.
 - **Inputs**:
-    - `stream`: A pointer to a FILE object representing the input stream from which the pcapng option is read.
-    - `opt`: A pointer to an fd_pcapng_option_t structure where the read option data will be stored.
-- **Control Flow**:
-    - Define a packed structure `opt_hdr` to hold the option type and size.
-    - Attempt to read 4 bytes from the stream into `opt_hdr`; if unsuccessful, return the stream error.
-    - Calculate `end_off` as the aligned size of the option data and `read_sz` as the minimum of `end_off` and the size available in `opt->sz`.
-    - If `read_sz` is non-zero, attempt to read `read_sz` bytes into `opt->value`; if unsuccessful, return the stream error.
-    - Subtract `read_sz` from `end_off` to determine remaining bytes to skip.
-    - Attempt to seek forward by `end_off` bytes in the stream; if unsuccessful, return the error code.
+    - `stream`: A pointer to a `FILE` object representing the pcapng file stream to read from.
+    - `opt`: A pointer to an `fd_pcapng_option_t` structure where the read option will be stored.
+- **Logic and Control Flow**:
+    - Define a packed structure `opt_hdr` with `ushort` fields `type` and `sz` to read the option header.
+    - Read 4 bytes from `stream` into `opt_hdr`; if unsuccessful, return the error from `ferror(stream)`.
+    - Calculate `end_off` as the aligned size of the option data and `read_sz` as the minimum of `end_off` and `opt->sz`.
+    - If `read_sz` is non-zero, read `read_sz` bytes from `stream` into `opt->value`; if unsuccessful, return the error from `ferror(stream)`.
+    - Subtract `read_sz` from `end_off`.
+    - Seek forward in `stream` by `end_off` bytes; if unsuccessful, return `errno`.
     - Return 0 to indicate success.
-- **Output**: Returns 0 on success, or an error code if reading or seeking in the stream fails.
+- **Output**: Returns 0 on success, or an error code from `ferror` or `errno` on failure.
 
 
 ---
 ### fd\_pcapng\_iter\_new<!-- {{#callable:fd_pcapng_iter_new}} -->
-The `fd_pcapng_iter_new` function initializes a new PCAPNG iterator for reading a PCAPNG file from a given memory location and file stream.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L167>)
+
+Initializes a new `fd_pcapng_iter_t` iterator for reading a PCAPNG file from memory.
 - **Inputs**:
-    - `mem`: A pointer to a memory location where the iterator will be initialized; it must be aligned to the alignment requirements of `fd_pcapng_iter_t`.
-    - `_file`: A pointer to a file stream (of type `FILE *`) from which the PCAPNG data will be read.
-- **Control Flow**:
+    - `mem`: A pointer to memory where the `fd_pcapng_iter_t` structure will be initialized.
+    - `_file`: A pointer to a file object representing the PCAPNG file to be read.
+- **Logic and Control Flow**:
     - Check if `mem` is NULL; if so, log a warning and return NULL.
-    - Check if `mem` is properly aligned; if not, log a warning and return NULL.
+    - Check if `mem` is properly aligned for `fd_pcapng_iter_t`; if not, log a warning and return NULL.
     - Check if `_file` is NULL; if so, log a warning and return NULL.
-    - Cast `_file` to a `FILE *` and assign it to `file`.
-    - Initialize the memory pointed to by `mem` to zero and cast it to `fd_pcapng_iter_t *`, assigning it to `iter`.
-    - Set the `stream` member of `iter` to `file`.
-    - Peek at the first block in the file to ensure it is a valid Section Header Block (SHB); if not, log a warning and return NULL.
-    - Read the SHB from the file and check its version; if the version is not supported, log a warning and return NULL.
-    - Return the initialized iterator `iter`.
-- **Output**: Returns a pointer to an initialized `fd_pcapng_iter_t` structure if successful, or NULL if any error occurs during initialization.
-- **Functions called**:
-    - [`fd_pcapng_peek_block`](#fd_pcapng_peek_block)
-    - [`fd_pcapng_iter_strerror`](#fd_pcapng_iter_strerror)
+    - Cast `_file` to a `FILE` pointer and initialize the `fd_pcapng_iter_t` structure with zeroes.
+    - Set the `stream` field of the iterator to the `FILE` pointer.
+    - Peek at the first block in the file to ensure it is a valid Section Header Block (SHB).
+    - If the SHB is invalid or cannot be read, log a warning and return NULL.
+    - Read the SHB and check its version; if unsupported, log a warning and return NULL.
+    - Return the initialized iterator.
+- **Output**: Returns a pointer to the initialized `fd_pcapng_iter_t` structure, or NULL if an error occurs.
+- **Functions Called**:
+    - [`fd_pcapng_peek_block`](<#fd_pcapng_peek_block>)
+    - [`fd_pcapng_iter_strerror`](<#fd_pcapng_iter_strerror>)
 
 
 ---
 ### fd\_pcapng\_iter\_delete<!-- {{#callable:fd_pcapng_iter_delete}} -->
-The `fd_pcapng_iter_delete` function clears and returns the memory associated with a `fd_pcapng_iter_t` iterator.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L222>)
+
+Clears the memory of a `fd_pcapng_iter_t` structure and returns the memory pointer.
 - **Inputs**:
-    - `iter`: A pointer to a `fd_pcapng_iter_t` structure that represents the iterator to be deleted.
-- **Control Flow**:
-    - The function casts the `iter` pointer to a `void*` and assigns it to a local variable `mem`.
-    - It uses `memset` to set all bytes of the memory pointed to by `mem` to zero, effectively clearing the `fd_pcapng_iter_t` structure.
-    - The function returns the `mem` pointer, which is the same as the input `iter` pointer.
-- **Output**: A `void*` pointer to the cleared memory, which is the same as the input `iter` pointer.
+    - `iter`: A pointer to a `fd_pcapng_iter_t` structure that needs to be deleted.
+- **Logic and Control Flow**:
+    - Cast the `iter` pointer to a `void *` and store it in `mem`.
+    - Use `memset` to set all bytes of the memory pointed to by `mem` to zero, with the size of `fd_pcapng_iter_t`.
+    - Return the `mem` pointer.
+- **Output**: Returns a `void *` pointer to the cleared memory of the `fd_pcapng_iter_t` structure.
 
 
 ---
 ### fd\_pcapng\_iter\_next<!-- {{#callable:fd_pcapng_iter_next}} -->
-The `fd_pcapng_iter_next` function iterates through a PCAPNG file stream to find and return the next frame of a known type, handling various block types and errors.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L229>)
+
+Iterates through a PCAPNG file stream to find and return the next frame of a known type, handling various block types and errors.
 - **Inputs**:
-    - `iter`: A pointer to an `fd_pcapng_iter_t` structure, which contains the state of the iteration, including the file stream and error status.
-- **Control Flow**:
+    - `iter`: A pointer to an `fd_pcapng_iter_t` structure, which contains the state of the iteration and the file stream to read from.
+- **Logic and Control Flow**:
     - Initialize a static `fd_pcapng_frame_t` structure `pkt` and clear its fields.
     - Retrieve the file stream from the `iter` structure.
-    - Attempt up to 256 times to find a frame of a known type by peeking at the next block in the stream.
-    - If an error occurs during block peeking, log a warning and return `NULL`.
+    - Attempt up to 256 times to find a frame of a known type, aborting if too many unknown frames are encountered.
+    - Peek at the next block in the stream using [`fd_pcapng_peek_block`](<#fd_pcapng_peek_block>) and handle errors appropriately.
     - Switch on the block type to handle different PCAPNG block types:
     - For `FD_PCAPNG_BLOCK_TYPE_SHB`, set error to -1 (EOF) and return `NULL`.
     - For `FD_PCAPNG_BLOCK_TYPE_IDB`, read the IDB block, add the interface to the list, read options, and seek to the end of the block.
-    - For `FD_PCAPNG_BLOCK_TYPE_SPB`, read the SPB block, set packet fields, and return the packet.
-    - For `FD_PCAPNG_BLOCK_TYPE_EPB`, read the EPB block, read options, set packet fields, and return the packet.
-    - For `FD_PCAPNG_BLOCK_TYPE_DSB`, read the DSB block, read options, set packet fields, and return the packet.
-    - For unknown block types, skip the block and continue to the next attempt.
-    - If no interesting blocks are found after 256 attempts, set error to EPROTO, log a warning, and return `NULL`.
+    - For `FD_PCAPNG_BLOCK_TYPE_SPB`, read the SPB block, update `pkt` with frame data, and return a pointer to `pkt`.
+    - For `FD_PCAPNG_BLOCK_TYPE_EPB`, read the EPB block, update `pkt` with frame data and options, and return a pointer to `pkt`.
+    - For `FD_PCAPNG_BLOCK_TYPE_DSB`, read the DSB block, update `pkt` with frame data, and return a pointer to `pkt`.
+    - For unknown block types, log a debug message and seek past the block.
+    - If no interesting blocks are found after 256 attempts, set an error and return `NULL`.
 - **Output**: Returns a pointer to an `fd_pcapng_frame_t` structure containing the next frame of a known type, or `NULL` if no such frame is found or an error occurs.
-- **Functions called**:
-    - [`fd_pcapng_peek_block`](#fd_pcapng_peek_block)
-    - [`fd_pcapng_iter_strerror`](#fd_pcapng_iter_strerror)
-    - [`fd_pcapng_read_option`](#fd_pcapng_read_option)
+- **Functions Called**:
+    - [`fd_pcapng_peek_block`](<#fd_pcapng_peek_block>)
+    - [`fd_pcapng_iter_strerror`](<#fd_pcapng_iter_strerror>)
+    - [`fd_pcapng_read_option`](<#fd_pcapng_read_option>)
 
 
 ---
 ### fd\_pcapng\_iter\_err<!-- {{#callable:fd_pcapng_iter_err}} -->
-The `fd_pcapng_iter_err` function retrieves the error code from a given `fd_pcapng_iter_t` iterator structure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L516>)
+
+Returns the error code from the `fd_pcapng_iter_t` structure.
 - **Inputs**:
-    - `iter`: A pointer to a constant `fd_pcapng_iter_t` structure from which the error code is to be retrieved.
-- **Control Flow**:
-    - The function accesses the `error` member of the `fd_pcapng_iter_t` structure pointed to by `iter`.
-- **Output**: Returns the integer value of the `error` member from the `fd_pcapng_iter_t` structure.
+    - `iter`: A pointer to a constant `fd_pcapng_iter_t` structure from which the error code is retrieved.
+- **Logic and Control Flow**:
+    - Accesses the `error` field of the `iter` structure.
+    - Returns the value of the `error` field.
+- **Output**: The function returns an integer representing the error code stored in the `iter` structure.
 
 
 ---
 ### fd\_pcapng\_fwrite\_shb<!-- {{#callable:fd_pcapng_fwrite_shb}} -->
-The function `fd_pcapng_fwrite_shb` writes a Section Header Block (SHB) to a file in the PCAPNG format, optionally including hardware, OS, and user application options.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L582>)
+
+Writes a Section Header Block (SHB) to a file in the PCAPNG format.
 - **Inputs**:
-    - `opt`: A pointer to a `fd_pcapng_shb_opts_t` structure containing optional metadata such as hardware, OS, and user application information to be included in the SHB.
-    - `file`: A pointer to a file stream where the SHB will be written.
-- **Control Flow**:
-    - Initialize a buffer `buf` of size `FD_PCAPNG_BLOCK_SZ` to hold the SHB data.
-    - Cast the buffer to a `fd_pcapng_shb_t` pointer `block` and set its fields with default values, including block type, byte order magic, version, and section size.
-    - Set the cursor to the size of `fd_pcapng_shb_t` to track the current position in the buffer.
-    - If `opt` is provided, write optional fields for hardware, OS, and user application using the `FD_PCAPNG_FWRITE_OPT` macro, which handles alignment and size checks.
-    - Write a null option to terminate the options list using `FD_PCAPNG_FWRITE_NULLOPT`.
-    - Finalize the block by setting its size and writing a terminating block size using `FD_PCAPNG_FWRITE_BLOCK_TERM`.
-    - Write the buffer to the file using `fwrite`, returning the result of this operation.
-- **Output**: The function returns the result of the `fwrite` operation, which is the number of elements successfully written to the file (should be 1 if successful).
+    - `opt`: A pointer to `fd_pcapng_shb_opts_t` containing optional metadata such as hardware, OS, and user application information.
+    - `file`: A pointer to a file object where the SHB will be written.
+- **Logic and Control Flow**:
+    - Initialize a buffer `buf` of size `FD_PCAPNG_BLOCK_SZ` to store the SHB data.
+    - Cast the buffer to a `fd_pcapng_shb_t` pointer `block` and set its fields with default values, including `block_type`, `byte_order_magic`, `version_major`, `version_minor`, and `section_sz`.
+    - Set the `cursor` to the size of `fd_pcapng_shb_t`.
+    - If `opt` is not NULL, write optional fields for hardware, OS, and user application using the `FD_PCAPNG_FWRITE_OPT` macro.
+    - Write a null option using the `FD_PCAPNG_FWRITE_NULLOPT` macro.
+    - Terminate the block using the `FD_PCAPNG_FWRITE_BLOCK_TERM` macro, which sets the block size and appends it to the buffer.
+    - Write the buffer to the file using `fwrite` and return the result.
+- **Output**: Returns the number of elements successfully written to the file, which should be 1 if successful.
 
 
 ---
 ### fd\_pcapng\_fwrite\_idb<!-- {{#callable:fd_pcapng_fwrite_idb}} -->
-The `fd_pcapng_fwrite_idb` function writes an Interface Description Block (IDB) to a file in the PCAPNG format, including optional metadata if provided.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L612>)
+
+Writes an Interface Description Block (IDB) to a file in the PCAPNG format.
 - **Inputs**:
-    - `link_type`: An unsigned integer representing the link type for the interface.
-    - `opt`: A pointer to a `fd_pcapng_idb_opts_t` structure containing optional metadata for the IDB, such as name, IP address, MAC address, and hardware information.
+    - `link_type`: The type of link layer for the interface, represented as an unsigned integer.
+    - `opt`: A pointer to a `fd_pcapng_idb_opts_t` structure containing optional interface description options.
     - `file`: A pointer to a file stream where the IDB will be written.
-- **Control Flow**:
-    - Initialize a buffer `buf` of size `FD_PCAPNG_BLOCK_SZ` to hold the IDB data.
-    - Cast the buffer to a `fd_pcapng_idb_t` pointer `block` and set its initial fields, including `block_type` and `link_type`.
-    - Set a default timestamp resolution option using `FD_PCAPNG_FWRITE_OPT`.
-    - If `opt` is not NULL, check and write optional fields such as name, IPv4 address, MAC address, and hardware using `FD_PCAPNG_FWRITE_OPT`.
+- **Logic and Control Flow**:
+    - Initialize a buffer `buf` of size `FD_PCAPNG_BLOCK_SZ` to store the IDB data.
+    - Cast the buffer to a `fd_pcapng_idb_t` structure pointer `block`.
+    - Set the initial cursor position to the size of `fd_pcapng_idb_t`.
+    - Initialize the `block` with the block type `FD_PCAPNG_BLOCK_TYPE_IDB`, the provided `link_type`, and a default `snap_len` of 0.
+    - Set the timestamp resolution option `FD_PCAPNG_IDB_OPT_TSRESOL` to nanoseconds using `FD_PCAPNG_FWRITE_OPT`.
+    - If `opt` is not null, write additional options such as `name`, `ip4_addr`, `mac_addr`, and `hardware` using `FD_PCAPNG_FWRITE_OPT` if they are present in `opt`.
     - Write a null option to terminate the options list using `FD_PCAPNG_FWRITE_NULLOPT`.
-    - Terminate the block by setting the block size and writing a footer using `FD_PCAPNG_FWRITE_BLOCK_TERM`.
+    - Terminate the block by setting the block size and writing the block size at the end using `FD_PCAPNG_FWRITE_BLOCK_TERM`.
     - Write the buffer to the file using `fwrite` and return the result.
 - **Output**: Returns the number of elements successfully written to the file, which should be 1 if successful.
 
 
 ---
 ### fd\_pcapng\_fwrite\_pkt<!-- {{#callable:fd_pcapng_fwrite_pkt}} -->
-The `fd_pcapng_fwrite_pkt` function writes a packet to a PCAPNG file, ensuring proper alignment and formatting according to the PCAPNG Enhanced Packet Block (EPB) structure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L655>)
+
+Writes a packet to a PCAPNG file with proper alignment and block structure.
 - **Inputs**:
-    - `ts`: A long integer representing the timestamp of the packet.
+    - `ts`: The timestamp of the packet, given as a long integer.
     - `payload`: A pointer to the packet data to be written.
-    - `payload_sz`: An unsigned long integer representing the size of the packet data.
-    - `_file`: A pointer to a FILE object where the packet will be written.
-- **Control Flow**:
-    - The function begins by casting the `_file` pointer to a `FILE` pointer and checks if the current file position is 4-byte aligned using `fd_ulong_is_aligned`.
-    - It initializes a cursor to the size of `fd_pcapng_epb_t` and sets up an `fd_pcapng_epb_t` block with the appropriate fields, including the timestamp and payload size.
-    - The payload size is aligned to the next 4-byte boundary, and padding is calculated if necessary.
-    - The cursor is incremented by the aligned payload size and an additional 4 bytes for an empty option list.
-    - The block size is calculated and set in the `block_sz` field of the block.
-    - The function writes the block header to the file using `fwrite` and checks for errors.
-    - It writes the payload to the file and checks for errors.
-    - If padding is needed, it writes the padding to the file and checks for errors.
-    - It writes an empty options block to the file and checks for errors.
-    - Finally, it writes the block size trailer to the file and checks for errors.
-    - If all writes are successful, the function returns 1UL; otherwise, it returns 0UL on any failure.
-- **Output**: The function returns 1UL on successful writing of the packet to the file, or 0UL if any write operation fails.
+    - `payload_sz`: The size of the packet data in bytes.
+    - `_file`: A pointer to the file where the packet will be written, cast to a `void *`.
+- **Logic and Control Flow**:
+    - Cast `_file` to a `FILE *` and check if the file position is 4-byte aligned using `fd_ulong_is_aligned`.
+    - Initialize a `fd_pcapng_epb_t` structure with the block type, interface index, timestamp, and payload size.
+    - Calculate the aligned payload size to the nearest 4-byte boundary and determine the padding size needed.
+    - Increment the cursor by the aligned payload size and add 4 bytes for the empty option list.
+    - Set the block size in the `fd_pcapng_epb_t` structure to the current cursor position plus 4 bytes for the trailer.
+    - Write the block header to the file and check for write success.
+    - Write the payload to the file and check for write success.
+    - If padding is needed, write the padding to the file and check for write success.
+    - Write 4 bytes of zero for the empty options and check for write success.
+    - Write the block size trailer to the file and check for write success.
+- **Output**: Returns 1UL on success, or 0UL if any write operation fails.
 
 
 ---
 ### fd\_pcapng\_fwrite\_tls\_key\_log<!-- {{#callable:fd_pcapng_fwrite_tls_key_log}} -->
-The function `fd_pcapng_fwrite_tls_key_log` writes a TLS key log entry to a file in the PCAPNG format, ensuring proper alignment and block structure.
+[View Source →](<../../../../../src/util/net/fd_pcapng.c#L706>)
+
+Writes a TLS key log to a file in PCAPNG format, ensuring proper alignment and block structure.
 - **Inputs**:
-    - `log`: A pointer to the TLS key log data to be written.
+    - `log`: A pointer to the TLS key log data to write.
     - `log_sz`: The size of the TLS key log data in bytes.
-    - `_file`: A pointer to a FILE object where the TLS key log will be written.
-- **Control Flow**:
-    - The function begins by casting the `_file` pointer to a `FILE` pointer and checks if the current file position is 4-byte aligned using `fd_ulong_is_aligned`.
-    - It initializes a `fd_pcapng_dsb_t` structure named `block` with the block type set to `FD_PCAPNG_BLOCK_TYPE_DSB`, secret type to `FD_PCAPNG_SECRET_TYPE_TLS`, and secret size to `log_sz`.
-    - The function calculates the aligned size of the log data (`log_sz_align`) and the padding size (`pad_sz`) needed to ensure 4-byte alignment.
-    - The cursor is updated to account for the aligned log size and an additional 4 bytes for the end of options block.
-    - The total block size is calculated and stored in `block.block_sz`.
-    - The function writes the `block` header to the file and checks for successful write operations using `fwrite`.
-    - It writes the log data to the file, followed by any necessary padding to maintain alignment.
-    - An empty options block is written, followed by the block size trailer.
-    - If any `fwrite` operation fails, the function returns `0UL` to indicate failure; otherwise, it returns `1UL` to indicate success.
-- **Output**: The function returns `1UL` on successful writing of the TLS key log entry, or `0UL` if any write operation fails.
+    - `_file`: A pointer to the file where the TLS key log will be written.
+- **Logic and Control Flow**:
+    - Cast `_file` to a `FILE` pointer named `file`.
+    - Check if the current file position is 4-byte aligned using `fd_ulong_is_aligned`.
+    - Initialize a `fd_pcapng_dsb_t` structure named `block` with the block type set to `FD_PCAPNG_BLOCK_TYPE_DSB`, secret type set to `FD_PCAPNG_SECRET_TYPE_TLS`, and secret size set to `log_sz`.
+    - Calculate `log_sz_align` as the 4-byte aligned size of `log_sz` and determine `pad_sz` as the difference between `log_sz_align` and `log_sz`.
+    - Increment `cursor` by `log_sz_align` and add 4 bytes for the end of options block.
+    - Set `block.block_sz` to the total size of the block, including the header, log, padding, options, and trailer.
+    - Write the `block` header to the file and return 0 if unsuccessful.
+    - Write the `log` data to the file and return 0 if unsuccessful.
+    - Write padding to the file if `pad_sz` is non-zero and return 0 if unsuccessful.
+    - Write an empty options block to the file and return 0 if unsuccessful.
+    - Write the block size trailer to the file and return 0 if unsuccessful.
+    - Return 1 to indicate success.
+- **Output**: Returns 1 on success, or 0 if any write operation fails.
 
 
 
