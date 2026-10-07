@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build tool and compiler settings, linker flags, fuzzing flags, and utility commands.
+Makefile configuration for build settings, compiler flags, and toolchain parameters in the Firedancer project.
 
 # Purpose
-This file defines build and tool settings that are used across the project. It sets default paths, compiler commands, language flags, and linker options for C, C++, Rust, and shared library builds, and it also defines common file and directory commands such as `cp`, `rm`, `mkdir`, and `find`. The file includes tool names for coverage and test support, such as `llvm-cov`, `llvm-profdata`, `lcov`, `genhtml`, and `libFuzzer` options, so build and test tasks use the same parameters. It also reads the compiler major version with `CC_MAJOR_VERSION` and sets a default `_FORTIFY_SOURCE` level to control security-related compile behavior.
+This Makefile defines various build and compilation settings for a software project. It specifies default directories, tools, and flags used during the build process. The `BASEDIR` variable sets the base directory for build outputs, while `OPT` specifies an optional directory for additional includes. Compiler settings are defined with variables such as `CC`, `CXX`, and their respective flags `CFLAGS` and `CXXFLAGS`, which set standards and options for C and C++ compilation. The file also includes settings for Rust compilation with `RUSTFLAGS` and `RUST_PROFILE`, and it configures tools for code coverage analysis using LLVM and lcov. Additionally, it defines commands for file operations like `CP`, `RM`, and `MKDIR`, and includes parameters for running libFuzzer tests with `FUZZFLAGS`. The `FORTIFY_SOURCE` variable sets a default level for source fortification, enhancing security during compilation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

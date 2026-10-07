@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `MismatchedMemset.ql` file in the `firedancer` codebase detects potential issues where the `memset` function is called with a size that does not match the type of the first argument, issuing a warning when a mismatch is found.
+Detects potential mismatches in memset size arguments where the type of the first argument differs from the sizeof type.
 
 # Purpose
-This source code file is designed to identify potential issues in C/C++ code related to the use of the `memset` function, specifically focusing on mismatches in the size argument. The code defines a class `MemsetFunction` that extends a `Function` class, which is used to identify calls to various memory-setting functions such as `fd_memset`, `memset`, `bzero`, and `__builtin_memset`. The primary functionality of this code is to detect instances where the size argument in a `memset` call does not match the type of the memory being set, which can lead to incorrect memory operations and potential bugs.
+The code is a static analysis tool designed to detect potential issues with the use of the `memset` function in C or C++ code. Specifically, it identifies cases where the size argument in a `memset` call might be incorrect due to a mismatch between the type of the first argument and the type used in the `sizeof` operator. This is important for ensuring that memory operations are performed correctly and safely, preventing potential buffer overflows or memory corruption.
 
-The code is structured to filter and analyze function calls, checking if the size argument in a `memset` call is derived from a `sizeof` operator that does not correspond to the type of the first argument. It uses a combination of type checking and logical conditions to ensure that the size argument is appropriate for the type of the memory being initialized. The code also includes a mechanism to exclude certain types, such as `char`, `unsigned char`, and `void`, from triggering a warning, as these are commonly used with `memset` without issues.
+The code defines a class `MemsetFunction` that extends a `Function` class. This class is used to identify functions that are globally named `fd_memset`, `memset`, `bzero`, or `__builtin_memset`. The `sizeIdx` method determines the index of the size argument based on the function name, which is crucial for the subsequent analysis.
 
-This file is part of a static analysis tool, likely intended to be integrated into a larger code analysis framework. It provides a high-precision warning when a potential mismatch is detected, helping developers identify and correct these issues before they lead to runtime errors. The code does not define public APIs or external interfaces but rather serves as a rule or check within a static analysis system to improve code safety and reliability.
+The analysis is performed by examining function calls to `memset` and checking if the size argument is derived from a `SizeofTypeOperator`. It then compares the type of the first argument with the type used in the `sizeof` operator. If there is a mismatch and the type is not `char`, `unsigned char`, or `void`, a warning is generated. This warning indicates that the call to `memset` might be of incorrect size, providing details about the types involved.
 # Imports and Dependencies
 
 ---
