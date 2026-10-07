@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for the `fd_circq` and related components within the `disco/events` directory.
+Makefile for adding headers, objects, and running unit tests for `fd_circq` in the `firedancer` codebase.
 
 # Purpose
-This file is a Makefile script used for building and testing components of a software project. It adds header files and object files to the build process, specifically `fd_circq.h` and `fd_circq`, `fd_disco`. It also defines and executes a unit test named `test_circq`, which depends on several components: `fd_disco`, `fd_flamenco`, `fd_tango`, and `fd_util`.
+The `Makefile` content defines build and test instructions for a software project. It adds headers and object files using the `add-hdrs` and `add-objs` functions, specifically for `fd_circq.h` and the objects `fd_circq` and `fd_disco`. It also sets up a unit test named `test_circq` with dependencies on `fd_disco`, `fd_flamenco`, `fd_tango`, and `fd_util`, and includes a command to run this unit test.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

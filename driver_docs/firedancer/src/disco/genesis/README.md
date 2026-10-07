@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `genesis` folder in the `firedancer` codebase contains source and header files for identifying and naming blockchain clusters based on genesis hash values, along with a makefile for conditional compilation settings.
+Functions for blockchain cluster identification, macros for cluster identifiers, and Makefile logic.
 
 
 ## Files
-- **[fd_genesis_cluster.c](fd_genesis_cluster.c.md)**: The `fd_genesis_cluster.c` file in the `firedancer` codebase provides functions to identify and name blockchain clusters based on their genesis hash values.
-- **[fd_genesis_cluster.h](fd_genesis_cluster.h.md)**: The `fd_genesis_cluster.h` file defines macros for different cluster types and provides functions to identify a cluster from a base58 encoded hash and to retrieve the human-readable name of a cluster in the `firedancer` codebase.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and objects related to `fd_genesis_cluster` and `fd_disco` based on the presence of `FD_HAS_INT128`.
+- **[fd_genesis_cluster.c](fd_genesis_cluster.c.md)**: Functions to identify and name blockchain clusters based on genesis hash values.
+- **[fd_genesis_cluster.h](fd_genesis_cluster.h.md)**: Defines macros for cluster identifiers and functions to convert between base58 hashes and cluster names.
+- **[Local.mk](Local.mk.md)**: Makefile logic for adding headers and objects if 128-bit integer support is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

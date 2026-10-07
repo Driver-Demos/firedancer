@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_curve25519_tables.c` file in the `firedancer` codebase is responsible for generating precomputation tables for Curve25519 and Ed25519 operations, which are stored in the `table/` directory, and includes functions for creating field constants, point constants, and various precomputed tables for cryptographic operations.
+Generates precomputation tables for Curve25519 and Ristretto255 used in cryptographic operations.
 
 # Purpose
-This C source code file is designed to generate precomputation tables for cryptographic operations involving Curve25519 and Ristretto255, which are elliptic curve cryptography systems. The file includes functions to create and store tables of field constants and elliptic curve points, which are essential for efficient cryptographic computations such as scalar multiplication. The code is structured to support different hardware backends, including AVX512, to optimize performance on various architectures. The generated tables are stored in the specified directory and are used to accelerate cryptographic operations by precomputing values that are frequently used in algorithms like Ed25519 signature verification and Ristretto255-based range proofs.
+The code is a C program designed to generate precomputation tables for cryptographic operations involving Curve25519 and Ristretto255. These tables are stored in the `table/` directory and are used to optimize operations such as scalar multiplication in elliptic curve cryptography. The program includes functions to generate field constants and point tables, which are essential for efficient cryptographic computations. The tables are generated for different architectures, such as AVX512 and reference implementations, to ensure compatibility and performance across various systems.
 
-The file is a comprehensive utility that includes functions for encoding and decoding hexadecimal values, managing elliptic curve points, and generating tables for both Ed25519 and Ristretto255 points. It also includes a main function that orchestrates the generation of these tables, saving them to files with architecture-specific suffixes. The code is intended to be executed as a standalone program, which, when run, will produce the necessary precomputation tables for use in other cryptographic applications. The generated files are marked as auto-generated and should not be modified manually, ensuring that they remain consistent with the cryptographic algorithms they support.
+The program defines several functions to create and write these tables to files. The [`field_tables_file`](<#field_tables_file>), [`point_tables_file`](<#point_tables_file>), and [`rangeproofs_tables_file`](<#rangeproofs_tables_file>) functions generate tables for field elements, elliptic curve points, and range proofs, respectively. The [`main`](<#main>) function orchestrates the generation process by calling these functions and writing the output to specific files based on the target architecture. The program also includes instructions for regenerating the tables, which involve compiling the code for different backends and running the generated unit tests. The generated files are marked as auto-generated and should not be modified manually.
 # Imports and Dependencies
 
 ---
@@ -23,193 +23,214 @@ The file is a comprehensive utility that includes functions for encoding and dec
 
 ---
 ### field\_constant<!-- {{#callable:field_constant}} -->
-The `field_constant` function writes a static constant definition of a field element in hexadecimal and array format to a specified file.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L27>)
+
+Generates a static constant field in C code from a given `fd_f25519_t` value and writes it to a file.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the output will be written.
-    - `name`: A constant character pointer representing the name of the field element to be used in the static constant definition.
-    - `value`: A pointer to an `fd_f25519_t` structure representing the field element whose value will be written to the file.
-- **Control Flow**:
-    - Initialize a 32-byte buffer `buf` and a 65-character array `hex` with the last character set to null terminator.
-    - Convert the field element `value` to a byte array using `fd_f25519_tobytes` and encode it to a hexadecimal string using `fd_hex_encode`.
-    - Write a comment line to the file containing the hexadecimal representation of the field element.
-    - Write the beginning of a static constant definition for the field element to the file, using the provided `name`.
-    - Write the opening brace for the array initialization.
-    - If `FD_HAS_AVX512` is defined, iterate over the first 6 elements of `value->el`, writing each as a 16-character hexadecimal value to the file, followed by two zero values.
-    - If `FD_HAS_AVX512` is not defined, iterate over the first 5 elements of `value->el`, writing each as a 16-character hexadecimal value to the file.
-    - Write the closing brace for the array and the static constant definition to the file.
-- **Output**: The function does not return a value; it writes formatted data to the specified file.
+    - ``file``: A pointer to a `FILE` object where the function writes the generated C code.
+    - ``name``: A constant character pointer representing the name of the field to be generated.
+    - ``value``: A pointer to an `fd_f25519_t` structure containing the value to be encoded and written as a static constant field.
+- **Logic and Control Flow**:
+    - Initializes a buffer `buf` of 32 unsigned characters and a `hex` string of 65 characters, setting `hex[64]` to 0 to ensure null-termination.
+    - Encodes the `fd_f25519_t` value into a hexadecimal string using `fd_hex_encode` and `fd_f25519_tobytes`, storing the result in `hex`.
+    - Writes a comment line to the file with the hexadecimal representation of the value.
+    - Writes the declaration of a static constant `fd_f25519_t` array with the specified `name` to the file.
+    - Writes the opening brace for the array initialization.
+    - If `FD_HAS_AVX512` is defined, iterates over the first 6 elements of `value->el`, writing each as a 64-bit hexadecimal value to the file, followed by two zero values.
+    - If `FD_HAS_AVX512` is not defined, iterates over the first 5 elements of `value->el`, writing each as a 64-bit hexadecimal value to the file.
+    - Writes the closing brace for the array initialization and the closing brace for the static constant declaration.
+    - Writes two newline characters to the file to separate this field from subsequent content.
+- **Output**: No return value; the function writes the generated C code directly to the specified file.
 
 
 ---
 ### field\_tables\_file<!-- {{#callable:field_tables_file}} -->
-The `field_tables_file` function generates and writes precomputed field constants for Curve25519 operations to a specified file.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L54>)
+
+Generates and writes precomputed field constants for Curve25519 operations to a file.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the precomputed field constants will be written.
-- **Control Flow**:
-    - Initialize a buffer `buf` of 32 unsigned characters for temporary storage.
-    - Declare several `fd_f25519_t` variables to hold precomputed field constants.
-    - Decode hexadecimal strings into byte arrays and convert them into `fd_f25519_t` field elements using `fd_f25519_frombytes`.
-    - Negate the value of `fd_f25519_k` to obtain `fd_f25519_minus_k`.
+    - `file`: A pointer to a `FILE` object where the function writes the precomputed field constants.
+- **Logic and Control Flow**:
+    - Declare and initialize an array `buf` of 32 unsigned characters for temporary storage.
+    - Declare several `fd_f25519_t` variables to store field constants.
+    - Decode hexadecimal strings into byte arrays and convert them into field elements using `fd_f25519_frombytes`.
+    - Negate the field element `fd_f25519_k` to get `fd_f25519_minus_k`.
     - Write a predefined header to the file to indicate the file is auto-generated.
     - Iterate over the header array and write each line to the file using `fprintf`.
-    - Call [`field_constant`](#field_constant) for each precomputed field constant to write its definition to the file.
-- **Output**: The function does not return a value; it writes data to the provided file.
-- **Functions called**:
-    - [`field_constant`](#field_constant)
+    - Call [`field_constant`](<#field_constant>) for each field constant to write its definition to the file.
+- **Output**: Writes precomputed field constants for Curve25519 to the specified file.
+- **Functions Called**:
+    - [`field_constant`](<#field_constant>)
 
 
 ---
 ### point\_const<!-- {{#callable:point_const}} -->
-The `point_const` function writes the hexadecimal representation of an `fd_ed25519_point_t` structure to a file, formatted differently based on whether AVX512 is available.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L128>)
+
+Formats and writes the components of an `fd_ed25519_point_t` structure to a file in a specific format depending on the availability of AVX512 support.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the output will be written.
-    - `value`: A constant pointer to an `fd_ed25519_point_t` structure containing the point data to be written.
-- **Control Flow**:
-    - Check if FD_HAS_AVX512 is defined to determine the output format.
-    - If FD_HAS_AVX512 is defined, iterate over three arrays (P03, P14, P25) of the `value` structure, each containing 8 elements, and write each element in hexadecimal format to the file.
-    - If FD_HAS_AVX512 is not defined, iterate over four arrays (X, Y, T, Z) of the `value` structure, each containing 5 elements, and write each element in hexadecimal format to the file.
-- **Output**: The function does not return a value; it writes formatted data to the specified file.
+    - ``file``: A pointer to a `FILE` object where the function will write the formatted point data.
+    - ``value``: A constant pointer to an `fd_ed25519_point_t` structure containing the point data to be formatted and written.
+- **Logic and Control Flow**:
+    - Checks if `FD_HAS_AVX512` is defined to determine the format of the output.
+    - If `FD_HAS_AVX512` is defined, iterates over three arrays `P03`, `P14`, and `P25` in the `value` structure, each containing 8 elements, and writes them to the file in a specific format.
+    - If `FD_HAS_AVX512` is not defined, iterates over four arrays `X->el`, `Y->el`, `T->el`, and `Z->el` in the `value` structure, each containing 5 elements, and writes them to the file in a different format.
+- **Output**: No return value; the function writes formatted data to the specified file.
 
 
 ---
 ### points\_matrix<!-- {{#callable:points_matrix}} -->
-The `points_matrix` function generates and writes a static constant matrix of `fd_ed25519_point_t` points to a file, with each point being encoded in hexadecimal format.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L170>)
+
+Generates a static constant matrix of `fd_ed25519_point_t` points and writes it to a file.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the matrix will be written.
-    - `name`: A constant character pointer representing the name of the matrix to be used in the output file.
-    - `values`: A 2D array of `fd_ed25519_point_t` structures containing the points to be written to the file.
+    - `file`: A pointer to a `FILE` object where the matrix will be written.
+    - `name`: A constant character pointer representing the name of the matrix.
+    - `values`: A 2D array of `fd_ed25519_point_t` structures containing the point values to be written.
     - `n`: An integer representing the number of rows in the matrix.
     - `m`: An integer representing the number of columns in the matrix.
-- **Control Flow**:
-    - Initialize a buffer `buf` of 32 unsigned characters and a `hex` string of 65 characters with the last character set to null terminator.
-    - Write the matrix declaration to the file using `fprintf`, including the matrix name and dimensions `n` and `m`.
-    - Iterate over each row `j` from 0 to `n-1`, writing the row index as a comment in the file.
-    - For each row, iterate over each column `k` from 0 to `m-1`, obtaining a pointer to the current point `value` in the `values` array.
-    - Convert the point to bytes using `fd_ed25519_point_tobytes`, encode it to a hexadecimal string using `fd_hex_encode`, and write the compressed point as a comment in the file.
-    - Write the opening brace for the point structure to the file.
-    - Call [`point_const`](#point_const) to write the detailed point structure to the file.
-    - Write the closing brace and a comma for the point structure to the file.
-    - After iterating through all columns, write the closing brace and a comma for the row to the file.
-    - After iterating through all rows, write the closing brace for the matrix to the file.
-- **Output**: The function outputs a static constant matrix of `fd_ed25519_point_t` points in C source code format to the specified file.
-- **Functions called**:
-    - [`point_const`](#point_const)
+- **Logic and Control Flow**:
+    - Initializes a buffer `buf` of 32 bytes and a `hex` string of 65 characters, setting the last character of `hex` to 0.
+    - Writes the matrix declaration to the file using `fprintf`, including the matrix name and dimensions `n` and `m`.
+    - Iterates over each row `j` from 0 to `n-1`, writing a comment with the row index.
+    - For each row, iterates over each column `k` from 0 to `m-1`, processing each point value.
+    - Encodes each point value to a hexadecimal string using `fd_hex_encode` and writes a comment with the compressed point.
+    - Writes the point value to the file by calling [`point_const`](<#point_const>) with the current point value.
+    - Closes the row and column braces with `fprintf`.
+    - Ends the matrix declaration with a closing brace and a newline.
+- **Output**: No return value; the function writes the matrix to the specified file.
+- **Functions Called**:
+    - [`point_const`](<#point_const>)
 
 
 ---
 ### points\_array<!-- {{#callable:points_array}} -->
-The `points_array` function generates and writes a static array of `fd_ed25519_point_t` structures to a file, with each point's data being encoded in hexadecimal format.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L197>)
+
+Generates a static array of `fd_ed25519_point_t` structures and writes it to a file.
 - **Inputs**:
-    - `file`: A pointer to a `FILE` object where the output will be written.
-    - `name`: A constant character pointer representing the name of the array to be written in the file.
-    - `values`: A pointer to an array of `fd_ed25519_point_t` structures that contains the points to be written.
-    - `n`: An integer representing the number of points in the `values` array.
-- **Control Flow**:
-    - Initialize a buffer `buf` of 32 unsigned characters and a `hex` string of 65 characters, setting the last character of `hex` to null terminator.
-    - Write the array declaration to the file using `fprintf`, including the array name and size `n`.
-    - Iterate over each point in the `values` array using a for loop from 0 to `n-1`.
-    - For each point, encode the point's data into a hexadecimal string using `fd_hex_encode` and `fd_ed25519_point_tobytes`.
-    - Write a comment to the file with the compressed hexadecimal representation of the point.
-    - Call [`point_const`](#point_const) to write the detailed structure of the point to the file.
-    - Close the point structure with a closing brace and comma, and continue to the next point.
-    - After the loop, close the array declaration with a closing brace and two newlines.
-- **Output**: The function outputs a C source code snippet to the specified file, which declares and initializes a static array of `fd_ed25519_point_t` structures with their data encoded in hexadecimal format.
-- **Functions called**:
-    - [`point_const`](#point_const)
+    - `file`: A pointer to a `FILE` object where the function writes the output.
+    - `name`: A constant character pointer representing the name of the array to be written.
+    - `values`: A pointer to an array of `fd_ed25519_point_t` structures that contains the point values to be written.
+    - `n`: An integer representing the number of elements in the `values` array.
+- **Logic and Control Flow**:
+    - Initializes a buffer `buf` of 32 unsigned characters and a `hex` string of 65 characters, setting `hex[64]` to 0 to ensure it is null-terminated.
+    - Writes the declaration of a static array of `fd_ed25519_point_t` with the specified `name` and size `n` to the `file`.
+    - Iterates over each element in the `values` array using a loop that runs `n` times.
+    - For each element, gets a pointer to the current `fd_ed25519_point_t` structure and encodes it into a hexadecimal string using `fd_hex_encode`.
+    - Writes a comment with the compressed hexadecimal representation of the point to the `file`.
+    - Writes the opening brace for the current point structure to the `file`.
+    - Calls the [`point_const`](<#point_const>) function to write the constant representation of the point to the `file`.
+    - Writes the closing brace and a comma for the current point structure to the `file`.
+    - After the loop, writes the closing brace for the array to the `file`.
+- **Output**: No return value; the function writes the output directly to the specified `file`.
+- **Functions Called**:
+    - [`point_const`](<#point_const>)
 
 
 ---
 ### point\_tables\_file<!-- {{#callable:point_tables_file}} -->
-The `point_tables_file` function generates and writes precomputed Ed25519 point tables to a specified file for use in cryptographic operations.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L220>)
+
+Generates and writes precomputed tables for Ed25519 base points and related data to a file.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the generated tables will be written.
-- **Control Flow**:
-    - Initialize arrays for x and y coordinates and various Ed25519 point tables.
-    - Decode hexadecimal strings into byte arrays x and y, and convert them into an Ed25519 base point.
-    - Initialize low-order points by decoding hexadecimal strings into byte arrays and converting them into field elements.
-    - Create a w-NAF table by doubling the base point and iteratively adding it to previous entries, then precompute each entry.
-    - Create a constant-time table by doubling the base point multiple times and adding it to previous entries, then precompute each entry.
+    - `file`: A pointer to a `FILE` object where the function writes the generated tables.
+- **Logic and Control Flow**:
+    - Initialize arrays `x` and `y` to store decoded hexadecimal values.
+    - Decode hexadecimal strings into `x` and `y` arrays using `fd_hex_decode`.
+    - Convert the decoded bytes into an Ed25519 base point using `fd_curve25519_affine_frombytes`.
+    - Initialize low-order points `fd_ed25519_order8_point_y0` and `fd_ed25519_order8_point_y1` by decoding and converting hexadecimal strings.
+    - Create a w-NAF table for fast scalar multiplication by initializing the first element and iteratively adding the base point to fill the table.
+    - Precompute values for the w-NAF table using [`fd_curve25519_into_precomputed`](<ref/fd_curve25519.h.md#fd_curve25519_into_precomputed>).
+    - Create a constant-time table for scalar multiplication by doubling points and adding them iteratively.
+    - Precompute values for the constant-time table using [`fd_curve25519_into_precomputed`](<ref/fd_curve25519.h.md#fd_curve25519_into_precomputed>).
     - Write a header comment to the file indicating the file is auto-generated.
-    - Write the base point, low-order points, w-NAF table, and constant-time table to the file using helper functions.
-- **Output**: The function outputs the generated Ed25519 point tables to the specified file.
-- **Functions called**:
-    - [`fd_ed25519_point_set`](avx512/fd_curve25519.h.md#fd_ed25519_point_set)
-    - [`fd_curve25519_into_precomputed`](avx512/fd_curve25519.h.md#fd_curve25519_into_precomputed)
-    - [`points_array`](#points_array)
-    - [`field_constant`](#field_constant)
-    - [`points_matrix`](#points_matrix)
+    - Write the base point, low-order points, w-NAF table, and constant-time table to the file using [`points_array`](<#points_array>) and [`points_matrix`](<#points_matrix>) functions.
+- **Output**: Writes precomputed Ed25519 tables to the specified file.
+- **Functions Called**:
+    - [`fd_ed25519_point_set`](<ref/fd_curve25519.h.md#fd_ed25519_point_set>)
+    - [`fd_curve25519_into_precomputed`](<ref/fd_curve25519.h.md#fd_curve25519_into_precomputed>)
+    - [`points_array`](<#points_array>)
+    - [`field_constant`](<#field_constant>)
+    - [`points_matrix`](<#points_matrix>)
 
 
 ---
 ### ristretto\_points\_array<!-- {{#callable:ristretto_points_array}} -->
-The `ristretto_points_array` function writes an array of Ristretto255 points to a file in a specific format, including their compressed hexadecimal representation.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L306>)
+
+Generates a static array of `fd_ristretto255_point_t` points and writes it to a file.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the array of Ristretto255 points will be written.
+    - `file`: A pointer to a `FILE` object where the function will write the output.
     - `name`: A constant character pointer representing the name of the array to be written in the file.
-    - `values`: A constant pointer to an array of `fd_ristretto255_point_t` structures representing the Ristretto255 points to be written.
-    - `n`: An integer representing the number of Ristretto255 points in the `values` array.
-- **Control Flow**:
-    - Initialize a buffer `buf` of 32 unsigned characters and a `hex` string of 65 characters with the last character set to null terminator.
-    - Write the declaration of a static array of `fd_ristretto255_point_t` with the given `name` and size `n` to the file.
-    - Iterate over each Ristretto255 point in the `values` array using a loop that runs `n` times.
-    - For each point, get its address and convert it to a byte array using [`fd_ristretto255_point_tobytes`](fd_ristretto255.c.md#fd_ristretto255_point_tobytes), then encode it to a hexadecimal string using `fd_hex_encode`.
-    - Write a comment line to the file with the compressed hexadecimal representation of the point.
-    - Write the opening brace for the point structure to the file.
-    - Call [`point_const`](#point_const) to write the point's internal structure to the file.
-    - Write the closing brace and a comma to the file to complete the point's entry in the array.
-    - After the loop, write the closing brace and semicolon to the file to complete the array definition.
-- **Output**: The function does not return a value; it outputs the formatted array of Ristretto255 points to the specified file.
-- **Functions called**:
-    - [`fd_ristretto255_point_tobytes`](fd_ristretto255.c.md#fd_ristretto255_point_tobytes)
-    - [`point_const`](#point_const)
+    - `values`: A constant pointer to an array of `fd_ristretto255_point_t` structures representing the points to be written.
+    - `n`: An integer representing the number of points in the `values` array.
+- **Logic and Control Flow**:
+    - Initializes a buffer `buf` of 32 bytes and a `hex` string of 65 characters, setting the last character of `hex` to null terminator.
+    - Writes the declaration of a static array of `fd_ristretto255_point_t` with the given `name` and size `n` to the `file`.
+    - Iterates over each point in the `values` array using a loop that runs `n` times.
+    - For each point, encodes it into a hexadecimal string using `fd_hex_encode` and writes a comment with the compressed hexadecimal representation to the `file`.
+    - Calls [`point_const`](<#point_const>) to write the point's constant representation to the `file`.
+    - Writes the closing brace and comma for each point in the array.
+    - Writes the closing brace for the array declaration.
+- **Output**: No return value; the function writes the formatted array of points to the specified file.
+- **Functions Called**:
+    - [`fd_ristretto255_point_tobytes`](<fd_ristretto255.c.md#fd_ristretto255_point_tobytes>)
+    - [`point_const`](<#point_const>)
 
 
 ---
 ### rangeproofs\_tables\_file<!-- {{#callable:rangeproofs_tables_file}} -->
-The `rangeproofs_tables_file` function generates and writes precomputed tables for range proofs, including base points and generators, to a specified file.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L329>)
+
+Generates and writes precomputed tables for range proofs to a specified file.
 - **Inputs**:
-    - `file`: A pointer to a FILE object where the generated tables will be written.
-- **Control Flow**:
-    - Initialize a buffer `buf` of 32 bytes for temporary storage.
+    - `file`: A pointer to a `FILE` object where the precomputed tables will be written.
+- **Logic and Control Flow**:
+    - Initialize a buffer `buf` of 32 bytes.
     - Set `fd_rangeproofs_basepoint_G` to the Ed25519 base point.
     - Decode a hardcoded hexadecimal string into `buf` and convert it to a Ristretto255 point, storing it in `fd_rangeproofs_basepoint_H`.
-    - Iterate over 256 pre-defined compressed hexadecimal strings for `fd_rangeproofs_generators_G_compressed`, decode each into `buf`, convert to Ristretto255 points, and store in `fd_rangeproofs_generators_G`.
-    - Repeat the previous step for `fd_rangeproofs_generators_H_compressed`, storing results in `fd_rangeproofs_generators_H`.
-    - Write a header comment to the file indicating the file is auto-generated.
-    - Write the base point `fd_rangeproofs_basepoint_G` to the file using [`ristretto_points_array`](#ristretto_points_array).
-    - Write the base point `fd_rangeproofs_basepoint_H` to the file using [`ristretto_points_array`](#ristretto_points_array).
-    - Write the generator tables `fd_rangeproofs_generators_G` and `fd_rangeproofs_generators_H` to the file using [`ristretto_points_array`](#ristretto_points_array).
-- **Output**: The function writes the precomputed tables for range proofs to the specified file, including base points and generator tables.
-- **Functions called**:
-    - [`fd_ristretto255_point_frombytes`](fd_ristretto255.c.md#fd_ristretto255_point_frombytes)
-    - [`ristretto_points_array`](#ristretto_points_array)
+    - Iterate over 256 hardcoded hexadecimal strings, decode each into `buf`, convert to Ristretto255 points, and store in `fd_rangeproofs_generators_G`.
+    - Repeat the previous step for another set of 256 hexadecimal strings, storing results in `fd_rangeproofs_generators_H`.
+    - Write a predefined header to the `file`.
+    - Write the `fd_rangeproofs_basepoint_G` to the `file` using [`ristretto_points_array`](<#ristretto_points_array>).
+    - Write the `fd_rangeproofs_basepoint_H` to the `file` using [`ristretto_points_array`](<#ristretto_points_array>).
+    - Write the `fd_rangeproofs_generators_G` to the `file` using [`ristretto_points_array`](<#ristretto_points_array>).
+    - Write the `fd_rangeproofs_generators_H` to the `file` using [`ristretto_points_array`](<#ristretto_points_array>).
+- **Output**: No return value; writes data to the provided `file`.
+- **Functions Called**:
+    - [`fd_ristretto255_point_frombytes`](<fd_ristretto255.c.md#fd_ristretto255_point_frombytes>)
+    - [`ristretto_points_array`](<#ristretto_points_array>)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment, determines the directory for saving precomputation tables, and generates three specific tables for field, point, and rangeproofs, saving them to files.
+[View Source →](<../../../../../src/ballet/ed25519/fd_curve25519_tables.c#L895>)
+
+Generates and saves precomputation tables for cryptographic operations to specified files.
 - **Inputs**:
-    - `argc`: An integer representing the number of command-line arguments.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with command-line arguments.
-    - Define a `path` buffer to store file paths.
-    - Determine the `path_suffix` based on whether AVX512 is available.
-    - Set the default directory for saving tables and attempt to override it with a command-line argument if provided.
-    - Log a notice indicating the start of table saving.
-    - For each table (field, point, rangeproofs):
-    -   - Construct the file path using `snprintf`.
-    -   - Open the file for writing in binary mode.
-    -   - If file opening fails, log an error and exit.
-    -   - Call the respective table generation function ([`field_tables_file`](#field_tables_file), [`point_tables_file`](#point_tables_file), [`rangeproofs_tables_file`](#rangeproofs_tables_file)).
-    -   - Attempt to close the file and log a warning if it fails.
-    - Log a notice indicating successful completion.
-    - Call `fd_halt` to clean up and exit the program.
-- **Output**: The function returns an integer `0` indicating successful execution.
-- **Functions called**:
-    - [`field_tables_file`](#field_tables_file)
-    - [`point_tables_file`](#point_tables_file)
-    - [`rangeproofs_tables_file`](#rangeproofs_tables_file)
+    - `argc`: The number of command-line arguments.
+    - `argv`: An array of command-line arguments.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with command-line arguments.
+    - Defines a `path` buffer to store file paths.
+    - Sets `path_suffix` based on the presence of AVX512 support.
+    - Defines `default_dir` as the default directory for saving tables.
+    - Retrieves the directory from command-line arguments using `fd_env_strip_cmdline_cstr`; defaults to `default_dir` if not provided.
+    - Logs a notice indicating the start of table saving.
+    - For each table type (`fd_f25519_table`, `fd_curve25519_table`, `fd_rangeproofs_table`):
+    -   - Constructs the file path using `snprintf`.
+    -   - Opens the file for writing in binary mode.
+    -   - Logs an error and exits if the file cannot be opened.
+    -   - Calls the respective table generation function ([`field_tables_file`](<#field_tables_file>), [`point_tables_file`](<#point_tables_file>), [`rangeproofs_tables_file`](<#rangeproofs_tables_file>)).
+    -   - Closes the file and logs a warning if closing fails.
+    - Logs a notice indicating successful completion.
+    - Calls `fd_halt` to clean up and exit the program.
+- **Output**: Returns 0 to indicate successful execution.
+- **Functions Called**:
+    - [`field_tables_file`](<#field_tables_file>)
+    - [`point_tables_file`](<#point_tables_file>)
+    - [`rangeproofs_tables_file`](<#rangeproofs_tables_file>)
 
 
 

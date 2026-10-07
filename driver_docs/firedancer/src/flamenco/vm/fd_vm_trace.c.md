@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_vm_trace.c` file in the `firedancer` codebase provides functions for managing and processing virtual machine trace events, including creating, joining, leaving, deleting traces, and handling execution and memory events.
+Implements functions for managing and processing virtual machine trace events, including memory and execution events.
 
 # Purpose
-This C source code file is designed to manage and manipulate a virtual machine (VM) trace system, which is used to record and analyze events occurring during the execution of a virtual machine. The file provides a set of functions that handle the creation, joining, leaving, and deletion of trace objects, as well as recording execution and memory events. The primary data structure used is `fd_vm_trace_t`, which stores information about the maximum number of events and data size, and tracks the current size of recorded events. The code ensures memory alignment and integrity through checks and uses a magic number to validate trace objects.
+The code is a C module that provides functionality for managing and tracing virtual machine (VM) events. It defines several functions to create, join, leave, and delete a trace object, which is used to record execution and memory events within a VM. The module includes functions such as [`fd_vm_trace_new`](<#fd_vm_trace_new>), [`fd_vm_trace_join`](<#fd_vm_trace_join>), [`fd_vm_trace_leave`](<#fd_vm_trace_leave>), and [`fd_vm_trace_delete`](<#fd_vm_trace_delete>) to manage the lifecycle of a trace object. It also includes functions like [`fd_vm_trace_event_exe`](<#fd_vm_trace_event_exe>) and [`fd_vm_trace_event_mem`](<#fd_vm_trace_event_mem>) to log execution and memory events, respectively. These functions ensure that the trace object is correctly aligned and initialized before recording events.
 
-The file includes functions for recording execution ([`fd_vm_trace_event_exe`](#fd_vm_trace_event_exe)) and memory events ([`fd_vm_trace_event_mem`](#fd_vm_trace_event_mem)), which capture details such as program counter, instruction count, and register states for execution events, and virtual address, size, and data for memory events. Additionally, the [`fd_vm_trace_printf`](#fd_vm_trace_printf) function provides a mechanism to print the recorded events in a human-readable format, facilitating debugging and analysis. The code is structured to handle potential errors and misalignments gracefully, logging warnings and returning error codes when issues are detected. This file is likely part of a larger system, providing a focused API for VM trace management and event logging.
+The module also includes a function [`fd_vm_trace_printf`](<#fd_vm_trace_printf>) that prints the recorded events in a human-readable format. This function iterates over the stored events, decodes them, and outputs details such as program counter, instruction count, and register states for execution events, as well as memory addresses and data for memory events. The code uses several macros and utility functions, such as `FD_UNLIKELY`, `fd_ulong_align_up`, and `fd_vm_trace_event_info`, to handle conditions and align data structures. The module is intended to be part of a larger system where it interfaces with other components, such as system calls and disassembly functions, to provide detailed tracing capabilities for VM operations.
 # Imports and Dependencies
 
 ---
@@ -20,171 +20,192 @@ The file includes functions for recording execution ([`fd_vm_trace_event_exe`](#
 
 ---
 ### fd\_vm\_trace\_align<!-- {{#callable:fd_vm_trace_align}} -->
-The `fd_vm_trace_align` function returns the alignment requirement for a virtual machine trace, which is 8 bytes.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L3>)
+
+Returns the alignment value for virtual machine trace data structures.
 - **Inputs**: None
-- **Control Flow**:
-    - The function is defined to return an unsigned long integer.
-    - It directly returns the constant value 8UL, indicating an 8-byte alignment requirement.
-- **Output**: The function returns an unsigned long integer representing the alignment requirement, which is 8 bytes.
+- **Logic and Control Flow**:
+    - Returns a constant value of `8UL`.
+- **Output**: The function returns an unsigned long integer (`ulong`) with a value of `8UL`, representing the alignment requirement.
 
 
 ---
 ### fd\_vm\_trace\_footprint<!-- {{#callable:fd_vm_trace_footprint}} -->
-The `fd_vm_trace_footprint` function calculates the memory footprint required for a trace structure based on the maximum number of events and event data.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L8>)
+
+Calculates the aligned memory footprint required for a trace structure based on maximum event and event data sizes.
 - **Inputs**:
     - `event_max`: The maximum number of events that the trace can store.
-    - `event_data_max`: The maximum size of event data that the trace can handle.
-- **Control Flow**:
-    - Check if either `event_max` or `event_data_max` exceeds the limit of `1UL<<60`; if so, return 0UL as an error condition.
-    - Calculate the footprint by aligning the sum of the size of `fd_vm_trace_t` and `event_max` to an 8-byte boundary using `fd_ulong_align_up`.
-    - Return the calculated aligned footprint.
-- **Output**: The function returns the aligned memory footprint required for the trace structure, or 0UL if the input values exceed the specified limits.
+    - `event_data_max`: The maximum size of data associated with events that the trace can store.
+- **Logic and Control Flow**:
+    - Checks if `event_max` or `event_data_max` exceed the limit of `1UL<<60`; if so, returns 0UL.
+    - Calculates the size of the trace structure by adding `sizeof(fd_vm_trace_t)` to `event_max`.
+    - Aligns the calculated size to the nearest multiple of 8 using `fd_ulong_align_up`.
+    - Returns the aligned size as the footprint.
+- **Output**: Returns the aligned memory footprint as an unsigned long integer, or 0UL if input limits are exceeded.
 
 
 ---
 ### fd\_vm\_trace\_new<!-- {{#callable:fd_vm_trace_new}} -->
-The `fd_vm_trace_new` function initializes a new virtual machine trace structure in shared memory, setting up its parameters and ensuring proper alignment and size.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L15>)
+
+Initializes a new `fd_vm_trace_t` structure in shared memory with specified event limits and returns a pointer to it.
 - **Inputs**:
-    - `shmem`: A pointer to the shared memory where the trace structure will be initialized.
+    - `shmem`: A pointer to the shared memory where the `fd_vm_trace_t` structure will be initialized.
     - `event_max`: The maximum number of events that the trace can store.
-    - `event_data_max`: The maximum size of event data that can be stored in the trace.
-- **Control Flow**:
-    - Cast the `shmem` pointer to a `fd_vm_trace_t` pointer named `trace`.
-    - Check if `trace` is NULL and log a warning if so, returning NULL.
-    - Verify that `shmem` is aligned according to `fd_vm_trace_align()` and log a warning if not, returning NULL.
-    - Calculate the memory footprint required using `fd_vm_trace_footprint()` and log a warning if the footprint is zero, returning NULL.
+    - `event_data_max`: The maximum size of event data that the trace can store.
+- **Logic and Control Flow**:
+    - Cast `shmem` to a `fd_vm_trace_t` pointer named `trace`.
+    - Check if `trace` is NULL; if so, log a warning and return NULL.
+    - Check if `shmem` is aligned according to [`fd_vm_trace_align`](<#fd_vm_trace_align>); if not, log a warning and return NULL.
+    - Calculate the memory footprint required using [`fd_vm_trace_footprint`](<#fd_vm_trace_footprint>) with `event_max` and `event_data_max`.
+    - If the calculated footprint is zero, log a warning and return NULL.
     - Initialize the memory pointed to by `trace` to zero using `memset`.
     - Set `trace->event_max` to `event_max`, `trace->event_data_max` to `event_data_max`, and `trace->event_sz` to 0.
     - Use memory fences (`FD_COMPILER_MFENCE`) to ensure memory operations are completed before setting `trace->magic` to `FD_VM_TRACE_MAGIC`.
-    - Return the initialized `trace` pointer.
-- **Output**: A pointer to the initialized `fd_vm_trace_t` structure, or NULL if initialization fails due to invalid input or alignment issues.
-- **Functions called**:
-    - [`fd_vm_trace_align`](#fd_vm_trace_align)
-    - [`fd_vm_trace_footprint`](#fd_vm_trace_footprint)
+    - Return the pointer to `trace`.
+- **Output**: A pointer to the initialized `fd_vm_trace_t` structure, or NULL if an error occurs.
+- **Functions Called**:
+    - [`fd_vm_trace_align`](<#fd_vm_trace_align>)
+    - [`fd_vm_trace_footprint`](<#fd_vm_trace_footprint>)
 
 
 ---
 ### fd\_vm\_trace\_join<!-- {{#callable:fd_vm_trace_join}} -->
-The `fd_vm_trace_join` function validates and returns a pointer to a `fd_vm_trace_t` structure if it is correctly aligned and has the correct magic number.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L50>)
+
+Validates and returns a pointer to a `fd_vm_trace_t` structure if the input trace is valid and aligned.
 - **Inputs**:
-    - `_trace`: A void pointer to a `fd_vm_trace_t` structure that needs to be validated and joined.
-- **Control Flow**:
-    - Cast the input `_trace` to a `fd_vm_trace_t` pointer named `trace`.
-    - Check if `trace` is NULL; if so, log a warning and return NULL.
-    - Check if `trace` is not aligned according to [`fd_vm_trace_align`](#fd_vm_trace_align); if misaligned, log a warning and return NULL.
-    - Check if `trace->magic` does not equal `FD_VM_TRACE_MAGIC`; if not, log a warning and return NULL.
-    - If all checks pass, return the `trace` pointer.
-- **Output**: Returns a pointer to the `fd_vm_trace_t` structure if all validations pass, otherwise returns NULL.
-- **Functions called**:
-    - [`fd_vm_trace_align`](#fd_vm_trace_align)
+    - `_trace`: A pointer to a memory location that is expected to be a `fd_vm_trace_t` structure.
+- **Logic and Control Flow**:
+    - Cast `_trace` to a `fd_vm_trace_t` pointer named `trace`.
+    - Check if `trace` is NULL; if true, log a warning and return NULL.
+    - Check if `_trace` is aligned according to [`fd_vm_trace_align`](<#fd_vm_trace_align>); if not, log a warning and return NULL.
+    - Check if `trace->magic` equals `FD_VM_TRACE_MAGIC`; if not, log a warning and return NULL.
+    - Return the `trace` pointer.
+- **Output**: A pointer to a `fd_vm_trace_t` structure if all checks pass, otherwise NULL.
+- **Functions Called**:
+    - [`fd_vm_trace_align`](<#fd_vm_trace_align>)
 
 
 ---
 ### fd\_vm\_trace\_leave<!-- {{#callable:fd_vm_trace_leave}} -->
-The `fd_vm_trace_leave` function checks if a given trace pointer is valid and returns it as a void pointer if it is, or logs a warning and returns NULL if it is not.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L72>)
+
+Returns the input `trace` pointer if it is not NULL, otherwise logs a warning and returns NULL.
 - **Inputs**:
-    - `trace`: A pointer to an `fd_vm_trace_t` structure, which represents a trace object to be validated and returned.
-- **Control Flow**:
-    - Check if the `trace` pointer is NULL using `FD_UNLIKELY`; if it is, log a warning message 'NULL trace' and return NULL.
-    - If the `trace` pointer is not NULL, cast it to a void pointer and return it.
-- **Output**: Returns the input `trace` pointer cast to a void pointer if it is not NULL; otherwise, returns NULL.
+    - `trace`: A pointer to an `fd_vm_trace_t` structure that represents the trace to leave.
+- **Logic and Control Flow**:
+    - Check if `trace` is NULL using `FD_UNLIKELY`.
+    - If `trace` is NULL, log a warning message 'NULL trace' and return NULL.
+    - If `trace` is not NULL, cast it to a `void *` and return it.
+- **Output**: A `void *` pointer to the `trace` if it is not NULL, otherwise NULL.
 
 
 ---
 ### fd\_vm\_trace\_delete<!-- {{#callable:fd_vm_trace_delete}} -->
-The `fd_vm_trace_delete` function validates and deletes a virtual machine trace by resetting its magic number to zero.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L83>)
+
+Validates and deletes a virtual machine trace object by resetting its magic number.
 - **Inputs**:
-    - `_trace`: A pointer to the trace object to be deleted, expected to be of type `fd_vm_trace_t`.
-- **Control Flow**:
-    - Cast the input `_trace` to a `fd_vm_trace_t` pointer named `trace`.
-    - Check if `trace` is NULL; if so, log a warning and return NULL.
-    - Check if `trace` is not aligned according to [`fd_vm_trace_align`](#fd_vm_trace_align); if misaligned, log a warning and return NULL.
-    - Check if `trace->magic` does not match `FD_VM_TRACE_MAGIC`; if not, log a warning and return NULL.
-    - Use memory fence operations to ensure memory ordering and set `trace->magic` to 0, effectively marking it as deleted.
-    - Return the `trace` pointer cast back to `void *`.
-- **Output**: Returns a pointer to the deleted trace object if successful, or NULL if any validation checks fail.
-- **Functions called**:
-    - [`fd_vm_trace_align`](#fd_vm_trace_align)
+    - `_trace`: A pointer to the trace object to delete.
+- **Logic and Control Flow**:
+    - Cast `_trace` to a `fd_vm_trace_t` pointer named `trace`.
+    - Check if `trace` is NULL; if true, log a warning and return NULL.
+    - Check if `_trace` is not aligned according to `fd_vm_trace_align()`; if true, log a warning and return NULL.
+    - Check if `trace->magic` is not equal to `FD_VM_TRACE_MAGIC`; if true, log a warning and return NULL.
+    - Use `FD_COMPILER_MFENCE()` to ensure memory ordering before and after setting `trace->magic` to 0.
+    - Return the `trace` pointer cast to `void *`.
+- **Output**: Returns a pointer to the deleted trace object if successful, or NULL if any validation fails.
+- **Functions Called**:
+    - [`fd_vm_trace_align`](<#fd_vm_trace_align>)
 
 
 ---
 ### fd\_vm\_trace\_event\_exe<!-- {{#callable:fd_vm_trace_event_exe}} -->
-The `fd_vm_trace_event_exe` function records an execution event in a virtual machine trace, storing details about the program counter, instruction count, computational units, registers, and instruction text.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L109>)
+
+Records an execution event in a virtual machine trace, storing details about the program counter, instruction count, and other execution-specific data.
 - **Inputs**:
     - `trace`: A pointer to an `fd_vm_trace_t` structure where the event will be recorded.
     - `pc`: The program counter value at the time of the event.
     - `ic`: The instruction count at the time of the event.
-    - `cu`: The computational unit count at the time of the event.
-    - `reg`: An array of registers (`ulong` type) representing the state of the registers at the time of the event.
-    - `text`: A pointer to an array of `ulong` representing the instruction text.
-    - `text_cnt`: The number of words in the instruction text.
+    - `cu`: The cycle count at the time of the event.
+    - `reg`: An array of register values, with a size defined by `FD_VM_REG_CNT`.
+    - `text`: A pointer to an array of instruction words.
+    - `text_cnt`: The number of instruction words in the `text` array.
     - `ic_correction`: A correction value for the instruction count.
     - `frame_cnt`: The frame count at the time of the event.
-- **Control Flow**:
-    - Check if any of the pointers `trace`, `reg`, or `text` are NULL or if `text_cnt` is zero; if so, return `FD_VM_ERR_INVAL`.
-    - Extract the first word of the instruction text and determine if the instruction is multiword based on its opcode class.
-    - Calculate the footprint of the event, adjusting for multiword instructions.
-    - Check if there is enough space in the trace to store the event; if not, return `FD_VM_ERR_FULL`.
-    - Calculate the address where the event should be stored in the trace and update the trace's event size.
-    - Populate the event structure with the provided data, including program counter, instruction count, computational units, registers, and instruction text.
-    - If the instruction is multiword, store the second word of the instruction text.
-    - Return `FD_VM_SUCCESS` to indicate successful recording of the event.
-- **Output**: Returns an integer status code: `FD_VM_SUCCESS` on success, `FD_VM_ERR_INVAL` if inputs are invalid, or `FD_VM_ERR_FULL` if there is insufficient space to record the event.
-- **Functions called**:
-    - [`fd_vm_trace_event_info`](fd_vm_base.h.md#fd_vm_trace_event_info)
+- **Logic and Control Flow**:
+    - Checks if `trace`, `reg`, `text`, or `text_cnt` are invalid and returns `FD_VM_ERR_INVAL` if so.
+    - Determines if the instruction is multiword based on `text_cnt` and the opcode class of the first instruction word.
+    - Calculates the `event_footprint` based on whether the instruction is multiword.
+    - Checks if there is enough space in the trace to store the event; returns `FD_VM_ERR_FULL` if not.
+    - Allocates space for the event in the trace and updates the trace's `event_sz`.
+    - Records the event details, including program counter, instruction count, cycle count, register values, and instruction text.
+    - Handles multiword instructions by storing the second instruction word if applicable.
+    - Returns `FD_VM_SUCCESS` upon successful recording of the event.
+- **Output**: Returns `FD_VM_SUCCESS` if the event is successfully recorded, or an error code such as `FD_VM_ERR_INVAL` or `FD_VM_ERR_FULL` if there is an issue.
+- **Functions Called**:
+    - [`fd_vm_trace_event_info`](<fd_vm_base.h.md#fd_vm_trace_event_info>)
 
 
 ---
 ### fd\_vm\_trace\_event\_mem<!-- {{#callable:fd_vm_trace_event_mem}} -->
-The `fd_vm_trace_event_mem` function records a memory event in a trace, handling both read and write operations, and stores associated data if provided.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L152>)
+
+Records a memory event in the trace log, indicating a read or write operation at a specified virtual address with optional data.
 - **Inputs**:
-    - `trace`: A pointer to an `fd_vm_trace_t` structure, which holds the trace information and storage.
-    - `write`: An integer indicating whether the event is a write (non-zero) or read (zero) operation.
-    - `vaddr`: An unsigned long representing the virtual address involved in the memory event.
-    - `sz`: An unsigned long specifying the size of the data involved in the memory event.
-    - `data`: A pointer to the data to be recorded with the event, if any.
-- **Control Flow**:
-    - Check if the `trace` pointer is NULL and return `FD_VM_ERR_INVAL` if it is.
+    - `trace`: A pointer to the `fd_vm_trace_t` structure where the event will be recorded.
+    - `write`: An integer flag indicating if the operation is a write (non-zero) or a read (zero).
+    - `vaddr`: The virtual address where the memory operation occurs.
+    - `sz`: The size of the data involved in the memory operation.
+    - `data`: A pointer to the data being read or written, or NULL if no data is involved.
+- **Logic and Control Flow**:
+    - Check if `trace` is NULL; if so, return `FD_VM_ERR_INVAL`.
     - Determine if the event is valid by checking if `data` and `sz` are non-zero.
-    - Calculate the size of the data to be recorded, ensuring it does not exceed `trace->event_data_max`.
-    - Calculate the total footprint of the event, aligning it to 8 bytes.
-    - Check if there is enough space in the trace to store the event; return `FD_VM_ERR_FULL` if not.
-    - Calculate the location in memory to store the event and update the trace's event size.
-    - Record the event type and validity in the event structure.
-    - Store the virtual address and size in the event structure.
-    - If the event is valid, copy the data into the event structure.
-    - Return `FD_VM_SUCCESS` to indicate successful recording of the event.
-- **Output**: Returns an integer status code: `FD_VM_SUCCESS` on success, `FD_VM_ERR_INVAL` if the trace is NULL, or `FD_VM_ERR_FULL` if there is insufficient space to record the event.
-- **Functions called**:
-    - [`fd_vm_trace_event_info`](fd_vm_base.h.md#fd_vm_trace_event_info)
+    - Calculate `event_data_sz` as the minimum of `sz` and `trace->event_data_max` if valid, otherwise 0.
+    - Calculate `event_footprint` as the aligned size of the event structure plus `event_data_sz`.
+    - Check if there is enough space in the trace for the event; if not, return `FD_VM_ERR_FULL`.
+    - Calculate the event's memory location in the trace and update `trace->event_sz`.
+    - Record the event type and validity in `event->info`.
+    - Store `vaddr` and `sz` in the event structure.
+    - If the event is valid, copy `data` into the event structure.
+- **Output**: Returns `FD_VM_SUCCESS` on success, `FD_VM_ERR_INVAL` if `trace` is NULL, or `FD_VM_ERR_FULL` if there is not enough space to record the event.
+- **Functions Called**:
+    - [`fd_vm_trace_event_info`](<fd_vm_base.h.md#fd_vm_trace_event_info>)
 
 
 ---
 ### fd\_vm\_trace\_printf<!-- {{#callable:fd_vm_trace_printf}} -->
-The `fd_vm_trace_printf` function processes and prints detailed information about virtual machine trace events, including execution and memory access events, from a given trace object.
+[View Source →](<../../../../../src/flamenco/vm/fd_vm_trace.c#L187>)
+
+Processes and prints virtual machine trace events, handling execution, memory read, and write events.
 - **Inputs**:
-    - `trace`: A pointer to a `fd_vm_trace_t` structure containing the trace events to be processed and printed.
-    - `syscalls`: A pointer to a `fd_sbpf_syscalls_t` structure used for disassembling instructions during execution event processing.
-- **Control Flow**:
-    - Check if the `trace` input is NULL and log a warning if so, returning an invalid argument error code.
-    - Retrieve the maximum data size for events from the trace and initialize pointers to the event data and remaining size.
-    - Enter a loop to process each event in the trace while there is remaining data.
-    - For each event, check if there is enough data to read the event info; if not, log a warning and return an I/O error code.
-    - Determine the event type from the event info and handle it based on its type (execution or memory access).
-    - For execution events, calculate the event footprint, check for truncation, and print the architectural state and disassembled instruction.
-    - For memory access events, calculate the event footprint, check for truncation, and print the memory access details including data in a formatted manner.
-    - If an unexpected event type is encountered, log a warning and return an I/O error code.
-    - Update the pointer and remaining size to move to the next event in the trace.
-    - Return success if all events are processed without errors.
-- **Output**: Returns an integer status code, `FD_VM_SUCCESS` on success, or an error code such as `FD_VM_ERR_INVAL` or `FD_VM_ERR_IO` on failure.
-- **Functions called**:
-    - [`fd_vm_trace_event_data_max`](fd_vm_base.h.md#fd_vm_trace_event_data_max)
-    - [`fd_vm_trace_event`](fd_vm_base.h.md#fd_vm_trace_event)
-    - [`fd_vm_trace_event_sz`](fd_vm_base.h.md#fd_vm_trace_event_sz)
-    - [`fd_vm_trace_event_info_type`](fd_vm_base.h.md#fd_vm_trace_event_info_type)
-    - [`fd_vm_trace_event_info_valid`](fd_vm_base.h.md#fd_vm_trace_event_info_valid)
-    - [`fd_vm_disasm_instr`](fd_vm_disasm.c.md#fd_vm_disasm_instr)
-    - [`fd_vm_strerror`](fd_vm.c.md#fd_vm_strerror)
+    - ``trace``: A pointer to a `fd_vm_trace_t` structure containing trace event data.
+    - ``syscalls``: A pointer to a `fd_sbpf_syscalls_t` structure used for disassembling instructions.
+- **Logic and Control Flow**:
+    - Check if `trace` is NULL and log a warning if true, returning `FD_VM_ERR_INVAL`.
+    - Retrieve the maximum data size from the trace using [`fd_vm_trace_event_data_max`](<fd_vm_base.h.md#fd_vm_trace_event_data_max>).
+    - Initialize a pointer `ptr` to the trace event data and a variable `rem` to the size of the trace event data.
+    - Enter a loop that continues while `rem` is non-zero, processing each event in the trace.
+    - For each event, check if the remaining size `rem` is less than 7 bytes, log a warning, and return `FD_VM_ERR_IO` if true.
+    - Read the event information from the trace and determine the event type using [`fd_vm_trace_event_info_type`](<fd_vm_base.h.md#fd_vm_trace_event_info_type>).
+    - Use a switch statement to handle different event types: `FD_VM_TRACE_EVENT_TYPE_EXE`, `FD_VM_TRACE_EVENT_TYPE_READ`, and `FD_VM_TRACE_EVENT_TYPE_WRITE`.
+    - For `FD_VM_TRACE_EVENT_TYPE_EXE`, calculate the event footprint, check for truncation, and print the architectural state and instruction.
+    - For `FD_VM_TRACE_EVENT_TYPE_READ` and `FD_VM_TRACE_EVENT_TYPE_WRITE`, calculate the event footprint, check for truncation, and print memory access details.
+    - Log a warning and return `FD_VM_ERR_IO` for unexpected event types.
+    - Update the pointer `ptr` and the remaining size `rem` by subtracting the event footprint.
+    - Return `FD_VM_SUCCESS` after processing all events.
+- **Output**: Returns `FD_VM_SUCCESS` on successful processing of all events, or an error code such as `FD_VM_ERR_INVAL` or `FD_VM_ERR_IO` if an error occurs.
+- **Functions Called**:
+    - [`fd_vm_trace_event_data_max`](<fd_vm_base.h.md#fd_vm_trace_event_data_max>)
+    - [`fd_vm_trace_event`](<fd_vm_base.h.md#fd_vm_trace_event>)
+    - [`fd_vm_trace_event_sz`](<fd_vm_base.h.md#fd_vm_trace_event_sz>)
+    - [`fd_vm_trace_event_info_type`](<fd_vm_base.h.md#fd_vm_trace_event_info_type>)
+    - [`fd_vm_trace_event_info_valid`](<fd_vm_base.h.md#fd_vm_trace_event_info_valid>)
+    - [`fd_vm_disasm_instr`](<fd_vm_disasm.c.md#fd_vm_disasm_instr>)
+    - [`fd_vm_strerror`](<fd_vm.c.md#fd_vm_strerror>)
 
 
 

@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `tool` folder in the `firedancer` codebase contains various scripts and configuration files for interacting with Solana blockchain nodes, syntax highlighting, debugging, memory leak detection, and code formatting.
+Scripts and tools for Solana block production, transaction generation, memory leak detection, and code formatting.
 
 
 ## Files
-- **[block_production.py](block_production.py.md)**: The `block_production.py` file in the `firedancer` codebase is a script that connects to a Solana RPC client to retrieve and display upcoming leader slots for a given public key.
-- **[c.vim](c.vim.md)**: The `c.vim` file provides syntax highlighting definitions for Firedancer style code, including keywords for versioning, build targets, primitive types, compiler tricks, optimizer hints, atomic operations, logging, and testing.
-- **[fd_gdb](fd_gdb.md)**: The `fd_gdb` file is a shell script that executes GDB with a command to source the `fd_gdb.py` script from the `contrib/gdb` directory.
-- **[leak-detector.py](leak-detector.py.md)**: The `leak-detector.py` file is a tool for detecting memory leaks by analyzing log files for allocation and deallocation operations, and reporting unfreed memory addresses along with their backtraces.
-- **[lint.cfg](lint.cfg.md)**: The `lint.cfg` file in the `firedancer` codebase configures code formatting rules for the Uncrustify tool, specifying settings such as tab sizes, spacing rules, and alignment preferences.
-- **[load_gen.py](load_gen.py.md)**: The `load_gen.py` file in the `firedancer` codebase is a tool for generating and sending various types of transactions to Solana blockchain nodes, including system transfers, token transfers, and nano token transfers, while also monitoring transaction throughput.
-- **[load_gen2.py](load_gen2.py.md)**: The `load_gen2.py` file in the `firedancer` codebase is a tool for generating and sending Solana transactions to specified TPU endpoints, supporting different transaction types and monitoring transaction throughput.
-- **[txn-gen.py](txn-gen.py.md)**: The `txn-gen.py` file in the `firedancer` codebase is a Python script designed to generate and send various types of transactions to specified TPU UDP endpoints, utilizing Solana's blockchain infrastructure and supporting functionalities such as account creation, token transfers, and transaction monitoring.
+- **[block_production.py](block_production.py.md)**: A script for producing block schedules in Solana using RPC, public keys, and slot information.
+- **[c.vim](c.vim.md)**: Syntax highlighting for Firedancer style code in Vim, including constants, types, operators, and logging.
+- **[fd_gdb](fd_gdb.md)**: Shell script to execute GDB with a specific Python script sourced.
+- **[leak-detector.py](leak-detector.py.md)**: A Python script for detecting memory leaks by analyzing log files for allocation and deallocation events.
+- **[lint.cfg](lint.cfg.md)**: Configuration settings for the Uncrustify code beautifier, specifying tab sizes, spacing, and alignment rules.
+- **[load_gen.py](load_gen.py.md)**: A tool for generating and sending Solana transactions, including account creation and token transfers, with multiprocessing and threading support.
+- **[load_gen2.py](load_gen2.py.md)**: A tool for generating and sending Solana transactions, including account creation and transaction monitoring.
+- **[txn-gen.py](txn-gen.py.md)**: A tool for generating and sending Solana transactions with various types and configurations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
