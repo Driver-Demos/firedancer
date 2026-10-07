@@ -3,12 +3,41 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Reads the active identity key from the shred tile and prints it in base58.
+Defines a command to retrieve and print the current active identity of a running validator.
 
 # Purpose
-This file defines the `get-identity` action for a validator control tool. The `get_identity_cmd_fn` function finds the `shred` tile in the current topology, joins the tile workspace in read-only mode, and reads the current runtime identity key from the shred context. It also joins the `fd_keyswitch_t` object so it can check whether an identity switch is in progress before and after the read. If the keyswitch state changes during the read, the function retries once after a short delay. If the read still does not produce a stable result, it reports an error.
+The code defines a function `get_identity_cmd_fn` that retrieves the current active identity of a running validator in a distributed system. It does this by interacting with a "shred tile" in the system's topology, which holds the runtime identity. The function first locates the shred tile and its associated workspace, then joins the workspace in read-only mode. It accesses the shred context structure to read the identity key, ensuring consistency by checking the state of a keyswitch for concurrent identity updates. If the keyswitch indicates a pending state, the function retries the read operation after a short delay. Once a consistent identity key is obtained, it is converted to a base58 string and printed.
 
-After it reads a stable `fd_pubkey_t` value, the code encodes the 32-byte public key into base58 with `fd_base58_encode_32` and prints it to standard output. The `fd_action_get_identity` object registers this function as the `get-identity` command, marks it as requiring configuration, and describes it as a command that returns the current active identity of the running validator.
+The code also defines an `action_t` structure named `fd_action_get_identity`, which represents the "get-identity" command. This structure includes the command's name, the function to execute (`get_identity_cmd_fn`), and a description of the command's purpose. The command requires a configuration to execute, as indicated by the `require_config` field. The code suggests that future updates may need to address permission requirements for locking the workspace in memory. The code is part of a larger system that involves multiple components, such as topology management, keyswitch handling, and base58 encoding, indicating its role in managing and retrieving identity information within a distributed environment.
+# Imports and Dependencies
+
+---
+- `../fd_config.h`
+- `../fd_action.h`
+- `../../../util/fd_util.h`
+- `../../../ballet/base58/fd_base58.h`
+- `../../../flamenco/types/fd_types_custom.h`
+- `../../../disco/shred/fd_shred_tile.h`
+- `../../../disco/keyguard/fd_keyswitch.h`
+- `unistd.h`
+
+
+# Global Variables
+
+---
+### get\_identity\_cmd\_fn
+- **Type**: `function`
+- **Description**: Processes the retrieval of the current runtime identity key from a shred tile in a read-only workspace. It ensures the identity key is read consistently by checking the keyswitch state and retries if necessary.
+- **Use**: Used to obtain and print the current active identity key of the running validator in base58 format.
+
+
+---
+### fd\_action\_get\_identity
+- **Type**: ``action_t``
+- **Description**: A global variable of type `action_t` that defines an action to get the current active identity of the running validator. It includes a function pointer to `get_identity_cmd_fn`, which implements the logic to retrieve and display the identity key.
+- **Use**: Used to define and execute the action for retrieving the validator's current active identity.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
