@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_zksdk headers, objects, and unit tests when int128 and hosted support are enabled.
+Makefile for building and testing the `fd_zksdk` component with conditional compilation flags.
 
 # Purpose
-This Makefile fragment adds the `fd_zksdk.h` header and the `fd_zksdk` object when `FD_HAS_INT128` is set. When `FD_HAS_HOSTED` is also set, it defines the `test_zksdk` unit test, links it with `fd_flamenco`, `fd_funk`, `fd_ballet`, and `fd_util`, and schedules the test to run.
+This Makefile script conditionally includes headers and object files for the `fd_zksdk` component if the `FD_HAS_INT128` flag is set. It adds the header `fd_zksdk.h` and the object files `fd_zksdk` and `fd_flamenco`. If the `FD_HAS_HOSTED` flag is also set, it creates and runs a unit test named `test_zksdk`, which depends on the `fd_flamenco`, `fd_funk`, `fd_ballet`, and `fd_util` components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

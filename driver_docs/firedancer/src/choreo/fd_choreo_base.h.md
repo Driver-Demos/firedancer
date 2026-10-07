@@ -3,10 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Consensus constants and type aliases for block IDs and slot-based keys.
+Defines constants, types, and functions for the Choreo consensus library, including block and voter management.
 
 # Purpose
-`fd_choreo_base.h` defines shared constants, macros, and basic types for the Choreo consensus library. It sets limits for the maximum number of blocks and voters, and it defines percentage thresholds used for equivocation safety, confirmation, and finalization. The file also provides comparison, equality, and hash macros for `fd_slot_hash_t` and `fd_slot_pubkey_t` values, which are used in ordered and hashed data structures. It declares `fd_block_id_t` as a 32-byte block identifier and maps `fd_slot_pubkey_t` to `fd_slot_hash_t` for use as a block or pubkey key type.
+This C header file defines constants, macros, and type definitions for a consensus library related to blockchain technology. It includes functionality for handling block and vote equivocation, managing the frontier of banks, implementing a fork choice rule, and tracking voters using the TowerBFT algorithm. The file sets maximum limits for blocks and voters, and defines percentage thresholds for equivocation safety and confirmation. It provides macros for comparing and hashing slot hashes and public keys, which are essential for maintaining the integrity and uniqueness of blocks within the blockchain. The `fd_block_id_t` type is defined as a 32-byte array representing the Merkle root of the last FEC set for a slot, ensuring unique block identification even in cases of leader equivocation.
+# Imports and Dependencies
+
+---
+- `../flamenco/fd_flamenco.h`
+- `../flamenco/types/fd_types.h`
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
