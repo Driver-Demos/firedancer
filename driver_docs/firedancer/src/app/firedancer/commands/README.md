@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Retrieves the current shred version from entrypoints using a client in a command function.
+Retrieves the current shred version from gossip entrypoints and prints it.
 
 
 ## Files
-- **[shred_version.c](shred_version.c.md)**: Retrieves the current shred version from entrypoints using a client in a command function.
+- **[shred_version.c](shred_version.c.md)**: Retrieves the current shred version from gossip entrypoints and prints it.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
