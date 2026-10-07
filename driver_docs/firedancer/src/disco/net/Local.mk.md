@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for fd_net_tile.h and fd_net_tile_topo when FD_HAS_ALLOCA is set.
+Makefile logic for adding headers and objects if `FD_HAS_ALLOCA` is defined.
 
 # Purpose
-Adds `fd_net_tile.h` to the header list and adds `fd_net_tile_topo` to the `fd_disco` object list when `FD_HAS_ALLOCA` is defined. The `ifdef` block limits these build entries to systems that define `FD_HAS_ALLOCA`.
+The `Makefile` snippet uses conditional directives to manage the inclusion of headers and object files based on the presence of the `FD_HAS_ALLOCA` macro. If `FD_HAS_ALLOCA` is defined, it adds `fd_net_tile.h` to the list of headers and includes `fd_net_tile_topo` and `fd_disco` in the list of object files. This configuration helps in controlling the build process by conditionally compiling specific components.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

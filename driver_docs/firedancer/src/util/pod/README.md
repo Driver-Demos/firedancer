@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Typed key-value pod APIs, CLI tools, format helpers, build rules, and unit tests.
+Macros, functions, APIs, command-line tools, and tests for managing and querying POD structures.
 
 
 ## Files
-- **[fd_pod.c](fd_pod.c.md)**: The `fd_pod.c` file in the `firedancer` codebase provides functions and macros for managing and manipulating a hierarchical data structure called a "pod," including operations for querying, listing, counting, resizing, compacting, and removing key-value pairs within the pod.
-- **[fd_pod.h](fd_pod.h.md)**: Typed key-value pod APIs for creation, query, iteration, insert, remove, resize, and compact.
-- **[fd_pod_ctl.c](fd_pod_ctl.c.md)**: The `fd_pod_ctl.c` file in the `firedancer` codebase implements a command-line utility for managing and manipulating POD (Plain Old Data) structures, including operations like creating, deleting, resetting, listing, inserting, removing, updating, and querying PODs.
-- **[fd_pod_ctl_help](fd_pod_ctl_help.md)**: The `fd_pod_ctl_help` file provides detailed usage instructions for the `fd_pod_ctl` command-line tool, which manages operations on pods such as creation, deletion, insertion, querying, and compaction within the `firedancer` codebase.
-- **[fd_pod_format.h](fd_pod_format.h.md)**: The `fd_pod_format.h` file in the `firedancer` codebase provides macros and inline functions for inserting, replacing, and querying various data types in a pod structure using formatted paths.
-- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions for headers, objects, unit tests, binaries, and test scripts related to the `fd_pod` and `fd_util` components.
-- **[test_pod.c](test_pod.c.md)**: The `test_pod.c` file in the `firedancer` codebase contains a comprehensive set of unit tests for the `fd_pod` utility, verifying various functionalities such as alignment, footprint, value type conversions, and insertion and querying of different data types in a POD (Plain Old Data) structure.
-- **[test_pod_ctl](test_pod_ctl.md)**: The `test_pod_ctl` file is a Bash script for testing various functionalities of the `fd_pod_ctl` command in the `firedancer` codebase, including operations like creating, inserting, updating, querying, listing, removing, resetting, and deleting pods.
+- **[fd_pod.c](fd_pod.c.md)**: Macros and functions for manipulating POD (Plain Old Data) structures, including path splitting, iteration, querying, allocation, and removal.
+- **[fd_pod.h](fd_pod.h.md)**: APIs for managing flexible hierarchies of typed key-value pairs in memory, supporting serialization, querying, and various data types.
+- **[fd_pod_ctl.c](fd_pod_ctl.c.md)**: A command-line tool for managing and querying POD (Plain Old Data) structures in shared memory.
+- **[fd_pod_ctl_help](fd_pod_ctl_help.md)**: Command-line tool for managing and querying pods with various operations like insert, delete, and query.
+- **[fd_pod_format.h](fd_pod_format.h.md)**: Functions for inserting, replacing, and querying typed values in a pod using formatted paths.
+- **[Local.mk](Local.mk.md)**: Makefile for building and testing components related to `fd_pod` and `fd_util`.
+- **[test_pod.c](test_pod.c.md)**: Unit tests for POD (Plain Old Data) utilities, including type validation and memory footprint checks.
+- **[test_pod_ctl](test_pod_ctl.md)**: A Bash script for testing various functionalities of the `fd_pod_ctl` command in the `firedancer` codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-QUIC compatibility tests, benchmarks, and interop tooling for Go and Rust.
+Functions and files for QUIC data transmission, testing, and compatibility in Agave, Go, and Rust.
 
 ## Folders
-- **[agave_compat](agave_compat/README.md)**: QUIC interop test and benchmark commands, plus a random-batch sender and build scripts.
-- **[go_compat](go_compat/README.md)**: QUIC compatibility tests, TLS certificate generation, loopback packet simulation, and Go module files.
-- **[rust_compat](rust_compat/README.md)**: Rust QUIC test package with build script, bindings, and interoperability tests for quiche and quinn.
+- **[agave_compat](agave_compat/README.md)**: Functions for QUIC data transmission and testing, build scripts, package configuration, and integration test documentation.
+- **[go_compat](go_compat/README.md)**: Go files for QUIC protocol testing, TLS certificate generation, and module dependencies.
+- **[rust_compat](rust_compat/README.md)**: QUIC test application entry point, build script, Rust package configuration, and compatibility headers.
 
 
 ---
