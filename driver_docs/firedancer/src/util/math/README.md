@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Primitives and tests for fixed-point arithmetic, integer square roots, and statistical functions.
+The `math` folder in the `firedancer` codebase contains a collection of files providing implementations and tests for fixed-point arithmetic, square root calculations, and statistical functions, along with a makefile for building and testing these mathematical utilities.
 
 
 ## Files
-- **[fd_fxp.h](fd_fxp.h.md)**: Primitives for portable fixed-point arithmetic with rounding and overflow detection, targeting 64-bit unsigned integers.
-- **[fd_sqrt.h](fd_sqrt.h.md)**: Portable integer square root functions for various data types, using fixed-point iteration.
-- **[fd_stat.c](fd_stat.c.md)**: Implements statistical functions and sorting algorithms for various data types, including robust fitting.
-- **[fd_stat.h](fd_stat.h.md)**: Functions for statistical operations, including averaging, filtering, median calculation, robust fitting, and sorting.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for math utilities in the Firedancer project.
-- **[test_fxp.c](test_fxp.c.md)**: Tests for fixed-point arithmetic operations using 128-bit integers, including addition, subtraction, multiplication, division, and square root.
-- **[test_sqrt.c](test_sqrt.c.md)**: Tests the square root functions for various integer types using random number generation.
-- **[test_stat.c](test_stat.c.md)**: Tests statistical functions and random number generation for various data types.
+- **[fd_fxp.h](fd_fxp.h.md)**: The `fd_fxp.h` file in the `firedancer` codebase provides a comprehensive set of functions for performing portable fixed-point arithmetic, including addition, subtraction, multiplication, division, square root, logarithm, and exponential operations, with various rounding modes and overflow detection, specifically targeting 64-bit unsigned integer arithmetic with 30 fractional bits.
+- **[fd_sqrt.h](fd_sqrt.h.md)**: The `fd_sqrt.h` file in the `firedancer` codebase provides a robust and portable implementation for computing the integer square root of various data types, including unsigned and signed integers, using a fixed-point iteration method.
+- **[fd_stat.c](fd_stat.c.md)**: The `fd_stat.c` file in the `firedancer` codebase provides implementations for statistical functions such as filtering, median calculation, and robust fitting for various data types, along with sorting utilities for both ascending and descending orders.
+- **[fd_stat.h](fd_stat.h.md)**: The `fd_stat.h` file in the `firedancer` codebase provides functions for statistical computations such as averaging, filtering, median calculation, robust fitting, and sorting for various data types.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for mathematical utilities, including `fd_sqrt`, `fd_fxp`, and `fd_stat`, and defines how to build and run their respective tests.
+- **[test_fxp.c](test_fxp.c.md)**: The `test_fxp.c` file in the `firedancer` codebase contains a comprehensive suite of tests for fixed-point arithmetic operations, including addition, subtraction, multiplication, division, square root, logarithm, and exponential functions, with various rounding modes, using 128-bit integer support.
+- **[test_sqrt.c](test_sqrt.c.md)**: The `test_sqrt.c` file in the `firedancer` codebase is a test program that verifies the correctness of various square root functions for different integer types using random number generation.
+- **[test_stat.c](test_stat.c.md)**: The `test_stat.c` file in the `firedancer` codebase contains a series of tests for statistical functions, including average calculations, filtering, and robust fitting for normal and exponential distributions, using both single and double precision where available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

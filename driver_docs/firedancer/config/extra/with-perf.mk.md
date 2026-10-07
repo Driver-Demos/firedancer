@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration to add compiler flags for performance profiling.
+The `with-perf.mk` file in the `firedancer` codebase adds compiler flags to disable frame pointer omission and inlining for performance analysis.
 
 # Purpose
-The `CPPFLAGS` variable in this configuration file adds the compiler flags `-fno-omit-frame-pointer` and `-fno-inline`. The `-fno-omit-frame-pointer` flag instructs the compiler to keep the frame pointer in the generated code, which can be useful for debugging and profiling. The `-fno-inline` flag prevents the compiler from inlining functions, which can also aid in debugging by preserving function call boundaries.
+The file contains a makefile configuration line that appends specific compiler flags to the `CPPFLAGS` variable. The flags `-fno-omit-frame-pointer` and `-fno-inline` are used to modify the behavior of the C++ compiler, ensuring that frame pointers are not omitted and inlining is disabled, which can be useful for debugging and profiling purposes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

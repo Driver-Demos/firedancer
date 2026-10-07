@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for HTTP/2 implementation, including callback, stream, transmission, and HPACK components.
+The `fd_h2.h` file in the `firedancer` codebase serves as a header file that includes various other headers related to HTTP/2 functionality, such as callbacks, streams, and transmission.
 
 # Purpose
-This code is a C header file that manages the inclusion of other header files related to HTTP/2 functionality. It uses include guards to prevent multiple inclusions of the same header file, which can cause compilation errors. The file includes several other headers such as `fd_h2_callback.h`, `fd_h2_stream.h`, `fd_h2_tx.h`, and `fd_hpack.h`, each of which may include additional headers like `fd_h2_base.h`, `fd_h2_proto.h`, and `fd_h2_conn.h`. This structure helps organize and manage dependencies between different components of an HTTP/2 implementation, ensuring that necessary components are available while avoiding redundant inclusions.
+This code is a C header file that serves as an inclusion guard and organizes the inclusion of other related header files for a module, likely dealing with HTTP/2 (H2) protocol functionalities. The file uses preprocessor directives to prevent multiple inclusions, ensuring that the compiler processes the file's contents only once. It includes several other headers, such as `fd_h2_callback.h`, `fd_h2_stream.h`, `fd_h2_tx.h`, and `fd_hpack.h`, which suggest that the module handles callbacks, stream management, transmission, and header compression/decompression (HPACK) in the context of HTTP/2. The commented-out includes indicate potential dependencies that are not currently needed, possibly for modularity or to reduce compilation dependencies.
 # Imports and Dependencies
 
 ---
