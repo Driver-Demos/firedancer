@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_zstd.c` file in the `firedancer` codebase provides functions for handling Zstandard decompression streams, including initialization, reading, resetting, and deleting operations, while ensuring compatibility with the libzstd library.
+Functions for handling Zstandard decompression streams, including initialization, reading, and deletion.
 
 # Purpose
-This C source code file provides functionality for handling Zstandard (ZSTD) compressed data streams. It is designed to work with the Zstandard compression library, as indicated by the inclusion of `<zstd.h>` and the preprocessor directive that checks for the presence of the `libzstd` library. The file defines several functions that facilitate the creation, management, and operation of ZSTD decompression streams. These functions include initializing a new decompression stream ([`fd_zstd_dstream_new`](#fd_zstd_dstream_new)), resetting a stream ([`fd_zstd_dstream_reset`](#fd_zstd_dstream_reset)), reading and decompressing data from a stream ([`fd_zstd_dstream_read`](#fd_zstd_dstream_read)), and deleting a stream ([`fd_zstd_dstream_delete`](#fd_zstd_dstream_delete)). Additionally, the file provides utility functions to determine the alignment and memory footprint required for a decompression stream.
+The code provides functionality for handling Zstandard (ZSTD) compressed data streams. It includes functions to peek into ZSTD frame headers, manage ZSTD decompression streams, and perform decompression operations. The code is designed to work with the Zstandard library, as indicated by the inclusion of `zstd.h` and the preprocessor directive that checks for the presence of the library. The [`fd_zstd_peek`](<#fd_zstd_peek>) function inspects the frame header of a ZSTD compressed buffer to extract metadata such as window size and frame content size. This function helps determine if a frame is skippable.
 
-The code is structured to ensure robust error handling and memory management, with checks for potential errors and memory corruption. It uses a custom data structure (`fd_zstd_dstream_t`) to manage the state of the decompression stream, including memory size and a magic number for validation. The [`fd_zstd_peek`](#fd_zstd_peek) function is used to inspect the frame header of a ZSTD compressed buffer, extracting information such as window size and frame content size. This file is intended to be part of a larger system, likely a library, that provides ZSTD decompression capabilities, and it does not define a standalone executable. The functions defined here serve as an interface for other parts of the system to interact with ZSTD compressed data.
+The code also defines a set of functions to create, reset, read from, and delete ZSTD decompression streams. The [`fd_zstd_dstream_new`](<#fd_zstd_dstream_new>) function initializes a new decompression stream using static memory allocation, while [`fd_zstd_dstream_delete`](<#fd_zstd_dstream_delete>) cleans up the stream. The [`fd_zstd_dstream_read`](<#fd_zstd_dstream_read>) function reads and decompresses data from an input buffer to an output buffer, handling errors and progress checks. The code uses several macros and utility functions, such as `FD_UNLIKELY` for branch prediction optimization and `FD_COMPILER_MFENCE` for memory fence operations, to ensure efficient and safe execution. The code is intended to be part of a larger system that requires ZSTD decompression capabilities.
 # Imports and Dependencies
 
 ---
@@ -23,121 +23,141 @@ The code is structured to ensure robust error handling and memory management, wi
 
 ---
 ### fd\_zstd\_peek<!-- {{#callable:fd_zstd_peek}} -->
-The `fd_zstd_peek` function inspects a Zstandard compressed data buffer to extract and return frame header information into a provided structure.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L13>)
+
+Extracts and validates the frame header from a Zstandard compressed buffer and populates a `fd_zstd_peek_t` structure with frame details.
 - **Inputs**:
-    - `peek`: A pointer to an `fd_zstd_peek_t` structure where the frame header information will be stored.
-    - `buf`: A constant pointer to the buffer containing the Zstandard compressed data to be inspected.
-    - `bufsz`: An unsigned long integer representing the size of the buffer `buf`.
-- **Control Flow**:
-    - Declare a `ZSTD_frameHeader` array `hdr` with one element.
-    - Call `ZSTD_getFrameHeader` to fill `hdr` with the frame header information from `buf` and store the result in `err`.
-    - Check if `err` indicates an error using `ZSTD_isError`; if so, return `NULL`.
-    - Check if `err` is greater than 0, indicating that more data is needed; if so, return `NULL`.
+    - ``peek``: A pointer to a `fd_zstd_peek_t` structure where the function will store the extracted frame details.
+    - ``buf``: A pointer to the buffer containing the Zstandard compressed data.
+    - ``bufsz``: The size of the buffer in bytes.
+- **Logic and Control Flow**:
+    - Call `ZSTD_getFrameHeader` to extract the frame header from the buffer into `hdr` and store the result in `err`.
+    - Check if `err` indicates an error using `ZSTD_isError`; if true, return `NULL`.
+    - Check if `err` is greater than 0, indicating an incomplete frame header; if true, return `NULL`.
     - Call `fd_msan_unpoison` to mark the `hdr` memory as initialized for memory sanitizers.
-    - Check if `hdr->windowSize` exceeds the maximum allowed window size; if so, return `NULL`.
-    - Populate the `peek` structure with `hdr`'s `windowSize`, `frameContentSize`, and `frameType` information.
+    - Check if `hdr->windowSize` exceeds the maximum allowed window size (`1U<<ZSTD_WINDOWLOG_MAX`); if true, return `NULL`.
+    - Populate the `peek` structure with `hdr->windowSize`, `hdr->frameContentSize`, and whether the frame is skippable (`hdr->frameType == ZSTD_skippableFrame`).
     - Return the `peek` pointer.
-- **Output**: Returns a pointer to the `fd_zstd_peek_t` structure filled with frame header information, or `NULL` if an error occurs or more data is needed.
+- **Output**: A pointer to the `fd_zstd_peek_t` structure populated with frame details, or `NULL` if an error occurs.
 
 
 ---
 ### fd\_zstd\_dstream\_align<!-- {{#callable:fd_zstd_dstream_align}} -->
-The function `fd_zstd_dstream_align` returns the alignment requirement for a ZSTD decompression stream.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L29>)
+
+Returns the alignment requirement for a Zstandard decompression stream.
 - **Inputs**: None
-- **Control Flow**:
-    - The function directly returns the value of the macro `FD_ZSTD_DSTREAM_ALIGN`.
-- **Output**: The function returns an unsigned long integer representing the alignment requirement for a ZSTD decompression stream.
+- **Logic and Control Flow**:
+    - Returns the value of the macro `FD_ZSTD_DSTREAM_ALIGN`.
+- **Output**: The function returns an `ulong` value representing the alignment requirement for a Zstandard decompression stream.
 
 
 ---
 ### fd\_zstd\_dstream\_footprint<!-- {{#callable:fd_zstd_dstream_footprint}} -->
-The function `fd_zstd_dstream_footprint` calculates the memory footprint required for a Zstandard decompression stream given a maximum window size.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L34>)
+
+Calculates the memory footprint required for a Zstandard decompression stream with a given maximum window size.
 - **Inputs**:
-    - `max_window_sz`: The maximum window size for the Zstandard decompression stream, specified as an unsigned long integer.
-- **Control Flow**:
-    - The function calculates the offset of the 'mem' field within the 'fd_zstd_dstream_t' structure using the 'offsetof' macro.
-    - It then calls 'ZSTD_estimateDStreamSize' with 'max_window_sz' to estimate the size of the decompression stream.
-    - The function returns the sum of the offset and the estimated decompression stream size.
-- **Output**: The function returns an unsigned long integer representing the total memory footprint required for the decompression stream.
+    - `max_window_sz`: The maximum window size for the Zstandard decompression stream.
+- **Logic and Control Flow**:
+    - Calculate the offset of the `mem` field in the `fd_zstd_dstream_t` structure using `offsetof(fd_zstd_dstream_t, mem)`.
+    - Estimate the size of the decompression stream using `ZSTD_estimateDStreamSize(max_window_sz)`.
+    - Add the offset and the estimated size to determine the total memory footprint.
+- **Output**: Returns the total memory footprint in bytes as an unsigned long integer.
 
 
 ---
 ### fd\_zstd\_dstream\_new<!-- {{#callable:fd_zstd_dstream_new}} -->
-The `fd_zstd_dstream_new` function initializes a new Zstandard decompression stream using a provided memory buffer and a specified maximum window size.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L39>)
+
+Initializes a new Zstandard decompression stream using static memory allocation.
 - **Inputs**:
-    - `mem`: A pointer to a memory buffer where the decompression stream will be initialized.
-    - `max_window_sz`: The maximum window size for the decompression stream, which influences the memory size estimation.
-- **Control Flow**:
-    - The function casts the provided memory buffer to a `fd_zstd_dstream_t` pointer and estimates the memory size required for the decompression stream using `ZSTD_estimateDStreamSize` with the given `max_window_sz`.
-    - It initializes a static decompression stream context using `ZSTD_initStaticDStream` with the memory buffer and the estimated size.
-    - If the context initialization fails (unlikely), it logs a warning and returns `NULL`.
-    - If the context pointer does not match the memory buffer pointer (unlikely), it logs a critical error.
-    - It sets a magic number in the `dstream` structure to indicate successful initialization and returns the `dstream` pointer.
-- **Output**: Returns a pointer to the initialized `fd_zstd_dstream_t` structure, or `NULL` if initialization fails.
+    - ``mem``: A pointer to the memory location where the decompression stream will be initialized.
+    - ``max_window_sz``: The maximum window size for the decompression stream, which determines the memory size needed for the stream.
+- **Logic and Control Flow**:
+    - Assigns the `mem` pointer to a `fd_zstd_dstream_t` pointer `dstream`.
+    - Calculates the memory size needed for the decompression stream using `ZSTD_estimateDStreamSize` and assigns it to `dstream->mem_sz`.
+    - Initializes a Zstandard decompression context using `ZSTD_initStaticDStream` with the memory and estimated size.
+    - Checks if the context initialization failed; logs a warning and returns `NULL` if it did.
+    - Verifies that the context pointer matches the expected memory location; logs a critical error if it does not.
+    - Sets the `magic` field of `dstream` to `FD_ZSTD_DSTREAM_MAGIC` to indicate successful initialization.
+    - Returns the initialized `dstream` pointer.
+- **Output**: A pointer to the initialized `fd_zstd_dstream_t` structure, or `NULL` if initialization fails.
 
 
 ---
 ### fd\_zstd\_dstream\_ctx<!-- {{#callable:fd_zstd_dstream_ctx}} -->
-The `fd_zstd_dstream_ctx` function retrieves the ZSTD decompression context from a given `fd_zstd_dstream_t` structure, ensuring the structure's integrity by checking its magic number.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L61>)
+
+Retrieves the `ZSTD_DCtx` context from a `fd_zstd_dstream_t` structure after verifying its integrity.
 - **Inputs**:
-    - `dstream`: A pointer to an `fd_zstd_dstream_t` structure, which contains the memory and state for a ZSTD decompression stream.
-- **Control Flow**:
-    - Check if the `magic` field of the `dstream` structure matches the expected `FD_ZSTD_DSTREAM_MAGIC` value to ensure the structure is valid and not corrupted.
-    - If the `magic` value is incorrect, log a critical error indicating potential memory corruption.
-    - Return the ZSTD decompression context by casting the `mem` field of the `dstream` structure to a `ZSTD_DCtx` pointer.
-- **Output**: A pointer to a `ZSTD_DCtx` structure, which is the decompression context extracted from the `dstream`.
+    - `dstream`: A pointer to a `fd_zstd_dstream_t` structure, which contains the decompression stream state and memory.
+- **Logic and Control Flow**:
+    - Check if the `magic` field of `dstream` is equal to `FD_ZSTD_DSTREAM_MAGIC` to verify the integrity of the `dstream` structure.
+    - If the `magic` field is invalid, log a critical error indicating potential memory corruption.
+    - Return the `ZSTD_DCtx` context by casting the `mem` field of `dstream` using `fd_type_pun`.
+- **Output**: A pointer to a `ZSTD_DCtx` context, which is used for decompression operations.
 
 
 ---
 ### fd\_zstd\_dstream\_delete<!-- {{#callable:fd_zstd_dstream_delete}} -->
-The `fd_zstd_dstream_delete` function safely deletes a Zstandard decompression stream by resetting its magic number and memory size to zero, ensuring no memory corruption issues.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L68>)
+
+Deletes a Zstandard decompression stream by resetting its magic number and memory size.
 - **Inputs**:
-    - `dstream`: A pointer to an `fd_zstd_dstream_t` structure representing the Zstandard decompression stream to be deleted.
-- **Control Flow**:
-    - Check if the `dstream` pointer is NULL; if so, return NULL immediately.
-    - Verify that the `magic` field of `dstream` matches the expected `FD_ZSTD_DSTREAM_MAGIC` value to ensure the stream is valid; if not, log a critical error indicating potential memory corruption.
-    - Use memory fence operations (`FD_COMPILER_MFENCE`) to ensure memory operations are completed before and after resetting the `magic` and `mem_sz` fields to zero.
-    - Return the `dstream` pointer cast to a `void *`.
-- **Output**: Returns a `void *` pointer to the `dstream` after it has been reset, or NULL if the input `dstream` was NULL.
+    - `dstream`: A pointer to an `fd_zstd_dstream_t` structure representing the decompression stream to delete.
+- **Logic and Control Flow**:
+    - Check if `dstream` is NULL; if so, return NULL.
+    - Verify the `magic` field of `dstream` to ensure it matches `FD_ZSTD_DSTREAM_MAGIC`; if not, log a critical error indicating potential memory corruption.
+    - Use `FD_COMPILER_MFENCE()` to ensure memory operations are completed before proceeding.
+    - Set the `magic` field of `dstream` to 0UL to mark it as deleted.
+    - Set the `mem_sz` field of `dstream` to 0UL to indicate no memory is allocated.
+    - Use `FD_COMPILER_MFENCE()` again to ensure memory operations are completed.
+    - Return the `dstream` pointer cast to `void *`.
+- **Output**: Returns a `void *` pointer to the `dstream` that was deleted, or NULL if `dstream` was NULL.
 
 
 ---
 ### fd\_zstd\_dstream\_reset<!-- {{#callable:fd_zstd_dstream_reset}} -->
-The `fd_zstd_dstream_reset` function resets a Zstandard decompression stream to prepare it for a new decompression session.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L86>)
+
+Resets the Zstandard decompression stream context to prepare for a new decompression session.
 - **Inputs**:
-    - `dstream`: A pointer to an `fd_zstd_dstream_t` structure representing the decompression stream to be reset.
-- **Control Flow**:
-    - The function calls [`fd_zstd_dstream_ctx`](#fd_zstd_dstream_ctx) to retrieve the `ZSTD_DCtx` context from the provided `dstream`.
-    - It then calls `ZSTD_DCtx_reset` on the retrieved context with the `ZSTD_reset_session_only` flag to reset the session state of the decompression context.
-- **Output**: This function does not return a value; it performs an in-place reset of the decompression stream's session state.
-- **Functions called**:
-    - [`fd_zstd_dstream_ctx`](#fd_zstd_dstream_ctx)
+    - `dstream`: A pointer to an `fd_zstd_dstream_t` structure representing the decompression stream to reset.
+- **Logic and Control Flow**:
+    - Calls [`fd_zstd_dstream_ctx`](<#fd_zstd_dstream_ctx>) to retrieve the `ZSTD_DCtx` context from the `dstream`.
+    - Invokes `ZSTD_DCtx_reset` on the retrieved context with the `ZSTD_reset_session_only` flag to reset the session state.
+- **Output**: No output is returned as the function is of type `void`.
+- **Functions Called**:
+    - [`fd_zstd_dstream_ctx`](<#fd_zstd_dstream_ctx>)
 
 
 ---
 ### fd\_zstd\_dstream\_read<!-- {{#callable:fd_zstd_dstream_read}} -->
-The `fd_zstd_dstream_read` function decompresses a stream of data using the Zstandard library, updating input and output pointers, and handling errors.
+[View Source →](<../../../../../src/ballet/zstd/fd_zstd.c#L91>)
+
+Decompresses a stream of data using Zstandard and updates input and output pointers.
 - **Inputs**:
-    - `dstream`: A pointer to an `fd_zstd_dstream_t` structure representing the decompression stream context.
-    - `in_p`: A pointer to a pointer to the start of the input buffer, which will be updated to reflect the new position after decompression.
-    - `in_end`: A pointer to the end of the input buffer.
-    - `out_p`: A pointer to a pointer to the start of the output buffer, which will be updated to reflect the new position after decompression.
-    - `out_end`: A pointer to the end of the output buffer.
-    - `opt_errcode`: An optional pointer to a `ulong` where an error code will be stored if an error occurs during decompression.
-- **Control Flow**:
-    - Initialize a local error code storage if `opt_errcode` is not provided.
-    - Set `in_start` and `out_start` to the current positions of the input and output buffers, respectively.
-    - Check if the input or output pointers are invalid (i.e., start is greater than end) and return `EINVAL` if so.
-    - Initialize `ZSTD_inBuffer` and `ZSTD_outBuffer` structures with the input and output buffer details.
-    - Retrieve the decompression context using [`fd_zstd_dstream_ctx`](#fd_zstd_dstream_ctx).
-    - Call `ZSTD_decompressStream` to perform the decompression.
-    - Check if the decompression resulted in an error using `ZSTD_isError`, log a warning, set the error code, and return `EPROTO` if an error occurred.
-    - Check if no progress was made in decompression (input and output positions did not change) and return `EPIPE` if so.
-    - Update the input and output pointers to reflect the new positions after decompression.
-    - Return `-1` if the decompression frame is complete, otherwise return `0` to indicate more data is needed.
-- **Output**: Returns `-1` if the decompression frame is complete, `0` if more data is needed, or an error code (`EINVAL`, `EPROTO`, or `EPIPE`) if an error occurs.
-- **Functions called**:
-    - [`fd_zstd_dstream_ctx`](#fd_zstd_dstream_ctx)
+    - ``dstream``: A pointer to the `fd_zstd_dstream_t` structure, which holds the decompression context.
+    - ``in_p``: A pointer to a pointer to the start of the input buffer.
+    - ``in_end``: A pointer to the end of the input buffer.
+    - ``out_p``: A pointer to a pointer to the start of the output buffer.
+    - ``out_end``: A pointer to the end of the output buffer.
+    - ``opt_errcode``: An optional pointer to store error codes; if NULL, a local variable is used.
+- **Logic and Control Flow**:
+    - Initialize a local error code storage if `opt_errcode` is NULL.
+    - Set `in_start` and `out_start` to the current positions of `in_p` and `out_p`.
+    - Check if `in_start` is greater than `in_end` or `out_start` is greater than `out_end`; return `EINVAL` if true.
+    - Initialize `ZSTD_inBuffer` and `ZSTD_outBuffer` with the input and output buffer details.
+    - Retrieve the decompression context using [`fd_zstd_dstream_ctx`](<#fd_zstd_dstream_ctx>).
+    - Call `ZSTD_decompressStream` to decompress data from `in_buf` to `out_buf`.
+    - Check if `ZSTD_decompressStream` returned an error; log a warning and return `EPROTO` if true.
+    - Check if no progress was made in decompression; log a warning and return `EPIPE` if true.
+    - Update `in_p` and `out_p` to reflect the new positions after decompression.
+    - Return `-1` if the frame is complete, otherwise return `0`.
+- **Output**: Returns `-1` if the decompression frame is complete, `0` if still working, or an error code if an error occurs.
+- **Functions Called**:
+    - [`fd_zstd_dstream_ctx`](<#fd_zstd_dstream_ctx>)
 
 
 

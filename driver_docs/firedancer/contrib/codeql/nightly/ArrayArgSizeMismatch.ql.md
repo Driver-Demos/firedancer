@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `ArrayArgSizeMismatch.ql` file in the `firedancer` codebase identifies function calls in C++ where an array argument is smaller than the expected parameter size, potentially leading to out-of-bounds memory access.
+Finds function calls where an array argument is smaller than the declared parameter's array size.
 
 # Purpose
-This code is a query written in a domain-specific language used for static analysis, specifically targeting C++ codebases. Its primary purpose is to identify instances where a function call passes an array whose size is smaller than the size expected by the function's parameter. This situation can lead to potential memory access violations, as the function may attempt to access elements beyond the bounds of the provided array, leading to undefined behavior or security vulnerabilities.
+The code is a query written for a static analysis tool that identifies potential issues in C++ code related to array argument size mismatches. It specifically targets function calls where the size of an array being passed as an argument is smaller than the size of the array expected by the function's parameter. This mismatch can lead to out-of-bounds memory access, which is a common source of reliability issues in software.
 
-The query imports necessary modules such as `cpp`, `semmle.code.cpp.commons.Buffer`, and `filter`, which provide the foundational elements and utilities needed to analyze C++ code structures and perform filtering operations. The query defines a set of conditions using logical expressions to match function calls (`FunctionCall c`) where the size of the argument array (`argType`) is less than the size of the parameter array (`paramType`). It ensures that the base types of the arrays are of the same size and excludes cases where the array size might be variable or where there are inconsistent declarations.
+The query imports necessary modules such as `cpp`, `semmle.code.cpp.commons.Buffer`, and `filter` to facilitate the analysis. It defines a set of conditions using logical expressions to identify function calls (`FunctionCall c`) where the array size of the argument (`argType`) is less than the array size of the parameter (`paramType`). The query ensures that the base types of the arrays are of the same size and filters out cases where the array size might be variable or where there are inconsistent declarations.
 
-The result of the query is a warning message that highlights the mismatch, specifying the sizes of the arrays involved and the function expecting the larger array. This message is intended to aid developers in identifying and rectifying potential reliability issues in their code. The query is marked with metadata indicating its severity level as a warning, its high precision, and its relevance to code reliability, making it a valuable tool for improving code quality and preventing runtime errors.
+When a mismatch is detected, the query selects the argument in question and generates a warning message. The message specifies the size of the array being passed and the size expected by the function, providing the function's name for context. This helps developers quickly identify and address potential issues in their code, improving the reliability of the software.
 # Imports and Dependencies
 
 ---
