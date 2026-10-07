@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, structures, and makefile for managing capture, execution epoch, instruction, slot, and transaction contexts in a runtime environment.
+Context management for capture, instruction, and transaction execution, with build rules.
 
 
 ## Files
-- **[fd_capture_ctx.c](fd_capture_ctx.c.md)**: Functions for managing capture context memory and transaction status locks.
-- **[fd_capture_ctx.h](fd_capture_ctx.h.md)**: Defines structures and functions for capturing Solana account updates and transaction execution context.
-- **[fd_exec_instr_ctx.c](fd_exec_instr_ctx.c.md)**: Functions for managing and accessing instruction and transaction contexts in a runtime environment.
-- **[fd_exec_instr_ctx.h](fd_exec_instr_ctx.h.md)**: Defines the `fd_exec_instr_ctx_t` structure and related functions for managing instruction execution contexts.
-- **[fd_exec_txn_ctx.c](fd_exec_txn_ctx.c.md)**: Functions for managing and interacting with transaction execution contexts, including account handling.
-- **[fd_exec_txn_ctx.h](fd_exec_txn_ctx.h.md)**: Defines the context and functions needed to execute a transaction, including account management and error handling.
-- **[Local.mk](Local.mk.md)**: Makefile directives for adding headers and objects related to transaction, instruction, and capture contexts.
+- **[fd_capture_ctx.c](fd_capture_ctx.c.md)**: Memory management and join/leave helpers for a capture context, plus a transaction status read-write lock.
+- **[fd_capture_ctx.h](fd_capture_ctx.h.md)**: Runtime capture context, account update message, buffer sizing, and lifecycle and txn status lock APIs.
+- **[fd_exec_instr_ctx.c](fd_exec_instr_ctx.c.md)**: Instruction account lookup and borrow helpers, plus signer queries.
+- **[fd_exec_instr_ctx.h](fd_exec_instr_ctx.h.md)**: Instruction execution context and account borrow helpers.
+- **[fd_exec_txn_ctx.c](fd_exec_txn_ctx.c.md)**: Transaction context setup, account lookup, writability checks, and precondition filters.
+- **[fd_exec_txn_ctx.h](fd_exec_txn_ctx.h.md)**: Transaction execution context, account access helpers, and instruction trace management.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_exec_txn_ctx, fd_exec_instr_ctx, and fd_capture_ctx when FD_HAS_INT128 is set.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

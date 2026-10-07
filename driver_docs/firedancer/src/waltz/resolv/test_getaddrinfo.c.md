@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests the `fd_getaddrinfo` function by resolving hostnames to IP addresses and printing the results.
+The `test_getaddrinfo.c` file in the `firedancer` codebase tests the functionality of resolving hostnames to IP addresses using the `fd_getaddrinfo` function and prints the results for both IPv4 and IPv6 addresses.
 
 # Purpose
-The code is an executable C program designed to perform network address resolution for given hostnames. It includes necessary headers for network operations and defines a function [`test_gai`](<#test_gai>) that takes a hostname as input. The function uses `fd_getaddrinfo` to retrieve address information for the specified host and prints the resolved IP addresses. It handles both IPv4 and IPv6 addresses, using `inet_ntop` for converting network addresses to a human-readable form. The program uses a static buffer `scratch` for temporary storage during address resolution.
+This C source code file is designed to perform network address resolution for given hostnames, demonstrating a specific functionality related to network programming. The code includes necessary headers for network operations and defines a function [`test_gai`](#test_gai) that utilizes the `fd_getaddrinfo` function to resolve hostnames into network addresses. The resolved addresses are then printed in either IPv4 or IPv6 format, depending on the address family. The code is structured as an executable program, with a [`main`](#main) function that iterates over command-line arguments, treating each as a hostname to be resolved and processed by [`test_gai`](#test_gai).
 
-The [`main`](<#main>) function initializes network database file descriptors with `fd_netdb_open_fds` and iterates over command-line arguments, calling [`test_gai`](<#test_gai>) for each hostname provided. The program is intended to be run from the command line, where it will output the resolved IP addresses for each hostname argument. The code relies on external functions such as `fd_getaddrinfo` and `fd_gai_strerror`, which are likely defined in the included `fd_netdb.h` and `fd_ip4.h` headers, indicating that it is part of a larger codebase with custom network utility functions.
+The file leverages custom data structures and functions, such as `fd_addrinfo_t` and `fd_getaddrinfo`, which are likely defined in the included "fd_netdb.h" and "fd_ip4.h" headers. These components suggest that the code is part of a larger library or framework focused on network database operations. The use of `fd_netdb_open_fds` at the beginning of the [`main`](#main) function indicates an initialization step for network database operations, which is crucial for the subsequent address resolution tasks. Overall, the code provides a focused utility for converting hostnames to their respective network addresses, showcasing the integration of custom network handling functions with standard socket programming techniques.
 # Imports and Dependencies
 
 ---
@@ -24,42 +24,39 @@ The [`main`](<#main>) function initializes network database file descriptors wit
 
 ---
 ### test\_gai<!-- {{#callable:test_gai}} -->
-[View Source →](<../../../../../src/waltz/resolv/test_getaddrinfo.c#L10>)
-
-Resolves a hostname to its IP addresses and prints them.
+The `test_gai` function performs a DNS lookup for a given hostname and prints the resolved IP addresses in both IPv4 and IPv6 formats.
 - **Inputs**:
-    - `host`: A constant character pointer to the hostname to resolve.
-- **Logic and Control Flow**:
-    - Prints the hostname using `puts`.
-    - Initializes a static buffer `scratch` for temporary storage.
-    - Calls [`fd_getaddrinfo`](<fd_getaddrinfo.c.md#fd_getaddrinfo>) to resolve the hostname to an address list, storing the result in `res`.
-    - Checks if [`fd_getaddrinfo`](<fd_getaddrinfo.c.md#fd_getaddrinfo>) returns an error; if so, prints an error message and returns.
-    - Iterates over the linked list of address results in `res`.
-    - For each address, checks the address family (`AF_INET` or `AF_INET6`).
-    - If `AF_INET`, casts the address to `sockaddr_in` and prints the IPv4 address.
-    - If `AF_INET6`, casts the address to `sockaddr_in6`, converts the IPv6 address to a string using `inet_ntop`, and prints it.
-    - Continues to the next address in the list by updating `res` to `res->ai_next`.
-- **Output**: No return value; outputs the resolved IP addresses to the standard output.
-- **Functions Called**:
-    - [`fd_getaddrinfo`](<fd_getaddrinfo.c.md#fd_getaddrinfo>)
-    - [`fd_gai_strerror`](<fd_getaddrinfo.c.md#fd_gai_strerror>)
+    - `host`: A constant character pointer representing the hostname to be resolved.
+- **Control Flow**:
+    - The function begins by printing the provided hostname using `puts`.
+    - It declares a static buffer `scratch` and initializes a pointer `pscratch` to point to this buffer.
+    - The function calls [`fd_getaddrinfo`](fd_getaddrinfo.c.md#fd_getaddrinfo) to perform a DNS lookup for the given hostname, storing the result in `res` and using `pscratch` for scratch space.
+    - If [`fd_getaddrinfo`](fd_getaddrinfo.c.md#fd_getaddrinfo) returns a non-zero error code, the function prints an error message using [`fd_gai_strerror`](fd_getaddrinfo.c.md#fd_gai_strerror) and returns early.
+    - If the lookup is successful, the function enters a loop to iterate over the linked list of address information structures pointed to by `res`.
+    - For each address, it checks the address family (`sa_family`) to determine if it is IPv4 or IPv6.
+    - If the address is IPv4 (`AF_INET`), it casts the address to `sockaddr_in` and prints the IPv4 address using `FD_IP4_ADDR_FMT` and `FD_IP4_ADDR_FMT_ARGS`.
+    - If the address is IPv6 (`AF_INET6`), it casts the address to `sockaddr_in6`, converts it to a string using `inet_ntop`, and prints it.
+    - The loop continues until all address information structures have been processed.
+- **Output**: The function does not return a value; it outputs the resolved IP addresses to the standard output.
+- **Functions called**:
+    - [`fd_getaddrinfo`](fd_getaddrinfo.c.md#fd_getaddrinfo)
+    - [`fd_gai_strerror`](fd_getaddrinfo.c.md#fd_gai_strerror)
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/waltz/resolv/test_getaddrinfo.c#L42>)
-
-Executes a loop to perform address information retrieval for each command-line argument provided.
+The `main` function initializes network database file descriptors and processes each command-line argument as a hostname to resolve its address information.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
-    - `argv`: An array of strings representing the command-line arguments.
-- **Logic and Control Flow**:
-    - Calls `fd_netdb_open_fds` with `NULL` to initialize network database file descriptors.
-    - Iterates over each command-line argument starting from index 1 to `argc - 1`.
-    - For each argument, calls the [`test_gai`](<#test_gai>) function with the argument as the host name.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`test_gai`](<#test_gai>)
+    - `argc`: The count of command-line arguments passed to the program, including the program name.
+    - `argv`: An array of strings representing the command-line arguments, where each element is a string containing one argument.
+- **Control Flow**:
+    - Call `fd_netdb_open_fds` with `NULL` to initialize network database file descriptors.
+    - Iterate over each command-line argument starting from index 1 (skipping the program name).
+    - For each argument, call [`test_gai`](#test_gai) to resolve the hostname and print its address information.
+    - Return 0 to indicate successful execution.
+- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Functions called**:
+    - [`test_gai`](#test_gai)
 
 
 

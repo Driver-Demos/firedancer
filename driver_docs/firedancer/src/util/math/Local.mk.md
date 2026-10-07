@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, and unit tests for math utilities in the Firedancer project.
+The `Local.mk` file in the `firedancer` codebase specifies the headers, object files, and unit tests for mathematical utilities, including `fd_sqrt`, `fd_fxp`, and `fd_stat`, and defines how to build and run their respective tests.
 
 # Purpose
-The Makefile content defines a build and test process for a software project. It adds header files `fd_sqrt.h`, `fd_fxp.h`, and `fd_stat.h` to the build using the `add-hdrs` function. It includes object files `fd_stat` and `fd_util` with the `add-objs` function. The `make-unit-test` function creates unit tests for `test_sqrt`, `test_fxp`, and `test_stat`, each depending on `fd_util`. The `run-unit-test` function executes these unit tests: `test_sqrt`, `test_fxp`, and `test_stat`.
+This file is a Makefile script used to automate the process of building and testing a software project. It defines targets for adding header files and object files, creating unit tests for specific components (`test_sqrt`, `test_fxp`, `test_stat`), and executing these unit tests. The script leverages macros to streamline the inclusion and testing of various components within the project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
