@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Blockstore configuration, TPS benchmark commands, development validator, tests, and build files for `fddev`.
+Commands, tests, and build rules for blockstore configuration, TPS benchmarks, and development validator threads.
 
 ## Folders
-- **[commands](commands/README.md)**: Blockstore configuration for Agave validator and commands for testing TPS benchmarks and starting a development validator.
-- **[tests](tests/README.md)**: Tests for the `fddev` application, including configuration, workspace, and device readiness.
+- **[commands](commands/README.md)**: Commands for blockstore configuration, validator TPS benchmarks, and development validator threads.
+- **[tests](tests/README.md)**: Test harness for fddev configure, workspace, ready, and dev command execution.
 
 ## Files
-- **[dev1.c](dev1.c.md)**: Defines and implements the `dev1` command for configuring and running a single tile in Firedancer.
-- **[dev1.h](dev1.h.md)**: Defines an external action `fd_action_dev1` with configuration inclusion.
-- **[Local.mk](Local.mk.md)**: Makefile for building and running the `fddev` application with integration tests and conditional dependencies.
-- **[main.c](main.c.md)**: Initializes and runs the main function with default configuration and topology setup.
-- **[main.h](main.h.md)**: Defines constants, callback arrays, configuration stages, tile functions, and actions for the fddev application.
+- **[dev1.c](dev1.c.md)**: Starts one tile, with optional configure, signal handling, and tile runner selection.
+- **[dev1.h](dev1.h.md)**: The `dev1.h` file in the `firedancer` codebase declares an external action, `fd_action_dev1`, and includes a shared configuration header.
+- **[Local.mk](Local.mk.md)**: Make rules for fddev build, run, monitor, and integration tests.
+- **[main.c](main.c.md)**: Entry point that builds a default config list and calls fd_dev_main with fd_topo_initialize.
+- **[main.h](main.h.md)**: Declarations for app name, callbacks, stages, tiles, and actions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
