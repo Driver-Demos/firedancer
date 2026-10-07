@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for managing shared memory components, scripts, binaries, and tests in the Firedancer project.
+The `Local.mk` file in the `firedancer` codebase specifies the build configuration for shared memory utilities, including headers, objects, scripts, binaries, and unit tests, with conditional object inclusion based on the `FD_HAS_HOSTED` flag.
 
 # Purpose
-The Makefile content defines build instructions for a software project. It uses a series of `$(call ...)` functions to add headers, objects, scripts, binaries, and unit tests to the build process. The `add-hdrs` function includes the header file `fd_shmem.h`. The `add-objs` function adds object files such as `fd_shmem_admin`, `fd_shmem_user`, and `fd_util`, with conditional logic to include either `fd_numa_linux` or `fd_numa_stub` based on the `FD_HAS_HOSTED` variable. The `add-scripts` function includes the script `fd_shmem_cfg`. The `make-bin` function creates the binary `fd_shmem_ctl` using `fd_util`, and the `make-unit-test` function sets up the unit test `test_shmem`. Finally, `add-test-scripts` includes the test script `test_shmem_ctl`.
+This file is a Makefile, which is used to automate the build process of a software project. It defines rules and dependencies for compiling and linking various components, such as headers, object files, scripts, binaries, and unit tests related to shared memory functionality. The conditional block at the end specifies different object files to include based on whether the `FD_HAS_HOSTED` variable is defined, allowing for platform-specific configurations.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
