@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-CodeQL workspace for local test, dev, and nightly qlpacks with a codeql registry URL.
+Configures CodeQL to reference nightly queries from local files instead of the default registry.
 
 # Purpose
-This file configures local package resolution for CodeQL by exposing `test/qlpack.yml`, `dev/qlpack.yml`, and `nightly/qlpack.yml` so the CLI can use queries from the file system instead of the default registry. It also defines the `codeql/*` package registry and sets its URL to `https://ghcr.io/v2/`.
+The file configures the CodeQL CLI to reference specific query packs from the local file system instead of the default registry. It specifies three query packs: `test/qlpack.yml`, `dev/qlpack.yml`, and `nightly/qlpack.yml` under the `provide` section. Additionally, it defines a registry with the `packages` field set to `codeql/*` and the `url` pointing to `https://ghcr.io/v2/`, indicating where to find the packages.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

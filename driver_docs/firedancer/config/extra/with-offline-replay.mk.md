@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-offline-replay.mk` file in the `firedancer` codebase configures compilation flags to enable offline replay and track usage in the build process.
+Makefile configuration for offline replay and usage tracking in the Firedancer project.
 
 # Purpose
-This Makefile snippet includes an additional makefile, `config/extra/with-handholding.mk`, and sets preprocessor and compiler flags. The flags `-DFD_SPAD_TRACK_USAGE=1` and `-DFD_OFFLINE_REPLAY=1` are added to both `CPPFLAGS` and `CFLAGS`, enabling specific features or behaviors in the code related to tracking usage and offline replay functionality.
+The file includes the `config/extra/with-handholding.mk` makefile, which likely contains additional build configurations. It appends the `CPPFLAGS` and `CFLAGS` variables with the preprocessor definitions `-DFD_SPAD_TRACK_USAGE=1` and `-DFD_OFFLINE_REPLAY=1`. These definitions enable specific features or modes in the software, such as tracking usage and offline replay functionality, during the compilation process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
