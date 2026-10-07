@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Message types, tile forwarding logic, seccomp policy, and build rules for plugin updates.
+Defines seccomp filter policies, message structures, plugin tiles, and Makefile logic for Firedancer.
 
 ## Folders
-- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only for fd 2 or logfile_fd.
+- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall handling based on architecture and specific conditions.
 
 ## Files
-- **[fd_plugin.h](fd_plugin.h.md)**: Message type constants and packed structs for slot, gossip, vote, and block engine updates.
-- **[fd_plugin_tile.c](fd_plugin_tile.c.md)**: Tile logic that copies plugin input fragments to an output dcache and republishes them by message kind.
-- **[fd_plugin_tile.seccomppolicy](fd_plugin_tile.seccomppolicy.md)**: The `fd_dedup_tile.seccomppolicy` file defines security policies for logging in the Firedancer deduplication tile, specifying conditions for writing and syncing log messages to a file or STDERR.
-- **[Local.mk](Local.mk.md)**: Build rule that adds fd_plugin_tile objects when FD_HAS_INT128 is defined.
+- **[fd_plugin.h](fd_plugin.h.md)**: Defines message types and structures for plugin communication in the Firedancer codebase.
+- **[fd_plugin_tile.c](fd_plugin_tile.c.md)**: Implements a plugin tile for processing and managing data fragments in a network topology.
+- **[fd_plugin_tile.seccomppolicy](fd_plugin_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
+- **[Local.mk](Local.mk.md)**: Makefile logic to conditionally add objects based on the presence of 128-bit integer support.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

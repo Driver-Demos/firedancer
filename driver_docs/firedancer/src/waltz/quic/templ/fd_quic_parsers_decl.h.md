@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_quic_parsers_decl.h` file declares functions for decoding QUIC packets and frames, specifying the structure and behavior of these decoding operations.
+Declarations for `fd_quic_decode_*` functions to decode QUIC packets and frames.
 
 # Purpose
-This code is a C header file that defines a macro for declaring functions used to decode QUIC packets and frames. The macro `FD_TEMPL_DEF_STRUCT_BEGIN(NAME)` is designed to generate function prototypes for decoding different QUIC structures, where `NAME` is a placeholder for the specific structure type. Each generated function, such as `fd_quic_decode_<NAME>`, takes a pointer to an output structure and a byte array as input, returning the number of bytes consumed during the decoding process. The use of `FD_WARN_UNUSED` suggests that the return value must be checked by the caller, ensuring that the function's result is not ignored. The inclusion of `"fd_quic_dft.h"` indicates that this file likely relies on definitions or additional macros provided in that header, which are necessary for the decoding operations.
+The code is a C header file that declares a macro `FD_TEMPL_DEF_STRUCT_BEGIN` for defining functions to decode QUIC packets and frames. The macro generates function declarations for `fd_quic_decode_*` functions, where `*` is replaced by a specific name. Each function takes a pointer to a structure `fd_quic_##NAME##_t`, a byte array `buf`, and its size `sz` as input parameters. The function returns the number of bytes consumed during the decoding process and requires the caller to check the result. The file includes another header file, `fd_quic_dft.h`, which likely contains additional definitions or implementations related to QUIC decoding.
 # Imports and Dependencies
 
 ---
