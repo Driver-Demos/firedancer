@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the SipHash13 implementation with unit and fuzz tests.
+The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `siphash13` component, including header and object file additions, unit test creation and execution, and conditional fuzz test setup.
 
 # Purpose
-The `Makefile` content defines build and test instructions for the `fd_siphash13` component. It adds headers and object files using `add-hdrs` and `add-objs` functions, respectively. It creates and runs a unit test named `test_siphash13` with dependencies on `fd_ballet` and `fd_util`. If the `FD_HAS_HOSTED` variable is defined, it also creates a fuzz test named `fuzz_siphash13` with the same dependencies.
+The file is a Makefile script used for building and testing components related to the `fd_siphash13` module. It defines rules to add headers and object files, create and run a unit test named `test_siphash13`, and conditionally create a fuzz test `fuzz_siphash13` if the `FD_HAS_HOSTED` variable is defined.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
