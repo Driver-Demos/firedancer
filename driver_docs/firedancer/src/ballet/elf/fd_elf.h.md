@@ -3,42 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines constants and functions for handling ELF files, including reading C-style strings.
+ELF constants and a C-string bounds-check helper, plus fd_elf64 re-export.
 
 # Purpose
-The code is a C header file that defines constants and functions related to the Executable and Linking Format (ELF), which is a common file format for executables, object code, shared libraries, and core dumps. The file provides a set of macros that define various ELF-related constants, such as file type identifiers (`FD_ELF_ET_*`), machine types (`FD_ELF_EM_*`), and section header types (`FD_ELF_SHT_*`). These constants are used to interpret the structure and contents of ELF files.
-
-Additionally, the file includes a static inline function [`fd_elf_read_cstr`](<#fd_elf_read_cstr>), which is used to validate and read a C-style string from a specified memory region. This function checks if the string is within bounds and returns a pointer to the string if successful, or `NULL` if the operation fails. The header file also includes other headers, such as `fd_elf64.h`, to provide additional ELF-related functionality. The file is intended to be included in other C source files that need to work with ELF files, providing a standardized interface for handling ELF-specific data.
-# Imports and Dependencies
-
----
-- `../../util/fd_util.h`
-- `string.h`
-- `fd_elf64.h`
-
-
-# Functions
-
----
-### fd\_elf\_read\_cstr<!-- {{#callable:fd_elf_read_cstr}} -->
-[View Source →](<../../../../../src/ballet/elf/fd_elf.h#L116>)
-
-Validates and returns a pointer to a C-style string within a specified memory buffer.
-- **Inputs**:
-    - `buf`: A pointer to the memory buffer that contains the C-style string.
-    - `buf_sz`: The size of the memory buffer in bytes.
-    - `off`: The offset in bytes from the start of the buffer where the C-style string is expected to begin.
-    - `max_sz`: The maximum allowable size for the C-style string, including the null terminator.
-- **Logic and Control Flow**:
-    - Check if the offset `off` is greater than or equal to `buf_sz`; if true, return `NULL` as the offset is out-of-bounds.
-    - Calculate the pointer `str` to the start of the C-style string by adding the offset `off` to the base address of `buf`.
-    - Determine the size `str_sz` of the remaining buffer from the offset to the end of the buffer.
-    - Calculate `n` as the minimum of `str_sz` and `max_sz`.
-    - Check if the length of the string up to `n` characters (using `fd_cstr_nlen`) is equal to `n`; if true, return `NULL` as the string is not properly null-terminated within the allowed size.
-    - Return the pointer `str` to the start of the C-style string.
-- **Output**: A pointer to the first byte of the C-style string in the buffer on success, or `NULL` on failure.
-
-
+This header defines ELF-related constants and helper macros for file parsing and relocation handling. It includes values for ELF identification fields, file types, machine types, section and program header types, dynamic tags, symbol types, and BPF relocation codes used by the project. The file also provides [`fd_elf_read_cstr`](<#fd_elf_read_cstr>), a small inline helper that checks bounds and validates a NUL-terminated string inside a memory buffer before returning a pointer to it. At the end, it includes `fd_elf64.h` to re-export related 64-bit ELF definitions for convenience.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

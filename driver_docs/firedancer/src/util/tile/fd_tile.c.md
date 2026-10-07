@@ -3,10 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions to get and set CPU affinity for a process on Linux systems.
+The `fd_tile.c` file in the `firedancer` codebase provides functions to get and set CPU affinity for a process on Linux systems, with a fallback to return an error on unsupported platforms.
 
 # Purpose
-The code provides two functions, [`fd_cpuset_getaffinity`](<#fd_cpuset_getaffinity>) and [`fd_cpuset_setaffinity`](<#fd_cpuset_setaffinity>), which are used to get and set the CPU affinity of a process identified by `pid` on Linux systems. These functions utilize the `sched_getaffinity` and `sched_setaffinity` system calls, respectively, to manipulate the CPU set associated with a process. The `fd_cpuset_t` type is used to represent the CPU set, and the functions use `fd_type_pun` and `fd_type_pun_const` to cast this type to `cpu_set_t`. If the code is not compiled on a Linux system, the functions return `-1` and set `errno` to `ENOTSUP`, indicating that the operation is not supported. The inclusion of `fd_tile_private.h` suggests that these functions are part of a larger system that manages CPU sets.
+This C source code file provides functionality for managing CPU affinity for processes, specifically targeting systems running the Linux operating system. The file defines two primary functions: [`fd_cpuset_getaffinity`](#fd_cpuset_getaffinity) and [`fd_cpuset_setaffinity`](#fd_cpuset_setaffinity). These functions are designed to retrieve and set the CPU affinity of a process, respectively. CPU affinity determines which CPU cores a process is allowed to execute on, which can be crucial for optimizing performance and resource management in multi-core systems. The code uses conditional compilation to ensure that these functions are only operational on Linux systems, as indicated by the `#if defined(__linux__)` preprocessor directive. If the code is compiled on a non-Linux system, the functions will return an error, setting `errno` to `ENOTSUP` to indicate that the operation is not supported.
+
+The technical components of the code include the use of the `sched_getaffinity` and `sched_setaffinity` system calls, which are part of the GNU C Library and provide the underlying functionality for CPU affinity management. The code also includes a custom type, `fd_cpuset_t`, which is presumably defined in the included header file "fd_tile_private.h". This type is used to represent the CPU set mask, and the code employs type punning to convert between this custom type and the standard `cpu_set_t` type used by the system calls. The file is likely part of a larger library or application that deals with process management or system resource allocation, and it provides a narrow, specialized functionality focused on CPU affinity.
 # Imports and Dependencies
 
 ---
@@ -19,30 +21,28 @@ The code provides two functions, [`fd_cpuset_getaffinity`](<#fd_cpuset_getaffini
 
 ---
 ### fd\_cpuset\_getaffinity<!-- {{#callable:fd_cpuset_getaffinity}} -->
-[View Source →](<../../../../../src/util/tile/fd_tile.c#L7>)
-
-Retrieves the CPU affinity mask for a given process ID on Linux systems.
+The `fd_cpuset_getaffinity` function retrieves the CPU affinity mask for a given process ID on Linux systems.
 - **Inputs**:
-    - `pid`: The process ID for which to get the CPU affinity mask.
+    - `pid`: The process ID (PID) for which the CPU affinity mask is to be retrieved.
     - `mask`: A pointer to an `fd_cpuset_t` structure where the CPU affinity mask will be stored.
-- **Logic and Control Flow**:
-    - If the system is Linux, call `sched_getaffinity` with the process ID, size of the CPU set, and a pointer to the mask to retrieve the CPU affinity.
-    - If the system is not Linux, set `errno` to `ENOTSUP` to indicate the operation is not supported and return -1.
-- **Output**: Returns 0 on success, or -1 if the operation is not supported or fails.
+- **Control Flow**:
+    - Check if the code is being compiled on a Linux system using the `__linux__` preprocessor directive.
+    - If on Linux, call `sched_getaffinity` with the given PID, size of the CPU set, and a type-punned pointer to the mask to retrieve the CPU affinity.
+    - If not on Linux, set the `errno` to `ENOTSUP` to indicate the operation is not supported and return -1.
+- **Output**: On Linux, it returns the result of `sched_getaffinity`, which is 0 on success and -1 on failure; on non-Linux systems, it returns -1 and sets `errno` to `ENOTSUP`.
 
 
 ---
 ### fd\_cpuset\_setaffinity<!-- {{#callable:fd_cpuset_setaffinity}} -->
-[View Source →](<../../../../../src/util/tile/fd_tile.c#L19>)
-
-Sets the CPU affinity for a process specified by its PID using a given CPU set mask.
+The `fd_cpuset_setaffinity` function sets the CPU affinity mask for a given process ID on Linux systems.
 - **Inputs**:
-    - `pid`: The process ID for which to set the CPU affinity.
-    - `mask`: A pointer to a `fd_cpuset_t` structure that specifies the desired CPU set mask.
-- **Logic and Control Flow**:
-    - If the platform is Linux, call `sched_setaffinity` with the given `pid`, the size of the CPU set mask, and the mask itself after type punning.
-    - If the platform is not Linux, set `errno` to `ENOTSUP` to indicate that the operation is not supported and return -1.
-- **Output**: Returns 0 on success, or -1 if the operation is not supported or if an error occurs.
+    - `pid`: The process ID (PID) of the process for which the CPU affinity is to be set.
+    - `mask`: A pointer to a `fd_cpuset_t` structure that represents the CPU affinity mask to be applied.
+- **Control Flow**:
+    - The function checks if the code is being compiled on a Linux system using the `__linux__` preprocessor directive.
+    - If on Linux, it calls `sched_setaffinity` with the given PID, the size of the CPU set, and the CPU set mask, after casting the mask to a `cpu_set_t` type using `fd_type_pun_const`.
+    - If not on Linux, it sets the `errno` to `ENOTSUP` to indicate that the operation is not supported and returns -1.
+- **Output**: On Linux, it returns the result of `sched_setaffinity`, which is 0 on success and -1 on failure; on non-Linux systems, it returns -1 and sets `errno` to `ENOTSUP`.
 
 
 

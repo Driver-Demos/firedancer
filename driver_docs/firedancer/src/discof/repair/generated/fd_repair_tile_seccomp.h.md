@@ -3,57 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall access control in the Firedancer project.
+Generated seccomp filter allowing read, write, lseek, ftruncate, and fsync on specific file descriptors.
 
 # Purpose
-The code is a C header file that defines a seccomp (secure computing mode) filter policy for a specific application. The file is automatically generated and should not be edited manually. It includes several Linux kernel headers related to auditing, capabilities, filtering, and seccomp, which are necessary for defining and applying the seccomp filter. The file sets up a filter using the Berkeley Packet Filter (BPF) syntax to restrict the system calls that a process can make, enhancing security by allowing only specific, predefined system calls.
-
-The [`populate_sock_filter_policy_fd_repair_tile`](<#populate_sock_filter_policy_fd_repair_tile>) function is the main component of this file. It initializes a `struct sock_filter` array with 27 instructions that define the seccomp policy. The policy checks the architecture of the running process and allows or denies system calls based on predefined conditions. The allowed system calls include `write`, `lseek`, `ftruncate`, `fsync`, and `read`, with further checks on their arguments to ensure they are only used with specific file descriptors. If a system call does not match the allowed criteria, the process is terminated using `SECCOMP_RET_KILL_PROCESS`. The function uses `fd_memcpy` to copy the filter instructions to the output buffer, which is then used to apply the seccomp policy.
-# Imports and Dependencies
-
----
-- `../../../../src/util/fd_util_base.h`
-- `linux/audit.h`
-- `linux/capability.h`
-- `linux/filter.h`
-- `linux/seccomp.h`
-- `linux/bpf.h`
-- `sys/syscall.h`
-- `signal.h`
-- `stddef.h`
-
-
-# Global Variables
-
----
-### sock\_filter\_policy\_fd\_repair\_tile\_instr\_cnt
-- **Type**: ``unsigned int``
-- **Description**: Defines the number of instructions in the socket filter policy for the repair tile. This constant is used to ensure that the correct number of instructions are processed in the filter.
-- **Use**: Used to verify the instruction count in the `populate_sock_filter_policy_fd_repair_tile` function.
-
-
-# Functions
-
----
-### populate\_sock\_filter\_policy\_fd\_repair\_tile<!-- {{#callable:populate_sock_filter_policy_fd_repair_tile}} -->
-[View Source →](<../../../../../../src/discof/repair/generated/fd_repair_tile_seccomp.h#L26>)
-
-Populates a `sock_filter` array with a predefined set of BPF instructions to enforce a seccomp policy for file descriptor operations.
-- **Inputs**:
-    - `out_cnt`: The number of elements in the `out` array, which must be at least 27.
-    - `out`: A pointer to a `sock_filter` array where the function will copy the predefined filter instructions.
-    - `logfile_fd`: The file descriptor for the log file, used in the filter to allow specific operations.
-    - `good_peer_cache_file_fd`: The file descriptor for the good peer cache file, used in the filter to allow specific operations.
-- **Logic and Control Flow**:
-    - Checks if `out_cnt` is at least 27 to ensure the `out` array can hold the filter instructions.
-    - Defines a `sock_filter` array with 27 BPF instructions to enforce a seccomp policy.
-    - The filter checks if the architecture of the script matches the runtime architecture, otherwise it jumps to `RET_KILL_PROCESS`.
-    - Loads the syscall number and checks if it matches allowed syscalls like `write`, `lseek`, `ftruncate`, `fsync`, and `read`.
-    - For each allowed syscall, checks the first argument against `logfile_fd` and `good_peer_cache_file_fd` to decide whether to allow or kill the process.
-    - Copies the predefined filter instructions into the `out` array using `fd_memcpy`.
-- **Output**: The function does not return a value; it modifies the `out` array in place.
-
-
+This generated header defines a seccomp BPF policy for the `fd_repair_tile` component and limits the system calls that the process can use at runtime. It allows only `write`, `lseek`, `ftruncate`, `fsync`, and `read`, and it checks each call against the expected file descriptors `logfile_fd` and `good_peer_cache_file_fd` before it grants access. The filter also verifies the CPU architecture with `ARCH_NR` and kills the process if the runtime environment does not match the supported target. The [`populate_sock_filter_policy_fd_repair_tile`](<#populate_sock_filter_policy_fd_repair_tile>) function copies the prepared `sock_filter` program into the output buffer so the codebase can install the policy without manual editing of the generated file.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
