@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Interactive packet generation, topology setup, tile execution, and live network stats.
+Packet generation and testing tools for network tiles, including Ethernet frame generation and topology setup.
 
 
 ## Files
-- **[fd_pktgen_tile.c](fd_pktgen_tile.c.md)**: The `fd_pktgen_tile.c` file in the `firedancer` codebase implements a packet generator that floods a network tile with small outgoing Ethernet frames, each containing a unique sequence number to prevent network interface controllers from halting transmission due to repeated payloads.
-- **[pktgen.c](pktgen.c.md)**: Interactive packet generator that builds topology, runs tiles, and shows live network stats.
-- **[pktgen.h](pktgen.h.md)**: The `pktgen.h` file in the `firedancer` codebase declares an external action, `fd_action_pktgen`, for packet generation functionality.
+- **[fd_pktgen_tile.c](fd_pktgen_tile.c.md)**: Generates and sends small Ethernet frames with unique payloads to test network tiles.
+- **[pktgen.c](pktgen.c.md)**: Implements a packet generator for network testing, including topology setup, command handling, and status rendering.
+- **[pktgen.h](pktgen.h.md)**: Defines an external action for packet generation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

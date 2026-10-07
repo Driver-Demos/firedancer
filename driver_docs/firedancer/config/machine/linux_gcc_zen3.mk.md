@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build settings for Linux GCC Zen 3 with x86, AVX, and AESNI flags.
+Makefile for configuring GCC build settings optimized for Zen 3 architecture in the Firedancer project.
 
 # Purpose
-This Makefile fragment sets the build directory to `linux/gcc/zen3` and includes shared build settings from `config/base.mk` and several `config/extra` files that enable GCC, x86-64, debug, security, brutality, optimization, and threads options. It then selects the target CPU architecture flags based on the GCC version: GCC 8 uses `-march=znver1` and `-mtune=znver1`, while later versions use `-march=znver3` and `-mtune=znver3`. The file also defines preprocessor flags and Make variables such as `FD_HAS_INT128`, `FD_HAS_DOUBLE`, `FD_HAS_ALLOCA`, `FD_HAS_X86`, `FD_HAS_SSE`, `FD_HAS_AVX`, `FD_HAS_SHANI`, and `FD_HAS_AESNI` to mark the available platform features for the build.
+The Makefile configures the build environment for a software project targeting the Zen 3 architecture using GCC. It sets the `BUILDDIR` variable to specify the build directory and includes several configuration files to extend the build setup with additional features such as debugging, security, optimization, and threading. The file checks the GCC version to determine the appropriate architecture flags, using `znver1` for GCC 8 and `znver3` for later versions. It defines several preprocessor flags (`CPPFLAGS`) to enable specific hardware and software features, such as support for 128-bit integers, double precision, and various x86 instruction sets like SSE, AVX, SHANI, and AESNI. These flags ensure that the compiled code can utilize advanced processor capabilities for improved performance.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
