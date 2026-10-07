@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fuzz_base64_garbage` folder in the `firedancer` codebase contains a file that appears to be a crash report or test case related to fuzz testing of base64 encoding/decoding.
+Binary data file for fuzz testing base64 decoding.
 
 
 ## Files
-- **[crash-58668e7669fd564d99db5d581fcdb6a5618440b5](crash-58668e7669fd564d99db5d581fcdb6a5618440b5.md)**: The `crash-58668e7669fd564d99db5d581fcdb6a5618440b5` file in the `firedancer` codebase appears to be a crash report or test case related to fuzz testing of base64 encoding/decoding.
+- **[crash-58668e7669fd564d99db5d581fcdb6a5618440b5](crash-58668e7669fd564d99db5d581fcdb6a5618440b5.md)**: Binary data file for fuzz testing base64 decoding in the `firedancer` codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
