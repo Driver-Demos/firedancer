@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Testnet gossip entrypoints, genesis hash, funk heap and account limits, layout, and snapshot source settings
+Configuration settings for the Solana testnet, including gossip entrypoints and consensus parameters.
 
 # Purpose
-This configuration file sets Solana testnet network parameters for gossip, consensus, memory layout, and snapshot download. It defines gossip entrypoints, the expected genesis hash, `funk` heap and account record limits, `layout` tile count, and an enabled HTTP snapshot source with its RPC URL.
+The configuration file defines settings for a Solana testnet node. The `[gossip]` section specifies entry points for network communication. The `[consensus]` section sets the expected genesis hash for the blockchain. The `[funk]` section configures memory and account record limits. The `[layout]` section defines the number of tiles for the gossvf layout. The `[snapshots]` section enables HTTP sources for snapshots and provides a URL for accessing them.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Path-based code ownership assignments for repository directories and files.
+Defines code ownership for directories and files in the `firedancer` codebase.
 
 # Purpose
-This `CODEOWNERS` file assigns review responsibility for paths in the repository to named users and teams. The root entry `/CODEOWNERS @firedancer-admin` sets ownership for the file itself, while the other path rules map directories such as `/agave`, `/config`, and `/src/...` to the people who must review changes in those areas. Each line uses a path pattern followed by one or more GitHub handles, which defines the code owners for that part of the source tree. This file supports change review by directing pull requests to the correct maintainers for each directory.
+The `CODEOWNERS` file assigns responsibility for specific parts of a codebase to designated users or teams. The file specifies that the entire repository is under the oversight of the `@firedancer-admin` team. Specific directories and files have additional owners, such as `@0x0ece`, `@anwayde`, and others for the `/agave` directory, and `@ptaffet-jump` for the `/src/ballet/txn/fd_txn_parse.c` file. This structure helps manage code reviews and ensures that knowledgeable individuals are responsible for maintaining different sections of the codebase. By defining code ownership, the file facilitates efficient collaboration and accountability within the development team.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
