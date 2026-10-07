@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding headers, objects, unit tests, and fuzz tests for base64 functionality.
+Build rules for base64 headers, object, unit test, and fuzz tests.
 
 # Purpose
-This Makefile script automates the build and test process for a software project. It adds the header file `fd_base64.h` and object files `fd_base64` and `fd_ballet` to the build. It creates and runs a unit test named `test_base64` using the `fd_ballet` and `fd_util` libraries. If the `FD_HAS_HOSTED` condition is true, it also creates fuzz tests for `fuzz_base64_dec` and `fuzz_base64_enc`, utilizing the same libraries.
+Build rules add the `fd_base64.h` header and the `fd_base64` object to the `fd_ballet` target. They also define the `test_base64` unit test with `fd_ballet` and `fd_util` as dependencies, run that test, and, when `FD_HAS_HOSTED` is set, define the `fuzz_base64_dec` and `fuzz_base64_enc` fuzz tests with the same dependencies.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

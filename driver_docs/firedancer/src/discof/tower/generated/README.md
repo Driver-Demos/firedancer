@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp filter policy for syscall access control based on architecture and syscall numbers.
+Generated seccomp BPF filter for selected FDs allowing read, write, fstat, and fsync.
 
 
 ## Files
-- **[fd_tower_tile_seccomp.h](fd_tower_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall access control based on architecture and syscall numbers.
+- **[fd_tower_tile_seccomp.h](fd_tower_tile_seccomp.h.md)**: Generated seccomp BPF filter allowing read, write, fstat, and fsync on selected FDs.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

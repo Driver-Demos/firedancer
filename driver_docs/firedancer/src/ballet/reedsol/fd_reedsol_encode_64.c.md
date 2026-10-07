@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Auto-generated C code for encoding data and parity shreds using Reed-Solomon algorithm.
+The `fd_reedsol_encode_64.c` file in the `firedancer` codebase implements a function for encoding data shreds and generating parity shreds using Reed-Solomon error correction for 64 data inputs.
 
 # Purpose
-The code defines a function [`fd_reedsol_private_encode_64`](<#fd_reedsol_private_encode_64>), which is part of an implementation for encoding data using Reed-Solomon error correction. This function is designed to generate parity shreds from a set of data shreds. The function takes parameters that specify the size of each shred, pointers to the data shreds, the count of data shreds, pointers to the parity shreds, and the count of parity shreds. The function uses Galois Field arithmetic to process the data shreds and produce the required parity shreds, which are used for error detection and correction in data transmission or storage.
+This C source code file defines a function [`fd_reedsol_private_encode_64`](#fd_reedsol_private_encode_64), which is part of an implementation of Reed-Solomon encoding, a type of error correction code. The function is designed to generate parity shreds from a set of data shreds, which are used to recover lost or corrupted data in storage or transmission systems. The function takes in parameters specifying the size of each shred, pointers to arrays of data shreds, the count of data shreds, pointers to arrays of parity shreds, and the count of parity shreds. The function processes the data shreds to compute the necessary parity shreds using operations over a Galois Field, which is typical in Reed-Solomon encoding.
 
-The function is structured to handle up to 64 data shreds and uses a series of switch-case statements to determine the number of data shreds to process. It uses macros like `FD_REEDSOL_GENERATE_IFFT` and `FD_REEDSOL_GENERATE_FFT` to perform the necessary mathematical transformations. The function also includes logic to handle cases where the number of parity shreds required exceeds the initial set of parity shreds generated, by producing additional parity shreds as needed. The function is marked with `FD_FN_UNSANITIZED`, indicating that it may not include certain safety checks, and it is part of a larger library, as suggested by the inclusion of the header file `fd_reedsol_ppt.h`.
+The code is structured to handle up to 64 data shreds and uses a series of switch-case statements to manage different counts of data shreds, ensuring that the correct number of parity shreds is generated. The function utilizes macros and helper functions (such as `gf_ldu`, `gf_stu`, and `FD_REEDSOL_GENERATE_IFFT`) to perform operations on the data, which are likely defined in the included header file `fd_reedsol_ppt.h`. The use of `FD_FN_UNSANITIZED` suggests that this function is optimized for performance, possibly at the expense of some safety checks, which is common in high-performance computing scenarios. The file is auto-generated, indicating that it might be part of a larger codebase where such functions are generated based on specific parameters or configurations.
 # Imports and Dependencies
 
 ---
@@ -19,61 +19,55 @@ The function is structured to handle up to 64 data shreds and uses a series of s
 
 ---
 ### fd\_reedsol\_private\_encode\_64<!-- {{#callable:fd_reedsol_private_encode_64}} -->
-[View Source →](<../../../../../src/ballet/reedsol/fd_reedsol_encode_64.c#L4>)
-
-Generates parity shreds from data shreds using Reed-Solomon encoding.
+The function `fd_reedsol_private_encode_64` generates parity shreds from data shreds using Reed-Solomon encoding for error correction.
 - **Inputs**:
     - `shred_sz`: The size of each shred in bytes.
-    - `data_shred`: A pointer to an array of pointers, each pointing to a data shred.
+    - `data_shred`: An array of pointers to the data shreds to be encoded.
     - `data_shred_cnt`: The number of data shreds.
-    - `parity_shred`: A pointer to an array of pointers, each pointing to a parity shred.
-    - `parity_shred_cnt`: The number of parity shreds to generate.
-- **Logic and Control Flow**:
-    - Initialize `shred_pos` to 0 and iterate while `shred_pos` is less than `shred_sz`.
-    - Load data shreds into `gf_t` variables using [`gf_ldu`](<fd_reedsol_arith_none.h.md#gf_ldu>) for the first 32 data shreds and initialize the rest to zero.
-    - Use a switch statement to load additional data shreds based on `data_shred_cnt`.
-    - Define macros `ALL_VARS` and `ALL_VARS_REF` to reference all `gf_t` variables.
-    - Use a switch statement to call specific functions or macros based on `data_shred_cnt` to generate parity shreds.
-    - Calculate `total_shreds` as the sum of `data_shred_cnt` and `parity_shred_cnt`.
-    - Store generated parity shreds into `parity_shred` using [`gf_stu`](<fd_reedsol_arith_none.h.md#gf_stu>) and reset the corresponding `gf_t` variables to zero.
-    - Calculate `parity_produced` and `parity_remaining` to determine if more parity shreds are needed.
-    - If more parity shreds are needed, generate additional parity shreds using `FD_REEDSOL_GENERATE_FFT` and store them.
-    - Adjust `shred_pos` by `GF_WIDTH` and clamp it to `shred_sz-32` if necessary.
-- **Output**: No direct output is returned; the function modifies the contents of `parity_shred` to store the generated parity shreds.
-- **Functions Called**:
-    - [`gf_ldu`](<fd_reedsol_arith_none.h.md#gf_ldu>)
-    - [`fd_reedsol_ppt_64_63`](<wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_63>)
-    - [`fd_reedsol_ppt_64_62`](<wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_62>)
-    - [`fd_reedsol_ppt_64_61`](<wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_61>)
-    - [`fd_reedsol_ppt_64_60`](<wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_60>)
-    - [`fd_reedsol_ppt_64_59`](<wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_59>)
-    - [`fd_reedsol_ppt_64_58`](<wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_58>)
-    - [`fd_reedsol_ppt_64_57`](<wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_57>)
-    - [`fd_reedsol_ppt_64_56`](<wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_56>)
-    - [`fd_reedsol_ppt_64_55`](<wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_55>)
-    - [`fd_reedsol_ppt_64_54`](<wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_54>)
-    - [`fd_reedsol_ppt_64_53`](<wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_53>)
-    - [`fd_reedsol_ppt_64_52`](<wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_52>)
-    - [`fd_reedsol_ppt_64_51`](<wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_51>)
-    - [`fd_reedsol_ppt_64_50`](<wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_50>)
-    - [`fd_reedsol_ppt_64_49`](<wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_49>)
-    - [`fd_reedsol_ppt_64_48`](<wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_48>)
-    - [`fd_reedsol_ppt_64_47`](<wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_47>)
-    - [`fd_reedsol_ppt_64_46`](<wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_46>)
-    - [`fd_reedsol_ppt_64_45`](<wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_45>)
-    - [`fd_reedsol_ppt_64_44`](<wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_44>)
-    - [`fd_reedsol_ppt_64_43`](<wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_43>)
-    - [`fd_reedsol_ppt_64_42`](<wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_42>)
-    - [`fd_reedsol_ppt_64_41`](<wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_41>)
-    - [`fd_reedsol_ppt_64_40`](<wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_40>)
-    - [`fd_reedsol_ppt_64_39`](<wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_39>)
-    - [`fd_reedsol_ppt_64_38`](<wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_38>)
-    - [`fd_reedsol_ppt_64_37`](<wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_37>)
-    - [`fd_reedsol_ppt_64_36`](<wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_36>)
-    - [`fd_reedsol_ppt_64_35`](<wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_35>)
-    - [`fd_reedsol_ppt_64_34`](<wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_34>)
-    - [`fd_reedsol_ppt_64_33`](<wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_33>)
-    - [`gf_stu`](<fd_reedsol_arith_none.h.md#gf_stu>)
+    - `parity_shred`: An array of pointers to the parity shreds where the encoded data will be stored.
+    - `parity_shred_cnt`: The number of parity shreds to be generated.
+- **Control Flow**:
+    - Initialize a loop to iterate over each position in the shreds up to `shred_sz`.
+    - Load data from each data shred into `gf_t` variables for the first 32 shreds, and conditionally load more based on `data_shred_cnt`.
+    - Use a switch statement to apply different Reed-Solomon encoding functions based on `data_shred_cnt`.
+    - Calculate the number of parity shreds needed and store them in the `parity_shred` array.
+    - If more parity shreds are needed, generate additional parity shreds using FFT and IFFT operations.
+    - Adjust `shred_pos` to handle cases where `shred_sz` is not divisible by 32.
+- **Output**: The function does not return a value but modifies the `parity_shred` array to contain the generated parity shreds.
+- **Functions called**:
+    - [`gf_ldu`](fd_reedsol_arith_none.h.md#gf_ldu)
+    - [`fd_reedsol_ppt_64_63`](wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_63)
+    - [`fd_reedsol_ppt_64_62`](wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_62)
+    - [`fd_reedsol_ppt_64_61`](wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_61)
+    - [`fd_reedsol_ppt_64_60`](wrapped_impl/fd_reedsol_ppt_impl_60.c.md#fd_reedsol_ppt_64_60)
+    - [`fd_reedsol_ppt_64_59`](wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_59)
+    - [`fd_reedsol_ppt_64_58`](wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_58)
+    - [`fd_reedsol_ppt_64_57`](wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_57)
+    - [`fd_reedsol_ppt_64_56`](wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_56)
+    - [`fd_reedsol_ppt_64_55`](wrapped_impl/fd_reedsol_ppt_impl_55.c.md#fd_reedsol_ppt_64_55)
+    - [`fd_reedsol_ppt_64_54`](wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_54)
+    - [`fd_reedsol_ppt_64_53`](wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_53)
+    - [`fd_reedsol_ppt_64_52`](wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_52)
+    - [`fd_reedsol_ppt_64_51`](wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_51)
+    - [`fd_reedsol_ppt_64_50`](wrapped_impl/fd_reedsol_ppt_impl_50.c.md#fd_reedsol_ppt_64_50)
+    - [`fd_reedsol_ppt_64_49`](wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_49)
+    - [`fd_reedsol_ppt_64_48`](wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_48)
+    - [`fd_reedsol_ppt_64_47`](wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_47)
+    - [`fd_reedsol_ppt_64_46`](wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_46)
+    - [`fd_reedsol_ppt_64_45`](wrapped_impl/fd_reedsol_ppt_impl_45.c.md#fd_reedsol_ppt_64_45)
+    - [`fd_reedsol_ppt_64_44`](wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_44)
+    - [`fd_reedsol_ppt_64_43`](wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_43)
+    - [`fd_reedsol_ppt_64_42`](wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_42)
+    - [`fd_reedsol_ppt_64_41`](wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_41)
+    - [`fd_reedsol_ppt_64_40`](wrapped_impl/fd_reedsol_ppt_impl_40.c.md#fd_reedsol_ppt_64_40)
+    - [`fd_reedsol_ppt_64_39`](wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_39)
+    - [`fd_reedsol_ppt_64_38`](wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_38)
+    - [`fd_reedsol_ppt_64_37`](wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_37)
+    - [`fd_reedsol_ppt_64_36`](wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_36)
+    - [`fd_reedsol_ppt_64_35`](wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_35)
+    - [`fd_reedsol_ppt_64_34`](wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_34)
+    - [`fd_reedsol_ppt_64_33`](wrapped_impl/fd_reedsol_ppt_impl_33.c.md#fd_reedsol_ppt_64_33)
+    - [`gf_stu`](fd_reedsol_arith_none.h.md#gf_stu)
 
 
 

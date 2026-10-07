@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, headers, makefiles, and tests for managing bstream blocks, I/O operations, metadata, and error codes.
+Base types, error codes, I/O, metadata, and bstream helpers for vinyl storage.
 
 ## Folders
-- **[bstream](bstream/README.md)**: Functions, headers, makefile, and unit tests for managing and testing vinyl bstream blocks.
-- **[io](io/README.md)**: Functions, headers, and tests for Vinyl I/O operations with LZ4 compression, block device, and memory-mapped I/O.
-- **[meta](meta/README.md)**: Fast query and removal operations for metadata in a hash map, lock-free caching, and unit tests.
+- **[bstream](bstream/README.md)**: Bstream block layouts, hashes, validation helpers, and unit tests for vinyl storage.
+- **[io](io/README.md)**: I/O API, block-device and memory-mapped bstream helpers, and tests for append, read, commit, and recovery
+- **[meta](meta/README.md)**: Metadata cache and lookup helpers with concurrent tests and build rules.
 
 ## Files
-- **[fd_vinyl.h](fd_vinyl.h.md)**: Header file for the Vinyl module, including base, IO, and metadata components.
-- **[fd_vinyl_base.c](fd_vinyl_base.c.md)**: Maps error codes to their corresponding string messages in the Firedancer codebase.
-- **[fd_vinyl_base.h](fd_vinyl_base.h.md)**: Header file for a persistent interprocess shared key-value store with non-volatile storage and various optimizations.
-- **[Local.mk](Local.mk.md)**: Makefile for building and testing the `fd_vinyl` library and its components.
-- **[test_vinyl_base.c](test_vinyl_base.c.md)**: Tests for error codes, key initialization, and key comparison functions in the Vinyl module.
+- **[fd_vinyl.h](fd_vinyl.h.md)**: Includes vinyl base, I/O, and meta headers.
+- **[fd_vinyl_base.c](fd_vinyl_base.c.md)**: Maps vinyl error codes to string messages.
+- **[fd_vinyl_base.h](fd_vinyl_base.h.md)**: Shared key-value store base types, error codes, key helpers, and value metadata definitions.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_vinyl and its base header, objects, and unit test.
+- **[test_vinyl_base.c](test_vinyl_base.c.md)**: Unit tests for vinyl error codes, key layout, copy, equality, and memo behavior.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
