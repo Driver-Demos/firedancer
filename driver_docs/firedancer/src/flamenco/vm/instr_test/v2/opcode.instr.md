@@ -3,30 +3,33 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a set of opcodes with their corresponding operations and status for a virtual machine.
+The `opcode.instr` file in the `firedancer` codebase defines a set of opcodes with their corresponding operations and status, such as `ok`, `vfy`, and `err`, for a virtual machine instruction set.
 
 # Purpose
-This file defines a set of operation codes (`op`) and their corresponding behaviors for a virtual machine or an instruction set simulator. Each line specifies an operation code, an immediate value (`imm`), and a status or action such as `vfy` (verify), `ok` (operation is valid), or `err` (error). The comments following each entry provide additional context about the operation, such as arithmetic operations (e.g., `add32`, `sub64`), logical operations (e.g., `or32`, `xor64`), and control flow operations (e.g., `jeq`, `jgt`). Some operations have been marked as removed or added, indicating changes in the instruction set, possibly due to updates or optimizations. This file is crucial for defining the behavior of the instruction set and ensuring that the virtual machine or simulator processes instructions correctly.
+The file content provided appears to be a configuration or metadata file that defines a set of operations, likely for a virtual machine or an interpreter, such as an eBPF (extended Berkeley Packet Filter) verifier or similar bytecode processing system. Each line specifies an operation code (`op`), an immediate value (`imm`), and a status or action (`vfy`, `ok`, `err`) with comments indicating the operation's purpose or any modifications. The file provides narrow functionality, focusing on the validation and execution of specific bytecode instructions, with operations like arithmetic (`add`, `sub`, `mul`), logical (`and`, `or`, `xor`), and control flow (`jeq`, `jgt`, `jlt`). The relevance of this file to a codebase is significant as it dictates how bytecode instructions are interpreted, verified, and executed, ensuring that only valid operations are processed, which is crucial for maintaining the integrity and security of the system executing these instructions.
 # Content Summary
-The provided content is a configuration file that defines a set of operations, each identified by an opcode (`op`) and an immediate value (`imm`). The file specifies the status of each operation, which can be one of the following: `ok`, `vfy`, `vfyub`, or `err`. These statuses indicate whether the operation is valid (`ok`), requires verification (`vfy`), requires verification with a specific check (`vfyub`), or is erroneous (`err`).
+The provided content appears to be a configuration or metadata file that defines a set of operations, likely for a virtual machine or a low-level instruction set. Each line specifies an operation code (`op`), an immediate value (`imm`), and a status or action (`vfy`, `ok`, `err`, etc.). The operations are associated with various arithmetic, logical, and control instructions, which are common in assembly language or bytecode instruction sets.
 
-Key details include:
+Key technical details include:
 
-1. **Opcode and Immediate Value**: Each operation is associated with an opcode (`op`) and an immediate value (`imm`). The opcode is a hexadecimal value that uniquely identifies the operation, while the immediate value is typically set to `0` unless specified otherwise.
+1. **Operation Codes (op):** Each operation is identified by a unique hexadecimal code ranging from `00` to `ff`. These codes represent different instructions that can be executed.
 
-2. **Operation Status**:
-   - `ok`: The operation is valid and can be executed without restrictions.
-   - `vfy`: The operation requires verification before execution.
-   - `vfyub`: The operation requires verification with a specific check, such as `FD_CHECK_DIV`.
-   - `err`: The operation is erroneous and should not be executed.
+2. **Immediate Values (imm):** The `imm` field specifies an immediate value associated with the operation. This value is often used in arithmetic operations or as a condition in control flow instructions.
 
-3. **Operation Descriptions**: Each operation is described with a comment indicating its function, such as arithmetic operations (`add32`, `sub64`), logical operations (`or32`, `xor64`), and control flow operations (`jeq`, `jgt`).
+3. **Status/Action Indicators:** Each operation is followed by a status or action indicator:
+   - `vfy`: Indicates that the operation is subject to verification. This might imply a check or validation step before execution.
+   - `ok`: Denotes that the operation is valid and can be executed without issues.
+   - `err`: Marks the operation as erroneous, suggesting that it should not be executed or that it will result in an error if attempted.
 
-4. **SIMD-0173 and SIMD-0174**: Some operations have comments indicating they were added or removed due to specific changes, such as `SIMD-0173` and `SIMD-0174`. These comments provide context for modifications in the operation set.
+4. **Instruction Descriptions:** Comments following the status indicators provide a brief description of the operation, such as `add32 reg, imm` for a 32-bit addition of a register and an immediate value, or `jgt reg, imm` for a jump if greater than condition.
 
-5. **Error and Verification**: Certain operations, particularly those involving memory access or division, are marked as `err` or `vfy`, indicating potential issues or the need for additional checks.
+5. **SIMD-0173 and SIMD-0174 Annotations:** Some operations are marked with comments indicating they were removed or added as part of changes labeled `SIMD-0173` and `SIMD-0174`. This suggests a versioning or feature update process, where certain instructions were deprecated or introduced.
 
-This configuration file is crucial for developers working with the software codebase, as it defines the permissible operations and their statuses, guiding the implementation and execution of these operations within the system.
+6. **Division and Remainder Operations:** Several operations involve division and remainder calculations, with specific checks (`FD_CHECK_DIV`) to ensure safe execution, likely to prevent division by zero errors.
+
+7. **Control Flow Instructions:** The file includes various jump instructions (`ja`, `jeq`, `jgt`, `jge`, etc.) that control the flow of execution based on conditions evaluated at runtime.
+
+This file is crucial for developers working with this instruction set, as it defines the permissible operations, their constraints, and any special conditions or updates that have been applied. Understanding these details is essential for implementing or debugging the execution of these instructions within the software system.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

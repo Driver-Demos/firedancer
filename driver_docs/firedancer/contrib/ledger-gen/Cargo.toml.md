@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for the `ledger-gen` package with dependencies on various Solana components.
+The `Cargo.toml` file in the `firedancer/contrib/ledger-gen` directory specifies the package configuration and dependencies for the `ledger-gen` project, including various Solana-related libraries.
 
 # Purpose
-The `Cargo.toml` file specifies the configuration for a Rust project named `ledger-gen`. It defines the package metadata, including the name, version, and edition of the Rust language to use. The `[dependencies]` section lists the external libraries required by the project, specifying their versions. These dependencies include `dirs-next`, `lazy_static`, and several Solana-related packages such as `solana-sdk`, `solana-bpf-loader-program`, and `solana-client`, among others. The configuration ensures that the correct versions of these libraries are used, and it includes specific features for some dependencies, such as `dev-context-only-utils` for `solana-sdk`.
+The provided content is from a `Cargo.toml` file, which is a configuration file used by Rust's package manager, Cargo. This file specifies metadata about the Rust package, such as its name, version, and the edition of Rust it is compatible with. In this case, the package is named "ledger-gen" and is set to version "0.1.0" with the 2021 edition of Rust. The `[dependencies]` section lists the external libraries or crates that the package depends on, along with their respective versions. Notably, it includes several Solana-related dependencies, indicating that this package is likely involved in blockchain or cryptocurrency development using the Solana platform. The dependencies are specified with precise versions, ensuring compatibility and stability in the package's build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

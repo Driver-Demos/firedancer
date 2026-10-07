@@ -3,40 +3,40 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Transaction packing, conflict detection, cost and pacing tools, seccomp policy, and tests.
+Transaction packing, cost, rebate, deduplication, and test code with seccomp policy.
 
 ## Folders
-- **[generated](generated/README.md)**: Defines a seccomp filter policy for syscall control based on architecture and specific syscalls.
+- **[generated](generated/README.md)**: Generated seccomp filter allowing write and fsync only for fd 2 or logfile_fd.
 
 ## Files
-- **[fd_chkdup.h](fd_chkdup.h.md)**: Functions for high-performance duplicate detection in account address lists, with AVX optimizations.
-- **[fd_compute_budget_program.h](fd_compute_budget_program.h.md)**: Utility functions for parsing compute budget program instructions from transactions, including state management and fee calculation.
-- **[fd_est_tbl.h](fd_est_tbl.h.md)**: Defines a data structure for estimating the sliding-window mean and variance of tagged data.
-- **[fd_microblock.h](fd_microblock.h.md)**: Defines structures and constants for managing microblocks, including metadata and transaction limits.
-- **[fd_pack.c](fd_pack.c.md)**: Implements a transaction packing system with data structures and functions for managing transaction order, priority, and scheduling in a blockchain environment.
-- **[fd_pack.h](fd_pack.h.md)**: Defines methods for prioritizing and ordering Solana transactions to maximize validator profitability.
-- **[fd_pack_bitset.h](fd_pack_bitset.h.md)**: Header file implementing a hybrid bitset/hashset for transaction conflict detection using AVX or fd_set.
-- **[fd_pack_cost.h](fd_pack_cost.h.md)**: Defines a transaction cost model for consensus, detailing cost components and computing total transaction costs.
-- **[fd_pack_pacing.h](fd_pack_pacing.h.md)**: Defines structures and functions for pacing CU consumption in transaction packing.
-- **[fd_pack_rebate_sum.c](fd_pack_rebate_sum.c.md)**: Implements functions for managing and processing rebate sums in transaction packs, including adding transactions, reporting, and clearing data.
-- **[fd_pack_rebate_sum.h](fd_pack_rebate_sum.h.md)**: Defines data structures and functions for managing and reporting transaction rebate summaries.
-- **[fd_pack_tile.c](fd_pack_tile.c.md)**: Implements functionality for arranging verified transactions into microblocks for serial execution, with potential parallel execution if transactions do not write to the same accounts.
-- **[fd_pack_tile.seccomppolicy](fd_pack_tile.seccomppolicy.md)**: Defines security policies for logging, including file descriptor management and log message handling.
-- **[fd_pack_tip_prog_blacklist.h](fd_pack_tip_prog_blacklist.h.md)**: Defines a blacklist for transaction tip payment programs with hash-based checks for bundle and non-bundle transactions.
-- **[fd_pack_unwritable.h](fd_pack_unwritable.h.md)**: Defines a perfect hash table for special addresses that cannot be written to, ensuring transaction rejection.
-- **[fuzz_chkdup.c](fuzz_chkdup.c.md)**: Fuzz testing for duplicate checking functionality using LLVM's libFuzzer.
-- **[fuzz_compute_budget_program_parse.c](fuzz_compute_budget_program_parse.c.md)**: Fuzz testing for the `fd_compute_budget_program_parse` function in the Firedancer codebase.
-- **[generate_delays.py](generate_delays.py.md)**: Generates and writes microblock execution delay data to a binary file using Poisson process modeling.
-- **[Local.mk](Local.mk.md)**: Defines build rules and unit tests for the `firedancer` project's `disco/pack` module.
-- **[test_chkdup.c](test_chkdup.c.md)**: Tests for false positive rates, null checks, and duplicate detection in the `fd_chkdup` component.
-- **[test_compute_budget_program.c](test_compute_budget_program.c.md)**: Tests for the compute budget program, including transaction parsing and validation of compute unit limits and fees.
-- **[test_deduplication.c](test_deduplication.c.md)**: Tests for deduplication and validation of transactions using sorting, hashing, and AVX operations.
-- **[test_est_tbl.c](test_est_tbl.c.md)**: Tests for the `fd_est_tbl` functions using various statistical distributions.
-- **[test_pack.c](test_pack.c.md)**: Tests for transaction packing, scheduling, and validation in the Firedancer codebase, including performance and edge case scenarios.
-- **[test_pack_bitset.c](test_pack_bitset.c.md)**: Tests for the functionality of packed bitsets, including set, clear, copy, and intersection operations.
-- **[test_pack_rebate_sum.c](test_pack_rebate_sum.c.md)**: Tests for the `fd_pack_rebate_sum` functionality, including transaction creation and rebate calculations.
-- **[test_pack_tile.c](test_pack_tile.c.md)**: Tests for the pack tile functionality, including transaction and bundle I/O, overrun scenarios, and stress tests.
-- **[test_tip_prog_blacklist.c](test_tip_prog_blacklist.c.md)**: Tests the blacklist functionality for public keys using base58 encoding in the Firedancer codebase.
+- **[fd_chkdup.h](fd_chkdup.h.md)**: Fast duplicate-account-address detection with AVX and hash-table fallback.
+- **[fd_compute_budget_program.h](fd_compute_budget_program.h.md)**: Parsing and finalizing ComputeBudgetProgram instructions for compute limits, fees, and data size.
+- **[fd_est_tbl.h](fd_est_tbl.h.md)**: Sliding-window mean and variance estimates for tagged data using bins and EMA.
+- **[fd_microblock.h](fd_microblock.h.md)**: Microblock metadata, header, and size limits for PoH shred packing.
+- **[fd_pack.c](fd_pack.c.md)**: Transaction packing, scheduling, and validation logic with treaps, maps, bitsets, and bundle handling.
+- **[fd_pack.h](fd_pack.h.md)**: Transaction packing, scheduling, rebate, expiry, and bundle management APIs for Solana blocks.
+- **[fd_pack_bitset.h](fd_pack_bitset.h.md)**: Macros for a fixed-size bitset interface with fd_set, AVX, or AVX512 back ends.
+- **[fd_pack_cost.h](fd_pack_cost.h.md)**: Transaction cost model constants and cost computation for signatures, writes, instructions, and votes.
+- **[fd_pack_pacing.h](fd_pack_pacing.h.md)**: Inline helpers for pacing CU consumption and computing enabled bank count.
+- **[fd_pack_rebate_sum.c](fd_pack_rebate_sum.c.md)**: Accumulates transaction rebate totals and per-account rebates, then reports or clears them.
+- **[fd_pack_rebate_sum.h](fd_pack_rebate_sum.h.md)**: Rebate summary types and functions for adding transactions and generating rebate reports.
+- **[fd_pack_tile.c](fd_pack_tile.c.md)**: Schedules verified transactions into microblocks and handles leader transitions, bundles, and metrics.
+- **[fd_pack_tile.seccomppolicy](fd_pack_tile.seccomppolicy.md)**: The `fd_pack_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, specifying conditions for writing log messages to STDERR and a log file, and ensuring immediate disk synchronization for warnings and above.
+- **[fd_pack_tip_prog_blacklist.h](fd_pack_tip_prog_blacklist.h.md)**: Perfect-hash blacklist for tip payment, config, and tip account pubkeys.
+- **[fd_pack_unwritable.h](fd_pack_unwritable.h.md)**: The `fd_pack_unwritable.h` file defines a perfect hash table for special addresses that are not allowed to be written to, ensuring transactions that attempt to write to these addresses are rejected in the `firedancer` codebase.
+- **[fuzz_chkdup.c](fuzz_chkdup.c.md)**: Fuzzer for fd_chkdup that compares regular and slow duplicate checks on split address lists.
+- **[fuzz_compute_budget_program_parse.c](fuzz_compute_budget_program_parse.c.md)**: The `fuzz_compute_budget_program_parse.c` file in the `firedancer` codebase implements a fuzzing test for the `fd_compute_budget_program_parse` function, ensuring that the compute budget program state is correctly parsed and validated.
+- **[generate_delays.py](generate_delays.py.md)**: The `generate_delays.py` file in the `firedancer` codebase calculates and stores expected microblock execution delays based on transaction arrival modeled as a Poisson process, using SageMath for symbolic computation.
+- **[Local.mk](Local.mk.md)**: Build rules for pack headers, objects, unit tests, and fuzz tests.
+- **[test_chkdup.c](test_chkdup.c.md)**: Tests fd_chkdup false positives, null cases, duplicates, and performance.
+- **[test_compute_budget_program.c](test_compute_budget_program.c.md)**: Tests compute budget parsing, fee calculation, overflow, and duplicate instruction handling.
+- **[test_deduplication.c](test_deduplication.c.md)**: The `test_deduplication.c` file in the `firedancer` codebase implements tests for deduplication and validation of transactions using various methods such as sorting, hashing, and AVX instructions.
+- **[test_est_tbl.c](test_est_tbl.c.md)**: The `test_est_tbl.c` file contains a test suite for the `fd_est_tbl` module, verifying its functionality with various statistical distributions and ensuring the accuracy of mean and variance estimations.
+- **[test_pack.c](test_pack.c.md)**: Tests transaction packing, scheduling, deletion, expiration, nonce, bundle, and limit rules.
+- **[test_pack_bitset.c](test_pack_bitset.c.md)**: The `test_pack_bitset.c` file in the `firedancer` codebase contains a test suite for verifying the functionality of packed bitset operations, including setting, clearing, copying, and checking intersections of bitsets.
+- **[test_pack_rebate_sum.c](test_pack_rebate_sum.c.md)**: The `test_pack_rebate_sum.c` file in the `firedancer` codebase contains tests for the `fd_pack_rebate_sum` functionality, which involves creating and processing fake transactions to verify rebate calculations and transaction handling.
+- **[test_pack_tile.c](test_pack_tile.c.md)**: Unit tests for pack tile transaction, bundle, leader, overrun, and stress handling.
+- **[test_tip_prog_blacklist.c](test_tip_prog_blacklist.c.md)**: The `test_tip_prog_blacklist.c` file in the `firedancer` codebase tests the functionality of checking whether specific public keys are blacklisted for bundles and non-bundles using the `fd_pack_tip_prog_check_blacklist` function.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

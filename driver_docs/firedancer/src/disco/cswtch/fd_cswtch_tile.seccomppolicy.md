@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging, metrics, and CPU usage management in a tile environment.
+The `fd_cswtch_tile.seccomppolicy` file in the `firedancer` codebase defines security policies for logging, file synchronization, context switch metrics retrieval, and CPU usage reduction through sleep operations.
 
 # Purpose
-The configuration file defines logging and metrics operations for a software system. It specifies that log messages are written to a file or pipe, with messages of 'WARNING' level and above also sent to STDERR. The file descriptor for logging is identified by `logfile_fd`, and the system ensures that STDERR is always descriptor 2. The configuration also includes conditions for synchronizing the log file to disk immediately for 'WARNING' level messages and above. Additionally, it outlines how to retrieve metrics, such as the number of context switches, by reading from `/proc/status` file descriptors, excluding those for the log file and STDOUT. The file also includes a condition to reduce CPU usage by sleeping, using `clock_nanosleep` with specific arguments.
+The provided file contents appear to be a configuration or policy script that defines rules for logging and metrics collection within a software system. It specifies how log messages are handled, indicating that all messages are written to a log file, while messages of 'WARNING' level and above are also directed to STDERR. The configuration ensures that the log file is immediately synchronized to disk for critical messages. Additionally, it outlines how metrics related to context switches are gathered by reading from specific file descriptors associated with the `/proc/status` files, excluding those used for logging and STDOUT. The script also includes a rule to reduce CPU usage by allowing the system to sleep under certain conditions, specifically when using the `clock_nanosleep` function with the `CLOCK_REALTIME` clock.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

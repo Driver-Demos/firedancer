@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for the `firedancer-agave-quic-test` package with dependencies and build settings.
+The `Cargo.toml` file in the `firedancer` codebase specifies the package configuration and dependencies for the `firedancer-agave-quic-test` project, including build dependencies and various Solana-related libraries.
 
 # Purpose
-The `Cargo.toml` file specifies the configuration for a Rust package named `firedancer-agave-quic-test`. It defines the package version as `0.1.0`, uses the 2021 edition of Rust, and indicates that the package is not intended for publishing. The file also specifies a custom build script `build.rs`. The `build-dependencies` section lists `bindgen` version `0.70` as a build dependency. The `dependencies` section includes several runtime dependencies with specified versions, such as `crossbeam-channel`, `env_logger`, `libc`, `rand`, and various `solana` libraries, which are required for the package's functionality.
+This file is a Cargo.toml configuration file for a Rust project named "firedancer-agave-quic-test" with version "0.1.0" and edition "2021". It specifies that the package should not be published and includes a custom build script "build.rs". The file also lists build dependencies, specifically "bindgen" version "0.70", and runtime dependencies such as "crossbeam-channel", "env_logger", "libc", "rand", and several Solana-related libraries with their respective versions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
