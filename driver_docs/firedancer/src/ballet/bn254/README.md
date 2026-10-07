@@ -3,25 +3,25 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-BN254 elliptic curve and Poseidon hash function implementations, utilities, tests, and Makefile.
+BN254 field, curve, pairing, Poseidon, and syscall helpers with tests and build rules.
 
 
 ## Files
-- **[fd_bn254.c](fd_bn254.c.md)**: Implements compression, decompression, addition, scalar multiplication, and pairing checks for BN254 elliptic curve points.
-- **[fd_bn254.h](fd_bn254.h.md)**: Utility functions for the bn254 (alt_bn128) curve, including point compression, decompression, and arithmetic.
-- **[fd_bn254_field.c](fd_bn254_field.c.md)**: Implements operations and constants for the BN254 base field, including addition, subtraction, multiplication, and square root calculations.
-- **[fd_bn254_field_ext.c](fd_bn254_field_ext.c.md)**: Implements extension fields Fp2, Fp6, and Fp12 for BN254, including arithmetic operations and conversions.
-- **[fd_bn254_g1.c](fd_bn254_g1.c.md)**: Functions for operations on G1 elements of the BN254 elliptic curve, including addition, doubling, and serialization.
-- **[fd_bn254_g2.c](fd_bn254_g2.c.md)**: Implements internal operations for G2 elements in the BN254 elliptic curve, including addition, doubling, negation, and subgroup checks.
-- **[fd_bn254_internal.h](fd_bn254_internal.h.md)**: Defines data structures and utility functions for BN254 elliptic curve operations, including field and point arithmetic.
-- **[fd_bn254_pairing.c](fd_bn254_pairing.c.md)**: Implements BN254 pairing operations, including Miller loop and final exponentiation, for elliptic curve cryptography.
-- **[fd_bn254_scalar.h](fd_bn254_scalar.h.md)**: Implementation of BN254 scalar field operations, including validation, arithmetic, and Montgomery conversions.
-- **[fd_poseidon.c](fd_poseidon.c.md)**: Implements the Poseidon hash function for the BN254 curve, including initialization, appending data, and finalizing the hash.
-- **[fd_poseidon.h](fd_poseidon.h.md)**: Implementation of the Poseidon hash function over the BN254 scalar field with initialization, appending, and finalization functions.
-- **[fd_poseidon_params.c](fd_poseidon_params.c.md)**: Defines static constant arrays for Poseidon hash function parameters using BN254 curve, including round constants and MDS matrices.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and running unit tests for bn254 and poseidon in firedancer.
-- **[test_bn254.c](test_bn254.c.md)**: Tests and benchmarks for BN254 elliptic curve operations, including addition, scalar multiplication, and compression.
-- **[test_poseidon.c](test_poseidon.c.md)**: Tests for the Poseidon hash function and benchmarks its performance.
+- **[fd_bn254.c](fd_bn254.c.md)**: BN254 point compression, decompression, addition, scalar mul, and pairing syscall helpers.
+- **[fd_bn254.h](fd_bn254.h.md)**: The `fd_bn254.h` file in the `firedancer` codebase provides utility functions for operations on the bn254 (alt_bn128) elliptic curve, including point addition, scalar multiplication, pairing checks, and compression/decompression of points in G1 and G2.
+- **[fd_bn254_field.c](fd_bn254_field.c.md)**: BN254 base-field constants and arithmetic, including serialization, Montgomery conversion, inversion, and square root.
+- **[fd_bn254_field_ext.c](fd_bn254_field_ext.c.md)**: BN254 Fp2, Fp6, and Fp12 field arithmetic, including Frobenius and pairing helpers.
+- **[fd_bn254_g1.c](fd_bn254_g1.c.md)**: The `fd_bn254_g1.c` file in the `firedancer` codebase provides functions for operations on elliptic curve points in the G1 group of the BN254 curve, including point addition, doubling, scalar multiplication, and conversion between affine and projective coordinates.
+- **[fd_bn254_g2.c](fd_bn254_g2.c.md)**: The `fd_bn254_g2.c` file in the `firedancer` codebase implements various operations for the G2 group of the BN254 elliptic curve, including point addition, doubling, negation, scalar multiplication, and subgroup membership checks, while noting that these operations are not exposed to users.
+- **[fd_bn254_internal.h](fd_bn254_internal.h.md)**: The `fd_bn254_internal.h` file in the `firedancer` codebase defines internal structures and utility functions for handling base and extension fields, as well as points on elliptic curves in the BN254 pairing-friendly elliptic curve.
+- **[fd_bn254_pairing.c](fd_bn254_pairing.c.md)**: The `fd_bn254_pairing.c` file in the `firedancer` codebase implements functions for BN254 pairing operations, including projection doubling, addition/subtraction, Miller loop, and final exponentiation.
+- **[fd_bn254_scalar.h](fd_bn254_scalar.h.md)**: The `fd_bn254_scalar.h` file implements the BN254 scalar field for scalar validation and arithmetic, primarily for use in the Firedancer VM, with optimizations for multiplication using either fiat-crypto or a custom implementation based on uint128.
+- **[fd_poseidon.c](fd_poseidon.c.md)**: The `fd_poseidon.c` file in the `firedancer` codebase implements the Poseidon hash function for the BN254 curve, including initialization, parameter retrieval, and the application of arithmetic operations such as addition, multiplication, and S-box transformations.
+- **[fd_poseidon.h](fd_poseidon.h.md)**: The `fd_poseidon.h` file provides an implementation of the Poseidon hash function over the BN254 scalar field, including functions to initialize, append data to, and finalize a hash calculation.
+- **[fd_poseidon_params.c](fd_poseidon_params.c.md)**: The `fd_poseidon_params.c` file in the `firedancer` codebase contains static constant arrays of `fd_bn254_scalar_t` structures, which are used to define round constants and Maximum Distance Separable (MDS) matrices for the Poseidon cryptographic hash function tailored for the BN254 elliptic curve, facilitating secure and efficient hashing operations in cryptographic protocols such as zero-knowledge proofs.
+- **[Local.mk](Local.mk.md)**: Build rules for bn254 and Poseidon headers, objects, and unit tests.
+- **[test_bn254.c](test_bn254.c.md)**: BN254 syscall tests and benchmarks for G1, G2, pairing, and final exponentiation.
+- **[test_poseidon.c](test_poseidon.c.md)**: The `test_poseidon.c` file in the `firedancer` codebase contains tests and benchmarks for the Poseidon hash function and BN254 scalar multiplication.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
