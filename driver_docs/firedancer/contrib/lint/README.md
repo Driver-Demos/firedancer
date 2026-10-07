@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Verifies C/C++ header include guards against Firedancer code style.
+Checks C/C++ header include guards against Firedancer style.
 
 
 ## Files
-- **[check_include_guards.py](check_include_guards.py.md)**: Verifies C/C++ header include guards against Firedancer code style.
+- **[check_include_guards.py](check_include_guards.py.md)**: Checks C/C++ header include guards against Firedancer style.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

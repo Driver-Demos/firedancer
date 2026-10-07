@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for simulating the `ed25519_point_add` module using Verilog sources and Cocotb.
+The `Makefile` in the `firedancer/src/wiredancer/sim/ed25519_point_add` directory is configured to simulate the `ed25519_point_add` module using Verilog sources and the Questa simulator.
 
 # Purpose
-The `Makefile` is used to automate the build process for a simulation environment. It specifies the simulator to use with the `SIM` variable, defaulting to `questa`, and sets the module name with the `MODULE` variable. The `RTL_DIR` variable defines the directory path for the RTL (Register Transfer Level) source files, and `TOPLEVEL` specifies the top-level module for the simulation, which is `ed25519_point_add`. The `VERILOG_SOURCES` variable lists all the Verilog and SystemVerilog source files required for the simulation, including files from the Xilinx Vivado library and custom RTL files. The `Makefile` also includes additional makefile configurations from `cocotb-config`, which are necessary for running the simulation with the Cocotb framework.
+The provided Makefile is used to automate the simulation of a hardware design, specifically for testing the `ed25519_point_add` module using the Questa simulator. It sets up various environment variables and paths, such as `SIM` for the simulator, `MODULE` for the test module, and `RTL_DIR` for the directory containing the RTL (Register Transfer Level) source files. The file lists several Verilog source files, including those from the Xilinx Vivado library and custom RTL files, which are necessary for the simulation. Additionally, it includes a makefile from the cocotb framework, which is a coroutine-based co-simulation library for testing VHDL and Verilog, to facilitate the simulation process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
