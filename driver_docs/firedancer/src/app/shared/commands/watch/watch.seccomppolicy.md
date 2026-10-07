@@ -3,28 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging and diagnostics in the Firedancer watcher application.
+Seccomp policy for watcher logging, waiting, exit, and pipe read/write syscalls.
 
 # Purpose
-This configuration file defines the behavior of a diagnostic tool, referred to as the watcher, which operates alongside the Firedancer application. The watcher is responsible for logging and monitoring the status and performance of the Firedancer validator. It manages file descriptors for logging, such as `logfile_fd` and `drain_output_fd`, to control where log messages are written and how they are interleaved with monitoring output. The file specifies conditions for writing and synchronizing log messages, ensuring that messages of 'WARNING' level and above are immediately synchronized to disk. Additionally, the watcher uses functions like `nanosleep` and `sched_yield` to manage the timing of diagnostic output refreshes. The file also outlines the watcher's behavior in response to system signals, such as exiting the process upon receiving SIGINT or SIGTERM, and describes a development mode where the watcher supervises Firedancer, handling log output from a child process. This configuration is crucial for maintaining organized and efficient logging and monitoring within the Firedancer environment.
-# Content Summary
-The provided content describes the configuration and operational details of a diagnostic tool, referred to as "the watcher," which operates alongside the Firedancer software. The watcher is responsible for monitoring and printing diagnostics related to the status and performance of the Firedancer validator.
-
-Key technical details include:
-
-1. **Log File Management**: The watcher can manage log files through file descriptors. The `logfile_fd` is used to write log messages to a file, while `drain_output_fd` is used when the watcher is supervising Firedancer, allowing it to interleave log messages with monitoring output.
-
-2. **Logging Mechanism**: All log messages are written to a file and/or a pipe. Messages with a severity of 'WARNING' and above are directed to the STDERR pipe, while all messages are logged to the file. The monitor uses STDOUT for its diagnostics. The file descriptors are managed such that descriptor 1 is STDOUT and descriptor 2 is STDERR.
-
-3. **Immediate Log Synchronization**: For messages of 'WARNING' level and above, the log file is immediately synchronized to disk using the `fsync` operation on the `logfile_fd`.
-
-4. **Diagnostic Output Refresh**: The watcher uses `fd_log_wait_until()` to determine when to refresh the diagnostic output screen. This function may call `nanosleep` or `sched_yield` based on the remaining wait time.
-
-5. **Process Termination**: The watcher can terminate itself by calling `exit_group()` when it receives a SIGINT or SIGTERM signal.
-
-6. **Development Mode**: In a development setting, the watcher can act as a supervisor for Firedancer, using a custom pipe to receive log messages. It interposes these messages with diagnostics for enhanced readability. This mode is not intended for production use. The file descriptor for reading is either the `drain_output_fd` or the standard input used by the monitor.
-
-These details are crucial for developers to understand how the watcher interacts with Firedancer, manages logging, and handles process control.
+This file defines the system call and file descriptor rules used by the watcher process in Firedancer. It controls which descriptors the watcher may write to, fsync, read from, and use for waiting or exit handling, with separate rules for normal log output, STDERR warnings, and optional log draining from a supervised child process. The entries also document the watcher’s runtime behavior, including periodic refresh waits through `nanosleep` and `sched_yield`, and process termination through `exit_group` on `SIGINT` or `SIGTERM`. Overall, the file limits the watcher to the operations it needs for diagnostics and log handling, while supporting both standalone and supervised execution modes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

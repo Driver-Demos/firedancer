@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and data structures for range proofs using Curve25519 and Ristretto255, with a Makefile.
+The `rangeproofs` folder in the `firedancer` codebase contains source and header files for implementing, verifying, and optimizing cryptographic range proofs, utilizing various architectures and protocols, and includes a makefile for build configuration.
 
 
 ## Files
-- **[fd_rangeproofs.c](fd_rangeproofs.c.md)**: Implements functions for validating, computing, and verifying range proofs using Curve25519 operations.
-- **[fd_rangeproofs.h](fd_rangeproofs.h.md)**: Header file for range proofs, defining constants, data structures, and a verification function.
-- **[fd_rangeproofs_table_avx512.c](fd_rangeproofs_table_avx512.c.md)**: Contains static constant data structures for cryptographic range proofs using the Ristretto255 curve.
-- **[fd_rangeproofs_table_ref.c](fd_rangeproofs_table_ref.c.md)**: Defines constants and precomputed tables for cryptographic operations using the Ristretto255 group.
-- **[fd_rangeproofs_transcript.h](fd_rangeproofs_transcript.h.md)**: Functions for domain separation, message appending, and scalar challenges in range proofs using Merlin transcripts.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers and objects related to range proofs in the Firedancer codebase.
+- **[fd_rangeproofs.c](fd_rangeproofs.c.md)**: The `fd_rangeproofs.c` file in the `firedancer` codebase implements functions for validating and verifying batched range proofs using cryptographic operations, specifically focusing on handling range proofs for different bit lengths and ensuring the integrity of confidential transactions.
+- **[fd_rangeproofs.h](fd_rangeproofs.h.md)**: The `fd_rangeproofs.h` file in the `firedancer` codebase defines structures and constants for range proofs, including functions for verifying these proofs, with support for different architectures using AVX512 or reference implementations.
+- **[fd_rangeproofs_table_avx512.c](fd_rangeproofs_table_avx512.c.md)**: The file `fd_rangeproofs_table_avx512.c` in the firedancer codebase is an auto-generated C header file within a cryptographic library, designed for internal use to handle range proofs using the Ristretto255 group by defining static constant arrays of precomputed points for efficient cryptographic operations, including base points and generators for Pedersen commitments.
+- **[fd_rangeproofs_table_ref.c](fd_rangeproofs_table_ref.c.md)**: The `fd_rangeproofs_table_ref.c` file in the Firedancer codebase is an auto-generated C header file that defines static constant arrays of precomputed points on the Ristretto255 curve, including base points and generators, which are used internally in cryptographic operations for range proofs to enhance performance and efficiency.
+- **[fd_rangeproofs_transcript.h](fd_rangeproofs_transcript.h.md)**: The `fd_rangeproofs_transcript.h` file in the `firedancer` codebase provides functions for handling domain separation and message appending in range proofs and inner product proofs using the Merlin transcript protocol.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and objects related to `fd_rangeproofs` and `fd_flamenco` for the build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

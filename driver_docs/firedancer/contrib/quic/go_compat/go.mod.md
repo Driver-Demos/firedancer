@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration for Go module dependencies and toolchain version for post-quantum key exchange.
+Go module for quic-go compatibility with Go 1.23.0 and toolchain go1.23.6
 
 # Purpose
-The `go.mod` file specifies the module path as `github.com/firedancer-io/firedancer/contrib/quic/go_compat` and sets the Go language version to 1.23.0, which enables post-quantum key exchange. It defines the toolchain version as `go1.23.6`. The file lists direct dependencies required for the module, including `github.com/quic-go/quic-go` version `v0.54.1` and `golang.org/x/net` version `v0.40.0`. Additionally, it includes several indirect dependencies, such as `github.com/francoispqt/gojay`, `go.uber.org/mock`, and various packages from `golang.org/x`, which are necessary for the module's functionality but not directly imported in the module's source code.
+This `go.mod` file defines the Go module `github.com/firedancer-io/firedancer/contrib/quic/go_compat` and sets the Go language version to `1.23.0` so post-quantum key exchange support can be enabled. It also selects the `go1.23.6` toolchain for builds in this module. The `require` blocks list the direct dependencies `github.com/quic-go/quic-go` and `golang.org/x/net`, along with indirect dependencies used by those packages and related build tools.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
