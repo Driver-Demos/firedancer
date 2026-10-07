@@ -3,12 +3,59 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-SHA-512 block pipeline with message sequencing, round logic, RAM, and metadata FIFO.
+Implements a SHA-512 hashing block in SystemVerilog, following RFC6234 specifications.
 
 # Purpose
-`sha512_block` implements the block-processing stage of the SHA-512 hash algorithm. It accepts a 1024-bit message block, control flags that mark the first, middle, and last block of a message, and a message index. The file defines the SHA-512 initial hash vector and the 80 round constants from RFC 6234, then uses them to drive a full 80-round compression pipeline. The design also checks key parameter values at run time, which keeps the implementation fixed to the SHA-512 word and block sizes used by the rest of the logic.
+The `sha512_block` module implements a hardware description of a SHA-512 cryptographic hash function block. This module processes 1024-bit data blocks to produce a 512-bit hash output, following the SHA-512 algorithm as specified in RFC 6234. The module uses a series of constants and initial vectors defined in the SHA-512 specification to perform the hashing operations. It includes input and output ports for data, control signals, and hash results, and it operates synchronously with a clock and reset signal.
 
-The file connects several internal components to complete one block update. `sha512_msgseq` converts the input block into the 80-word message schedule, and a generated set of `sha512_round` instances performs the round function for each schedule word. A dual-port RAM stores intermediate hash state, and a FIFO carries the message index so it stays aligned with the long pipeline latency. The control pipeline tracks first, middle, and last block markers through the same number of cycles as the hash datapath, and the final output adds the last round result to the stored hash state to produce `o_hash` with `o_valid` and `o_msgi` aligned to the completed block.
+The module is structured around several key components, including a message sequence generator (`sha512_msgseq`), a series of SHA-512 round operations (`sha512_round`), and a dual-port RAM for storing intermediate hash values. The design uses a pipeline approach to process data in stages, with control logic to manage the flow of data through the pipeline. The module also includes assertions to ensure that certain parameters, such as data width and control width, meet expected values. The implementation adheres to the big-endian convention for data representation, as required by the SHA-512 specification.
+# Modules
+
+---
+### sha512\_block
+Implements the SHA-512 hash function block, processing 1024-bit data blocks to produce a 512-bit hash output. Utilizes a series of rounds and constants as defined in RFC6234 to perform the hashing operation.
+- **Constants**:
+    - ``DATA_W``: Defines the data width as 1024 bits.
+    - ``CTRL_W``: Defines the control width as 3 bits.
+    - ``MSGI_W``: Defines the message input width as 64 bits.
+    - ``HASH_W``: Defines the hash width as 512 bits.
+    - ``WORD_W``: Defines the word width as 64 bits.
+    - ``H_WD_N``: Calculates the number of hash words as `HASH_W / WORD_W`.
+    - ``N_ROUNDS``: Defines the number of rounds as 80.
+    - ``CYCLES_OHEAD``: Defines the overhead cycles as 3.
+    - ``CYCLES_ROUND``: Defines the cycles per round as 1.
+    - ``CYCLES_ADDER``: Defines the adder cycles as 1.
+    - ``CYCLES_BLOCK``: Calculates the total cycles per block as `CYCLES_OHEAD + N_ROUNDS * CYCLES_ROUND + CYCLES_ADDER`.
+    - ``M_FIFO_DEPTH``: Defines the FIFO depth as `1<<$clog2(CYCLES_BLOCK + 2)`.
+    - ``M_FIFO_WIDTH``: Defines the FIFO width as `MSGI_W`.
+    - ``CTRL_BIT_FIRST``: Defines the first control bit as 2.
+    - ``CTRL_BIT_MIDD``: Defines the middle control bit as 1.
+    - ``CTRL_BIT_LAST``: Defines the last control bit as 0.
+    - ``RCOUNT_N``: Calculates the round count numerator as `CYCLES_OHEAD + N_ROUNDS * CYCLES_ROUND`.
+    - ``RCOUNT_D``: Defines the round count denominator as 6.
+    - ``RCOUNT_W``: Calculates the round count width as `$clog2(RCOUNT_N + RCOUNT_D)`.
+    - ``H_RAM_ADDR_W``: Calculates the hash RAM address width as `$clog2(RCOUNT_N)`.
+    - ``H_RAM_DATA_W``: Defines the hash RAM data width as `HASH_W`.
+- **Ports**:
+    - ``i_valid``: Indicates if the input data is valid.
+    - ``i_data``: Carries the input data block of width `DATA_W`.
+    - ``i_ctrl``: Carries control signals of width `CTRL_W`.
+    - ``i_msgi``: Carries the message input of width `MSGI_W`.
+    - ``o_valid``: Indicates if the output data is valid.
+    - ``o_msgi``: Carries the message output of width `MSGI_W`.
+    - ``o_hash``: Carries the hash output of width `HASH_W`.
+    - ``clk``: Clock signal for synchronization.
+    - ``rst``: Reset signal to initialize the module.
+- **Logic and Control Flow**:
+    - Asserts ensure that the parameters `DATA_W`, `CTRL_W`, `HASH_W`, and `WORD_W` have specific values, and the module will error if they do not.
+    - Initializes the `InitVector` and `Constants` arrays with predefined values for the SHA-512 algorithm.
+    - Uses `always_ff` and `always_comb` blocks to manage data flow and control signals through the pipeline stages.
+    - Implements a pipeline with stages for input validation, data processing, and hash computation.
+    - Uses a `generate` block to instantiate `sha512_round` modules for each of the 80 rounds of the SHA-512 algorithm.
+    - Utilizes a dual-port RAM for storing intermediate hash values and a FIFO for managing message data.
+    - Handles control signals to manage the flow of data through the pipeline, including first, middle, and last block indicators.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Epoch leader schedule APIs, sampling, multi-epoch lookup, and tests.
+Functions, APIs, and tests for Solana epoch and multi-epoch leader schedules with build support.
 
 
 ## Files
-- **[fd_leaders.c](fd_leaders.c.md)**: Epoch leader schedule creation with stake sorting, deduping, and weighted sampling.
-- **[fd_leaders.h](fd_leaders.h.md)**: APIs and data structures for Solana epoch leader schedules.
-- **[fd_leaders_base.h](fd_leaders_base.h.md)**: Stake weight message layout, size constants, and a message size helper.
-- **[fd_multi_epoch_leaders.c](fd_multi_epoch_leaders.c.md)**: Epoch leader schedule management across two epochs, with slot and leader lookup.
-- **[fd_multi_epoch_leaders.h](fd_multi_epoch_leaders.h.md)**: Two-epoch leader schedule tracking and slot lookup helpers.
-- **[Local.mk](Local.mk.md)**: Build rules for leaders headers, objects, and unit tests when FD_HAS_INT128 is set.
-- **[test_leaders.c](test_leaders.c.md)**: Tests epoch leader schedule generation and lookup against fixture data.
-- **[test_multi_leaders.c](test_multi_leaders.c.md)**: Tests multi-epoch leader schedule updates, lookup, ordering, limits, and slot queries.
+- **[fd_leaders.c](fd_leaders.c.md)**: Implements functions for managing epoch leaders, including sorting and memory alignment operations.
+- **[fd_leaders.h](fd_leaders.h.md)**: APIs for managing the Solana leader schedule, including memory management and leader retrieval functions.
+- **[fd_leaders_base.h](fd_leaders_base.h.md)**: Defines structures and constants for managing stake weights and leader schedules in epochs.
+- **[fd_multi_epoch_leaders.c](fd_multi_epoch_leaders.c.md)**: Manages multi-epoch leader schedules, including initialization, joining, and retrieval of leader data.
+- **[fd_multi_epoch_leaders.h](fd_multi_epoch_leaders.h.md)**: A wrapper for managing and querying leader schedules across multiple epochs, with lifecycle and stake update functions.
+- **[Local.mk](Local.mk.md)**: Makefile configuration for building and testing leader-related components in the Flamenco module.
+- **[test_leaders.c](test_leaders.c.md)**: Tests the functionality of epoch leader data import and validation for Solana's Mainnet-beta epoch 454.
+- **[test_multi_leaders.c](test_multi_leaders.c.md)**: Tests for multi-epoch leader scheduling and stake message handling in the Firedancer codebase.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
