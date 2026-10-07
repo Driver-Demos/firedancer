@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for patching picohttpparser and adding HTTP headers, objects, and tests.
+Applies a local patch to picohttpparser and compiles it, with unit and fuzz tests for HTTP components.
 
 # Purpose
-This Makefile fragment defines build rules for `fd_picohttpparser.c` by copying `picohttpparser.c`, applying `fd_picohttpparser.patch`, and then removing the temporary file after the patched source is created. It also declares the object file dependency for `fd_picohttpparser.o` and registers headers and objects for `fd_url` and, when `FD_HAS_HOSTED` is set, for `fd_http_server` and `fd_picohttpparser`. The conditional block also adds unit tests and fuzz tests for the HTTP server, HTTP parser, and URL parser, and it enables the `test_http_server` unit test to run as part of the test set.
+The content is a Makefile script that automates the process of applying a patch to the `picohttpparser` source file and compiling it into an object file. It first copies the original `picohttpparser.c` to a temporary file, applies the patch, and then copies the patched file to `fd_picohttpparser.c`. The script then removes the temporary file. The Makefile also defines dependencies for building the object file `fd_picohttpparser.o` and includes additional headers and objects if the `FD_HAS_HOSTED` condition is met. It further sets up unit tests and fuzz tests for components like `http_server` and `picohttpparser`, ensuring that these components are tested for functionality and robustness.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

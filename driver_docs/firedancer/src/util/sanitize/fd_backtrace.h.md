@@ -3,20 +3,22 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_backtrace.h` file declares a function for printing a backtrace to a specified file descriptor.
+Header file for printing a backtrace to a specified file descriptor.
 
 # Purpose
-This code is a simple C header file that declares a function prototype for [`fd_backtrace_print`](#fd_backtrace_print). The function is intended to print a backtrace to a specified file descriptor, which is useful for debugging purposes by providing a stack trace of function calls leading to a certain point in the program. The header guards, defined by `#ifndef`, `#define`, and `#endif`, prevent multiple inclusions of this header file, which could otherwise lead to compilation errors. This file is likely part of a larger utility library focused on error handling or debugging support.
+This is a C header file that declares a function for printing a backtrace. The function [`fd_backtrace_print`](<#fd_backtrace_print>) takes an integer `fd` as a parameter, which typically represents a file descriptor. The purpose of this function is to output a backtrace to the specified file descriptor, which can be useful for debugging by providing a stack trace of the program's execution. The header file uses include guards to prevent multiple inclusions, ensuring that the function declaration is only processed once during compilation.
 # Function Declarations (Public API)
 
 ---
 ### fd\_backtrace\_print<!-- {{#callable_declaration:fd_backtrace_print}} -->
-Prints a backtrace to the specified file descriptor.
-- **Description**: Use this function to output a backtrace of the current call stack to a given file descriptor, which is useful for debugging purposes. It captures the current execution state and writes the backtrace information directly to the specified file descriptor. This function should be called when a backtrace is needed, such as during error handling or debugging sessions. Ensure that the file descriptor is valid and open for writing to avoid undefined behavior.
+[View Source →](<../../../../../src/util/sanitize/fd_backtrace.h#L4>)
+
+Prints a backtrace to a file descriptor.
+- **Description**: Use this function to print a backtrace of the current call stack to a specified file descriptor. This is useful for debugging purposes, especially when diagnosing crashes or unexpected behavior. Ensure that the file descriptor is valid and open for writing before calling this function. The function does not validate the file descriptor, so invalid descriptors can lead to undefined behavior.
 - **Inputs**:
-    - `fd`: An integer representing the file descriptor to which the backtrace will be printed. It must be a valid, open file descriptor capable of writing. If the file descriptor is invalid or closed, the behavior is undefined.
+    - `fd`: An integer representing the file descriptor where the backtrace will be printed. Must be a valid file descriptor open for writing. The function does not check the validity of the file descriptor, and using an invalid one can cause undefined behavior.
 - **Output**: None
-- **See also**: [`fd_backtrace_print`](fd_backtrace.c.md#fd_backtrace_print)  (Implementation)
+- **See Also**: [`fd_backtrace_print`](<fd_backtrace.c.md#fd_backtrace_print>)  (Implementation)
 
 
 
