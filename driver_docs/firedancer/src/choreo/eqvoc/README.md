@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions and API for equivocation detection and handling, Makefile, and tests for proof verification.
+Equivocation proof management, API, build rules, and tests for shred verification.
 
 
 ## Files
-- **[fd_eqvoc.c](fd_eqvoc.c.md)**: Implements functions for managing and verifying FEC and proof data structures in memory.
-- **[fd_eqvoc.h](fd_eqvoc.h.md)**: API for detecting and handling equivocation proofs in shreds, including construction, verification, and metadata indexing.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests based on configuration flags.
-- **[test_eqvoc.c](test_eqvoc.c.md)**: Tests equivocation proof verification and manipulation for data shreds in a distributed system.
+- **[fd_eqvoc.c](fd_eqvoc.c.md)**: Equivocation proof management and verification for shreds, with FEC and proof maps.
+- **[fd_eqvoc.h](fd_eqvoc.h.md)**: API for detecting equivocation and building, verifying, and chunking duplicate-shred proofs.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies build instructions for the `fd_eqvoc` component, including header and object files, and conditional unit test setup based on the presence of `FD_HAS_INT128` and `FD_HAS_HOSTED`.
+- **[test_eqvoc.c](test_eqvoc.c.md)**: Tests equivocation proof verification and shred chunk conversion logic.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

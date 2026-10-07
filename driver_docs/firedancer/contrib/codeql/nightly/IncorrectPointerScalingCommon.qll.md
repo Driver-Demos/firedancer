@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Shared utilities for CWE-468 queries, including functions for analyzing pointer arithmetic and `sizeof` expressions.
+The `IncorrectPointerScalingCommon.qll` file provides shared utilities for CWE-468 queries, focusing on analyzing and handling pointer arithmetic and type expressions in C++ code.
 
 # Purpose
-The code provides shared utility functions and predicates for analyzing `sizeof` expressions and pointer arithmetic in C/C++ code. It is part of a query system, likely used for static analysis or code querying, specifically related to CWE-468, which involves incorrect pointer scaling. The code is not an executable or a library but a collection of utility functions intended to be used within a larger analysis framework.
+This source code file provides a collection of utility functions and predicates designed to analyze and manipulate expressions related to the `sizeof` operator and pointer arithmetic in C/C++ code. The file is part of a larger system that likely deals with code analysis, specifically focusing on identifying and handling potential issues related to type conversions and pointer arithmetic, which are common sources of errors in C/C++ programming. The utilities are tailored to support queries related to the Common Weakness Enumeration (CWE) 468, which involves incorrect pointer scaling.
 
-The code defines several private functions and predicates that help identify and work with `sizeof` expressions and pointer types. The `sizeofParam` function extracts the type parameter from a `sizeof` expression. The `multiplyWithSizeof` predicate checks if an expression involves a `sizeof` expression, possibly multiplied by another expression, and identifies the type parameter of the `sizeof` expression. The `addWithSizeof` predicate determines if a pointer is added to a `sizeof` expression, which may be multiplied by another expression, and identifies the type parameter.
+The code defines several private functions and predicates that operate on expressions (`Expr`) and types (`Type`). Key components include `sizeofParam`, which extracts the type parameter from a `sizeof` expression, and `multiplyWithSizeof`, which checks if an expression involves multiplication with a `sizeof` expression. The `addWithSizeof` predicate determines if a pointer is involved in an addition or subtraction operation with a `sizeof` expression. Additionally, the `isPointerType` predicate checks if a given type is a pointer or array type, while `baseType` retrieves the base type of a pointer or array, ensuring it is not ambiguous.
 
-Additional predicates and functions include `isPointerType`, which checks if a type is a pointer or array type, and `baseType`, which retrieves the base type of a pointer or array type. The `exprSourceType` and `defSourceType` predicates are used to trace the source of pointer expressions and their types, considering operations like addition, subtraction, and increment. The `pointerArithmeticParent` function identifies the pointer arithmetic expression in which a given expression is directly used. These utilities are essential for analyzing and understanding pointer arithmetic and type usage in C/C++ code.
+The file also includes predicates like `exprSourceType` and `defSourceType`, which are used to trace the source of pointer expressions and their types within the code, potentially identifying the origins of pointer arithmetic operations. These predicates are crucial for understanding how data flows through pointer operations, which is essential for detecting and preventing errors related to pointer misuse. Overall, this file serves as a specialized library for analyzing and querying C/C++ code, particularly in the context of pointer arithmetic and type safety.
 # Imports and Dependencies
 
 ---
@@ -21,109 +21,109 @@ Additional predicates and functions include `isPointerType`, which checks if a t
 
 ---
 ### sizeofParam
-Gets the type parameter of a `sizeof` expression `e`.
+The `sizeofParam` function retrieves the type parameter of a `sizeof` expression.
 - **Inputs**:
-    - ``e``: An expression of type `Expr` that represents a `sizeof` expression.
-- **Logic and Control Flow**:
-    - Check if `e` is an instance of `SizeofExprOperator` and get the type of its operand using `getExprOperand().getFullyConverted().getType()`.
-    - If the above condition is not met, check if `e` is an instance of `SizeofTypeOperator` and get its type operand using `getTypeOperand()`.
-- **Output**: Returns a `Type` object that represents the type parameter of the `sizeof` expression.
+    - `e`: An expression of type `Expr` representing a `sizeof` expression.
+- **Control Flow**:
+    - The function checks if the expression `e` is a `SizeofExprOperator` and retrieves the type of its operand after full conversion.
+    - If the first condition is not met, it checks if `e` is a `SizeofTypeOperator` and retrieves its type operand.
+- **Output**: The function returns a `Type` representing the type parameter of the `sizeof` expression.
 
 
 ---
 ### multiplyWithSizeof
-Determines if an expression `e` is a `sizeof` expression, possibly multiplied by another expression, and verifies the type parameter of the `sizeof` expression.
+The `multiplyWithSizeof` function checks if an expression `e` is a `sizeof` expression, possibly multiplied by another expression, and retrieves the type parameter of the `sizeof` expression.
 - **Inputs**:
-    - ``e``: An expression to check if it is a `sizeof` expression or a multiplication involving a `sizeof` expression.
-    - ``sizeofExpr``: The `sizeof` expression to compare against `e`.
-    - ``sizeofParam``: The type parameter of the `sizeof` expression.
-- **Logic and Control Flow**:
+    - `e`: An expression that is being checked to see if it is a `sizeof` expression, possibly multiplied by another expression.
+    - `sizeofExpr`: The `sizeof` expression that is part of the expression `e`.
+    - `sizeofParam`: The type parameter of the `sizeof` expression `sizeofExpr`.
+- **Control Flow**:
     - Check if `e` is equal to `sizeofExpr` and if `sizeofParam` is equal to the unspecified type of `sizeofExpr`'s type parameter.
     - If the above condition is not met, recursively call `multiplyWithSizeof` on one of the operands of `e` if `e` is a multiplication expression (`MulExpr`).
-- **Output**: A boolean value indicating whether `e` is a `sizeof` expression or a multiplication involving a `sizeof` expression with the specified type parameter.
+- **Output**: A boolean predicate that holds true if `e` is a `sizeof` expression, possibly multiplied by another expression, with the specified type parameter `sizeofParam`.
 
 
 ---
 ### addWithSizeof
-Determines if a pointer expression `e` is added to or subtracted from a `sizeof` expression `sizeofExpr`, with `sizeofParam` as the type parameter of `sizeofExpr`.
+The `addWithSizeof` predicate checks if a pointer expression is added to or subtracted from a `sizeof` expression, potentially multiplied by another expression, and identifies the type parameter of the `sizeof` expression.
 - **Inputs**:
-    - ``e``: An expression representing a pointer.
-    - ``sizeofExpr``: An expression representing a `sizeof` operation, possibly multiplied by another expression.
-    - ``sizeofParam``: The type parameter of the `sizeof` expression.
-- **Logic and Control Flow**:
-    - Checks if there exists a `PointerAddExpr` where `e` is the left operand and the right operand satisfies the `multiplyWithSizeof` predicate with `sizeofExpr` and `sizeofParam`.
-    - Checks if there exists a `PointerSubExpr` where `e` is the left operand and the right operand satisfies the `multiplyWithSizeof` predicate with `sizeofExpr` and `sizeofParam`.
-- **Output**: A boolean value indicating whether the conditions for `addWithSizeof` are met.
+    - `e`: An expression representing a pointer.
+    - `sizeofExpr`: An expression representing a `sizeof` operation.
+    - `sizeofParam`: The type parameter of the `sizeof` expression.
+- **Control Flow**:
+    - The predicate checks if there exists a `PointerAddExpr` where `e` is the left operand and the right operand is a `sizeof` expression possibly multiplied by another expression, using the `multiplyWithSizeof` predicate.
+    - Alternatively, it checks if there exists a `PointerSubExpr` where `e` is the left operand and the right operand is a `sizeof` expression possibly multiplied by another expression, again using the `multiplyWithSizeof` predicate.
+- **Output**: The predicate holds true if the conditions for either addition or subtraction with a `sizeof` expression are met.
 
 
 ---
 ### isPointerType
-Determines if a given type is a pointer or array type.
+The `isPointerType` function checks if a given type is either a pointer or an array type.
 - **Inputs**:
-    - ``t``: The type to check if it is a pointer or array type.
-- **Logic and Control Flow**:
-    - Check if `t` is an instance of `PointerType`.
-    - If not, check if `t` is an instance of `ArrayType`.
-    - Return true if either condition is met.
-- **Output**: A boolean value indicating whether `t` is a pointer or array type.
+    - `t`: The type to be checked, which is an instance of the `Type` class.
+- **Control Flow**:
+    - The function checks if the type `t` is an instance of `PointerType`.
+    - If not, it checks if the type `t` is an instance of `ArrayType`.
+    - The function returns true if either condition is met, indicating that `t` is a pointer or array type.
+- **Output**: A boolean value indicating whether the type `t` is a pointer or array type.
 
 
 ---
 ### baseType
-Gets the base type of a pointer or array type, returning the innermost base type for arrays of arrays.
+The `baseType` function retrieves the base type of a given pointer or array type, handling nested arrays by returning the innermost base type.
 - **Inputs**:
-    - ``t``: A `Type` object representing a pointer or array type.
-- **Logic and Control Flow**:
-    - Check if `t` is a `PointerType`; if true, set `result` to the base type of `t` after removing any unspecified type information.
-    - Check if `t` is an `ArrayType` and its base type is not another `ArrayType`; if true, set `result` to the base type of `t` after removing any unspecified type information.
-    - If `t` is an `ArrayType` and its base type is another `ArrayType`, recursively call `baseType` on the base type of `t` to get the innermost base type.
-    - Ensure that the `result` type has a size and is not ambiguous by checking that the size count is exactly 1.
-- **Output**: The innermost base `Type` of the input pointer or array type `t`.
+    - `t`: A `Type` object representing a pointer or array type whose base type is to be determined.
+- **Control Flow**:
+    - Check if `t` is a `PointerType`, and if so, set `result` to the base type of `t` after removing any unspecified type qualifiers.
+    - Check if `t` is an `ArrayType` and its base type is not another `ArrayType`, then set `result` to the base type of `t` after removing any unspecified type qualifiers.
+    - If `t` is an `ArrayType` whose base type is another `ArrayType`, recursively call `baseType` on the base type of `t` to find the innermost base type.
+    - Ensure that the resulting type has a defined size and is not ambiguous by checking that the size count is exactly one.
+- **Output**: The function returns a `Type` object representing the base type of the input pointer or array type, ensuring it is not ambiguous and has a defined size.
 
 
 ---
 ### exprSourceType
-Determines if there is a pointer expression with a specific type and location that might be the source expression for a given use.
+The `exprSourceType` predicate determines if a pointer expression with a specific type and location might be the source expression for a given use.
 - **Inputs**:
-    - ``use``: An `Expr` object representing the expression whose source type is being determined.
-    - ``sourceType``: A `Type` object representing the type of the source expression.
-    - ``sourceLoc``: A `Location` object representing the location of the source expression.
-- **Logic and Control Flow**:
-    - Check if there exists an `SsaDefinition` where `use` is a use of a variable; if so, determine the source type using `defSourceType`.
-    - If `use` is an instance of `PointerAddExpr`, recursively call `exprSourceType` on the left operand of `use`.
-    - If `use` is an instance of `PointerSubExpr`, recursively call `exprSourceType` on the left operand of `use`.
-    - If `use` is an instance of `AddExpr`, recursively call `exprSourceType` on any operand of `use`.
-    - If `use` is an instance of `SubExpr`, recursively call `exprSourceType` on any operand of `use`.
-    - If `use` is an instance of `CrementOperation`, recursively call `exprSourceType` on the operand of `use`.
-    - If `use` is not an instance of `Conversion`, check if `sourceType` is the unspecified type of `use`, ensure it is a pointer type, and set `sourceLoc` to the location of `use`.
-- **Output**: A boolean value indicating whether there is a pointer expression with the specified type and location that might be the source expression for `use`.
+    - `use`: An expression (`Expr`) for which the source type and location are being determined.
+    - `sourceType`: The type (`Type`) of the source expression that might be associated with the `use`.
+    - `sourceLoc`: The location (`Location`) of the source expression that might be associated with the `use`.
+- **Control Flow**:
+    - Check if there exists a single static assignment (SSA) definition for the `use` expression; if so, determine the source type and location using `defSourceType`.
+    - If `use` is a `PointerAddExpr`, recursively call `exprSourceType` on the left operand of the `PointerAddExpr`.
+    - If `use` is a `PointerSubExpr`, recursively call `exprSourceType` on the left operand of the `PointerSubExpr`.
+    - If `use` is an `AddExpr`, recursively call `exprSourceType` on any operand of the `AddExpr`.
+    - If `use` is a `SubExpr`, recursively call `exprSourceType` on any operand of the `SubExpr`.
+    - If `use` is a `CrementOperation`, recursively call `exprSourceType` on the operand of the `CrementOperation`.
+    - If `use` is not a `Conversion`, check if the `use` expression's type is a pointer type and assign its type and location to `sourceType` and `sourceLoc`, respectively.
+- **Output**: The predicate holds true if the conditions are met, indicating that the `use` expression has a source expression with the specified type and location.
 
 
 ---
 ### defSourceType
-Determines if there is a pointer expression with a specific type at a given location that might define the value of a stack variable at a specific definition.
+The `defSourceType` function determines if there is a pointer expression with a specific type and location that might define the value of a stack variable at a given SSA definition.
 - **Inputs**:
-    - ``def``: An `SsaDefinition` object representing the definition context to check.
-    - ``v``: A `StackVariable` object representing the variable whose source type is being determined.
-    - ``sourceType``: A `Type` object representing the type of the source expression.
-    - ``sourceLoc``: A `Location` object representing the location of the source expression.
-- **Logic and Control Flow**:
-    - Checks if the defining value of `v` in `def` has a source type and location using `exprSourceType`.
-    - If not, recursively checks the phi inputs of `def` for `v` using `defSourceType`.
-    - If neither of the above holds, checks if `v` is defined by a parameter, and if so, verifies the type and location of the parameter.
-- **Output**: A boolean value indicating whether a pointer expression with the specified type and location might define the value of the stack variable at the given definition.
+    - `def`: An SSA (Static Single Assignment) definition that potentially defines the value of a stack variable.
+    - `v`: A stack variable whose value might be defined by the pointer expression.
+    - `sourceType`: The type of the pointer expression that might define the value of the stack variable.
+    - `sourceLoc`: The location of the pointer expression that might define the value of the stack variable.
+- **Control Flow**:
+    - Check if the defining value of the stack variable `v` in the SSA definition `def` is a source expression with the specified `sourceType` and `sourceLoc` using `exprSourceType`.
+    - If not, recursively check if any phi input of `v` in `def` is a source expression with the specified `sourceType` and `sourceLoc` using `defSourceType`.
+    - Check if the stack variable `v` is defined by a parameter `p`, and if so, verify that `p` has the specified `sourceType` and `sourceLoc`, ensuring it is a pointer type and has a unique type size.
+- **Output**: The function holds true if there is a pointer expression with the specified `sourceType` and `sourceLoc` that might define the value of the stack variable `v` at the SSA definition `def`.
 
 
 ---
 ### pointerArithmeticParent
-Finds the pointer arithmetic expression in which the expression `e` is directly used.
+The `pointerArithmeticParent` function retrieves the pointer arithmetic expression in which a given expression `e` is directly used.
 - **Inputs**:
-    - ``e``: An expression of type `Expr` that is checked for its involvement in a pointer arithmetic operation.
-- **Logic and Control Flow**:
-    - Check if `e` is the left operand of a `PointerAddExpr` and assign the result to `result`.
-    - Check if `e` is the left operand of a `PointerSubExpr` and assign the result to `result`.
-    - Check if `e` is an operand of a `PointerDiffExpr` and assign the result to `result`.
-- **Output**: An expression of type `Expr` that represents the pointer arithmetic operation involving `e`, if any.
+    - `e`: An expression (`Expr`) for which the function will find the parent pointer arithmetic expression.
+- **Control Flow**:
+    - The function checks if `e` is the left operand of a `PointerAddExpr` and assigns the result to that expression if true.
+    - If not, it checks if `e` is the left operand of a `PointerSubExpr` and assigns the result to that expression if true.
+    - If neither of the above, it checks if `e` is an operand of a `PointerDiffExpr` and assigns the result to that expression if true.
+- **Output**: The function returns an `Expr` that represents the pointer arithmetic expression in which `e` is directly used, if any.
 
 
 

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging, including file descriptor management and log message handling.
+The `fd_dedup_tile.seccomppolicy` file defines security policies for logging in the Firedancer deduplication tile, specifying conditions for writing and syncing log messages to a file or STDERR.
 
 # Purpose
-The configuration file defines the logging behavior for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above also directed to the STDERR pipe. The file descriptor for logging is identified by `logfile_fd`, which can be disabled by configuration. The boot process ensures that descriptor 2 is always STDERR, and the configuration uses this to determine where to write log messages. Additionally, for messages of 'WARNING' level and above, the configuration ensures that the log file is immediately synchronized to disk using the `fsync` operation on the `logfile_fd`.
+The provided content is a configuration snippet related to logging behavior in a software system. It defines how log messages are managed, specifying that all log messages are written to a file and/or a pipe. Messages with a severity of 'WARNING' and above are directed to the STDERR pipe, while all messages are consistently logged to a designated log file. The configuration uses a file descriptor, `logfile_fd`, to identify the log file, and ensures that the boot process assigns STDERR to descriptor 2. Additionally, it specifies that for messages of 'WARNING' level and above, the log file is immediately synchronized to disk using the `fsync` operation, ensuring that critical log data is promptly saved.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
