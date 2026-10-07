@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Describes the Firedancer security program, including bug bounty, third-party audits, and an audit contest.
+The `SECURITY.md` file outlines the security measures for the Firedancer project, including a bug bounty program, third-party security audits, and an audit contest.
 
 # Purpose
-The document outlines the security measures and programs associated with the Firedancer project. It includes a Bug Bounty Program where security-relevant bugs in Firedancer v0.1 can be reported through the Immunefi platform, potentially earning rewards for valid submissions. The document also details the involvement of third-party firms in conducting independent security audits, with the results made public once issues are resolved. Additionally, it describes an audit contest held on Immunefi, which took place before the mainnet launch of Firedancer v0.1, to further ensure the security of the project.
+The document is a security policy outline for the Firedancer software project, detailing its approach to ensuring the security and integrity of its codebase. It includes a structured overview of the Firedancer security program, highlighting key components such as the Bug Bounty Program, Third Party Security Audits, and an Audit Contest. The Bug Bounty Program encourages the reporting of security-relevant bugs through the Immunefi platform, offering potential rewards for valid submissions. The document also emphasizes the role of third-party security audits, which are conducted to independently assess the software's security, with audit reports made publicly available once issues are resolved. Additionally, it mentions an audit contest held on Immunefi, aimed at further scrutinizing the software before its mainnet launch.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

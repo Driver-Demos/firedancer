@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for replaying ledgers with configurable inputs and environment setup.
+Workflow to replay ledgers in backtest mode.
 
 # Purpose
-The YAML configuration file defines a GitHub Actions workflow named `Replay Ledgers`. This workflow can be triggered by a `workflow_call` or `workflow_dispatch` event. It accepts inputs such as `coverage`, `machine`, and `extras`, with default values set for each. The workflow includes a job named `backtest-ledger-replay`, which has a timeout of 15 minutes and runs on a self-hosted runner with specific labels and group settings. The job sets environment variables and executes a series of steps, including cleanup, checking out the repository, setting up dependencies, configuring hugepages, building the project, finding the `OBJDIR`, testing replay ledgers, and final cleanup. The steps involve running shell commands to manage processes, build the project, and execute tests related to ledger replay.
+This GitHub Actions workflow defines the `Replay Ledgers` job for running a ledger replay backtest on a self-hosted Linux runner. It can run from `workflow_call` with the `coverage`, `machine`, and `extras` inputs, or from `workflow_dispatch`, and it sets `CC`, `MACHINE`, and `EXTRAS` for the build and test steps. The job checks out the repository with submodules, installs dependencies, configures huge pages and CPU settings, builds the project, finds the `OBJDIR` path, and then runs `firedancer-dev` with replay test commands under elevated resource limits. Cleanup steps run at the start and end of the job to stop any active `firedancer-dev` process and to finish the configured runtime state even when earlier steps fail.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

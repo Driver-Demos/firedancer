@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for generating and uploading a coverage report to Google Cloud Storage.
+GitHub Actions workflow for coverage generation and upload to Google Cloud Storage and Codecov.
 
 # Purpose
-The configuration file defines a GitHub Actions workflow named `Coverage Report`. This workflow is triggered manually or by other workflows and is designed to generate a coverage report for the codebase. It includes unit tests, script tests, and fuzz tests, and is intended to run only on trusted code, such as commits merged to the main branch. The workflow runs on a specified environment with a timeout of 60 minutes and involves several steps, including checking out the code, setting up dependencies, configuring the environment, generating coverage data, and uploading the results to Google Cloud Storage and CodeCov. The workflow uses specific GitHub Actions and tools, such as `actions/checkout`, `google-github-actions/auth`, and `codecov/codecov-action`, to perform these tasks.
+This GitHub Actions workflow generates a coverage report and uploads the results to Google Cloud Storage and Codecov. It runs on trusted code through `workflow_call` and `workflow_dispatch`, checks out the repository with submodules, installs development dependencies, configures CPU and huge page settings, and sets up the Rust toolchain before running the full coverage test suite with `llvm-cov`. After the report is built, it authenticates to Google Cloud with `FUZZ_SERVICE_ACCT_JSON_BUNDLE`, copies the HTML coverage output to the bucket in `COVERAGE_BUCKET`, and sends the `build/cov/cov.lcov` file to Codecov with the `dist-cov-report` name and `ci` flag.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
