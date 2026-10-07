@@ -3,31 +3,31 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A Bash script to test transaction transmission using a specified number of transactions and log results.
+The `test-transactions.sh` file is a Bash script used to test transaction transmissions by reading a specified number of transactions from a file and logging the results.
 
 # Purpose
-This script is a Bash executable designed to process and transmit a specified number of transactions from a file. It uses Bash strict mode to ensure robust error handling and sets the internal field separator for safe parsing of input. The script changes the working directory to the location of the script itself and initializes a log file at `/tmp/test-transactions.log`. It reads a specified number of transactions from a given file, defaulting to 1000 transactions from a file named `tx` if not specified. Each transaction is processed and transmitted using the `nsenter` command to execute within a specific network namespace, and the results are logged. The script concludes by reporting the number of transactions successfully transmitted based on specific return codes found in the log file.
+This Bash script is designed to process and transmit a specified number of transactions from a given file, logging the results for analysis. It operates in a narrow scope, focusing specifically on reading transaction data, executing a network namespace command (`nsenter`) to transmit each transaction, and logging the outcomes. The script employs Bash strict mode to ensure robust error handling and uses command-line arguments to determine the number of transactions to process and the source file. It is not a standalone executable but rather a utility script intended to be run in a specific network environment, as indicated by the use of `nsenter` with a network namespace. The script concludes by summarizing the success rate of the transactions, providing a simple report of the transmission results.
 # Global Variables
 
 ---
 ### SCRIPT\_DIR
-- **Type**: ``SCRIPT_DIR``
-- **Description**: Contains the absolute path of the directory where the script is located. It is determined by changing to the directory of the script's source file and then obtaining the current working directory.
-- **Use**: Used to change the current directory to the script's directory to ensure subsequent commands execute in the correct context.
+- **Type**: `string`
+- **Description**: `SCRIPT_DIR` is a string variable that stores the absolute path of the directory where the script is located. It is determined by using the `dirname` command on the script's source path and converting it to an absolute path with `pwd`. This ensures that any subsequent commands that rely on the script's location can use this variable to operate relative to the script's directory.
+- **Use**: This variable is used to change the current working directory to the script's directory, ensuring that all file operations are performed relative to the script's location.
 
 
 ---
 ### NUM\_TRANSACTIONS
-- **Type**: ``integer``
-- **Description**: Defines the number of transactions to process from the transaction file. It is set to a default value of 1000 if not provided as a command-line argument.
-- **Use**: Controls the number of lines read from the transaction file and processed in the script.
+- **Type**: `integer`
+- **Description**: `NUM_TRANSACTIONS` is a global variable that holds the number of transactions to be processed. It is initialized with a default value of 1000, but can be overridden by a command-line argument.
+- **Use**: This variable is used to determine how many lines from the transaction file (`TX_FILE`) should be read and processed.
 
 
 ---
 ### TX\_FILE
-- **Type**: ``string``
-- **Description**: `TX_FILE` is a global variable that stores the name of the file containing transaction data. It defaults to 'tx' if not provided as the second argument to the script.
-- **Use**: Used to specify the file from which the script reads a specified number of transaction lines.
+- **Type**: `string`
+- **Description**: `TX_FILE` is a global variable that holds the name of the file containing transaction data. It is initialized with a default value of 'tx', but can be overridden by a second command-line argument when the script is executed.
+- **Use**: This variable is used to specify the source file from which a specified number of transaction lines are read and processed.
 
 
 

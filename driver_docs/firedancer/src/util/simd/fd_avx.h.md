@@ -3,10 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-An API for vectorized C/C++ code using AVX intrinsics for various data types and operations.
+The `fd_avx.h` file provides an API for writing vectorized C/C++ code using AVX intrinsics, offering a thin wrapper to facilitate operations on various data types and enabling easy porting to non-Intel architectures.
 
 # Purpose
-This C header file provides an API for writing vectorized code using Intel's AVX (Advanced Vector Extensions) intrinsics. It supports operations on various data types, including 8-wide 32-bit integers, unsigned integers, and floats, as well as 4-wide 64-bit doubles, longs, and unsigned longs. The API offers vectorized equivalents for standard C/C++ operations, enabling efficient computation by leveraging single assembly instructions. It also includes utilities for transitioning between scalar and vector code and handling cross-lane data motion. The file acts as a wrapper around AVX intrinsics, providing a consistent type system and semantics, and facilitates porting vectorized code to non-Intel architectures by implementing these wrappers for different platforms. The header includes several other headers that provide specific support for different data types and operations.
+The provided C header file, `fd_avx.h`, is designed to facilitate the development of vectorized code using Intel's Advanced Vector Extensions (AVX) on platforms that support these instructions. It acts as a thin wrapper around Intel's AVX intrinsics, providing a more user-friendly and robust type system for writing vectorized operations involving various data types such as 32-bit integers, floats, 64-bit doubles, and longs. The file includes a series of other headers, each dedicated to handling specific data types or operations, such as vector conditionals, floats, integers, and more. This modular approach allows developers to write highly optimized, compute-intensive code by leveraging AVX's capabilities while abstracting away the complexities and irregularities of the underlying intrinsics.
+
+The header file defines several constants related to vector width, footprint, and alignment, which are crucial for ensuring that vector operations are performed efficiently and correctly. By providing a consistent API, this file not only simplifies the process of writing vectorized code but also enhances portability across different architectures. Developers can adapt the code for non-Intel platforms by implementing equivalent wrappers for the target architecture, similar to how CUDA abstracts GPU programming. This makes the `fd_avx.h` header a powerful tool for developers aiming to optimize performance-critical applications through vectorization while maintaining code portability and readability.
 # Imports and Dependencies
 
 ---
