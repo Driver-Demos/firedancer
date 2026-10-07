@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implementation of the Poseidon hash function over the BN254 scalar field with initialization, appending, and finalization functions.
+The `fd_poseidon.h` file provides an implementation of the Poseidon hash function over the BN254 scalar field, including functions to initialize, append data to, and finalize a hash calculation.
 
 # Purpose
-The code is a C header file that defines the implementation of the Poseidon hash function over the BN254 scalar field. It is based on the Rust library `light-poseidon` and the Circom library. The file provides the necessary data structures and function prototypes to perform hashing operations using the Poseidon algorithm. The key components include the `fd_poseidon` structure, which maintains the state of the hash calculation, and the `fd_poseidon_par` structure, which holds parameters like the Ark and MDS matrices used in the Poseidon algorithm.
+This C header file provides an implementation of the Poseidon hash function over the BN254 scalar field. The Poseidon hash function is a cryptographic hash function designed for use in zero-knowledge proofs and other cryptographic protocols. The implementation is based on the Rust library "light-poseidon" and the Circom library, which are both well-regarded in the cryptographic community. The file defines several key structures and functions necessary for initializing, appending data to, and finalizing a Poseidon hash calculation. The primary structures include `fd_poseidon_t`, which maintains the state of the hash calculation, and `fd_poseidon_par_t`, which holds parameters such as the Ark and MDS matrices used in the hash function.
 
-The file defines several functions to manage the Poseidon hash calculation process. The `fd_poseidon_init` function initializes the hash state, allowing the user to specify the endianness of the input and output data. The [`fd_poseidon_append`](<#fd_poseidon_append>) function adds data to the hash calculation, supporting up to 12 elements, each representing a 256-bit integer in the BN254 field. The [`fd_poseidon_fini`](<#fd_poseidon_fini>) function finalizes the hash calculation and stores the result in a specified memory location. Additionally, the file provides a convenience function, [`fd_poseidon_hash`](<#fd_poseidon_hash>), to hash a series of bytes in a single operation. The header file is intended to be included in other C source files that require Poseidon hashing functionality.
+The file defines a public API for using the Poseidon hash function, including functions like `fd_poseidon_init`, [`fd_poseidon_append`](#fd_poseidon_append), and [`fd_poseidon_fini`](#fd_poseidon_fini). These functions manage the lifecycle of a hash calculation, from initialization through data appending to finalization, where the hash result is produced. The header also includes a convenience function, [`fd_poseidon_hash`](#fd_poseidon_hash), which performs a complete hash operation on a series of bytes. The implementation supports both big-endian and little-endian byte orders, providing flexibility for different system architectures. The file is intended to be included in other C source files that require Poseidon hashing functionality, making it a reusable component in cryptographic applications.
 # Imports and Dependencies
 
 ---
@@ -16,102 +16,112 @@ The file defines several functions to manage the Poseidon hash calculation proce
 - `./fd_bn254_scalar.h`
 
 
+# Global Variables
+
+---
+### fd\_poseidon\_append
+- **Type**: `function pointer`
+- **Description**: `fd_poseidon_append` is a function that appends a specified number of bytes from a data source to an in-progress Poseidon hash calculation. It is part of the implementation of the Poseidon hash function over the BN254 scalar field, which is used for cryptographic operations. The function takes a pointer to a Poseidon state, a pointer to the data to be appended, and the size of the data in bytes.
+- **Use**: This function is used to add data to the Poseidon hash state during the hash calculation process.
+
+
+---
+### fd\_poseidon\_fini
+- **Type**: `function`
+- **Description**: The `fd_poseidon_fini` function is used to complete a Poseidon hash calculation. It takes a pointer to a `fd_poseidon_t` structure, which represents the current state of the hash calculation, and a 32-byte array where the resulting hash will be stored. The function returns a pointer to the hash array or NULL if the input state pointer is NULL.
+- **Use**: This function finalizes the Poseidon hash computation and stores the result in the provided hash buffer.
+
+
 # Data Structures
 
 ---
 ### fd\_poseidon\_hash\_result
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``v``: An array of unsigned characters with a size defined by `FD_POSEIDON_HASH_SZ`.
-- **Description**: Represents the result of a Poseidon hash calculation, storing the hash value as an array of unsigned characters with a fixed size.
+    - `v`: An array of unsigned characters with a size defined by FD_POSEIDON_HASH_SZ.
+- **Description**: The `fd_poseidon_hash_result` structure is designed to store the result of a Poseidon hash computation. It contains a single member, `v`, which is an array of unsigned characters with a fixed size, defined by the macro `FD_POSEIDON_HASH_SZ`. This structure is used to hold the hash value, which is a 32-byte result of the Poseidon hash function over the BN254 scalar field, ensuring compatibility with cryptographic operations that require fixed-size hash outputs.
 
 
 ---
 ### fd\_poseidon\_hash\_result\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``v``: An array of unsigned characters with a size defined by `FD_POSEIDON_HASH_SZ`.
-- **Description**: Represents the result of a Poseidon hash calculation, stored as an array of unsigned characters (`uchar`) with a fixed size of 32 bytes, corresponding to the size of the hash output in the BN254 scalar field.
+    - `v`: An array of unsigned characters with a fixed size of 32 bytes, representing the hash result.
+- **Description**: The `fd_poseidon_hash_result_t` structure is designed to store the result of a Poseidon hash computation. It contains a single member, `v`, which is an array of 32 unsigned characters. This array holds the hash value, which is a 256-bit number, resulting from the Poseidon hash function applied over the BN254 scalar field. The structure is used to encapsulate the hash output in a standardized format for further processing or storage.
 
 
 ---
 ### fd\_poseidon\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``state``: An array of `fd_bn254_scalar_t` representing the current state of the Poseidon hash calculation.
-    - ``cnt``: A `ulong` that counts how many elements have been appended to the hash calculation.
-    - ``big_endian``: An `int` indicating the endianness of the input and output, where 0 is little endian and 1 is big endian.
-- **Description**: Defines the state and configuration for a Poseidon hash calculation over the BN254 scalar field, including the current state, the number of elements appended, and the endianness of the data.
+    - `state`: An array of fd_bn254_scalar_t representing the current state of the Poseidon hash calculation.
+    - `cnt`: A counter indicating how many elements have been appended to the hash calculation.
+    - `big_endian`: An integer flag indicating the endianness of the input and output data (0 for little endian, 1 for big endian).
+- **Description**: The `fd_poseidon_t` structure is used to maintain the state of a Poseidon hash calculation over the BN254 scalar field. It includes an array to store the current state of the hash, a counter to track the number of elements appended, and a flag to specify the endianness of the data being processed. This structure is central to the implementation of the Poseidon hash function, allowing for the initialization, appending of data, and finalization of the hash calculation.
 
 
 ---
 ### fd\_poseidon\_par
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``ark``: A pointer to an array of `fd_bn254_scalar_t` representing the round constants for the Poseidon hash function.
-    - ``mds``: A pointer to an array of `fd_bn254_scalar_t` representing the mix matrix for the Poseidon hash function.
-- **Description**: Defines parameters for the Poseidon hash function, specifically the round constants (`ark`) and the mix matrix (`mds`), both of which are essential for the hash computation over the BN254 scalar field.
+    - `ark`: A pointer to an array of fd_bn254_scalar_t representing the round constants for the Poseidon hash function.
+    - `mds`: A pointer to an array of fd_bn254_scalar_t representing the MDS (Maximum Distance Separable) matrix for the Poseidon hash function.
+- **Description**: The `fd_poseidon_par` structure is used to encapsulate parameters necessary for the Poseidon hash function, specifically the round constants (`ark`) and the MDS matrix (`mds`). These parameters are essential for the cryptographic operations performed by the Poseidon hash function, which operates over the BN254 scalar field. The structure is designed to hold pointers to these arrays, allowing for flexible and efficient manipulation of the hash function's parameters.
 
 
 ---
 ### fd\_poseidon\_par\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``ark``: Pointer to an array of `fd_bn254_scalar_t` representing the round constants.
-    - ``mds``: Pointer to an array of `fd_bn254_scalar_t` representing the MDS matrix.
-- **Description**: Defines parameters for the Poseidon hash function, specifically the round constants (`ark`) and the MDS matrix (`mds`), which are essential for the cryptographic operations performed by the hash function.
+    - `ark`: A pointer to an array of BN254 scalar values used as the round constants in the Poseidon hash function.
+    - `mds`: A pointer to an array of BN254 scalar values used as the MDS matrix in the Poseidon hash function.
+- **Description**: The `fd_poseidon_par_t` structure is used to store parameters necessary for the Poseidon hash function, specifically the round constants (`ark`) and the MDS matrix (`mds`). These parameters are essential for the cryptographic operations performed by the Poseidon hash function, which operates over the BN254 scalar field. The structure is designed to hold pointers to these arrays, allowing for flexible and efficient access to the parameters during hash computations.
 
 
 # Functions
 
 ---
 ### fd\_poseidon\_hash<!-- {{#callable:fd_poseidon_hash}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.h#L94>)
-
-Computes the Poseidon hash of a given byte array and stores the result in a specified structure.
+The `fd_poseidon_hash` function computes a Poseidon hash over a given byte array and stores the result in a specified result structure.
 - **Inputs**:
-    - `result`: A pointer to `fd_poseidon_hash_result_t` where the hash result will be stored.
+    - `result`: A pointer to an `fd_poseidon_hash_result_t` structure where the hash result will be stored.
     - `bytes`: A pointer to the byte array that will be hashed.
     - `bytes_len`: The length of the byte array to be hashed.
-    - `big_endian`: An integer indicating the endianness of the input and output; non-zero for big-endian, zero for little-endian.
-- **Logic and Control Flow**:
+    - `big_endian`: An integer indicating whether the input and output should be treated as big endian (non-zero) or little endian (zero).
+- **Control Flow**:
     - Initialize a `fd_poseidon_t` structure with the specified endianness using `fd_poseidon_init`.
-    - Iterate over the byte array in chunks of 32 bytes, appending each chunk to the Poseidon state using [`fd_poseidon_append`](<fd_poseidon.c.md#fd_poseidon_append>).
-    - Finalize the Poseidon hash calculation with [`fd_poseidon_fini`](<fd_poseidon.c.md#fd_poseidon_fini>), storing the result in the provided `result` structure.
-    - Return the negation of the result of [`fd_poseidon_fini`](<fd_poseidon.c.md#fd_poseidon_fini>) to indicate success or failure.
-- **Output**: Returns an integer indicating success (0) or failure (non-zero) of the hash operation.
-- **Functions Called**:
-    - [`fd_poseidon_append`](<fd_poseidon.c.md#fd_poseidon_append>)
-    - [`fd_poseidon_fini`](<fd_poseidon.c.md#fd_poseidon_fini>)
+    - Iterate over the byte array in chunks of 32 bytes, appending each chunk to the Poseidon state using [`fd_poseidon_append`](fd_poseidon.c.md#fd_poseidon_append).
+    - Finalize the Poseidon hash computation with [`fd_poseidon_fini`](fd_poseidon.c.md#fd_poseidon_fini), storing the result in the provided result structure.
+    - Return the negation of the result from [`fd_poseidon_fini`](fd_poseidon.c.md#fd_poseidon_fini) to indicate success or failure.
+- **Output**: Returns an integer that is the negation of the result from [`fd_poseidon_fini`](fd_poseidon.c.md#fd_poseidon_fini), indicating success (0) or failure (non-zero).
+- **Functions called**:
+    - [`fd_poseidon_append`](fd_poseidon.c.md#fd_poseidon_append)
+    - [`fd_poseidon_fini`](fd_poseidon.c.md#fd_poseidon_fini)
 
 
 # Function Declarations (Public API)
 
 ---
 ### fd\_poseidon\_append<!-- {{#callable_declaration:fd_poseidon_append}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.h#L73>)
-
-Appends data to an in-progress Poseidon hash calculation.
-- **Description**: Use this function to add data to a Poseidon hash calculation that is currently in progress. The function expects a valid Poseidon state object and data representing a BN254 scalar. The data can be up to 32 bytes long and will be padded with zeros if shorter. The function can be called up to 12 times on the same state object. If the state object is null, the data size is zero or greater than 32, or the state has reached its maximum capacity, the function returns null.
+Appends a scalar to an in-progress Poseidon hash calculation.
+- **Description**: Use this function to add a scalar value, represented by a byte array, to an ongoing Poseidon hash calculation. This function should be called after initializing the Poseidon state with `fd_poseidon_init` and before finalizing the hash with `fd_poseidon_fini`. The function supports appending up to 12 elements, and each element must be a valid BN254 scalar. If the input data is less than 32 bytes, it will be padded with zeros. The function returns NULL if the input is invalid, such as when the position is NULL, the size is zero or greater than 32, or if the maximum number of elements has been appended.
 - **Inputs**:
-    - `pos`: A pointer to a Poseidon state object. Must not be null. Represents the current state of the hash calculation.
-    - `data`: A pointer to the data to append. Represents a BN254 scalar. Can be null if sz is zero. The data is not modified by the function.
-    - `sz`: The size of the data in bytes. Must be between 1 and 32 inclusive. If zero or greater than 32, the function returns null.
-- **Output**: Returns a pointer to the updated Poseidon state object on success, or null if an error occurs.
-- **See Also**: [`fd_poseidon_append`](<fd_poseidon.c.md#fd_poseidon_append>)  (Implementation)
+    - `pos`: A pointer to an initialized Poseidon state. Must not be NULL. The caller retains ownership.
+    - `data`: A pointer to the byte array representing the scalar to append. Must not be NULL unless sz is zero. The caller retains ownership.
+    - `sz`: The size of the data in bytes. Must be between 1 and 32 inclusive. If not, the function returns NULL.
+- **Output**: Returns the updated Poseidon state on success, or NULL if an error occurs.
+- **See also**: [`fd_poseidon_append`](fd_poseidon.c.md#fd_poseidon_append)  (Implementation)
 
 
 ---
 ### fd\_poseidon\_fini<!-- {{#callable_declaration:fd_poseidon_fini}} -->
-[View Source →](<../../../../../src/ballet/bn254/fd_poseidon.h#L89>)
-
 Completes a Poseidon hash calculation and stores the result.
-- **Description**: Use this function to finalize a Poseidon hash calculation after all necessary data has been appended. It must be called on a valid Poseidon calculation state that has been initialized and has had data appended to it. The function writes the hash result to the provided buffer. If the input state is null or invalid, the function returns null and does not modify the hash buffer. Ensure that the hash buffer is correctly aligned and has sufficient space to store the 32-byte result.
+- **Description**: This function finalizes an in-progress Poseidon hash calculation, storing the resulting hash in the provided buffer. It should be called after all data has been appended using `fd_poseidon_append`. The function requires a valid Poseidon state object, which must have been initialized and used to append data. If the state object is null or no data has been appended, the function returns null. The hash buffer must be a 32-byte memory region, and the function will populate it with the hash result, respecting the endianness specified during initialization.
 - **Inputs**:
-    - `pos`: A pointer to a `fd_poseidon_t` structure representing the current state of a Poseidon hash calculation. Must not be null and should have a valid state with appended data. If null, the function returns null.
-    - `hash`: A pointer to a 32-byte buffer where the hash result will be stored. The buffer must be aligned to `FD_UINT256_ALIGNED` and have sufficient space for the result. The function does not modify the buffer if `pos` is null.
-- **Output**: Returns a pointer to the hash buffer if successful, or null if the input state is null or invalid.
-- **See Also**: [`fd_poseidon_fini`](<fd_poseidon.c.md#fd_poseidon_fini>)  (Implementation)
+    - `pos`: A pointer to a `fd_poseidon_t` structure representing the current state of the Poseidon hash calculation. Must not be null and should have been initialized and used to append data.
+    - `hash`: A 32-byte buffer where the resulting hash will be stored. The buffer must be properly aligned and is expected to be writable by the caller.
+- **Output**: Returns a pointer to the hash buffer on success, or null if the state object is null or no data has been appended.
+- **See also**: [`fd_poseidon_fini`](fd_poseidon.c.md#fd_poseidon_fini)  (Implementation)
 
 
 

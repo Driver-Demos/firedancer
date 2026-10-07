@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile configuration for compiling dependencies with MemorySanitizer using -fsanitize=memory.
+The `with-msan-pre.mk` file in the `firedancer` codebase configures the build process to use MemorySanitizer by recompiling all dependencies with the `-fsanitize=memory` flag.
 
 # Purpose
-The file configures the use of MemorySanitizer by specifying that all dependencies must be recompiled with the `-fsanitize=memory` flag. It instructs to run the `./deps.sh +msan` command to create an optimized build named `opt-msan`. The `OPT` and `LIBCXX` variables are set to `opt-msan`, indicating that this build configuration should be used for both optimization and the C++ standard library.
+This file is a Makefile snippet configuring the build process for a project using MemorySanitizer. It specifies that all dependencies must be recompiled with the `-fsanitize=memory` flag and sets the `OPT` and `LIBCXX` variables to `opt-msan`, indicating the use of a specific build configuration optimized for MemorySanitizer.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

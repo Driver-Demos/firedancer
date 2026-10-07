@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging, connection handling, and message transmission in a server-client setup.
+Seccomp policy for logging, socket I/O, polling, and file descriptor limits.
 
 # Purpose
-The configuration file defines rules for handling file descriptors in a logging and network communication context. It specifies that log messages are written to a file and/or STDERR, with 'WARNING' and above levels being immediately synchronized to disk. The file outlines conditions for closing file descriptors, ensuring that only those opened via sockets are closed, excluding STDERR and the log file. It also sets rules for reading, accepting, sending, and receiving data over network connections, restricting operations on STDERR and the log file. The configuration ensures that network operations are non-blocking and do not signal errors, maintaining efficient and error-free communication.
+This file defines a set of syscall rules for a process that uses a log file and network sockets. It stores the log file descriptor in `logfile_fd` and then allows or blocks operations such as `write`, `close`, `read`, `accept4`, `sendto`, `recvfrom`, `ppoll`, and `fsync` based on the target file descriptor and call arguments. The rules permit logging to the log file and to `STDERR` on descriptor `2`, while they prevent the process from closing, reading, or accepting on those protected descriptors. The `sendto` and `recvfrom` rules also require fixed flag values, and `fsync` is limited to `logfile_fd` so that warning-level messages are written to disk at once.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

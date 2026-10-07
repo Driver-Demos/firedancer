@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Python scripts for generating C files with cryptographic test vectors, perfect hash functions, and cBPF code.
+Python scripts for CAVP, perfect hash, Wycheproof, and seccomp filter generation.
 
 
 ## Files
-- **[cavp_generate.py](cavp_generate.py.md)**: Generates C include files with NIST CAVP test vectors for cryptographic hash function verification.
-- **[gen_map_perfect.py](gen_map_perfect.py.md)**: Generates perfect hash functions for various key tables using base58 decoding and bit manipulation.
-- **[gen_wycheproofs.py](gen_wycheproofs.py.md)**: Generates C test code from Wycheproof and CCTV test vectors for EDDSA and XDH algorithms.
-- **[generate_filters.py](generate_filters.py.md)**: A Python script that compiles symbolic expressions into C header files for cBPF code generation.
+- **[cavp_generate.py](cavp_generate.py.md)**: The `cavp_generate.py` file in the `firedancer` codebase generates C include files containing NIST CAVP test vectors for verifying cryptographic hash function implementations.
+- **[gen_map_perfect.py](gen_map_perfect.py.md)**: The `gen_map_perfect.py` file in the `firedancer` codebase is responsible for generating perfect hash functions for various tables of public keys and program identifiers by finding suitable constants for hash calculations.
+- **[gen_wycheproofs.py](gen_wycheproofs.py.md)**: The `gen_wycheproofs.py` file in the `firedancer` codebase downloads the latest Wycheproof test vectors and generates corresponding C test code for EDDSA and XDH algorithms.
+- **[generate_filters.py](generate_filters.py.md)**: Generates audited seccomp cBPF header files from symbolic policy expressions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

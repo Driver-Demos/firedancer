@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for map data structure operations, including insertion, deletion, and key-value integrity checks.
+The `test_map.c` file in the `firedancer` codebase tests the functionality of a map data structure, including insertion, deletion, and querying of key-value pairs, with additional checks for memory alignment and handling of edge cases.
 
 # Purpose
-The code is a C program that tests the functionality of a map data structure, which is a type of associative array or dictionary. The program includes a custom sorting function and a map implementation, both of which are included from external files `fd_sort.c` and `fd_map.c`. The map is designed to store and manage `pair_t` structures, which consist of a key (`mykey`), an optional hash (`myhash`), and a value (`val`). The map uses a fixed number of slots, defined by the `LG_SLOT_CNT` macro, and can optionally use memoization for hash values, controlled by the `MEMOIZE` macro.
+This C source code file is designed to test the functionality of a hash map implementation using a custom data structure called `pair_t`. The file includes the necessary headers and defines constants and structures to facilitate the testing process. The primary components of the code include the definition of a `pair` structure, which holds a key-value pair, and the integration of sorting and mapping functionalities through the inclusion of `fd_sort.c` and `fd_map.c`. The code is structured to test the insertion, querying, and deletion operations of the hash map, ensuring that the map can handle a maximum number of entries defined by `LG_SLOT_CNT`. The code also includes a shuffle function to randomize the order of operations, which helps in testing the robustness of the map under different scenarios.
 
-The main function initializes a random number generator and creates two arrays of `pair_t` structures, `ref` and `tst`, which are used to test the map's insertion, query, and deletion operations. The program performs multiple iterations of inserting and removing elements from the map, ensuring that the map behaves correctly by checking that inserted elements can be retrieved and that removed elements are no longer present. The code also includes tests for the map's alignment and footprint, as well as tests for handling invalid keys. Additionally, the program contains a section for testing error handling in a hosted environment, using process forking to verify that certain operations trigger critical log messages.
+The main function initializes a random number generator and creates arrays to hold reference and test data. It then populates these arrays with unique keys and random values, sorts the reference array, and performs a series of tests to verify the correctness of the map's operations. The tests include checking the alignment and footprint of the map, ensuring that keys can be inserted and queried correctly, and verifying that deletions are handled properly. Additionally, the code includes conditional compilation for testing under hosted environments, where it checks for critical log messages when invalid operations are attempted. This file is a comprehensive test suite for validating the behavior and performance of a hash map implementation in C.
 # Imports and Dependencies
 
 ---
@@ -24,73 +24,67 @@ The main function initializes a random number generator and creates two arrays o
 
 ---
 ### \_map
-- **Type**: ``pair_t` array`
-- **Description**: An array of `pair_t` structures, where each element contains a key (`mykey`) and a value (`val`). The size of the array is determined by the expression `1UL<<LG_SLOT_CNT`, which is a power of two based on the `LG_SLOT_CNT` macro.
-- **Use**: Used to store key-value pairs for a map data structure, allowing for efficient insertion, deletion, and lookup operations.
+- **Type**: `pair_t array`
+- **Description**: The variable `_map` is a global array of `pair_t` structures, with a size determined by the expression `1UL<<LG_SLOT_CNT`. The `pair_t` structure contains fields for a key (`mykey`), and a value (`val`), and optionally a hash (`myhash`) if memoization is enabled. This array is used to store key-value pairs for a map data structure.
+- **Use**: The `_map` variable is used as the underlying storage for a map data structure, allowing for insertion, querying, and deletion of key-value pairs.
 
 
 # Data Structures
 
 ---
 ### pair
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `mykey`: A unique key of type `ulong` for identifying the pair.
-    - `myhash`: A hash value of type `uint` for the key, used if `MEMOIZE` is enabled.
-    - `val`: A value of type `uint` associated with the key.
-- **Description**: Defines a `struct pair` that holds a key-value pair, where `mykey` is a unique identifier, `val` is the associated value, and `myhash` is an optional hash of the key used for memoization when `MEMOIZE` is enabled.
+    - `mykey`: A unique key of type unsigned long used to identify the pair.
+    - `myhash`: An optional hash value of type unsigned int used for memoization, included only if MEMOIZE is enabled.
+    - `val`: An unsigned integer value associated with the key.
+- **Description**: The `pair` structure is a simple data structure used to store a key-value pair, where `mykey` is a unique identifier of type `ulong`, and `val` is the associated value of type `uint`. The structure optionally includes a `myhash` field for memoization purposes, which is only present if the `MEMOIZE` macro is enabled. This structure is used in conjunction with sorting and mapping functions to manage collections of key-value pairs efficiently.
 
 
 ---
 ### pair\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - `mykey`: A unique key of type `ulong` for identifying the pair.
-    - `myhash`: A hash value of type `uint` for the key, used if `MEMOIZE` is enabled.
-    - `val`: A value of type `uint` associated with the key.
-- **Description**: Defines a data structure that represents a key-value pair, where `mykey` is the unique identifier, `val` is the associated value, and `myhash` is an optional hash of the key used for optimization when `MEMOIZE` is enabled.
+    - `mykey`: An unsigned long integer used as the key for the pair.
+    - `myhash`: An optional unsigned integer used to store a hash of the key, included only if MEMOIZE is enabled.
+    - `val`: An unsigned integer representing the value associated with the key.
+- **Description**: The `pair_t` data structure is a simple struct used to represent a key-value pair, where `mykey` is the key and `val` is the associated value. The structure optionally includes a `myhash` field for storing a hash of the key when memoization is enabled, which can be used to optimize certain operations like lookups in a map. This struct is utilized in sorting and mapping operations, as indicated by its integration with sorting and mapping utilities in the provided code.
 
 
 # Functions
 
 ---
 ### shuffle\_pair<!-- {{#callable:shuffle_pair}} -->
-[View Source →](<../../../../../src/util/tmpl/test_map.c#L38>)
-
-Randomizes the order of elements in an array of `pair_t` structures using the Fisher-Yates shuffle algorithm.
+The `shuffle_pair` function randomly shuffles an array of `pair_t` structures using a Fisher-Yates shuffle algorithm.
 - **Inputs**:
-    - `rng`: A pointer to a random number generator of type `fd_rng_t` used to generate random indices.
+    - `rng`: A pointer to an `fd_rng_t` random number generator used to generate random indices for shuffling.
     - `pair`: A pointer to an array of `pair_t` structures that will be shuffled.
     - `cnt`: The number of elements in the `pair` array to shuffle.
-- **Logic and Control Flow**:
-    - Iterates over the array from the second element to the last (index 1 to `cnt-1`).
-    - For each element at index `i`, generates a random index `j` such that `0 <= j <= i` using `fd_rng_ulong_roll`.
-    - Swaps the elements at indices `i` and `j` in the `pair` array.
-- **Output**: The function does not return a value; it modifies the input array `pair` in place.
+- **Control Flow**:
+    - The function iterates over the array from the second element to the last (index 1 to cnt-1).
+    - For each element at index `i`, it generates a random index `j` between 0 and `i` (inclusive) using `fd_rng_ulong_roll`.
+    - It swaps the elements at indices `i` and `j` in the `pair` array.
+- **Output**: The function does not return a value; it modifies the input `pair` array in place to shuffle its elements.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-[View Source →](<../../../../../src/util/tmpl/test_map.c#L48>)
-
-Initializes a random number generator, creates and tests a map data structure with randomized insertion and deletion operations, and performs validation checks.
+The `main` function initializes a random number generator, creates and tests a map data structure by inserting, querying, and deleting key-value pairs, and performs validation checks on the map's behavior.
 - **Inputs**:
-    - `argc`: The number of command-line arguments.
-    - `argv`: An array of command-line argument strings.
-- **Logic and Control Flow**:
-    - Calls `fd_boot` to initialize the environment with command-line arguments.
-    - Initializes a random number generator `rng` using `fd_rng_new` and `fd_rng_join`.
-    - Defines two arrays `ref` and `tst` of type `pair_t` with a maximum size determined by `LG_SLOT_CNT`.
-    - Populates `ref` and `tst` arrays with unique keys and random values, and sorts `ref` using `sort_pair_inplace`.
-    - Creates a new map using `map_new` and joins it with `map_join`.
-    - Performs various validation checks on map properties and key operations using `FD_TEST`.
-    - Iterates 100 times, shuffling `tst` and performing randomized insertion and deletion operations on the map.
-    - During each iteration, validates map operations such as insertion, query, and removal using `FD_TEST`.
-    - Tests error handling and logging for invalid map operations if `FD_HAS_HOSTED` and `FD_TMPL_USE_HANDHOLDING` are defined.
-    - Deletes the random number generator using `fd_rng_delete` and calls `fd_halt` to terminate the program.
-- **Output**: Returns 0 to indicate successful execution.
-- **Functions Called**:
-    - [`shuffle_pair`](<#shuffle_pair>)
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Control Flow**:
+    - Initialize the program environment with `fd_boot` and set up a random number generator `rng`.
+    - Define arrays `ref` and `tst` to hold `pair_t` structures, and calculate `max` as the maximum number of slots in the map.
+    - Populate `ref` and `tst` with unique keys and random values, and sort `ref` by keys.
+    - Create and join a new map using `map_new` and `map_join`, and perform initial validation checks on map properties.
+    - Iterate 100 times, each time shuffling `tst`, inserting its elements into the map, and verifying the map's integrity after each insertion.
+    - Shuffle `tst` again, delete its elements from the map in the new order, and verify the map's integrity after each deletion.
+    - If hosted and handholding is enabled, test critical logging behavior for invalid map operations.
+    - Clean up by deleting the random number generator and halting the program.
+- **Output**: The function returns an integer status code, 0 on successful completion.
+- **Functions called**:
+    - [`shuffle_pair`](#shuffle_pair)
 
 
 
