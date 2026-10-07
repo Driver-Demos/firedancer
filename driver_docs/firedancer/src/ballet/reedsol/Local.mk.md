@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing Reed-Solomon encoding and recovery components in the firedancer codebase.
+Build rules for reed-solomon objects, GFNI asm, and tests.
 
 # Purpose
-The Makefile content defines build instructions for the `fd_reedsol` module, which is part of a software project. It uses macros to add header files, assembly files, and object files to the build process. The `add-hdrs` macro includes the `fd_reedsol.h` header file. If the `FD_HAS_GFNI` flag is set, the `add-asms` macro adds the `fd_reedsol_gfni_32` assembly file. The `add-objs` macro adds several object files related to encoding and recovery functions, such as `fd_reedsol_encode_16` and `fd_reedsol_recover_256`. If the `FD_HAS_HOSTED` flag is set, the file also includes instructions to create unit and fuzz tests for the `fd_reedsol` module using the `make-unit-test` and `make-fuzz-test` macros.
+This build file adds the `fd_reedsol.h` header and registers the `fd_reedsol` source objects for the Reed-Solomon module, including encode and recover variants for several block sizes. When `FD_HAS_GFNI` is defined, it also adds the `fd_reedsol_gfni_32` assembly source so the build can use the GFNI path. When `FD_HAS_HOSTED` is defined, it creates the `test_reedsol` unit test and the `fuzz_reedsol` fuzz test, both linked with `fd_reedsol` and `fd_util`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

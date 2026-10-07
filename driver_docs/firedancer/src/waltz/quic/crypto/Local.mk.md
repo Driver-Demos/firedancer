@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile rules to add headers and objects for QUIC crypto suites.
+The `Local.mk` file in the `firedancer` codebase specifies the inclusion of headers and object files related to QUIC crypto suites for the build process.
 
 # Purpose
-The `Makefile` content defines build instructions for a project. It uses the `add-hdrs` and `add-objs` functions to include the header file `fd_quic_crypto_suites.h` and to add the object files `fd_quic_crypto_suites` and `fd_quic` to the build process. This setup helps manage dependencies and compile the project components correctly.
+The file is a Makefile snippet used in a build system to manage dependencies for a software project. It utilizes the `add-hdrs` and `add-objs` functions to include the header file `fd_quic_crypto_suites.h` and the object files `fd_quic_crypto_suites` and `fd_quic` in the build process, ensuring they are compiled and linked appropriately.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
