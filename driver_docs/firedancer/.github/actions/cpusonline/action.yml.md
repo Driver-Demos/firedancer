@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `action.yml` file in the `firedancer` codebase defines a GitHub Action named `cpusonline` that switches all CPUs to an online state using a bash script.
+A GitHub Action to switch all CPUs to online using a bash script.
 
 # Purpose
-The file is a GitHub Actions workflow configuration that defines a composite action named "cpusonline." Its purpose is to switch all CPUs to an online state by executing a Bash script that iterates through CPU directories and sets them online if they are currently offline.
+The `cpusonline` configuration file defines a composite GitHub Action that switches all CPUs to an online state. It does not require any inputs or produce any outputs. The action runs a Bash script that iterates over each CPU directory in `/sys/devices/system/cpu/`, checks if the CPU is offline, and uses `sudo` to write `1` to the `online` file, thus bringing the CPU online.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
