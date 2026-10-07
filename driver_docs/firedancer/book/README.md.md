@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Instructions for setting up and developing the Firedancer book using VitePress and Bun.
+The `README.md` file in the `firedancer/book` directory provides instructions for setting up and developing a local documentation site using VitePress and bun.
 
 # Purpose
-The content provides instructions for setting up and developing a documentation site using VitePress. It begins by guiding the user to install `bun`, a JavaScript runtime, and ensures it is available in the system's `PATH`. The user must navigate to the `firedancer/book` directory before executing `bun install` to install dependencies. The command `bun run dev` starts the development server, allowing the user to view the documentation site locally. If the development is on a remote host, the user should run `bun run dev --host` to expose the site endpoint.
+The provided content is a section from a documentation file that guides users on how to set up and develop a local documentation site using VitePress. It outlines the initial steps required to get started, including installing the Bun JavaScript runtime, ensuring it is available in the system's PATH, and setting the correct working directory. The instructions then guide the user through installing dependencies and running the development server with Bun. Additionally, it provides a note for users who may be working on a remote host, instructing them on how to expose the development server endpoint. This setup allows users to serve and view a local version of the documentation site for development and testing purposes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

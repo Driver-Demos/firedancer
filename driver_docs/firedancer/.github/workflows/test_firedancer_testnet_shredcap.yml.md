@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Actions workflow for testing the Firedancer Testnet Shredcap with specific environment setups.
+Workflow for building Firedancer and running the shredcap replay test on testnet.
 
 # Purpose
-The YAML configuration file defines a GitHub Actions workflow named `Firedancer Testnet Shredcap`. This workflow can be triggered manually (`workflow_dispatch`) or called by another workflow (`workflow_call`). It accepts an input parameter `machine` with a default value of `linux_gcc_zen2`. The workflow contains a single job, `firedancer-testnet-shredcap`, which runs on a self-hosted runner with specific labels and a timeout of 30 minutes. The job sets up the environment with specific variables, checks out the repository, and executes several steps including dependency setup, building the project, setting up the Agave repository, running a replay test, and cleaning up resources. The cleanup step ensures that all temporary files and processes related to the testnet are removed, maintaining a clean state for subsequent runs.
+This workflow defines the `Firedancer Testnet Shredcap` job for GitHub Actions and runs it on demand or from another workflow through `workflow_call`. It sets the build environment with `CC`, `MACHINE`, and `AGAVE_VERSION`, checks out the repository with submodules, installs required dependencies, configures CPU and huge page resources, and builds `firedancer-dev`. The job then locates `OBJDIR`, builds the `agave` repository for `solana-keygen`, and runs the shredcap replay test with elevated file and memory lock limits. After the test, it removes validator data, key files, cluster artifacts, and any running `fddev` or `firedancer-dev` processes to leave the host in a clean state.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
