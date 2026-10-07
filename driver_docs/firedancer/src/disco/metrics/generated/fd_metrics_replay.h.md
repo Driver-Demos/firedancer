@@ -3,10 +3,28 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated metric definitions for replay histograms, gauges, and counters.
+Defines metrics for replay operations, including histograms, gauges, and counters for various replay activities.
 
 # Purpose
-This generated header defines the metric metadata for the replay stage of the system. It lists histogram, gauge, and counter entries with fixed offsets, metric names, types, descriptions, and value converters, so other parts of the code can register and read replay-related measurements in a consistent way. The histograms track time spent in store link, read, and publish wait and work paths, while the gauges report replay state such as root slot, leader slot, reset slot, and live bank counts. The counters record replay progress, including total successful slots and total processed transactions on the current fork.
+The code is a C header file that defines a set of metrics for monitoring the performance and state of a replay system. It includes definitions for histograms, gauges, and counters, which are used to measure various aspects of the replay process. The histograms track the time spent in different stages of the replay process, such as waiting for and linking new FEC (Forward Error Correction) sets, reading FEC sets, and publishing new FEC sets. Each histogram is defined with specific offsets, names, types, descriptions, conversion factors, and value ranges.
+
+Additionally, the file defines several gauges that provide real-time measurements of the replay system's state, such as the current root slot, leader slot, and the number of live banks. Counters are also included to keep track of the total number of slots replayed and transactions processed. The file is generated automatically by a script (`gen_metrics.py`) and should not be edited manually. It includes external dependencies on `fd_metrics_base.h` and `fd_metrics_enums.h`, and it declares an external array `FD_METRICS_REPLAY` that holds metadata for the defined metrics.
+# Imports and Dependencies
+
+---
+- `../fd_metrics_base.h`
+- `fd_metrics_enums.h`
+
+
+# Global Variables
+
+---
+### FD\_METRICS\_REPLAY
+- **Type**: ``fd_metrics_meta_t[]``
+- **Description**: An array of `fd_metrics_meta_t` structures that contains metadata for various replay metrics. Each element in the array represents a specific metric related to the replay process, such as time spent on different operations or counts of specific events.
+- **Use**: Used to store and access metadata for replay metrics in a structured format.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
