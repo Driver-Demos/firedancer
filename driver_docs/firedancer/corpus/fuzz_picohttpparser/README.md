@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A simple HTTP GET request example for fuzz testing.
+The `fuzz_picohttpparser` folder in the `firedancer` codebase contains a file named `request_simple` which provides a simple HTTP GET request example.
 
 
 ## Files
-- **[request_simple](request_simple.md)**: A simple HTTP GET request example for fuzz testing.
+- **[request_simple](request_simple.md)**: The `request_simple` file in the `firedancer` codebase contains a simple HTTP GET request example with a specified host and an empty cookie header.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
