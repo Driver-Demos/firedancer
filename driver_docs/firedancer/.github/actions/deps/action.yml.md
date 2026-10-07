@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-GitHub Action for building and caching dependencies with configurable scripts and compiler options.
+The `action.yml` file in the `firedancer` codebase defines a GitHub Action for building and caching dependencies, with configurable options for script paths, compiler choice, and additional flags.
 
 # Purpose
-The configuration file defines a workflow for building and caching software dependencies. It specifies inputs such as the paths to the `deps.sh` and `deps-bundle.sh` scripts, extra flags, and the compiler and its version to use. The workflow checks if the `apt-get` package manager is available and updates the package list if it is. It calculates a hash for the `deps.sh` script and uses it to manage a local cache of dependencies, optimizing the build process by reusing cached dependencies when possible. If the cache is not available, the workflow installs system-level dependencies and compiles the necessary components from scratch, using the specified compiler and version.
+The provided file is a configuration script for a GitHub Actions workflow, designed to build and cache software dependencies efficiently. It defines a set of inputs, such as paths to scripts (`deps.sh` and `deps-bundle.sh`), compiler options, and additional flags, which are required for the execution of the workflow. The workflow consists of several steps, including checking for the presence of `apt-get`, updating package lists, calculating a hash for caching purposes, and determining whether to use cached dependencies or install them from scratch. The caching mechanism is implemented using the `corca-ai/local-cache` action, which helps optimize build times by storing and reusing previously built dependencies. This setup ensures that dependencies are managed in a consistent and efficient manner, leveraging caching to reduce redundant installations and improve the overall build process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

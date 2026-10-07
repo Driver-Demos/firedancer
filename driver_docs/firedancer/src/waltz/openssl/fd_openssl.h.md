@@ -3,28 +3,35 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a function to return human-readable strings for SSL error codes in OpenSSL.
+The `fd_openssl.h` file in the `firedancer` codebase provides a function to return human-readable strings for SSL error codes when using OpenSSL.
 
 # Purpose
-This C header file defines an interface for handling OpenSSL SSL error codes. It includes a function prototype for [`fd_openssl_ssl_strerror`](<#fd_openssl_ssl_strerror>), which returns a human-readable string for specific SSL error codes, such as `SSL_ERROR_ZERO_RETURN`. The file uses conditional compilation to ensure that the code is only included if OpenSSL support is available, as indicated by the `FD_HAS_OPENSSL` macro. The header also includes a base utility header file, `fd_util_base.h`, which may provide necessary utility functions or definitions. The use of `FD_PROTOTYPES_BEGIN` and `FD_PROTOTYPES_END` suggests a convention for marking the beginning and end of function prototypes in this codebase.
+This code is a C header file designed to provide a utility function for handling OpenSSL error codes. It includes a conditional compilation directive to ensure that the code is only compiled if OpenSSL support is available (`FD_HAS_OPENSSL`). The file declares a single function, [`fd_openssl_ssl_strerror`](#fd_openssl_ssl_strerror), which returns a human-readable string corresponding to an SSL error code, addressing the lack of a direct equivalent in OpenSSL for certain error codes that do not append to the error queue. The header file also includes a base utility header (`fd_util_base.h`) and uses macros to manage function prototypes, ensuring compatibility and maintainability within a larger codebase.
 # Imports and Dependencies
 
 ---
 - `../../util/fd_util_base.h`
 
 
+# Global Variables
+
+---
+### fd\_openssl\_ssl\_strerror
+- **Type**: `function`
+- **Description**: The `fd_openssl_ssl_strerror` function is designed to return a human-readable string corresponding to SSL error codes, such as `SSL_ERROR_ZERO_RETURN`. This function is necessary because OpenSSL does not provide a built-in strerror API for SSL errors that do not append to the error queue.
+- **Use**: This function is used to convert SSL error codes into readable strings for easier debugging and error handling in applications using OpenSSL.
+
+
 # Function Declarations (Public API)
 
 ---
 ### fd\_openssl\_ssl\_strerror<!-- {{#callable_declaration:fd_openssl_ssl_strerror}} -->
-[View Source →](<../../../../../src/waltz/openssl/fd_openssl.h#L8>)
-
-Returns a human-readable string for an SSL error code.
-- **Description**: Use this function to obtain a descriptive string for a given SSL error code. This is useful for logging or displaying error messages related to SSL operations. The function maps known SSL error codes to their corresponding string representations. If the error code is not recognized, it returns "unknown". This function does not modify any input parameters and does not append to the OpenSSL error queue.
+Returns a human-readable string for a given SSL error code.
+- **Description**: Use this function to obtain a descriptive string corresponding to an SSL error code, which can be useful for logging or debugging purposes. It is particularly helpful for interpreting error codes from OpenSSL APIs that do not append to the error queue. This function should be called whenever you need to convert an SSL error code into a more understandable format. The function handles a predefined set of SSL error codes and returns "unknown" for any unrecognized codes.
 - **Inputs**:
-    - `ssl_err`: An integer representing the SSL error code. Valid values are specific SSL error codes such as `SSL_ERROR_NONE`, `SSL_ERROR_SSL`, etc. If the value is not a recognized SSL error code, the function returns "unknown".
-- **Output**: A constant character pointer to a string that describes the SSL error code. If the error code is not recognized, the string "unknown" is returned.
-- **See Also**: [`fd_openssl_ssl_strerror`](<fd_openssl.c.md#fd_openssl_ssl_strerror>)  (Implementation)
+    - `ssl_err`: An integer representing the SSL error code. It should be one of the predefined SSL error codes such as SSL_ERROR_NONE, SSL_ERROR_SSL, etc. If the error code is not recognized, the function will return "unknown".
+- **Output**: A constant string describing the SSL error code, or "unknown" if the code is not recognized.
+- **See also**: [`fd_openssl_ssl_strerror`](fd_openssl.c.md#fd_openssl_ssl_strerror)  (Implementation)
 
 
 
