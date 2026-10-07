@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_heap.c` file in the `firedancer` codebase provides a template for generating high-performance, zero-copy heap data structures that support non-sequential memory storage, inter-process usage, and efficient memory operations, with customizable element types and comparison functions.
+Generates high-performance, zero-copy heap implementations for non-sequential memory storage.
 
 # Purpose
-This C code file is a template for generating high-performance, zero-copy heap data structures, which are particularly useful in scenarios where heap elements are not stored sequentially in memory. The code is designed to be highly flexible and efficient, supporting operations such as persistence, concurrent usage, inter-process communication, and memory relocation. It provides a set of macros and functions that allow users to define custom heap types by specifying the element type, comparison function, and other parameters. The code is structured to be included in a compilation unit, allowing for the creation of different heap types within the same program.
+The code defines a template for creating high-performance, zero-copy heap data structures in C. It is designed for use in scenarios where heap elements are not stored sequentially in memory, unlike traditional heap implementations. The code provides a flexible API that allows for the creation of heaps that can be tightly integrated with other data structures such as pools and maps. The heaps can be persisted beyond the lifetime of the creating process, used concurrently, relocated in memory, serialized/deserialized, and moved between hosts. The API supports index compression for cache and memory bandwidth efficiency.
 
-The file defines a comprehensive API for managing heaps, including functions for creating, joining, and deleting heaps, as well as inserting and removing elements. It also includes utility functions for checking heap integrity and accessing heap elements. The code is designed to be used as a header-only library or as part of a larger library, with options for different implementation styles. The use of macros allows for the customization of heap behavior, such as element comparison and index types, making the code adaptable to various application needs. The implementation emphasizes efficiency, with operations optimized for cache and memory bandwidth, and provides mechanisms for handling large data sets and ensuring data integrity.
+The code is structured to allow the generation of heap implementations by defining specific macros such as `HEAP_NAME`, `HEAP_T`, and `HEAP_LT`. These macros specify the heap's name, the type of elements it will store, and the comparison function for ordering elements, respectively. The code includes functions for creating, joining, leaving, and deleting heaps, as well as for inserting and removing elements. It also provides utility functions for checking heap integrity and accessing heap properties. The implementation is designed to be header-only or to generate separate headers and implementations for use in libraries, depending on the `HEAP_IMPL_STYLE` macro.
 # Imports and Dependencies
 
 ---
@@ -19,36 +19,39 @@ The file defines a comprehensive API for managing heaps, including functions for
 
 ---
 ### HEAP\_
-- **Type**: `HEAP_(t) *`
-- **Description**: The `HEAP_` variable is a macro that expands to a pointer to a structure representing a heap. This structure is used to manage a collection of elements in a non-sequential memory layout, allowing for operations such as insertion, removal, and peeking of elements based on a defined order.
-- **Use**: This variable is used to perform heap operations like inserting and removing elements, while maintaining the heap property, in a memory-efficient manner.
+- **Type**: `HEAP_(t)`
+- **Description**: Represents a data structure for managing a heap where elements are not stored sequentially in memory. It includes fields for the maximum number of elements (`ele_max`), the current number of elements (`ele_cnt`), and the index of the root element (`root`).
+- **Use**: Used to manage and perform operations on a heap, such as insertion and removal of elements, while maintaining the heap property.
 
 
 # Functions
 
 ---
 ### HEAP\_<!-- {{#callable:HEAP_}} -->
-The `HEAP_(verify)` function checks the integrity of a heap data structure by ensuring that it adheres to the heap properties and is not corrupted.
+[View Source →](<../../../../../src/util/tmpl/fd_heap.c#L607>)
+
+Validates the integrity of a heap data structure by checking its properties and structure.
 - **Inputs**:
-    - `heap`: A pointer to a constant heap structure (`HEAP_(t) const *`) that represents the heap to be verified.
-    - `pool`: A pointer to a constant array of heap elements (`HEAP_T const *`) that represents the storage pool for the heap elements.
-- **Control Flow**:
-    - Define a macro `HEAP_TEST` to log a warning and return -1 if a condition fails.
-    - Validate the `heap` pointer to ensure it is not NULL.
-    - Retrieve `ele_max` and `ele_cnt` from the heap and validate them against `HEAP_IDX_NULL` and each other.
-    - If `ele_max` is non-zero, validate the `pool` pointer to ensure it is not NULL.
-    - Initialize a stack to keep track of nodes to visit, with a maximum size of 512.
-    - Initialize `visit_cnt` to track the number of visited nodes.
-    - If the heap's root is not NULL, push it onto the stack after validating its index and ensuring no stack overflow.
-    - While there are nodes to visit (i.e., `stack_cnt` is non-zero), pop a node from the stack and validate it against cycles.
-    - For each node, check its right child: validate the heap property, ensure the index is in bounds, and push it onto the stack if valid.
-    - Similarly, check the left child of each node with the same validations and push it onto the stack if valid.
-    - Increment `visit_cnt` for each visited node.
-    - After visiting all nodes, ensure that `visit_cnt` matches `ele_cnt` to confirm all nodes were visited.
-    - Return 0 if all checks pass, indicating the heap is not obviously corrupt.
-- **Output**: Returns 0 if the heap is valid and not obviously corrupt, or -1 if any validation fails, logging a warning message.
-- **Functions called**:
-    - [`HEAP_`](#heap_)
+    - `heap`: A pointer to a `HEAP_(t)` structure representing the heap to verify.
+    - `pool`: A pointer to an array of `HEAP_T` elements representing the storage pool for the heap elements.
+- **Logic and Control Flow**:
+    - Define a macro `HEAP_TEST` to log a warning and return -1 if a condition is not met.
+    - Check if `heap` is not NULL using `HEAP_TEST`.
+    - Retrieve `ele_max` and `ele_cnt` from the `heap` structure.
+    - Validate `ele_max` is less than or equal to `HEAP_IDX_NULL` and `ele_cnt` is less than or equal to `ele_max` using `HEAP_TEST`.
+    - If `ele_max` is non-zero, validate `pool` is not NULL using `HEAP_TEST`.
+    - Initialize a stack array of size 512 to keep track of nodes to visit and set `stack_cnt` to 0.
+    - Set `visit_cnt` to 0 to count visited nodes.
+    - Get the root index `i` from the heap and check if it is not `HEAP_IDX_NULL`.
+    - If `i` is valid, ensure it is within bounds and push it onto the stack.
+    - While there are nodes to visit (`stack_cnt` is non-zero), pop the stack to get the next node index `i`.
+    - Ensure `visit_cnt` is less than `ele_cnt` to avoid cycles.
+    - For each node, check its right child `r` and left child `l` for heap property satisfaction, inbounds, and stack overflow, then push them onto the stack if valid.
+    - Increment `visit_cnt` after visiting a node.
+    - After visiting all nodes, ensure `visit_cnt` equals `ele_cnt` using `HEAP_TEST`.
+- **Output**: Returns 0 if the heap is valid, or -1 if any validation fails.
+- **Functions Called**:
+    - [`HEAP_`](<#heap_>)
 
 
 
