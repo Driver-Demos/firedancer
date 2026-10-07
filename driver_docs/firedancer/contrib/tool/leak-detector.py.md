@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A Python script for detecting memory leaks by analyzing log files for allocation and deallocation events.
+The `leak-detector.py` file is a tool for detecting memory leaks by analyzing log files for allocation and deallocation operations, and reporting unfreed memory addresses along with their backtraces.
 
 # Purpose
-This script is a command-line tool designed to detect memory leaks by analyzing log files. It reads input from the standard input, which is expected to be piped from a log file. The log file should contain lines that start with either `+++ ALLOC` or `+++ FREE`, indicating memory allocation and deallocation events, respectively. The script processes these lines to track memory addresses and their associated backtraces. It maintains a dictionary, `addr_map`, to map memory addresses to their backtrace information and size.
+The provided Python script is a command-line tool designed to detect memory leaks by analyzing log files. It reads input from the standard input (stdin), which is expected to be piped from a log file, and processes lines that indicate memory allocation and deallocation events. The script identifies lines starting with "+++" to parse operations such as "ALLOC" and "FREE," extracting relevant details like the backtrace line count and memory address. It maintains a dictionary (`addr_map`) to track allocations and deallocations, storing backtrace information and the size of allocations. The script uses the `Counter` class from the `collections` module to aggregate and count occurrences of backtraces associated with unfreed memory, effectively identifying potential memory leaks.
 
-The script calculates the total size of memory that remains allocated without being freed, grouped by backtrace. It uses the `Counter` class from the `collections` module to count the occurrences and sizes of these backtraces. The results are printed in ascending order of memory size, showing the size and count of allocations for each backtrace. This output helps identify potential memory leaks by highlighting backtraces that have not been properly freed. The script is intended to be executed as a standalone program and does not define any public APIs or external interfaces.
+This script is a specialized utility intended for use in environments where memory management is critical, such as in systems programming or performance analysis. It does not define a public API or external interfaces, as it is designed to be executed as a standalone script. The primary technical components include the use of dictionaries for tracking memory addresses and counters for summarizing backtrace data. The script's output provides insights into memory usage patterns, highlighting backtraces with the most significant unfreed memory, which can help developers identify and address memory leaks in their applications.
 # Imports and Dependencies
 
 ---
@@ -20,23 +20,22 @@ The script calculates the total size of memory that remains allocated without be
 
 ---
 ### main<!-- {{#callable:firedancer/contrib/tool/leak-detector.main}} -->
-[View Source →](<../../../../contrib/tool/leak-detector.py#L10>)
-
-Reads input from standard input, processes memory allocation and deallocation logs, and outputs a summary of memory usage.
+The `main` function processes input from standard input to track memory allocation and deallocation events, and then summarizes the memory usage by backtrace.
 - **Inputs**: None
-- **Logic and Control Flow**:
+- **Control Flow**:
     - Initialize `line_cnt` to 0 and `addr_map` as an empty dictionary.
     - Enter an infinite loop to read lines from standard input.
-    - Increment `line_cnt` for each line read.
+    - Increment `line_cnt` for each line read, and handle exceptions by continuing the loop.
     - Break the loop if an empty line is encountered.
-    - Check if the line starts with '+++', indicating a memory operation.
-    - Parse the operation type and parameters from the line.
-    - For 'ALLOC' and 'FREE' operations, read the specified number of backtrace lines.
-    - Store or remove entries in `addr_map` based on the operation type.
-    - After reading all input, initialize `bt_map_sz` and `bt_map_cnt` as `Counter` objects.
-    - Aggregate memory sizes and counts for each backtrace in `addr_map`.
-    - Sort and print the aggregated memory usage data.
-- **Output**: Prints the size and count of memory allocations for each unique backtrace.
+    - Check if the line starts with '+++', indicating a memory operation, and parse the operation parameters.
+    - Determine if the operation is 'ALLOC' or 'FREE', extracting the backtrace line count and address.
+    - Read the specified number of backtrace lines from input, handling exceptions and incrementing `line_cnt`.
+    - For 'ALLOC', store the backtrace and size in `addr_map` using the address as the key.
+    - For 'FREE', remove the address from `addr_map` if it exists.
+    - Initialize `bt_map_sz` and `bt_map_cnt` as `Counter` objects to aggregate memory usage by backtrace.
+    - Iterate over `addr_map` to populate `bt_map_sz` and `bt_map_cnt` with backtrace sizes and counts.
+    - Sort and print the backtrace sizes and counts in ascending order of size.
+- **Output**: The function outputs the sorted memory usage statistics by backtrace, including the size and count of allocations.
 
 
 

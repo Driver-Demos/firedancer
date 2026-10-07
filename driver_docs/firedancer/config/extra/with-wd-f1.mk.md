@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configuration file for AWS-F1 with include paths, preprocessor flags, and linker flags.
+The `with-wd-f1.mk` file in the `firedancer` codebase configures compilation flags and library paths for AWS-F1 FPGA development, including specific include directories and preprocessor definitions.
 
 # Purpose
-This Makefile snippet configures the build environment for a project using AWS F1 instances. It sets include paths for the compiler with `INCLUDES`, pointing to directories within the SDK and HDK. The `CPPFLAGS` variable defines preprocessor flags, setting a log level and enabling a feature called `WIREDANCER`. The `LDFLAGS` variable specifies the library path and links against the `fpga_mgmt` library.
+This file is a Makefile snippet used to configure the build process for a software project targeting AWS F1 instances. It specifies include directories for header files, preprocessor flags for logging level and feature configuration, and linker flags to include the FPGA management library during the build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A test script for verifying wide multiplication logic using the cocotb framework.
+The `test.py` file in the `firedancer` codebase is a cocotb-based test script for verifying a hardware module's wide multiplication functionality by generating random inputs and checking the outputs against expected results.
 
 # Purpose
-This code is a test suite for a digital design verification process using the Cocotb framework. It defines an asynchronous test function [`test`](<#test>) that interacts with a digital unit under test (DUT) through its clock and reset signals. The test initializes a clock signal with a period of 1 nanosecond and starts a reset sequence using the `toggle_reset` function from the `wd_cocotil` module. The test then reads configuration parameters `W`, `W0`, `W1`, and `T` from the DUT, which are used to generate random input values for the DUT's input signals `in0`, `in1`, and `m_i`.
+This Python code is a test script designed to be used with the Cocotb framework, which is a coroutine-based co-simulation library for verifying digital designs. The script is structured as a test function, [`test`](#test), which is decorated with `@cocotb.test()`, indicating that it is a test case to be executed by the Cocotb test runner. The primary purpose of this script is to verify the functionality of a digital design under test (DUT) by simulating clock cycles and checking the correctness of the DUT's output against expected results. The script sets up a clock signal for the DUT, initializes various parameters, and performs a series of operations over 1024 clock cycles to generate random input values, apply them to the DUT, and compare the DUT's output with expected values.
 
-The test runs for 1024 clock cycles, during which it generates random input values and applies them to the DUT. It checks the DUT's output signals `out0` and `m_o` against expected values calculated from the inputs. The test logs the results and asserts that the DUT's outputs match the expected values, ensuring the DUT's functionality is correct. If the output does not match, the test increments a discrepancy counter `D` and asserts that it remains below a threshold of 100, indicating a limit on acceptable mismatches during the test.
+The script imports several components from the Cocotb library, such as `Clock`, `Timer`, `RisingEdge`, and `ReadOnly`, which are used to control the simulation timing and synchronization. It also imports a custom module, `wd_cocotil`, which appears to provide utility functions like `toggle_reset` and `random_int` for generating random integers and managing reset signals. The test function initializes the clock and reset signals, reads configuration parameters from the DUT, and iteratively applies random inputs to the DUT's input ports. It then checks the DUT's output against expected results, logging the results and asserting correctness. This script is a focused test case, providing narrow functionality aimed at verifying specific aspects of the DUT's behavior in a simulated environment.
 # Imports and Dependencies
 
 ---
@@ -26,24 +26,22 @@ The test runs for 1024 clock cycles, during which it generates random input valu
 
 ---
 ### test<!-- {{#callable:firedancer/src/wiredancer/sim/mul_wide/test.test}} -->
-[View Source →](<../../../../../../src/wiredancer/sim/mul_wide/test.py#L12>)
-
-Executes a test on a digital unit under test (DUT) by simulating clock cycles and verifying output values against expected results.
+The `test` function is a cocotb-based asynchronous test that initializes a clock, performs a series of operations on a DUT (Device Under Test), and verifies the correctness of its output over multiple clock cycles.
 - **Decorators**: `@cocotb.test`
 - **Inputs**:
-    - `dut`: The device under test (DUT) which is a digital circuit or module to be tested.
-- **Logic and Control Flow**:
+    - `dut`: The Device Under Test (DUT) which is an object representing the hardware module being tested.
+- **Control Flow**:
     - Initialize a clock with a 1 ns period and start it.
-    - Start a reset toggle on the DUT's clock and reset signal with a duration of 32 cycles.
-    - Determine the width parameters `W`, `W0`, and `W1` from the DUT attributes, defaulting to `W` if `W0` or `W1` are not present.
-    - Mask the `T` parameter from the DUT to 8 bits.
-    - Wait for 1024 rising edges of the clock to synchronize the test environment.
-    - For 1024 iterations, generate random integers for `m_i`, `i0`, and `i1` based on the width parameters and append them to the `o_rs` list along with their product.
-    - Assign the generated values to the DUT's input signals and wait for a rising edge of the clock.
-    - Check if the least significant bit of `m_o` is not '1', increment `D`, and assert `D` is less than 100 before continuing to the next iteration.
-    - Pop the first tuple from `o_rs`, compare the expected and actual output values, and log the results.
-    - Assert that the expected and actual data and mask values match.
-- **Output**: No explicit return value; the function performs assertions and logs information during the test.
+    - Start a reset toggle on the DUT's reset line with a 32-cycle duration, active high.
+    - Determine the bit widths W, W0, and W1 from the DUT's attributes, defaulting to W if W0 or W1 are not present.
+    - Extract the lower 8 bits of the DUT's T attribute.
+    - Wait for 1024 clock cycles to pass.
+    - For the next 1024 cycles, generate random integers for inputs i0 and i1, and a random integer m_i for a mask.
+    - Set the DUT's input values in0, in1, and m_i based on the generated random values.
+    - Wait for a rising edge of the clock.
+    - Check if the first bit of the DUT's output m_o is '1'; if not, increment a counter D and continue if D is less than 100.
+    - Pop the first tuple from the list of expected results and compare the expected and actual outputs, logging the results and asserting equality.
+- **Output**: The function does not return a value but logs information and asserts the correctness of the DUT's output, raising an assertion error if the output does not match the expected results.
 
 
 
