@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Generated seccomp filter policy for allowed syscalls and argument checks.
+Defines a seccomp filter policy for syscall handling with architecture-specific checks and conditions.
 
 
 ## Files
-- **[fd_bundle_tile_seccomp.h](fd_bundle_tile_seccomp.h.md)**: Generated seccomp filter policy for allowed syscalls and argument checks.
+- **[fd_bundle_tile_seccomp.h](fd_bundle_tile_seccomp.h.md)**: Defines a seccomp filter policy for syscall handling with architecture-specific checks and conditions.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

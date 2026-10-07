@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `fd_sanitize.h` file in the `firedancer` codebase provides APIs for compiler sanitizers, such as AddressSanitizer, to detect errors like out-of-bounds memory accesses and undefined behavior.
+APIs for compiler sanitizers to detect errors like out-of-bounds memory access and undefined behavior.
 
 # Purpose
-This code is a C header file that serves as a wrapper for including compiler sanitizer APIs, specifically AddressSanitizer (ASan) and MemorySanitizer (MSan). The file begins with include guards to prevent multiple inclusions, ensuring that the header's contents are only processed once during compilation. The purpose of this header is to facilitate the integration of sanitizers, which are tools used to detect various types of runtime errors such as out-of-bounds memory accesses and undefined behavior. By including "fd_asan.h" and "fd_msan.h", this file provides a centralized way to incorporate these error detection capabilities into a C project, enhancing its robustness and reliability.
+This code is a C header file that provides an interface for compiler sanitizers. Compiler sanitizers are tools that help detect errors in programs by using hardware features, code hooks, special memory mappings, and library functions. The header file includes other headers, `fd_asan.h` and `fd_msan.h`, which likely contain specific implementations or configurations for different types of sanitizers, such as AddressSanitizer and MemorySanitizer. These sanitizers are used to identify issues like out-of-bounds memory accesses and other undefined behaviors in compiled code. The header guards prevent multiple inclusions of this file, ensuring that the declarations are only processed once by the compiler.
 # Imports and Dependencies
 
 ---

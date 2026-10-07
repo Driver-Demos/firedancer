@@ -3,37 +3,30 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `int_math.instr` file in the `firedancer` codebase contains test cases for various integer arithmetic operations, including addition, subtraction, multiplication, division, and modulus for both 32-bit and 64-bit registers, as well as byte order conversions, with validation for invalid operations.
+Test cases for arithmetic and bitwise operations on 32-bit and 64-bit registers with immediate and register operands.
 
 # Purpose
-The provided content appears to be a test suite or validation script for a virtual machine or an emulator that processes low-level arithmetic and bitwise operations. This file is likely used to verify the correctness of operations such as addition, subtraction, multiplication, division, and modulus on 32-bit and 64-bit registers, both with immediate values and between registers. Each line represents a test case, specifying the operation code (`op`), destination (`dst`), source (`src`), offset (`off`), and immediate value (`imm`), along with the expected result and any special conditions like overflow, underflow, or sign extension. The file also includes validation checks for invalid operations, such as division by zero or invalid register references, indicated by `vfy` or `err`. This file is crucial for ensuring the reliability and accuracy of the arithmetic logic unit (ALU) within the software, serving as a comprehensive test to catch errors and validate the implementation of arithmetic operations in the codebase.
+The content is a test suite for verifying the behavior of arithmetic and bitwise operations in a software system, likely an emulator or a virtual machine. Each line represents a test case for a specific operation, such as addition (`add32`, `add64`), subtraction (`sub32`, `sub64`), multiplication (`mul32`, `mul64`), division (`div32`, `div64`), modulus (`mod32`, `mod64`), and byte order conversion (`be{16,32,64}`, `le{16,32,64}`). The test cases specify the operation code (`op`), destination register (`dst`), source register (`src`), offset (`off`), initial register values, immediate values (`imm`), and expected results. The comments indicate the expected outcome, such as overflow, underflow, sign extension, or validation errors (`vfy`) for invalid operations. This file is crucial for ensuring the correctness and reliability of arithmetic and bitwise operations within the system.
 # Content Summary
-The provided content is a detailed specification of a set of operations for a virtual machine or a low-level programming environment, likely related to a custom instruction set architecture (ISA). The operations are categorized by arithmetic and bitwise operations, including addition, subtraction, multiplication, division, modulus, and byte order conversions. Each operation is specified with a unique opcode, destination and source registers, immediate values, and offsets. The results of these operations are also documented, along with any special conditions or errors that may occur.
+The provided content is a series of test cases for a set of operations on registers, likely for a virtual machine or a low-level programming environment. Each line represents a test case for a specific operation, detailing the operation code, destination and source registers, offsets, initial register values, immediate values, and the expected result after the operation. The operations include addition, subtraction, multiplication, division, and modulus, both with immediate values and between registers. Additionally, there are operations for byte order conversion (big-endian and little-endian).
 
-### Key Components:
+Key technical details include:
 
-1. **Operation Types**:
-   - **Addition (add32, add64)**: These operations perform addition between registers or between a register and an immediate value. They handle overflow, underflow, and sign extension.
-   - **Subtraction (sub32, sub64)**: These operations perform subtraction with similar handling of overflow, underflow, and sign extension.
-   - **Multiplication (mul32, mul64)**: These operations multiply register values or a register with an immediate value, considering sign extension and large value truncation.
-   - **Division (div32, div64)**: These operations divide register values or a register by an immediate value, with checks for division by zero.
-   - **Modulus (mod32, mod64)**: These operations compute the remainder of division, with similar checks for division by zero.
-   - **Byte Order Conversion (be{16,32,64}, le{16,32,64})**: These operations convert the byte order of register values to big-endian or little-endian formats.
+1. **Operation Codes**: Each operation is identified by a unique code (e.g., `op=04` for `add32 reg, imm`). These codes specify the type of arithmetic or logical operation to perform.
 
-2. **Instruction Format**:
-   - Each instruction is prefixed with `$ op=` followed by the opcode, destination (`dst`), source (`src`), offset (`off`), and immediate value (`imm`) if applicable.
-   - The result of the operation is indicated after `: ok` or `: vfy` for verification errors, with the final register value shown.
+2. **Registers**: The operations involve destination (`dst`) and source (`src`) registers, which are specified by numbers (e.g., `dst=0`, `src=1`). The initial values of these registers are provided, and the expected result is shown after the operation.
 
-3. **Error Handling**:
-   - **Verification Errors (`vfy`)**: Occur when there are invalid source or destination registers, or invalid immediate values.
-   - **Divide by Zero (`vfyub`, `err`)**: Specific errors for division operations when the divisor is zero.
+3. **Immediate Values**: Some operations use immediate values (`imm`) as operands, which are constants used in the operation.
 
-4. **Special Conditions**:
-   - **Overflow and Underflow**: Documented for operations where the result exceeds the register's capacity.
-   - **Sign Extension**: Noted for operations where the sign bit is extended to maintain the correct value.
-   - **Truncation**: Occurs when large values are reduced to fit within the register size.
+4. **Offsets**: Each operation includes an offset (`off`), which may be used for addressing or other purposes in the context of the operation.
 
-This file serves as a comprehensive guide for developers working with this instruction set, providing necessary details for implementing or debugging the operations within the virtual machine or low-level environment. Understanding these operations and their outcomes is crucial for ensuring correct program behavior and handling edge cases effectively.
+5. **Results and Annotations**: The expected result of each operation is provided, along with annotations indicating specific conditions such as overflow, underflow, sign extension, truncation, and invalid operations.
+
+6. **Validation and Errors**: Some operations are marked with `vfy` or `err`, indicating verification failures or errors, such as invalid source or destination registers, or divide-by-zero errors.
+
+7. **Byte Order Operations**: The `be{16,32,64}` and `le{16,32,64}` operations convert register values to big-endian or little-endian format, with specific immediate values indicating the size of the conversion. Invalid immediate values are flagged with `vfy`.
+
+This file is essential for developers to understand the behavior of arithmetic and logical operations in the system, including edge cases and error handling. It serves as a reference for expected outcomes and validation of operations within the system.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

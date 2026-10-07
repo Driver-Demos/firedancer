@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `with-security.mk` file in the `firedancer` codebase configures compiler and linker flags to enhance security, including position-independent code, stack protection, and optional fortification source.
+Makefile settings for security flags in C/C++ compilation and linking.
 
 # Purpose
-This file is a Makefile snippet used to configure compiler and linker flags for building a software project. It sets flags for position-independent code (`-fPIC`), position-independent executables (`-pie`), and stack protection (`-fstack-protector-strong`). It also includes linker options for read-only relocations and immediate binding (`-Wl,-z,relro,-z,now`). Additionally, it conditionally defines `_FORTIFY_SOURCE` for enhanced security checks when optimization is enabled.
+The file configures compiler and linker flags for building a software project. The `CPPFLAGS` variable includes flags for position-independent code (`-fPIC`), stack protection (`-fstack-protector-strong`), and linker options for read-only relocations and immediate binding (`-Wl,-z,relro,-z,now`). The `LDFLAGS_EXE` and `LDFLAGS_SO` variables specify flags for position-independent executables (`-pie`) and shared objects (`-fPIC`), respectively. Additionally, the `_FORTIFY_SOURCE` macro is conditionally defined in `CPPFLAGS` to enhance security, but only when optimization is enabled, as indicated by the absence of the `FD_DISABLE_OPTIMIZATION` variable.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

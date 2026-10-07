@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Build rules for bzip2 objects and libfd_ballet.a, with a skip warning if bzip2 is absent.
+Makefile logic for checking bzip2 installation and compiling related objects.
 
 
 ## Files
-- **[Local.mk](Local.mk.md)**: Build rules for bzip2 objects and libfd_ballet.a, with a skip warning if bzip2 is absent.
+- **[Local.mk](Local.mk.md)**: Makefile logic for checking bzip2 installation and compiling related objects.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
