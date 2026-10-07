@@ -3,59 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file for a generated seccomp filter policy using BPF to control system call permissions.
+Generated seccomp BPF filter for netlink syscalls and fd checks.
 
 # Purpose
-The code is a C header file that defines a seccomp (secure computing mode) filter policy for a specific application. It is generated automatically by a script and should not be edited manually. The file includes several Linux kernel headers related to auditing, capabilities, filtering, seccomp, and BPF (Berkeley Packet Filter), which are necessary for defining and applying the seccomp filter. The primary function, [`populate_sock_filter_policy_netlink`](<#populate_sock_filter_policy_netlink>), initializes a BPF program that enforces a security policy by allowing or denying specific system calls based on predefined rules.
-
-The seccomp filter is designed to restrict the system calls that a process can make, enhancing security by reducing the attack surface. The filter checks the architecture of the running process and allows or denies system calls such as `write`, `fsync`, `sendto`, and `recvfrom` based on specific conditions. The filter uses BPF instructions to load and compare syscall numbers and arguments, and it either allows the syscall to proceed or terminates the process if the syscall does not meet the criteria. The file defines constants and macros to support different architectures, ensuring compatibility with various systems.
-# Imports and Dependencies
-
----
-- `../../../../src/util/fd_util_base.h`
-- `linux/audit.h`
-- `linux/capability.h`
-- `linux/filter.h`
-- `linux/seccomp.h`
-- `linux/bpf.h`
-- `sys/syscall.h`
-- `signal.h`
-- `stddef.h`
-
-
-# Global Variables
-
----
-### sock\_filter\_policy\_netlink\_instr\_cnt
-- **Type**: ``unsigned int``
-- **Description**: A static constant variable that holds the number of instructions in a socket filter policy for netlink communication. The value is set to 46, indicating the number of BPF (Berkeley Packet Filter) instructions used in the filter.
-- **Use**: Used to define the size of the `filter` array in the `populate_sock_filter_policy_netlink` function.
-
-
-# Functions
-
----
-### populate\_sock\_filter\_policy\_netlink<!-- {{#callable:populate_sock_filter_policy_netlink}} -->
-[View Source →](<../../../../../../src/disco/netlink/generated/netlink_seccomp.h#L26>)
-
-Populates a socket filter policy for netlink communication using seccomp BPF instructions.
-- **Inputs**:
-    - `out_cnt`: The number of elements in the output filter array, which must be at least 46.
-    - `out`: A pointer to an array of `struct sock_filter` where the filter policy will be copied.
-    - `logfile_fd`: The file descriptor for the log file, used in syscall checks.
-    - `nl_mon_fd`: The file descriptor for netlink monitoring, used in syscall checks.
-    - `nl_req_fd`: The file descriptor for netlink requests, used in syscall checks.
-    - `arp_probe_fd`: The file descriptor for ARP probing, used in syscall checks.
-- **Logic and Control Flow**:
-    - Checks if `out_cnt` is at least 46, ensuring the output array can hold the filter policy.
-    - Defines a `struct sock_filter` array with 46 BPF instructions to enforce syscall filtering.
-    - Loads the architecture from `seccomp_data` and compares it to `ARCH_NR`; if they do not match, jumps to `RET_KILL_PROCESS`.
-    - Loads the syscall number and checks against allowed syscalls (`write`, `fsync`, `sendto`, `recvfrom`).
-    - For each allowed syscall, further checks are performed on syscall arguments to determine if the syscall should be allowed or the process should be killed.
-    - Copies the defined filter array to the output array using `fd_memcpy`.
-- **Output**: No return value; the function populates the `out` array with the filter policy.
-
-
+This header defines a generated seccomp filter for netlink-related system calls. It selects the target architecture with `ARCH_NR`, then builds a `sock_filter` program in [`populate_sock_filter_policy_netlink`](<#populate_sock_filter_policy_netlink>) that allows only the syscall and argument patterns needed for `write`, `fsync`, `sendto`, and `recvfrom`. The filter checks file descriptors such as `logfile_fd`, `nl_mon_fd`, `nl_req_fd`, and `arp_probe_fd`, and it rejects any other call with `SECCOMP_RET_KILL_PROCESS`. The file also defines `sock_filter_policy_netlink_instr_cnt` so callers can size the output buffer before copying the generated BPF instructions with `fd_memcpy`.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

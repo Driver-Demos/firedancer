@@ -3,28 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Troubleshooting steps for building, configuring, and running Frankendancer, with error-specific solutions.
+The `troubleshooting.md` file provides a collection of common troubleshooting steps for operators encountering errors while building and running Frankendancer in the Firedancer codebase, along with recommendations for resolving specific issues and guidance on configuration and execution.
 
 # Purpose
-This document provides troubleshooting guidance for operators who encounter errors while building and running the Frankendancer software. It includes sections on building, configuring, and running the software, with specific recommendations and solutions for common issues. The building section advises on retrying builds from scratch, updating repository clones, and addressing specific errors such as missing `cargo` binaries. The configuring section suggests steps to resolve configuration errors, emphasizing the importance of using a consistent and valid `config.toml` file. The running section reiterates the need for consistency in configuration files between different commands. This document is essential for maintaining smooth operation and resolving issues efficiently within the Frankendancer codebase.
+This file is a markdown document that serves as a troubleshooting guide for users operating the Frankendancer software, which is associated with the Solana blockchain ecosystem. It provides specific instructions and recommendations for resolving common issues encountered during the building, configuring, and running phases of the software. The document is organized into sections that address general recommendations and specific errors, such as issues with the Rust toolchain or configuration errors with `fdctl`. The content is highly relevant to the codebase as it aids developers and operators in diagnosing and fixing problems, ensuring smooth operation and deployment of the software. The file's purpose is to enhance user experience by providing clear, actionable steps to resolve technical challenges.
 # Content Summary
-The provided document is a troubleshooting guide for operators working with the Frankendancer software. It offers solutions for common issues encountered during the building, configuring, and running phases of the software.
+The provided content is a troubleshooting guide for the Frankendancer software, specifically aimed at operators who encounter issues during the building, configuring, and running phases. This document is structured into three main sections: Building, Configuring, and Running, each with general recommendations and specific error resolutions.
 
-### Building
+In the **Building** section, the guide emphasizes the importance of starting fresh by cloning the repository anew and ensuring the use of a supported compiler. It also highlights the necessity of updating the Solana submodule after pulling the latest changes. A specific error related to the missing `cargo` binary from the Rust toolchain is addressed, with a solution involving the reinstallation of the toolchain to resolve a race condition issue.
 
-- **General Recommendations**: Operators are advised to retry building from scratch by cloning the repository anew and following the instructions in the "Getting Started" guide. It is important to use a supported compiler and execute the `./deps.sh` script. When updating an existing repository, operators should update the Solana submodule after pulling the latest changes.
+The **Configuring** section provides guidance on handling errors during the configuration initialization process. It suggests using the `fdctl configure fini all` command to clear existing configurations before retrying the initialization. The document stresses the importance of using the same `config.toml` file for both configuration and running commands and ensuring its validity. It also advises users to carefully read command outputs for helpful error resolution suggestions.
 
-- **Specific Errors**: A common error involves the missing `cargo` binary from the Rust toolchain. This error is due to a race condition between installing and using the correct Rust toolchain version. The solution is to uninstall and reinstall the specified toolchain version using `rustup`.
+In the **Running** section, the guide reiterates the importance of consistency in using the same `config.toml` file across different commands to avoid configuration mismatches.
 
-### Configuring
-
-- **General Recommendations**: If errors occur during the `fdctl configure init all` command, operators should run `fdctl configure fini all` to clear existing configurations and retry the `init` command. It is crucial to ensure that the `config.toml` file used is consistent across commands and contains valid TOML syntax. Operators should also pay attention to the command output for helpful error resolution suggestions.
-
-### Running
-
-- **General Recommendations**: Consistency in using the `~/config.toml` file across both `configure` and `run` commands is emphasized to avoid errors.
-
-This guide is essential for operators to efficiently troubleshoot and resolve issues in the Frankendancer software, ensuring smooth building, configuring, and running processes.
+Overall, this troubleshooting guide is a practical resource for operators, providing clear steps and solutions to common issues encountered in the Frankendancer software lifecycle.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
