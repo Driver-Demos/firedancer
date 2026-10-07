@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building and testing the fd_flamenco library with conditional unit tests.
+Build rules for fd_flamenco and headers, with optional test_flamenco unit test.
 
 # Purpose
-The `Makefile` content defines build and test instructions for the `fd_flamenco` library. It uses a macro `make-lib` to create the library and adds headers `fd_flamenco_base.h` and `fd_flamenco.h` to the build. If the `FD_HAS_ALLOCA` condition is true, it compiles and runs a unit test named `test_flamenco` with dependencies on `fd_flamenco`, `fd_ballet`, and `fd_util`. Additionally, it includes headers `fd_rwlock.h` and `fd_rwlock_recursive.h` in the build process.
+This Makefile fragment registers the `fd_flamenco` library and adds the public headers `fd_flamenco_base.h` and `fd_flamenco.h`. It also conditionally builds and runs the `test_flamenco` unit test when `FD_HAS_ALLOCA` is defined, and it adds the `fd_rwlock.h` and `fd_rwlock_recursive.h` headers to the build.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

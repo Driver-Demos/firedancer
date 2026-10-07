@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines development dependencies and scripts for a VitePress project.
+The `package.json` file in the `firedancer` codebase specifies development dependencies and scripts for using VitePress to develop, build, and preview documentation.
 
 # Purpose
-The JSON file defines the development environment setup for a project using `vitepress`. It specifies `vitepress` version `^1.6.3` as a development dependency under `devDependencies`. The `scripts` section includes commands for development (`dev`), building (`build`), and previewing (`preview`) the project using `vitepress`.
+This JSON file is a package configuration file for a JavaScript project, specifying development dependencies and scripts. It lists "vitepress" as a development dependency with a version constraint of "^1.6.3" and defines scripts for development, build, and preview tasks using VitePress commands.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

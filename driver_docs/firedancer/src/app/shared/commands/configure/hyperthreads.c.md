@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Configures and checks hyperthreading settings for CPU tiles, issuing warnings if performance may be reduced.
+The `hyperthreads.c` file in the `firedancer` codebase is responsible for configuring and checking the status of hyperthread pairs in a CPU topology, issuing warnings if certain conditions that may affect performance are met.
 
 # Purpose
-The code is a C source file that defines a configuration stage for managing hyperthreading in a system topology. It includes the header file `configure.h` and a specific topology header `fd_cpu_topo.h`, indicating its reliance on external configuration and topology structures. The primary functionality of this code is to check the status of hyperthread pairs associated with specific CPU tiles, such as "pack" and "poh", within a given system configuration. It uses functions like [`determine_ht_pair`](<#determine_ht_pair>) and [`determine_cpu_used`](<#determine_cpu_used>) to identify and verify the usage and online status of these hyperthread pairs.
+This C source code file is designed to manage and verify the configuration of CPU hyperthreading within a specific system topology. It is part of a larger system, likely a configuration management or system initialization framework, as indicated by its inclusion of a header file named "configure.h" and its definition of a `configure_stage_t` structure. The primary functionality of this file is to check the status of hyperthread pairs associated with specific CPU tiles, ensuring that they are not being used by other tiles or are offline when expected. This is achieved through functions that determine the hyperthread pair for a given CPU and check if a CPU is currently in use.
 
-The [`check`](<#check>) function is the core component of this module, performing the validation of hyperthread pairs and issuing warnings if certain conditions are met, such as when a hyperthread pair is used by another tile or should be offline. The results of these checks are encapsulated in the `fd_cfg_stage_hyperthreads` structure, which defines a configuration stage with a name, and a [`check`](<#check>) function pointer. This structure is likely intended to be part of a larger configuration management system, where it can be used to ensure optimal performance by managing hyperthreading configurations.
+The file defines several static functions that encapsulate the logic for identifying and verifying the status of hyperthread pairs. The [`determine_ht_pair`](#determine_ht_pair) function identifies the hyperthread pair for a given CPU tile, while [`determine_cpu_used`](#determine_cpu_used) checks if a specific CPU is in use. The [`check`](#check) function consolidates these checks and logs warnings if any potential performance issues are detected due to hyperthread pairs being used by other tiles or being online when they should be offline. The `fd_cfg_stage_hyperthreads` structure at the end of the file registers this check function as part of a configuration stage, indicating that this file is intended to be integrated into a broader configuration process.
 # Imports and Dependencies
 
 ---
@@ -20,71 +20,66 @@ The [`check`](<#check>) function is the core component of this module, performin
 
 ---
 ### fd\_cfg\_stage\_hyperthreads
-- **Type**: ``configure_stage_t``
-- **Description**: Defines a configuration stage for managing hyperthreading settings. It includes a name, a flag for recreation, and a function pointer for checking the configuration.
-- **Use**: Used to configure and verify hyperthreading settings in a system.
+- **Type**: `configure_stage_t`
+- **Description**: The `fd_cfg_stage_hyperthreads` is a global variable of type `configure_stage_t` that represents a configuration stage specifically for managing hyperthreads. It is initialized with a name, 'hyperthreads', and a function pointer `check` that performs validation checks related to hyperthread pairs and their usage.
+- **Use**: This variable is used to define and manage a configuration stage that checks the status and usage of hyperthread pairs in a CPU topology.
 
 
 # Functions
 
 ---
 ### determine\_ht\_pair<!-- {{#callable:determine_ht_pair}} -->
-[View Source →](<../../../../../../../src/app/shared/commands/configure/hyperthreads.c#L7>)
-
-Finds the hyperthread pair for a given tile kind and ID in the CPU topology.
+The `determine_ht_pair` function finds the hyperthread pair for a given CPU tile based on its kind and ID within a topology configuration.
 - **Inputs**:
-    - `config`: A pointer to a `config_t` structure that contains the CPU topology information.
-    - `cpus`: A pointer to a `fd_topo_cpus_t` structure that contains CPU information, including hyperthread pairs.
-    - `kind`: A string representing the type of tile to find in the topology.
-    - `kind_id`: An unsigned long integer representing the ID of the tile kind to find.
-- **Logic and Control Flow**:
-    - Call `fd_topo_find_tile` with `config->topo`, `kind`, and `kind_id` to find the index of the tile in the topology.
-    - Check if `tile_idx` is not `ULONG_MAX` to ensure a valid tile index was found.
-    - If valid, retrieve the tile from `config->topo.tiles` using `tile_idx`.
-    - Check if `tile->cpu_idx` is not `ULONG_MAX` to ensure a valid CPU index is present.
-    - If valid, return the sibling CPU index from `cpus->cpu[tile->cpu_idx].sibling`.
-    - If any check fails, return `ULONG_MAX` to indicate an invalid or non-existent hyperthread pair.
-- **Output**: Returns the sibling CPU index of the tile's CPU if found, otherwise returns `ULONG_MAX`.
+    - `config`: A pointer to a `config_t` structure containing the topology configuration.
+    - `cpus`: A pointer to a `fd_topo_cpus_t` structure representing the CPU topology.
+    - `kind`: A string representing the type of tile to search for.
+    - `kind_id`: An unsigned long integer representing the ID of the tile kind to search for.
+- **Control Flow**:
+    - Call `fd_topo_find_tile` with the topology from `config`, `kind`, and `kind_id` to find the index of the tile.
+    - Check if the returned `tile_idx` is not `ULONG_MAX` (indicating a valid tile was found).
+    - If a valid tile is found, retrieve the tile from the topology using `tile_idx`.
+    - Check if the `cpu_idx` of the tile is not `ULONG_MAX` (indicating a valid CPU index).
+    - If a valid CPU index is found, return the sibling CPU index from the `cpus` structure.
+    - If any checks fail, return `ULONG_MAX` to indicate no valid hyperthread pair was found.
+- **Output**: Returns the sibling CPU index of the found tile's CPU, or `ULONG_MAX` if no valid hyperthread pair is found.
 
 
 ---
 ### determine\_cpu\_used<!-- {{#callable:determine_cpu_used}} -->
-[View Source →](<../../../../../../../src/app/shared/commands/configure/hyperthreads.c#L20>)
-
-Checks if a given CPU index is used by any tile in the configuration.
+The `determine_cpu_used` function checks if a given CPU index is used by any tile in the provided configuration.
 - **Inputs**:
-    - `config`: A pointer to a `config_t` structure that contains the topology information of the system.
-    - `cpu_idx`: An unsigned long integer representing the CPU index to check.
-- **Logic and Control Flow**:
-    - Check if `cpu_idx` is equal to `ULONG_MAX`; if true, return 0.
-    - Retrieve the number of tiles from `config->topo.tile_cnt`.
-    - Iterate over each tile in `config->topo.tiles`.
-    - For each tile, check if `tile->cpu_idx` is equal to `cpu_idx`; if true, return 1.
-    - If no tile matches `cpu_idx`, return 0.
-- **Output**: Returns 1 if the CPU index is used by any tile, otherwise returns 0.
+    - `config`: A pointer to a `config_t` structure containing the topology information of the system.
+    - `cpu_idx`: An unsigned long integer representing the CPU index to check for usage.
+- **Control Flow**:
+    - Check if `cpu_idx` is equal to `ULONG_MAX`; if so, return 0 indicating the CPU is not used.
+    - Retrieve the number of tiles from the configuration's topology.
+    - Iterate over each tile in the configuration's topology.
+    - For each tile, check if the tile's CPU index matches the given `cpu_idx`.
+    - If a match is found, return 1 indicating the CPU is used.
+    - If no match is found after checking all tiles, return 0 indicating the CPU is not used.
+- **Output**: Returns an integer: 1 if the CPU index is used by any tile, or 0 if it is not used.
 
 
 ---
 ### check<!-- {{#callable:check}} -->
-[View Source →](<../../../../../../../src/app/shared/commands/configure/hyperthreads.c#L33>)
-
-Checks the configuration for hyperthread pairs and logs warnings if they are used or online when they should not be.
+The `check` function verifies the configuration of CPU hyperthread pairs for 'pack' and 'poh' tiles, issuing warnings if they are used or online when they shouldn't be.
 - **Inputs**:
-    - `config`: A pointer to a `config_t` structure containing the topology configuration.
-- **Logic and Control Flow**:
-    - Initialize a static integer `has_warned` to track if a warning has been logged.
+    - `config`: A pointer to a `config_t` structure containing the topology configuration of the system.
+- **Control Flow**:
+    - Initialize a static integer `has_warned` to track if warnings have been issued.
     - Initialize an array `cpus` of type `fd_topo_cpus_t` and call `fd_topo_cpus_init` to populate it.
     - Find the tile indices for 'pack' and 'poh' using `fd_topo_find_tile`.
-    - Determine the hyperthread pairs for 'pack' and 'poh' using [`determine_ht_pair`](<#determine_ht_pair>).
-    - Check if the hyperthread pairs are used by other tiles using [`determine_cpu_used`](<#determine_cpu_used>).
-    - Iterate over the CPUs to check if the hyperthread pairs are online when they should not be.
-    - Log warnings if the hyperthread pairs are used or online, but only if `has_warned` is false.
-    - Set `has_warned` to true to prevent further warnings.
-    - Return `CONFIGURE_OK()` to indicate successful configuration check.
-- **Output**: Returns a `configure_result_t` indicating the result of the configuration check, specifically `CONFIGURE_OK()`.
-- **Functions Called**:
-    - [`determine_ht_pair`](<#determine_ht_pair>)
-    - [`determine_cpu_used`](<#determine_cpu_used>)
+    - Determine the hyperthread pairs for 'pack' and 'poh' using [`determine_ht_pair`](#determine_ht_pair).
+    - Check if the hyperthread pairs are used by other tiles using [`determine_cpu_used`](#determine_cpu_used).
+    - Iterate over the CPUs to check if the hyperthread pairs are online when they shouldn't be.
+    - If no warnings have been issued yet, log warnings if the hyperthread pairs are used or online.
+    - Set `has_warned` to 1 to prevent further warnings.
+    - Return a successful configuration result using `CONFIGURE_OK()`.
+- **Output**: The function returns a `configure_result_t` indicating the success of the configuration check.
+- **Functions called**:
+    - [`determine_ht_pair`](#determine_ht_pair)
+    - [`determine_cpu_used`](#determine_cpu_used)
 
 
 

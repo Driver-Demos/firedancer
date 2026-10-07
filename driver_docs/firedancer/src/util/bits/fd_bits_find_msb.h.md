@@ -3,166 +3,147 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions to find the most significant bit in various integer types, with optional default values.
+The `fd_bits_find_msb.h` file in the `firedancer` codebase provides functions to find the most significant bit of various integer types, with optimizations for different architectures and support for default values.
 
 # Purpose
-The code provides a set of inline functions to find the most significant bit (MSB) in various integer types, including `uchar`, `ushort`, `uint`, `ulong`, and `uint128`. These functions are designed to be included in other files, as indicated by the comment at the top of the file. The functions use built-in compiler functions like `__builtin_clz` and `__builtin_clzl` to efficiently compute the MSB for different integer sizes. The code also includes architecture-specific optimizations for x86 platforms, using inline assembly to handle cases where the input is zero and to optimize for specific instruction sets like `LZCNT` and `BSR`.
+This C source code file is designed to provide utility functions for finding the most significant bit (MSB) in various integer types, including `uchar`, `ushort`, `uint`, `ulong`, and `uint128`. The file is not intended to be included directly; instead, it is included by another header file, `fd_bits.h`. The functions are implemented as static inline functions, which suggests that they are meant to be used within the same translation unit to optimize performance by avoiding function call overhead. The code includes architecture-specific optimizations, particularly for x86 architectures, using inline assembly to leverage processor instructions like `lzcnt` and `bsr` for efficient bit manipulation. These optimizations are conditional, allowing the code to adapt to different hardware capabilities, such as the presence of 128-bit integers or specific x86 instructions.
 
-The code also provides versions of the MSB functions that accept a default value to return when the input is zero. These functions are similarly optimized for x86 architectures, using conditional move instructions to handle zero inputs without branching. For non-x86 architectures, the code falls back to a simpler implementation that checks for zero and returns the default value if necessary. The functions are marked with `FD_FN_CONST` to indicate that they are constant expressions, which can help the compiler optimize their usage. The code is intended to be part of a larger library, as it does not define a main function or any external interfaces.
+The file provides two sets of functions: one set for finding the MSB directly and another set that includes a default value to return when the input is zero. This dual functionality is useful for applications where a default behavior is needed when no bits are set. The use of inline assembly and conditional compilation directives indicates a focus on performance and portability across different architectures. The functions are marked with `FD_FN_CONST`, suggesting that they are pure functions with no side effects, which can be beneficial for compiler optimizations. Overall, this file is a specialized utility for bit manipulation, providing efficient and portable solutions for determining the MSB in various integer types.
 # Functions
 
 ---
 ### fd\_uchar\_find\_msb<!-- {{#callable:fd_uchar_find_msb}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L4>)
-
-Finds the most significant bit set in an unsigned char.
+The `fd_uchar_find_msb` function calculates the position of the most significant bit (MSB) set to 1 in an unsigned char value.
 - **Inputs**:
-    - `x`: An unsigned char value to find the most significant bit in.
-- **Logic and Control Flow**:
-    - Casts the input `x` to an unsigned int.
-    - Uses the `__builtin_clz` function to count the leading zeros in the integer representation of `x`.
-    - Subtracts the result of `__builtin_clz` from 31 to find the position of the most significant bit set.
-- **Output**: Returns the position of the most significant bit set in the input `x`, as an integer.
+    - `x`: An unsigned char value for which the most significant bit position is to be found.
+- **Control Flow**:
+    - The function casts the input `x` to an unsigned integer type.
+    - It uses the built-in function `__builtin_clz` to count the number of leading zeros in the integer representation of `x`.
+    - The result of `__builtin_clz` is subtracted from 31 to determine the position of the most significant bit set to 1.
+- **Output**: The function returns an integer representing the zero-based index of the most significant bit set to 1 in the input value.
 
 
 ---
 ### fd\_ushort\_find\_msb<!-- {{#callable:fd_ushort_find_msb}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L5>)
-
-Finds the most significant bit set in a `ushort` integer.
+The `fd_ushort_find_msb` function calculates the position of the most significant bit (MSB) set to 1 in a given unsigned short integer.
 - **Inputs**:
-    - `x`: A `ushort` integer whose most significant bit is to be found.
-- **Logic and Control Flow**:
-    - Casts the `ushort` input `x` to a `uint` type.
-    - Uses the `__builtin_clz` function to count the leading zeros in the `uint` representation of `x`.
-    - Subtracts the result of `__builtin_clz` from 31 to determine the position of the most significant bit set.
-- **Output**: Returns an `int` representing the position of the most significant bit set in the input `ushort`.
+    - `x`: An unsigned short integer whose most significant bit position is to be found.
+- **Control Flow**:
+    - The function casts the input `x` from `ushort` to `uint` to ensure compatibility with the `__builtin_clz` function.
+    - It then calls the `__builtin_clz` function, which counts the number of leading zeros in the binary representation of the input integer.
+    - The result of `__builtin_clz` is subtracted from 31 to determine the position of the most significant bit set to 1.
+- **Output**: The function returns an integer representing the zero-based index of the most significant bit set to 1 in the binary representation of the input `ushort`.
 
 
 ---
 ### fd\_uint\_find\_msb<!-- {{#callable:fd_uint_find_msb}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L6>)
-
-Finds the most significant bit set in an unsigned integer.
+The `fd_uint_find_msb` function calculates the position of the most significant bit (MSB) set to 1 in a given unsigned integer.
 - **Inputs**:
-    - `x`: An unsigned integer of type `uint`.
-- **Logic and Control Flow**:
-    - Uses the built-in function `__builtin_clz` to count the leading zeros in `x`.
-    - Subtracts the count of leading zeros from 31 to find the index of the most significant bit set.
-- **Output**: Returns the index of the most significant bit set in the input `x`.
+    - `x`: An unsigned integer (`uint`) whose most significant bit position is to be found.
+- **Control Flow**:
+    - The function uses the built-in function `__builtin_clz` to count the number of leading zeros in the binary representation of `x`.
+    - It subtracts the count of leading zeros from 31 to determine the position of the most significant bit set to 1.
+- **Output**: The function returns an integer representing the zero-based index of the most significant bit set to 1 in the input `x`.
 
 
 ---
 ### fd\_ulong\_find\_msb<!-- {{#callable:fd_ulong_find_msb}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L7>)
-
-Finds the most significant bit set in an unsigned long integer.
+The `fd_ulong_find_msb` function calculates the index of the most significant bit set to 1 in an unsigned long integer.
 - **Inputs**:
-    - `x`: An unsigned long integer (`ulong`) whose most significant bit is to be found.
-- **Logic and Control Flow**:
-    - Calls the built-in function `__builtin_clzl` to count the number of leading zeros in `x`.
-    - Subtracts the result of `__builtin_clzl(x)` from 63 to determine the index of the most significant bit set.
-- **Output**: Returns an integer representing the index of the most significant bit set in `x`, with 0 being the least significant bit.
+    - `x`: An unsigned long integer whose most significant bit set to 1 is to be found.
+- **Control Flow**:
+    - The function uses the built-in function `__builtin_clzl` to count the number of leading zeros in the binary representation of `x`.
+    - It subtracts the result from 63, which is the maximum index for a 64-bit unsigned long, to find the index of the most significant bit set to 1.
+- **Output**: The function returns an integer representing the index of the most significant bit set to 1 in the input unsigned long integer.
 
 
 ---
 ### fd\_uint128\_find\_msb<!-- {{#callable:fd_uint128_find_msb}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L28>)
-
-Finds the most significant bit set in a 128-bit unsigned integer.
+The `fd_uint128_find_msb` function calculates the index of the most significant bit set in a 128-bit unsigned integer.
 - **Inputs**:
-    - `x`: A 128-bit unsigned integer (`uint128`) to find the most significant bit in.
-- **Logic and Control Flow**:
-    - Convert `x` to two 64-bit unsigned integers `xl` and `xh`, where `xl` is the lower 64 bits and `xh` is the upper 64 bits of `x`.
-    - Check if `xh` is zero and store the result in `c`.
-    - If `xh` is zero, use `xl` to find the most significant bit; otherwise, use `xh`.
-    - Calculate the position of the most significant bit using `__builtin_clzl` and adjust the result based on whether `xh` was zero.
-- **Output**: Returns the position of the most significant bit set in `x` as an integer.
+    - `x`: A 128-bit unsigned integer (`uint128`) whose most significant bit is to be found.
+- **Control Flow**:
+    - The function casts the lower 64 bits of `x` to `ulong` and assigns it to `xl`.
+    - The function shifts `x` right by 64 bits, casts the result to `ulong`, and assigns it to `xh`.
+    - It checks if `xh` is zero and assigns the result to `c`.
+    - The function calculates the most significant bit index using the formula `(127-((c)<<6)) - __builtin_clzl( fd_ulong_if( c, xl, xh ) )`.
+    - The `fd_ulong_if` function is used to select between `xl` and `xh` based on the value of `c`.
+- **Output**: The function returns an integer representing the index of the most significant bit set in the 128-bit unsigned integer `x`.
 
 
 ---
 ### fd\_uchar\_find\_msb\_w\_default<!-- {{#callable:fd_uchar_find_msb_w_default}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L138>)
-
-Finds the most significant bit of an `uchar` value, returning a default value if the input is zero.
+The `fd_uchar_find_msb_w_default` function returns the most significant bit position of an unsigned char, or a default value if the input is zero.
 - **Inputs**:
-    - `x`: An `uchar` value for which to find the most significant bit.
-    - `d`: An integer default value to return if `x` is zero.
-- **Logic and Control Flow**:
-    - Check if `x` is zero.
+    - `x`: An unsigned char whose most significant bit position is to be found.
+    - `d`: An integer representing the default value to return if the input `x` is zero.
+- **Control Flow**:
+    - Check if the input `x` is zero.
     - If `x` is zero, return the default value `d`.
-    - If `x` is not zero, call `fd_uchar_find_msb(x)` to find and return the most significant bit of `x`.
-- **Output**: Returns the position of the most significant bit of `x`, or `d` if `x` is zero.
-- **Functions Called**:
-    - [`fd_uchar_find_msb`](<#fd_uchar_find_msb>)
+    - If `x` is not zero, call the [`fd_uchar_find_msb`](#fd_uchar_find_msb) function to find and return the most significant bit position of `x`.
+- **Output**: Returns an integer representing the most significant bit position of `x`, or the default value `d` if `x` is zero.
+- **Functions called**:
+    - [`fd_uchar_find_msb`](#fd_uchar_find_msb)
 
 
 ---
 ### fd\_ushort\_find\_msb\_w\_default<!-- {{#callable:fd_ushort_find_msb_w_default}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L139>)
-
-Finds the most significant bit of a `ushort` value, returning a default value if the input is zero.
+The `fd_ushort_find_msb_w_default` function returns the most significant bit position of a `ushort` integer, or a default value if the integer is zero.
 - **Inputs**:
-    - `x`: A `ushort` value for which to find the most significant bit.
-    - `d`: An integer default value to return if `x` is zero.
-- **Logic and Control Flow**:
+    - `x`: A `ushort` integer whose most significant bit position is to be found.
+    - `d`: An integer representing the default value to return if `x` is zero.
+- **Control Flow**:
     - Check if `x` is zero.
     - If `x` is zero, return the default value `d`.
-    - If `x` is not zero, call `fd_ushort_find_msb(x)` to find and return the most significant bit of `x`.
-- **Output**: Returns the most significant bit position of `x` if `x` is non-zero; otherwise, returns the default value `d`.
-- **Functions Called**:
-    - [`fd_ushort_find_msb`](<#fd_ushort_find_msb>)
+    - If `x` is not zero, call `fd_ushort_find_msb(x)` to find and return the most significant bit position of `x`.
+- **Output**: Returns an integer representing the most significant bit position of `x`, or `d` if `x` is zero.
+- **Functions called**:
+    - [`fd_ushort_find_msb`](#fd_ushort_find_msb)
 
 
 ---
 ### fd\_uint\_find\_msb\_w\_default<!-- {{#callable:fd_uint_find_msb_w_default}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L140>)
-
-Finds the most significant bit of an unsigned integer, returning a default value if the integer is zero.
+The `fd_uint_find_msb_w_default` function returns the most significant bit position of a given unsigned integer, or a default value if the integer is zero.
 - **Inputs**:
-    - `x`: An unsigned integer of type `uint` whose most significant bit is to be found.
+    - `x`: An unsigned integer (`uint`) whose most significant bit position is to be found.
     - `d`: An integer representing the default value to return if `x` is zero.
-- **Logic and Control Flow**:
-    - Check if `x` is zero.
+- **Control Flow**:
+    - Check if the input `x` is zero.
     - If `x` is zero, return the default value `d`.
-    - If `x` is not zero, call `fd_uint_find_msb(x)` to find and return the most significant bit of `x`.
-- **Output**: Returns an integer representing the most significant bit of `x`, or the default value `d` if `x` is zero.
-- **Functions Called**:
-    - [`fd_uint_find_msb`](<#fd_uint_find_msb>)
+    - If `x` is not zero, call the [`fd_uint_find_msb`](#fd_uint_find_msb) function to find and return the most significant bit position of `x`.
+- **Output**: An integer representing the most significant bit position of `x`, or the default value `d` if `x` is zero.
+- **Functions called**:
+    - [`fd_uint_find_msb`](#fd_uint_find_msb)
 
 
 ---
 ### fd\_ulong\_find\_msb\_w\_default<!-- {{#callable:fd_ulong_find_msb_w_default}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L141>)
-
-Finds the most significant bit of an unsigned long integer, returning a default value if the input is zero.
+The `fd_ulong_find_msb_w_default` function returns the most significant bit position of an unsigned long integer, or a default value if the integer is zero.
 - **Inputs**:
-    - `x`: An unsigned long integer whose most significant bit is to be found.
+    - `x`: An unsigned long integer whose most significant bit position is to be found.
     - `d`: An integer representing the default value to return if `x` is zero.
-- **Logic and Control Flow**:
-    - Check if `x` is zero.
+- **Control Flow**:
+    - Check if the input `x` is zero.
     - If `x` is zero, return the default value `d`.
-    - If `x` is not zero, call `fd_ulong_find_msb(x)` to find and return the most significant bit of `x`.
-- **Output**: Returns an integer representing the position of the most significant bit of `x`, or the default value `d` if `x` is zero.
-- **Functions Called**:
-    - [`fd_ulong_find_msb`](<#fd_ulong_find_msb>)
+    - If `x` is not zero, call `fd_ulong_find_msb(x)` to find and return the most significant bit position of `x`.
+- **Output**: Returns an integer representing the most significant bit position of `x`, or `d` if `x` is zero.
+- **Functions called**:
+    - [`fd_ulong_find_msb`](#fd_ulong_find_msb)
 
 
 ---
 ### fd\_uint128\_find\_msb\_w\_default<!-- {{#callable:fd_uint128_find_msb_w_default}} -->
-[View Source →](<../../../../../src/util/bits/fd_bits_find_msb.h#L165>)
-
-Finds the most significant bit of a `uint128` value, returning a default value if the input is zero.
+The `fd_uint128_find_msb_w_default` function returns the most significant bit position of a 128-bit unsigned integer, or a default value if the integer is zero.
 - **Inputs**:
-    - `x`: A `uint128` integer whose most significant bit is to be found.
-    - `d`: An integer default value to return if `x` is zero.
-- **Logic and Control Flow**:
-    - Check if `x` is zero.
+    - `x`: A 128-bit unsigned integer whose most significant bit position is to be found.
+    - `d`: An integer representing the default value to return if the input `x` is zero.
+- **Control Flow**:
+    - Check if the input `x` is zero.
     - If `x` is zero, return the default value `d`.
-    - If `x` is not zero, call `fd_uint128_find_msb(x)` to find and return the most significant bit.
-- **Output**: Returns an integer representing the position of the most significant bit of `x`, or the default value `d` if `x` is zero.
-- **Functions Called**:
-    - [`fd_uint128_find_msb`](<#fd_uint128_find_msb>)
+    - If `x` is not zero, call the [`fd_uint128_find_msb`](#fd_uint128_find_msb) function to find and return the most significant bit position of `x`.
+- **Output**: An integer representing the most significant bit position of `x`, or the default value `d` if `x` is zero.
+- **Functions called**:
+    - [`fd_uint128_find_msb`](#fd_uint128_find_msb)
 
 
 

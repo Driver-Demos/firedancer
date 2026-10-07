@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements functions for verifying Ed25519 signatures using various mathematical operations and checks.
+The `sigverify.py` file in the `firedancer` codebase implements functions for verifying Ed25519 digital signatures, including various methods for point decomposition, multiplication, and addition, as well as signature verification and testing.
 
 # Purpose
-The code is a Python script that implements and tests cryptographic signature verification using the Ed25519 algorithm. It imports several functions and constants from modules such as `ref_ed25519`, `ed25519_lib`, `point_decomp`, and `point_mul`, which are used to perform mathematical operations related to elliptic curve cryptography. The script defines several functions, including [`kpoint_equal`](<#kpoint_equal>), [`ksigverify`](<#ksigverify>), [`ksigverify2`](<#ksigverify2>), [`ksigverify_split0`](<#ksigverify_split0>), and [`ksigverify_split1`](<#ksigverify_split1>), which are responsible for verifying signatures by performing operations like point decomposition, point addition, and modular arithmetic.
+This Python script is designed to perform cryptographic operations related to the Ed25519 digital signature scheme. It includes functions for verifying Ed25519 signatures, which are used to ensure the authenticity and integrity of messages. The script imports several modules and functions from `ref_ed25519`, `ed25519_lib`, `point_decomp`, and `point_mul`, which provide essential mathematical operations and constants for elliptic curve computations. The primary functions, such as [`ksigverify`](#ksigverify), [`ksigverify2`](#ksigverify2), [`ksigverify_split0`](#ksigverify_split0), and [`ksigverify_split1`](#ksigverify_split1), implement different methods of verifying signatures by manipulating elliptic curve points and performing modular arithmetic.
 
-The script also includes a main execution block that generates random secret keys, public keys, and messages to create and verify signatures. It uses the `ref_ed25519` module to generate public keys and signatures, and then verifies these signatures using the defined functions. The script outputs hexadecimal representations of the inputs and results, and it compares the verification results from the custom implementation with those from the `ref_ed25519` library to ensure correctness. The script is designed to be executed as a standalone program, and it includes error simulation to test the robustness of the signature verification process.
+The script is structured to be executed as a standalone program, as indicated by the `if __name__ == '__main__':` block. This block includes test cases and examples of generating random secret keys, public keys, and messages, followed by signing and verifying these messages. The script also includes functionality to simulate errors in the signature or message to test the robustness of the verification process. The use of `Expr` objects suggests that the script is designed to handle symbolic expressions, which are evaluated to perform the necessary cryptographic checks. The script outputs results in hexadecimal format, which is typical for cryptographic applications, and it includes mechanisms to output these results to files for further analysis.
 # Imports and Dependencies
 
 ---
@@ -34,149 +34,146 @@ The script also includes a main execution block that generates random secret key
 
 ---
 ### kpoint\_equal<!-- {{#callable:firedancer/src/wiredancer/py/sigverify.kpoint_equal}} -->
-[View Source →](<../../../../../src/wiredancer/py/sigverify.py#L21>)
-
-Checks if two projective points P and Q are equal by comparing their x and y coordinates after scaling by their respective z coordinates.
+The `kpoint_equal` function checks if two projective points P and Q are equal by comparing their respective x and y coordinates after scaling by their z coordinates.
 - **Inputs**:
     - `P`: A tuple representing the first projective point with coordinates (x1, y1, z1).
     - `Q`: A tuple representing the second projective point with coordinates (x2, y2, z2).
-    - `p`: A prime number used as the modulus for arithmetic operations.
-- **Logic and Control Flow**:
-    - Calculate `x1z2` as the product of `P[0]` and `Q[2]` modulo `p`.
-    - Calculate `x2z1` as the product of `P[2]` and `Q[0]` modulo `p`.
-    - Calculate `y1z2` as the product of `P[1]` and `Q[2]` modulo `p`.
-    - Calculate `y2z1` as the product of `P[2]` and `Q[1]` modulo `p`.
-    - Initialize result `r` to 1.
-    - Set `r` to 0 if `x1z2` is not equal to `x2z1`.
-    - Set `r` to 0 if `y1z2` is not equal to `y2z1`.
+    - `p`: A modulus value used for modular arithmetic operations.
+- **Control Flow**:
+    - Calculate x1z2 as the product of P[0] and Q[2] modulo p using the [`Expr`](ed25519_lib.py.md#expr) class.
+    - Calculate x2z1 as the product of P[2] and Q[0] modulo p using the [`Expr`](ed25519_lib.py.md#expr) class.
+    - Calculate y1z2 as the product of P[1] and Q[2] modulo p using the [`Expr`](ed25519_lib.py.md#expr) class.
+    - Calculate y2z1 as the product of P[2] and Q[1] modulo p using the [`Expr`](ed25519_lib.py.md#expr) class.
+    - Initialize a result variable `r` to 1.
+    - Use a ternary operation to set `r` to 0 if x1z2 is not equal to x2z1.
+    - Use another ternary operation to set `r` to 0 if y1z2 is not equal to y2z1.
     - Return the value of `r`.
-- **Output**: Returns 1 if the points are equal, otherwise returns 0.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](<ed25519_lib.py.md#expr>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](<ed25519_lib.py.md#ternary>)
+- **Output**: The function returns 1 if the points are equal, otherwise it returns 0.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](ed25519_lib.py.md#expr)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](ed25519_lib.py.md#ternary)
 
 
 ---
 ### ksigverify<!-- {{#callable:firedancer/src/wiredancer/py/sigverify.ksigverify}} -->
-[View Source →](<../../../../../src/wiredancer/py/sigverify.py#L32>)
-
-Verifies a cryptographic signature using elliptic curve operations.
+The `ksigverify` function verifies a cryptographic signature using elliptic curve operations.
 - **Inputs**:
-    - `public`: The public key used for verification.
-    - `sl`: The lower part of the signature.
-    - `sh`: The higher part of the signature.
-    - `h`: The hash of the message.
-    - `d`: A constant used in elliptic curve operations.
-    - `p`: The prime number defining the field for elliptic curve operations.
-    - `q`: The order of the base point in the elliptic curve group.
-- **Logic and Control Flow**:
-    - Decompresses the public key and signature parts to obtain elliptic curve points `A` and `R`.
-    - Calculates the product of the base point `G` and `sh` to get `shG`.
-    - Calculates the product of the point `A` and `h` to get `hA`.
-    - Adds the points `R` and `hA` to get `RhA`.
-    - Checks if `shG` is equal to `RhA` using [`kpoint_equal`](<#kpoint_equal>).
-    - Uses [`ternary`](<ed25519_lib.py.md#ternary>) operations to set the result `r` to 0 if `sh` is greater than or equal to `q`, or if `Ax` or `Rx` equals `p`.
-- **Output**: Returns 1 if the signature is valid, otherwise returns 0.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/py/point_decomp.kpoint_decomp`](<point_decomp.py.md#kpoint_decomp>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](<ed25519_lib.py.md#expr>)
-    - [`firedancer/src/wiredancer/py/point_mul.kpoint_mul`](<point_mul.py.md#kpoint_mul>)
-    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](<point_mul.py.md#kpoint_add>)
-    - [`firedancer/src/wiredancer/py/sigverify.kpoint_equal`](<#kpoint_equal>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](<ed25519_lib.py.md#ternary>)
+    - `public`: The public key used for signature verification, represented as an integer.
+    - `sl`: The lower part of the signature, represented as an integer.
+    - `sh`: The higher part of the signature, represented as an integer.
+    - `h`: The hash of the message being verified, represented as an integer.
+    - `d`: A constant used in elliptic curve operations, specific to the curve being used.
+    - `p`: The prime modulus of the field over which the elliptic curve is defined.
+    - `q`: The order of the base point of the elliptic curve.
+- **Control Flow**:
+    - Decompose the public key and signature lower part into elliptic curve points using [`kpoint_decomp`](point_decomp.py.md#kpoint_decomp).
+    - Calculate the y-coordinate and t-coordinate for both the public key and signature lower part.
+    - Construct elliptic curve points A and R using the decomposed values and calculated coordinates.
+    - Multiply the base point G by the higher part of the signature `sh` to get `shG`.
+    - Multiply the point A by the hash `h` to get `hA`.
+    - Add the points R and hA to get `RhA`.
+    - Check if `shG` is equal to `RhA` using [`kpoint_equal`](#kpoint_equal).
+    - Apply ternary checks to ensure `sh` is less than `q`, and that `Ax` and `Rx` are not equal to `p`.
+    - Return the result of the verification as an integer (1 for valid, 0 for invalid).
+- **Output**: An integer indicating whether the signature is valid (1) or invalid (0).
+- **Functions called**:
+    - [`firedancer/src/wiredancer/py/point_decomp.kpoint_decomp`](point_decomp.py.md#kpoint_decomp)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](ed25519_lib.py.md#expr)
+    - [`firedancer/src/wiredancer/py/point_mul.kpoint_mul`](point_mul.py.md#kpoint_mul)
+    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](point_mul.py.md#kpoint_add)
+    - [`firedancer/src/wiredancer/py/sigverify.kpoint_equal`](#kpoint_equal)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](ed25519_lib.py.md#ternary)
 
 
 ---
 ### ksigverify2<!-- {{#callable:firedancer/src/wiredancer/py/sigverify.ksigverify2}} -->
-[View Source →](<../../../../../src/wiredancer/py/sigverify.py#L55>)
-
-Verifies a cryptographic signature using elliptic curve operations and modular arithmetic.
+The `ksigverify2` function verifies a cryptographic signature using elliptic curve operations and modular arithmetic.
 - **Inputs**:
-    - `public`: The public key used for verification.
-    - `sl`: The lower part of the signature.
-    - `sh`: The higher part of the signature.
-    - `h`: A hash value derived from the message and signature.
-    - `d`: A constant used in elliptic curve operations.
-    - `p`: The prime modulus for the field.
-    - `q`: The order of the base point.
-- **Logic and Control Flow**:
-    - Decompose the public key into elliptic curve components using [`kpoint_decomp`](<point_decomp.py.md#kpoint_decomp>) and compute `Axn` as the modular subtraction of `Ax` from `p`.
-    - Compute `Ay` by masking the public key and `At` as the modular product of `Axn` and `Ay`.
-    - Initialize point `A` with components `(Axn, Ay, 1, At)` and compute point `T` by adding the base point `G` to `A`.
-    - Initialize `Z` as `(0, 1, 1, 0)` and iterate 256 times to update `Z` by conditionally adding points `Q` derived from `A` and `T` using ternary expressions based on `sh2` and `h`.
-    - Decompose the lower part of the signature `sl` into elliptic curve components to form point `R`.
-    - Check if `Z` equals `R` using [`kpoint_equal`](<#kpoint_equal>) and apply additional checks to ensure `sh` is less than `q` and `Ax` and `Rx` are not equal to `p`.
-- **Output**: Returns 1 if the signature is valid, otherwise returns 0.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/py/point_decomp.kpoint_decomp`](<point_decomp.py.md#kpoint_decomp>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](<ed25519_lib.py.md#expr>)
-    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](<point_mul.py.md#kpoint_add>)
-    - [`firedancer/src/wiredancer/py/sigverify.kpoint_equal`](<#kpoint_equal>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](<ed25519_lib.py.md#ternary>)
+    - `public`: The public key used for signature verification, represented as an integer.
+    - `sl`: The lower part of the signature, represented as an integer.
+    - `sh`: The higher part of the signature, represented as an integer.
+    - `h`: A hash value derived from the message and other components, used in the verification process.
+    - `d`: A constant used in elliptic curve operations, typically related to the curve's parameters.
+    - `p`: The prime modulus used for modular arithmetic operations.
+    - `q`: The order of the base point in the elliptic curve group.
+- **Control Flow**:
+    - Decompose the public key into elliptic curve components using [`kpoint_decomp`](point_decomp.py.md#kpoint_decomp) and compute the negated x-coordinate `Axn`.
+    - Compute the y-coordinate `Ay` and the t-coordinate `At` using modular multiplication, forming the point `A`.
+    - Initialize a point `T` by adding the base point `G` to `A` using [`kpoint_add`](point_mul.py.md#kpoint_add).
+    - Initialize a point `Z` and iterate 256 times to perform double scalar multiplication using a loop.
+    - In each iteration, compute a selection value `sel` using `dsdp_sel` and update `sh2` and `h` by left-shifting.
+    - Compute the coordinates `qx`, `qy`, `qz`, and `qt` using ternary expressions based on `sel`, `A`, and `T`.
+    - Form a point `Q` from these coordinates and update `Z` by adding `Q` to it using [`kpoint_add`](point_mul.py.md#kpoint_add).
+    - Decompose the signature lower part `sl` into elliptic curve components to form point `R`.
+    - Check if `Z` equals `R` using [`kpoint_equal`](#kpoint_equal) and apply additional checks using ternary expressions to ensure validity.
+    - Return the result of the verification checks.
+- **Output**: The function returns an integer `r`, which is 1 if the signature is valid and 0 otherwise.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/py/point_decomp.kpoint_decomp`](point_decomp.py.md#kpoint_decomp)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](ed25519_lib.py.md#expr)
+    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](point_mul.py.md#kpoint_add)
+    - [`firedancer/src/wiredancer/py/sigverify.kpoint_equal`](#kpoint_equal)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](ed25519_lib.py.md#ternary)
 
 
 ---
 ### ksigverify\_split0<!-- {{#callable:firedancer/src/wiredancer/py/sigverify.ksigverify_split0}} -->
-[View Source →](<../../../../../src/wiredancer/py/sigverify.py#L118>)
-
-Performs point decomposition and addition operations, and checks conditions for signature verification.
+The `ksigverify_split0` function performs initial computations and checks for signature verification using elliptic curve operations.
 - **Inputs**:
-    - `public`: The public key as an integer.
-    - `sl`: The lower part of the signature as an integer.
-    - `sh`: The higher part of the signature as an integer.
+    - `public`: The public key used in the signature verification process.
+    - `sl`: The lower part of the signature.
+    - `sh`: The higher part of the signature.
     - `d`: A constant used in elliptic curve operations.
-    - `p`: The prime modulus for the field.
-    - `q`: The order of the base point.
-- **Logic and Control Flow**:
-    - Decompose the `public` key using [`kpoint_decomp`](<point_decomp.py.md#kpoint_decomp>) to get `Ax`.
-    - Calculate `Axn` as the modular subtraction of `Ax` from `p`.
-    - Extract `Ay` from the `public` key by masking with `(1 << 255) - 1`.
-    - Compute `At` as the modular multiplication of `Axn` and `Ay`.
-    - Form the tuple `A` with elements `(Axn, Ay, 1, At)`.
-    - Decompose `sl` using [`kpoint_decomp`](<point_decomp.py.md#kpoint_decomp>) to get `Rx`.
-    - Add points `A` and `G` using [`kpoint_add`](<point_mul.py.md#kpoint_add>) to get `T`.
-    - Initialize `r` to 1 and perform checks using [`ternary`](<ed25519_lib.py.md#ternary>) to set `r` to 0 if `sh >= q`, `Ax == p`, or `Rx == p`.
-- **Output**: A tuple containing the result of the checks `r`, the decomposed and computed values `Axn`, `At`, `Rx`, and the components of `T`.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/py/point_decomp.kpoint_decomp`](<point_decomp.py.md#kpoint_decomp>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](<ed25519_lib.py.md#expr>)
-    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](<point_mul.py.md#kpoint_add>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](<ed25519_lib.py.md#ternary>)
+    - `p`: The prime modulus for the elliptic curve operations.
+    - `q`: The order of the base point used in elliptic curve operations.
+- **Control Flow**:
+    - Decompose the public key using [`kpoint_decomp`](point_decomp.py.md#kpoint_decomp) to get `Ax`.
+    - Compute `Axn` as the modular subtraction of `Ax` from `p`.
+    - Extract `Ay` from the public key by masking with `(1 << 255) - 1`.
+    - Calculate `At` as the modular product of `Axn` and `Ay`.
+    - Form the tuple `A` with components `(Axn, Ay, 1, At)`.
+    - Decompose `sl` using [`kpoint_decomp`](point_decomp.py.md#kpoint_decomp) to get `Rx`.
+    - Add points `A` and `G` using [`kpoint_add`](point_mul.py.md#kpoint_add) to get `T`.
+    - Initialize `r` to 1 and perform checks to potentially set `r` to 0 using [`ternary`](ed25519_lib.py.md#ternary) based on conditions involving `sh`, `Ax`, and `Rx`.
+- **Output**: Returns a tuple containing the result of the checks `r`, the decomposed and computed values `Axn`, `At`, `Rx`, and the components of `T`.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/py/point_decomp.kpoint_decomp`](point_decomp.py.md#kpoint_decomp)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](ed25519_lib.py.md#expr)
+    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](point_mul.py.md#kpoint_add)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](ed25519_lib.py.md#ternary)
 
 
 ---
 ### ksigverify\_split1<!-- {{#callable:firedancer/src/wiredancer/py/sigverify.ksigverify_split1}} -->
-[View Source →](<../../../../../src/wiredancer/py/sigverify.py#L137>)
-
-Verifies a cryptographic signature using elliptic curve operations and returns a boolean result.
+The `ksigverify_split1` function verifies a cryptographic signature by performing a series of mathematical checks on elliptic curve points.
 - **Inputs**:
-    - `r`: An integer that indicates whether to proceed with verification (non-zero) or return immediately (zero).
-    - `Ax`: The x-coordinate of the public key point on the elliptic curve.
+    - `r`: An integer flag indicating whether to proceed with verification (non-zero) or return immediately (zero).
+    - `Ax`: The x-coordinate of the decompressed public key point.
     - `At`: A precomputed value related to the public key point.
-    - `Rx`: The x-coordinate of the signature point on the elliptic curve.
-    - `Tx`: The x-coordinate of a temporary point used in verification.
-    - `Ty`: The y-coordinate of a temporary point used in verification.
-    - `Tz`: The z-coordinate of a temporary point used in verification.
-    - `Tt`: A precomputed value related to the temporary point.
+    - `Rx`: The x-coordinate of the decompressed signature point.
+    - `Tx`: The x-coordinate of a temporary point used in calculations.
+    - `Ty`: The y-coordinate of a temporary point used in calculations.
+    - `Tz`: The z-coordinate of a temporary point used in calculations.
+    - `Tt`: The t-coordinate of a temporary point used in calculations.
     - `public`: The public key as an integer.
     - `sl`: The lower part of the signature as an integer.
     - `sh`: The higher part of the signature as an integer.
     - `h`: A hash value derived from the message and signature.
-- **Logic and Control Flow**:
-    - If `r` is zero, return 0 immediately, indicating verification failure.
-    - Extract the y-coordinate `Ay` from the `public` key and construct the point `A` on the elliptic curve.
-    - Extract the y-coordinate `Ry` from the `sl` value and construct the point `R` on the elliptic curve.
-    - Compute the point `Z` by multiplying the point `A` with the hash `h` and the signature part `sh` using the [`ed25519_dsdp_mul`](<ed25519_lib.py.md#ed25519_dsdp_mul>) function.
+- **Control Flow**:
+    - Check if the input `r` is zero; if so, return 0 immediately.
+    - Extract the y-coordinate `Ay` from the public key and construct the point `A` using `Ax`, `Ay`, and `At`.
+    - Extract the y-coordinate `Ry` from the signature and construct the point `R` using `Rx` and `Ry`.
+    - Compute the point `Z` by multiplying the point `A` with the hash `h` and the signature part `sh` using the [`ed25519_dsdp_mul`](ed25519_lib.py.md#ed25519_dsdp_mul) function.
     - Calculate `RxZz` as the product of `R[0]` and `Z[2]` modulo `p`.
     - Assign `RzZx` to `Z[0]` and `RzZy` to `Z[1]`, assuming `Rz` is 1.
     - Calculate `RyZz` as the product of `R[1]` and `Z[2]` modulo `p`.
-    - If `RxZz` is not equal to `RzZx`, return 0, indicating verification failure.
-    - If `RyZz` is not equal to `RzZy`, return 0, indicating verification failure.
-    - If all checks pass, return 1, indicating verification success.
-- **Output**: Returns 1 if the signature verification is successful, otherwise returns 0.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/py/ed25519_lib.ed25519_dsdp_mul`](<ed25519_lib.py.md#ed25519_dsdp_mul>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.mul_modp`](<ed25519_lib.py.md#mul_modp>)
+    - Check if `RxZz` is not equal to `RzZx`; if so, return 0.
+    - Check if `RyZz` is not equal to `RzZy`; if so, return 0.
+    - If all checks pass, return 1.
+- **Output**: The function returns 1 if the signature verification checks pass, otherwise it returns 0.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/py/ed25519_lib.ed25519_dsdp_mul`](ed25519_lib.py.md#ed25519_dsdp_mul)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.mul_modp`](ed25519_lib.py.md#mul_modp)
 
 
 
