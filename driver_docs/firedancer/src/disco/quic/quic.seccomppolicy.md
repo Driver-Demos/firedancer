@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines security policies for logging and randomness in the QUIC protocol, including file descriptor management.
+Seccomp policy for logging, fsync, and getrandom syscalls.
 
 # Purpose
-The configuration file defines logging behavior for a software system. It specifies that log messages are written to a file and/or a pipe, with messages of 'WARNING' level and above directed to the `STDERR` pipe. The file descriptor for `STDERR` is always set to 2 during the boot process. The configuration also ensures that all log messages are written to the log file, and messages of 'WARNING' level and above trigger an immediate `fsync` to the disk for the log file. Additionally, the file indicates that the QUIC protocol uses the `getrandom` function to obtain cryptographically secure randomness.
+This file defines policy rules for logging and randomness access in the system. It declares the file descriptors `logfile_fd` and `keylog_fd`, then allows `write` only to standard error, the log file, or the key log file, and allows `fsync` only for `logfile_fd` so warning-level messages are forced to disk. It also grants access to `getrandom` so `QUIC` can obtain cryptographically secure random data.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

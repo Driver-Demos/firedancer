@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for creating, moving, and delegating Solana stake accounts using RPC client interactions.
+The `stake.rs` file in the `firedancer` codebase provides functions to create, manage, and move lamports and stakes between accounts using the Solana blockchain.
 
 # Purpose
-The code provides functionality for managing Solana stake accounts and transferring lamports and stakes between them. It defines two main functions: `move_lamports` and `move_stake`. Both functions use the `RpcClient` to interact with the Solana blockchain and require a `Keypair` for authorization. The `move_lamports` function creates two stake accounts and transfers a specified amount of lamports from one account to another. The `move_stake` function also creates two stake accounts, delegates the stake of the first account to a voter account, and then transfers a specified amount of stake from the first account to the second account.
+This Rust source code file provides functionality for managing and transferring lamports and stakes within the Solana blockchain network. It defines two primary functions: `move_lamports` and `move_stake`. Both functions utilize the Solana SDK and client libraries to interact with the blockchain, creating and managing stake accounts, and executing transactions. The `move_lamports` function is responsible for transferring a specified amount of lamports from one stake account to another, while the `move_stake` function handles the delegation of stake to a voter account and subsequently moves the stake from one account to another. These operations are facilitated by creating and signing transactions, which are then sent and confirmed on the Solana network.
 
-The code imports several modules from the Solana SDK and client libraries, which provide the necessary tools and structures for creating and managing stake accounts, signing transactions, and interacting with the blockchain. The `utils` module is used to create and sign transactions, and to wait for a certain number of slots to pass. The code is structured to be part of a larger application, likely a script or a library, that manages Solana stake accounts. It does not define public APIs or external interfaces, but rather provides specific operations related to stake management on the Solana blockchain.
+The code is structured to leverage Solana's stake and transaction mechanisms, utilizing various components such as `RpcClient` for network communication, `Keypair` for account management, and `stake_instruction` for generating the necessary instructions to create accounts and move funds. The file is likely part of a larger application or library that interacts with the Solana blockchain, providing specific utilities for managing stake accounts and transferring funds. The use of utility functions from a `utils` module suggests a modular design, where common operations like creating and signing messages are abstracted for reuse. This code is intended to be executed as part of a larger system, possibly as a script or a component within a Solana client application, rather than as a standalone library.
 # Imports and Dependencies
 
 ---
@@ -24,47 +24,43 @@ The code imports several modules from the Solana SDK and client libraries, which
 
 ---
 ### move\_lamports
-Transfers a specified amount of lamports from one stake account to another using the Solana blockchain.
+The `move_lamports` function creates two stake accounts and transfers a specified amount of lamports from one to the other using the Solana blockchain.
 - **Inputs**:
-    - `client`: An `RpcClient` instance used to interact with the Solana blockchain.
-    - `payer`: A `Keypair` representing the account that pays for the transactions.
-- **Logic and Control Flow**:
+    - `client`: An instance of `RpcClient` used to interact with the Solana blockchain.
+    - `payer`: A `Keypair` representing the account that will pay for the transactions and authorize the operations.
+- **Control Flow**:
     - Create a new `Keypair` for the `from_stake_account`.
     - Define `authorized` with the `staker` and `withdrawer` set to the `payer`'s public key.
     - Create a `create_from_stake_account_instruction` to initialize the `from_stake_account` with 1,000,000,000 lamports.
-    - Create and sign a transaction with `create_from_stake_account_instruction` and send it using the `client`.
+    - Create and sign a transaction with the `create_from_stake_account_instruction` and send it to the blockchain.
     - Print the creation of the `from_stake_account` with its public key and current slot.
     - Create a new `Keypair` for the `to_stake_account`.
     - Create a `create_to_stake_account_instruction` to initialize the `to_stake_account` with 1,000,000,000 lamports.
-    - Create and sign a transaction with `create_to_stake_account_instruction` and send it using the `client`.
+    - Create and sign a transaction with the `create_to_stake_account_instruction` and send it to the blockchain.
     - Print the creation of the `to_stake_account` with its public key and current slot.
     - Create a `move_lamports_instruction` to transfer 10,000,000 lamports from `from_stake_account` to `to_stake_account`.
-    - Create and sign a transaction with `move_lamports_instruction` and send it using the `client`.
+    - Create and sign a transaction with the `move_lamports_instruction` and send it to the blockchain.
     - Print the transfer of lamports from `from_stake_account` to `to_stake_account` with their public keys and current slot.
-- **Output**: None
+- **Output**: The function does not return any value; it performs blockchain transactions and prints the results of these operations.
 
 
 ---
 ### move\_stake
-Transfers stake from one account to another and delegates it to a voter account.
+The `move_stake` function creates two stake accounts, delegates stake from the first account to a voter, and then moves a specified amount of stake from the first account to the second account.
 - **Inputs**:
-    - `client`: An `RpcClient` instance used to interact with the Solana blockchain.
-    - `payer`: A `Keypair` representing the account that pays for the transactions.
-- **Logic and Control Flow**:
+    - `client`: An instance of `RpcClient` used to interact with the Solana blockchain.
+    - `payer`: A `Keypair` representing the account that will pay for the transactions and authorize actions on the stake accounts.
+- **Control Flow**:
     - Create a new `Keypair` for the `from_stake_account`.
-    - Define `authorized` with the `staker` and `withdrawer` set to the `payer`'s public key.
-    - Create a stake account for `from_stake_account` with 1,000,000,000 lamports using `create_account_checked`.
-    - Sign and send the transaction to create the `from_stake_account`.
-    - Read the `voter` keypair from a file.
-    - Delegate the stake of `from_stake_account` to the `voter` using `delegate_stake`.
-    - Sign and send the transaction to delegate the stake.
+    - Define `Authorized` struct with the payer's public key for both staker and withdrawer roles.
+    - Create a stake account for `from_stake_account` with 1,000,000,000 lamports and send the transaction.
+    - Read a keypair from a file to get the `voter` account.
+    - Delegate the stake from `from_stake_account` to the `voter` account and send the transaction.
     - Create a new `Keypair` for the `to_stake_account`.
-    - Create a stake account for `to_stake_account` with 1,000,000,000 lamports using `create_account_checked`.
-    - Sign and send the transaction to create the `to_stake_account`.
-    - Wait for at least 1000 slots using `wait_atleast_n_slots`.
-    - Move 100,000,000 lamports from `from_stake_account` to `to_stake_account` using `move_stake`.
-    - Sign and send the transaction to move the stake.
-- **Output**: None; the function performs actions on the blockchain and prints status messages.
+    - Create a stake account for `to_stake_account` with 1,000,000,000 lamports and send the transaction.
+    - Wait for at least 1000 slots to ensure the stake is activated.
+    - Move 100,000,000 lamports of stake from `from_stake_account` to `to_stake_account` and send the transaction.
+- **Output**: The function does not return any value; it performs blockchain transactions and prints status messages to the console.
 
 
 
