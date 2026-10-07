@@ -3,113 +3,141 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `run_integration_tests.sh` file in the `firedancer` codebase is a Bash script designed to sequentially execute integration tests, with options for verbosity and specific test selection, while ensuring system configuration changes are managed and logging results for each test.
+A Bash script to sequentially run integration tests with logging and error handling.
 
 # Purpose
-The provided script, `run_integration_tests.sh`, is a Bash executable designed to manage and execute integration tests for a software project. It offers narrow functionality focused on running integration tests sequentially, ensuring that only one test runs at a time to avoid potential conflicts or system configuration changes. The script processes command-line arguments to specify test files and verbosity, and it uses a Makefile to determine the appropriate build environment if no tests are directly specified. It manages test execution by dispatching and monitoring test processes, capturing their output, and logging results. The script also handles cleanup and reports the success or failure of the tests, making it a crucial tool for developers to verify the integration of different software components in a controlled manner.
+The `run_integration_tests.sh` script is a Bash executable designed to run integration tests sequentially. It reads command-line arguments to specify test files and verbosity, and it ensures that only one integration test runs at a time. The script manages test execution by dispatching tests as jobs, tracking their process IDs, and logging their outputs. It uses a Makefile to determine the correct build directory if no specific tests are provided. The script also handles cleanup of processes and logs the results of each test, indicating success or failure.
 # Global Variables
 
 ---
 ### TESTS
 - **Type**: `string`
-- **Description**: The `TESTS` variable is a global string variable that is initially set to an empty value. It is intended to hold the path to a file containing a list of integration tests to be executed. The variable is populated based on the command-line argument `--tests` provided when the script is run.
-- **Use**: This variable is used to determine which integration tests should be scheduled and executed by the script.
+- **Description**: The `TESTS` variable is a global string variable that stores the path to a file containing a list of integration tests to run. It is initially set to an empty string and can be modified by the `--tests` command-line argument.
+- **Use**: Stores the path to a file with integration tests to execute.
 
 
 ---
 ### VERBOSE
 - **Type**: `integer`
-- **Description**: The `VERBOSE` variable is a global integer variable used to control the verbosity level of the script's output. It is initialized to 0, indicating that verbose output is disabled by default.
-- **Use**: The `VERBOSE` variable is set to 1 when the `-v` flag is passed as a command-line argument, enabling verbose output for debugging or informational purposes.
+- **Description**: The `VERBOSE` variable is an integer that controls the verbosity level of the script's output. It is set to 0 by default, indicating that verbose output is disabled.
+- **Use**: Used to enable verbose output when the '-v' flag is provided in the command-line arguments.
 
 
 ---
 ### AVAILABLE\_JOBS
 - **Type**: `integer`
-- **Description**: The `AVAILABLE_JOBS` variable is a global integer variable that is initialized to 1. It is used to control the number of concurrent jobs that can be scheduled and run at any given time in the script. By setting it to 1, the script ensures that only one integration test job is executed at a time, preventing concurrent execution.
-- **Use**: This variable is used to limit the number of concurrent jobs to one, ensuring sequential execution of integration tests.
+- **Description**: Defines the maximum number of jobs that can run concurrently. It is set to 1, which means only one job can run at a time.
+- **Use**: Used to control the concurrency of job scheduling, ensuring that only one job is executed at any given time.
+
+
+---
+### PIDS
+- **Type**: ``declare -A``
+- **Description**: Stores the process IDs (PIDs) of child processes that are spawned during the execution of integration tests. This associative array maps each PID to itself, effectively keeping track of all active child processes.
+- **Use**: Used to manage and track the lifecycle of child processes during test execution.
+
+
+---
+### PID2UNIT
+- **Type**: ``declare -A``
+- **Description**: Maps process IDs (PIDs) to their corresponding unit names. This associative array is used to track which unit (or program) is associated with each running process.
+- **Use**: Used to remember the unit name of each PID for tracking and logging purposes during test execution.
+
+
+---
+### PID2LOG
+- **Type**: ``declare -A``
+- **Description**: `PID2LOG` is an associative array that maps process IDs (PIDs) to their corresponding log file names. It is used to track the log file associated with each child process that is spawned during the execution of integration tests.
+- **Use**: Stores the log file name for each process ID to facilitate logging and debugging of integration tests.
+
+
+---
+### TEST\_LIST
+- **Type**: ``array``
+- **Description**: Contains a list of integration tests to be scheduled and executed sequentially. The list is populated by reading from a file specified by the `TESTS` variable, excluding lines that are comments.
+- **Use**: Used to store and manage the sequence of integration tests to be executed by the script.
 
 
 ---
 ### FAIL\_CNT
 - **Type**: `integer`
-- **Description**: `FAIL_CNT` is a global integer variable initialized to zero. It is used to keep track of the number of integration tests that have failed during the execution of the script.
-- **Use**: `FAIL_CNT` is incremented each time a test fails, and its final value determines the script's exit status, indicating the number of failed tests.
+- **Description**: `FAIL_CNT` is a global integer variable that tracks the number of failed integration tests during the execution of the script.
+- **Use**: Used to count and report the number of test failures, incrementing each time a test fails.
 
 
 # Functions
 
 ---
 ### rc\_path
-The `rc_path` function generates a file path for storing the return code and elapsed time of a process based on its process ID.
+Generates a file path for a process-specific return code file in the `/tmp` directory.
 - **Inputs**:
-    - `$1`: The process ID (PID) for which the return code file path is being generated.
-- **Control Flow**:
-    - The function takes a single argument, which is the process ID.
-    - It constructs a file path string using the format `/tmp/.pid-<PID>.rc`.
-    - The constructed file path is then printed to the standard output.
-- **Output**: A string representing the file path `/tmp/.pid-<PID>.rc` where `<PID>` is the provided process ID.
+    - ``$1``: The process identifier (PID) for which to generate the return code file path.
+- **Logic and Control Flow**:
+    - The function takes a single argument, which is the process identifier (PID).
+    - It constructs a file path string in the format `/tmp/.pid-<PID>.rc`.
+    - The function outputs this constructed file path.
+- **Output**: A string representing the file path for the return code file associated with the given PID.
 
 
 ---
 ### runner
-The `runner` function executes a given program with specific logging and coverage settings, capturing its execution time and exit status.
+Executes a given program with logging and coverage setup, capturing its exit status and execution time.
 - **Inputs**:
-    - `prog`: The path to the program to be executed.
-    - `log`: The path to the log file where the program's stderr output will be redirected.
-    - `...`: Additional arguments to be passed to the program being executed.
-- **Control Flow**:
-    - The function starts by setting the local variable `pid` to the current process ID (`BASHPID`).
-    - It extracts the program path (`prog`) and log file path (`log`) from the arguments, and constructs a full log file path (`logfull`).
-    - A coverage directory (`covdir`) is created based on the program's directory structure, and a coverage file path (`LLVM_PROFILE_FILE`) is set up.
-    - The function then executes the program using `sudo`, redirecting its stderr to the log file and suppressing stdout, while also setting the log path and log level.
-    - The execution time is measured using the `time` command, and the exit status is captured.
-    - The exit status and elapsed time are written to a file at a path determined by the `rc_path` function, using the process ID.
-- **Output**: The function does not return a value, but it writes the program's exit status and elapsed time to a file specified by the `rc_path` function.
+    - ``prog``: The path to the program to execute.
+    - ``log``: The path to the log file where the program's stderr output will be saved.
+    - ``...``: Additional arguments to pass to the program.
+- **Logic and Control Flow**:
+    - Assigns the current process ID to `pid` and extracts the program name from `prog`.
+    - Creates a directory for coverage data and sets up a coverage file path using `LLVM_PROFILE_FILE`.
+    - Executes the program with `sudo`, redirecting its stderr to `log` and stdout to `/dev/null`, while capturing the execution time using the `time` command.
+    - Stores the program's exit status in `ret` and the elapsed time in `elapsed`.
+    - Writes the exit status and elapsed time to a file at the path returned by `rc_path` using the process ID.
+- **Output**: The function does not return a value, but it writes the program's exit status and elapsed time to a file.
 
 
 ---
 ### dispatch
-The `dispatch` function forks a task to run a specified program with logging and tracks its process ID for later management.
+Dispatches a program to run as a background process and tracks its execution details.
 - **Inputs**:
-    - `prog`: The path to the program to be executed.
-    - `...`: Additional command-line arguments to be passed to the program.
-- **Control Flow**:
+    - `prog`: The path to the program to execute.
+    - `...`: Additional command-line arguments to pass to the program.
+- **Logic and Control Flow**:
     - Extracts the program name from the provided path.
-    - Creates a directory for logs based on the program's path and name.
-    - Generates a log file name with a timestamp.
+    - Creates a log directory based on the program's path and name.
+    - Generates a log file with a timestamp in the log directory.
     - If verbose mode is enabled, prints a message indicating the program being dispatched.
-    - Calls the `runner` function in the background to execute the program with logging, capturing its process ID.
-    - Stores the process ID in the `PIDS` associative array and maps it to the program name and log file in `PID2UNIT` and `PID2LOG` arrays respectively.
-- **Output**: The function does not return a value but manages the execution of a program in the background and tracks its process ID for further management.
+    - Calls the `runner` function to execute the program in the background, passing the program path, log file, and additional arguments.
+    - Stores the process ID (PID) of the background process in the `PIDS` associative array.
+    - Maps the PID to the program name and log file in the `PID2UNIT` and `PID2LOG` associative arrays, respectively.
+- **Output**: There is no direct output from the function itself, but it starts a background process and updates global associative arrays with the process details.
 
 
 ---
 ### sow
-The 'sow' function schedules tasks from a list of tests until the maximum concurrency limit is reached.
-- **Inputs**:
-    - `None`: The function does not take any direct input arguments, but it operates on the global TEST_LIST and AVAILABLE_JOBS variables.
-- **Control Flow**:
-    - Check if TEST_LIST is empty or AVAILABLE_JOBS is zero; if either is true, return immediately.
-    - Retrieve the first test from TEST_LIST and remove it from the list.
-    - Decrement AVAILABLE_JOBS by one to account for the new task being scheduled.
-    - Call the 'dispatch' function with the test to schedule it for execution.
-- **Output**: The function does not return any value; it modifies the global state by scheduling a test for execution and updating the AVAILABLE_JOBS count.
+Schedules tasks until the maximum concurrency is reached.
+- **Inputs**: None
+- **Logic and Control Flow**:
+    - Checks if `TEST_LIST` is empty or if `AVAILABLE_JOBS` is zero; if either condition is true, the function returns immediately.
+    - Retrieves the first test from `TEST_LIST` and removes it from the list.
+    - Decrements `AVAILABLE_JOBS` by one to indicate a job is being scheduled.
+    - Calls the `dispatch` function with the test to schedule it for execution.
+- **Output**: No direct output; modifies global state by scheduling a test for execution.
 
 
 ---
 ### reap
-The 'reap' function waits for any child process to finish and handles the cleanup and logging of the process results.
+Waits for a job to finish and processes its completion status.
 - **Inputs**: None
-- **Control Flow**:
-    - The function waits for any child process in the PIDS array to finish using 'wait -n'.
-    - It iterates over the PIDS array to check if any process has completed by verifying the absence of its directory in '/proc/'.
-    - For each completed process, it reads the return code and elapsed time from the corresponding rc file.
-    - It retrieves the unit name and log file path associated with the process ID from the PID2UNIT and PID2LOG arrays.
-    - The function increments the AVAILABLE_JOBS counter to allow scheduling of new jobs.
-    - If the process exited with a non-zero return code, it increments the FAIL_CNT counter and logs the failure details.
-    - If the process exited successfully, it logs a success message.
-- **Output**: The function does not return a value but updates global state variables such as AVAILABLE_JOBS and FAIL_CNT, and logs the results of completed processes.
+- **Logic and Control Flow**:
+    - Waits for any job in the `PIDS` array to finish using `wait -n`.
+    - Iterates over each process ID in the `PIDS` array to check if the process has finished by verifying the absence of its directory in `/proc`.
+    - For each finished job, reads the return code and elapsed time from the corresponding `.rc` file.
+    - Retrieves the unit name and log file path associated with the finished process ID.
+    - Removes the finished process ID from the `PIDS`, `PID2UNIT`, and `PID2LOG` arrays.
+    - Increments the `AVAILABLE_JOBS` counter to indicate a free job slot.
+    - If the return code is non-zero, increments the `FAIL_CNT` counter, prints a failure message with the elapsed time, unit name, return code, and log file path, and displays the log content excluding lines containing 'Log at'.
+    - If the return code is zero, prints a success message with the elapsed time and unit name.
+- **Output**: No direct output; modifies global state by updating job tracking arrays and counters, and prints job completion status to standard error.
 
 
 
