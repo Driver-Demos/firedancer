@@ -3,44 +3,39 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Single-threaded fixed-capacity red-black tree with pool allocation and search, insert, remove, verify APIs.
+Functions for a single-threaded, fixed-capacity red-black tree with operations like insert, remove, and find.
 
 # Purpose
-This file defines a template for a single-threaded, fixed-capacity red-black tree that uses a preallocated node pool. It is meant for code that needs ordered storage with `O(log n)` insert, remove, and search operations, while also supporting fast in-order traversal. The tree does not allocate memory during normal use. Instead, nodes are acquired from and returned to the pool with functions such as `my_rb_acquire`, `my_rb_release`, `my_rb_insert`, and `my_rb_remove`. The file also defines pool management functions such as `my_rb_new`, `my_rb_join`, `my_rb_leave`, and `my_rb_delete`, plus helpers for traversal, search, size, and integrity checks.
+The code defines a family of functions for implementing a single-threaded, fixed-capacity red-black tree. A red-black tree is a type of self-balancing binary search tree that maintains sorted order of nodes, allowing for efficient queries, insertions, and deletions with a time complexity of O(log n), where n is the number of nodes in the tree. This implementation is designed for high-performance contexts and uses a pool-based memory allocation strategy. Nodes are allocated from a pre-defined pool, and after removal, they are returned to the pool. This allows multiple trees to coexist within the same pool, facilitating operations like moving nodes between trees without copying data.
 
-The file is written as a macro-based C template that is included after the application defines `REDBLK_T` and `REDBLK_NAME`. This lets the same source generate a type-specific API for any node type that contains the required red-black tree link fields. The implementation includes the red-black tree balancing logic, such as rotations and insert or delete fixup, and it also provides `my_rb_insert_or_replace` for key replacement during insertion. The application must provide `my_rb_compare`, which defines the key order used by the tree.
-# Function Declarations (Public API)
+The code provides a comprehensive API for managing red-black trees, including functions for creating and managing memory pools, inserting and removing nodes, and performing tree operations such as finding the minimum or maximum node, and verifying the integrity of the tree. The API is designed to be flexible, allowing the user to define the node structure and key comparison logic. The code also includes mechanisms for ensuring the correctness of the tree structure, such as maintaining the red-black properties during insertions and deletions. The implementation is modular, allowing for different styles of use, including local use, library header declarations, and library implementations.
+# Imports and Dependencies
 
 ---
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
-- `REDBLK_`
+- `../log/fd_log.h`
+- `fd_pool.c`
+
+
+# Functions
+
+---
+### REDBLK\_<!-- {{#callable:REDBLK_}} -->
+[View Source →](<../../../../../src/util/tmpl/fd_redblack.c#L1217>)
+
+Verifies the integrity of a red-black tree structure within a given pool.
+- **Inputs**:
+    - `pool`: A pointer to the pool of red-black tree nodes.
+    - `root`: A pointer to the root node of the red-black tree to verify.
+- **Logic and Control Flow**:
+    - Check that the sentinel node (`REDBLK_NIL`) has no children and is black.
+    - If the `root` is null or points to the sentinel node, return 0 as the tree is trivially correct.
+    - Verify that the `root` node is black.
+    - Calculate the size of the tree and ensure it matches the used nodes in the pool.
+    - Determine the number of black nodes on a path from the root to a leaf.
+    - Call `REDBLK_(verify_private)` to recursively verify the tree structure, ensuring all red-black tree properties are maintained.
+- **Output**: Returns 0 if the tree is correct, or a non-zero value if an error is detected.
+
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

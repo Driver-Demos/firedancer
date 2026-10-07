@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Debug build flags for CPPFLAGS and LDFLAGS.
+Makefile settings to enable debug information and dynamic linking.
 
 # Purpose
-Adds debug build flags to the compiler and linker settings. `CPPFLAGS` enables full debug symbols with `-g3` and keeps the frame pointer with `-fno-omit-frame-pointer`, and `LDFLAGS` adds `-rdynamic` so the linker exports symbols for runtime use.
+The file configures compilation and linking flags for a C++ project. The `CPPFLAGS` variable is set to include the `-g3` flag, which adds debugging information, and the `-fno-omit-frame-pointer` flag, which preserves the frame pointer for better debugging. The `LDFLAGS` variable includes the `-rdynamic` flag, which makes all symbols in the executable available to the dynamic linker, aiding in debugging and profiling.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

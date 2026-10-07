@@ -3,44 +3,46 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `pcie_inorder.sv` file in the `firedancer` codebase implements a SystemVerilog module for handling in-order PCIe transactions with dual-port RAM for data storage and retrieval.
+Implements a PCIe inorder module with dual-port RAM for data handling and address matching.
 
 # Purpose
-The provided Verilog code defines a module named `pcie_inorder`, which is designed to handle PCI Express (PCIe) transactions in an orderly manner. This module is primarily focused on managing data flow and ensuring that transactions are processed in sequence, as indicated by its name. The module uses parameters such as `ADDR_MASK`, `ADDR_VAL`, `W`, and `D` to configure address matching and data width, allowing for flexible adaptation to different system requirements. The core functionality revolves around checking address matches, managing timestamps, and controlling data flow through dual-port RAM instances, which are used to store and retrieve transaction data.
+The `pcie_inorder` module is a Verilog hardware description that manages data transactions over a PCI Express (PCIe) interface. It processes incoming PCIe data and addresses, and outputs them in an ordered manner. The module uses parameters such as `ADDR_MASK`, `ADDR_VAL`, `W`, and `D` to configure address matching and data width. The module includes logic to handle address matching, data validation, and timestamping to ensure data is processed in order. It uses dual-port RAM instances to store and retrieve data and timestamps, ensuring that data is read and written in a synchronized manner.
 
-The module includes several key components, such as logic for address matching, timestamp management, and dual-port RAM instances for data storage. The use of generate blocks and conditional logic allows for configurable behavior based on the `REG_O` parameter, which determines whether outputs are registered or directly assigned. The module also includes mechanisms for resetting and incrementing addresses and timestamps, ensuring that data is processed in a consistent and orderly fashion. Overall, this module provides a specialized function within a PCIe system, focusing on maintaining the order of transactions and managing data flow efficiently.
+The module's functionality is controlled by input signals such as `pcie_v`, `pcie_a`, and `pcie_d`, and it outputs signals like `out_v`, `out_s`, `out_a`, and `out_d`. The module uses a clock (`clk`) and reset (`rst`) signal to synchronize operations. The `generate` block conditionally instantiates logic based on the `REG_O` parameter, which determines whether outputs are registered. The module also includes logic to increment a timestamp and manage read addresses, ensuring that data is processed in the correct sequence. The use of `simple_dual_port_ram` components facilitates efficient data storage and retrieval, supporting the module's primary function of maintaining in-order data processing for PCIe transactions.
 # Modules
 
 ---
 ### pcie\_inorder
-The `pcie_inorder` module is designed to handle PCIe transactions in an ordered manner, ensuring data integrity and correct sequencing. It uses dual-port RAMs to manage data and timestamps, and it includes logic to handle address matching and output validation.
+Implements a PCIe interface that processes input data and addresses, and outputs validated data and addresses based on specific conditions. Uses dual-port RAM for data storage and retrieval, and includes logic for address matching and timestamp management.
 - **Constants**:
-    - `ADDR_MASK`: A 64-bit constant used to mask the PCIe address for matching purposes.
-    - `ADDR_VAL`: A 64-bit constant representing the target address value for matching.
-    - `W`: The width of the data, set to 512 bits.
-    - `D`: The depth of the data, set to 512.
-    - `REG_O`: A parameter to determine if output registers are used, default is 0.
-    - `W2`: Half the width of the data, calculated as W/2.
-    - `W_L`: The logarithm base 2 of the data width, used for address calculations.
-    - `D_L`: The logarithm base 2 of the data depth, used for address calculations.
+    - ``ADDR_MASK``: Defines the address mask for matching PCIe addresses.
+    - ``ADDR_VAL``: Specifies the address value for comparison with PCIe addresses.
+    - ``W``: Sets the data width for PCIe data.
+    - ``D``: Defines the depth of the dual-port RAM.
+    - ``REG_O``: Determines if output registers are used.
+    - ``W2``: Calculates half of the data width `W`.
+    - ``W_L``: Calculates the log base 2 of the data width `W`.
+    - ``D_L``: Calculates the log base 2 of the depth `D`.
 - **Ports**:
-    - `pcie_v`: A 2-bit input wire indicating the validity of PCIe transactions.
-    - `pcie_a`: A 64-bit input wire representing the PCIe address.
-    - `pcie_d`: A 2xW2-bit input wire array for PCIe data.
-    - `out_v`: A 1-bit output logic indicating the validity of the output data.
-    - `out_s`: A 1-bit output logic indicating a status signal based on address matching.
-    - `out_p`: A 1-bit input wire for output processing control.
-    - `out_a`: A 64-bit output logic for the output address.
-    - `out_d`: A W-bit output logic for the output data.
-    - `clk`: A 1-bit input wire for the clock signal.
-    - `rst`: A 1-bit input wire for the reset signal.
-- **Logic And Control Flow**:
-    - The module uses a `generate` block to conditionally instantiate logic based on the `REG_O` parameter, determining if outputs are registered or not.
-    - The `addr_match` signal is assigned by comparing the masked PCIe address with `ADDR_VAL`.
-    - The `out_iv` signal is calculated based on address and timestamp comparisons to ensure data validity.
-    - A `generate` block instantiates two `simple_dual_port_ram` modules for handling PCIe data and timestamps, with separate read and write logic.
-    - An `always_ff` block updates the `timestamp` and manages the read address and output address based on input conditions and reset state.
-    - The module includes commented `always_ff` blocks for debugging purposes, displaying input and output states when certain conditions are met.
+    - ``pcie_v``: Input wire for PCIe valid signals.
+    - ``pcie_a``: Input wire for PCIe addresses.
+    - ``pcie_d``: Input wire for PCIe data.
+    - ``out_v``: Output logic for valid signal.
+    - ``out_s``: Output logic for status signal.
+    - ``out_p``: Input wire for output processing signal.
+    - ``out_a``: Output logic for address.
+    - ``out_d``: Output logic for data.
+    - ``clk``: Input wire for clock signal.
+    - ``rst``: Input wire for reset signal.
+- **Logic and Control Flow**:
+    - Assigns `addr_match` to check if the PCIe address matches the specified address value using the address mask.
+    - Calculates `out_iv` to determine if the output address and timestamp conditions are met.
+    - Updates `rd_addr_n` based on the output valid and processing signals.
+    - Uses a `generate` block to conditionally assign or register output signals based on `REG_O`.
+    - Instantiates dual-port RAM modules for storing and retrieving PCIe data and timestamps.
+    - Increments `timestamp` on each clock cycle and resets it on reset signal.
+    - Resets `rd_addr` and `out_ia` when PCIe valid and address match conditions are met.
+    - Updates `rd_addr` and `out_ia` based on output valid and processing signals.
 
 
 
