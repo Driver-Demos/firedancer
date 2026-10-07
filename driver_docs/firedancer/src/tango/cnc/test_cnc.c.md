@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `test_cnc.c` file in the `firedancer` codebase contains a unit test for the command and control (CNC) system, verifying its functionality through various signal handling and state transitions, including booting, running, and halting states.
+Unit test for command and control (CNC) functionality, including signal handling and app thread management.
 
 # Purpose
-This C source code file is designed to implement a unit test for a command-and-control (CNC) system, which is part of a larger software framework. The code is structured to test the functionality of CNC operations, including signal handling, memory alignment, and inter-thread communication. It includes static assertions to verify compile-time constants related to memory alignment and signal definitions, ensuring that the CNC system adheres to expected specifications. The file defines a main function that initializes the environment, sets up shared memory, and manages the lifecycle of an application thread that interacts with the CNC system. The application thread, defined in [`app_main`](#app_main), transitions through various states (BOOT, RUN, HALT) and processes signals to perform tasks such as acknowledging commands and simulating a simple "game" interaction.
+The code is a C program that functions as a unit test for a command and control (CNC) system. It verifies the behavior of CNC operations, including signal handling and memory alignment. The program uses static assertions to ensure that certain constants and alignments are correct, such as `FD_CNC_ALIGN` and `FD_CNC_FOOTPRINT`. It defines several signals like `FD_CNC_SIGNAL_RUN`, `FD_CNC_SIGNAL_BOOT`, and user-defined signals such as `USER_ACK` and `USER_GAME`. The main functionality is encapsulated in the [`app_main`](<#app_main>) function, which simulates a thread that transitions through different states (BOOT, RUN, HALT) and processes signals accordingly.
 
-The code is a comprehensive test suite that validates the CNC system's ability to handle signals and manage shared memory across threads. It includes detailed checks for error conditions and logs the results of various operations, providing insights into the system's behavior. The file is intended to be executed as a standalone program, as indicated by the presence of a [`main`](#main) function, and it requires specific capabilities (`FD_HAS_HOSTED` and `FD_HAS_ATOMIC`) to run. The test suite ensures that the CNC system can handle concurrent operations and signal processing, which are critical for applications that rely on precise inter-thread communication and synchronization.
+The [`main`](<#main>) function initializes the environment, sets up shared memory, and starts the application thread. It performs a series of tests to ensure that the CNC system behaves as expected, including signal queries, heartbeats, and error handling. The program uses the `fd_cnc` API to manage the lifecycle of the CNC session, including joining, signaling, and leaving the session. It also logs error messages and notices to provide feedback on the test results. If the required capabilities (`FD_HAS_HOSTED` and `FD_HAS_ATOMIC`) are not available, the program will skip the test and log a notice.
 # Imports and Dependencies
 
 ---
@@ -20,44 +20,48 @@ The code is a comprehensive test suite that validates the CNC system's ability t
 ---
 ### shmem
 - **Type**: `uchar array`
-- **Description**: The `shmem` variable is a globally declared unsigned character array with a size determined by the macro `FD_CNC_FOOTPRINT(APP_MAX)`. It is aligned to `FD_CNC_ALIGN` using the `__attribute__((aligned(FD_CNC_ALIGN)))` directive, ensuring proper memory alignment for efficient access.
-- **Use**: This variable is used as a shared memory buffer for command and control operations, facilitating communication between different parts of the application.
+- **Description**: An array of unsigned characters (`uchar`) with a size determined by the macro `FD_CNC_FOOTPRINT(APP_MAX)`, which is aligned to `FD_CNC_ALIGN` bytes. The alignment ensures that the memory is accessed efficiently according to the specified alignment constraints.
+- **Use**: Used as a shared memory buffer for command and control operations in the application.
 
 
 # Functions
 
 ---
 ### app\_main<!-- {{#callable:app_main}} -->
-The `app_main` function manages the lifecycle of an application thread, handling signals for booting, running, and halting, and processing specific user commands in a loop.
+[View Source →](<../../../../../src/tango/cnc/test_cnc.c#L32>)
+
+Manages the lifecycle of an application thread, handling signals for booting, running, and halting states.
 - **Inputs**:
-    - `argc`: The number of command-line arguments passed to the function, expected to be zero.
-    - `argv`: An array of command-line arguments, where the first element is used as a pointer to join the command and control (CNC) structure.
-- **Control Flow**:
-    - The function begins by asserting that no command-line arguments are passed and joins a CNC structure using the first element of `argv`.
-    - It verifies that the CNC structure is in the BOOT state and aligns the application memory address.
-    - The function signals the transition to the RUN state and enters an infinite loop to manage the application thread's operations.
-    - Within the loop, it periodically sends a heartbeat signal and checks for incoming signals to process.
-    - If a HALT signal is received, the loop breaks, ending the run state.
-    - If a USER_ACK signal is received, it clears the signal by setting it back to RUN.
-    - If a USER_GAME signal is received, it performs a sequence of operations to simulate a game, including serving a 'ball', waiting for a return, and verifying the game's legality.
-    - If an unexpected signal is received, it logs an error.
-    - After exiting the loop, the function performs dummy halt operations and signals a transition back to the BOOT state.
-    - Finally, it leaves the CNC structure and returns 0, indicating successful execution.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+    - `argc`: The number of command-line arguments passed to the program.
+    - `argv`: An array of strings representing the command-line arguments.
+- **Logic and Control Flow**:
+    - Verify that `argc` is zero and join the command-and-control (CNC) session using `argv` as the shared memory address.
+    - Check that the CNC signal is in the BOOT state and align the application memory address.
+    - Signal the transition to the RUN state and enter an infinite loop to manage the application thread.
+    - Periodically update the heartbeat and check for signals other than RUN.
+    - If a HALT signal is received, break the loop to halt the application.
+    - If a USER_ACK signal is received, clear it by signaling RUN.
+    - If a USER_GAME signal is received, perform a sequence of operations to simulate a game, including serving a ball, waiting for a return, and verifying the game state.
+    - Log an error if an unexpected signal is received.
+    - Yield control periodically during the run loop and after halting.
+    - Signal the transition back to the BOOT state and leave the CNC session, ensuring a clean halt.
+- **Output**: Returns 0 to indicate successful execution.
 
 
 ---
 ### main<!-- {{#callable:main}} -->
-The `main` function initializes the environment and logs a notice that the unit test is skipped due to missing capabilities, then halts the program.
+[View Source →](<../../../../../src/tango/cnc/test_cnc.c#L219>)
+
+Initializes the environment and logs a notice if certain capabilities are not available, then halts execution.
 - **Inputs**:
-    - `argc`: The count of command-line arguments passed to the program.
+    - `argc`: The number of command-line arguments.
     - `argv`: An array of strings representing the command-line arguments.
-- **Control Flow**:
-    - Call `fd_boot` to initialize the environment with the command-line arguments.
-    - Log a notice message indicating that the unit test is skipped because it requires `FD_HAS_HOSTED` and `FD_HAS_ATOMIC` capabilities.
-    - Call `fd_halt` to terminate the program.
-    - Return 0 to indicate successful completion.
-- **Output**: The function returns an integer value of 0, indicating successful execution.
+- **Logic and Control Flow**:
+    - Calls `fd_boot` to initialize the environment with the command-line arguments.
+    - Logs a notice indicating that the unit test requires `FD_HAS_HOSTED` and `FD_HAS_ATOMIC` capabilities.
+    - Calls `fd_halt` to stop execution.
+    - Returns 0 to indicate successful completion.
+- **Output**: Returns 0, indicating successful execution.
 
 
 
