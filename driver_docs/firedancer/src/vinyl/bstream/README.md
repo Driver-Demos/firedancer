@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions, headers, makefile, and unit tests for managing and testing vinyl bstream blocks.
+Bstream block layouts, hashes, validation helpers, and unit tests for vinyl storage.
 
 
 ## Files
-- **[fd_vinyl_bstream.c](fd_vinyl_bstream.c.md)**: Functions for hashing, testing, and validating vinyl bstream blocks, including control style conversion.
-- **[fd_vinyl_bstream.h](fd_vinyl_bstream.h.md)**: Header file for managing a vinyl key-value store's block stream, including data integrity, compaction, and encoding.
-- **[Local.mk](Local.mk.md)**: Makefile for adding headers, objects, and unit tests for the `fd_vinyl_bstream` component.
-- **[test_vinyl_bstream.c](test_vinyl_bstream.c.md)**: Unit tests for the `fd_vinyl_bstream` module, verifying static assertions, sequence comparisons, control encoding, and hash tests.
+- **[fd_vinyl_bstream.c](fd_vinyl_bstream.c.md)**: Hashing and validation helpers for vinyl bstream pairs, dead, move, part, and zero padding blocks.
+- **[fd_vinyl_bstream.h](fd_vinyl_bstream.h.md)**: Bstream block layouts, control codes, hashes, and validation helpers for vinyl storage.
+- **[Local.mk](Local.mk.md)**: Build rules for fd_vinyl_bstream headers, objects, and unit test execution.
+- **[test_vinyl_bstream.c](test_vinyl_bstream.c.md)**: Unit tests for vinyl bstream constants, encoding, hashing, and validation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

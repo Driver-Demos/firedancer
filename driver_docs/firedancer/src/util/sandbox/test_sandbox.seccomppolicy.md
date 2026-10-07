@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a seccomp policy for system calls with specific argument conditions.
+The `test_sandbox.seccomppolicy` file defines a seccomp policy for the `firedancer` project, specifying allowed system calls and their conditions, such as `write` and `fsync` with specific argument checks, and `exit_group`.
 
 # Purpose
-The configuration specifies conditions for certain operations based on the value of `arg 0`. The `write` operation is allowed if `arg 0` equals 2 or 3. The `fsync` operation is allowed only if `arg 0` equals 3. The `exit_group` operation is listed without conditions, indicating it may be executed without specific argument checks.
+The file defines a set of conditions and operations for a system or application, likely related to process management or system calls. It specifies that the "write" operation should occur if the first argument equals 2 or 3, and the "fsync" operation should occur if the first argument equals 3. Additionally, it includes an "exit_group" operation, which may indicate a termination or cleanup process.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
