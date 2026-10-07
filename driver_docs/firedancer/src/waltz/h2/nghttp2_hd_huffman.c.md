@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements Huffman decoding for HTTP/2 header compression.
+The `nghttp2_hd_huffman.c` file in the `firedancer` codebase implements functions for initializing and decoding Huffman encoded data as part of the HTTP/2 C library.
 
 # Purpose
-The code is part of the `nghttp2` library, which is a C library for HTTP/2. It specifically deals with Huffman decoding, a compression technique used in HTTP/2 header compression. The file includes functions to initialize and perform Huffman decoding. The function [`nghttp2_hd_huff_decode_context_init`](<#nghttp2_hd_huff_decode_context_init>) initializes a Huffman decoding context by setting its state to `NGHTTP2_HUFF_ACCEPTED`. The function [`nghttp2_hd_huff_decode`](<#nghttp2_hd_huff_decode>) performs the actual decoding process. It takes a decoding context, a buffer to store the decoded output, a source byte array, the length of the source, and a flag indicating if it is the final block. The function iterates over the source data, using a Huffman decoding table to translate encoded bytes into symbols, which are then stored in the buffer.
+This C source code file is part of the nghttp2 library, which is an implementation of the HTTP/2 protocol. The file specifically deals with Huffman decoding, a compression technique used in HTTP/2 to reduce the size of headers. The primary functionality provided by this file is the initialization and execution of Huffman decoding operations. It includes the function [`nghttp2_hd_huff_decode_context_init`](#nghttp2_hd_huff_decode_context_init), which initializes a decoding context, and [`nghttp2_hd_huff_decode`](#nghttp2_hd_huff_decode), which performs the actual decoding of a given input buffer using a predefined Huffman decoding table. The code is designed to handle the decoding process efficiently by iterating over the input data and updating the decoding context state.
 
-The code uses a decoding algorithm referenced in several documents, which are linked in the comments. The decoding process involves checking the state of the decoding context and updating it as each byte is processed. If the final flag is set and the decoding context is not in an accepted state, the function returns an error code `NGHTTP2_ERR_HEADER_COMP`. The file is intended to be part of the internal implementation of the `nghttp2` library and does not define public APIs or external interfaces directly.
+The file is intended to be part of a larger library and is not a standalone executable. It includes headers and functions that are likely used by other parts of the nghttp2 library to handle HTTP/2 header compression and decompression. The code is structured to be integrated into the broader nghttp2 library, providing a specific and narrow functionality focused on Huffman decoding. It does not define public APIs or external interfaces directly but rather contributes to the internal workings of the nghttp2 library's header compression mechanism.
 # Imports and Dependencies
 
 ---
@@ -22,38 +22,32 @@ The code uses a decoding algorithm referenced in several documents, which are li
 
 ---
 ### nghttp2\_hd\_huff\_decode\_context\_init<!-- {{#callable:nghttp2_hd_huff_decode_context_init}} -->
-[View Source →](<../../../../../src/waltz/h2/nghttp2_hd_huffman.c#L34>)
-
-Initializes the Huffman decoding context by setting its state to accepted.
+The function `nghttp2_hd_huff_decode_context_init` initializes a Huffman decoding context by setting its state to `NGHTTP2_HUFF_ACCEPTED`.
 - **Inputs**:
     - `ctx`: A pointer to an `nghttp2_hd_huff_decode_context` structure that will be initialized.
-- **Logic and Control Flow**:
-    - Set the `fstate` member of the `ctx` structure to `NGHTTP2_HUFF_ACCEPTED`.
-- **Output**: No output is returned as the function is of type `void`.
+- **Control Flow**:
+    - The function sets the `fstate` member of the `ctx` structure to `NGHTTP2_HUFF_ACCEPTED`.
+- **Output**: This function does not return a value; it initializes the provided context structure.
 
 
 ---
 ### nghttp2\_hd\_huff\_decode<!-- {{#callable:nghttp2_hd_huff_decode}} -->
-[View Source →](<../../../../../src/waltz/h2/nghttp2_hd_huffman.c#L38>)
-
-Decodes Huffman-encoded data from a source buffer into a destination buffer.
+The `nghttp2_hd_huff_decode` function decodes a Huffman-encoded byte sequence into its original form using a specified decoding context and buffer.
 - **Inputs**:
-    - `ctx`: A pointer to `nghttp2_hd_huff_decode_context` which maintains the current state of the Huffman decoding process.
-    - `buf`: A pointer to `nghttp2_buf` where the decoded output will be stored.
-    - `src`: A pointer to the source buffer containing Huffman-encoded data.
-    - `srclen`: The length of the source buffer `src`.
-    - `final`: An integer flag indicating if this is the final block of data to decode.
-- **Logic and Control Flow**:
-    - Initialize `end` to point to the end of the source buffer `src`.
-    - Initialize a `nghttp2_huff_decode` node with the current state from `ctx`.
-    - Iterate over each byte in the source buffer `src` until `end` is reached.
-    - For each byte, use the high nibble to index into the Huffman decode table and update the decode state `t`.
-    - If the current state `t` indicates a symbol, append the symbol to the destination buffer `buf`.
-    - Repeat the process for the low nibble of the byte.
-    - Update the context's state `ctx->fstate` with the final state `t->fstate`.
-    - If `final` is true and the final state is not accepted, return an error code `NGHTTP2_ERR_HEADER_COMP`.
-    - Return the number of bytes processed from the source buffer `src`.
-- **Output**: Returns the number of bytes processed from the source buffer `src`, or an error code if the final state is not accepted.
+    - `ctx`: A pointer to an `nghttp2_hd_huff_decode_context` structure that maintains the current state of the Huffman decoding process.
+    - `buf`: A pointer to an `nghttp2_buf` structure where the decoded output will be stored.
+    - `src`: A pointer to the source byte array containing the Huffman-encoded data to be decoded.
+    - `srclen`: The length of the source byte array `src`.
+    - `final`: An integer flag indicating whether this is the final block of data to be decoded (non-zero if final, zero otherwise).
+- **Control Flow**:
+    - Initialize the end pointer to the end of the source data and set up the initial decoding node using the current state from the context.
+    - Iterate over each byte in the source data until the end is reached.
+    - For each byte, perform two decoding steps: first using the higher 4 bits and then the lower 4 bits of the byte, updating the decoding node each time.
+    - If a symbol is found during decoding (indicated by the `NGHTTP2_HUFF_SYM` flag), append it to the output buffer.
+    - Update the context's state with the final state of the decoding node after processing all input bytes.
+    - If the `final` flag is set and the final state is not `NGHTTP2_HUFF_ACCEPTED`, return an error code `NGHTTP2_ERR_HEADER_COMP`.
+    - Return the length of the source data as the function's result.
+- **Output**: The function returns the number of bytes processed from the source data as an `nghttp2_ssize` type, or an error code `NGHTTP2_ERR_HEADER_COMP` if the final state is not accepted when `final` is set.
 
 
 

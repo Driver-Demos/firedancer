@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines a structure and macros for a QUIC connection map with dynamic mapping capabilities.
+The `fd_quic_conn_map.h` file defines a structure and associated macros for managing a map of QUIC connections in the Firedancer project.
 
 # Purpose
-This C header file defines a data structure and related macros for managing a map of QUIC connections. The `fd_quic_conn_map` structure, aligned to 16 bytes, contains a `conn_id` of type `ulong` and a pointer `conn` to a `fd_quic_conn_t` structure. The typedef `fd_quic_conn_map_t` is provided for ease of use. The file also sets up several macros, such as `MAP_NAME`, `MAP_T`, and `MAP_KEY`, which are used to configure a dynamic map implementation included from `fd_map_dynamic.c`. The map uses `conn_id` as the key and a simple hash function `MAP_KEY_HASH` that casts the key to a `uint`.
+This C header file defines a data structure and associated macros for managing a map of QUIC connections, specifically tailored for use within a larger QUIC protocol implementation. The `fd_quic_conn_map` structure is defined with two fields: `conn_id`, a unique identifier for each connection, and `conn`, a pointer to a `fd_quic_conn_t` structure representing the connection details. The file uses macros to set up a dynamic map, leveraging an included template file (`fd_map_dynamic.c`) to handle map operations such as insertion and lookup. The map is designed to be efficient, with the `conn_id` serving as the key and a simple hash function (`MAP_KEY_HASH`) that directly casts the connection ID to an unsigned integer. This header is part of a modular system, likely used to manage and access multiple QUIC connections efficiently within a network application.
 # Imports and Dependencies
 
 ---
@@ -18,20 +18,20 @@ This C header file defines a data structure and related macros for managing a ma
 
 ---
 ### fd\_quic\_conn\_map
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``conn_id``: A unique identifier for a connection.
-    - ``conn``: A pointer to an `fd_quic_conn_t` structure representing the connection.
-- **Description**: Aligns to 16 bytes and maps a connection ID to a pointer to an `fd_quic_conn_t` structure, facilitating the management of QUIC connections.
+    - `conn_id`: A unique identifier for a QUIC connection.
+    - `conn`: A pointer to an fd_quic_conn_t structure representing the QUIC connection.
+- **Description**: The `fd_quic_conn_map` structure is designed to map a unique connection identifier (`conn_id`) to a pointer to a QUIC connection (`conn`). It is aligned to 16 bytes for performance optimization and is used in conjunction with a dynamic map implementation to efficiently manage and access QUIC connections by their identifiers.
 
 
 ---
 ### fd\_quic\_conn\_map\_t
-- **Type**: ``struct``
+- **Type**: `struct`
 - **Members**:
-    - ``conn_id``: A unique identifier for a connection.
-    - ``conn``: A pointer to a `fd_quic_conn_t` structure representing the connection.
-- **Description**: Aligns to 16 bytes and maps a connection ID to a pointer to a QUIC connection structure, facilitating efficient connection management.
+    - `conn_id`: A unique identifier for a QUIC connection.
+    - `conn`: A pointer to an fd_quic_conn_t structure representing the QUIC connection.
+- **Description**: The `fd_quic_conn_map_t` structure is designed to map a unique connection identifier to a corresponding QUIC connection object. It is aligned to 16 bytes for performance optimization and includes a connection ID and a pointer to the connection structure. This mapping is crucial for managing and accessing QUIC connections efficiently within the system.
 
 
 

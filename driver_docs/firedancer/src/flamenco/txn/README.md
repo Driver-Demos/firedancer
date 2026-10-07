@@ -3,13 +3,13 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for transaction metadata and payloads, utility methods for transaction templates, and a Makefile.
+The `txn` folder in the `firedancer` codebase contains files for generating and managing transaction metadata and payloads, including utility methods and build configurations related to transaction processing.
 
 
 ## Files
-- **[fd_txn_generate.c](fd_txn_generate.c.md)**: Functions for generating and managing transaction metadata and payloads in a blockchain context.
-- **[fd_txn_generate.h](fd_txn_generate.h.md)**: Utility methods for creating transaction templates and building transactions with instructions.
-- **[Local.mk](Local.mk.md)**: Makefile for conditionally adding headers and objects if 128-bit integers are available.
+- **[fd_txn_generate.c](fd_txn_generate.c.md)**: The `fd_txn_generate.c` file in the `firedancer` codebase provides functions for generating and managing transaction metadata and payloads, including adding and resetting transaction instructions.
+- **[fd_txn_generate.h](fd_txn_generate.h.md)**: The `fd_txn_generate.h` file provides utility methods for creating transaction templates, adding instructions, and managing account lists in the Firedancer codebase.
+- **[Local.mk](Local.mk.md)**: The `Local.mk` file in the `firedancer` codebase specifies conditional inclusion of headers and objects related to transaction generation and flamenco if 128-bit integer support is available.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
