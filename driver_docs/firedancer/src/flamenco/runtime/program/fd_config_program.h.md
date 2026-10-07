@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-A native program for storing and managing lists of pubkeys with designated signers in accounts.
+The `fd_config_program.h` file defines a native program for managing lists of public keys in accounts, requiring designated signers to authorize changes, and includes an entry point for executing instructions within the `firedancer` codebase.
 
 # Purpose
-This C header file defines the interface for a configuration program within a runtime environment. The program implements a single instruction that facilitates the storage of lists of public keys (`pubkeys`) in accounts, with some of these keys designated as "signers." To modify the list of `pubkeys`, all designated signers must sign the instruction. The file includes necessary dependencies from `fd_flamenco_base.h` and `fd_exec_instr_ctx.h`, and it declares the function [`fd_config_program_execute`](<#fd_config_program_execute>), which serves as the entry point for processing instructions related to the configuration program. The program is associated with the address `Config1111111111111111111111111111111111111`.
+This C header file defines the interface for a configuration program within the "flamenco" runtime environment. It primarily declares a function, [`fd_config_program_execute`](#fd_config_program_execute), which serves as the entry point for processing instructions related to managing lists of public keys (pubkeys) in accounts. The program facilitates the storage and modification of these pubkey lists, requiring signatures from designated "signers" to authorize changes. The header includes necessary dependencies from the flamenco base and execution context, ensuring that the function can interact with the broader system. The file is structured to prevent multiple inclusions and provides a clear, concise API for integrating this configuration functionality into other parts of the software.
 # Imports and Dependencies
 
 ---
@@ -18,14 +18,12 @@ This C header file defines the interface for a configuration program within a ru
 
 ---
 ### fd\_config\_program\_execute<!-- {{#callable_declaration:fd_config_program_execute}} -->
-[View Source →](<../../../../../../src/flamenco/runtime/program/fd_config_program.h#L15>)
-
-Processes a configuration program instruction.
-- **Description**: Use this function to execute a configuration program instruction within the given execution context. It checks if the program is a migrated native program and returns an error if so. This function updates the compute units and processes the instruction. Call this function when you need to handle a configuration program instruction in the context of a transaction. Ensure that the execution context is properly initialized before calling this function.
+Execute the instruction processing for the config program.
+- **Description**: This function serves as the entry point for executing instructions in the config program, which is a native program designed to manage lists of public keys in accounts. It should be called when an instruction needs to be processed, ensuring that all designated signers have signed the instruction. The function checks for unsupported program IDs and updates compute units before processing the instruction. It is important to ensure that the context provided is properly initialized and that the program is not a migrated native program, as this will result in an error.
 - **Inputs**:
-    - `ctx`: A pointer to an `fd_exec_instr_ctx_t` structure that represents the execution context for the instruction. This must not be null and must be properly initialized before calling the function. The caller retains ownership of this context.
-- **Output**: Returns an integer status code. If the program is a migrated native program, it returns `FD_EXECUTOR_INSTR_ERR_UNSUPPORTED_PROGRAM_ID`. Otherwise, it returns the result of processing the configuration instruction.
-- **See Also**: [`fd_config_program_execute`](<fd_config_program.c.md#fd_config_program_execute>)  (Implementation)
+    - `ctx`: A pointer to an `fd_exec_instr_ctx_t` structure that contains the execution context for the instruction. This must be a valid, non-null pointer, and the context should be properly initialized before calling this function. The caller retains ownership of the context.
+- **Output**: Returns an integer status code. If the program ID is unsupported due to migration, it returns `FD_EXECUTOR_INSTR_ERR_UNSUPPORTED_PROGRAM_ID`. Otherwise, it returns the result of processing the instruction.
+- **See also**: [`fd_config_program_execute`](fd_config_program.c.md#fd_config_program_execute)  (Implementation)
 
 
 

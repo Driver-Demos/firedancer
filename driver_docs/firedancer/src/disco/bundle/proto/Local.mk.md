@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for adding protobuf object files to the fd_disco target.
+The `Local.mk` file in the `firedancer` codebase specifies object files related to protocol buffers for inclusion in the `fd_disco` build target.
 
 # Purpose
-The `Makefile` snippet uses a function call to add object files to a target. The `add-objs` function is invoked with a list of protocol buffer object files: `auth.pb`, `block_engine.pb`, `bundle.pb`, `packet.pb`, `shared.pb`, and `timestamp.pb`. These object files are added to the `fd_disco` target, which is likely a build target in the make process.
+The file content is a Makefile snippet that uses a macro to add object files to a build target. It calls the `add-objs` function to include the object files `auth.pb`, `block_engine.pb`, `bundle.pb`, `packet.pb`, `shared.pb`, and `timestamp.pb` into the `fd_disco` target, facilitating the build process in a software project.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
