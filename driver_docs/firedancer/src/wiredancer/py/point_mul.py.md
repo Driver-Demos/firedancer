@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements elliptic curve point multiplication and addition using the Ed25519 curve.
+The `point_mul.py` file in the `firedancer` codebase implements elliptic curve point multiplication and addition operations using the Ed25519 curve, and includes a test routine to verify the correctness of these operations.
 
 # Purpose
-The code is a Python script that performs operations related to elliptic curve cryptography using the Ed25519 curve. It imports functions and constants from two modules, `ref_ed25519` and `ed25519_lib`, which provide mathematical operations and cryptographic utilities. The script defines two main functions: [`kpoint_add`](<#kpoint_add>) and [`kpoint_mul`](<#kpoint_mul>). The [`kpoint_add`](<#kpoint_add>) function computes the addition of two points on the elliptic curve, while the [`kpoint_mul`](<#kpoint_mul>) function performs scalar multiplication of a point on the curve. These functions use modular arithmetic operations to ensure calculations remain within the finite field defined by the curve's parameters.
+This Python script is designed to perform operations related to elliptic curve cryptography, specifically using the Ed25519 curve. The code primarily focuses on implementing point addition and scalar multiplication on the elliptic curve, which are fundamental operations in elliptic curve cryptography. The script imports several functions and constants from two modules, `ref_ed25519` and `ed25519_lib`, which provide necessary mathematical operations and constants for the Ed25519 curve. The functions [`kpoint_add`](#kpoint_add) and [`kpoint_mul`](#kpoint_mul) are central to the script, implementing the addition of two points on the curve and the multiplication of a point by a scalar, respectively. These operations are crucial for cryptographic protocols such as digital signatures and key exchange.
 
-The script also includes a main execution block that tests the elliptic curve operations. It generates random hexadecimal strings to create secret keys, converts them to public keys using the `ref_ed25519` module, and performs point decompression and multiplication. The results of these operations are compared to ensure correctness. The script uses the `Expr` class from `ed25519_lib` to manage expressions and trace computations, which helps in debugging and verifying the cryptographic operations. The script is intended to be run as a standalone program, as indicated by the `if __name__ == '__main__':` block, and it does not define any public APIs or external interfaces for use in other modules.
+The script also includes a main execution block that demonstrates the use of these functions. It generates random keys, converts them to public keys using the Ed25519 curve, and performs point multiplication. The results are evaluated and compared using the `Expr` class, which appears to be a custom class for handling expressions and traces of operations. The script is structured as a standalone executable, indicated by the `if __name__ == '__main__':` block, and is not intended to be used as an importable library. The code includes debugging and tracing capabilities, such as dumping instructions and evaluating traces, which are useful for verifying the correctness of the cryptographic operations.
 # Imports and Dependencies
 
 ---
@@ -32,53 +32,48 @@ The script also includes a main execution block that tests the elliptic curve op
 
 ---
 ### kpoint\_add<!-- {{#callable:firedancer/src/wiredancer/py/point_mul.kpoint_add}} -->
-[View Source →](<../../../../../src/wiredancer/py/point_mul.py#L18>)
-
-Performs point addition on elliptic curve points using modular arithmetic.
+The `kpoint_add` function performs point addition on elliptic curve points in a projective coordinate system using modular arithmetic.
 - **Inputs**:
-    - `P`: A tuple representing the first elliptic curve point with four components.
-    - `Q`: A tuple representing the second elliptic curve point with four components.
-    - `d`: A constant used in the elliptic curve equation.
-    - `p`: The prime modulus for the modular arithmetic operations.
-- **Logic and Control Flow**:
-    - Calculate `A0` and `B0` as the modular subtraction and addition of the first two components of `P`, respectively.
-    - Calculate `A1` and `B1` as the modular subtraction and addition of the first two components of `Q`, respectively.
-    - Compute `A` and `B` as the modular multiplication of `A0` with `A1` and `B0` with `B1`, respectively.
-    - Calculate `C` as the modular multiplication of the third components of `P` and `Q`, then multiply by `d`, and double the result.
-    - Calculate `D` as the modular multiplication of the fourth components of `P` and `Q`, and double the result.
-    - Compute `F` and `G` as the modular subtraction and addition of `D` and `C`, respectively.
-    - Compute `E` and `H` as the modular subtraction and addition of `B` and `A`, respectively.
-    - Calculate `x`, `y`, `z`, and `t` as the modular multiplication of `E` with `F`, `G` with `H`, `F` with `G`, and `E` with `H`, respectively, marking them as output expressions.
-    - Return the tuple `(x, y, z, t)` as the result of the point addition.
-- **Output**: A tuple `(x, y, z, t)` representing the result of the point addition on the elliptic curve.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](<ed25519_lib.py.md#expr>)
+    - `P`: A tuple representing the first elliptic curve point in projective coordinates (x, y, z, t).
+    - `Q`: A tuple representing the second elliptic curve point in projective coordinates (x, y, z, t).
+    - `d`: A constant used in the elliptic curve equation, typically the curve parameter.
+    - `p`: The prime modulus used for modular arithmetic operations.
+- **Control Flow**:
+    - Calculate A0 and B0 as the modular subtraction and addition of the y and x coordinates of point P, respectively.
+    - Calculate A1 and B1 as the modular subtraction and addition of the y and x coordinates of point Q, respectively.
+    - Compute A and B as the modular product of A0 with A1 and B0 with B1, respectively.
+    - Calculate C as twice the modular product of the t coordinates of P and Q, multiplied by d.
+    - Calculate D as twice the modular product of the z coordinates of P and Q.
+    - Compute F, G, E, and H as the modular subtraction and addition of D with C and B with A, respectively.
+    - Calculate x, y, z, and t as the modular products of E with F, G with H, F with G, and E with H, respectively, marking them as output expressions.
+    - Return the tuple (x, y, z, t) representing the resulting point in projective coordinates.
+- **Output**: A tuple (x, y, z, t) representing the resulting elliptic curve point in projective coordinates after the addition.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](ed25519_lib.py.md#expr)
 
 
 ---
 ### kpoint\_mul<!-- {{#callable:firedancer/src/wiredancer/py/point_mul.kpoint_mul}} -->
-[View Source →](<../../../../../src/wiredancer/py/point_mul.py#L54>)
-
-Performs scalar multiplication of a point on an elliptic curve using a given scalar, curve parameter, and prime modulus.
+The `kpoint_mul` function performs scalar multiplication on a point in elliptic curve cryptography using a double-and-add algorithm.
 - **Inputs**:
-    - `P`: A tuple representing a point on the elliptic curve, consisting of four [`Expr`](<ed25519_lib.py.md#expr>) objects.
-    - `s`: An integer scalar used for multiplication.
-    - `d`: A curve parameter used in the elliptic curve equation.
-    - `p`: A prime modulus used for calculations on the elliptic curve.
-- **Logic and Control Flow**:
-    - Initialize `Q` as the neutral element of the elliptic curve.
+    - `P`: A tuple representing a point on the elliptic curve, consisting of four [`Expr`](ed25519_lib.py.md#expr) objects.
+    - `s`: An integer scalar used for multiplication, represented as an [`Expr`](ed25519_lib.py.md#expr) object.
+    - `d`: A constant used in the elliptic curve equation, represented as an [`Expr`](ed25519_lib.py.md#expr) object.
+    - `p`: The prime modulus for the elliptic curve, represented as an [`Expr`](ed25519_lib.py.md#expr) object.
+- **Control Flow**:
+    - Initialize Q as the neutral element of the elliptic curve, represented by a tuple of [`Expr`](ed25519_lib.py.md#expr) objects.
     - Iterate 256 times, corresponding to the bit length of the scalar `s`.
-    - In each iteration, determine the least significant bit of `s` and shift `s` right by one bit.
-    - Compute `Q2` by adding `Q` and `P` using the [`kpoint_add`](<#kpoint_add>) function.
-    - Double the point `P` by adding it to itself using the [`kpoint_add`](<#kpoint_add>) function.
-    - Use the [`ternary`](<ed25519_lib.py.md#ternary>) function to conditionally select components from `Q2` or `Q` based on the bit value `a`.
-    - Update `Q` with the selected components `(x, y, z, t)`.
-    - Return the final value of `Q` after completing all iterations.
-- **Output**: A tuple representing the resulting point on the elliptic curve after scalar multiplication, consisting of four [`Expr`](<ed25519_lib.py.md#expr>) objects.
-- **Functions Called**:
-    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](<ed25519_lib.py.md#expr>)
-    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](<#kpoint_add>)
-    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](<ed25519_lib.py.md#ternary>)
+    - In each iteration, extract the least significant bit of `s` into `a` and right-shift `s` by one bit.
+    - Compute Q2 by adding Q and P using the [`kpoint_add`](#kpoint_add) function.
+    - Double the point P by adding it to itself using the [`kpoint_add`](#kpoint_add) function.
+    - Use the [`ternary`](ed25519_lib.py.md#ternary) function to conditionally select between Q2 and Q based on the value of `a` for each component (x, y, z, t).
+    - Update Q with the selected components (x, y, z, t).
+    - Return the final value of Q after completing all iterations.
+- **Output**: The function returns a tuple of four [`Expr`](ed25519_lib.py.md#expr) objects representing the resulting point on the elliptic curve after scalar multiplication.
+- **Functions called**:
+    - [`firedancer/src/wiredancer/py/ed25519_lib.Expr`](ed25519_lib.py.md#expr)
+    - [`firedancer/src/wiredancer/py/point_mul.kpoint_add`](#kpoint_add)
+    - [`firedancer/src/wiredancer/py/ed25519_lib.ternary`](ed25519_lib.py.md#ternary)
 
 
 

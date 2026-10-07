@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for configuring a build environment with Clang on Haswell architecture, including optimizations and security features.
+The `linux_clang_haswell.mk` file in the `firedancer` codebase is a makefile configuration for building with Clang on Haswell architecture, including various optimizations and feature flags such as AVX and AESNI.
 
 # Purpose
-The Makefile content specifies the build configuration for a software project targeting a Linux environment with the Clang compiler on the Haswell architecture. It sets the `BUILDDIR` variable to `linux/clang/haswell`, indicating the directory structure for the build output. The file includes several other configuration files, such as `config/base.mk` and various `config/extra/*.mk` files, to extend the build settings with additional features like debugging, security, optimization, and threading. The `CPPFLAGS` variable is augmented with compiler flags to optimize for the Haswell architecture and enable specific CPU features like AES-NI and AVX. Additionally, several preprocessor definitions are set to indicate the presence of certain features, such as 128-bit integers and SSE instructions, which are used to conditionally compile code that depends on these capabilities.
+The provided content is a Makefile, which is used to automate the build process of a software project. The `BUILDDIR` variable specifies the directory for the build, targeting a Linux environment with the Clang compiler on a Haswell architecture. The file includes several configuration files, each likely contributing specific build settings or features, such as debugging, security, optimization, and threading capabilities. The `CPPFLAGS` are compiler flags that define preprocessor macros and specify architecture-specific optimizations, such as enabling support for Intel's Haswell architecture features like AES-NI, SSE, and AVX instructions. The defined macros (`FD_HAS_INT128`, `FD_HAS_DOUBLE`, etc.) indicate the presence of certain features or capabilities in the build environment, ensuring that the software is compiled with the appropriate optimizations and functionalities.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

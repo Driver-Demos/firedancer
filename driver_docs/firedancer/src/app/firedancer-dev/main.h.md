@@ -3,46 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Header file declaring external configuration stages for the Firedancer application.
+Declarations for configure stages kill, netns, genesis, and keys.
 
 # Purpose
-This code is a C header file that defines preprocessor directives and includes necessary dependencies for a project. It includes the `configure.h` header file from a shared commands directory, which suggests that it relies on configuration functionalities defined elsewhere. The file declares four external variables of type `configure_stage_t`: `fd_cfg_stage_kill`, `fd_cfg_stage_netns`, `fd_cfg_stage_genesis`, and `fd_cfg_stage_keys`. These variables likely represent different stages in a configuration process, and their external declaration indicates that they are defined in another source file. The header guards prevent multiple inclusions of this file, ensuring that the declarations are only processed once during compilation.
-# Imports and Dependencies
-
----
-- `../shared/commands/configure/configure.h`
-
-
-# Global Variables
-
----
-### fd\_cfg\_stage\_kill
-- **Type**: ``configure_stage_t``
-- **Description**: `fd_cfg_stage_kill` is a global variable of type `configure_stage_t`. It is declared as an external variable, indicating that it is defined elsewhere in the program.
-- **Use**: Used to represent a specific configuration stage in the application.
-
-
----
-### fd\_cfg\_stage\_netns
-- **Type**: ``configure_stage_t``
-- **Description**: `fd_cfg_stage_netns` is a global variable of type `configure_stage_t`. It is declared as an external variable, indicating that its definition is in another source file.
-- **Use**: Used to represent a specific configuration stage related to network namespaces in the application.
-
-
----
-### fd\_cfg\_stage\_genesis
-- **Type**: ``configure_stage_t``
-- **Description**: A global variable of type `configure_stage_t`.
-- **Use**: Used to represent a specific configuration stage in the application.
-
-
----
-### fd\_cfg\_stage\_keys
-- **Type**: ``configure_stage_t``
-- **Description**: A variable of type `configure_stage_t` that is declared as an external variable. It is likely used to represent a specific configuration stage related to keys in the application.
-- **Use**: Used to manage or represent a configuration stage related to keys in the application.
-
-
+This header file declares the configuration stages used by the Firedancer development main code. It includes the shared `configure.h` header so the `configure_stage_t` type is available. The file exposes four external stage variables: `fd_cfg_stage_kill`, `fd_cfg_stage_netns`, `fd_cfg_stage_genesis`, and `fd_cfg_stage_keys`. These declarations let other source files use the stage definitions without defining them in the header.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
